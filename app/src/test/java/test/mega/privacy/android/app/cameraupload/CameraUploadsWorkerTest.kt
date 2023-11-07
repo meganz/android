@@ -24,6 +24,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
@@ -56,6 +57,7 @@ import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemp
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
@@ -64,7 +66,9 @@ import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
+import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintUseCase
@@ -74,6 +78,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCa
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.monitoring.StartTracePerformanceUseCase
@@ -202,7 +207,12 @@ class CameraUploadsWorkerTest {
     private val startTracePerformanceUseCase: StartTracePerformanceUseCase = mock()
     private val stopTracePerformanceUseCase: StopTracePerformanceUseCase = mock()
     private var isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
-
+    private val processCameraUploadsMediaUseCase: ProcessCameraUploadsMediaUseCase = mock()
+    private val getPendingCameraUploadsRecordsUseCase: GetPendingCameraUploadsRecordsUseCase =
+        mock()
+    private val renameCameraUploadsRecordsUseCase: RenameCameraUploadsRecordsUseCase = mock()
+    private val uploadCameraUploadsRecordsUseCase: UploadCameraUploadsRecordsUseCase = mock()
+    private val fileSystemRepository: FileSystemRepository = mock()
 
     @Before
     fun setUp() {
@@ -310,7 +320,12 @@ class CameraUploadsWorkerTest {
             startTracePerformanceUseCase = startTracePerformanceUseCase,
             stopTracePerformanceUseCase = stopTracePerformanceUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
-            loginMutex = mock()
+            loginMutex = mock(),
+            processCameraUploadsMediaUseCase = processCameraUploadsMediaUseCase,
+            getPendingCameraUploadsRecordsUseCase = getPendingCameraUploadsRecordsUseCase,
+            renameCameraUploadsRecordsUseCase = renameCameraUploadsRecordsUseCase,
+            uploadCameraUploadsRecordsUseCase = uploadCameraUploadsRecordsUseCase,
+            fileSystemRepository = fileSystemRepository,
         )
     }
 

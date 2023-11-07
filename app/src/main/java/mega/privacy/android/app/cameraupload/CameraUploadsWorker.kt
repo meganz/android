@@ -15,12 +15,14 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
@@ -58,8 +60,10 @@ import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -72,6 +76,7 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
@@ -104,6 +109,7 @@ import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemp
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
@@ -112,7 +118,9 @@ import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
+import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintUseCase
@@ -122,6 +130,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCa
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.monitoring.StartTracePerformanceUseCase
@@ -233,6 +242,11 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val startTracePerformanceUseCase: StartTracePerformanceUseCase,
     private val stopTracePerformanceUseCase: StopTracePerformanceUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    private val processCameraUploadsMediaUseCase: ProcessCameraUploadsMediaUseCase,
+    private val getPendingCameraUploadsRecordsUseCase: GetPendingCameraUploadsRecordsUseCase,
+    private val renameCameraUploadsRecordsUseCase: RenameCameraUploadsRecordsUseCase,
+    private val uploadCameraUploadsRecordsUseCase: UploadCameraUploadsRecordsUseCase,
+    private val fileSystemRepository: FileSystemRepository,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -364,16 +378,34 @@ class CameraUploadsWorker @AssistedInject constructor(
             withContext(ioDispatcher) {
                 performanceEnabled =
                     getFeatureFlagValueUseCase(DataFeatures.CameraUploadsPerformance)
+                useCameraUploadsRecordsEnabled =
+                    getFeatureFlagValueUseCase(DataFeatures.UseCameraUploadsRecords)
                 initService()
                 if (hasMediaPermissionUseCase() && isLoginSuccessful() && canRunCameraUploads()) {
                     Timber.d("Calling startWorker() successful. Starting Camera Uploads")
                     cameraUploadsNotificationManagerWrapper.cancelNotifications()
 
-                    tracePerformance(PerfScanFilesTrace) { checkUploadNodes() }
-                    tracePerformance(PerfUploadFilesTrace) { upload() }
-                    tracePerformance(PerfCompressVideosTrace) { compressVideos() }
-                    tracePerformance(PerfUploadCompressedVideosTrace) { uploadCompressedVideos() }
-
+                    if (useCameraUploadsRecordsEnabled) {
+                        tracePerformance(PerfScanFilesTrace) { scanFiles() }
+                        tracePerformance(PerfUploadFilesTrace) {
+                            uploadFiles(tempRoot)
+                                .flowOn(ioDispatcher)
+                                .catch {
+                                    Timber.w(it)
+                                    endService(it.message ?: "", aborted = true)
+                                }
+                                .collect { progressEvent ->
+                                    launch(ioDispatcher) {
+                                        processProgressEvent(progressEvent)
+                                    }
+                                }
+                        }
+                    } else {
+                        tracePerformance(PerfScanFilesTrace) { checkUploadNodes() }
+                        tracePerformance(PerfUploadFilesTrace) { upload() }
+                        tracePerformance(PerfCompressVideosTrace) { compressVideos() }
+                        tracePerformance(PerfUploadCompressedVideosTrace) { uploadCompressedVideos() }
+                    }
                     endService()
                     Result.success()
                 } else {
@@ -677,6 +709,301 @@ class CameraUploadsWorker @AssistedInject constructor(
             }
         }
     }
+
+    /**
+     * Retrieve the files from the media store and insert them in the database
+     */
+    private suspend fun scanFiles() {
+        Timber.d("Get Pending Files from Media Store")
+        showCheckUploadStatus()
+        processCameraUploadsMediaUseCase(tempRoot = tempRoot)
+    }
+
+    /**
+     * Retrieve the files and upload them
+     * - Retrieve the pending camera uploads records from the database
+     * - Filter the camera uploads based on video compression size condition
+     * - Rename the camera uploads records
+     * - Upload the camera uploads records
+     *
+     * @param tempRoot the root path of the temporary files
+     * @return a flow of [CameraUploadsTransferProgress]
+     */
+    private suspend fun uploadFiles(tempRoot: String): Flow<CameraUploadsTransferProgress> {
+        val primaryUploadNodeId =
+            NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
+        val secondaryUploadNodeId =
+            NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
+
+        Timber.d("Get Pending Files from Database")
+        return getPendingCameraUploadsRecords()
+            .let { pendingRecords ->
+                Timber.d("Check compression requirements")
+                filterCameraUploadsRecords(pendingRecords)
+            }
+            .let { filteredRecords ->
+                Timber.d("Renaming ${filteredRecords.size} files")
+                renameCameraUploadsRecords(
+                    filteredRecords,
+                    primaryUploadNodeId,
+                    secondaryUploadNodeId
+                )
+            }
+            .let { renamedRecords ->
+                Timber.d("Start uploading ${renamedRecords.size} files")
+                startHeartbeat()
+                uploadCameraUploadsRecords(
+                    renamedRecords,
+                    primaryUploadNodeId,
+                    secondaryUploadNodeId,
+                    tempRoot,
+                )
+
+            }
+    }
+
+    /**
+     * Retrieve the pending camera uploads records from the database
+     *
+     * @return a list of [CameraUploadsRecord]
+     */
+    private suspend fun getPendingCameraUploadsRecords(): List<CameraUploadsRecord> =
+        getPendingCameraUploadsRecordsUseCase(
+            listOf(SyncRecordType.TYPE_PHOTO, SyncRecordType.TYPE_VIDEO)
+        )
+
+    /**
+     * Filter the camera uploads records based on video compression size condition
+     *
+     * @return a list of [CameraUploadsRecord]
+     */
+    private suspend fun filterCameraUploadsRecords(records: List<CameraUploadsRecord>): List<CameraUploadsRecord> {
+        val videoRecords =
+            records.filter { it.type == SyncRecordType.TYPE_VIDEO }
+        totalVideoSize = getTotalVideoSizeInMB(videoRecords.map { it.filePath })
+        Timber.d("Total videos count are ${videoRecords.size}, $totalVideoSize MB to Conversion")
+
+        return if (shouldStartVideoCompression(totalVideoSize)) {
+            records
+        } else {
+            Timber.d("Compression queue bigger than setting, show notification to user.")
+            showVideoCompressionErrorStatus()
+            records.filter { it.type == SyncRecordType.TYPE_PHOTO }
+        }
+    }
+
+    /**
+     * Rename the camera uploads records
+     *
+     * @return a list of [CameraUploadsRecord]
+     */
+    private suspend fun renameCameraUploadsRecords(
+        filteredRecords: List<CameraUploadsRecord>,
+        primaryUploadNodeId: NodeId,
+        secondaryUploadNodeId: NodeId,
+    ): List<CameraUploadsRecord> =
+        renameCameraUploadsRecordsUseCase(
+            filteredRecords,
+            primaryUploadNodeId,
+            secondaryUploadNodeId,
+        )
+
+    /**
+     * Upload the camera uploads records
+     *
+     * @return a flow of [CameraUploadsTransferProgress]
+     */
+    private suspend fun uploadCameraUploadsRecords(
+        renamedRecords: List<CameraUploadsRecord>,
+        primaryUploadNodeId: NodeId,
+        secondaryUploadNodeId: NodeId,
+        tempRoot: String,
+    ): Flow<CameraUploadsTransferProgress> =
+        uploadCameraUploadsRecordsUseCase(
+            renamedRecords,
+            primaryUploadNodeId,
+            secondaryUploadNodeId,
+            tempRoot,
+        )
+
+    /**
+     *  Process the progress event based on his type
+     *
+     *  @param progressEvent
+     */
+    private suspend fun processProgressEvent(progressEvent: CameraUploadsTransferProgress) {
+        when (progressEvent) {
+            is CameraUploadsTransferProgress.ToUpload,
+            is CameraUploadsTransferProgress.ToCopy,
+            -> processToCopyOrUploadEvent(progressEvent)
+
+            is CameraUploadsTransferProgress.Copied,
+            -> processCopiedEvent(progressEvent)
+
+            is CameraUploadsTransferProgress.UploadInProgress.TransferUpdate
+            -> processUploadInProgressTransferUpdateEvent(progressEvent)
+
+            is CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError
+            -> processUploadInProgressTransferTemporaryErrorEvent(progressEvent)
+
+            is CameraUploadsTransferProgress.Uploaded,
+            -> processUploadedEvent(progressEvent)
+
+            is CameraUploadsTransferProgress.Compressing.Progress,
+            -> processCompressingProgress(progressEvent)
+
+            is CameraUploadsTransferProgress.Compressing.InsufficientStorage,
+            -> processCompressingInsufficientStorage()
+
+            is CameraUploadsTransferProgress.Compressing.Successful,
+            -> processCompressingSuccessful()
+
+            is CameraUploadsTransferProgress.Error -> {
+                Timber.e(progressEvent.error)
+            }
+        }
+    }
+
+    /**
+     * Process a progress event of type [CameraUploadsTransferProgress.ToUpload] or [CameraUploadsTransferProgress.ToCopy]
+     *
+     * Update to upload transfer count
+     *
+     * @param progressEvent
+     */
+    private suspend fun processToCopyOrUploadEvent(
+        progressEvent: CameraUploadsTransferProgress
+    ) {
+        updateToUploadCount(
+            filePath = progressEvent.record.tempFilePath
+                .takeIf {
+                    fileSystemRepository.doesFileExist(
+                        it
+                    )
+                }
+                ?: progressEvent.record.filePath,
+            folderType = progressEvent.record.folderType,
+        )
+    }
+
+    /**
+     * Process a progress event of type [CameraUploadsTransferProgress.Copied]
+     *
+     * Update uploaded transfer count
+     *
+     * @param progressEvent
+     */
+    private suspend fun processCopiedEvent(
+        progressEvent: CameraUploadsTransferProgress.Copied
+    ) {
+        updateUploadedCountAfterCopy(
+            folderType = progressEvent.record.folderType,
+            filePath = progressEvent.record.filePath,
+            id = progressEvent.record.mediaId,
+            nodeId = progressEvent.nodeId
+        )
+    }
+
+    /**
+     * Process a progress event of type [CameraUploadsTransferProgress.UploadInProgress.TransferUpdate]
+     *
+     * Update transfer progress count
+     *
+     * @param progressEvent
+     */
+    private suspend fun processUploadInProgressTransferUpdateEvent(
+        progressEvent: CameraUploadsTransferProgress.UploadInProgress.TransferUpdate
+    ) {
+        updateUploadedCountAfterTransfer(
+            folderType = progressEvent.record.folderType,
+            id = progressEvent.record.mediaId,
+            transfer = progressEvent.transferEvent.transfer,
+        )
+    }
+
+    /**
+     * Process a progress event of type [CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError]
+     *
+     * Handle error
+     *
+     * @param progressEvent
+     */
+    private suspend fun processUploadInProgressTransferTemporaryErrorEvent(
+        progressEvent: CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError
+    ) {
+        progressEvent.transferEvent.error?.let { handleTransferError(it) }
+    }
+
+    /**
+     * Process a progress event of type [CameraUploadsTransferProgress.Uploaded]
+     *
+     * - Handle error
+     * - Update uploaded transfer count
+     *
+     * @param progressEvent
+     */
+    private suspend fun processUploadedEvent(
+        progressEvent: CameraUploadsTransferProgress.Uploaded
+    ) {
+        with(progressEvent.transferEvent) {
+            error?.let { handleTransferError(it) }
+            updateUploadedCountAfterTransfer(
+                progressEvent.record.folderType,
+                progressEvent.record.mediaId,
+                transfer,
+            )
+        }
+    }
+
+    /**
+     * Process a progress event of type [CameraUploadsTransferProgress.Compressing.Progress]
+     *
+     * Display or update compression progress notification
+     *
+     * @param progressEvent
+     */
+    private suspend fun processCompressingProgress(
+        progressEvent: CameraUploadsTransferProgress.Compressing.Progress
+    ) {
+        showVideoCompressionProgress(progressEvent.progress, 1, 1)
+    }
+
+    /**
+     * Process a progress event of type [CameraUploadsTransferProgress.Compressing.InsufficientStorage]
+     *
+     * - Display out of space notification for compression
+     * - End service
+     */
+    private suspend fun processCompressingInsufficientStorage() {
+        showVideoCompressionOutOfSpaceStatus()
+        endService(aborted = true)
+    }
+
+    /**
+     * Process a progress event of type [CameraUploadsTransferProgress.Compressing.Successful]
+     *
+     * Cancel the compression notification
+     */
+    private fun processCompressingSuccessful() {
+        cameraUploadsNotificationManagerWrapper.cancelCompressionNotification()
+    }
+
+    /**
+     * If error corresponds to [QuotaExceededMegaException], broadcast over quota error
+     *
+     * @param error
+     */
+    private suspend fun handleTransferError(error: MegaException) {
+        when (error) {
+            is QuotaExceededMegaException -> {
+                Timber.w("Over quota error: ${error.errorCode}")
+                broadcastStorageOverQuotaUseCase()
+            }
+
+            else -> Timber.w("Image Sync FAIL: ${error.errorString}")
+        }
+    }
+
 
     private suspend fun checkUploadNodes() {
         Timber.d("Get Pending Files from Media Store Database")
@@ -1416,7 +1743,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         if (fullList.isNotEmpty()) {
             resetTotalUploadsUseCase()
             resetUploadsCounts()
-            totalVideoSize = getTotalVideoSizeInMB(fullList)
+            totalVideoSize = getTotalVideoSizeInMB(fullList.map { it.localPath })
             Timber.d("Total videos count are ${fullList.size}, $totalVideoSize MB to Conversion")
             if (shouldStartVideoCompression(totalVideoSize)) {
                 videoCompressionJob = launch {
@@ -1470,8 +1797,8 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
-    private fun getTotalVideoSizeInMB(records: List<SyncRecord>) =
-        records.sumOf { File(it.localPath).length() } / (1024 * 1024)
+    private fun getTotalVideoSizeInMB(recordFilePathList: List<String>) =
+        recordFilePathList.sumOf { File(it).length() } / (1024 * 1024)
 
     private suspend fun shouldStartVideoCompression(queueSize: Long): Boolean {
         if (isChargingRequired(queueSize) && !isChargingUseCase()) {

@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPr
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
 import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
 import java.io.File
@@ -76,6 +78,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     private val deletePreviewUseCase: DeletePreviewUseCase,
     private val compressVideoUseCase: CompressVideoUseCase,
     private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
+    private val addCompletedTransferUseCase: AddCompletedTransferUseCase,
     private val fileSystemRepository: FileSystemRepository,
 ) {
 
@@ -109,20 +112,23 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         primaryUploadNodeId: NodeId,
         secondaryUploadNodeId: NodeId,
         tempRoot: String,
-    ) = channelFlow {
+    ): Flow<CameraUploadsTransferProgress> = channelFlow {
         val videoQuality = getUploadVideoQualityUseCase() ?: VideoQuality.ORIGINAL
         val locationTagsDisabled = !areLocationTagsEnabledUseCase()
 
-        cameraUploadsRecords.map { record ->
-            val parentNodeId = getParentNodeId(record, primaryUploadNodeId, secondaryUploadNodeId)
-
-            val (existsInParentFolder, existingNodeId) =
-                findNodeWithFingerprintInParentNodeUseCase(
-                    record.originalFingerprint,
-                    record.generatedFingerprint,
-                    parentNodeId,
-                )
-            Triple(record, existsInParentFolder, existingNodeId)
+        cameraUploadsRecords.mapNotNull { record ->
+            runCatching {
+                retrieveNode(
+                    record = record,
+                    parentNodeId =
+                    getParentNodeId(record, primaryUploadNodeId, secondaryUploadNodeId)
+                ).let { (existsInParentFolder, existingNodeId) ->
+                    Triple(record, existsInParentFolder, existingNodeId)
+                }
+            }.getOrElse {
+                trySend(CameraUploadsTransferProgress.Error(record, it))
+                null
+            }
         }.map { (record, existsInParentFolder, existingNodeId) ->
             launch {
                 semaphore.acquire()
@@ -134,38 +140,25 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                     // node does not exist => upload
                     existingNodeId == null -> {
 
+                        val shouldRemoveLocationTags =
+                            record.type == SyncRecordType.TYPE_PHOTO && locationTagsDisabled
+                        val shouldCompressVideo =
+                            record.type == SyncRecordType.TYPE_VIDEO && videoQuality != VideoQuality.ORIGINAL
+
                         // create temporary file
-                        if (shouldRemoveLocationTags(record.type, locationTagsDisabled)) {
-                            flow {
-                                emit(
-                                    createTempFileAndRemoveCoordinatesUseCase(
-                                        tempRoot,
-                                        record.filePath,
-                                        record.tempFilePath,
-                                        record.timestamp,
-                                    )
-                                )
-                            }.retry(60) { cause ->
-                                return@retry if (cause is NotEnoughStorageException) {
-                                    // total delay (1 second times 60 attempts) = 60 seconds
-                                    delay(TimeUnit.SECONDS.toMillis(1))
-                                    true
-                                } else {
-                                    // not storage exception, no need to retry
-                                    false
+                        if (shouldRemoveLocationTags) {
+                            createTempFileAndRemoveCoordinates(record, tempRoot)
+                                .catch {
+                                    trySend(CameraUploadsTransferProgress.Error(record, it))
+                                    setCameraUploadsRecordUploadStatus(
+                                        record = record,
+                                        status = if (it is FileNotFoundException)
+                                            CameraUploadsRecordUploadStatus.LOCAL_FILE_NOT_EXIST
+                                        else CameraUploadsRecordUploadStatus.FAILED
+                                    ).onFailure { error ->
+                                        trySend(CameraUploadsTransferProgress.Error(record, error))
+                                    }
                                 }
-                            }.catch {
-                                setCameraUploadsRecordUploadStatusUseCase(
-                                    mediaId = record.mediaId,
-                                    timestamp = record.timestamp,
-                                    folderType = record.folderType,
-                                    uploadStatus =
-                                    if (it is FileNotFoundException)
-                                        CameraUploadsRecordUploadStatus.LOCAL_FILE_NOT_EXIST
-                                    else CameraUploadsRecordUploadStatus.FAILED
-                                )
-                            }
-                                .cancellable()
                                 .singleOrNull()
                                 ?: run {
                                     semaphore.release()
@@ -174,34 +167,38 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                         }
 
                         // Compress Video
-                        if (shouldCompressVideo(record.type, videoQuality)) {
+                        if (shouldCompressVideo) {
                             videoCompressionSemaphore.acquire()
-                            compressVideoUseCase(
-                                tempRoot,
-                                record.filePath,
-                                record.tempFilePath,
-                                videoQuality,
-                            ).catch { emit(VideoCompressionState.Finished) }
+                            compressVideo(record, tempRoot, videoQuality)
+                                .catch {
+                                    emit(VideoCompressionState.Finished)
+                                    trySend(CameraUploadsTransferProgress.Error(record, it))
+                                }
                                 .onCompletion { videoCompressionSemaphore.release() }
                                 .collect {
                                     when (it) {
-                                        is VideoCompressionState.Progress,
-                                        is VideoCompressionState.Successful
-                                        -> {
+                                        is VideoCompressionState.Progress -> {
                                             trySend(
-                                                CameraUploadsTransferProgress.Compressing(
+                                                CameraUploadsTransferProgress.Compressing.Progress(
                                                     record = record,
-                                                    compressionState = it,
+                                                    progress = it.progress,
                                                 )
                                             )
                                         }
 
-                                        is VideoCompressionState.InsufficientStorage,
-                                        -> {
+                                        is VideoCompressionState.Successful -> {
                                             trySend(
-                                                CameraUploadsTransferProgress.Compressing(
+
+                                                CameraUploadsTransferProgress.Compressing.Successful(
                                                     record = record,
-                                                    compressionState = it,
+                                                )
+                                            )
+                                        }
+
+                                        is VideoCompressionState.InsufficientStorage -> {
+                                            trySend(
+                                                CameraUploadsTransferProgress.Compressing.InsufficientStorage(
+                                                    record = record,
                                                 )
                                             )
                                         }
@@ -214,29 +211,15 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                         // generate fingerprint and save it
                         // This step is important to check if a file exist in the cloud drive,
                         // in case the original fingerprint cannot be assigned to the Node after the transfer finishes
-                        getFingerprintUseCase(record.tempFilePath)?.let { generatedFingerprint ->
-                            setCameraUploadsRecordGeneratedFingerprintUseCase(
-                                mediaId = record.mediaId,
-                                timestamp = record.timestamp,
-                                folderType = record.folderType,
-                                generatedFingerprint = generatedFingerprint,
-                            )
+                        val setGeneratedFingerprintJob = launch {
+                            setGeneratedFingerprint(record)
+                                .onFailure {
+                                    trySend(CameraUploadsTransferProgress.Error(record, it))
+                                }
                         }
 
                         // retrieve path of file to upload
-                        val path = when {
-                            shouldRemoveLocationTags(record.type, locationTagsDisabled) -> {
-                                record.tempFilePath
-                            }
-
-                            shouldCompressVideo(record.type, videoQuality) -> {
-                                // Fallback to the original file if for some reason the compression failed
-                                record.tempFilePath.takeIf { fileSystemRepository.doesFileExist(it) }
-                                    ?: record.filePath
-                            }
-
-                            else -> record.filePath
-                        }
+                        val path = getPath(record, shouldRemoveLocationTags, shouldCompressVideo)
 
                         // upload
                         startUploadUseCase(
@@ -247,83 +230,70 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                             appData = TransferType.CU_UPLOAD.name,
                             isSourceTemporary = false,
                             shouldStartFirst = false,
-                        ).collect { globalTransfer ->
-                            when (globalTransfer) {
+                        ).collect { transferEvent ->
+                            when (transferEvent) {
                                 is TransferEvent.TransferStartEvent -> {
                                     // set status to STARTED
-                                    setCameraUploadsRecordUploadStatusUseCase(
-                                        mediaId = record.mediaId,
-                                        timestamp = record.timestamp,
-                                        folderType = record.folderType,
-                                        uploadStatus = CameraUploadsRecordUploadStatus.STARTED,
-                                    )
+                                    setCameraUploadsRecordUploadStatus(
+                                        record = record,
+                                        status = CameraUploadsRecordUploadStatus.STARTED,
+                                    ).onFailure {
+                                        trySend(CameraUploadsTransferProgress.Error(record, it))
+                                    }
 
                                     trySend(
                                         CameraUploadsTransferProgress.ToUpload(
                                             record = record,
-                                            transferEvent = globalTransfer,
+                                            transferEvent = transferEvent,
                                         )
                                     )
                                 }
 
                                 is TransferEvent.TransferFinishEvent -> {
-                                    // set the original fingerprint to the Node
-                                    setOriginalFingerprintUseCase(
-                                        nodeId = NodeId(globalTransfer.transfer.nodeHandle),
-                                        originalFingerprint = record.originalFingerprint,
-                                    )
+                                    processTransferFinishEvent(record, transferEvent, path)
+                                        .collect {
+                                            trySend(CameraUploadsTransferProgress.Error(record, it))
+                                        }
 
-                                    // set the GPS coordinates to the Node
-                                    val (latitude, longitude) = getGPSCoordinatesUseCase(
-                                        filePath = record.filePath,
-                                        isVideo = record.type == SyncRecordType.TYPE_VIDEO,
-                                    )
-                                    setCoordinatesUseCase(
-                                        nodeId = NodeId(globalTransfer.transfer.nodeHandle),
-                                        latitude = latitude.toDouble(),
-                                        longitude = longitude.toDouble(),
-                                    )
-
-                                    // set status to UPLOADED
-                                    setCameraUploadsRecordUploadStatusUseCase(
-                                        mediaId = record.mediaId,
-                                        timestamp = record.timestamp,
-                                        folderType = record.folderType,
-                                        uploadStatus = CameraUploadsRecordUploadStatus.UPLOADED,
-                                    )
+                                    // Make sure that the generated fingerprint has complete
+                                    setGeneratedFingerprintJob.join()
 
                                     // delete temp file
-                                    fileSystemRepository.deleteFile(File(record.tempFilePath))
+                                    deleteTempFile(record)
+                                        .onFailure {
+                                            trySend(CameraUploadsTransferProgress.Error(record, it))
+                                        }
 
-                                    // create thumbnail and preview
-                                    val nodeHandle = globalTransfer.transfer.nodeHandle
-                                    File(record.fileName).let {
-                                        if (deleteThumbnailUseCase(nodeHandle)) {
-                                            createImageOrVideoThumbnailUseCase(nodeHandle, it)
-                                        }
-                                        if (deletePreviewUseCase(nodeHandle)) {
-                                            createImageOrVideoPreviewUseCase(nodeHandle, it)
-                                        }
-                                    }
 
                                     trySend(
                                         CameraUploadsTransferProgress.Uploaded(
                                             record = record,
-                                            transferEvent = globalTransfer,
-                                            nodeId = NodeId(nodeHandle),
+                                            transferEvent = transferEvent,
+                                            nodeId = NodeId(transferEvent.transfer.nodeHandle),
                                         )
                                     )
 
                                     semaphore.release()
                                 }
 
-                                else ->
+                                is TransferEvent.TransferUpdateEvent -> {
                                     trySend(
-                                        CameraUploadsTransferProgress.UploadInProgress(
+                                        CameraUploadsTransferProgress.UploadInProgress.TransferUpdate(
                                             record = record,
-                                            transferEvent = globalTransfer,
+                                            transferEvent = transferEvent,
                                         )
                                     )
+                                }
+
+                                is TransferEvent.TransferTemporaryErrorEvent ->
+                                    trySend(
+                                        CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError(
+                                            record = record,
+                                            transferEvent = transferEvent,
+                                        )
+                                    )
+
+                                else -> Unit
                             }
                         }
                     }
@@ -336,18 +306,15 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                 nodeId = existingNodeId,
                             )
                         )
-                        copyNodeUseCase(
-                            nodeToCopy = existingNodeId,
-                            newNodeParent = parentNodeId,
-                            newNodeName = record.fileName,
-                        ).let { newNodeId ->
-                            val (latitude, longitude) = getNodeGPSCoordinatesUseCase(existingNodeId)
-                            setCoordinatesUseCase(
-                                nodeId = newNodeId,
-                                latitude = latitude,
-                                longitude = longitude,
-                            )
+
+                        copyNode(
+                            record = record,
+                            existingNodeId = existingNodeId,
+                            parentNodeId = parentNodeId,
+                        ).onFailure {
+                            trySend(CameraUploadsTransferProgress.Error(record, it))
                         }
+
                         trySend(
                             CameraUploadsTransferProgress.Copied(
                                 record = record,
@@ -355,12 +322,12 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                             )
                         )
 
-                        setCameraUploadsRecordUploadStatusUseCase(
-                            mediaId = record.mediaId,
-                            timestamp = record.timestamp,
-                            folderType = record.folderType,
-                            uploadStatus = CameraUploadsRecordUploadStatus.COPIED,
-                        )
+                        setCameraUploadsRecordUploadStatus(
+                            record = record,
+                            status = CameraUploadsRecordUploadStatus.COPIED
+                        ).onFailure {
+                            trySend(CameraUploadsTransferProgress.Error(record, it))
+                        }
 
                         semaphore.release()
                         return@launch
@@ -368,12 +335,13 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
 
                     // node exists in target folder or is in rubbish bin => do nothing
                     else -> {
-                        setCameraUploadsRecordUploadStatusUseCase(
-                            mediaId = record.mediaId,
-                            timestamp = record.timestamp,
-                            folderType = record.folderType,
-                            uploadStatus = CameraUploadsRecordUploadStatus.ALREADY_EXISTS,
-                        )
+                        setCameraUploadsRecordUploadStatus(
+                            record = record,
+                            status = CameraUploadsRecordUploadStatus.ALREADY_EXISTS,
+                        ).onFailure {
+                            trySend(CameraUploadsTransferProgress.Error(record, it))
+                        }
+
                         semaphore.release()
                         return@launch
                     }
@@ -385,6 +353,369 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         .buffer(UNLIMITED)
         .cancellable()
 
+    /**
+     * Compress a video
+     * Will emit a [VideoCompressionState.Finished] if an error is thrown
+     *
+     * @param record
+     * @param tempRoot
+     * @param videoQuality
+     * @return a [Flow] of [VideoCompressionState]
+     */
+    private fun compressVideo(
+        record: CameraUploadsRecord,
+        tempRoot: String,
+        videoQuality: VideoQuality,
+    ): Flow<VideoCompressionState> =
+        compressVideoUseCase(
+            tempRoot,
+            record.filePath,
+            record.tempFilePath,
+            videoQuality,
+        ).cancellable()
+
+
+    /**
+     * Create a temporary file with the coordinates removed
+     *
+     * @param record
+     * @param tempRoot
+     * @return a [Flow] of [String]
+     *
+     */
+    private suspend fun createTempFileAndRemoveCoordinates(
+        record: CameraUploadsRecord,
+        tempRoot: String
+    ): Flow<String> = flow {
+        emit(
+            createTempFileAndRemoveCoordinatesUseCase(
+                tempRoot,
+                record.filePath,
+                record.tempFilePath,
+                record.timestamp,
+            )
+        )
+    }.retry(60) { cause ->
+        return@retry if (cause is NotEnoughStorageException) {
+            // total delay (1 second times 60 attempts) = 60 seconds
+            delay(TimeUnit.SECONDS.toMillis(1))
+            true
+        } else {
+            // not storage exception, no need to retry
+            false
+        }
+    }.cancellable()
+
+    /**
+     * Find a node corresponding to the [CameraUploadsRecord] in the cloud
+     *
+     * @param record
+     * @param parentNodeId
+     *
+     * @return a [Pair] of <Boolean?, Boolean?>.
+     *         The first element will return true if it exists in the parent folder given in parameter,
+     *         false otherwise, null if in rubbish bin
+     *         The second element will return the node retrieved, null if cannot be retrieved
+     */
+    private suspend fun retrieveNode(
+        record: CameraUploadsRecord,
+        parentNodeId: NodeId
+    ): Pair<Boolean?, NodeId?> {
+        val (existsInParentFolder, existingNodeId) =
+            findNodeWithFingerprintInParentNodeUseCase(
+                record.originalFingerprint,
+                record.generatedFingerprint,
+                parentNodeId,
+            )
+        return Pair(existsInParentFolder, existingNodeId)
+    }
+
+    /**
+     * Get the path of the file to upload
+     *
+     * @param record
+     * @param shouldRemoveLocationTags
+     * @param shouldCompressVideo
+     *
+     * @return the path of file to upload
+     */
+    private suspend fun getPath(
+        record: CameraUploadsRecord,
+        shouldRemoveLocationTags: Boolean,
+        shouldCompressVideo: Boolean,
+    ): String = when {
+        shouldRemoveLocationTags -> {
+            record.tempFilePath
+        }
+
+        shouldCompressVideo -> {
+            // Fallback to the original file if for some reason the compression failed
+            record.tempFilePath.takeIf { fileSystemRepository.doesFileExist(it) }
+                ?: record.filePath
+        }
+
+        else -> record.filePath
+    }
+
+    /**
+     * Delete the temporary file created
+     *
+     * @param record
+     */
+    private suspend fun deleteTempFile(record: CameraUploadsRecord) = runCatching {
+        fileSystemRepository.deleteFile(File(record.tempFilePath))
+    }
+
+    /**
+     * Set the generated fingerprint to the database
+     *
+     * This value will be used to check the existence of the file in the cloud
+     *
+     * @param record
+     */
+    private suspend fun setGeneratedFingerprint(
+        record: CameraUploadsRecord
+    ) = runCatching {
+        getFingerprintUseCase(record.tempFilePath)?.let { generatedFingerprint ->
+            setCameraUploadsRecordGeneratedFingerprintUseCase(
+                mediaId = record.mediaId,
+                timestamp = record.timestamp,
+                folderType = record.folderType,
+                generatedFingerprint = generatedFingerprint,
+            )
+        }
+    }
+
+    /**
+     * Run some operations after a transfer completes
+     *
+     * @param record
+     * @param transferEvent
+     * @param path
+     *
+     * @return a [Flow] of [Throwable] to inform about the failure of one of the operations
+     */
+    private suspend fun processTransferFinishEvent(
+        record: CameraUploadsRecord,
+        transferEvent: TransferEvent.TransferFinishEvent,
+        path: String,
+    ) = channelFlow {
+        val nodeId = NodeId(transferEvent.transfer.nodeHandle)
+        listOf(
+            launch {
+                setOriginalFingerprintUseCase(
+                    record = record,
+                    nodeId = nodeId,
+                ).onFailure { trySend(it) }
+            },
+            launch {
+                runCatching {
+                    setGpsCoordinatesFromRecord(
+                        record = record,
+                        nodeId = nodeId,
+                    )
+                }.onFailure { trySend(it) }
+            },
+            launch {
+                setCameraUploadsRecordUploadStatus(
+                    record = record,
+                    status = CameraUploadsRecordUploadStatus.UPLOADED,
+                ).onFailure { trySend(it) }
+            },
+            launch {
+                createThumbnailAndPreview(
+                    path = path,
+                    nodeId = nodeId,
+                ).onFailure { trySend(it) }
+            },
+            launch {
+                addCompletedTransfer(transferEvent)
+                    .onFailure { trySend(it) }
+            }
+        ).joinAll()
+        close()
+    }
+
+    /**
+     * Add the transfer to the completed transfer list
+     *
+     * @param transferEvent
+     */
+    private suspend fun addCompletedTransfer(
+        transferEvent: TransferEvent.TransferFinishEvent,
+    ) = runCatching {
+        with(transferEvent) {
+            addCompletedTransferUseCase(transfer, error)
+        }
+    }
+
+    /**
+     * Copy a node and set the gps coordinates to the node
+     *
+     * @param record
+     * @param existingNodeId
+     * @param parentNodeId
+     */
+    private suspend fun copyNode(
+        record: CameraUploadsRecord,
+        existingNodeId: NodeId,
+        parentNodeId: NodeId,
+    ) = runCatching {
+        copyNodeUseCase(
+            nodeToCopy = existingNodeId,
+            newNodeParent = parentNodeId,
+            newNodeName = record.fileName,
+        ).let { newNodeId ->
+            setGpsCoordinatesFromNode(
+                existingNodeId = existingNodeId,
+                newNodeId = newNodeId,
+            )
+        }
+    }
+
+    /**
+     * Set the original fingerprint to the node
+     *
+     * @param record
+     * @param nodeId
+     */
+    private suspend fun setOriginalFingerprintUseCase(
+        record: CameraUploadsRecord,
+        nodeId: NodeId,
+    ) = runCatching {
+        setOriginalFingerprintUseCase(
+            nodeId = nodeId,
+            originalFingerprint = record.originalFingerprint,
+        )
+    }
+
+    /**
+     * Set the gps coordinates to a node from a record
+     *
+     * @param record
+     * @param nodeId
+     */
+    private suspend fun setGpsCoordinatesFromRecord(
+        record: CameraUploadsRecord,
+        nodeId: NodeId,
+    ) = runCatching {
+        getGpsCoordinatesFromRecord(
+            record = record,
+        ).let { (latitude, longitude) ->
+            setGpsCoordinates(
+                nodeId = nodeId,
+                latitude = latitude,
+                longitude = longitude,
+            )
+        }
+    }
+
+    /**
+     * Set the gps coordinates to a node from an existing node
+     *
+     * @param existingNodeId
+     * @param newNodeId
+     */
+    private suspend fun setGpsCoordinatesFromNode(
+        existingNodeId: NodeId,
+        newNodeId: NodeId
+    ) = runCatching {
+        getGpsCoordinatesFromNode(
+            existingNodeId = existingNodeId,
+        ).let { (latitude, longitude) ->
+            setGpsCoordinates(
+                nodeId = newNodeId,
+                latitude = latitude,
+                longitude = longitude,
+            )
+        }
+    }
+
+    /**
+     * Get the gps coordinates from a record
+     *
+     * @param record
+     * @return a [Pair] of <[Double], [Double]> corresponding to latitude and longitude
+     */
+    private suspend fun getGpsCoordinatesFromRecord(
+        record: CameraUploadsRecord,
+    ): Pair<Double, Double> = getGPSCoordinatesUseCase(
+        filePath = record.filePath,
+        isVideo = record.type == SyncRecordType.TYPE_VIDEO,
+    ).let { (latitude, longitude) -> Pair(latitude.toDouble(), longitude.toDouble()) }
+
+    /**
+     * Get the gps coordinates from node
+     *
+     * @param existingNodeId
+     * @return a [Pair] of <[Double], [Double]> corresponding to latitude and longitude
+     */
+    private suspend fun getGpsCoordinatesFromNode(existingNodeId: NodeId) =
+        getNodeGPSCoordinatesUseCase(existingNodeId)
+
+    /**
+     * Set gps coordinates to a Node
+     *
+     * @param nodeId
+     * @param latitude
+     * @param longitude
+     */
+    private suspend fun setGpsCoordinates(
+        nodeId: NodeId,
+        latitude: Double,
+        longitude: Double,
+    ) = setCoordinatesUseCase(
+        nodeId = nodeId,
+        latitude = latitude,
+        longitude = longitude,
+    )
+
+    /**
+     * Create thumbnail and preview
+     *
+     * @param path
+     * @param nodeId
+     */
+    private suspend fun createThumbnailAndPreview(
+        path: String,
+        nodeId: NodeId,
+    ) = runCatching {
+        File(path).let {
+            val nodeHandle = nodeId.longValue
+            if (deleteThumbnailUseCase(nodeId.longValue)) {
+                createImageOrVideoThumbnailUseCase(nodeHandle, it)
+            }
+            if (deletePreviewUseCase(nodeHandle)) {
+                createImageOrVideoPreviewUseCase(nodeHandle, it)
+            }
+        }
+    }
+
+    /**
+     * Set the camera uploads status
+     *
+     * @param record
+     * @param status
+     */
+    private suspend fun setCameraUploadsRecordUploadStatus(
+        record: CameraUploadsRecord,
+        status: CameraUploadsRecordUploadStatus,
+    ) = runCatching {
+        setCameraUploadsRecordUploadStatusUseCase(
+            mediaId = record.mediaId,
+            timestamp = record.timestamp,
+            folderType = record.folderType,
+            uploadStatus = status,
+        )
+    }
+
+    /**
+     * Get the target node id based on the record folder type
+     *
+     * @param record
+     * @param primaryUploadNodeId
+     * @param secondaryUploadNodeId
+     */
     private fun getParentNodeId(
         record: CameraUploadsRecord,
         primaryUploadNodeId: NodeId,
@@ -393,15 +724,5 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         CameraUploadFolderType.Primary -> primaryUploadNodeId
         CameraUploadFolderType.Secondary -> secondaryUploadNodeId
     }
-
-    private fun shouldRemoveLocationTags(
-        type: SyncRecordType,
-        locationTagsDisabled: Boolean,
-    ) = type == SyncRecordType.TYPE_PHOTO && locationTagsDisabled
-
-    private fun shouldCompressVideo(
-        type: SyncRecordType,
-        videoQuality: VideoQuality
-    ) = type == SyncRecordType.TYPE_VIDEO && videoQuality != VideoQuality.ORIGINAL
 }
 

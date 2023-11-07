@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPr
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
 import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
 import org.junit.jupiter.api.Assertions.*
@@ -79,6 +80,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
     private val compressVideoUseCase = mock<CompressVideoUseCase>()
     private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
+    private val addCompletedTransferUseCase = mock<AddCompletedTransferUseCase>()
 
     private val primaryUploadNodeId = NodeId(1111L)
     private val secondaryUploadNodeId = NodeId(2222L)
@@ -124,6 +126,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             compressVideoUseCase = compressVideoUseCase,
             getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
             fileSystemRepository = fileSystemRepository,
+            addCompletedTransferUseCase = addCompletedTransferUseCase,
         )
     }
 
@@ -149,6 +152,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             compressVideoUseCase,
             getUploadVideoQualityUseCase,
             fileSystemRepository,
+            addCompletedTransferUseCase,
         )
     }
 
@@ -559,7 +563,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
 
         @ParameterizedTest(name = "when folder type is {0}")
         @MethodSource("provideParameters")
-        fun `test that if record is uploaded and the transfer is in progress then then an event UploadInProgress is emitted`(
+        fun `test that if record is uploaded and the transfer is in progress then then an event TransferUpdate is emitted`(
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
@@ -587,9 +591,52 @@ class UploadCameraUploadsRecordsUseCaseTest {
             executeUnderTest().test {
                 awaitItem()
                 assertThat(awaitItem()).isEqualTo(
-                    CameraUploadsTransferProgress.UploadInProgress(
+                    CameraUploadsTransferProgress.UploadInProgress.TransferUpdate(
                         record,
                         transferUpdateEvent,
+                    )
+                )
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+        @ParameterizedTest(name = "when folder type is {0}")
+        @MethodSource("provideParameters")
+        fun `test that if record is uploaded and the transfer has a temporary error then then an event TransferTemporaryError is emitted`(
+            cameraUploadFolderType: CameraUploadFolderType,
+        ) = runTest {
+            setInput(cameraUploadFolderType)
+            mockFindNodeWithFingerprintInParentNodeUseCase()
+            whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
+            whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
+            whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
+
+            val transferStartEvent = mock<TransferEvent.TransferStartEvent>()
+            val transferFinished = mock<Transfer> {
+                on { nodeHandle }.thenReturn(9876L)
+            }
+            val transferTemporaryErrorEvent = mock<TransferEvent.TransferTemporaryErrorEvent>()
+            val transferFinishedEvent = mock<TransferEvent.TransferFinishEvent> {
+                on { transfer }.thenReturn(transferFinished)
+            }
+            mockStartUploadUseCase(
+                events = flowOf(
+                    transferStartEvent,
+                    transferTemporaryErrorEvent,
+                    transferFinishedEvent
+                )
+            )
+            whenever(getGPSCoordinatesUseCase(record.filePath, false))
+                .thenReturn(Pair(0.0F, 0.0F))
+            whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
+            whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
+
+            executeUnderTest().test {
+                awaitItem()
+                assertThat(awaitItem()).isEqualTo(
+                    CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError(
+                        record,
+                        transferTemporaryErrorEvent,
                     )
                 )
                 cancelAndConsumeRemainingEvents()
@@ -611,7 +658,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
                 .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
-
+            whenever(fileSystemRepository.deleteFile(File(record.tempFilePath))).thenReturn(true)
             executeUnderTest().test {
                 awaitItem()
                 assertThat(awaitItem()).isEqualTo(
@@ -715,10 +762,34 @@ class UploadCameraUploadsRecordsUseCaseTest {
 
             verify(deleteThumbnailUseCase).invoke(transferFinished.nodeHandle)
             verify(createImageOrVideoThumbnailUseCase)
-                .invoke(transferFinished.nodeHandle, File(record.fileName))
+                .invoke(transferFinished.nodeHandle, File(record.filePath))
             verify(deletePreviewUseCase).invoke(transferFinished.nodeHandle)
             verify(createImageOrVideoPreviewUseCase)
-                .invoke(transferFinished.nodeHandle, File(record.fileName))
+                .invoke(transferFinished.nodeHandle, File(record.filePath))
+        }
+
+        @ParameterizedTest(name = "when folder type is {0}")
+        @MethodSource("provideParameters")
+        fun `test that if record is uploaded and the transfer finished then the completed transfer is added`(
+            cameraUploadFolderType: CameraUploadFolderType,
+        ) = runTest {
+            setInput(cameraUploadFolderType)
+            mockFindNodeWithFingerprintInParentNodeUseCase()
+            whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
+            whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
+            whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
+            mockStartUploadUseCase()
+            whenever(getGPSCoordinatesUseCase(record.filePath, false))
+                .thenReturn(Pair(0.0F, 0.0F))
+            whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
+            whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
+
+            executeUnderTest().collect()
+
+            verify(addCompletedTransferUseCase).invoke(
+                transferFinishedEvent.transfer,
+                transferFinishedEvent.error
+            )
         }
 
         private fun provideParameters() = Stream.of(
@@ -1040,7 +1111,30 @@ class UploadCameraUploadsRecordsUseCaseTest {
                 }
                     .forEach {
                         assertThat(awaitItem())
-                            .isEqualTo(CameraUploadsTransferProgress.Compressing(record, it))
+                            .isEqualTo(
+                                when (it) {
+                                    is VideoCompressionState.Progress -> {
+                                        CameraUploadsTransferProgress.Compressing.Progress(
+                                            record = record,
+                                            progress = it.progress,
+                                        )
+                                    }
+
+                                    is VideoCompressionState.Successful -> {
+                                        CameraUploadsTransferProgress.Compressing.Successful(
+                                            record = record,
+                                        )
+                                    }
+
+                                    is VideoCompressionState.InsufficientStorage -> {
+                                        CameraUploadsTransferProgress.Compressing.InsufficientStorage(
+                                            record = record,
+                                        )
+                                    }
+
+                                    else -> {}
+                                }
+                            )
                     }
                 cancelAndConsumeRemainingEvents()
             }

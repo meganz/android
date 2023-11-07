@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.entity.camerauploads
 
-import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 
@@ -12,6 +11,15 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 sealed interface CameraUploadsTransferProgress {
     val record: CameraUploadsRecord
 
+    /**
+     * Represents a record which encounter an error during its upload
+     *
+     * @param error the error encountered
+     */
+    data class Error(
+        override val record: CameraUploadsRecord,
+        val error: Throwable
+    ) : CameraUploadsTransferProgress
 
     /**
      * Represents a record to copy in the scope of uploading the camera uploads record through CameraUploads
@@ -48,10 +56,25 @@ sealed interface CameraUploadsTransferProgress {
      *
      * @property transferEvent the transfer event associated to the record
      */
-    data class UploadInProgress(
-        override val record: CameraUploadsRecord,
-        val transferEvent: TransferEvent,
-    ) : CameraUploadsTransferProgress
+    sealed interface UploadInProgress : CameraUploadsTransferProgress {
+        val transferEvent: TransferEvent
+
+        /**
+         * Represents a record that does not have sufficient space to perform video compression
+         */
+        data class TransferUpdate(
+            override val record: CameraUploadsRecord,
+            override val transferEvent: TransferEvent.TransferUpdateEvent
+        ) : UploadInProgress
+
+        /**
+         * Represents a record that does not have sufficient space to perform video compression
+         */
+        data class TransferTemporaryError(
+            override val record: CameraUploadsRecord,
+            override val transferEvent: TransferEvent.TransferTemporaryErrorEvent
+        ) : UploadInProgress
+    }
 
     /**
      * Represents a record that completes an upload in the scope of uploading the camera uploads record through CameraUploads
@@ -67,11 +90,30 @@ sealed interface CameraUploadsTransferProgress {
 
     /**
      * Represents a record associated to a video that is under compression
-     *
-     * @property compressionState the state of the compression
      */
-    data class Compressing(
-        override val record: CameraUploadsRecord,
-        val compressionState: VideoCompressionState,
-    ) : CameraUploadsTransferProgress
+    sealed interface Compressing : CameraUploadsTransferProgress {
+        /**
+         * Represents a record that does not have sufficient space to perform video compression
+         */
+        data class InsufficientStorage(
+            override val record: CameraUploadsRecord,
+        ) : Compressing
+
+        /**
+         * Represents a record that is under compression
+         *
+         * @property progress the current progress of the compression
+         */
+        data class Progress(
+            override val record: CameraUploadsRecord,
+            val progress: Int,
+        ) : Compressing
+
+        /**
+         * Represents a record that successfully complete compression
+         */
+        data class Successful(
+            override val record: CameraUploadsRecord,
+        ) : Compressing
+    }
 }
