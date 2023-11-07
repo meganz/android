@@ -2,7 +2,6 @@ package mega.privacy.android.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -30,7 +29,6 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploa
     primaryKeys = ["media_id", "timestamp", "folder_type"]
 )
 internal data class CameraUploadsRecordEntity(
-    @PrimaryKey
     @ColumnInfo(name = "media_id") val encryptedMediaId: String,
     @ColumnInfo(name = "timestamp") val encryptedTimestamp: String,
     @ColumnInfo(name = "folder_type") val folderType: CameraUploadFolderType,

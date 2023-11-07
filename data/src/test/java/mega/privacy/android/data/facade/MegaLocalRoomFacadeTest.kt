@@ -9,12 +9,14 @@ import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
+import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.database.entity.BackupEntity
+import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.SyncRecordEntity
@@ -22,6 +24,8 @@ import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.data.mapper.backup.BackupModelMapper
+import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordEntityMapper
+import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordModelMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordEntityMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordModelMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
@@ -40,11 +44,15 @@ import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -87,6 +95,9 @@ internal class MegaLocalRoomFacadeTest {
     private val offlineDao: OfflineDao = mock()
     private val offlineModelMapper: OfflineModelMapper = mock()
     private val offlineEntityMapper: OfflineEntityMapper = mock()
+    private val cameraUploadsRecordDao: CameraUploadsRecordDao = mock()
+    private val cameraUploadsRecordEntityMapper: CameraUploadsRecordEntityMapper = mock()
+    private val cameraUploadsRecordModelMapper: CameraUploadsRecordModelMapper = mock()
 
     @BeforeAll
     fun setUp() {
@@ -115,7 +126,10 @@ internal class MegaLocalRoomFacadeTest {
             backupInfoTypeIntMapper = backupInfoTypeIntMapper,
             offlineDao = offlineDao,
             offlineEntityMapper = offlineEntityMapper,
-            offlineModelMapper = offlineModelMapper
+            offlineModelMapper = offlineModelMapper,
+            cameraUploadsRecordDao = cameraUploadsRecordDao,
+            cameraUploadsRecordEntityMapper = cameraUploadsRecordEntityMapper,
+            cameraUploadsRecordModelMapper = cameraUploadsRecordModelMapper,
         )
     }
 
@@ -139,6 +153,9 @@ internal class MegaLocalRoomFacadeTest {
             backupEntityMapper,
             backupModelMapper,
             backupInfoTypeIntMapper,
+            cameraUploadsRecordDao,
+            cameraUploadsRecordEntityMapper,
+            cameraUploadsRecordModelMapper,
         )
     }
 
@@ -663,6 +680,149 @@ internal class MegaLocalRoomFacadeTest {
             underTest.deleteOldestCompletedTransfers()
             verify(completedTransferDao).deleteCompletedTransferByIds(deletedTransfers.mapNotNull { it.id }
                 .sortedDescending())
+        }
+
+    @Test
+    fun `test that insertOrUpdateCameraUploadsRecords insert or update in database`() =
+        runTest {
+            val records = listOf<CameraUploadsRecord>(mock())
+            val entities = listOf<CameraUploadsRecordEntity>(mock())
+            records.mapIndexed { index, record ->
+                whenever(cameraUploadsRecordEntityMapper(record)).thenReturn(entities[index])
+            }
+
+            underTest.insertOrUpdateCameraUploadsRecords(records)
+
+            verify(cameraUploadsRecordDao).insertOrUpdateCameraUploadsRecords(entities)
+        }
+
+    @Test
+    fun `test that getCameraUploadsRecordByUploadStatusAndTypes returns the corresponding items`() =
+        runTest {
+            val entities = listOf<CameraUploadsRecordEntity>(mock())
+            val expected = listOf<CameraUploadsRecord>(mock())
+            entities.mapIndexed { index, entity ->
+                whenever(cameraUploadsRecordModelMapper(entity)).thenReturn(expected[index])
+            }
+            val status = listOf<CameraUploadsRecordUploadStatus>(mock())
+            val types = listOf<SyncRecordType>(mock())
+            whenever(
+                cameraUploadsRecordDao.getCameraUploadsRecordByUploadStatusAndTypes(status, types)
+            ).thenReturn(entities)
+
+            assertThat(underTest.getCameraUploadsRecordByUploadStatusAndTypes(status, types))
+                .isEqualTo(expected)
+        }
+
+    @ParameterizedTest(name = "when encrypted media id is {0} and encrypted timestamp is {1}")
+    @MethodSource("provideEncryptedUpdateCameraUploadsRecordUploadStatusParameters")
+    fun `test that updateCameraUploadsRecordUploadStatus update the upload status of the corresponding item or throw an error`(
+        encryptedMediaId: String?,
+        encryptedTimestamp: String?,
+    ) = runTest {
+        val mediaId = 0L
+        val timestamp = 1L
+        val folderType = CameraUploadFolderType.Primary
+        val uploadStatus = CameraUploadsRecordUploadStatus.LOCAL_FILE_NOT_EXIST
+
+        whenever(encryptData(mediaId.toString())).thenReturn(encryptedMediaId)
+        whenever(encryptData(timestamp.toString())).thenReturn(encryptedTimestamp)
+
+        when {
+            encryptedMediaId != null && encryptedTimestamp != null -> {
+                underTest.updateCameraUploadsRecordUploadStatus(
+                    mediaId,
+                    timestamp,
+                    folderType,
+                    uploadStatus,
+                )
+                verify(cameraUploadsRecordDao).updateCameraUploadsRecordUploadStatus(
+                    encryptedMediaId,
+                    encryptedTimestamp,
+                    folderType,
+                    uploadStatus,
+                )
+            }
+
+            else -> {
+                assertThrows<IllegalArgumentException> {
+                    underTest.updateCameraUploadsRecordUploadStatus(
+                        mediaId,
+                        timestamp,
+                        folderType,
+                        uploadStatus,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun provideEncryptedUpdateCameraUploadsRecordUploadStatusParameters() = Stream.of(
+        Arguments.of("encryptedMediaId", "encryptedTimestamp"),
+        Arguments.of(null, "encryptedTimestamp"),
+        Arguments.of("encryptedMediaId", null),
+    )
+
+    @ParameterizedTest(name = "when encrypted media id is {0}, encrypted timestamp is {1} and encrypted generated fingerprint is {2}")
+    @MethodSource("provideEncryptedSetCameraUploadsRecordGeneratedFingerprintParameters")
+    fun `test that setCameraUploadsRecordGeneratedFingerprint set the upload status of the corresponding item or throw an error`(
+        encryptedMediaId: String?,
+        encryptedTimestamp: String?,
+        encryptedGeneratedFingerprint: String?,
+    ) = runTest {
+        val mediaId = 0L
+        val timestamp = 1L
+        val folderType = CameraUploadFolderType.Primary
+        val generatedFingerprint = "generatedFingerprint"
+
+        whenever(encryptData(mediaId.toString())).thenReturn(encryptedMediaId)
+        whenever(encryptData(timestamp.toString())).thenReturn(encryptedTimestamp)
+        whenever(encryptData(generatedFingerprint)).thenReturn(encryptedGeneratedFingerprint)
+
+        when {
+            encryptedMediaId != null && encryptedTimestamp != null && encryptedGeneratedFingerprint != null -> {
+                underTest.setCameraUploadsRecordGeneratedFingerprint(
+                    mediaId,
+                    timestamp,
+                    folderType,
+                    generatedFingerprint,
+                )
+                verify(cameraUploadsRecordDao).updateCameraUploadsRecordGeneratedFingerprint(
+                    encryptedMediaId,
+                    encryptedTimestamp,
+                    folderType,
+                    encryptedGeneratedFingerprint,
+                )
+            }
+
+            else -> {
+                assertThrows<IllegalArgumentException> {
+                    underTest.setCameraUploadsRecordGeneratedFingerprint(
+                        mediaId,
+                        timestamp,
+                        folderType,
+                        generatedFingerprint,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun provideEncryptedSetCameraUploadsRecordGeneratedFingerprintParameters() = Stream.of(
+        Arguments.of("encryptedMediaId", "encryptedTimestamp", "encryptedGeneratedFingerprint"),
+        Arguments.of(null, "encryptedTimestamp", "encryptedGeneratedFingerprint"),
+        Arguments.of("encryptedMediaId", null, "encryptedGeneratedFingerprint"),
+        Arguments.of("encryptedMediaId", "encryptedTimestamp", null),
+    )
+
+    @Test
+    fun `test that deleteCameraUploadsRecords deletes the corresponding items`() =
+        runTest {
+            val folderType = listOf(CameraUploadFolderType.Primary)
+
+            underTest.deleteCameraUploadsRecords(folderType)
+
+            verify(cameraUploadsRecordDao).deleteCameraUploadsRecordsByFolderType(folderType)
         }
 
     private fun provideDoesFileNameExistParameters() = Stream.of(

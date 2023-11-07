@@ -6,6 +6,7 @@ import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
+import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
@@ -16,6 +17,8 @@ import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.data.mapper.backup.BackupModelMapper
+import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordEntityMapper
+import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordModelMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordEntityMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordModelMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
@@ -65,6 +68,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val backupEntityMapper: BackupEntityMapper,
     private val backupModelMapper: BackupModelMapper,
     private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
+    private val cameraUploadsRecordDao: CameraUploadsRecordDao,
+    private val cameraUploadsRecordEntityMapper: CameraUploadsRecordEntityMapper,
+    private val cameraUploadsRecordModelMapper: CameraUploadsRecordModelMapper,
     private val encryptData: EncryptData,
     private val decryptData: DecryptData,
     private val offlineDao: OfflineDao,
@@ -333,16 +339,21 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun getCompletedTransferById(id: Int) = completedTransferDao
         .getCompletedTransferById(id)?.let { completedTransferModelMapper(it) }
 
-    override suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>) {
-        // Implementation to be added with the implementation of the table
-    }
+    override suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>) =
+        cameraUploadsRecordDao.insertOrUpdateCameraUploadsRecords(
+            records.map { cameraUploadsRecordEntityMapper(it) }
+        )
 
     override suspend fun getCameraUploadsRecordByUploadStatusAndTypes(
         uploadStatus: List<CameraUploadsRecordUploadStatus>,
         types: List<SyncRecordType>,
     ): List<CameraUploadsRecord> =
-        // Implementation to be added with the implementation of the table
-        emptyList()
+        cameraUploadsRecordDao.getCameraUploadsRecordByUploadStatusAndTypes(
+            uploadStatus,
+            types,
+        ).map {
+            cameraUploadsRecordModelMapper(it)
+        }
 
     override suspend fun updateCameraUploadsRecordUploadStatus(
         mediaId: Long,
@@ -350,7 +361,17 @@ internal class MegaLocalRoomFacade @Inject constructor(
         folderType: CameraUploadFolderType,
         uploadStatus: CameraUploadsRecordUploadStatus,
     ) {
-        // Implementation to be added with the implementation of the table
+        val encryptedMediaId = encryptData(mediaId.toString())
+        requireNotNull(encryptedMediaId)
+        val encryptedTimestamp = encryptData(timestamp.toString())
+        requireNotNull(encryptedTimestamp)
+
+        cameraUploadsRecordDao.updateCameraUploadsRecordUploadStatus(
+            encryptedMediaId,
+            encryptedTimestamp,
+            folderType,
+            uploadStatus
+        )
     }
 
     override suspend fun setCameraUploadsRecordGeneratedFingerprint(
@@ -359,12 +380,23 @@ internal class MegaLocalRoomFacade @Inject constructor(
         folderType: CameraUploadFolderType,
         generatedFingerprint: String,
     ) {
-        // Implementation to be added with the implementation of the table
+        val encryptedMediaId = encryptData(mediaId.toString())
+        requireNotNull(encryptedMediaId)
+        val encryptedTimestamp = encryptData(timestamp.toString())
+        requireNotNull(encryptedTimestamp)
+        val encryptedGeneratedFingerprint = encryptData(generatedFingerprint)
+        requireNotNull(encryptedGeneratedFingerprint)
+
+        cameraUploadsRecordDao.updateCameraUploadsRecordGeneratedFingerprint(
+            encryptedMediaId,
+            encryptedTimestamp,
+            folderType,
+            encryptedGeneratedFingerprint
+        )
     }
 
-    override suspend fun deleteCameraUploadsRecords(folderTypes: List<CameraUploadFolderType>) {
-        // Implementation to be added with the implementation of the table
-    }
+    override suspend fun deleteCameraUploadsRecords(folderTypes: List<CameraUploadFolderType>) =
+        cameraUploadsRecordDao.deleteCameraUploadsRecordsByFolderType(folderTypes)
 
     override suspend fun deleteBackupById(backupId: Long) {
         encryptData(backupId.toString())?.let {

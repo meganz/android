@@ -18,6 +18,7 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.MegaOpenHelperFactor
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
+import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
@@ -86,6 +87,11 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideBackupDao(database: MegaDatabase): BackupDao =
         database.backupDao()
+
+    @Provides
+    @Singleton
+    internal fun provideCameraUploadsRecordDao(database: MegaDatabase): CameraUploadsRecordDao =
+        database.cameraUploadsRecordDao()
 
     @Provides
     @Singleton
