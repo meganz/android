@@ -67,19 +67,21 @@ fun PhotoBox(
                 translationY = state.currentOffset.y
             }
             .pointerInput(Unit) {
-                detectTransformGestures(
-                    onGestureStart = { },
-                    onGesture = { _, pan, zoom, _ ->
-                        if (zoom != state.currentScale) {
-                            state.currentScale *= zoom
-                            state.currentOffset += pan
-                            return@detectTransformGestures true
-                        }
-                        return@detectTransformGestures false
-                    },
-                    onGestureEnd = { },
-                    enableOneFingerZoom = false,
-                )
+                if (enabled) {
+                    detectTransformGestures(
+                        onGestureStart = { },
+                        onGesture = { _, pan, zoom, _ ->
+                            if (zoom != state.currentScale) {
+                                state.currentScale *= zoom
+                                state.currentOffset += pan
+                                return@detectTransformGestures true
+                            }
+                            return@detectTransformGestures false
+                        },
+                        onGestureEnd = { },
+                        enableOneFingerZoom = false,
+                    )
+                }
             },
         contentAlignment = contentAlignment,
         propagateMinConstraints = propagateMinConstraints,

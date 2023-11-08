@@ -221,7 +221,7 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun playSlideshow() {
         val intent = Intent(this, SlideshowActivity::class.java)
-        intent.putExtras(intent.extras ?: Bundle())
+        intent.putExtras(this@ImagePreviewActivity.intent)
         startActivity(intent)
     }
 

@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowState
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
@@ -76,7 +77,7 @@ class SlideshowViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             val order = _state.value.order ?: SlideshowOrder.Shuffle
             val filteredImageNodes = imageNodes.filter {
-                it.hasThumbnail || it.hasPreview
+                it.type !is VideoFileTypeInfo && (it.hasThumbnail || it.hasPreview)
                 //TODO We don't have those path in ImageNode, and mapTo TypedImageNode will cost more time.
 //                with(it.photo) {
 //                    Path(previewFilePath ?: "").exists() || Path(thumbnailFilePath ?: "").exists()

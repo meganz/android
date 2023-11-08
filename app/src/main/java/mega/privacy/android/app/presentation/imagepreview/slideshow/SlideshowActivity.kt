@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.imagepreview.slideshow
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -22,6 +23,7 @@ class SlideshowActivity : BaseActivity() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+    private val slideshowViewModel: SlideshowViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +36,7 @@ class SlideshowActivity : BaseActivity() {
                 NavHost(navController, startDestination = "slideshow") {
                     composable("slideshow") {
                         SlideshowScreen(
+                            viewModel = slideshowViewModel,
                             onClickSettingMenu = {
                                 navController.navigate("slideshowSetting")
                             },

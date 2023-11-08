@@ -31,7 +31,6 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
-import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
@@ -69,6 +68,7 @@ import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
+import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
@@ -207,7 +207,6 @@ fun ImagePreviewScreen(
                         isAvailableOffline = isCurrentImageNodeAvailableOffline,
                         onClickInfo = {
                             onClickInfo(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
                         },
                         onClickFavourite = {
                             onClickFavourite(currentImageNode)
@@ -215,7 +214,6 @@ fun ImagePreviewScreen(
                         },
                         onClickLabel = {
                             onClickLabel(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
                         },
                         onClickOpenWith = {
                             onClickOpenWith(currentImageNode)
@@ -231,7 +229,6 @@ fun ImagePreviewScreen(
                         },
                         onClickGetLink = {
                             onClickGetLink(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
                         },
                         onClickSendTo = {
                             onClickSendTo(currentImageNode)
@@ -243,7 +240,6 @@ fun ImagePreviewScreen(
                         },
                         onClickRename = {
                             onClickRename(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
                         },
                         onClickMove = {
                             onClickMove(currentImageNode)
@@ -371,12 +367,14 @@ private fun ImagePreviewContent(
             }
 
             Box(modifier = Modifier.fillMaxSize()) {
+                val isVideo = imageNode.type is VideoFileTypeInfo
                 ImageContent(
                     fullSizePath = imageResult?.getHighestResolutionAvailableUri(),
                     photoState = photoState,
-                    onImageTap = onImageTap
+                    onImageTap = onImageTap,
+                    enableZoom = !isVideo
                 )
-                if (imageNode.type is VideoFileTypeInfo) {
+                if (isVideo) {
                     IconButton(
                         modifier = Modifier.align(Alignment.Center),
                         onClick = { onClickVideoPlay(imageNode) }
@@ -422,10 +420,12 @@ private fun ImageContent(
     fullSizePath: String?,
     photoState: PhotoState,
     onImageTap: () -> Unit,
+    enableZoom: Boolean,
 ) {
     PhotoBox(
         modifier = Modifier.fillMaxSize(),
         state = photoState,
+        enabled = enableZoom,
         onTap = {
             onImageTap()
         }
@@ -536,8 +536,8 @@ private fun ImagePreviewBottomBar(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(imageName)
-            Text(imageIndex)
+            MiddleEllipsisText(imageName)
+            MiddleEllipsisText(imageIndex)
         }
     }
 }
