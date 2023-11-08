@@ -125,7 +125,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         stubParentOfflineInfo()
 
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
-        whenever(monitorBackupFolder()).thenReturn(flowOf(Result.success(nodeId)))
+        whenever(monitorBackupFolder()).thenReturn(flowOf(Result.success(backupId)))
 
         underTest(nodeId)
         verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, parentId)
@@ -163,5 +163,6 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         private val parentId = NodeId(2L)
         private val parentParentId = NodeId(3L)
         private val invalidId = NodeId(-1L)
+        private val backupId = NodeId(2L)
     }
 }
