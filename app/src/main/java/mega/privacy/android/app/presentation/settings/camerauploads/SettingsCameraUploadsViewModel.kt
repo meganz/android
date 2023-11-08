@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.settings.camerauploads
 
-import android.Manifest.permission.POST_NOTIFICATIONS
-import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +13,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.domain.entity.SyncStatus
+import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -30,6 +29,7 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
+import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.backup.MonitorBackupInfoTypeUseCase
 import mega.privacy.android.domain.usecase.backup.SetupOrUpdateCameraUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.backup.SetupOrUpdateMediaUploadsBackupUseCase
@@ -176,6 +176,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
     private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase,
+    private val updateCameraUploadTimeStamp: UpdateCameraUploadTimeStamp,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -217,34 +218,14 @@ class SettingsCameraUploadsViewModel @Inject constructor(
 
     /**
      * Handle specific behavior when permissions are granted / denied
-     *
-     * @param permissions A [Map] of permissions that were requested
      */
-    fun handlePermissionsResult(permissions: Map<String, Boolean>) {
+    fun handlePermissionsResult() {
         if (hasMediaPermissionUseCase()) {
             handleEnableCameraUploads()
         } else {
             setMediaPermissionsRationaleState(shouldShow = true)
         }
-        if (!isNotificationPermissionGranted(permissions)) {
-            setNotificationPermissionRationaleState(shouldShow = true)
-        }
     }
-
-    /**
-     * Checks whether the Notification Permission been granted. For Devices running Android 12
-     * and below, this is automatically granted.
-     *
-     * @param permissions A [Map] of permissions that were requested
-     *
-     * @return Boolean value
-     */
-    private fun isNotificationPermissionGranted(permissions: Map<String, Boolean>) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions[POST_NOTIFICATIONS] == true
-        } else {
-            true
-        }
 
     /**
      *
@@ -360,14 +341,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Sets the value of [SettingsCameraUploadsState.shouldShowNotificationPermissionRationale]
-     * @param shouldShow The new state value
-     */
-    fun setNotificationPermissionRationaleState(shouldShow: Boolean) {
-        _state.update { it.copy(shouldShowNotificationPermissionRationale = shouldShow) }
-    }
-
-    /**
      * Shows / hides the Access Media Location Permission rationale by updating the
      * value of [SettingsCameraUploadsState.accessMediaLocationRationaleText]
      *
@@ -393,17 +366,13 @@ class SettingsCameraUploadsViewModel @Inject constructor(
 
     /**
      * onCameraUploadsEnabled
-     * @param shouldDisableMediaUploads
      */
-    fun onCameraUploadsEnabled(shouldDisableMediaUploads: Boolean) {
+    fun onCameraUploadsEnabled() {
         viewModelScope.launch {
             runCatching {
-                setCameraUploadsEnabled(true)
                 restorePrimaryTimestamps()
                 setupCameraUploadsSettingUseCase(isEnabled = true)
-                if (shouldDisableMediaUploads) {
-                    resetAndDisableMediaUploads()
-                }
+                setCameraUploadsEnabled(true)
             }.onFailure {
                 Timber.e(it)
                 setErrorState(shouldShow = true)
@@ -417,7 +386,12 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * @param isEnabled True if Camera Uploads is enabled, and false if otherwise
      */
     fun setCameraUploadsEnabled(isEnabled: Boolean) =
-        _state.update { it.copy(isCameraUploadsEnabled = isEnabled) }
+        _state.update {
+            it.copy(
+                isCameraUploadsEnabled = isEnabled,
+                isMediaUploadsEnabled = if (isEnabled) it.isMediaUploadsEnabled else false
+            )
+        }
 
     /**
      * Change the Upload Connection Type for Camera Uploads
@@ -796,7 +770,8 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * Stop camera uploads
      * Cancel camera upload and heartbeat workers
      */
-    fun stopCameraUploads() = viewModelScope.launch {
+    private suspend fun stopCameraUploads() {
+        setCameraUploadsEnabled(isEnabled = false)
         stopCameraUploadsUseCase(shouldReschedule = false)
         stopCameraUploadAndHeartbeatUseCase()
     }
@@ -922,6 +897,25 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                 return false
             }
             return true
+        }
+    }
+
+    /**
+     * toggle CameraUploads Settings
+     */
+    fun toggleCameraUploadsSettings() {
+        viewModelScope.launch {
+            runCatching {
+                updateCameraUploadTimeStamp(timestamp = 0L, SyncTimeStamp.PRIMARY_PHOTO)
+                updateCameraUploadTimeStamp(timestamp = 0L, SyncTimeStamp.PRIMARY_VIDEO)
+                if (isCameraUploadsEnabledUseCase()) {
+                    stopCameraUploads()
+                } else {
+                    handlePermissionsResult()
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 }

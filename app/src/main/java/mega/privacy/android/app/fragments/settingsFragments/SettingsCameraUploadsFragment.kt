@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
 import android.Manifest
-import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
@@ -72,13 +71,11 @@ import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCame
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.permission.PermissionUtils.displayNotificationPermissionRationale
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getPartialMediaPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasAccessMediaLocationPermission
-import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.BackupInfoType
@@ -115,6 +112,28 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private var queueSizeInput: EditText? = null
     private var mediaPermissionsDialog: AlertDialog? = null
 
+    private val permissionsList by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            arrayOf(
+                getNotificationsPermission(),
+                getImagePermissionByVersion(),
+                getVideoPermissionByVersion(),
+                getPartialMediaPermission(),
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(
+                getNotificationsPermission(),
+                getImagePermissionByVersion(),
+                getVideoPermissionByVersion()
+            )
+        } else {
+            arrayOf(
+                getImagePermissionByVersion(),
+                getVideoPermissionByVersion()
+            )
+        }
+    }
+
     /**
      * Flag that control the start of the Camera Uploads when the user leaves the screen [onPause]
      * to avoid unwanted trigger when the user goes to the folder picker for choosing primary and secondary local folder
@@ -131,7 +150,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
      */
     private val enableCameraUploadsPermissionLauncher =
         registerForActivityResult(RequestMultiplePermissions()) { permissions ->
-            viewModel.handlePermissionsResult(permissions)
+            viewModel.handlePermissionsResult()
         }
 
     /**
@@ -200,7 +219,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
         Timber.d("CameraUpload enabled through Settings - fireCameraUploadJob()")
         if (canStartCameraUploads)
             viewModel.startCameraUpload()
-
         super.onPause()
     }
 
@@ -217,8 +235,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             it.isEnabled = true
             it.setOnPreferenceChangeListener { _, _ ->
                 if (viewModel.isConnected) {
-                    dbH.setCamSyncTimeStamp(0)
-                    refreshCameraUploadsSettings()
+                    viewModel.toggleCameraUploadsSettings()
                 }
                 false
             }
@@ -548,7 +565,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 }
                 handleTriggerCameraUploads(it.shouldTriggerCameraUploads)
                 handleMediaPermissionsRationale(it.shouldShowMediaPermissionsRationale)
-                handleNotificationPermissionRationale(it.shouldShowNotificationPermissionRationale)
                 handleAccessMediaLocationPermissionRationale(it.accessMediaLocationRationaleText)
                 handleInvalidFolderSelectedPrompt(it.invalidFolderSelectedTextId)
                 handleShouldDisplayError(it.shouldShowError)
@@ -556,7 +572,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             collectFlow(viewModel.monitorCameraUploadsSettingsActions) {
                 when (it) {
                     CameraUploadsSettingsAction.DisableMediaUploads -> viewModel.onEnableOrDisableMediaUpload()
-                    CameraUploadsSettingsAction.RefreshSettings -> refreshCameraUploadsSettings()
+                    CameraUploadsSettingsAction.RefreshSettings -> viewModel.toggleCameraUploadsSettings()
                 }
             }
             collectFlow(viewModel.monitorBackupInfoType) {
@@ -598,6 +614,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private fun handleIsCameraUploadsEnabled(isCameraUploadsEnabled: Boolean) {
         if (isCameraUploadsEnabled) {
             Timber.d("Camera Uploads ON")
+            cameraUploadOnOff?.isEnabled = true
             cameraUploadOnOff?.isChecked = true
             secondaryMediaFolderOn?.let { preferenceScreen.addPreference(it) }
         } else {
@@ -905,22 +922,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 .setMessage(R.string.settings_camera_uploads_grant_media_permissions_body)
                 .setPositiveButton(R.string.settings_camera_uploads_grant_media_permissions_positive_button) { dialog, _ ->
                     if (shouldShowMediaPermissionsRationale()) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                            enableCameraUploadsPermissionLauncher.launch(
-                                arrayOf(
-                                    getImagePermissionByVersion(),
-                                    getVideoPermissionByVersion(),
-                                    getPartialMediaPermission(),
-                                )
-                            )
-                        } else {
-                            enableCameraUploadsPermissionLauncher.launch(
-                                arrayOf(
-                                    getImagePermissionByVersion(),
-                                    getVideoPermissionByVersion(),
-                                )
-                            )
-                        }
+                        enableCameraUploadsPermissionLauncher.launch(permissionsList)
                     } else {
                         // User has selected "Never Ask Again". Starting Android 11, selecting "Deny"
                         // more than once is equivalent to selecting "Never Ask Again"
@@ -934,21 +936,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     viewModel.setMediaPermissionsRationaleState(shouldShow = false)
                 }
                 .show()
-        }
-    }
-
-    /**
-     * Handle the display of the Notification Permission rationale when a UI State change happens
-     *
-     * @param showRationale If true, display the Notification Permission rationale
-     */
-    private fun handleNotificationPermissionRationale(showRationale: Boolean) {
-        if (showRationale) {
-            if (shouldShowRequestPermissionRationale(POST_NOTIFICATIONS)) {
-                displayNotificationPermissionRationale(requireActivity())
-            }
-            // Once the rationale has been shown, reset the Notification Permission Rationale state
-            viewModel.setNotificationPermissionRationaleState(shouldShow = false)
         }
     }
 
@@ -1055,60 +1042,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 viewModel.updateSecondaryUploadNode(destination.nodeHandle)
             }
         }
-    }
-
-    /**
-     * Refresh the Camera Uploads service settings depending on the service status
-     */
-    private fun refreshCameraUploadsSettings() {
-        var cuEnabled = false
-        if (prefs != null) {
-            cuEnabled = prefs?.camSyncEnabled.toBoolean()
-        }
-        if (cuEnabled) {
-            Timber.d("Disable CU.")
-            disableCameraUploads()
-        } else {
-            // Check if the necessary permissions to enable Camera Uploads have been granted.
-            // The permissions are adaptive depending on the Android SDK version
-            Timber.d("Checking if the necessary permissions have been granted")
-            val permissionsList =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    arrayOf(
-                        getNotificationsPermission(),
-                        getImagePermissionByVersion(),
-                        getVideoPermissionByVersion(),
-                        getPartialMediaPermission(),
-                    )
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    arrayOf(
-                        getNotificationsPermission(),
-                        getImagePermissionByVersion(),
-                        getVideoPermissionByVersion()
-                    )
-                } else {
-                    arrayOf(
-                        getImagePermissionByVersion(),
-                        getVideoPermissionByVersion()
-                    )
-                }
-            if (hasPermissions(context, *permissionsList)) {
-                Timber.d("All necessary permissions have been granted")
-                viewModel.handleEnableCameraUploads()
-            } else {
-                Timber.d("At least one permission was denied. Launching permission window")
-                enableCameraUploadsPermissionLauncher.launch(permissionsList)
-            }
-        }
-    }
-
-    /**
-     * This method is to do the setting process and UI related process.
-     * It also cancels all Camera Uploads and Heartbeat workers.
-     */
-    private fun disableCameraUploads() {
-        viewModel.stopCameraUploads()
-        disableCameraUploadUIProcess()
     }
 
     /**
@@ -1272,7 +1205,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             snackbarCallBack?.showSnackbar(message)
         }
 
-        viewModel.onCameraUploadsEnabled(prefs?.secondaryMediaFolderEnabled == null)
+        viewModel.onCameraUploadsEnabled()
 
         cameraUploadOnOff?.isChecked = true
 
@@ -1301,8 +1234,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private fun disableCameraUploadUIProcess() {
         Timber.d("Camera Uploads Disabled")
         cameraUploadOnOff?.isChecked = false
-
-        viewModel.setCameraUploadsEnabled(false)
 
         megaCameraFolder?.let { preferenceScreen.removePreference(it) }
         secondaryMediaFolderOn?.let { preferenceScreen.removePreference(it) }

@@ -47,7 +47,6 @@ data class SettingsCameraUploadsState(
     val shouldShowBusinessAccountPrompt: Boolean = false,
     val shouldTriggerCameraUploads: Boolean = false,
     val shouldShowMediaPermissionsRationale: Boolean = false,
-    val shouldShowNotificationPermissionRationale: Boolean = false,
     val uploadConnectionType: UploadConnectionType? = null,
     val uploadOption: UploadOption? = null,
     val videoCompressionSizeLimit: Int = 0,

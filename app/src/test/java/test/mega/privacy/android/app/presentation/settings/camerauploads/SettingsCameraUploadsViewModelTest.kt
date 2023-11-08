@@ -14,6 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.domain.entity.SyncStatus
+import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
+import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.backup.SetupOrUpdateCameraUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.backup.SetupOrUpdateMediaUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
@@ -156,6 +158,7 @@ class SettingsCameraUploadsViewModelTest {
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase = mock()
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase = mock()
     private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase = mock()
+    private val updateCameraUploadTimeStamp: UpdateCameraUploadTimeStamp = mock()
 
     @BeforeAll
     fun setUp() {
@@ -222,6 +225,7 @@ class SettingsCameraUploadsViewModelTest {
             isSecondaryFolderPathValidUseCase,
             setSecondaryFolderLocalPathUseCase,
             clearCameraUploadsRecordUseCase,
+            updateCameraUploadTimeStamp,
         )
     }
 
@@ -286,6 +290,7 @@ class SettingsCameraUploadsViewModelTest {
             isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
             setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
             clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
+            updateCameraUploadTimeStamp = updateCameraUploadTimeStamp
         )
     }
 
@@ -335,7 +340,6 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(state.shouldShowBusinessAccountPrompt).isFalse()
             assertThat(state.shouldTriggerCameraUploads).isFalse()
             assertThat(state.shouldShowMediaPermissionsRationale).isFalse()
-            assertThat(state.shouldShowNotificationPermissionRationale).isFalse()
             assertThat(state.uploadConnectionType).isEqualTo(UploadConnectionType.WIFI)
             assertThat(state.uploadOption).isEqualTo(UploadOption.PHOTOS_AND_VIDEOS)
             assertThat(state.videoCompressionSizeLimit).isEqualTo(200)
@@ -446,22 +450,6 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(awaitItem()).isFalse()
         }
     }
-
-    @Test
-    fun `test that shouldShowNotificationPermissionRationale is updated correctly`() =
-        runTest {
-            setupUnderTest()
-
-            underTest.setNotificationPermissionRationaleState(true)
-
-            underTest.state.map { it.shouldShowNotificationPermissionRationale }
-                .distinctUntilChanged().test {
-                    assertThat(awaitItem()).isTrue()
-
-                    underTest.setNotificationPermissionRationaleState(false)
-                    assertThat(awaitItem()).isFalse()
-                }
-        }
 
     @Test
     fun `test that accessMediaLocationRationaleText is updated correctly`() = runTest {
@@ -748,26 +736,6 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that when stopCameraUpload is called, stopCameraUploadUseCase is called`() =
-        runTest {
-            setupUnderTest()
-
-            underTest.stopCameraUploads()
-
-            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = false)
-        }
-
-    @Test
-    fun `test that when stopCameraUpload is called, stopCameraUploadAndHeartbeatUseCase is called`() =
-        runTest {
-            setupUnderTest()
-
-            underTest.stopCameraUploads()
-
-            verify(stopCameraUploadAndHeartbeatUseCase).invoke()
-        }
-
-    @Test
     fun `test that shouldDisplayError is true when an exception occurs while setting up the primary folder`() =
         runTest {
             setupUnderTest()
@@ -814,12 +782,13 @@ class SettingsCameraUploadsViewModelTest {
     fun `test that camera uploads is enabled when onCameraUploadsEnabled is invoked`() =
         runTest {
             setupUnderTest()
-            val shouldDisableMediaUploads = true
-            underTest.onCameraUploadsEnabled(shouldDisableMediaUploads)
+            underTest.onCameraUploadsEnabled()
             verify(restorePrimaryTimestamps).invoke()
             verify(setupCameraUploadsSettingUseCase).invoke(true)
-            verify(resetMediaUploadTimeStamps).invoke()
-            verify(disableMediaUploadSettings).invoke()
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isCameraUploadsEnabled).isTrue()
+            }
         }
 
     @Test
@@ -952,5 +921,29 @@ class SettingsCameraUploadsViewModelTest {
             verify(clearCameraUploadsRecordUseCase).invoke(
                 listOf(CameraUploadFolderType.Secondary)
             )
+        }
+
+    @ParameterizedTest(name = "when camera upload enabled status is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that camera uploads enabled status changes when refreshCameraUploadsSettings is invoked`(
+        isEnabled: Boolean,
+    ) =
+        runTest {
+            setupUnderTest()
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(isEnabled)
+            whenever(hasMediaPermissionUseCase()).thenReturn(!isEnabled)
+            underTest.toggleCameraUploadsSettings()
+            verify(updateCameraUploadTimeStamp).invoke(0L, SyncTimeStamp.PRIMARY_PHOTO)
+            verify(updateCameraUploadTimeStamp).invoke(0L, SyncTimeStamp.PRIMARY_VIDEO)
+            if (isEnabled) {
+                verify(stopCameraUploadsUseCase).invoke(shouldReschedule = false)
+                verify(stopCameraUploadAndHeartbeatUseCase).invoke()
+            } else {
+                verify(checkEnableCameraUploadsStatus).invoke()
+            }
+            underTest.state.test {
+                assertThat(awaitItem().isCameraUploadsEnabled).isEqualTo(!isEnabled)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 }
