@@ -302,7 +302,7 @@ dependencies {
     "qaImplementation"(project(":screenshot"))
     implementation(project(":liveeventbus-x"))
     implementation(project(":analytics"))
-
+    implementation(project(":icon-pack"))
     testImplementation(project(":core-ui-test"))
 
     // Jetbrains

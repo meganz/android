@@ -39,6 +39,8 @@ include(":analytics")
 include(":core-ui-test")
 include(":baselineprofile")
 include(":navigation")
+include(":legacy-core-ui")
+include(":icon-pack")
 
 println("isServerBuild = ${isServerBuild()}")
 buildCache {
@@ -58,4 +60,3 @@ buildCache {
         isEnabled = isServerBuild()
     }
 }
-include(":legacy-core-ui")
