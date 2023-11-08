@@ -15,6 +15,8 @@ internal class ChatSessionChangesMapper @Inject constructor() {
         MegaChatSession.CHANGE_TYPE_SESSION_ON_HOLD -> ChatSessionChanges.SessionOnHold
         MegaChatSession.CHANGE_TYPE_AUDIO_LEVEL -> ChatSessionChanges.AudioLevel
         MegaChatSession.CHANGE_TYPE_PERMISSIONS -> ChatSessionChanges.Permissions
+        MegaChatSession.CHANGE_TYPE_SESSION_ON_RECORDING -> ChatSessionChanges.SessionOnRecording
+        MegaChatSession.CHANGE_TYPE_SPEAK_PERMISSION -> ChatSessionChanges.SpeakPermissions
         else -> ChatSessionChanges.NoChanges
     }
 }

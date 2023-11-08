@@ -48,4 +48,14 @@ enum class ChatSessionChanges {
      * Permission changes
      */
     Permissions,
+
+    /**
+     * Speak permission changes
+     */
+    SpeakPermissions,
+
+    /**
+     * Session on recording
+     */
+    SessionOnRecording,
 }

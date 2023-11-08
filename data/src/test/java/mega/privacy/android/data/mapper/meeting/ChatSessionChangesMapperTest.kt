@@ -46,6 +46,15 @@ class ChatSessionChangesMapperTest {
         Arguments.of(ChatSessionChanges.SessionOnHold, MegaChatSession.CHANGE_TYPE_SESSION_ON_HOLD),
         Arguments.of(ChatSessionChanges.AudioLevel, MegaChatSession.CHANGE_TYPE_AUDIO_LEVEL),
         Arguments.of(ChatSessionChanges.Permissions, MegaChatSession.CHANGE_TYPE_PERMISSIONS),
+        Arguments.of(
+            ChatSessionChanges.SessionOnRecording,
+            MegaChatSession.CHANGE_TYPE_SESSION_ON_RECORDING
+        ),
+        Arguments.of(
+            ChatSessionChanges.SpeakPermissions,
+            MegaChatSession.CHANGE_TYPE_SPEAK_PERMISSION
+        ),
+
         Arguments.of(ChatSessionChanges.NoChanges, -1)
     )
 }
