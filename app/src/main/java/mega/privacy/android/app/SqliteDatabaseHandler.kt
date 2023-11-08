@@ -2696,8 +2696,7 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     override fun clearOffline() {
-        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_OFFLINE")
-        legacyDatabaseMigration.onCreate(writableDatabase)
+        writableDatabase.execSQL("DELETE TABLE IF EXISTS $TABLE_OFFLINE")
     }
 
     /**
