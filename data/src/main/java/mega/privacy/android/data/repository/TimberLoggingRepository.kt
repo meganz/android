@@ -84,10 +84,10 @@ internal class TimberLoggingRepository @Inject constructor(
     }
 
     override fun enableLogAllToConsole() {
-        MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX)
-        MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX)
         MegaApiAndroid.addLoggerObject(megaSdkLogger)
+        MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX)
         MegaChatApiAndroid.setLoggerObject(megaChatLogger)
+        MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX)
         Timber.plant(LineNumberDebugTree())
     }
 
