@@ -1560,7 +1560,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     } else if (intent.action == Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE) {
                         val chatId: Long = intent.getLongExtra(
                             Constants.CHAT_ID,
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                            MEGACHAT_INVALID_HANDLE
                         )
                         showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId)
                         intent.action = null
@@ -1574,8 +1574,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             Timber.d("Check if there any INCOMING pendingRequest contacts")
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
-            val firstLaunch =
-                intent?.getBooleanExtra(IntentConstants.EXTRA_FIRST_LOGIN, false) == true
             if (drawerItem == null) {
                 drawerItem = getStartDrawerItem()
                 if (intent != null) {
@@ -1657,15 +1655,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
                     } else {
                         if (firstLogin && !joiningToChatLink) {
-                            Timber.d("Intent firstTimeCam==true")
-                            if (prefs?.camSyncEnabled != null) {
-                                firstLogin = false
-                            } else {
-                                firstLogin = true
-                                if (viewModel.getStorageState() !== StorageState.PayWall && isInPhotosPage) {
-                                    drawerItem = DrawerItem.PHOTOS
-                                }
-                            }
                             intent = null
                         }
                     }
