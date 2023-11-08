@@ -29,7 +29,7 @@ val Typography.subtitle2medium: TextStyle
  * Body 2 medium weight
  */
 val Typography.body2medium: TextStyle
-    get() = body2.copy(fontWeight = FontWeight.Medium)
+    get() = body2.copy(fontWeight = FontWeight(500))
 
 /**
  * Body 3

@@ -336,12 +336,12 @@ internal fun MyAccountHeader(
 
         Icon(
             modifier = Modifier
-                .size(24.dp)
+                .size(16.dp)
                 .clickable(onClick = onEditProfile)
                 .constrainAs(edit) {
                     top.linkTo(nameTv.top)
                     bottom.linkTo(nameTv.bottom)
-                    start.linkTo(nameTv.end)
+                    start.linkTo(nameTv.end, 5.dp)
                 },
             painter = painterResource(id = R.drawable.ic_view_edit_profile),
             contentDescription = "Edit Profile",
@@ -682,7 +682,7 @@ internal fun AccountTypeSection(
                 },
             text = stringResource(id = attributes.description),
             style = MaterialTheme.typography.body2medium,
-            color = MaterialTheme.colors.textColorSecondary,
+            color = MaterialTheme.colors.textColorPrimary,
         )
 
         if (showButton) {
@@ -813,7 +813,7 @@ internal fun UsageMeterSection(
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier
-                            .size(55.dp)
+                            .size(50.dp)
                             .testTag(USAGE_TRANSFER_PROGRESS),
                         backgroundColor = MaterialTheme.colors.grey_100_grey_600,
                         color = MaterialTheme.colors.secondary,
