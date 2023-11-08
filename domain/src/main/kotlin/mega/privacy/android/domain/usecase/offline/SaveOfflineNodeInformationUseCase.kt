@@ -65,7 +65,7 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
                 }
                 nodeRepository.saveOfflineNodeInformation(
                     getOfflineNodeInformationUseCase(node),
-                    if (node.parentId != driveRootNodeId) node.parentId else null
+                    if (node.parentId != driveRootNodeId && node.id != backupRootNodeId) node.parentId else null
                 )
             }
         }
