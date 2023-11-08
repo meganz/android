@@ -6,7 +6,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.repository.AdsRepositoryImpl
 import mega.privacy.android.data.repository.AndroidBillingRepository
-import mega.privacy.android.data.repository.ApiServerRepositoryImpl
 import mega.privacy.android.data.repository.BackupRepositoryImpl
 import mega.privacy.android.data.repository.CacheRepositoryImpl
 import mega.privacy.android.data.repository.CallRepositoryImpl
@@ -58,6 +57,7 @@ import mega.privacy.android.data.repository.VideoRepositoryImpl
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
+import mega.privacy.android.data.repository.apiserver.ApiServerRepositoryImpl
 import mega.privacy.android.data.repository.filemanagement.ShareRepositoryImpl
 import mega.privacy.android.data.repository.files.PdfRepositoryImpl
 import mega.privacy.android.data.repository.monitoring.PerformanceReporterRepositoryImpl
@@ -67,7 +67,6 @@ import mega.privacy.android.data.repository.thumbnailpreview.ThumbnailPreviewRep
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AdsRepository
 import mega.privacy.android.domain.repository.AlbumRepository
-import mega.privacy.android.domain.repository.ApiServerRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.BackupRepository
 import mega.privacy.android.domain.repository.BillingRepository
@@ -112,6 +111,7 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.repository.VideoRepository
 import mega.privacy.android.domain.repository.ViewTypeRepository
+import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
 import mega.privacy.android.domain.repository.files.PdfRepository
 import mega.privacy.android.domain.repository.monitoring.PerformanceReporterRepository

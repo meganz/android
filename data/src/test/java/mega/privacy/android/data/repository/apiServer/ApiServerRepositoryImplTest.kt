@@ -1,11 +1,13 @@
-package mega.privacy.android.data.repository
+package mega.privacy.android.data.repository.apiServer
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.domain.repository.ApiServerRepository
+import mega.privacy.android.data.mapper.apiserver.ApiServerMapper
+import mega.privacy.android.data.repository.apiserver.ApiServerRepositoryImpl
+import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -24,13 +26,16 @@ internal class ApiServerRepositoryImplTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
+    private val apiServerMapper = ApiServerMapper()
 
     @BeforeAll
     fun setup() {
         underTest = ApiServerRepositoryImpl(
             megaApiGateway = megaApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
-            ioDispatcher = UnconfinedTestDispatcher()
+            apiServerMapper = apiServerMapper,
+            ioDispatcher = UnconfinedTestDispatcher(),
+            context = mock()
         )
     }
 
@@ -59,7 +64,7 @@ internal class ApiServerRepositoryImplTest {
     @ValueSource(booleans = [true, false])
     fun `test that change api url invokes megaApi`(disablePkp: Boolean) = runTest {
         val apiUrl = "apiURL"
-        underTest.changeApiUrl(apiUrl, disablePkp)
+        underTest.changeApi(apiUrl, disablePkp)
         verify(megaApiGateway).changeApiUrl(apiUrl, disablePkp)
         verifyNoMoreInteractions(megaApiGateway)
     }
@@ -68,7 +73,7 @@ internal class ApiServerRepositoryImplTest {
     @ValueSource(booleans = [true, false])
     fun `test that change api url invokes megaApiFolder`(disablePkp: Boolean) = runTest {
         val apiUrl = "apiURL"
-        underTest.changeApiUrl(apiUrl, disablePkp)
+        underTest.changeApi(apiUrl, disablePkp)
         verify(megaApiFolderGateway).changeApiUrl(apiUrl, disablePkp)
         verifyNoMoreInteractions(megaApiFolderGateway)
     }
