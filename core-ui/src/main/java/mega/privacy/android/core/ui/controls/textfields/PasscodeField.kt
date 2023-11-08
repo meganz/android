@@ -10,7 +10,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
 import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -30,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.core.ui.theme.MegaTheme
 
 
 internal const val PASSCODE_FIELD_TAG = "passcode_field:text_field"
@@ -115,7 +114,7 @@ private fun PasscodeCell(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         CompositionLocalProvider(
-            LocalTextStyle provides LocalTextStyle.current.copy(color = MaterialTheme.colors.textColorSecondary)
+            LocalTextStyle provides LocalTextStyle.current.copy(color = MegaTheme.colors.text.placeholder)
         ) {
             Text(
                 text = char,
@@ -124,7 +123,7 @@ private fun PasscodeCell(
                 modifier = modifier,
             )
             Divider(
-                color = if (isFocussed) MaterialTheme.colors.secondary else LocalTextStyle.current.color,
+                color = if (isFocussed) MegaTheme.colors.border.strongSelected else LocalTextStyle.current.color,
             )
         }
     }
