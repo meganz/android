@@ -8,18 +8,14 @@
     android:background="@color/white_grey_087"
     android:fillViewport="true">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
     <LinearLayout
-        android:layout_width="390dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingStart="14dp"
         android:paddingTop="20dp"
         android:paddingEnd="14dp"
-        android:paddingBottom="50dp"
+        android:paddingBottom="30dp"
         android:transitionName="end_container"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -229,6 +225,4 @@
         </RelativeLayout>
 
     </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
 </ScrollView>
