@@ -1,8 +1,9 @@
+import groovy.lang.Closure
+
 plugins {
     id("com.android.library")
     id("kotlin-android")
     id("kotlin-kapt")
-    id("dagger.hilt.android.plugin")
     id("de.mannodermaus.android-junit5")
     id("com.google.devtools.ksp")
 }
@@ -101,9 +102,18 @@ dependencies {
     implementation(androidx.hilt.work)
     implementation(google.hilt.android)
     implementation(androidx.concurrent.futures)
-    kapt(google.hilt.android.compiler)
-    kapt(androidx.hilt.compiler)
     ksp(androidx.room.compiler)
+
+    val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
+    if (shouldApplyDefaultConfiguration()) {
+        apply(plugin = "dagger.hilt.android.plugin")
+
+        kapt(google.hilt.android.compiler)
+        kapt(androidx.hilt.compiler)
+
+        implementation(google.autovalue.annotations)
+        "kapt"(google.autovalue)
+    }
 
     "gmsImplementation"(lib.billing.client.ktx)
 
@@ -114,9 +124,6 @@ dependencies {
 
     // Logging
     implementation(lib.bundles.logging)
-
-    implementation(google.autovalue.annotations)
-    kapt(google.autovalue)
 
     // Testing dependencies
     testImplementation(testlib.bundles.unit.test)

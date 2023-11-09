@@ -1,3 +1,5 @@
+import groovy.lang.Closure
+
 plugins {
     id("kotlin")
     id("com.android.lint")
@@ -46,8 +48,12 @@ dependencies {
     implementation(lib.coroutines.core)
     implementation(lib.javax.inject)
 
-    kapt(google.hilt.android.compiler)
     implementation(google.hilt.core)
+
+    val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
+    if (shouldApplyDefaultConfiguration()) {
+        kapt(google.hilt.android.compiler)
+    }
 
     // Testing dependencies
     testImplementation(testlib.bundles.unit.test)

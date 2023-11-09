@@ -1,9 +1,10 @@
+import groovy.lang.Closure
+
 plugins {
     id("com.android.library")
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
-    id("dagger.hilt.android.plugin")
 }
 
 apply(from = "${project.rootDir}/tools/util.gradle")
@@ -89,8 +90,14 @@ dependencies {
     implementation(androidx.lifecycle.viewmodel)
     implementation(androidx.lifecycle.service)
     implementation(google.hilt.android)
-    kapt(google.hilt.android.compiler)
-    kapt(androidx.hilt.compiler)
+
+    val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
+    if (shouldApplyDefaultConfiguration()) {
+        apply(plugin = "dagger.hilt.android.plugin")
+
+        kapt(google.hilt.android.compiler)
+        kapt(androidx.hilt.compiler)
+    }
 
     // Compose
     implementation(androidx.lifecycle.runtime.compose)

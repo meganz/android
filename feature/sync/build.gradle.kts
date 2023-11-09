@@ -1,9 +1,10 @@
+import groovy.lang.Closure
+
 plugins {
     id("com.android.library")
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
-    id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
 }
 
@@ -91,8 +92,14 @@ dependencies {
     implementation(google.gson)
     implementation(androidx.datastore.preferences)
     implementation(androidx.hilt.navigation)
-    kapt(google.hilt.android.compiler)
-    kapt(androidx.hilt.compiler)
+
+    val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
+    if (shouldApplyDefaultConfiguration()) {
+        apply(plugin = "dagger.hilt.android.plugin")
+
+        kapt(google.hilt.android.compiler)
+        kapt(androidx.hilt.compiler)
+    }
 
     implementation(androidx.appcompat)
     implementation(androidx.fragment)

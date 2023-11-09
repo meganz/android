@@ -5,7 +5,6 @@ plugins {
     id("kotlin-android")
     id("kotlin-parcelize")
     id("kotlin-kapt")
-    id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.firebase.appdistribution")
     id("jacoco")
@@ -289,6 +288,8 @@ tasks.withType<Test> {
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
+applyTestLiteForTasks()
+
 dependencies {
     // Modules
     implementation(project(":core:formatter"))
@@ -360,8 +361,6 @@ dependencies {
     implementation(google.accompanist.permissions)
     implementation(google.accompanist.navigationanimation)
     implementation(google.accompanist.systemui)
-    implementation(google.autovalue.annotations)
-    kapt(google.autovalue)
 
     // Google GMS
     "gmsImplementation"(lib.billing.client.ktx)
@@ -385,8 +384,15 @@ dependencies {
     implementation(google.hilt.android)
     implementation(androidx.hilt.work)
     implementation(androidx.hilt.navigation)
-    kapt(google.hilt.android.compiler)
-    kapt(androidx.hilt.compiler)
+
+    val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
+    if (shouldApplyDefaultConfiguration()) {
+        apply(plugin = "dagger.hilt.android.plugin")
+
+        kapt(google.hilt.android.compiler)
+        kapt(androidx.hilt.compiler)
+        kaptTest(google.hilt.android.compiler)
+    }
 
     // RX
     implementation(lib.bundles.rx)
@@ -490,7 +496,6 @@ dependencies {
     androidTestImplementation(testlib.compose.junit)
 
     kaptAndroidTest(google.hilt.android.compiler)
-    kaptTest(google.hilt.android.compiler)
     debugImplementation(androidx.fragment.test)
     debugImplementation(testlib.compose.manifest)
     debugImplementation(testlib.test.monitor)
@@ -687,4 +692,27 @@ fun useStaticVersion(): Boolean {
             buildTypeMatches("test", taskNames) ||
             (buildTypeMatches("qa", taskNames) && !isServerBuild()) ||
             (buildTypeMatches("qa", taskNames) && isCiBuild())
+}
+
+/**
+ * Apply unit test lite mode if constraints met
+ */
+fun applyTestLiteForTasks() {
+    val shouldActivateTestLite: Closure<Boolean> by extra
+    val excludedTasks = listOf<(Task) -> Boolean>(
+        { it.name.startsWith("injectCrashlytics") },
+        { it.name.startsWith("kapt") && it.name.endsWith("TestKotlin") },
+    )
+
+    gradle.taskGraph.whenReady {
+        for (task in allTasks) {
+            if (task.name.lowercase().startsWith("test")) {
+                tasks.matching { activeTask ->
+                    excludedTasks.any { it(activeTask) } && shouldActivateTestLite()
+                }.configureEach {
+                    enabled = false
+                }
+            }
+        }
+    }
 }

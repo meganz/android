@@ -312,6 +312,28 @@ boolean buildTypeMatches(String type, List<String> taskNames) {
 }
 
 /**
+ * Get flag to activate test lite mode from local.properties file.
+ */
+boolean shouldActivateTestLite() {
+    def file = rootProject.file('local.properties')
+    if (file.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(file))
+        return props["test.lite"]?.toBoolean() ?: false
+    }
+    return false
+}
+
+boolean shouldApplyDefaultConfiguration() {
+    for (taskName in gradle.startParameter.taskNames) {
+        if (taskName.contains(":test") && taskName.contains("UnitTest") && shouldActivateTestLite()) {
+            return false
+        }
+    }
+    return true
+}
+
+/**
  * Ensure that the native libs folder exists and return its relative path.
  * @return path of native library symbols. The returned path is relative to root of app module
  */
@@ -343,4 +365,6 @@ ext {
     isCiBuild = this.&isCiBuild
     buildTypeMatches = this.&buildTypeMatches
     getKarmaPluginPort = this.&getKarmaPluginPort
+    shouldActivateTestLite = this.&shouldActivateTestLite
+    shouldApplyDefaultConfiguration = this.&shouldApplyDefaultConfiguration
 }
