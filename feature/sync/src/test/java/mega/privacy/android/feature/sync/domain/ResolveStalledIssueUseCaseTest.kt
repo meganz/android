@@ -61,7 +61,7 @@ class ResolveStalledIssueUseCaseTest {
                 nodeIds = listOf(NodeId(1L)),
                 nodeNames = listOf("nodeName"),
                 localPaths = listOf("path/to/file"),
-                issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose,
+                issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
                 conflictName = "conflictName"
             )
             val megaNodeId = 1L
@@ -84,7 +84,7 @@ class ResolveStalledIssueUseCaseTest {
                 nodeIds = listOf(NodeId(1L)),
                 nodeNames = listOf("nodeName"),
                 localPaths = listOf(localPath),
-                issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose,
+                issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
                 conflictName = "conflictName"
             )
 
@@ -107,7 +107,7 @@ class ResolveStalledIssueUseCaseTest {
                 nodeIds = listOf(nodeId),
                 nodeNames = listOf("nodeName"),
                 localPaths = listOf(localPath),
-                issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose,
+                issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
                 conflictName = "conflictName"
             )
             val remoteNodeModificationTimeInSeconds = 100L
@@ -141,7 +141,7 @@ class ResolveStalledIssueUseCaseTest {
                 nodeIds = listOf(nodeId),
                 nodeNames = listOf("nodeName"),
                 localPaths = listOf(localPath),
-                issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose,
+                issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
                 conflictName = "conflictName"
             )
             val remoteNodeModificationTimeInSeconds = 105L

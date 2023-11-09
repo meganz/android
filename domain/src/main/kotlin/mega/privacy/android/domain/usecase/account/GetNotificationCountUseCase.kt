@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
+import mega.privacy.android.domain.usecase.notifications.GetFeatureNotificationCountUseCase
 import javax.inject.Inject
 
 /**
@@ -14,6 +15,7 @@ class GetNotificationCountUseCase @Inject constructor(
     private val getNumUnreadUserAlertsUseCase: GetNumUnreadUserAlertsUseCase,
     private val getIncomingContactRequestsUseCase: GetIncomingContactRequestsUseCase,
     private val getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
+    private val featureNotifications: Set<@JvmSuppressWildcards GetFeatureNotificationCountUseCase>,
 ) {
 
     /**
@@ -25,6 +27,7 @@ class GetNotificationCountUseCase @Inject constructor(
     suspend operator fun invoke(withChatNotifications: Boolean) = if (rootNodeExistsUseCase()) {
         getNumUnreadUserAlertsUseCase() +
                 getIncomingContactRequestsUseCase().size +
+                featureNotifications.sumOf { it() } +
                 if (withChatNotifications) getNumUnreadChatsUseCase().firstOrNull() ?: 0 else 0
     } else {
         0

@@ -1,9 +1,9 @@
 package mega.privacy.android.feature.sync.ui.mapper
 
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
+import mega.privacy.android.feature.sync.domain.entity.StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose
+import mega.privacy.android.feature.sync.domain.entity.StallIssueType.LocalAndRemotePreviouslyNotSyncedDifferUserMustChoose
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType.NamesWouldClashWhenSynced
-import mega.privacy.android.feature.sync.domain.entity.StallIssueType.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose
-import mega.privacy.android.feature.sync.domain.entity.StallIssueType.LocalAndRemotePreviouslyUnsyncedDiffer_userMustChoose
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import javax.inject.Inject
@@ -33,8 +33,8 @@ internal class StalledIssueResolutionActionMapper @Inject constructor() {
                 )
             }
 
-            LocalAndRemoteChangedSinceLastSyncedState_userMustChoose,
-            LocalAndRemotePreviouslyUnsyncedDiffer_userMustChoose,
+            LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
+            LocalAndRemotePreviouslyNotSyncedDifferUserMustChoose,
             -> {
                 listOf(
                     StalledIssueResolutionAction(

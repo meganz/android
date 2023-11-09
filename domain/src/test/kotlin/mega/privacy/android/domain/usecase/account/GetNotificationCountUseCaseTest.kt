@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
+import mega.privacy.android.domain.usecase.notifications.GetFeatureNotificationCountUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -29,6 +30,8 @@ class GetNotificationCountUseCaseTest {
     private val getNumUnreadUserAlertsUseCase = mock<GetNumUnreadUserAlertsUseCase>()
     private val getIncomingContactRequestsUseCase = mock<GetIncomingContactRequestsUseCase>()
     private val getNumUnreadChatsUseCase = mock<GetNumUnreadChatsUseCase>()
+    private val getFeatureNotificationCountUseCase = mock<GetFeatureNotificationCountUseCase>()
+    private val featureNotifications = setOf(getFeatureNotificationCountUseCase)
 
     @BeforeAll
     fun setUp() {
@@ -36,7 +39,8 @@ class GetNotificationCountUseCaseTest {
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             getNumUnreadUserAlertsUseCase = getNumUnreadUserAlertsUseCase,
             getIncomingContactRequestsUseCase = getIncomingContactRequestsUseCase,
-            getNumUnreadChatsUseCase = getNumUnreadChatsUseCase
+            getNumUnreadChatsUseCase = getNumUnreadChatsUseCase,
+            featureNotifications = featureNotifications,
         )
     }
 
@@ -46,15 +50,15 @@ class GetNotificationCountUseCaseTest {
             rootNodeExistsUseCase,
             getNumUnreadUserAlertsUseCase,
             getIncomingContactRequestsUseCase,
-            getNumUnreadChatsUseCase
+            getNumUnreadChatsUseCase,
+            getFeatureNotificationCountUseCase,
         )
     }
 
     @ParameterizedTest(
         name = "when withChatNotifications is {0} and rootNodeExistsUseCase is {1} " +
                 "and the unhandled notifications are: unread user alerts {2}, " +
-                "incoming contact requests {3} and" +
-                "unread chats {4}"
+                "incoming contact requests {3} unread chats {4} and featureNotifications are {5}"
     )
     @MethodSource("provideParameters")
     fun `test that the notification count is correct`(
@@ -63,10 +67,12 @@ class GetNotificationCountUseCaseTest {
         numUnreadUserAlerts: Int,
         numIncomingContactRequests: Int,
         numUnreadChats: Int,
+        featureNotification: Int,
         expectedResult: Int,
     ) = runTest {
         whenever(rootNodeExistsUseCase()).thenReturn(rootNodeExists)
         whenever(getNumUnreadUserAlertsUseCase()).thenReturn(numUnreadUserAlerts)
+        whenever(getFeatureNotificationCountUseCase()).thenReturn(featureNotification)
         val incomingContactRequestsList = mock<List<ContactRequest>> {
             on { size }.thenReturn(numIncomingContactRequests)
         }
@@ -80,14 +86,14 @@ class GetNotificationCountUseCaseTest {
         @JvmStatic
         private fun provideParameters(): Stream<Arguments?>? =
             Stream.of(
-                Arguments.of(false, true, 1, 2, 4, 3),
-                Arguments.of(false, true, 0, 2, 4, 2),
-                Arguments.of(false, false, 1, 2, 4, 0),
-                Arguments.of(false, false, 1, 2, 0, 0),
-                Arguments.of(true, false, 1, 2, 4, 0),
-                Arguments.of(true, false, 1, 0, 4, 0),
-                Arguments.of(true, true, 1, 2, 4, 7),
-                Arguments.of(true, true, 1, 2, 0, 3),
+                Arguments.of(false, true, 1, 2, 4, 0, 3),
+                Arguments.of(false, true, 0, 2, 4, 0, 2),
+                Arguments.of(false, false, 1, 2, 4, 0, 0),
+                Arguments.of(false, false, 1, 2, 0, 0, 0),
+                Arguments.of(true, false, 1, 2, 4, 0, 0),
+                Arguments.of(true, false, 1, 0, 4, 1, 0),
+                Arguments.of(true, true, 1, 2, 4, 1, 8),
+                Arguments.of(true, true, 1, 2, 0, 3, 6),
             )
     }
 }

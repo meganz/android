@@ -33,10 +33,10 @@ internal class StalledIssueTypeMapper @Inject constructor() {
         CannotPerformDeletion -> StallIssueType.CannotPerformDeletion
         SyncItemExceedsSupportedTreeDepth -> StallIssueType.SyncItemExceedsSupportedTreeDepth
         FolderMatchedAgainstFile -> StallIssueType.FolderMatchedAgainstFile
-        LocalAndRemoteChangedSinceLastSyncedState_userMustChoose -> StallIssueType.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose
-        LocalAndRemotePreviouslyUnsyncedDiffer_userMustChoose -> StallIssueType.LocalAndRemotePreviouslyUnsyncedDiffer_userMustChoose
+        LocalAndRemoteChangedSinceLastSyncedState_userMustChoose -> StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose
+        LocalAndRemotePreviouslyUnsyncedDiffer_userMustChoose -> StallIssueType.LocalAndRemotePreviouslyNotSyncedDifferUserMustChoose
         NamesWouldClashWhenSynced -> StallIssueType.NamesWouldClashWhenSynced
-        SyncStallReason_LastPlusOne -> StallIssueType.SyncStallReason_LastPlusOne
+        SyncStallReason_LastPlusOne -> StallIssueType.SyncStallReasonLastPlusOne
         else -> StallIssueType.NoReason
     }
 }
