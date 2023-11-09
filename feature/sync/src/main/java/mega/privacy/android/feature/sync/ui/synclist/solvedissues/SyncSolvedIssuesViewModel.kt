@@ -1,64 +1,45 @@
 package mega.privacy.android.feature.sync.ui.synclist.solvedissues
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import mega.privacy.android.core.R
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.feature.sync.domain.usecase.solvedissues.MonitorSyncSolvedIssuesUseCase
+import mega.privacy.android.feature.sync.ui.mapper.SolvedIssueItemMapper
 import javax.inject.Inject
 
 @HiltViewModel
-internal class SyncSolvedIssuesViewModel @Inject constructor() : ViewModel() {
+internal class SyncSolvedIssuesViewModel @Inject constructor(
+    private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase,
+    private val solvedIssueItemMapper: SolvedIssueItemMapper,
+    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
+) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncSolvedIssuesState())
     val state: StateFlow<SyncSolvedIssuesState> = _state.asStateFlow()
 
     init {
-        _state.value = SyncSolvedIssuesState(
-            getMockSolvedIssuesList()
-        )
+        viewModelScope.launch {
+            monitorSyncSolvedIssuesUseCase()
+                .map { solvedIssuesList ->
+                    solvedIssuesList.map { solvedIssue ->
+                        val node = getNodeByHandleUseCase(solvedIssue.nodeIds.first().longValue)
+                        solvedIssueItemMapper(
+                            solvedIssue = solvedIssue,
+                            isFolder = node is FolderNode
+                        )
+                    }
+                }
+                .collectLatest {
+                    _state.value = SyncSolvedIssuesState(it)
+                }
+        }
     }
-
-    private fun getMockSolvedIssuesList() = listOf(
-        SolvedIssueUiItem(
-            nodeIds = listOf(NodeId(1L)),
-            localPaths = listOf("Mock folder name"),
-            resolutionExplanation = "Folders were merged",
-            icon = R.drawable.ic_folder_list,
-        ),
-        SolvedIssueUiItem(
-            nodeIds = listOf(NodeId(2L)),
-            localPaths = listOf("Mock folder name"),
-            resolutionExplanation = "Folders were merged",
-            icon = R.drawable.ic_folder_list,
-        ),
-        SolvedIssueUiItem(
-            nodeIds = listOf(NodeId(3L)),
-            localPaths = listOf("Mock file name"),
-            resolutionExplanation = "All duplicates were removed",
-            icon = iconPackR.drawable.ic_generic_list
-        ),
-        SolvedIssueUiItem(
-            nodeIds = listOf(NodeId(4L)),
-            localPaths = listOf("Mock file name"),
-            resolutionExplanation = "All items were renamed",
-            icon = iconPackR.drawable.ic_generic_list,
-        ),
-        SolvedIssueUiItem(
-            nodeIds = listOf(NodeId(6L)),
-            localPaths = listOf("Mock folder name"),
-            resolutionExplanation = "All items were renamed",
-            icon = iconPackR.drawable.ic_generic_list,
-        ),
-        SolvedIssueUiItem(
-            nodeIds = listOf(NodeId(7L)),
-            localPaths = listOf("Mock folder name"),
-            resolutionExplanation = "All items were renamed",
-            icon = iconPackR.drawable.ic_generic_list,
-        )
-    )
 }

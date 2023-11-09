@@ -10,9 +10,12 @@ import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
+import mega.privacy.android.feature.sync.domain.mapper.StalledIssueToSolvedIssueMapper
 import mega.privacy.android.feature.sync.domain.usecase.ResolveStalledIssueUseCase
+import mega.privacy.android.feature.sync.domain.usecase.solvedissues.SetSyncSolvedIssueUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -33,11 +36,16 @@ class ResolveStalledIssueUseCaseTest {
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase = mock()
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
     private val getFileByPathUseCase: GetFileByPathUseCase = mock()
+    private val setSyncSolvedIssueUseCase: SetSyncSolvedIssueUseCase = mock()
+    private val stalledIssueToSolvedIssueMapper: StalledIssueToSolvedIssueMapper = mock()
+
     private val underTest = ResolveStalledIssueUseCase(
         deleteFileUseCase,
         moveNodesToRubbishUseCase,
         getNodeByHandleUseCase,
-        getFileByPathUseCase
+        getFileByPathUseCase,
+        setSyncSolvedIssueUseCase,
+        stalledIssueToSolvedIssueMapper
     )
 
     @AfterEach
@@ -161,4 +169,47 @@ class ResolveStalledIssueUseCaseTest {
             verify(deleteFileUseCase).invoke(localPath)
             verifyNoInteractions(moveNodesToRubbishUseCase)
         }
+
+    @Test
+    fun `test that after resolving stalled issue it is saved as solved issue`() = runTest {
+        val stalledIssueResolutionAction = StalledIssueResolutionAction(
+            actionName = "Choose file with the latest modified date",
+            resolutionActionType = StalledIssueResolutionActionType.CHOOSE_LATEST_MODIFIED_TIME
+        )
+        val localPath = "path/to/file"
+        val nodeId = NodeId(1L)
+        val stalledIssue = StalledIssue(
+            nodeIds = listOf(nodeId),
+            nodeNames = listOf("nodeName"),
+            localPaths = listOf(localPath),
+            issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
+            conflictName = "conflictName"
+        )
+        val remoteNodeModificationTimeInSeconds = 105L
+        val fileModificationTimeInMilliseconds = 100000L
+        val remoteNode = mock<FileNode> {
+            on { id } doReturn nodeId
+            on { modificationTime } doReturn remoteNodeModificationTimeInSeconds
+        }
+        val localFile = mock<File> {
+            on { lastModified() } doReturn fileModificationTimeInMilliseconds
+        }
+        val solvedIssue = SolvedIssue(
+            nodeIds = listOf(nodeId),
+            localPaths = listOf(localPath),
+            resolutionExplanation = stalledIssueResolutionAction.actionName
+        )
+        whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(remoteNode)
+        whenever(getFileByPathUseCase(localPath)).thenReturn(localFile)
+        whenever(
+            stalledIssueToSolvedIssueMapper(
+                stalledIssue,
+                stalledIssueResolutionAction.actionName
+            )
+        ).thenReturn(solvedIssue)
+
+        underTest(stalledIssueResolutionAction, stalledIssue)
+
+        verify(setSyncSolvedIssueUseCase).invoke(solvedIssue)
+    }
 }

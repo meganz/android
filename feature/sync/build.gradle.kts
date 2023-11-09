@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
     id("dagger.hilt.android.plugin")
+    id("com.google.devtools.ksp")
 }
 
 apply(from = "${project.rootDir}/tools/util.gradle")
@@ -87,6 +88,7 @@ dependencies {
     implementation(lib.logging.timber)
 
     implementation(google.hilt.android)
+    implementation(google.gson)
     implementation(androidx.datastore.preferences)
     implementation(androidx.hilt.navigation)
     kapt(google.hilt.android.compiler)
@@ -94,6 +96,8 @@ dependencies {
 
     implementation(androidx.appcompat)
     implementation(androidx.fragment)
+    implementation(androidx.room)
+    ksp(androidx.room.compiler)
     implementation(google.material)
     implementation(androidx.lifecycle.viewmodel)
     implementation(androidx.lifecycle.runtime.compose)

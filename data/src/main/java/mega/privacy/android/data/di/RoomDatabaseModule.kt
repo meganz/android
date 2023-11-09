@@ -26,6 +26,7 @@ import mega.privacy.android.data.database.dao.SyncRecordDao
 import java.security.KeyStore
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -128,4 +129,9 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideOfflineDao(database: MegaDatabase): OfflineDao =
         database.offlineDao()
+
+    @Provides
+    @Singleton
+    internal fun provideSyncSolvedIssuesDao(database: MegaDatabase): SyncSolvedIssuesDao =
+        database.syncSolvedIssuesDao()
 }

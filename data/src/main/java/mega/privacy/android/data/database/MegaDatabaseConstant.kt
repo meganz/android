@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 78
+    const val DATABASE_VERSION = 79
 
     /**
      * Database Name
@@ -54,4 +54,9 @@ object MegaDatabaseConstant {
      * Table Offline
      */
     const val TABLE_OFFLINE = "offline"
+
+    /**
+     * Table For Android Sync solved issues list
+     */
+    const val TABLE_SYNC_SOLVED_ISSUES = "syncsolvedissues"
 }

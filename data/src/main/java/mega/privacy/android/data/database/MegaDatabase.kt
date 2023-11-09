@@ -12,12 +12,14 @@ import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
+import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
+import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
 import mega.privacy.android.data.database.entity.SyncRecordEntity
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
 import timber.log.Timber
@@ -30,7 +32,8 @@ import timber.log.Timber
         SyncRecordEntity::class,
         SdTransferEntity::class,
         BackupEntity::class,
-        OfflineEntity::class
+        OfflineEntity::class,
+        SyncSolvedIssueEntity::class
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
@@ -38,6 +41,7 @@ import timber.log.Timber
         AutoMigration(69, 70),
         AutoMigration(72, 73),
         AutoMigration(73, 74, spec = AutoMigrationSpec73to74::class),
+        AutoMigration(78, 79),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -54,6 +58,8 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun backupDao(): BackupDao
 
     abstract fun offlineDao(): OfflineDao
+
+    abstract fun syncSolvedIssuesDao(): SyncSolvedIssuesDao
 
     companion object {
         private val MIGRATION_67_68 = object : Migration(67, 68) {

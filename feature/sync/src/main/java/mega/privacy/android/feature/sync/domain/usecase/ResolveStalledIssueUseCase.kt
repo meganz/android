@@ -8,6 +8,8 @@ import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
+import mega.privacy.android.feature.sync.domain.mapper.StalledIssueToSolvedIssueMapper
+import mega.privacy.android.feature.sync.domain.usecase.solvedissues.SetSyncSolvedIssueUseCase
 import javax.inject.Inject
 
 internal class ResolveStalledIssueUseCase @Inject constructor(
@@ -15,9 +17,22 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val getFileByPathUseCase: GetFileByPathUseCase,
+    private val setSyncSolvedIssueUseCase: SetSyncSolvedIssueUseCase,
+    private val stalledIssueToSolvedIssueMapper: StalledIssueToSolvedIssueMapper,
 ) {
 
     suspend operator fun invoke(
+        stalledIssueResolutionAction: StalledIssueResolutionAction,
+        stalledIssue: StalledIssue,
+    ) {
+        runCatching {
+            resolveIssue(stalledIssueResolutionAction, stalledIssue)
+        }.onSuccess {
+            saveSolvedIssue(stalledIssue, stalledIssueResolutionAction)
+        }
+    }
+
+    private suspend fun resolveIssue(
         stalledIssueResolutionAction: StalledIssueResolutionAction,
         stalledIssue: StalledIssue,
     ) {
@@ -61,5 +76,16 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
                 }
             }
         }
+    }
+
+    private suspend fun saveSolvedIssue(
+        stalledIssue: StalledIssue,
+        stalledIssueResolutionAction: StalledIssueResolutionAction,
+    ) {
+        val solvedIssue = stalledIssueToSolvedIssueMapper(
+            stalledIssue,
+            stalledIssueResolutionAction.actionName
+        )
+        setSyncSolvedIssueUseCase(solvedIssue = solvedIssue)
     }
 }
