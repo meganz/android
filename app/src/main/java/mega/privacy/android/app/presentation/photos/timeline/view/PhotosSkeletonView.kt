@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.ui.controls.modifier.skeletonEffect
+import mega.privacy.android.legacy.core.ui.controls.modifier.skeletonEffect
 
 @Composable
 internal fun PhotosSkeletonView() {

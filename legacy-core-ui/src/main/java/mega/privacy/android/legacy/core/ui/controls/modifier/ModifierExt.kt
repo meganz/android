@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.modifier
+package mega.privacy.android.legacy.core.ui.controls.modifier
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme

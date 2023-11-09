@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.ui.controls.modifier.skeletonEffect
+import mega.privacy.android.legacy.core.ui.controls.modifier.skeletonEffect
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
