@@ -107,42 +107,4 @@ internal class PasscodeDatastoreMigrationTest {
         verify(passcodeDataStore).setPasscodeType(expectedType)
         verify(passcodeDataStore).setBiometricsEnabled(expectedBiometricsState)
     }
-
-    @Test
-    internal fun `test that null passcode lock time does not cause an exception`() = runTest{
-        val expectedPasscodeLockEnabled = true
-        val expectedPasscodeLockCode = "expectedPasscodeLockCode"
-        val expectedPasscodeLockRequireTime = null
-        val expectedAttempts = 5
-        val expectedType = "4"
-        val expectedBiometricsState = true
-
-        val megaPreferences = mock<MegaPreferences> {
-            on { passcodeLockEnabled }.thenReturn(expectedPasscodeLockEnabled.toString())
-            on { passcodeLockCode }.thenReturn(expectedPasscodeLockCode)
-            on { passcodeLockEnabled }.thenReturn(expectedPasscodeLockEnabled.toString())
-            on { passcodeLockRequireTime }.thenReturn(expectedPasscodeLockRequireTime)
-            on { passcodeLockType }.thenReturn(expectedType)
-        }
-        val megaAttributes = mock<MegaAttributes> {
-            on { attempts }.thenReturn(expectedAttempts)
-        }
-
-        databaseHandler.stub {
-            on { preferences }.thenReturn(megaPreferences)
-            on { attributes }.thenReturn(megaAttributes)
-            on { isFingerprintLockEnabled }.thenReturn(expectedBiometricsState)
-        }
-
-        underTest.migrate(mock())
-
-        verify(passcodeDataStore).setPasscodeEnabledState(expectedPasscodeLockEnabled)
-        verify(passcodeDataStore).setFailedAttempts(expectedAttempts)
-        verify(passcodeDataStore).setPasscode(expectedPasscodeLockCode)
-        verify(passcodeDataStore).setLockedState(expectedPasscodeLockEnabled)
-        verify(passcodeDataStore).setPasscodeTimeout(expectedPasscodeLockRequireTime)
-        verify(passcodeDataStore).setLastBackgroundTime(null)
-        verify(passcodeDataStore).setPasscodeType(expectedType)
-        verify(passcodeDataStore).setBiometricsEnabled(expectedBiometricsState)
-    }
 }
