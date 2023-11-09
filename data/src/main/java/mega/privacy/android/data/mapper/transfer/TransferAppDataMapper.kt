@@ -24,7 +24,7 @@ internal class TransferAppDataMapper @Inject constructor() {
     ): List<TransferAppData> = if (appDataRaw.isEmpty()) emptyList() else {
         appDataRaw
             .split(APP_DATA_REPEATED_TRANSFER_SEPARATOR)
-            .flatMap { it.split(APP_DATA_SEPARATOR) }
+            .flatMap { it.splitTransfersParameters() }
             .map { appDataRawSingle ->
                 val typeAndValues = appDataRawSingle.split(APP_DATA_INDICATOR)
                 AppDataTypeConstants.getTypeFromSdkValue(typeAndValues.first()) to
@@ -34,8 +34,8 @@ internal class TransferAppDataMapper @Inject constructor() {
                 val result = when (type) {
                     VoiceClip -> TransferAppData.VoiceClip
                     CameraUpload -> TransferAppData.CameraUpload
-                    ChatUpload -> values.firstIfNotBlank()
-                        ?.let { TransferAppData.ChatUpload(it.toLong()) }
+                    ChatUpload -> values.firstIfNotBlank()?.toLongOrNull()
+                        ?.let { TransferAppData.ChatUpload(it) }
 
                     SDCardDownload -> {
                         values.firstIfNotBlank()?.let {
@@ -64,6 +64,30 @@ internal class TransferAppDataMapper @Inject constructor() {
     }
 
     private fun List<String>.firstIfNotBlank() = this.firstOrNull()?.takeIf { it.isNotBlank() }
+
+    /**
+     * Similar to [split(APP_DATA_SEPARATOR)] but checking if there is an [AppDataTypeConstants] after the separator
+     */
+    private fun String.splitTransfersParameters(): List<String> {
+        val separators = AppDataTypeConstants.values().map { APP_DATA_SEPARATOR + it.sdkTypeValue }
+        val result = mutableListOf<String>()
+        var toCheck = this
+        var index = toCheck.indexOfAny(separators)
+        while (index > 0) {
+            val parameter = toCheck.substring(0, index)
+            result.add(parameter)
+            toCheck = toCheck.removePrefix(parameter)
+            index = toCheck.indexOfAny(separators, 1)
+        }
+        result.add(toCheck)
+        return result.mapIndexed { i, s ->
+            if (i == 0) {
+                s
+            } else {
+                s.removePrefix(APP_DATA_SEPARATOR)
+            }
+        }
+    }
 
     companion object {
 

@@ -8,6 +8,7 @@ import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_SEPARATOR
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -62,6 +63,35 @@ class TransferAppDataMapperTest {
         expectedResult: List<TransferAppData>,
     ) {
         Truth.assertThat(underTest(appDataRaw)).containsExactlyElementsIn(expectedResult)
+    }
+
+    @Nested
+    inner class RealParameters {
+
+        @Test
+        fun `test that the sd card paths are mapped correctly when there are - char in the path`() {
+            val raw =
+                "SD_CARD_DOWNLOAD>/storage/48F8-4FB7/Download mega>content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
+            val expected = TransferAppData.SdCardDownload(
+                "/storage/48F8-4FB7/Download mega",
+                "content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
+            )
+            Truth.assertThat(underTest(raw)).containsExactly(expected)
+        }
+
+        @Test
+        fun `test that a chat upload is mapped correctly if the message id is a number`() {
+            val chatId = 1265L
+            val raw = "CHAT_UPLOAD>$chatId"
+            val expected = TransferAppData.ChatUpload(chatId)
+            Truth.assertThat(underTest(raw)).containsExactly(expected)
+        }
+
+        @Test
+        fun `test that a chat upload is mapped to null, returning an empty list, if the message id is not a number`() {
+            val raw = "CHAT_UPLOAD>chatId"
+            Truth.assertThat(underTest(raw)).isEmpty()
+        }
     }
 
     private fun provideWrongParameters() = wrongParameters
@@ -145,7 +175,7 @@ class TransferAppDataMapperTest {
                 }
             val joinedCorrect = correctParameters.reduce(reducer)
             val joinedWrong = wrongWithResult.reduce(reducer)
-            val joinedMix = (correctParameters + wrongWithResult).reduce(reducer)
+            val joinedMix = (wrongWithResult + correctParameters).reduce(reducer)
             return listOf(
                 Arguments.of(joinedCorrect.first, joinedCorrect.second),
                 Arguments.of(joinedWrong.first, joinedWrong.second),
