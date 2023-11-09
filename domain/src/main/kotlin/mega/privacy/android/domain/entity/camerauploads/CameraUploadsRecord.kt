@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.camerauploads
 
 import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * Representation of the files,used by Camera Uploads Process, to identify which files to be uploaded
@@ -17,6 +18,10 @@ import mega.privacy.android.domain.entity.SyncRecordType
  * @property generatedFingerprint the fingerprint of the generated file
  *                                Used for comparing files uploaded with local generated files (for video compression and gps tag removal)
  * @property tempFilePath the temporary path where the generated file will be located (used for video compression and gps tags removal)
+ * @property latitude the latitude coordinates extracted from the file. This value is computed during upload process
+ * @property longitude the longitude coordinates extracted from the file. This value is computed during upload process
+ * @property existsInTargetNode true if the file already exists in the target Node. This value is computed during upload process
+ * @property existingNodeId nodeId that corresponds to the parent folder This value is computed during upload process
  */
 data class CameraUploadsRecord(
     val mediaId: Long,
@@ -28,5 +33,9 @@ data class CameraUploadsRecord(
     val uploadStatus: CameraUploadsRecordUploadStatus,
     val originalFingerprint: String,
     val generatedFingerprint: String?,
-    val tempFilePath: String
+    val tempFilePath: String,
+    val latitude: Float? = null,
+    val longitude: Float? = null,
+    val existsInTargetNode: Boolean? = null,
+    val existingNodeId: NodeId? = null,
 )

@@ -107,6 +107,7 @@ import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DoesCameraUploadsRecordExistsInTargetNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
@@ -121,6 +122,7 @@ import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuota
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintUseCase
@@ -245,6 +247,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val processCameraUploadsMediaUseCase: ProcessCameraUploadsMediaUseCase,
     private val getPendingCameraUploadsRecordsUseCase: GetPendingCameraUploadsRecordsUseCase,
     private val renameCameraUploadsRecordsUseCase: RenameCameraUploadsRecordsUseCase,
+    private val doesCameraUploadsRecordExistsInTargetNodeUseCase: DoesCameraUploadsRecordExistsInTargetNodeUseCase,
+    private val extractGpsCoordinatesUseCase: ExtractGpsCoordinatesUseCase,
     private val uploadCameraUploadsRecordsUseCase: UploadCameraUploadsRecordsUseCase,
     private val fileSystemRepository: FileSystemRepository,
     @LoginMutex private val loginMutex: Mutex,
@@ -746,19 +750,30 @@ class CameraUploadsWorker @AssistedInject constructor(
                 renameCameraUploadsRecords(
                     filteredRecords,
                     primaryUploadNodeId,
-                    secondaryUploadNodeId
+                    secondaryUploadNodeId,
                 )
             }
             .let { renamedRecords ->
-                Timber.d("Start uploading ${renamedRecords.size} files")
+                Timber.d("Retrieve existence in target node for ${renamedRecords.size} files")
+                getExistenceInTargetNode(
+                    renamedRecords,
+                    primaryUploadNodeId,
+                    secondaryUploadNodeId
+                )
+            }
+            .let { renamedRecordsWithExistenceInTargetNode ->
+                Timber.d("Retrieve gps coordinates for ${renamedRecordsWithExistenceInTargetNode.size} files")
+                getGpsCoordinates(renamedRecordsWithExistenceInTargetNode)
+            }
+            .let { records ->
+                Timber.d("Start uploading ${records.size} files")
                 startHeartbeat()
                 uploadCameraUploadsRecords(
-                    renamedRecords,
+                    records,
                     primaryUploadNodeId,
                     secondaryUploadNodeId,
                     tempRoot,
                 )
-
             }
     }
 
@@ -798,15 +813,39 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @return a list of [CameraUploadsRecord]
      */
     private suspend fun renameCameraUploadsRecords(
-        filteredRecords: List<CameraUploadsRecord>,
+        records: List<CameraUploadsRecord>,
         primaryUploadNodeId: NodeId,
         secondaryUploadNodeId: NodeId,
     ): List<CameraUploadsRecord> =
         renameCameraUploadsRecordsUseCase(
-            filteredRecords,
+            records,
             primaryUploadNodeId,
             secondaryUploadNodeId,
         )
+
+    /**
+     * Get the existence of a node corresponding to the [CameraUploadsRecord] in the
+     * target node or other node
+     *
+     * @return a list of [CameraUploadsRecord]
+     */
+    private suspend fun getExistenceInTargetNode(
+        records: List<CameraUploadsRecord>,
+        primaryUploadNodeId: NodeId,
+        secondaryUploadNodeId: NodeId,
+    ) = doesCameraUploadsRecordExistsInTargetNodeUseCase(
+        records,
+        primaryUploadNodeId,
+        secondaryUploadNodeId,
+    )
+
+    /**
+     * Extract the gps coordinates and set in the respective [CameraUploadsRecord]
+     *
+     * @return a list of [CameraUploadsRecord]
+     */
+    private suspend fun getGpsCoordinates(records: List<CameraUploadsRecord>): List<CameraUploadsRecord> =
+        extractGpsCoordinatesUseCase(records)
 
     /**
      * Upload the camera uploads records
@@ -814,13 +853,13 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @return a flow of [CameraUploadsTransferProgress]
      */
     private suspend fun uploadCameraUploadsRecords(
-        renamedRecords: List<CameraUploadsRecord>,
+        records: List<CameraUploadsRecord>,
         primaryUploadNodeId: NodeId,
         secondaryUploadNodeId: NodeId,
         tempRoot: String,
     ): Flow<CameraUploadsTransferProgress> =
         uploadCameraUploadsRecordsUseCase(
-            renamedRecords,
+            records,
             primaryUploadNodeId,
             secondaryUploadNodeId,
             tempRoot,

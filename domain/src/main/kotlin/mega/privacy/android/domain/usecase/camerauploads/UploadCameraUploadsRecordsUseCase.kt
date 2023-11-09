@@ -28,7 +28,6 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
@@ -60,13 +59,11 @@ import javax.inject.Inject
  * The caller is responsible to aggregate the information.
  */
 class UploadCameraUploadsRecordsUseCase @Inject constructor(
-    private val findNodeWithFingerprintInParentNodeUseCase: FindNodeWithFingerprintInParentNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val setCoordinatesUseCase: SetCoordinatesUseCase,
     private val getNodeGPSCoordinatesUseCase: GetNodeGPSCoordinatesUseCase,
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val startUploadUseCase: StartUploadUseCase,
-    private val getGPSCoordinatesUseCase: GetGPSCoordinatesUseCase,
     private val setOriginalFingerprintUseCase: SetOriginalFingerprintUseCase,
     private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
     private val createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase,
@@ -116,20 +113,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         val videoQuality = getUploadVideoQualityUseCase()
         val locationTagsDisabled = !areLocationTagsEnabledUseCase()
 
-        cameraUploadsRecords.mapNotNull { record ->
-            runCatching {
-                retrieveNode(
-                    record = record,
-                    parentNodeId =
-                    getParentNodeId(record, primaryUploadNodeId, secondaryUploadNodeId)
-                ).let { (existsInParentFolder, existingNodeId) ->
-                    Triple(record, existsInParentFolder, existingNodeId)
-                }
-            }.getOrElse {
-                trySend(CameraUploadsTransferProgress.Error(record, it))
-                null
-            }
-        }.map { (record, existsInParentFolder, existingNodeId) ->
+        cameraUploadsRecords.map { record ->
             launch {
                 semaphore.acquire()
 
@@ -138,7 +122,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
 
                 when {
                     // node does not exist => upload
-                    existingNodeId == null -> {
+                    record.existingNodeId == null -> {
 
                         val shouldRemoveLocationTags =
                             record.type == SyncRecordType.TYPE_PHOTO && locationTagsDisabled
@@ -299,17 +283,17 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                     }
 
                     // node exists but not in target folder => copy
-                    existsInParentFolder == false -> {
+                    record.existsInTargetNode == false -> {
                         trySend(
                             CameraUploadsTransferProgress.ToCopy(
                                 record = record,
-                                nodeId = existingNodeId,
+                                nodeId = record.existingNodeId,
                             )
                         )
 
                         copyNode(
                             record = record,
-                            existingNodeId = existingNodeId,
+                            existingNodeId = record.existingNodeId,
                             parentNodeId = parentNodeId,
                         ).onFailure {
                             trySend(CameraUploadsTransferProgress.Error(record, it))
@@ -318,7 +302,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                         trySend(
                             CameraUploadsTransferProgress.Copied(
                                 record = record,
-                                nodeId = existingNodeId,
+                                nodeId = record.existingNodeId,
                             )
                         )
 
@@ -405,30 +389,6 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
             false
         }
     }.cancellable()
-
-    /**
-     * Find a node corresponding to the [CameraUploadsRecord] in the cloud
-     *
-     * @param record
-     * @param parentNodeId
-     *
-     * @return a [Pair] of <Boolean?, Boolean?>.
-     *         The first element will return true if it exists in the parent folder given in parameter,
-     *         false otherwise, null if in rubbish bin
-     *         The second element will return the node retrieved, null if cannot be retrieved
-     */
-    private suspend fun retrieveNode(
-        record: CameraUploadsRecord,
-        parentNodeId: NodeId
-    ): Pair<Boolean?, NodeId?> {
-        val (existsInParentFolder, existingNodeId) =
-            findNodeWithFingerprintInParentNodeUseCase(
-                record.originalFingerprint,
-                record.generatedFingerprint,
-                parentNodeId,
-            )
-        return Pair(existsInParentFolder, existingNodeId)
-    }
 
     /**
      * Get the path of the file to upload
@@ -601,7 +561,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     ) = runCatching {
         getGpsCoordinatesFromRecord(
             record = record,
-        ).let { (latitude, longitude) ->
+        )?.let { (latitude, longitude) ->
             setGpsCoordinates(
                 nodeId = nodeId,
                 latitude = latitude,
@@ -637,12 +597,14 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
      * @param record
      * @return a [Pair] of <[Double], [Double]> corresponding to latitude and longitude
      */
-    private suspend fun getGpsCoordinatesFromRecord(
+    private fun getGpsCoordinatesFromRecord(
         record: CameraUploadsRecord,
-    ): Pair<Double, Double> = getGPSCoordinatesUseCase(
-        filePath = record.filePath,
-        isVideo = record.type == SyncRecordType.TYPE_VIDEO,
-    ).let { (latitude, longitude) -> Pair(latitude.toDouble(), longitude.toDouble()) }
+    ): Pair<Double, Double>? =
+        record.latitude?.let { latitude ->
+            record.longitude?.let { longitude ->
+                Pair(latitude.toDouble(), longitude.toDouble())
+            }
+        }
 
     /**
      * Get the gps coordinates from node

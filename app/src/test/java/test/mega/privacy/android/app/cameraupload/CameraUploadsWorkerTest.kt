@@ -55,7 +55,9 @@ import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DoesCameraUploadsRecordExistsInTargetNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -211,6 +213,9 @@ class CameraUploadsWorkerTest {
     private val getPendingCameraUploadsRecordsUseCase: GetPendingCameraUploadsRecordsUseCase =
         mock()
     private val renameCameraUploadsRecordsUseCase: RenameCameraUploadsRecordsUseCase = mock()
+    private val doesCameraUploadsRecordExistsInTargetNodeUseCase: DoesCameraUploadsRecordExistsInTargetNodeUseCase =
+        mock()
+    private val extractGpsCoordinatesUseCase: ExtractGpsCoordinatesUseCase = mock()
     private val uploadCameraUploadsRecordsUseCase: UploadCameraUploadsRecordsUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
 
@@ -325,6 +330,8 @@ class CameraUploadsWorkerTest {
             getPendingCameraUploadsRecordsUseCase = getPendingCameraUploadsRecordsUseCase,
             renameCameraUploadsRecordsUseCase = renameCameraUploadsRecordsUseCase,
             uploadCameraUploadsRecordsUseCase = uploadCameraUploadsRecordsUseCase,
+            doesCameraUploadsRecordExistsInTargetNodeUseCase = doesCameraUploadsRecordExistsInTargetNodeUseCase,
+            extractGpsCoordinatesUseCase = extractGpsCoordinatesUseCase,
             fileSystemRepository = fileSystemRepository,
         )
     }

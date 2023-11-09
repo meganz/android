@@ -24,7 +24,6 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
@@ -57,14 +56,11 @@ import java.util.stream.Stream
 class UploadCameraUploadsRecordsUseCaseTest {
     private lateinit var underTest: UploadCameraUploadsRecordsUseCase
 
-    private val findNodeWithFingerprintInParentNodeUseCase =
-        mock<FindNodeWithFingerprintInParentNodeUseCase>()
     private val copyNodeUseCase = mock<CopyNodeUseCase>()
     private val setCoordinatesUseCase = mock<SetCoordinatesUseCase>()
     private val getNodeGPSCoordinatesUseCase = mock<GetNodeGPSCoordinatesUseCase>()
     private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
     private val startUploadUseCase = mock<StartUploadUseCase>()
-    private val getGPSCoordinatesUseCase = mock<GetGPSCoordinatesUseCase>()
     private val setOriginalFingerprintUseCase = mock<SetOriginalFingerprintUseCase>()
     private val areLocationTagsEnabledUseCase = mock<AreLocationTagsEnabledUseCase>()
     private val createTempFileAndRemoveCoordinatesUseCase =
@@ -97,6 +93,8 @@ class UploadCameraUploadsRecordsUseCaseTest {
         originalFingerprint = "originalFingerprint",
         generatedFingerprint = null,
         tempFilePath = "tempFilePath",
+        latitude = 0.0F,
+        longitude = 0.0F,
     )
 
     private val existingNodeId = mock<NodeId>()
@@ -107,13 +105,11 @@ class UploadCameraUploadsRecordsUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest = UploadCameraUploadsRecordsUseCase(
-            findNodeWithFingerprintInParentNodeUseCase = findNodeWithFingerprintInParentNodeUseCase,
             copyNodeUseCase = copyNodeUseCase,
             setCoordinatesUseCase = setCoordinatesUseCase,
             getNodeGPSCoordinatesUseCase = getNodeGPSCoordinatesUseCase,
             getFingerprintUseCase = getFingerprintUseCase,
             startUploadUseCase = startUploadUseCase,
-            getGPSCoordinatesUseCase = getGPSCoordinatesUseCase,
             setOriginalFingerprintUseCase = setOriginalFingerprintUseCase,
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
             createTempFileAndRemoveCoordinatesUseCase = createTempFileAndRemoveCoordinatesUseCase,
@@ -133,13 +129,11 @@ class UploadCameraUploadsRecordsUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            findNodeWithFingerprintInParentNodeUseCase,
             copyNodeUseCase,
             setCoordinatesUseCase,
             getNodeGPSCoordinatesUseCase,
             getFingerprintUseCase,
             startUploadUseCase,
-            getGPSCoordinatesUseCase,
             setOriginalFingerprintUseCase,
             areLocationTagsEnabledUseCase,
             createTempFileAndRemoveCoordinatesUseCase,
@@ -179,22 +173,17 @@ class UploadCameraUploadsRecordsUseCaseTest {
     @Nested
     inner class NoCopyOrUpload {
 
-        private fun setInput(cameraUploadFolderType: CameraUploadFolderType) {
-            record = record1.copy(folderType = cameraUploadFolderType)
+        private fun setInput(
+            cameraUploadFolderType: CameraUploadFolderType,
+            existsInTargetNode: Boolean?,
+        ) {
+            record = record1.copy(
+                folderType = cameraUploadFolderType,
+                existsInTargetNode = existsInTargetNode,
+                existingNodeId = existingNodeId,
+            )
             cameraUploadsRecords = listOf(record)
             uploadNodeId = getUploadNodeId(cameraUploadFolderType)
-        }
-
-        private suspend fun mockFindNodeWithFingerprintInParentNodeUseCase(
-            exists: Boolean?,
-        ) {
-            whenever(
-                findNodeWithFingerprintInParentNodeUseCase(
-                    record.originalFingerprint,
-                    record.generatedFingerprint,
-                    uploadNodeId,
-                )
-            ).thenReturn(Pair(exists, existingNodeId))
         }
 
         @ParameterizedTest(name = "when is in parent folder is {0} and folder type is {1}")
@@ -203,8 +192,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             exists: Boolean?,
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
-            setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase(exists)
+            setInput(cameraUploadFolderType, exists)
 
             executeUnderTest().collect()
 
@@ -230,8 +218,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             exists: Boolean?,
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
-            setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase(exists)
+            setInput(cameraUploadFolderType, exists)
 
             executeUnderTest().collect()
 
@@ -258,19 +245,13 @@ class UploadCameraUploadsRecordsUseCaseTest {
         private val newNodeId = mock<NodeId>()
 
         private fun setInput(cameraUploadFolderType: CameraUploadFolderType) {
-            record = record1.copy(folderType = cameraUploadFolderType)
+            record = record1.copy(
+                folderType = cameraUploadFolderType,
+                existsInTargetNode = false,
+                existingNodeId = existingNodeId,
+            )
             cameraUploadsRecords = listOf(record)
             uploadNodeId = getUploadNodeId(cameraUploadFolderType)
-        }
-
-        private suspend fun mockFindNodeWithFingerprintInParentNodeUseCase() {
-            whenever(
-                findNodeWithFingerprintInParentNodeUseCase(
-                    record.originalFingerprint,
-                    record.generatedFingerprint,
-                    uploadNodeId,
-                )
-            ).thenReturn(Pair(false, existingNodeId))
         }
 
         @ParameterizedTest(name = "when folder type is {0}")
@@ -279,7 +260,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(getNodeGPSCoordinatesUseCase(existingNodeId)).thenReturn(Pair(0.0, 0.0))
             whenever(copyNodeUseCase(existingNodeId, uploadNodeId, record.fileName))
                 .thenReturn(newNodeId)
@@ -299,7 +279,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             val (latitude, longitude) = Pair(0.0, 0.0)
             whenever(getNodeGPSCoordinatesUseCase(existingNodeId))
                 .thenReturn(Pair(latitude, longitude))
@@ -321,7 +300,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(getNodeGPSCoordinatesUseCase(existingNodeId)).thenReturn(Pair(0.0, 0.0))
             whenever(copyNodeUseCase(existingNodeId, uploadNodeId, record.fileName))
                 .thenReturn(newNodeId)
@@ -342,7 +320,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(getNodeGPSCoordinatesUseCase(existingNodeId)).thenReturn(Pair(0.0, 0.0))
             whenever(copyNodeUseCase(existingNodeId, uploadNodeId, record.fileName))
                 .thenReturn(newNodeId)
@@ -384,19 +361,13 @@ class UploadCameraUploadsRecordsUseCaseTest {
         private var uploadEvents = flowOf(transferStartEvent, transferFinishedEvent)
 
         private fun setInput(cameraUploadFolderType: CameraUploadFolderType) {
-            record = record1.copy(folderType = cameraUploadFolderType)
+            record = record1.copy(
+                folderType = cameraUploadFolderType,
+                existsInTargetNode = false,
+                existingNodeId = null,
+            )
             cameraUploadsRecords = listOf(record)
             uploadNodeId = getUploadNodeId(cameraUploadFolderType)
-        }
-
-        private suspend fun mockFindNodeWithFingerprintInParentNodeUseCase() {
-            whenever(
-                findNodeWithFingerprintInParentNodeUseCase(
-                    record.originalFingerprint,
-                    record.generatedFingerprint,
-                    uploadNodeId,
-                )
-            ).thenReturn(Pair(false, null))
         }
 
         private fun mockStartUploadUseCase(
@@ -422,13 +393,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase(record.filePath)
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
 
@@ -452,7 +420,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
         ) = runTest {
             setInput(cameraUploadFolderType)
             val generatedFingerprint = "generatedFingerprint"
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(false)
             whenever(
                 createTempFileAndRemoveCoordinatesUseCase(
@@ -465,8 +432,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(false)
             mockStartUploadUseCase(record.tempFilePath)
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(getFingerprintUseCase(record.tempFilePath))
@@ -488,13 +453,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase()
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
 
@@ -514,13 +476,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase()
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
 
@@ -540,13 +499,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase()
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
 
@@ -567,7 +523,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
@@ -583,8 +538,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             mockStartUploadUseCase(
                 events = flowOf(transferStartEvent, transferUpdateEvent, transferFinishedEvent)
             )
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
 
@@ -606,7 +559,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
@@ -626,8 +578,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
                     transferFinishedEvent
                 )
             )
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
 
@@ -649,13 +599,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase()
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(fileSystemRepository.deleteFile(File(record.tempFilePath))).thenReturn(true)
@@ -678,13 +625,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase()
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
 
@@ -702,13 +646,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase()
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
 
@@ -727,13 +668,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase()
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
 
@@ -748,13 +686,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase()
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
 
@@ -774,13 +709,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             mockStartUploadUseCase()
-            whenever(getGPSCoordinatesUseCase(record.filePath, false))
-                .thenReturn(Pair(0.0F, 0.0F))
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
 
@@ -806,19 +738,14 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
             type: SyncRecordType = SyncRecordType.TYPE_PHOTO,
         ) {
-            record = record1.copy(folderType = cameraUploadFolderType, type = type)
+            record = record1.copy(
+                folderType = cameraUploadFolderType,
+                type = type,
+                existsInTargetNode = false,
+                existingNodeId = null,
+            )
             cameraUploadsRecords = listOf(record)
             uploadNodeId = getUploadNodeId(cameraUploadFolderType)
-        }
-
-        private suspend fun mockFindNodeWithFingerprintInParentNodeUseCase() {
-            whenever(
-                findNodeWithFingerprintInParentNodeUseCase(
-                    record.originalFingerprint,
-                    record.generatedFingerprint,
-                    uploadNodeId,
-                )
-            ).thenReturn(Pair(false, null))
         }
 
         private fun mockStartUploadUseCase(
@@ -843,7 +770,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(false)
 
             executeUnderTest().collect()
@@ -862,7 +788,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType, SyncRecordType.TYPE_VIDEO)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
@@ -884,7 +809,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(false)
             whenever(
                 createTempFileAndRemoveCoordinatesUseCase(
@@ -911,7 +835,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(false)
             whenever(
                 createTempFileAndRemoveCoordinatesUseCase(
@@ -938,7 +861,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(false)
             whenever(
                 createTempFileAndRemoveCoordinatesUseCase(
@@ -966,7 +888,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(false)
             whenever(
                 createTempFileAndRemoveCoordinatesUseCase(
@@ -1004,19 +925,14 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
             type: SyncRecordType = SyncRecordType.TYPE_PHOTO,
         ) {
-            record = record1.copy(folderType = cameraUploadFolderType, type = type)
+            record = record1.copy(
+                folderType = cameraUploadFolderType,
+                type = type,
+                existsInTargetNode = false,
+                existingNodeId = null,
+            )
             cameraUploadsRecords = listOf(record)
             uploadNodeId = getUploadNodeId(cameraUploadFolderType)
-        }
-
-        private suspend fun mockFindNodeWithFingerprintInParentNodeUseCase() {
-            whenever(
-                findNodeWithFingerprintInParentNodeUseCase(
-                    record.originalFingerprint,
-                    record.generatedFingerprint,
-                    uploadNodeId,
-                )
-            ).thenReturn(Pair(false, null))
         }
 
         private fun mockStartUploadUseCase(
@@ -1044,7 +960,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             setInput(cameraUploadFolderType)
             val quality = VideoQuality.MEDIUM
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
@@ -1068,7 +983,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             setInput(cameraUploadFolderType, SyncRecordType.TYPE_VIDEO)
             val quality = VideoQuality.MEDIUM
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
@@ -1095,7 +1009,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             setInput(cameraUploadFolderType, SyncRecordType.TYPE_VIDEO)
             val quality = VideoQuality.MEDIUM
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
@@ -1148,7 +1061,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             setInput(cameraUploadFolderType, SyncRecordType.TYPE_VIDEO)
             val quality = VideoQuality.MEDIUM
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
-            mockFindNodeWithFingerprintInParentNodeUseCase()
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
