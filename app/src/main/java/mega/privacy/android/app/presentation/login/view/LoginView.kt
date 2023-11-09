@@ -27,8 +27,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,13 +55,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
 import mega.privacy.android.app.presentation.extensions.login.error
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationField
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
@@ -74,6 +76,7 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 
 /**
  * Login fragment view.
@@ -91,7 +94,6 @@ import mega.privacy.android.domain.entity.login.FetchNodesUpdate
  * @param onBackPressed             Action when back is pressed.
  * @param onUpdateKarereLogs        Action when needs to update MegaChat logs.
  * @param onUpdateSdkLogs           Action when needs to update Sdk logs.
- * @param onChangeApiServer         Action when needs to update API server.
  * @param onFirstTime2FAConsumed    Action when the 2FA is shown for the first time.
  * @param modifier                  [Modifier]
  */
@@ -110,13 +112,13 @@ fun LoginView(
     onBackPressed: () -> Unit,
     onUpdateKarereLogs: () -> Unit,
     onUpdateSdkLogs: () -> Unit,
-    onChangeApiServer: () -> Unit,
     onFirstTime2FAConsumed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
+    var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -148,7 +150,7 @@ fun LoginView(
                     paddingValues = paddingValues,
                     onUpdateKarereLogs = onUpdateKarereLogs,
                     onUpdateSdkLogs = onUpdateSdkLogs,
-                    onChangeApiServer = onChangeApiServer,
+                    onChangeApiServer = { showChangeApiServerDialog = true },
                     modifier = modifier,
                 )
 
@@ -178,6 +180,10 @@ fun LoginView(
                 duration = SnackbarDuration.Long
             )
         }
+
+        if (showChangeApiServerDialog) {
+            ChangeApiServerDialog(onDismissRequest = { showChangeApiServerDialog = false })
+        }
     }
 }
 
@@ -204,8 +210,8 @@ private fun RequireLogin(
     ) {
         val emailFocusRequester = remember { FocusRequester() }
         val passwordFocusRequester = remember { FocusRequester() }
-        var pendingClicksKarere by remember { mutableStateOf(CLICKS_TO_ENABLE_LOGS) }
-        var pendingClicksSDK by remember { mutableStateOf(CLICKS_TO_ENABLE_LOGS) }
+        var pendingClicksKarere by remember { mutableIntStateOf(CLICKS_TO_ENABLE_LOGS) }
+        var pendingClicksSDK by remember { mutableIntStateOf(CLICKS_TO_ENABLE_LOGS) }
         val focusManager = LocalFocusManager.current
 
         Text(
@@ -523,7 +529,6 @@ private fun PreviewLoginView(
             onBackPressed = {},
             onUpdateKarereLogs = {},
             onUpdateSdkLogs = {},
-            onChangeApiServer = {},
             onFirstTime2FAConsumed = {}
         )
     }

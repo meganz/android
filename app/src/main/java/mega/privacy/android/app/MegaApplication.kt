@@ -48,13 +48,12 @@ import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache
-import mega.privacy.android.app.utils.ChangeApiServerUtil
-import mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
 import mega.privacy.android.domain.usecase.monitoring.EnablePerformanceReporterUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPublicNodeThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -183,6 +182,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     lateinit var getPublicNodeThumbnailUseCase: dagger.Lazy<GetPublicNodeThumbnailUseCase>
 
+    @Inject
+    lateinit var updateApiServerUseCase: UpdateApiServerUseCase
+
     var localIpAddress: String? = ""
 
     var isEsid = false
@@ -229,22 +231,8 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             checkResumedPendingTransfers()
             initPausedTransfers()
         }
-        val apiServerValue =
-            getSharedPreferences(ChangeApiServerUtil.API_SERVER_PREFERENCES, MODE_PRIVATE)
-                .getInt(ChangeApiServerUtil.API_SERVER, ChangeApiServerUtil.PRODUCTION_SERVER_VALUE)
-        var disablePkp = false
-        if (apiServerValue != ChangeApiServerUtil.PRODUCTION_SERVER_VALUE) {
-            if (apiServerValue == ChangeApiServerUtil.SANDBOX3_SERVER_VALUE
-                || apiServerValue == ChangeApiServerUtil.STAGING_444_SERVER_VALUE
-            ) {
-                megaApi.setPublicKeyPinning(false)
-                megaApiFolder.setPublicKeyPinning(false)
-                disablePkp = true
-            }
-            val apiServer = getApiServerFromValue(apiServerValue)
-            megaApi.changeApiUrl(apiServer, disablePkp)
-            megaApiFolder.changeApiUrl(apiServer, disablePkp)
-        }
+
+        applicationScope.launch { runCatching { updateApiServerUseCase() } }
 
         val useHttpsOnly = java.lang.Boolean.parseBoolean(dbH.useHttpsOnly)
         Timber.d("Value of useHttpsOnly: %s", useHttpsOnly)

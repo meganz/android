@@ -8,25 +8,29 @@ import javax.inject.Inject
  * Update api server use case
  *
  * @property apiServerRepository [ApiServerRepository]
+ * @property getCurrentApiServerUseCase [GetCurrentApiServerUseCase]
  */
 class UpdateApiServerUseCase @Inject constructor(
     private val apiServerRepository: ApiServerRepository,
+    private val getCurrentApiServerUseCase: GetCurrentApiServerUseCase,
 ) {
 
     /**
      * Invoke
      *
-     * @param currentApi [ApiServer]
-     * @param newApi [ApiServer]
+     * @param currentApi [ApiServer], null if want to set the server when MegaApplication is created.
+     * @param newApi [ApiServer], null if want to set the server when MegaApplication is created.
      */
-    suspend operator fun invoke(currentApi: ApiServer, newApi: ApiServer) {
-        if (currentApi == newApi) return
+    suspend operator fun invoke(currentApi: ApiServer? = null, newApi: ApiServer? = null) {
+        val storedApi = currentApi ?: getCurrentApiServerUseCase()
+
+        if (storedApi == newApi || (newApi == null && storedApi == ApiServer.Production)) return
 
         var disablePkp = false
         var setPkp: Boolean? = null
 
         when {
-            currentApi == ApiServer.Sandbox3 || currentApi == ApiServer.Staging444 -> {
+            newApi != null && (storedApi == ApiServer.Sandbox3 || storedApi == ApiServer.Staging444) -> {
                 setPkp = true
             }
 
@@ -38,8 +42,8 @@ class UpdateApiServerUseCase @Inject constructor(
 
         with(apiServerRepository) {
             setPkp?.let { setPublicKeyPinning(it) }
-            changeApi(newApi.url, disablePkp)
-            setNewApi(newApi)
+            changeApi(newApi?.url ?: storedApi.url, disablePkp)
+            setNewApi(newApi ?: storedApi)
         }
     }
 }

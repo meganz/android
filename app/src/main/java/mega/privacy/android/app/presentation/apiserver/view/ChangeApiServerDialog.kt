@@ -33,7 +33,10 @@ internal fun ChangeApiServerDialog(
             uiState.currentApiServer?.let { viewModel.updateNewApiServer(it) }
             onDismissRequest()
         },
-        onConfirmRequest = viewModel::confirmUpdateApiServer,
+        onConfirmRequest = {
+            viewModel.confirmUpdateApiServer()
+            onDismissRequest()
+        },
     )
 }
 

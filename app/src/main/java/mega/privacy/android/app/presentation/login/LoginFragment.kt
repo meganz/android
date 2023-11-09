@@ -51,7 +51,6 @@ import mega.privacy.android.app.presentation.settings.startscreen.util.StartScre
 import mega.privacy.android.app.providers.FileProviderActivity
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
@@ -86,7 +85,6 @@ class LoginFragment : Fragment() {
     private val viewModel: LoginViewModel by activityViewModels()
 
     private var insertMKDialog: AlertDialog? = null
-    private var changeApiServerDialog: AlertDialog? = null
     private var confirmLogoutDialog: AlertDialog? = null
 
     private var intentExtras: Bundle? = null
@@ -107,7 +105,6 @@ class LoginFragment : Fragment() {
 
     override fun onDestroy() {
         confirmLogoutDialog?.dismiss()
-        changeApiServerDialog?.dismiss()
         super.onDestroy()
     }
 
@@ -149,7 +146,6 @@ class LoginFragment : Fragment() {
                 onBackPressed = { onBackPressed(uiState) },
                 onUpdateKarereLogs = { viewModel.checkAndUpdateKarereLogs(requireActivity()) },
                 onUpdateSdkLogs = { viewModel.checkAndUpdateSDKLogs(requireActivity()) },
-                onChangeApiServer = ::showChangeApiServerDialog,
                 onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed
             )
         }
@@ -426,12 +422,6 @@ class LoginFragment : Fragment() {
 
         Timber.d("querySignupLink")
         intent.getStringExtra(Constants.EXTRA_CONFIRMATION)?.let { viewModel.checkSignupLink(it) }
-    }
-
-    private fun showChangeApiServerDialog() {
-        if (changeApiServerDialog == null || changeApiServerDialog?.isShowing == false) {
-            changeApiServerDialog = showChangeApiServerDialog(requireActivity())
-        }
     }
 
     private fun startFastLogin() {
@@ -817,10 +807,6 @@ class LoginFragment : Fragment() {
      * @param time
      */
     private fun startCameraUploadService(firstTimeCam: Boolean, time: Int) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            return
-        }
-
         Timber.d("firstTimeCam: $firstTimeCam: $time")
 
         with(requireActivity()) {
