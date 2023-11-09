@@ -2,6 +2,8 @@ package mega.privacy.android.data.di
 
 import android.content.Context
 import android.provider.Settings
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
@@ -21,6 +23,9 @@ import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
+import java.security.KeyStore
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -87,6 +92,36 @@ internal object RoomDatabaseModule {
     internal fun provideAesKey(): ByteArray {
         val key = Settings.Secure.ANDROID_ID + "fkvn8 w4y*(NC\$G*(G($*GR*(#)*huio4h389\$G"
         return key.toByteArray().copyOfRange(0, 32)
+    }
+
+    @Provides
+    @Singleton
+    @Named("new_aes_key")
+    internal fun provideNewAesKey(): SecretKey {
+        val androidKeyStore = "AndroidKeyStore"
+        val keyName = "new_aes_key"
+        val keystore = KeyStore.getInstance(androidKeyStore)
+        keystore.load(null)
+        // only generate key one times
+        if (!keystore.containsAlias(keyName)) {
+            KeyGenerator.getInstance(
+                KeyProperties.KEY_ALGORITHM_AES,
+                androidKeyStore
+            ).apply {
+                init(
+                    KeyGenParameterSpec.Builder(
+                        keyName,
+                        KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+                    ).setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                        .setRandomizedEncryptionRequired(false)
+                        .build()
+                )
+
+                generateKey()
+            }
+        }
+        return keystore.getKey(keyName, null) as SecretKey
     }
 
     @Provides
