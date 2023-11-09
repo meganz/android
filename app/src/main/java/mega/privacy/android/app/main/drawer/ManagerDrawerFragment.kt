@@ -152,7 +152,9 @@ internal class ManagerDrawerFragment : Fragment() {
         }
         viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
             setContactStatus(uiState.userChatStatus)
-            updateBackupsSectionVisibility(uiState.hasBackupsChildren)
+            // For QA Builds, show Backups when the Device Center Feature Flag is also disabled
+            binding.backupsSection.isVisible =
+                !uiState.enabledFlags.contains(AppFeatures.DeviceCenter) && uiState.hasBackupsChildren
             setDrawerLayout(uiState.isRootNodeExist && uiState.isConnected)
             binding.navigationDrawerAddPhoneNumberContainer.isVisible = uiState.canVerifyPhoneNumber
             if (uiState.enabledFlags.contains(AppFeatures.AndroidSync)) {
@@ -321,22 +323,6 @@ internal class ManagerDrawerFragment : Fragment() {
         if (viewModel.isConnected) {
             drawerManager.closeDrawer()
             startActivity(Intent(requireActivity(), MyAccountActivity::class.java))
-        }
-    }
-
-    /**
-     * Updates Backups section visibility depending on if it has children.
-     *
-     * @param hasChildren True if the Backups node has children, false otherwise.
-     */
-    private fun updateBackupsSectionVisibility(hasChildren: Boolean) {
-        Timber.d("updateBackupsSectionVisibility")
-        binding.backupsSection.isEnabled = hasChildren
-        binding.backupsSection.isVisible = hasChildren
-        if (hasChildren) {
-            binding.backupsSectionText.setTextColor(
-                ColorUtils.getThemeColor(requireActivity(), android.R.attr.textColorPrimary)
-            )
         }
     }
 
