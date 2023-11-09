@@ -45,7 +45,7 @@ internal data class MegaColors(
         @Composable
         get() = RadioButtonDefaults.colors(
             selectedColor = MegaTheme.colors.border.strongSelected,
-            unselectedColor = MegaTheme.colors.icon.primary,
+            unselectedColor = MegaTheme.colors.icon.secondary,
             disabledColor = MegaTheme.colors.border.disabled,
         )
 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.dialogs
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,27 +9,30 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.lists.SettingsItemWithRadioButton
+import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 /**
  * Confirmation dialog with radio button
@@ -66,36 +70,56 @@ fun <T> ConfirmationDialogWithRadioButtons(
                     .fillMaxWidth()
             ) {
                 if (titleText.isNotEmpty()) {
-                    Text(
+                    MegaText(
                         modifier = Modifier
                             .padding(top = 20.dp, bottom = 16.dp, start = 24.dp, end = 24.dp),
                         text = titleText,
-                        color = MegaTheme.colors.text.primary,
+                        textColor = TextColor.Primary,
                         style = MaterialTheme.typography.h6,
-                        textAlign = TextAlign.Start,
                     )
                 }
                 if (subTitleText.isNotEmpty()) {
-                    Text(
+                    MegaText(
                         modifier = Modifier
                             .padding(bottom = 16.dp, start = 24.dp, end = 24.dp),
                         text = subTitleText,
-                        style = MaterialTheme.typography.subtitle1.copy(
-                            color = MegaTheme.colors.text.secondary,
-                            textAlign = TextAlign.Start,
-                        )
+                        textColor = TextColor.Secondary,
+                        style = MaterialTheme.typography.subtitle1,
                     )
                 }
 
-                Column(modifier = modifier.selectableGroup()) {
+                val optionsScrollState = rememberScrollState()
+                val showScrollSeparatorTop by remember {
+                    derivedStateOf {
+                        optionsScrollState.value > 0
+                    }
+                }
+                val showScrollSeparatorBottom by remember {
+                    derivedStateOf {
+                        optionsScrollState.value < optionsScrollState.maxValue
+                    }
+                }
+                if (showScrollSeparatorTop) {
+                    ScrollSeparator()
+                }
+                Column(
+                    modifier = Modifier
+                        .selectableGroup()
+                        .weight(1f, fill = false)
+                        .verticalScroll(state = optionsScrollState)
+                ) {
                     radioOptions?.forEach { item ->
                         SettingsItemWithRadioButton(
-                            modifier = modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                             title = optionDescriptionMapper(item),
                             selected = item == initialSelectedOption,
                             onClick = { onOptionSelected(item) })
                     }
                 }
+                if (showScrollSeparatorBottom) {
+                    ScrollSeparator()
+                }
+
 
                 if (!cancelButtonText.isNullOrEmpty() || !confirmButtonText.isNullOrEmpty()) {
                     Row(
@@ -118,17 +142,25 @@ fun <T> ConfirmationDialogWithRadioButtons(
                         }
                     }
                 } else {
-                    Spacer(modifier = modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
     }
 }
 
+@Composable
+private fun ScrollSeparator() = Spacer(
+    Modifier
+        .height(1.dp)
+        .fillMaxWidth()
+        .background(MegaTheme.colors.border.strong)
+)
+
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewConfirmationWithRadioButtonsDialog() {
+private fun ConfirmationDialogWithRadioButtonsPreview() {
     val options = listOf("Light", "Dark", "Busy", "System default")
     var selected by remember { mutableStateOf(options[0]) }
     AndroidTheme(isDark = isSystemInDarkTheme()) {
@@ -146,17 +178,44 @@ private fun PreviewConfirmationWithRadioButtonsDialog() {
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewConfirmationWithRadioButtonsDialogWithoutActionButton() {
+private fun ConfirmationDialogWithRadioButtonsWithCancelPreview() {
     val options = listOf(
         "Light",
         "Dark",
         "Busy",
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-        "System default"
+        "System default",
     )
     var selected by remember { mutableStateOf(options[0]) }
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ConfirmationDialogWithRadioButtons(
+            titleText = "Dialog title",
+            subTitleText = "Subtitle",
+            cancelButtonText = "Cancel",
+            confirmButtonText = "OK",
+            initialSelectedOption = selected,
+            radioOptions = options,
+            onOptionSelected = { selected = it },
+            onDismissRequest = { }
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ConfirmationDialogWithRadioButtonsWithScrollPreview() {
+    val options = listOf(
+        "Light",
+        "Dark",
+        "Busy",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+        "System default",
+        "Yet another one",
+    )
+    var selected by remember { mutableStateOf(options[0]) }
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        ConfirmationDialogWithRadioButtons(
+            modifier = Modifier.height(350.dp),
             titleText = "Dialog title",
             subTitleText = "Subtitle",
             cancelButtonText = "Cancel",
