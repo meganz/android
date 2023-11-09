@@ -59,6 +59,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:id="@+id/participant_info_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -82,7 +83,7 @@
             android:textAppearance="@style/TextAppearance.Mega.Caption.Variant6"
             android:textColor="@color/white_alpha_087" />
 
-        <ImageView
+        <mega.privacy.android.app.components.RoundedImageView
             android:id="@+id/mute_icon"
             android:layout_width="16dp"
             android:layout_height="16dp"

@@ -90,11 +90,16 @@ class VideoMeetingViewHolder(
                 inMeetingViewModel.onItemClick(participant)
             }
 
+            binding.root.background = ContextCompat.getDrawable(
+                binding.root.context,
+                R.drawable.self_feed_floating_window_background
+            )
 
             (binding.muteIcon.layoutParams as LinearLayout.LayoutParams).apply {
                 bottomMargin = 0
             }
 
+            roundMuteIconBackground()
             binding.name.isVisible = false
         }
 
@@ -120,6 +125,17 @@ class VideoMeetingViewHolder(
         }
 
         checkUI(participant)
+    }
+
+    /**
+     * Make the mute icon background rounded
+     */
+    private fun roundMuteIconBackground() {
+        binding.participantInfoLayout.background = ContextCompat.getDrawable(
+            binding.root.context,
+            R.drawable.participant_mic_off_background
+        )
+        binding.muteIcon.cornerRadius = dp2px(16f)
     }
 
     /**
@@ -420,8 +436,13 @@ class VideoMeetingViewHolder(
         if (isInvalid(participant)) return
 
         Timber.d("Update audio icon")
-        binding.muteIcon.isVisible =
-            inMeetingViewModel.getSession(participant.clientId)?.hasAudio()?.not() == true
+        (inMeetingViewModel.getSession(participant.clientId)
+            ?.hasAudio()?.not() == true).let { value ->
+            binding.muteIcon.isVisible = value
+            if (!isGrid) {
+                binding.participantInfoLayout.isVisible = value
+            }
+        }
     }
 
     /**
