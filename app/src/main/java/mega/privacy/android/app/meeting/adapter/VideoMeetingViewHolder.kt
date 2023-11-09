@@ -531,11 +531,6 @@ class VideoMeetingViewHolder(
 
         if (participant.isSpeaker) {
             Timber.d("Participant is speaker")
-            binding.selectedForeground.background = ContextCompat.getDrawable(
-                binding.root.context,
-                if (inMeetingViewModel.isSpeakerSelectionAutomatic) R.drawable.border_green_layer
-                else R.drawable.border_green_layer_selected
-            )
             setRoundedCorners(binding.selectedForeground)
             binding.selectedForeground.isVisible = true
         } else {

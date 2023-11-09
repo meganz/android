@@ -30,7 +30,7 @@
         android:id="@+id/selected_foreground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/border_green_layer"
+        android:background="@drawable/border_green_layer_selected"
         android:visibility="gone" />
 
     <mega.privacy.android.app.components.RoundedImageView
