@@ -1,5 +1,6 @@
 package mega.privacy.android.legacy.core.ui.controls.lists
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -419,7 +420,7 @@ private fun FilePreview() {
             modifier = Modifier,
             isSelected = false,
             folderInfo = null,
-            icon = R.drawable.ic_pdf_list,
+            icon = iconPackR.drawable.ic_pdf_list,
             fileSize = "1.2 MB",
             modifiedDate = "Dec 29, 2022",
             name = "documentation.pdf",

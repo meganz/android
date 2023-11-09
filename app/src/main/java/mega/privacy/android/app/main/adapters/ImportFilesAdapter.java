@@ -273,7 +273,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 fileName = textInfo.getSubject();
 
                 ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
-                int icon = textInfo.isUrl() ? R.drawable.ic_url_list : typeForName(fileName).getIconResourceId();
+                int icon = textInfo.isUrl() ? mega.privacy.android.icon.pack.R.drawable.ic_url_list : typeForName(fileName).getIconResourceId();
                 ((ViewHolderImportFiles) holder).thumbnail.setImageResource(icon);
             } else {
                 ShareInfo file = (ShareInfo) getItem(position);
