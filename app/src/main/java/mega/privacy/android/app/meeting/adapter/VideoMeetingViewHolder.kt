@@ -1,12 +1,17 @@
 package mega.privacy.android.app.meeting.adapter
 
 import android.content.res.Configuration
+import android.graphics.Outline
+import android.util.TypedValue
+import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
@@ -44,6 +49,8 @@ class VideoMeetingViewHolder(
 
     private var isDrawing = true
 
+    private var itemCount = 0
+
     fun bind(
         inMeetingViewModel: InMeetingViewModel,
         participant: Participant,
@@ -51,6 +58,7 @@ class VideoMeetingViewHolder(
         isFirstPage: Boolean,
     ) {
         this.inMeetingViewModel = inMeetingViewModel
+        this.itemCount = itemCount
 
         if (participant.peerId == MEGACHAT_INVALID_HANDLE || participant.clientId == MEGACHAT_INVALID_HANDLE) {
             Timber.e("Error. Peer id or client id invalid")
@@ -228,6 +236,12 @@ class VideoMeetingViewHolder(
             participant.videoListener?.width = 0
         }
 
+        if (!isGrid || itemCount != SLOT_NUM_1) {
+            participant.videoListener?.textureView?.let { view ->
+                setRoundedCorners(view)
+            }
+        }
+
         binding.parentTextureView.isVisible = true
     }
 
@@ -298,13 +312,16 @@ class VideoMeetingViewHolder(
      *
      * @param participant The participant whose video listener is going to be created
      */
-    fun createListener(participant: Participant) {
+    private fun createListener(participant: Participant) {
         if (isInvalid(participant)) return
 
         participant.videoListener =
             inMeetingViewModel.createVideoListener(participant, AVATAR_VIDEO_VISIBLE, ROTATION)
         participant.videoListener?.let { listener ->
             binding.parentTextureView.addView(listener.textureView)
+            if (!isGrid || itemCount != SLOT_NUM_1) {
+                listener.textureView?.let { view -> setRoundedCorners(view) }
+            }
             listener.localRenderer?.addListener(listenerRenderer)
         }
     }
@@ -314,7 +331,7 @@ class VideoMeetingViewHolder(
      *
      * @param participant The participant whose video listener is going to be removed
      */
-    fun removeListener(participant: Participant) {
+    private fun removeListener(participant: Participant) {
         if (isInvalid(participant)) return
 
         participant.videoListener?.let { listener ->
@@ -487,6 +504,10 @@ class VideoMeetingViewHolder(
     fun updatePeerSelected(participant: Participant) {
         if (isGrid || isInvalid(participant)) return
 
+        participant.videoListener?.textureView?.let { view ->
+            setRoundedCorners(view)
+        }
+
         if (participant.isSpeaker) {
             Timber.d("Participant is speaker")
             binding.selectedForeground.background = ContextCompat.getDrawable(
@@ -494,6 +515,7 @@ class VideoMeetingViewHolder(
                 if (inMeetingViewModel.isSpeakerSelectionAutomatic) R.drawable.border_green_layer
                 else R.drawable.border_green_layer_selected
             )
+            setRoundedCorners(binding.selectedForeground)
             binding.selectedForeground.isVisible = true
         } else {
             Timber.d("Participant is not selected")
@@ -726,6 +748,30 @@ class VideoMeetingViewHolder(
     private fun isInvalid(participant: Participant) =
         (participant.peerId != peerId || participant.clientId != clientId)
 
+    /**
+     * Set rounded corners for a view
+     *
+     * @param view  [View] to set the rounded corners
+     */
+    private fun setRoundedCorners(view: View) {
+        val mOutlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                val cornerRadius = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    ROUNDED_CORNERS_RADIUS,
+                    MegaApplication.getInstance().resources.displayMetrics
+                ).toInt()
+
+                outline.setRoundRect(0, 0, view.width, view.height, cornerRadius.toFloat())
+            }
+        }
+
+        view.apply {
+            outlineProvider = mOutlineProvider
+            clipToOutline = true
+        }
+    }
+
     companion object {
         const val ITEM_WIDTH = 90f
         const val ITEM_HEIGHT = 90f
@@ -736,6 +782,7 @@ class VideoMeetingViewHolder(
         const val ROTATION = 0f
         const val DEFAULT_MARGIN = 4f
         const val DEFAULT_HALF_MARGIN = 2f
+        const val ROUNDED_CORNERS_RADIUS = 8f
 
         const val TWO_COLUMNS = 2
         const val TWO_ROWS = 2
