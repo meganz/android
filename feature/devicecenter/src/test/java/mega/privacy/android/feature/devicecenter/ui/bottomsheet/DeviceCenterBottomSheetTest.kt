@@ -55,7 +55,6 @@ internal class DeviceCenterBottomSheetTest {
                 isCameraUploadsEnabled = true,
                 onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
-                onShowInBackupsClicked = {},
                 onShowInCloudDriveClicked = {},
                 onInfoClicked = {},
             )
@@ -86,7 +85,6 @@ internal class DeviceCenterBottomSheetTest {
                 isCameraUploadsEnabled = true,
                 onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
-                onShowInBackupsClicked = {},
                 onShowInCloudDriveClicked = {},
                 onInfoClicked = {},
             )
@@ -117,7 +115,6 @@ internal class DeviceCenterBottomSheetTest {
                 isCameraUploadsEnabled = true,
                 onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
-                onShowInBackupsClicked = {},
                 onShowInCloudDriveClicked = {},
                 onInfoClicked = {},
             )
@@ -148,7 +145,6 @@ internal class DeviceCenterBottomSheetTest {
                 isCameraUploadsEnabled = true,
                 onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
-                onShowInBackupsClicked = {},
                 onShowInCloudDriveClicked = {},
                 onInfoClicked = {},
             )

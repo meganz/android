@@ -8,7 +8,6 @@ import androidx.compose.ui.platform.testTag
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.InfoBottomSheetTile
-import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.ShowInBackupsBottomSheetTile
 
 /**
  * Test Tag for the Backup Folder Bottom Sheet Body
@@ -19,17 +18,14 @@ internal const val BOTTOM_SHEET_BODY_BACKUP_FOLDER =
 /**
  * A [Composable] Bottom Sheet Body that displays options specific to a Backup Device Folder
  *
- * @param onShowInBackupsClicked Lambda that is executed when the "Show in Backups" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
  */
 @Composable
 internal fun BackupFolderBottomSheetBody(
-    onShowInBackupsClicked: () -> Unit,
     onInfoClicked: () -> Unit,
 ) {
     Column(modifier = Modifier.testTag(BOTTOM_SHEET_BODY_BACKUP_FOLDER)) {
-        InfoBottomSheetTile(onActionClicked = onInfoClicked)
-        ShowInBackupsBottomSheetTile(onActionClicked = onShowInBackupsClicked)
+        InfoBottomSheetTile(onActionClicked = onInfoClicked, addSeparator = false)
     }
 }
 
@@ -41,7 +37,6 @@ internal fun BackupFolderBottomSheetBody(
 private fun PreviewBackupFolderBottomSheet() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         BackupFolderBottomSheetBody(
-            onShowInBackupsClicked = {},
             onInfoClicked = {},
         )
     }

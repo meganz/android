@@ -53,7 +53,6 @@ internal const val BOTTOM_SHEET_HEADER =
  * @param isCameraUploadsEnabled true if Camera Uploads is Enabled, and false if otherwise
  * @param onCameraUploadsClicked Lambda that is executed when the "Camera uploads" Tile is selected
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
- * @param onShowInBackupsClicked Lambda that is executed when the "Show in Backups" Tile is selected
  * @param onShowInCloudDriveClicked Lambda that is executed when the "Show in Cloud Drive" Tile is
  * selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
@@ -67,7 +66,6 @@ internal fun DeviceCenterBottomSheet(
     isCameraUploadsEnabled: Boolean,
     onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: (DeviceUINode) -> Unit,
-    onShowInBackupsClicked: () -> Unit,
     onShowInCloudDriveClicked: (Long) -> Unit,
     onInfoClicked: () -> Unit,
 ) {
@@ -122,10 +120,6 @@ internal fun DeviceCenterBottomSheet(
 
                 is BackupDeviceFolderUINode -> {
                     BackupFolderBottomSheetBody(
-                        onShowInBackupsClicked = {
-                            coroutineScope.launch { modalSheetState.hide() }
-                            onShowInBackupsClicked.invoke()
-                        },
                         onInfoClicked = {
                             coroutineScope.launch { modalSheetState.hide() }
                             onInfoClicked.invoke()
@@ -226,7 +220,6 @@ private fun PreviewDeviceCenterBottomSheet() {
             isCameraUploadsEnabled = true,
             onCameraUploadsClicked = {},
             onRenameDeviceClicked = {},
-            onShowInBackupsClicked = {},
             onShowInCloudDriveClicked = {},
             onInfoClicked = {},
         )

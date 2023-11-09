@@ -171,7 +171,6 @@ internal fun DeviceCenterScreen(
                 isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
                 onCameraUploadsClicked = onCameraUploadsClicked,
                 onRenameDeviceClicked = onRenameDeviceOptionClicked,
-                onShowInBackupsClicked = {},
                 onShowInCloudDriveClicked = onShowInCloudDriveClicked,
                 onInfoClicked = {},
             )

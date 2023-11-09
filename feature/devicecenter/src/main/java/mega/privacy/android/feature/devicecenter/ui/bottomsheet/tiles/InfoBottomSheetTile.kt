@@ -21,15 +21,18 @@ internal const val BOTTOM_SHEET_TILE_INFO =
  * A [Composable] Bottom Sheet Tile that displays "Info"
  *
  * @param onActionClicked Lambda that is executed when the Tile is selected
+ * @param addSeparator Adds a Divider at the bottom if true, and none if otherwise
  */
 @Composable
 internal fun InfoBottomSheetTile(
     onActionClicked: () -> Unit,
+    addSeparator: Boolean = true,
 ) {
     MenuActionListTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_INFO),
         text = stringResource(R.string.device_center_bottom_sheet_item_info),
         icon = painterResource(id = R.drawable.ic_bottom_sheet_info),
+        addSeparator = addSeparator,
         onActionClicked = onActionClicked,
     )
 }
