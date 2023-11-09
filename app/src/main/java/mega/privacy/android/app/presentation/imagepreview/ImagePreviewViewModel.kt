@@ -29,7 +29,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -42,7 +41,6 @@ import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
-import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
@@ -63,7 +61,6 @@ class ImagePreviewViewModel @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val addFavouritesUseCase: AddFavouritesUseCase,
     private val removeFavouritesUseCase: RemoveFavouritesUseCase,
-    private val exportNodeUseCase: ExportNodeUseCase,
     private val setNodeAvailableOffline: SetNodeAvailableOffline,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
@@ -270,20 +267,6 @@ class ImagePreviewViewModel @Inject constructor(
                 )
             } else {
                 removeOfflineNodeUseCase(imageNode.id)
-            }
-        }
-    }
-
-    fun shareImageNode(context: Context, imageNode: ImageNode) {
-        viewModelScope.launch {
-            runCatching {
-                exportNodeUseCase(imageNode.id)
-            }.onSuccess { link ->
-                if (link.isNotBlank()) {
-                    MegaNodeUtil.shareLink(context, link)
-                }
-            }.onFailure { error ->
-                Timber.e(error)
             }
         }
     }

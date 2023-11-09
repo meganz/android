@@ -40,6 +40,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -195,7 +196,7 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun shareNode(imageNode: ImageNode) {
-        viewModel.shareImageNode(context = this, imageNode = imageNode)
+        MegaNodeUtil.shareNode(this, MegaNode.unserialize(imageNode.serializedData))
     }
 
     private fun renameNode(imageNode: ImageNode) {

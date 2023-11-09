@@ -236,7 +236,6 @@ fun ImagePreviewScreen(
                         },
                         onClickFavourite = {
                             onClickFavourite(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
                         },
                         onClickLabel = {
                             onClickLabel(currentImageNode)
@@ -268,18 +267,15 @@ fun ImagePreviewScreen(
                         },
                         onClickShare = {
                             onClickShare(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
                         },
                         onClickRename = {
                             onClickRename(currentImageNode)
                         },
                         onClickMove = {
                             onClickMove(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
                         },
                         onClickCopy = {
                             onClickCopy(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
                         },
                         onClickMoveToRubbishBin = {
                             onClickMoveToRubbishBin(currentImageNode)

@@ -1,5 +1,8 @@
 package mega.privacy.android.domain.entity.imageviewer
 
+import java.io.File
+import java.net.URI
+
 /**
  * Domain entity that encapsulates an image result coming from GetImageUseCase.
  *
@@ -29,7 +32,7 @@ data class ImageResult constructor(
      * @return  Image Uri or null.
      */
     fun getHighestResolutionAvailableUri(): String? =
-        fullSizeUri ?: previewUri ?: thumbnailUri
+        checkUri(fullSizeUri) ?: checkUri(previewUri) ?: checkUri(thumbnailUri)
 
     /**
      * Get lowest resolution image available.
@@ -37,7 +40,7 @@ data class ImageResult constructor(
      * @return  Image Uri or null.
      */
     fun getLowestResolutionAvailableUri(): String? =
-        thumbnailUri ?: previewUri ?: fullSizeUri
+        checkUri(thumbnailUri) ?: checkUri(previewUri) ?: checkUri(fullSizeUri)
 
     /**
      * Get Progress percentage while Image is getting downloaded
@@ -53,5 +56,17 @@ data class ImageResult constructor(
             }
         }
         return null
+    }
+
+    private fun checkUri(uriPath: String?): String? {
+        return try {
+            if (File(URI.create(uriPath).path).exists()) {
+                uriPath
+            } else {
+                null
+            }
+        } catch (_: Exception) {
+            null
+        }
     }
 }
