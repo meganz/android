@@ -21,6 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
+import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenuOptions
@@ -40,6 +41,7 @@ import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
@@ -66,6 +68,8 @@ class ImagePreviewViewModel @Inject constructor(
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
+    private val disableExportNodesUseCase: DisableExportNodesUseCase,
+    private val removePublicLinkResultMapper: RemovePublicLinkResultMapper,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
@@ -401,6 +405,27 @@ class ImagePreviewViewModel @Inject constructor(
     suspend fun isAvailableOffline(imageNode: ImageNode): Boolean {
         val typedNode = addImageTypeUseCase(imageNode)
         return isAvailableOfflineUseCase(typedNode)
+    }
+
+    /**
+     * Disable export nodes
+     *
+     */
+    fun disableExport(imageNode: ImageNode) {
+        viewModelScope.launch {
+            runCatching {
+                disableExportNodesUseCase(listOf(imageNode.id))
+            }.onFailure {
+                Timber.e(it)
+            }.onSuccess { result ->
+                val message = removePublicLinkResultMapper(result)
+                _state.update { state ->
+                    state.copy(
+                        resultMessage = message,
+                    )
+                }
+            }
+        }
     }
 
     companion object {

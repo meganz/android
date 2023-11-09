@@ -37,9 +37,12 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +51,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,6 +72,7 @@ import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -107,6 +112,7 @@ fun ImagePreviewScreen(
         viewState.currentImageNode?.let { currentImageNode ->
             val isCurrentImageNodeAvailableOffline = viewState.isCurrentImageNodeAvailableOffline
             val context = LocalContext.current
+            var showRemoveLinkDialog by rememberSaveable { mutableStateOf(false) }
             val currentImageNodeInfo = remember(currentImageNodeIndex) {
                 MegaNode.unserialize(currentImageNode.serializedData).getInfoText(context)
             }
@@ -179,6 +185,24 @@ fun ImagePreviewScreen(
                 }
             }
 
+            if (showRemoveLinkDialog) {
+                MegaAlertDialog(
+                    text = pluralStringResource(
+                        id = R.plurals.remove_links_warning_text,
+                        count = 1
+                    ),
+                    confirmButtonText = stringResource(id = R.string.general_remove),
+                    cancelButtonText = stringResource(id = R.string.general_cancel),
+                    onConfirm = {
+                        viewModel.disableExport(currentImageNode)
+                        showRemoveLinkDialog = false
+                    },
+                    onDismiss = {
+                        showRemoveLinkDialog = false
+                    },
+                )
+            }
+
             Scaffold(
                 scaffoldState = scaffoldState,
                 snackbarHost = { snackBarHostState ->
@@ -201,6 +225,8 @@ fun ImagePreviewScreen(
                         imageName = currentImageNode.name,
                         imageInfo = currentImageNodeInfo,
                         isFavourite = currentImageNode.isFavourite,
+                        isExported = currentImageNode.exportedData != null,
+                        showRemoveLink = currentImageNode.exportedData != null,
                         showLabel = currentImageNode.label != MegaNode.NODE_LBL_UNKNOWN,
                         labelColor = colorResource(id = labelColorResId),
                         labelColorText = labelColorText,
@@ -229,6 +255,12 @@ fun ImagePreviewScreen(
                         },
                         onClickGetLink = {
                             onClickGetLink(currentImageNode)
+                        },
+                        onClickRemoveLink = {
+                            if (!currentImageNode.isTakenDown) {
+                                showRemoveLinkDialog = true
+                            }
+                            hideBottomSheet(coroutineScope, modalSheetState)
                         },
                         onClickSendTo = {
                             onClickSendTo(currentImageNode)

@@ -98,7 +98,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper,
     private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper,
     private val imageNodeMapper: ImageNodeMapper,
-    private val megaLocalRoomGateway: MegaLocalRoomGateway
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
 ) : PhotosRepository {
     private val photosCache: MutableMap<NodeId, Photo> = mutableMapOf()
 
@@ -119,6 +119,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         NodeChanges.Favourite,
         NodeChanges.Attributes,
         NodeChanges.Parent,
+        NodeChanges.Public_link,
     )
 
     private var monitorNodeUpdatesJob: Job? = null

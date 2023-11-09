@@ -61,6 +61,7 @@ internal fun ImagePreviewBottomSheet(
     imageName: String = "",
     imageInfo: String = "",
     isFavourite: Boolean = false,
+    isExported: Boolean = false,
     showLabel: Boolean = false,
     labelColorText: String = "",
     labelColor: Color = Color.Unspecified,
@@ -214,10 +215,14 @@ internal fun ImagePreviewBottomSheet(
                 item {
                     MenuActionListTile(
                         icon = painterResource(id = link_ic),
-                        text = LocalContext.current.resources.getQuantityString(
-                            R.plurals.get_links,
-                            1,
-                        ),
+                        text = if (isExported) {
+                            stringResource(id = R.string.edit_link_option)
+                        } else {
+                            LocalContext.current.resources.getQuantityString(
+                                R.plurals.get_links,
+                                1,
+                            )
+                        },
                         onActionClicked = onClickGetLink,
                         addSeparator = false,
                     )
