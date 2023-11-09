@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
 import mega.privacy.android.app.utils.Constants
@@ -144,6 +145,8 @@ internal class ChatViewModelTest {
         }
     private val inviteToChatUseCase: InviteToChatUseCase = mock()
 
+    private val inviteParticipantResultMapper: InviteParticipantResultMapper = mock()
+
     @BeforeAll
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -172,6 +175,7 @@ internal class ChatViewModelTest {
             getCustomSubtitleListUseCase,
             getAnotherCallParticipatingUseCase,
             inviteToChatUseCase,
+            inviteParticipantResultMapper,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -222,6 +226,7 @@ internal class ChatViewModelTest {
             savedStateHandle = savedStateHandle,
             monitorAllContactParticipantsInChatUseCase = monitorAllContactParticipantsInChatUseCase,
             inviteToChatUseCase = inviteToChatUseCase,
+            inviteParticipantResultMapper = inviteParticipantResultMapper,
         )
     }
 
@@ -1297,18 +1302,18 @@ internal class ChatViewModelTest {
     fun `test that multiple contacts are added to chat room`() = runTest {
         val contactList = listOf("user1", "user2")
         val chatRequest: ChatRequest = mock()
+        val resultList = listOf(
+            Result.success(chatRequest),
+            Result.success(chatRequest),
+        )
 
-        whenever(
-            inviteToChatUseCase(
-                chatId = chatId,
-                contactList = contactList
-            )
-        ).thenReturn(
-            listOf(
-                Result.success(chatRequest),
-                Result.success(chatRequest),
+        whenever(inviteToChatUseCase(chatId = chatId, contactList = contactList)).thenReturn(resultList)
+        whenever(inviteParticipantResultMapper(resultList)).thenReturn(
+            InviteContactToChatResult.MultipleContactsAdded(
+                success = 2
             )
         )
+
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {
@@ -1322,13 +1327,11 @@ internal class ChatViewModelTest {
     fun `test that one contact is added to chat room`() = runTest {
         val contactList = listOf("user1")
         val chatRequest: ChatRequest = mock()
+        val resultList = listOf(Result.success(chatRequest))
 
-        whenever(
-            inviteToChatUseCase(
-                chatId = chatId,
-                contactList = contactList
-            )
-        ).thenReturn(listOf(Result.success(chatRequest)))
+        whenever(inviteToChatUseCase(chatId = chatId, contactList = contactList)).thenReturn(resultList)
+        whenever(inviteParticipantResultMapper(resultList)).thenReturn(InviteContactToChatResult.OnlyOneContactAdded)
+
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {
@@ -1342,15 +1345,18 @@ internal class ChatViewModelTest {
     fun `test that add one contact fails to chat room due to already exists`() = runTest {
         val contactList = listOf("myself")
         val chatRequest: ChatRequest = mock()
-
-        whenever(inviteToChatUseCase(chatId, contactList)).thenReturn(
-            listOf(
-                Result.success(chatRequest),
-                Result.failure(
-                    ParticipantAlreadyExistsException()
-                )
+        val resultList = listOf(
+            Result.success(chatRequest),
+            Result.failure(
+                ParticipantAlreadyExistsException()
             )
         )
+
+        whenever(inviteToChatUseCase(chatId, contactList)).thenReturn(resultList)
+        whenever(inviteParticipantResultMapper(resultList)).thenReturn(
+            InviteContactToChatResult.AlreadyExistsError
+        )
+
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {
@@ -1365,18 +1371,19 @@ internal class ChatViewModelTest {
         runTest {
             val contactList = listOf("user1", "user2", "user3")
             val chatRequest: ChatRequest = mock()
-
-            whenever(inviteToChatUseCase(chatId, contactList)).thenReturn(
-                listOf(
-                    Result.success(chatRequest),
-                    Result.failure(
-                        MegaException(
-                            errorCode = MegaChatError.ERROR_ACCESS,
-                            errorString = "general error"
-                        )
+            val resultList = listOf(
+                Result.success(chatRequest),
+                Result.failure(
+                    MegaException(
+                        errorCode = MegaChatError.ERROR_ACCESS,
+                        errorString = "general error"
                     )
                 )
             )
+
+            whenever(inviteToChatUseCase(chatId, contactList)).thenReturn(resultList)
+            whenever(inviteParticipantResultMapper(resultList)).thenReturn(InviteContactToChatResult.GeneralError)
+
             initTestClass()
             underTest.inviteContactsToChat(chatId, contactList)
             underTest.state.test {
@@ -1391,21 +1398,24 @@ internal class ChatViewModelTest {
         val contactList =
             listOf("user1_added_ok", "user2_added_ok", "user3_add_failure", "user4_add_failure")
         val chatRequest: ChatRequest = mock()
-
-        whenever(inviteToChatUseCase(chatId, contactList)).thenReturn(
-            listOf(
-                Result.success(chatRequest),
-                Result.success(chatRequest),
-                Result.failure(
-                    ParticipantAlreadyExistsException()
-                ), Result.failure(
-                    MegaException(
-                        errorCode = MegaChatError.ERROR_ACCESS,
-                        errorString = "access error"
-                    )
+        val resultList = listOf(
+            Result.success(chatRequest),
+            Result.success(chatRequest),
+            Result.failure(
+                ParticipantAlreadyExistsException()
+            ), Result.failure(
+                MegaException(
+                    errorCode = MegaChatError.ERROR_ACCESS,
+                    errorString = "access error"
                 )
             )
         )
+
+        whenever(inviteToChatUseCase(chatId, contactList)).thenReturn(resultList)
+        whenever(inviteParticipantResultMapper(resultList)).thenReturn(
+            InviteContactToChatResult.SomeAddedSomeNot(success = 2, error = 2)
+        )
+
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {

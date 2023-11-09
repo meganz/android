@@ -17,14 +17,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
+import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -89,6 +88,7 @@ internal class ChatViewModel @Inject constructor(
     private val getCustomSubtitleListUseCase: GetCustomSubtitleListUseCase,
     private val monitorAllContactParticipantsInChatUseCase: MonitorAllContactParticipantsInChatUseCase,
     private val inviteToChatUseCase: InviteToChatUseCase,
+    private val inviteParticipantResultMapper: InviteParticipantResultMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -519,37 +519,13 @@ internal class ChatViewModel @Inject constructor(
             }.onSuccess { result ->
                 _state.update { state ->
                     state.copy(
-                        inviteToChatResultEvent = triggered(
-                            convertInviteContactResult(result)
-                        )
+                        inviteToChatResultEvent = triggered(inviteParticipantResultMapper(result))
                     )
                 }
             }.onFailure {
                 Timber.e(it)
             }
         }
-
-    private fun convertInviteContactResult(
-        results: List<Result<ChatRequest>>,
-    ): InviteContactToChatResult {
-        val errorCount = results.count { it.isFailure }
-        val successCount = results.size - errorCount
-
-        return when {
-            errorCount == 1 -> {
-                results.first { it.isFailure }.exceptionOrNull()?.let { throwable ->
-                    if (throwable is ParticipantAlreadyExistsException) {
-                        return InviteContactToChatResult.AlreadyExistsError
-                    }
-                }
-                return InviteContactToChatResult.GeneralError
-            }
-
-            errorCount > 1 -> InviteContactToChatResult.SomeAddedSomeNot(successCount, errorCount)
-            successCount == 1 -> InviteContactToChatResult.OnlyOneContactAdded
-            else -> InviteContactToChatResult.MultipleContactsAdded(successCount)
-        }
-    }
 
     fun onInviteContactsResultConsumed() {
         _state.update { state -> state.copy(inviteToChatResultEvent = consumed()) }
