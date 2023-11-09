@@ -10,11 +10,6 @@ interface MyAccountHomeViewActions {
     val isPhoneNumberDialogShown: Boolean
 
     /**
-     * show API Server dialog menu
-     */
-    fun showApiServerDialog() {}
-
-    /**
      * action when user clicks the user's avatar
      */
     fun onClickUserAvatar() {}

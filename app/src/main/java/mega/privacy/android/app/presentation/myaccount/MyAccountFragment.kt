@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
@@ -25,9 +24,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.myaccount.view.MyAccountHomeView
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
-import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.ChangeApiServerUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -49,7 +46,6 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
     @Deprecated("Should be removed later after refactor")
     private val activityViewModel: MyAccountViewModel by activityViewModels()
     private val viewModel: MyAccountHomeViewModel by viewModels()
-    private var changeApiServerDialog: AlertDialog? = null
     private var phoneNumberBottomSheet: PhoneNumberBottomSheetDialogFragment? = null
 
     /**
@@ -95,11 +91,6 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupObservers()
-        if (savedInstanceState != null) {
-            if (savedInstanceState.getBoolean(CHANGE_API_SERVER_SHOWN, false)) {
-                showApiServerDialog()
-            }
-        }
     }
 
     /**
@@ -110,34 +101,13 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
         viewModel.refreshAccountInfo()
     }
 
-    /**
-     * onDestroy
-     */
-    override fun onDestroy() {
-        super.onDestroy()
-        changeApiServerDialog?.dismiss()
-    }
-
     private fun setupObservers() {
         activityViewModel.onUpdateAccountDetails()
             .observe(viewLifecycleOwner) { viewModel.refreshAccountInfo() }
     }
 
-    /**
-     * onSaveInstanceState
-     */
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean(CHANGE_API_SERVER_SHOWN, isAlertDialogShown(changeApiServerDialog))
-        super.onSaveInstanceState(outState)
-    }
-
     override val isPhoneNumberDialogShown: Boolean
         get() = phoneNumberBottomSheet.isBottomSheetDialogShown()
-
-    override fun showApiServerDialog() {
-        changeApiServerDialog =
-            ChangeApiServerUtil.showChangeApiServerDialog(requireActivity())
-    }
 
     override fun onClickUserAvatar() {
         if (CallUtil.isNecessaryDisableLocalCamera() != Constants.INVALID_VALUE.toLong()) {

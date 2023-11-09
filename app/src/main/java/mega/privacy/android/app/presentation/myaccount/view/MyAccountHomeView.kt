@@ -37,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,6 +66,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
@@ -105,7 +107,6 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRAN
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -128,6 +129,7 @@ import mega.privacy.android.core.ui.theme.extensions.white_grey_800
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import org.jetbrains.anko.displayMetrics
 import java.io.File
 
@@ -474,6 +476,8 @@ private fun AccountInfoSection(
     val isSubscriptionRenewableOrExpired =
         uiState.hasRenewableSubscription || uiState.hasExpireAbleSubscription
 
+    var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .shadow(3.dp)
@@ -620,12 +624,16 @@ private fun AccountInfoSection(
                 lastSessionClick++
 
                 if (lastSessionClick >= CLICKS_TO_CHANGE_API_SERVER) {
-                    uiActions.showApiServerDialog()
+                    showChangeApiServerDialog = true
                     lastSessionClick = 0
                 }
             },
             testTag = LAST_SESSION
         )
+    }
+
+    if (showChangeApiServerDialog) {
+        ChangeApiServerDialog(onDismissRequest = { showChangeApiServerDialog = false })
     }
 }
 
