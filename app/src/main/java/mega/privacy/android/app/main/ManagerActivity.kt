@@ -8262,6 +8262,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                     startActivity(intent)
                                 } else {
                                     Timber.d("No Application found to can handle Ads intent")
+                                    adsViewModel.fetchNewAd()
                                 }
                             }
                         }, onAdDismissed = {

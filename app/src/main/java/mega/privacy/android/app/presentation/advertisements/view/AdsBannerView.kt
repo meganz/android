@@ -24,6 +24,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
+import java.net.URL
 
 /**
  * Compose View to show ads
@@ -54,14 +55,13 @@ internal fun AdsBannerView(
                 .size(width = 320.dp, height = 50.dp),
                 factory = { context ->
                     WebView(context).apply {
-                        var initialLoad = true
                         setBackgroundColor(webpageBackgroundColor)
                         settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
                         webViewClient = object : WebViewClient() {
+
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 super.onPageFinished(view, url)
-                                initialLoad = true
                                 onAdsWebpageLoaded()
                             }
 
@@ -69,15 +69,17 @@ internal fun AdsBannerView(
                                 view: WebView?,
                                 request: WebResourceRequest?,
                             ): Boolean {
-                                if (initialLoad) {
-                                    initialLoad = false
-                                    return false
+                                request?.url?.host?.let { targetDomain ->
+                                    val currentDomain = URL(view?.url).host
+                                    if (currentDomain.equals(targetDomain)) {
+                                        return false
+                                    }
+                                    onAdClicked(request.url)
+                                    return true
                                 }
-                                onAdClicked(request?.url)
-                                return true
+                                return false
                             }
                         }
-                        loadUrl(url)
                     }
                 }, update = {
                     it.loadUrl(url)

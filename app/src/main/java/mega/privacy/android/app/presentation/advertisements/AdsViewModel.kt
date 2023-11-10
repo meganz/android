@@ -135,7 +135,7 @@ class AdsViewModel @Inject constructor(
      * @param linkHandle  The public handle for file/folder link if user visits Share Link screen, this parameter is optional
      */
     fun fetchNewAd(
-        slotId: String,
+        slotId: String = uiState.value.slotId,
         linkHandle: Long? = null,
     ) {
         if (isAdsFeatureEnabled) {

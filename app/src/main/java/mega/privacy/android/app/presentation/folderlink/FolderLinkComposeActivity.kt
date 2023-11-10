@@ -211,6 +211,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                             Timber.d("No Application found to can handle Ads intent")
                         }
                     }
+                    adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
                 },
                 onAdDismissed = adsViewModel::onAdDismissed
             )
