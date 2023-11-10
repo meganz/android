@@ -33,10 +33,10 @@ class GetSecondaryFolderPathUseCase @Inject constructor(
     private suspend fun getLocalPath(): String {
         val localPath = cameraUploadRepository.getSecondaryFolderLocalPath()
 
-        return if (localPath.isBlank() ||
+        return if (localPath.isNullOrBlank() ||
             (localPath.isNotBlank() && fileSystemRepository.doesFolderExists(localPath))
         ) {
-            localPath
+            localPath ?: ""
         } else {
             cameraUploadRepository.setSecondaryFolderLocalPath("")
             ""

@@ -34,6 +34,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
@@ -99,6 +100,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper,
     private val imageNodeMapper: ImageNodeMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
+    private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
 ) : PhotosRepository {
     private val photosCache: MutableMap<NodeId, Photo> = mutableMapOf()
 
@@ -223,13 +225,11 @@ internal class DefaultPhotosRepository @Inject constructor(
     }
 
     override suspend fun getCameraUploadFolderId(): Long? = withContext(ioDispatcher) {
-        val getCameraUploadFolderId = megaLocalStorageFacade.getCamSyncHandle()
-        getCameraUploadFolderId
+        cameraUploadsSettingsPreferenceGateway.getCameraUploadsHandle()
     }
 
     override suspend fun getMediaUploadFolderId(): Long? = withContext(ioDispatcher) {
-        val getMediaUploadFolderId = megaLocalStorageFacade.getMegaHandleSecondaryFolder()
-        getMediaUploadFolderId
+        cameraUploadsSettingsPreferenceGateway.getMediaUploadsHandle()
     }
 
     private suspend fun fetchPhotosNodes(): List<List<MegaNode>> = withContext(ioDispatcher) {

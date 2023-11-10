@@ -13,6 +13,8 @@ import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
+import javax.inject.Inject
+import javax.inject.Named
 
 internal const val cameraUploadsSettingsPreferenceDataStoreName = "cameraUploadsSettingsDataStore"
 
@@ -26,8 +28,9 @@ internal class CameraUploadsSettingsPreferenceDataStore(
     private val decryptData: DecryptData,
 ) : CameraUploadsSettingsPreferenceGateway {
 
+    @Inject
     constructor(
-        dataStore: DataStore<Preferences>,
+        @Named(cameraUploadsSettingsPreferenceDataStoreName) dataStore: DataStore<Preferences>,
         encryptData: EncryptData,
         decryptData: DecryptData,
     ) : this(
@@ -344,7 +347,7 @@ internal class CameraUploadsSettingsPreferenceDataStore(
         }
     }
 
-    override suspend fun clear() {
+    override suspend fun clearPreferences() {
         editPreferences {
             it.clear()
         }

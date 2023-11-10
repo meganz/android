@@ -18,5 +18,5 @@ class IsChargingRequiredForVideoCompressionUseCase @Inject constructor(
      * @return true if the device needs to be charged to compress videos, and false if otherwise
      */
     suspend operator fun invoke(): Boolean =
-        cameraUploadRepository.isChargingRequiredForVideoCompression()
+        cameraUploadRepository.isChargingRequiredForVideoCompression() ?: true
 }

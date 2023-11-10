@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFolderState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -20,7 +21,11 @@ private const val ACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30L
  * Send Backup Heart Beat Use Case when camera uploads process is ongoing
  * @param cameraUploadRepository [CameraUploadRepository]
  */
-class SendBackupHeartBeatSyncUseCase @Inject constructor(private val cameraUploadRepository: CameraUploadRepository) {
+class SendBackupHeartBeatSyncUseCase @Inject constructor(
+    private val cameraUploadRepository: CameraUploadRepository,
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
+    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+) {
 
     /**
      * Invocation function
@@ -76,10 +81,10 @@ class SendBackupHeartBeatSyncUseCase @Inject constructor(private val cameraUploa
     ): Boolean {
         val isEnabled = when (cameraUploadFolderType) {
             CameraUploadFolderType.Primary ->
-                cameraUploadRepository.isCameraUploadsEnabled()
+                isCameraUploadsEnabledUseCase()
 
             CameraUploadFolderType.Secondary ->
-                cameraUploadRepository.isSecondaryMediaFolderEnabled()
+                isSecondaryFolderEnabled()
         }
         return isEnabled &&
                 cameraUploadsFolderState.bytesToUploadCount != 0L &&

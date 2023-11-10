@@ -18,6 +18,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
@@ -103,6 +104,8 @@ class DefaultAccountRepositoryTest {
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val fileGateway = mock<FileGateway>()
     private val recoveryKeyToFileMapper = mock<RecoveryKeyToFileMapper>()
+    private val cameraUploadsSettingsPreferenceGateway =
+        mock<CameraUploadsSettingsPreferenceGateway>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -164,6 +167,7 @@ class DefaultAccountRepositoryTest {
             megaLocalRoomGateway = megaLocalRoomGateway,
             fileGateway = fileGateway,
             recoveryKeyToFileMapper = recoveryKeyToFileMapper,
+            cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway
         )
 
     }
@@ -895,6 +899,7 @@ class DefaultAccountRepositoryTest {
             verify(megaLocalRoomGateway).deleteAllCompletedTransfers()
             verify(localStorageGateway).clearChatSettings()
             verify(megaLocalRoomGateway).deleteAllBackups()
+            verify(cameraUploadsSettingsPreferenceGateway).clearPreferences()
         }
 
     @Test

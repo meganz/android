@@ -20,7 +20,7 @@ class UpdatePrimaryFolderBackupStateUseCase @Inject constructor(
      * @param backupState The new [BackupState] of the Primary Folder
      */
     suspend operator fun invoke(backupState: BackupState) {
-        if (cameraUploadRepository.isCameraUploadsEnabled()) {
+        if (cameraUploadRepository.isCameraUploadsEnabled() == true) {
             cameraUploadRepository.getCuBackUp()?.let { backup ->
                 if (backupState != backup.state && backup.backupId != cameraUploadRepository.getInvalidHandle()) {
                     updateBackupStateUseCase(

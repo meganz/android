@@ -17,6 +17,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
@@ -92,6 +93,8 @@ class DefaultCameraUploadRepositoryTest {
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val videoQualityMapper: VideoQualityMapper = mock()
     private val videoQualityIntMapper: VideoQualityIntMapper = mock()
+    private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway =
+        mock()
 
     private val fakeRecord = SyncRecord(
         id = 0,
@@ -137,6 +140,7 @@ class DefaultCameraUploadRepositoryTest {
             uploadOptionIntMapper = uploadOptionIntMapper,
             megaLocalRoomGateway = megaLocalRoomGateway,
             context = mock(),
+            cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway
         )
     }
 
@@ -159,6 +163,7 @@ class DefaultCameraUploadRepositoryTest {
             backupStateIntMapper,
             uploadOptionMapper,
             uploadOptionIntMapper,
+            cameraUploadsSettingsPreferenceGateway
         )
     }
 
@@ -169,7 +174,9 @@ class DefaultCameraUploadRepositoryTest {
         @ValueSource(booleans = [true, false])
         fun `test that camera uploads can only run on specific connection types`(wifiOnly: Boolean) =
             runTest {
-                whenever(localStorageGateway.isCameraUploadsByWifi()).thenReturn(wifiOnly)
+                whenever(cameraUploadsSettingsPreferenceGateway.isUploadByWifi()).thenReturn(
+                    wifiOnly
+                )
                 assertThat(underTest.isCameraUploadsByWifi()).isEqualTo(wifiOnly)
             }
 
@@ -178,7 +185,7 @@ class DefaultCameraUploadRepositoryTest {
         fun `test that camera uploads can now be run on specific connection types`(wifiOnly: Boolean) =
             runTest {
                 underTest.setCameraUploadsByWifi(wifiOnly)
-                verify(localStorageGateway).setCameraUploadsByWifi(wifiOnly)
+                verify(cameraUploadsSettingsPreferenceGateway).setUploadsByWifi(wifiOnly)
             }
     }
 
@@ -196,7 +203,9 @@ class DefaultCameraUploadRepositoryTest {
             ).map { (input, expectedUploadOption) ->
                 dynamicTest("test that the value $input will return $expectedUploadOption") {
                     runTest {
-                        whenever(localStorageGateway.getCameraSyncFileUpload()).thenReturn(input)
+                        whenever(cameraUploadsSettingsPreferenceGateway.getFileUploadOption()).thenReturn(
+                            input
+                        )
                         whenever(uploadOptionMapper(input)).thenReturn(expectedUploadOption)
 
                         assertThat(underTest.getUploadOption()).isEqualTo(expectedUploadOption)
@@ -209,7 +218,7 @@ class DefaultCameraUploadRepositoryTest {
         fun `test that a new upload option for camera uploads is set`(uploadOption: UploadOption) =
             runTest {
                 underTest.setUploadOption(uploadOption)
-                verify(localStorageGateway).setCameraSyncFileUpload(
+                verify(cameraUploadsSettingsPreferenceGateway).setFileUploadOption(
                     uploadOptionIntMapper(
                         uploadOption
                     )
@@ -255,7 +264,9 @@ class DefaultCameraUploadRepositoryTest {
                 dynamicTest("test that the value $input will return $expectedVideoQuality") {
                     runTest {
                         whenever(videoQualityMapper.invoke(input)).thenReturn(expectedVideoQuality)
-                        whenever(localStorageGateway.getUploadVideoQuality()).thenReturn(input)
+                        whenever(cameraUploadsSettingsPreferenceGateway.getUploadVideoQuality()).thenReturn(
+                            input
+                        )
                         assertThat(underTest.getUploadVideoQuality()).isEqualTo(expectedVideoQuality)
                     }
                 }
@@ -267,7 +278,7 @@ class DefaultCameraUploadRepositoryTest {
             runTest {
                 whenever(videoQualityIntMapper.invoke(videoQuality)).thenReturn(videoQuality.value)
                 underTest.setUploadVideoQuality(videoQuality)
-                verify(localStorageGateway).setUploadVideoQuality(videoQuality.value)
+                verify(cameraUploadsSettingsPreferenceGateway).setUploadVideoQuality(videoQuality.value)
             }
     }
 
@@ -375,18 +386,22 @@ class DefaultCameraUploadRepositoryTest {
 
         @Test
         fun `test that the sync time stamp is retrieved`() = runTest {
-            val testTimeStamp = "150"
+            val testTimeStamp = 150L
 
-            whenever(localStorageGateway.getPhotoTimeStamp()).thenReturn(testTimeStamp)
+            whenever(cameraUploadsSettingsPreferenceGateway.getPhotoTimeStamp()).thenReturn(
+                testTimeStamp
+            )
             assertThat(underTest.getSyncTimeStamp(SyncTimeStamp.PRIMARY_PHOTO)).isEqualTo(
-                testTimeStamp.toInt()
+                testTimeStamp
             )
         }
 
         @ParameterizedTest(name = "sync enabled: {0}")
         @ValueSource(booleans = [true, false])
         fun `test that camera uploads is enabled or not`(syncEnabled: Boolean) = runTest {
-            whenever(localStorageGateway.isCameraUploadsEnabled()).thenReturn(syncEnabled)
+            whenever(cameraUploadsSettingsPreferenceGateway.isCameraUploadsEnabled()).thenReturn(
+                syncEnabled
+            )
             assertThat(underTest.isCameraUploadsEnabled()).isEqualTo(syncEnabled)
         }
 
@@ -484,7 +499,9 @@ class DefaultCameraUploadRepositoryTest {
         fun `test that the primary folder local path is retrieved`() = runTest {
             val testPath = "test/primary/path"
 
-            whenever(localStorageGateway.getPrimaryFolderLocalPath()).thenReturn(testPath)
+            whenever(cameraUploadsSettingsPreferenceGateway.getCameraUploadsLocalPath()).thenReturn(
+                testPath
+            )
             assertThat(underTest.getPrimaryFolderLocalPath()).isEqualTo(testPath)
         }
 
@@ -493,7 +510,7 @@ class DefaultCameraUploadRepositoryTest {
             val testPath = "test/new/primary/path"
 
             underTest.setPrimaryFolderLocalPath(testPath)
-            verify(localStorageGateway).setPrimaryFolderLocalPath(testPath)
+            verify(cameraUploadsSettingsPreferenceGateway).setCameraUploadsLocalPath(testPath)
         }
 
         @ParameterizedTest(name = "is in SD card: {0}")
@@ -586,7 +603,9 @@ class DefaultCameraUploadRepositoryTest {
         fun `test that the primary folder handle is retrieved`() = runTest {
             val testHandle = 1L
 
-            whenever(localStorageGateway.getCamSyncHandle()).thenReturn(testHandle)
+            whenever(cameraUploadsSettingsPreferenceGateway.getCameraUploadsHandle()).thenReturn(
+                testHandle
+            )
             assertThat(underTest.getPrimarySyncHandle()).isEqualTo(testHandle)
         }
     }
@@ -598,7 +617,9 @@ class DefaultCameraUploadRepositoryTest {
         fun `test that the secondary folder local path is retrieved`() = runTest {
             val testPath = "test/secondary/path"
 
-            whenever(localStorageGateway.getSecondaryFolderLocalPath()).thenReturn(testPath)
+            whenever(cameraUploadsSettingsPreferenceGateway.getMediaUploadsLocalPath()).thenReturn(
+                testPath
+            )
             assertThat(underTest.getSecondaryFolderLocalPath()).isEqualTo(testPath)
         }
 
@@ -607,14 +628,16 @@ class DefaultCameraUploadRepositoryTest {
             val testPath = "test/new/secondary/path"
 
             underTest.setSecondaryFolderLocalPath(testPath)
-            verify(localStorageGateway).setSecondaryFolderLocalPath(testPath)
+            verify(cameraUploadsSettingsPreferenceGateway).setMediaUploadsLocalPath(testPath)
         }
 
         @ParameterizedTest(name = "secondary folder enabled: {0}")
         @ValueSource(booleans = [true, false])
         fun `test that the secondary folder is enabled or not`(enabled: Boolean) =
             runTest {
-                whenever(localStorageGateway.isSecondaryMediaFolderEnabled()).thenReturn(enabled)
+                whenever(cameraUploadsSettingsPreferenceGateway.isMediaUploadsEnabled()).thenReturn(
+                    enabled
+                )
                 assertThat(underTest.isSecondaryMediaFolderEnabled()).isEqualTo(enabled)
             }
 
@@ -677,7 +700,9 @@ class DefaultCameraUploadRepositoryTest {
             runTest {
                 val testHandle = 2L
 
-                whenever(localStorageGateway.getMegaHandleSecondaryFolder()).thenReturn(testHandle)
+                whenever(cameraUploadsSettingsPreferenceGateway.getMediaUploadsHandle()).thenReturn(
+                    testHandle
+                )
                 assertThat(underTest.getSecondarySyncHandle()).isEqualTo(testHandle)
             }
         }
@@ -690,7 +715,7 @@ class DefaultCameraUploadRepositoryTest {
         @ValueSource(booleans = [true, false])
         fun `test that the location tags are added or not when uploading photos`(includeLocationTags: Boolean) =
             runTest {
-                whenever(localStorageGateway.areLocationTagsEnabled()).thenReturn(
+                whenever(cameraUploadsSettingsPreferenceGateway.areLocationTagsEnabled()).thenReturn(
                     includeLocationTags
                 )
                 assertThat(underTest.areLocationTagsEnabled()).isEqualTo(includeLocationTags)
@@ -701,7 +726,9 @@ class DefaultCameraUploadRepositoryTest {
         fun `test that the location tags are now handled when uploading photos`(includeLocationTags: Boolean) =
             runTest {
                 underTest.setLocationTagsEnabled(includeLocationTags)
-                verify(localStorageGateway).setLocationTagsEnabled(includeLocationTags)
+                verify(cameraUploadsSettingsPreferenceGateway).setLocationTagsEnabled(
+                    includeLocationTags
+                )
             }
     }
 
@@ -712,7 +739,9 @@ class DefaultCameraUploadRepositoryTest {
         @ValueSource(booleans = [true, false])
         fun `test that the file names are kept or not when uploading content`(keepFileNames: Boolean) =
             runTest {
-                whenever(localStorageGateway.areUploadFileNamesKept()).thenReturn(keepFileNames)
+                whenever(cameraUploadsSettingsPreferenceGateway.areUploadFileNamesKept()).thenReturn(
+                    keepFileNames
+                )
                 assertThat(underTest.areUploadFileNamesKept()).isEqualTo(keepFileNames)
             }
 
@@ -721,7 +750,7 @@ class DefaultCameraUploadRepositoryTest {
         fun `test that the file names for uploads are handled`(keepFileNames: Boolean) =
             runTest {
                 underTest.setUploadFileNamesKept(keepFileNames)
-                verify(localStorageGateway).setUploadFileNamesKept(keepFileNames)
+                verify(cameraUploadsSettingsPreferenceGateway).setUploadFileNamesKept(keepFileNames)
             }
     }
 
@@ -732,7 +761,7 @@ class DefaultCameraUploadRepositoryTest {
         @ValueSource(booleans = [true, false])
         fun `test that charging could be required to compress videos`(chargingRequired: Boolean) =
             runTest {
-                whenever(localStorageGateway.isChargingRequiredForVideoCompression()).thenReturn(
+                whenever(cameraUploadsSettingsPreferenceGateway.isChargingRequiredForVideoCompression()).thenReturn(
                     chargingRequired
                 )
                 assertThat(underTest.isChargingRequiredForVideoCompression()).isEqualTo(
@@ -747,7 +776,9 @@ class DefaultCameraUploadRepositoryTest {
         ) =
             runTest {
                 underTest.setChargingRequiredForVideoCompression(chargingRequired)
-                verify(localStorageGateway).setChargingRequiredForVideoCompression(chargingRequired)
+                verify(cameraUploadsSettingsPreferenceGateway).setChargingRequiredForVideoCompression(
+                    chargingRequired
+                )
             }
 
         @ParameterizedTest(name = "device charging: {0}")
@@ -765,7 +796,9 @@ class DefaultCameraUploadRepositoryTest {
         fun `test that the video compression size limit is retrieved`() = runTest {
             val testSizeLimit = 300
 
-            whenever(localStorageGateway.getVideoCompressionSizeLimit()).thenReturn(testSizeLimit)
+            whenever(cameraUploadsSettingsPreferenceGateway.getVideoCompressionSizeLimit()).thenReturn(
+                testSizeLimit
+            )
             assertThat(underTest.getVideoCompressionSizeLimit()).isEqualTo(testSizeLimit)
         }
 
@@ -774,7 +807,9 @@ class DefaultCameraUploadRepositoryTest {
             val testSizeLimit = 300
 
             underTest.setVideoCompressionSizeLimit(testSizeLimit)
-            verify(localStorageGateway).setVideoCompressionSizeLimit(testSizeLimit)
+            verify(cameraUploadsSettingsPreferenceGateway).setVideoCompressionSizeLimit(
+                testSizeLimit
+            )
         }
 
         @Test

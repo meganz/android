@@ -437,11 +437,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
         when (requestCode) {
             REQUEST_CAMERA_FOLDER -> {
                 val newPrimaryFolderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
-                val isFolderInSDCard =
-                    intent.getBooleanExtra(FileStorageActivity.EXTRA_IS_FOLDER_IN_SD_CARD, false)
                 viewModel.changePrimaryFolderPath(
-                    newPath = newPrimaryFolderPath,
-                    isFolderInSDCard = isFolderInSDCard,
+                    newPath = newPrimaryFolderPath
                 )
             }
 

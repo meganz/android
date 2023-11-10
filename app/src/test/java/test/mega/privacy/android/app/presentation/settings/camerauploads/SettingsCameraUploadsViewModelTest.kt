@@ -617,18 +617,13 @@ class SettingsCameraUploadsViewModelTest {
     @Test
     fun `test that the new primary folder path is set`() = runTest {
         val testPath = "test/new/folder/path"
-        val isPrimaryFolderInSDCard = false
         setupUnderTest()
         whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
         whenever(getPrimaryFolderPathUseCase()).thenReturn(testPath)
-        underTest.changePrimaryFolderPath(
-            newPath = testPath,
-            isFolderInSDCard = isPrimaryFolderInSDCard,
-        )
+        underTest.changePrimaryFolderPath(newPath = testPath)
 
         verify(setPrimaryFolderPathUseCase).invoke(
             newFolderPath = testPath,
-            isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
         )
         verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
         verify(clearCacheDirectory).invoke()
@@ -646,15 +641,11 @@ class SettingsCameraUploadsViewModelTest {
     fun `test that the invalid folder selected prompt is shown if the new primary folder path is invalid`() =
         runTest {
             val testPath = "test/invalid/folder/path"
-            val isPrimaryFolderInSDCard = false
 
             setupUnderTest()
             whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(false)
 
-            underTest.changePrimaryFolderPath(
-                testPath,
-                isFolderInSDCard = isPrimaryFolderInSDCard,
-            )
+            underTest.changePrimaryFolderPath(testPath)
             underTest.state.test {
                 assertThat(awaitItem().invalidFolderSelectedTextId).isEqualTo(R.string.error_invalid_folder_selected)
             }
@@ -896,14 +887,10 @@ class SettingsCameraUploadsViewModelTest {
     fun `test that the primary folder records are cleared when the primary folder path changes`() =
         runTest {
             val testPath = "test/new/folder/path"
-            val isPrimaryFolderInSDCard = false
 
             setupUnderTest()
 
-            underTest.changePrimaryFolderPath(
-                newPath = testPath,
-                isFolderInSDCard = isPrimaryFolderInSDCard,
-            )
+            underTest.changePrimaryFolderPath(newPath = testPath)
 
             verify(clearCameraUploadsRecordUseCase).invoke(
                 listOf(CameraUploadFolderType.Primary)

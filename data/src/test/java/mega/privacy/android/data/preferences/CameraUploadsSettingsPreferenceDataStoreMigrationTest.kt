@@ -49,9 +49,6 @@ class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
         }
 
         underTest.migrate(mock())
-
-        verify(dataStore).setCameraUploadsEnabled(false)
-        verify(dataStore).setMediaUploadsEnabled(false)
         verify(dataStore).setCameraUploadsHandle(null)
         verify(dataStore).setMediaUploadsHandle(null)
         verify(dataStore).setCameraUploadsLocalPath(null)
@@ -59,7 +56,7 @@ class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
         verify(dataStore).setLocationTagsEnabled(false)
         verify(dataStore).setUploadVideoQuality(VideoQuality.ORIGINAL.value)
         verify(dataStore).setChargingRequiredForVideoCompression(true)
-        verify(dataStore).setUploadFileNamesKept(true)
+        verify(dataStore).setUploadFileNamesKept(false)
         verify(dataStore).setVideoCompressionSizeLimit(200)
         verify(dataStore).setFileUploadOption(1001)
         verify(dataStore).setPhotoTimeStamp(0L)

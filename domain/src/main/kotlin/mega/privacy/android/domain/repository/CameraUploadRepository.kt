@@ -74,7 +74,7 @@ interface CameraUploadRepository {
      *
      * @return If true, will only upload on Wi-Fi. Otherwise, will upload through Wi-Fi or Mobile Data
      */
-    suspend fun isCameraUploadsByWifi(): Boolean
+    suspend fun isCameraUploadsByWifi(): Boolean?
 
     /**
      * Sets whether Camera Uploads should only run through Wi-Fi / Wi-Fi or Mobile Data
@@ -243,7 +243,7 @@ interface CameraUploadRepository {
      *
      * @return true if camera upload sync enabled
      */
-    suspend fun isCameraUploadsEnabled(): Boolean
+    suspend fun isCameraUploadsEnabled(): Boolean?
 
     /**
      * Set camera uploads enabled
@@ -255,7 +255,7 @@ interface CameraUploadRepository {
      *
      * @return A [String] that contains the Primary Folder local path
      */
-    suspend fun getPrimaryFolderLocalPath(): String
+    suspend fun getPrimaryFolderLocalPath(): String?
 
     /**
      * Sets the new Primary Folder local path
@@ -270,7 +270,7 @@ interface CameraUploadRepository {
      * @return A [String] that contains the Primary Folder local path, or an empty [String] if it
      * does not exist
      */
-    suspend fun getSecondaryFolderLocalPath(): String
+    suspend fun getSecondaryFolderLocalPath(): String?
 
     /**
      * Set secondary camera upload enabled
@@ -292,7 +292,7 @@ interface CameraUploadRepository {
      *
      * @return true if Location Tags should be added when uploading Photos, and false if otherwise
      */
-    suspend fun areLocationTagsEnabled(): Boolean
+    suspend fun areLocationTagsEnabled(): Boolean?
 
     /**
      * Sets the new value in the Database, as to whether Location Tags should be added or not
@@ -328,7 +328,7 @@ interface CameraUploadRepository {
      *
      * @return true if the File Names should be left as is, and false if otherwise
      */
-    suspend fun areUploadFileNamesKept(): Boolean
+    suspend fun areUploadFileNamesKept(): Boolean?
 
     /**
      * Sets whether the File Names of files to be uploaded will be kept or not
@@ -370,7 +370,7 @@ interface CameraUploadRepository {
      *
      * @return true if secondary media folder enabled
      */
-    suspend fun isSecondaryMediaFolderEnabled(): Boolean
+    suspend fun isSecondaryMediaFolderEnabled(): Boolean?
 
     /**
      * Get maximum timestamp or null
@@ -391,7 +391,7 @@ interface CameraUploadRepository {
      *
      * @return true if the device needs to be charged to compress videos, and false if otherwise
      */
-    suspend fun isChargingRequiredForVideoCompression(): Boolean
+    suspend fun isChargingRequiredForVideoCompression(): Boolean?
 
     /**
      * Sets whether compressing videos require the device to be charged or not
@@ -405,7 +405,7 @@ interface CameraUploadRepository {
      *
      * @return An [Int] that represents the maximum video file size that can be compressed
      */
-    suspend fun getVideoCompressionSizeLimit(): Int
+    suspend fun getVideoCompressionSizeLimit(): Int?
 
     /**
      * Sets the maximum video file size that can be compressed

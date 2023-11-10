@@ -23,7 +23,7 @@ class GetCameraUploadSelectionQueryUseCase @Inject constructor(
 
         // Do not create selection query if secondary preferences are not enabled or set (null)
         if (timestampType == SyncTimeStamp.SECONDARY_PHOTO || timestampType == SyncTimeStamp.SECONDARY_VIDEO) {
-            if (!cameraUploadRepository.isSecondaryMediaFolderEnabled()) {
+            if (cameraUploadRepository.isSecondaryMediaFolderEnabled() == false) {
                 return null
             }
         }

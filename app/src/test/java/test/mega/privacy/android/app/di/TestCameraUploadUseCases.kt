@@ -33,7 +33,6 @@ import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
@@ -70,9 +69,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideMediaLocalPathExists() = mock<MediaLocalPathExists>()
-
-    @Provides
-    fun provideIsSecondaryFolderEnabled() = mock<IsSecondaryFolderEnabled>()
 
     @Provides
     fun provideDeleteSyncRecord() = mock<DeleteSyncRecord>()

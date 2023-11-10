@@ -19,10 +19,7 @@ class GetPrimaryFolderPathUseCase @Inject constructor(
      */
     suspend operator fun invoke(): String {
         with(cameraUploadRepository) {
-            val isInSDCard = isPrimaryFolderInSDCard()
-            val path =
-                if (isInSDCard) getPrimaryFolderSDCardUriPath() else getPrimaryFolderLocalPath()
-            return path.addSeparator()
+            return getPrimaryFolderLocalPath()?.addSeparator() ?: ""
         }
     }
 

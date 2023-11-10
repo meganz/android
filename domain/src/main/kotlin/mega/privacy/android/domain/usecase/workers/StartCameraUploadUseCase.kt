@@ -11,7 +11,7 @@ class StartCameraUploadUseCase @Inject constructor(private val cameraUploadRepos
      * invoke
      */
     suspend operator fun invoke() {
-        if (cameraUploadRepository.isCameraUploadsEnabled()) {
+        if (cameraUploadRepository.isCameraUploadsEnabled() == true) {
             cameraUploadRepository.fireCameraUploadJob()
         }
     }

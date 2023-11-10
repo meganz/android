@@ -17,5 +17,16 @@ class GetVideoCompressionSizeLimitUseCase @Inject constructor(
      *
      * @return An [Int] that represents the maximum video file size that can be compressed
      */
-    suspend operator fun invoke(): Int = cameraUploadRepository.getVideoCompressionSizeLimit()
+    suspend operator fun invoke(): Int =
+        cameraUploadRepository.getVideoCompressionSizeLimit() ?: DEFAULT_SIZE
+
+    /**
+     * Default VideoCompression Size Limit
+     */
+    companion object {
+        /**
+         * Size in MB
+         */
+        const val DEFAULT_SIZE = 200
+    }
 }

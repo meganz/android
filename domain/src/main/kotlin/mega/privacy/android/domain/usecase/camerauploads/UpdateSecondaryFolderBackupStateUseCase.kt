@@ -20,7 +20,7 @@ class UpdateSecondaryFolderBackupStateUseCase @Inject constructor(
      * @param backupState The new [BackupState] of the Secondary Folder
      */
     suspend operator fun invoke(backupState: BackupState) {
-        if (cameraUploadRepository.isSecondaryMediaFolderEnabled()) {
+        if (cameraUploadRepository.isSecondaryMediaFolderEnabled() == true) {
             cameraUploadRepository.getMuBackUp()?.let { backup ->
                 if (backupState != backup.state && backup.backupId != cameraUploadRepository.getInvalidHandle()) {
                     updateBackupStateUseCase(

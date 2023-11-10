@@ -530,18 +530,13 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * Sets the new Primary Folder path, once a Folder has been selected from the File Explorer
      *
      * @param newPath The new Primary Folder path, which may be nullable
-     * @param isFolderInSDCard true if the local Folder is now located in the SD Card, and
-     * false if otherwise
      */
-    fun changePrimaryFolderPath(newPath: String?, isFolderInSDCard: Boolean) {
+    fun changePrimaryFolderPath(newPath: String?) {
         viewModelScope.launch {
             runCatching {
                 if (isPrimaryFolderPathValidUseCase(newPath)) {
                     newPath?.let {
-                        setPrimaryFolderPathUseCase(
-                            newFolderPath = it,
-                            isPrimaryFolderInSDCard = isFolderInSDCard,
-                        )
+                        setPrimaryFolderPathUseCase(newFolderPath = it)
                     }
                     resetTimestampsAndCacheDirectory()
                     clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Primary))

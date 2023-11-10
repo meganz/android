@@ -16,7 +16,7 @@ class StopCameraUploadsUseCase @Inject constructor(
      * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
      */
     suspend operator fun invoke(shouldReschedule: Boolean) {
-        if (cameraUploadRepository.isCameraUploadsEnabled()) {
+        if (cameraUploadRepository.isCameraUploadsEnabled() == true) {
             if (!shouldReschedule) {
                 disableCameraUploadsUseCase()
             }

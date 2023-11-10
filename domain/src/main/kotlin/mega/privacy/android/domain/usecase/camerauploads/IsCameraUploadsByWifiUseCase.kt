@@ -18,5 +18,5 @@ class IsCameraUploadsByWifiUseCase @Inject constructor(
      * @return true if Camera Uploads will only run through Wi-Fi
      * false if Camera Uploads can run through either Wi-Fi or Mobile Data
      */
-    suspend operator fun invoke(): Boolean = cameraUploadRepository.isCameraUploadsByWifi()
+    suspend operator fun invoke(): Boolean = cameraUploadRepository.isCameraUploadsByWifi() ?: false
 }

@@ -17,5 +17,6 @@ class AreLocationTagsEnabledUseCase @Inject constructor(
      *
      * @return true if Location Tags should be added when uploading Photos, and false if otherwise
      */
-    suspend operator fun invoke(): Boolean = cameraUploadRepository.areLocationTagsEnabled()
+    suspend operator fun invoke(): Boolean =
+        cameraUploadRepository.areLocationTagsEnabled() ?: false
 }

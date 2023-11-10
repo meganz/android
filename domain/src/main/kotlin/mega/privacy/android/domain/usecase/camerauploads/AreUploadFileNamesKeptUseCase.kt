@@ -17,5 +17,6 @@ class AreUploadFileNamesKeptUseCase @Inject constructor(
      *
      * @return true if the File Names should be left as is, and false if otherwise
      */
-    suspend operator fun invoke(): Boolean = cameraUploadRepository.areUploadFileNamesKept()
+    suspend operator fun invoke(): Boolean =
+        cameraUploadRepository.areUploadFileNamesKept() ?: false
 }

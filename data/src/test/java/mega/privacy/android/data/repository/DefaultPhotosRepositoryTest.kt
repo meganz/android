@@ -12,6 +12,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
@@ -65,7 +66,8 @@ class DefaultPhotosRepositoryTest {
     private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper =
         mock()
 
-    private val mockMegaStringMap = mock<MegaStringMap>()
+    private val cameraUploadsSettingsPreferenceGateway =
+        mock<CameraUploadsSettingsPreferenceGateway>()
 
     private val success = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
 
@@ -251,7 +253,8 @@ class DefaultPhotosRepositoryTest {
         timelineFilterPreferencesJSONMapper = timelineFilterPreferencesJSONMapper,
         contentConsumptionMegaStringMapMapper = contentConsumptionMegaStringMapMapper,
         imageNodeMapper = mock(),
-        megaLocalRoomGateway = mock()
+        megaLocalRoomGateway = mock(),
+        cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway
     )
 
     private fun createMegaNode(

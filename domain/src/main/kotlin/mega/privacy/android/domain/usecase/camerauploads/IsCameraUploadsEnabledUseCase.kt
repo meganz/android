@@ -15,5 +15,5 @@ class IsCameraUploadsEnabledUseCase @Inject constructor(
      *
      * @return true if camera uploads is enabled
      */
-    suspend operator fun invoke() = cameraUploadRepository.isCameraUploadsEnabled()
+    suspend operator fun invoke() = cameraUploadRepository.isCameraUploadsEnabled() ?: false
 }

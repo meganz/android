@@ -59,7 +59,6 @@ import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
@@ -112,13 +111,6 @@ abstract class CameraUploadUseCases {
                     isSecondary
                 )
             }
-
-        /**
-         * Provide the [IsSecondaryFolderEnabled] implementation
-         */
-        @Provides
-        fun provideIsSecondaryFolderEnabled(cameraUploadRepository: CameraUploadRepository): IsSecondaryFolderEnabled =
-            IsSecondaryFolderEnabled(cameraUploadRepository::isSecondaryMediaFolderEnabled)
 
         /**
          * Provide the [DeleteSyncRecord] implementation

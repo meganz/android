@@ -218,5 +218,5 @@ interface CameraUploadsSettingsPreferenceGateway {
     /**
      * Clear preferences
      */
-    suspend fun clear()
+    suspend fun clearPreferences()
 }

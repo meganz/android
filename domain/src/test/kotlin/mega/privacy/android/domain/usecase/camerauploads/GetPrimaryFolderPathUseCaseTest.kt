@@ -10,7 +10,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -41,34 +40,13 @@ class GetPrimaryFolderPathUseCaseTest {
         )
     }
 
-    @ParameterizedTest(name = "is in SD card: {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that the primary folder path is retrieved`(isInSDCard: Boolean) = runTest {
-        val testLocalPath = "test/local/path/"
-        val testSDCardPath = "test/sd/card/path/"
-
-        cameraUploadRepository.stub {
-            onBlocking { isPrimaryFolderInSDCard() }.thenReturn(isInSDCard)
-            onBlocking { getPrimaryFolderSDCardUriPath() }.thenReturn(testSDCardPath)
-            onBlocking { getPrimaryFolderLocalPath() }.thenReturn(testLocalPath)
-        }
-
-        val expectedPath = underTest()
-        if (isInSDCard) {
-            assertThat(expectedPath).isEqualTo(testSDCardPath)
-        } else {
-            assertThat(expectedPath).isEqualTo(testLocalPath)
-        }
-    }
-
     @ParameterizedTest(name = "when the original path is {0}, the new path becomes {1}")
     @MethodSource("providePathParameters")
     fun `test that the separator is appended in the primary folder path`(
-        originalPath: String,
+        originalPath: String?,
         newPath: String,
     ) = runTest {
         cameraUploadRepository.stub {
-            onBlocking { isPrimaryFolderInSDCard() }.thenReturn(false)
             onBlocking { getPrimaryFolderLocalPath() }.thenReturn(originalPath)
         }
 
@@ -77,6 +55,7 @@ class GetPrimaryFolderPathUseCaseTest {
     }
 
     private fun providePathParameters() = Stream.of(
+        Arguments.of(null, ""),
         Arguments.of("", ""),
         Arguments.of(" ", " "),
         Arguments.of("test/path", "test/path/"),

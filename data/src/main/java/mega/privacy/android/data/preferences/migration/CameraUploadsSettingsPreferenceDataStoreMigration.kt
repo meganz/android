@@ -6,8 +6,10 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.preferences.CameraUploadsSettingsPreferenceDataStore
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
+import javax.inject.Inject
 
-internal class CameraUploadsSettingsPreferenceDataStoreMigration constructor(
+internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     private val cameraUploadsSettingsPreferenceDataStoreFactory: CameraUploadsSettingsPreferenceDataStoreFactory,
 ) : DataMigration<Preferences> {
@@ -32,17 +34,17 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration constructor(
 
     private suspend fun setDefaults(store: CameraUploadsSettingsPreferenceDataStore) {
         store.setValues(
-            isCameraUploadsEnabled = false,
-            isMediaUploadsEnabled = false,
+            isCameraUploadsEnabled = null,
+            isMediaUploadsEnabled = null,
             cameraUploadsHandle = null,
             mediaUploadsHandle = null,
             cameraUploadsLocalPath = null,
             mediaUploadsLocalPath = null,
             areLocationTagsEnabled = false,
             uploadVideoQuality = VideoQuality.ORIGINAL.value,
-            areUploadFileNamesKept = true,
+            areUploadFileNamesKept = false,
             isChargingRequiredForVideoCompression = true,
-            videoCompressionSizeLimit = SIZE,
+            videoCompressionSizeLimit = GetVideoCompressionSizeLimitUseCase.DEFAULT_SIZE,
             fileUploadOption = 1001,
             photoTimeStamp = 0L,
             videoTimeStamp = 0L,
@@ -63,28 +65,29 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration constructor(
                 ?: false,
             cameraUploadsHandle = oldPreferences.camSyncHandle?.toLongOrNull(),
             mediaUploadsHandle = oldPreferences.megaHandleSecondaryFolder?.toLongOrNull(),
-            cameraUploadsLocalPath = oldPreferences.camSyncLocalPath,
+            cameraUploadsLocalPath = if (oldPreferences.cameraFolderExternalSDCard?.toBooleanStrictOrNull() == true) oldPreferences.uriExternalSDCard else oldPreferences.camSyncLocalPath,
             mediaUploadsLocalPath = oldPreferences.localPathSecondaryFolder,
             areLocationTagsEnabled = oldPreferences.removeGPS?.toBooleanStrictOrNull() ?: false,
             uploadVideoQuality = oldPreferences.uploadVideoQuality?.toIntOrNull()
                 ?: VideoQuality.ORIGINAL.value,
-            areUploadFileNamesKept = oldPreferences.keepFileNames?.toBooleanStrictOrNull() ?: true,
-            isChargingRequiredForVideoCompression = oldPreferences.conversionOnCharging.toBooleanStrictOrNull()
+            areUploadFileNamesKept = oldPreferences.keepFileNames?.toBooleanStrictOrNull() ?: false,
+            isChargingRequiredForVideoCompression = oldPreferences.conversionOnCharging?.toBooleanStrictOrNull()
                 ?: true,
-            videoCompressionSizeLimit = oldPreferences.chargingOnSize.toIntOrNull() ?: SIZE,
-            fileUploadOption = oldPreferences.camSyncFileUpload.toIntOrNull()
+            videoCompressionSizeLimit = oldPreferences.chargingOnSize?.toIntOrNull()
+                ?: GetVideoCompressionSizeLimitUseCase.DEFAULT_SIZE,
+            fileUploadOption = oldPreferences.camSyncFileUpload?.toIntOrNull()
                 ?: 1001,
-            photoTimeStamp = oldPreferences.camSyncTimeStamp.toLongOrNull() ?: 0L,
-            videoTimeStamp = oldPreferences.camVideoSyncTimeStamp.toLongOrNull() ?: 0L,
-            mediaUploadsPhotoTimeStamp = oldPreferences.secSyncTimeStamp.toLongOrNull() ?: 0L,
-            mediaUploadsVideoTimeStamp = oldPreferences.secVideoSyncTimeStamp.toLongOrNull() ?: 0L,
-            isUploadsByWifi = oldPreferences.camSyncWifi.toBooleanStrictOrNull() ?: false,
+            photoTimeStamp = oldPreferences.camSyncTimeStamp?.toLongOrNull() ?: 0L,
+            videoTimeStamp = oldPreferences.camVideoSyncTimeStamp?.toLongOrNull() ?: 0L,
+            mediaUploadsPhotoTimeStamp = oldPreferences.secSyncTimeStamp?.toLongOrNull() ?: 0L,
+            mediaUploadsVideoTimeStamp = oldPreferences.secVideoSyncTimeStamp?.toLongOrNull() ?: 0L,
+            isUploadsByWifi = oldPreferences.camSyncWifi?.toBooleanStrictOrNull() ?: false,
         )
     }
 
     private suspend fun CameraUploadsSettingsPreferenceDataStore.setValues(
-        isCameraUploadsEnabled: Boolean,
-        isMediaUploadsEnabled: Boolean,
+        isCameraUploadsEnabled: Boolean?,
+        isMediaUploadsEnabled: Boolean?,
         cameraUploadsHandle: Long?,
         mediaUploadsHandle: Long?,
         cameraUploadsLocalPath: String?,
@@ -102,8 +105,8 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration constructor(
         isUploadsByWifi: Boolean,
     ) {
         with(this) {
-            setCameraUploadsEnabled(isCameraUploadsEnabled)
-            setMediaUploadsEnabled(isMediaUploadsEnabled)
+            isCameraUploadsEnabled?.let { setCameraUploadsEnabled(it) }
+            isMediaUploadsEnabled?.let { setMediaUploadsEnabled(it) }
             setCameraUploadsHandle(cameraUploadsHandle)
             setMediaUploadsHandle(mediaUploadsHandle)
             setCameraUploadsLocalPath(cameraUploadsLocalPath)
@@ -120,10 +123,6 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration constructor(
             setMediaUploadsVideoTimeStamp(mediaUploadsVideoTimeStamp)
             setUploadsByWifi(isUploadsByWifi)
         }
-    }
-
-    companion object {
-        private const val SIZE = 200
     }
 
 }

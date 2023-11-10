@@ -32,6 +32,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
@@ -143,6 +144,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val fileGateway: FileGateway,
     private val recoveryKeyToFileMapper: RecoveryKeyToFileMapper,
+    private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -653,6 +655,7 @@ internal class DefaultAccountRepository @Inject constructor(
         callsPreferencesGateway.clearPreferences()
         chatPreferencesGateway.clearPreferences()
         accountPreferencesGateway.clearPreferences()
+        cameraUploadsSettingsPreferenceGateway.clearPreferences()
     }
 
     override suspend fun clearSharedPreferences() = withContext(ioDispatcher) {

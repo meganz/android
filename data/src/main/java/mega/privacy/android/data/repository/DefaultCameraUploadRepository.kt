@@ -22,6 +22,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
@@ -109,6 +110,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
+    private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
@@ -116,27 +118,27 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override fun getInvalidBackupType(): Int = megaApiGateway.getInvalidBackupType()
 
     override suspend fun getPrimarySyncHandle(): Long? = withContext(ioDispatcher) {
-        localStorageGateway.getCamSyncHandle()
+        cameraUploadsSettingsPreferenceGateway.getCameraUploadsHandle()
     }
 
     override suspend fun getSecondarySyncHandle(): Long? = withContext(ioDispatcher) {
-        localStorageGateway.getMegaHandleSecondaryFolder()
+        cameraUploadsSettingsPreferenceGateway.getMediaUploadsHandle()
     }
 
     override suspend fun setPrimarySyncHandle(primaryHandle: Long) = withContext(ioDispatcher) {
-        localStorageGateway.setPrimarySyncHandle(primaryHandle)
+        cameraUploadsSettingsPreferenceGateway.setCameraUploadsHandle(primaryHandle)
     }
 
     override suspend fun setSecondarySyncHandle(secondaryHandle: Long) = withContext(ioDispatcher) {
-        localStorageGateway.setSecondarySyncHandle(secondaryHandle)
+        cameraUploadsSettingsPreferenceGateway.setMediaUploadsHandle(secondaryHandle)
     }
 
     override suspend fun isCameraUploadsByWifi() = withContext(ioDispatcher) {
-        localStorageGateway.isCameraUploadsByWifi()
+        cameraUploadsSettingsPreferenceGateway.isUploadByWifi()
     }
 
     override suspend fun setCameraUploadsByWifi(wifiOnly: Boolean) {
-        localStorageGateway.setCameraUploadsByWifi(wifiOnly)
+        cameraUploadsSettingsPreferenceGateway.setUploadsByWifi(wifiOnly)
     }
 
     override suspend fun getPendingSyncRecords(): List<SyncRecord> = withContext(ioDispatcher) {
@@ -144,11 +146,15 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun getUploadOption() = withContext(ioDispatcher) {
-        uploadOptionMapper(localStorageGateway.getCameraSyncFileUpload())
+        uploadOptionMapper(cameraUploadsSettingsPreferenceGateway.getFileUploadOption())
     }
 
     override suspend fun setUploadOption(uploadOption: UploadOption) = withContext(ioDispatcher) {
-        localStorageGateway.setCameraSyncFileUpload(uploadOptionIntMapper(uploadOption))
+        cameraUploadsSettingsPreferenceGateway.setFileUploadOption(
+            uploadOptionIntMapper(
+                uploadOption
+            )
+        )
     }
 
     override suspend fun deleteAllSyncRecords(syncRecordType: SyncRecordType) =
@@ -222,34 +228,34 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long? {
         return withContext(ioDispatcher) {
-            when (type) {
-                SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.getPhotoTimeStamp()
-                    ?.toLongOrNull()
+            with(cameraUploadsSettingsPreferenceGateway) {
+                when (type) {
+                    SyncTimeStamp.PRIMARY_PHOTO -> getPhotoTimeStamp()
 
-                SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.getVideoTimeStamp()
-                    ?.toLongOrNull()
+                    SyncTimeStamp.PRIMARY_VIDEO -> getVideoTimeStamp()
 
-                SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.getSecondaryPhotoTimeStamp()
-                    ?.toLongOrNull()
+                    SyncTimeStamp.SECONDARY_PHOTO -> getMediaUploadsPhotoTimeStamp()
 
-                SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.getSecondaryVideoTimeStamp()
-                    ?.toLongOrNull()
+                    SyncTimeStamp.SECONDARY_VIDEO -> getMediaUploadsVideoTimeStamp()
+                }
             }
         }
     }
 
     override suspend fun setSyncTimeStamp(timeStamp: Long, type: SyncTimeStamp) =
         withContext(ioDispatcher) {
-            when (type) {
-                SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.setPhotoTimeStamp(timeStamp)
-                SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.setVideoTimeStamp(timeStamp)
-                SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.setSecondaryPhotoTimeStamp(
-                    timeStamp
-                )
+            with(cameraUploadsSettingsPreferenceGateway) {
+                when (type) {
+                    SyncTimeStamp.PRIMARY_PHOTO -> setPhotoTimeStamp(timeStamp)
+                    SyncTimeStamp.PRIMARY_VIDEO -> setVideoTimeStamp(timeStamp)
+                    SyncTimeStamp.SECONDARY_PHOTO -> setMediaUploadsPhotoTimeStamp(
+                        timeStamp
+                    )
 
-                SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.setSecondaryVideoTimeStamp(
-                    timeStamp
-                )
+                    SyncTimeStamp.SECONDARY_VIDEO -> setMediaUploadsVideoTimeStamp(
+                        timeStamp
+                    )
+                }
             }
         }
 
@@ -262,54 +268,58 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun doesSyncEnabledExist(): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.doesSyncEnabledExist()
+        cameraUploadsSettingsPreferenceGateway.isCameraUploadsEnabled() != null
     }
 
-    override suspend fun isCameraUploadsEnabled(): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.isCameraUploadsEnabled()
+    override suspend fun isCameraUploadsEnabled(): Boolean? = withContext(ioDispatcher) {
+        cameraUploadsSettingsPreferenceGateway.isCameraUploadsEnabled()
     }
 
     override suspend fun setCameraUploadsEnabled(enable: Boolean) = withContext(ioDispatcher) {
-        localStorageGateway.setCameraUploadsEnabled(enable)
+        cameraUploadsSettingsPreferenceGateway.setCameraUploadsEnabled(enable)
     }
 
-    override suspend fun getPrimaryFolderLocalPath(): String = withContext(ioDispatcher) {
-        localStorageGateway.getPrimaryFolderLocalPath()
+    override suspend fun getPrimaryFolderLocalPath(): String? = withContext(ioDispatcher) {
+        cameraUploadsSettingsPreferenceGateway.getCameraUploadsLocalPath()
     }
 
     override suspend fun setPrimaryFolderLocalPath(localPath: String) = withContext(ioDispatcher) {
-        localStorageGateway.setPrimaryFolderLocalPath(localPath)
+        cameraUploadsSettingsPreferenceGateway.setCameraUploadsLocalPath(localPath)
     }
 
     override suspend fun setSecondaryFolderLocalPath(localPath: String) =
         withContext(ioDispatcher) {
-            localStorageGateway.setSecondaryFolderLocalPath(localPath)
+            cameraUploadsSettingsPreferenceGateway.setMediaUploadsLocalPath(localPath)
         }
 
     override suspend fun setSecondaryEnabled(secondaryCameraUpload: Boolean) =
         withContext(ioDispatcher) {
-            localStorageGateway.setSecondaryEnabled(secondaryCameraUpload)
+            cameraUploadsSettingsPreferenceGateway.setMediaUploadsEnabled(secondaryCameraUpload)
         }
 
     override suspend fun getSecondaryFolderLocalPath() = withContext(ioDispatcher) {
-        localStorageGateway.getSecondaryFolderLocalPath()
+        cameraUploadsSettingsPreferenceGateway.getMediaUploadsLocalPath()
     }
 
-    override suspend fun areLocationTagsEnabled(): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.areLocationTagsEnabled()
+    override suspend fun areLocationTagsEnabled(): Boolean? = withContext(ioDispatcher) {
+        cameraUploadsSettingsPreferenceGateway.areLocationTagsEnabled()
     }
 
     override suspend fun setLocationTagsEnabled(enable: Boolean) = withContext(ioDispatcher) {
-        localStorageGateway.setLocationTagsEnabled(enable)
+        cameraUploadsSettingsPreferenceGateway.setLocationTagsEnabled(enable)
     }
 
     override suspend fun getUploadVideoQuality(): VideoQuality? = withContext(ioDispatcher) {
-        videoQualityMapper(localStorageGateway.getUploadVideoQuality())
+        videoQualityMapper(cameraUploadsSettingsPreferenceGateway.getUploadVideoQuality())
     }
 
     override suspend fun setUploadVideoQuality(videoQuality: VideoQuality) =
         withContext(ioDispatcher) {
-            localStorageGateway.setUploadVideoQuality(videoQualityIntMapper(videoQuality))
+            cameraUploadsSettingsPreferenceGateway.setUploadVideoQuality(
+                videoQualityIntMapper(
+                    videoQuality
+                )
+            )
         }
 
     override suspend fun setUploadVideoSyncStatus(syncStatus: SyncStatus) =
@@ -317,13 +327,13 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             megaLocalRoomGateway.setUploadVideoSyncStatus(syncStatusIntMapper(syncStatus))
         }
 
-    override suspend fun areUploadFileNamesKept(): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.areUploadFileNamesKept()
+    override suspend fun areUploadFileNamesKept(): Boolean? = withContext(ioDispatcher) {
+        cameraUploadsSettingsPreferenceGateway.areUploadFileNamesKept()
     }
 
     override suspend fun setUploadFileNamesKept(keepFileNames: Boolean) =
         withContext(ioDispatcher) {
-            localStorageGateway.setUploadFileNamesKept(keepFileNames)
+            cameraUploadsSettingsPreferenceGateway.setUploadFileNamesKept(keepFileNames)
         }
 
     override suspend fun isPrimaryFolderInSDCard(): Boolean = withContext(ioDispatcher) {
@@ -343,7 +353,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun isSecondaryMediaFolderEnabled() = withContext(ioDispatcher) {
-        localStorageGateway.isSecondaryMediaFolderEnabled()
+        cameraUploadsSettingsPreferenceGateway.isMediaUploadsEnabled()
     }
 
     override suspend fun shouldClearSyncRecords() = withContext(ioDispatcher) {
@@ -400,20 +410,22 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         }
 
     override suspend fun isChargingRequiredForVideoCompression() = withContext(ioDispatcher) {
-        localStorageGateway.isChargingRequiredForVideoCompression()
+        cameraUploadsSettingsPreferenceGateway.isChargingRequiredForVideoCompression()
     }
 
     override suspend fun setChargingRequiredForVideoCompression(chargingRequired: Boolean) =
         withContext(ioDispatcher) {
-            localStorageGateway.setChargingRequiredForVideoCompression(chargingRequired)
+            cameraUploadsSettingsPreferenceGateway.setChargingRequiredForVideoCompression(
+                chargingRequired
+            )
         }
 
     override suspend fun getVideoCompressionSizeLimit() = withContext(ioDispatcher) {
-        localStorageGateway.getVideoCompressionSizeLimit()
+        cameraUploadsSettingsPreferenceGateway.getVideoCompressionSizeLimit()
     }
 
     override suspend fun setVideoCompressionSizeLimit(size: Int) = withContext(ioDispatcher) {
-        localStorageGateway.setVideoCompressionSizeLimit(size)
+        cameraUploadsSettingsPreferenceGateway.setVideoCompressionSizeLimit(size)
     }
 
     override suspend fun updateSyncRecordStatusByLocalPath(
@@ -605,7 +617,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun listenToNewMedia() {
         withContext(ioDispatcher) {
-            if (isCameraUploadsEnabled()) {
+            if (isCameraUploadsEnabled() == true) {
                 NewMediaWorker.scheduleWork(context, false)
             }
         }
