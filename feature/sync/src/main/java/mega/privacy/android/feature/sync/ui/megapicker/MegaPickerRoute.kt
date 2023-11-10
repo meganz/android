@@ -10,6 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.FolderClicked
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import nz.mega.sdk.MegaApiJava
@@ -20,6 +21,7 @@ internal fun MegaPickerRoute(
     syncPermissionsManager: SyncPermissionsManager,
     folderSelected: () -> Unit,
     backClicked: () -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -39,6 +41,7 @@ internal fun MegaPickerRoute(
             currentFolderSelected = {
                 selectCurrentFolder(viewModel, syncPermissionsManager, context)
             },
+            fileTypeIconMapper = fileTypeIconMapper
         )
     }
 

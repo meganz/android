@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.ui.mapper
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import javax.inject.Inject
 
@@ -12,9 +13,8 @@ class FileTypeIconMapper @Inject constructor() {
      * invoke
      * @param typedFileNode [TypedFileNode]
      */
-    operator fun invoke(typedFileNode: TypedFileNode): Int {
-        return mergedMap[typedFileNode.type.extension] ?: iconPackR.drawable.ic_generic_list
-    }
+    operator fun invoke(fileNode: FileNode): Int =
+        mergedMap[fileNode.type.extension] ?: iconPackR.drawable.ic_generic_list
 }
 
 private val textExtensionMap =

@@ -23,10 +23,12 @@ import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import java.io.File
 
 @Composable
@@ -41,6 +43,7 @@ internal fun MegaFolderPickerView(
     getThumbnail: ((handle: Long, onFinished: (file: File?) -> Unit) -> Unit),
     onFolderClick: (TypedNode) -> Unit,
     modifier: Modifier = Modifier,
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     LazyColumn(state = listState, modifier = modifier) {
         item(
@@ -67,14 +70,24 @@ internal fun MegaFolderPickerView(
                 }
             }
 
+            val icon = when (nodeEntity) {
+                is FolderNode -> {
+                    nodeEntity.getIcon()
+                }
+
+                is FileNode -> {
+                    fileTypeIconMapper(nodeEntity)
+                }
+
+                else -> {
+                    iconPackR.drawable.ic_generic_list
+                }
+            }
             NodeListViewItem(
                 isSelected = false,
                 folderInfo = (nodeEntity as? FolderNode)
                     ?.folderInfo(),
-                icon = (nodeEntity as? FolderNode)
-                    ?.getIcon()
-                // In future, instead of this line we will get icon based on the file extension
-                    ?: iconPackR.drawable.ic_generic_list,
+                icon = icon,
                 fileSize = (nodeEntity as? FileNode)
                     ?.let { node -> formatFileSize(node.size, LocalContext.current) },
                 modifiedDate = (nodeEntity as? FileNode)
@@ -119,7 +132,8 @@ private fun PreviewMegaFolderPickerView() {
             getThumbnail = { _, _ -> },
             modifier = Modifier,
             showChangeViewType = true,
-            onFolderClick = {}
+            onFolderClick = {},
+            fileTypeIconMapper = FileTypeIconMapper()
         )
     }
 }

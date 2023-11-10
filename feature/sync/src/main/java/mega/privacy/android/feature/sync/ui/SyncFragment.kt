@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.navigation.syncNavGraph
 import mega.privacy.android.feature.sync.navigation.syncRoute
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import javax.inject.Inject
 
 /**
@@ -43,6 +44,12 @@ class SyncFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    /**
+     * Get fileTypeIconMapper
+     */
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
+
     private val viewModel by viewModels<SyncViewModel>()
 
     override fun onCreateView(
@@ -64,7 +71,7 @@ class SyncFragment : Fragment() {
                             startDestination = syncRoute,
                         ) {
                             syncNavGraph(
-                                showOnboarding, animatedNavController
+                                showOnboarding, animatedNavController, fileTypeIconMapper
                             )
                         }
                     }

@@ -1,12 +1,12 @@
 package mega.privacy.android.feature.sync.navigation
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
@@ -22,6 +22,7 @@ private const val syncList = "sync/list"
 internal fun NavGraphBuilder.syncNavGraph(
     showOnboardingScreen: Boolean,
     navController: NavController,
+    fileTypeIconMapper: FileTypeIconMapper
 ) {
     navigation(
         startDestination = if (showOnboardingScreen) {
@@ -57,7 +58,8 @@ internal fun NavGraphBuilder.syncNavGraph(
                     navController.popBackStack()
                 }, backClicked = {
                     navController.popBackStack()
-                }
+                },
+                fileTypeIconMapper = fileTypeIconMapper
             )
         }
         composable(route = syncList) {

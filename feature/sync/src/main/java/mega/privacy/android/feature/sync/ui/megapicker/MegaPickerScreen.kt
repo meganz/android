@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaApiJava
 
 @Composable
@@ -29,6 +30,7 @@ internal fun MegaPickerScreen(
     nodes: List<TypedNode>,
     folderClicked: (TypedNode) -> Unit,
     currentFolderSelected: () -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper
 ) {
 
     val onBackPressedDispatcher =
@@ -58,7 +60,8 @@ internal fun MegaPickerScreen(
                 nodes,
                 folderClicked,
                 currentFolderSelected,
-                Modifier.padding(paddingValues)
+                Modifier.padding(paddingValues),
+                fileTypeIconMapper
             )
         }
     )
@@ -70,6 +73,7 @@ private fun MegaPickerScreenContent(
     folderClicked: (TypedNode) -> Unit,
     currentFolderSelected: () -> Unit,
     modifier: Modifier = Modifier,
+    fileTypeIconMapper: FileTypeIconMapper
 ) {
     Column(modifier) {
         MegaFolderPickerView(
@@ -88,6 +92,7 @@ private fun MegaPickerScreenContent(
             onFolderClick = {
                 folderClicked(it)
             },
+            fileTypeIconMapper = fileTypeIconMapper
         )
 
         Box(
@@ -115,7 +120,8 @@ private fun PreviewSyncNewFolderScreen() {
             null,
             SampleNodeDataProvider.values,
             {},
-            {}
+            {},
+            FileTypeIconMapper()
         )
     }
 }
