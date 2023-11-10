@@ -50,10 +50,12 @@ class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
                     lastNodeHandle = -1L
                 )
                 Timber.d("Camera Uploads up to date heartbeat sent")
-                sendMediaUploadsBackupHeartBeatUseCase(
-                    heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
-                    lastNodeHandle = -1L
-                )
+                runCatching {
+                    sendMediaUploadsBackupHeartBeatUseCase(
+                        heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
+                        lastNodeHandle = -1L
+                    )
+                }.onFailure { Timber.e(it) }
                 Timber.d("Media Uploads up to date heartbeat sent")
             }
             Result.success()

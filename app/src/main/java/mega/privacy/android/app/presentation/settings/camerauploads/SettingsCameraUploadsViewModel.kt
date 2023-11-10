@@ -809,7 +809,8 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             if (_state.value.isMediaUploadsEnabled) {
                 // we need to disable media upload
                 disableMediaUploads()
-                stopCameraUploadsUseCase(shouldReschedule = true)
+                runCatching { stopCameraUploadsUseCase(shouldReschedule = true) }
+                    .onFailure { Timber.e(it) }
                 _state.update {
                     it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
                 }
@@ -821,7 +822,8 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     )
                 ) {
                     enableMediaUploads()
-                    stopCameraUploadsUseCase(shouldReschedule = true)
+                    runCatching { stopCameraUploadsUseCase(shouldReschedule = true) }
+                        .onFailure { Timber.e(it) }
                     _state.update {
                         it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
                     }

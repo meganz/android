@@ -109,6 +109,7 @@ import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemp
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DoesCameraUploadsRecordExistsInTargetNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -122,7 +123,6 @@ import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuota
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
-import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintUseCase
@@ -2060,10 +2060,12 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun updateBackupHeartbeatStatus(heartbeatStatus: HeartbeatStatus) {
         updateLastTimestamp()
-        updateCameraUploadsBackupHeartbeatStatusUseCase(
-            heartbeatStatus = heartbeatStatus,
-            cameraUploadsState = state.value,
-        )
+        runCatching {
+            updateCameraUploadsBackupHeartbeatStatusUseCase(
+                heartbeatStatus = heartbeatStatus,
+                cameraUploadsState = state.value,
+            )
+        }.onFailure { Timber.e(it) }
     }
 
     /**

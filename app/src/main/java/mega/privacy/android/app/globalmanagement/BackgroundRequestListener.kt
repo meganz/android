@@ -216,7 +216,8 @@ class BackgroundRequestListener @Inject constructor(
             myAccountInfo.resetDefaults()
             (application as MegaApplication).isEsid = true
             applicationScope.launch {
-                localLogoutAppUseCase()
+                runCatching { localLogoutAppUseCase() }
+                    .onFailure { Timber.d(it) }
             }
         } else if (e.errorCode == MegaError.API_EBLOCKED) {
             api.localLogout()

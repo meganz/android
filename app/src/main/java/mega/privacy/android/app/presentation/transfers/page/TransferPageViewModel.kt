@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.DeleteAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.DeleteFailedOrCanceledTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import timber.log.Timber
@@ -87,7 +87,8 @@ internal class TransferPageViewModel @Inject constructor(
      * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
      */
     fun stopCameraUploads(shouldReschedule: Boolean) = viewModelScope.launch {
-        stopCameraUploadsUseCase(shouldReschedule = shouldReschedule)
+        runCatching { stopCameraUploadsUseCase(shouldReschedule = shouldReschedule) }
+            .onFailure { Timber.d(it) }
     }
 
     /**

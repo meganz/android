@@ -324,7 +324,8 @@ class ManagerViewModel @Inject constructor(
                         "The Camera Uploads Sync Handles have been changed in the API + " +
                                 "Refresh the Sync Handles"
                     )
-                    establishCameraUploadsSyncHandlesUseCase()
+                    runCatching { establishCameraUploadsSyncHandlesUseCase() }
+                        .onFailure { Timber.e(it) }
                 }
         }
         viewModelScope.launch {
@@ -618,7 +619,8 @@ class ManagerViewModel @Inject constructor(
      * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
      */
     fun stopCameraUploads(shouldReschedule: Boolean) = viewModelScope.launch {
-        stopCameraUploadsUseCase(shouldReschedule = shouldReschedule)
+        runCatching { stopCameraUploadsUseCase(shouldReschedule = shouldReschedule) }
+            .onFailure { Timber.d(it) }
     }
 
     /**

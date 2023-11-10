@@ -780,7 +780,10 @@ class LoginViewModel @Inject constructor(
      * Stop camera upload
      */
     fun stopCameraUploads() =
-        viewModelScope.launch { stopCameraUploadsUseCase(shouldReschedule = false) }
+        viewModelScope.launch {
+            runCatching { stopCameraUploadsUseCase(shouldReschedule = false) }
+                .onFailure { Timber.e(it) }
+        }
 
     /**
      * Updates a pin of the 2FA code in state.

@@ -110,7 +110,8 @@ class MegaChatRequestHandler @Inject constructor(
             Timber.d("Login status on %s", loggedState)
             if (loggedState == 0) {
                 sharingScope.launch {
-                    localLogoutAppUseCase()
+                    runCatching { localLogoutAppUseCase() }
+                        .onFailure { Timber.d(it) }
                     //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
                     broadcastFinishActivityUseCase()
                     withContext(mainDispatcher) {
