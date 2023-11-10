@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.core.R as CoreUIR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -73,7 +74,7 @@ internal fun MegaFolderPickerView(
                 icon = (nodeEntity as? FolderNode)
                     ?.getIcon()
                 // In future, instead of this line we will get icon based on the file extension
-                    ?: CoreUIR.drawable.ic_generic_list,
+                    ?: iconPackR.drawable.ic_generic_list,
                 fileSize = (nodeEntity as? FileNode)
                     ?.let { node -> formatFileSize(node.size, LocalContext.current) },
                 modifiedDate = (nodeEntity as? FileNode)

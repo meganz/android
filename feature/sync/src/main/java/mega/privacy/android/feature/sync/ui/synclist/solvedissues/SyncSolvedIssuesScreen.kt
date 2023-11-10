@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist.solvedissues
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -58,25 +59,25 @@ internal fun SyncSolvedIssuesScreenPreview() {
                     nodeIds = listOf(NodeId(3L)),
                     localPaths = listOf("File name"),
                     resolutionExplanation = "All duplicates were removed",
-                    icon = R.drawable.ic_generic_list
+                    icon = iconPackR.drawable.ic_generic_list
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(4L)),
                     localPaths = listOf("File name"),
                     resolutionExplanation = "All items were renamed",
-                    icon = R.drawable.ic_generic_list,
+                    icon = iconPackR.drawable.ic_generic_list,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(6L)),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "All items were renamed",
-                    icon = R.drawable.ic_generic_list,
+                    icon = iconPackR.drawable.ic_generic_list,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(7L)),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "All items were renamed",
-                    icon = R.drawable.ic_generic_list,
+                    icon = iconPackR.drawable.ic_generic_list,
                 )
             )
         )

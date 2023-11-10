@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist.solvedissues
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,25 +40,25 @@ internal class SyncSolvedIssuesViewModel @Inject constructor() : ViewModel() {
             nodeIds = listOf(NodeId(3L)),
             localPaths = listOf("Mock file name"),
             resolutionExplanation = "All duplicates were removed",
-            icon = R.drawable.ic_generic_list
+            icon = iconPackR.drawable.ic_generic_list
         ),
         SolvedIssueUiItem(
             nodeIds = listOf(NodeId(4L)),
             localPaths = listOf("Mock file name"),
             resolutionExplanation = "All items were renamed",
-            icon = R.drawable.ic_generic_list,
+            icon = iconPackR.drawable.ic_generic_list,
         ),
         SolvedIssueUiItem(
             nodeIds = listOf(NodeId(6L)),
             localPaths = listOf("Mock folder name"),
             resolutionExplanation = "All items were renamed",
-            icon = R.drawable.ic_generic_list,
+            icon = iconPackR.drawable.ic_generic_list,
         ),
         SolvedIssueUiItem(
             nodeIds = listOf(NodeId(7L)),
             localPaths = listOf("Mock folder name"),
             resolutionExplanation = "All items were renamed",
-            icon = R.drawable.ic_generic_list,
+            icon = iconPackR.drawable.ic_generic_list,
         )
     )
 }

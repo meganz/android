@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
@@ -96,7 +97,7 @@ class FavouriteMapperTest {
         val expectedName = "TestFile.test"
         val expectedInfo = "Size · Modification"
         val expectedLabel = MegaNode.NODE_LBL_RED
-        val expectedIcon = CoreUiR.drawable.ic_generic_list
+        val expectedIcon = IconPackR.drawable.ic_generic_list
         val expectedIsFavourite = false
         val expectedIsExported = false
         val expectedIsTakenDown = false

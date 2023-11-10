@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.views
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -123,7 +124,7 @@ private fun IssueResolutionAction(
 internal fun IssuesResolutionDialogPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         IssuesResolutionDialog(
-            icon = mega.privacy.android.core.R.drawable.ic_generic_list,
+            icon = iconPackR.drawable.ic_generic_list,
             conflictName = "Conflict A",
             nodeName = "some file",
             actions = listOf(

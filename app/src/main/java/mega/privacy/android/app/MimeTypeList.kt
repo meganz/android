@@ -7,7 +7,6 @@ import android.webkit.MimeTypeMap
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.getMimeType
-import mega.privacy.android.core.R as CoreUiR
 import java.io.File
 
 /**
@@ -413,7 +412,7 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
                     }
                 }
                 if (resId == -1) {
-                    resId = CoreUiR.drawable.ic_generic_list
+                    resId = iconPackR.drawable.ic_generic_list
                 }
             }
             return resId

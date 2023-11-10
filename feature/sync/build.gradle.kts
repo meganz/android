@@ -81,6 +81,7 @@ dependencies {
     implementation(project(":core:formatter"))
     implementation(project(":core-ui"))
     implementation(project(":legacy-core-ui"))
+    implementation(project(":icon-pack"))
 
     implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)

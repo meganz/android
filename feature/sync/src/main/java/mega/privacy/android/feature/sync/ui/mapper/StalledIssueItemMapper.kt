@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.mapper
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.core.R
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.ui.model.StalledIssueDetailedInfo
@@ -20,7 +21,7 @@ internal class StalledIssueItemMapper @Inject constructor(
             icon = if (isFolder) {
                 R.drawable.ic_folder_list
             } else {
-                R.drawable.ic_generic_list
+                iconPackR.drawable.ic_generic_list
             },
             detailedInfo = getMockStalledIssueResolveInfo(),
             actions = stalledIssueResolutionActionMapper(stalledIssueEntity.issueType)
