@@ -136,7 +136,7 @@ pipeline {
                         }
                     }
 
-                    def failureMessage = ":x: Build Failed" +
+                    def failureMessage = ":x: Build Failed(Build: ${env.BUILD_NUMBER})" +
                             "<br/>Failure Stage: ${BUILD_STEP}" +
                             "<br/>Last Commit Message: ${getLastCommitMessage()}" +
                             "Last Commit ID: ${env.GIT_COMMIT}" +
@@ -169,7 +169,7 @@ pipeline {
                         common.sendToMR(skipMessage)
                     } else {
                         // Create the String to be posted as a comment in Gitlab
-                        String mergeRequestMessage = ":white_check_mark: Build Succeeded!\n\n" +
+                        String mergeRequestMessage = ":white_check_mark: Build Succeeded!(Build: ${env.BUILD_NUMBER})\n\n" +
                                 "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
                                 "**Build Warnings:**\n" + getBuildWarnings() + "\n\n" +
                                 buildLintSummaryTable(JSON_LINT_REPORT_LINK) + "\n\n" +
@@ -793,28 +793,6 @@ def archiveUnitTestReport(String reportPath, String targetFileName) {
 }
 
 /**
- * Create a unit test summary after uploading the HTML test report. The summary includes the download
- * link of the HTML test report.
- *
- * @param testResultPath relative path to the xml format test results
- * @param reportPath relative path to the HTML format test report
- * @param archiveTargetName file name of the test report zip file
- */
-def unitTestSummaryWithArchiveLink(String testResultPath, String reportPath, String archiveTargetName) {
-
-    String unitTestResult
-    if (archiveUnitTestReport(reportPath, archiveTargetName)) {
-        unitTestFileLink = uploadFileToGitLab(archiveTargetName)
-
-        String unitTestSummary = unitTestSummary("${WORKSPACE}/${testResultPath}")
-        unitTestResult = "<br/>${unitTestSummary} <br/>${unitTestFileLink}"
-    } else {
-        unitTestResult = "<br>Unit Test report not available, perhaps test code has compilation error. Please check full build log."
-    }
-    return unitTestResult
-}
-
-/**
  * Get the link of the HTML test report.
  *
  * @param reportPath relative path to the HTML format test report
@@ -866,9 +844,12 @@ String getArtifactoryDevelopCodeCoverage(String coveragePath) {
 private String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
-        link = new JsonSlurperClassic().parseText(response).markdown
-        return link
+        try {
+            final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
+            link = new JsonSlurperClassic().parseText(response).markdown
+        } catch (Exception e) {
+            link = "Failed to upload file ${fileName} to GitLab(${e.toString()})"
+        }
     }
     return link
 }
