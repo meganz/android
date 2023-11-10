@@ -118,7 +118,7 @@ class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
         verify(dataStore).setMediaUploadsHandle(expectedMediaUploadsHandle)
         verify(dataStore).setCameraUploadsLocalPath(expectedCameraUploadsLocalPath)
         verify(dataStore).setMediaUploadsLocalPath(expectedMediaUploadsLocalPath)
-        verify(dataStore).setLocationTagsEnabled(expectedLocationTagsEnabled)
+        verify(dataStore).setLocationTagsEnabled(!expectedLocationTagsEnabled)
         verify(dataStore).setUploadVideoQuality(expectedUploadVideoQuality)
         verify(dataStore).setUploadFileNamesKept(expectedUploadFileNamesKept)
         verify(dataStore).setChargingRequiredForVideoCompression(

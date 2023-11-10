@@ -27,26 +27,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
     private val dbHandler: DatabaseHandler,
 ) : MegaLocalStorageGateway {
 
-    override suspend fun getCamSyncHandle(): Long? =
-        dbHandler.preferences?.camSyncHandle?.toLongOrNull()
-
-    override suspend fun getMegaHandleSecondaryFolder(): Long? =
-        dbHandler.preferences?.megaHandleSecondaryFolder?.toLongOrNull()
-
-    override suspend fun setPrimarySyncHandle(primaryHandle: Long) {
-        with(dbHandler) {
-            preferences?.camSyncHandle = primaryHandle.toString()
-            setCamSyncHandle(primaryHandle)
-        }
-    }
-
-    override suspend fun setSecondarySyncHandle(secondaryHandle: Long) {
-        with(dbHandler) {
-            preferences?.megaHandleSecondaryFolder = secondaryHandle.toString()
-            setSecondaryFolderHandle(secondaryHandle)
-        }
-    }
-
     override suspend fun getCloudSortOrder(): Int =
         dbHandler.preferences?.preferredSortCloud?.toInt() ?: ORDER_DEFAULT_ASC
 
@@ -93,100 +73,11 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getUserCredentials(): UserCredentials? = dbHandler.credentials
 
-    override suspend fun isCameraUploadsByWifi(): Boolean =
-        dbHandler.preferences?.camSyncWifi?.toBoolean() ?: true
-
-    override suspend fun getCameraSyncFileUpload(): Int? =
-        dbHandler.preferences?.camSyncFileUpload?.toIntOrNull()
-
-    override suspend fun setCameraSyncFileUpload(uploadOption: Int) =
-        dbHandler.setCamSyncFileUpload(uploadOption)
-
-    override suspend fun getPhotoTimeStamp() = dbHandler.preferences?.camSyncTimeStamp
-
-    override suspend fun getSecondaryPhotoTimeStamp() = dbHandler.preferences?.secSyncTimeStamp
-
-    override suspend fun getVideoTimeStamp() = dbHandler.preferences?.camVideoSyncTimeStamp
-
-    override suspend fun getSecondaryVideoTimeStamp() = dbHandler.preferences?.secVideoSyncTimeStamp
-
-    override suspend fun setPhotoTimeStamp(timeStamp: Long) =
-        dbHandler.setCamSyncTimeStamp(timeStamp)
-
-    override suspend fun setSecondaryPhotoTimeStamp(timeStamp: Long) =
-        dbHandler.setSecSyncTimeStamp(timeStamp)
-
-    override suspend fun setVideoTimeStamp(timeStamp: Long) =
-        dbHandler.setCamVideoSyncTimeStamp(timeStamp)
-
-    override suspend fun setSecondaryVideoTimeStamp(timeStamp: Long) =
-        dbHandler.setSecVideoSyncTimeStamp(timeStamp)
-
     override suspend fun doCredentialsExist(): Boolean = dbHandler.credentials != null
 
     override suspend fun doPreferencesExist(): Boolean = dbHandler.preferences != null
 
-    override suspend fun doesSyncEnabledExist() = dbHandler.preferences?.camSyncEnabled != null
-
-    override suspend fun isCameraUploadsEnabled(): Boolean =
-        dbHandler.preferences?.camSyncEnabled.toBoolean()
-
-    override suspend fun getPrimaryFolderLocalPath(): String =
-        dbHandler.preferences?.camSyncLocalPath ?: ""
-
-    override suspend fun setPrimaryFolderLocalPath(localPath: String) =
-        dbHandler.setCamSyncLocalPath(localPath)
-
-    override suspend fun setSecondaryFolderLocalPath(localPath: String) =
-        dbHandler.setSecondaryFolderPath(localPath)
-
-    override suspend fun setSecondaryEnabled(secondaryCameraUpload: Boolean) =
-        dbHandler.setSecondaryUploadEnabled(secondaryCameraUpload)
-
-    override suspend fun getSecondaryFolderLocalPath(): String =
-        dbHandler.preferences?.localPathSecondaryFolder ?: ""
-
-    override suspend fun areLocationTagsEnabled(): Boolean =
-        dbHandler.preferences?.removeGPS?.toBoolean()?.not() ?: false
-
-    override suspend fun setLocationTagsEnabled(enable: Boolean) =
-        dbHandler.setRemoveGPS(!enable)
-
-    override suspend fun getUploadVideoQuality(): Int? =
-        dbHandler.preferences?.uploadVideoQuality?.toIntOrNull()
-
-    override suspend fun areUploadFileNamesKept(): Boolean =
-        dbHandler.preferences?.keepFileNames.toBoolean()
-
-    override suspend fun setUploadFileNamesKept(keepFileNames: Boolean) =
-        dbHandler.setKeepFileNames(keepFileNames)
-
-    override suspend fun isPrimaryFolderInSDCard(): Boolean =
-        dbHandler.preferences?.cameraFolderExternalSDCard.toBoolean()
-
-    override suspend fun getPrimaryFolderSDCardUriPath(): String =
-        dbHandler.preferences?.uriExternalSDCard ?: ""
-
-    override suspend fun setPrimaryFolderSDCardUriPath(path: String) =
-        dbHandler.setUriExternalSDCard(path)
-
-    override suspend fun isSecondaryMediaFolderEnabled(): Boolean =
-        dbHandler.preferences?.secondaryMediaFolderEnabled.toBoolean()
-
     override suspend fun shouldClearSyncRecords(): Boolean = dbHandler.shouldClearCamsyncRecords()
-
-    override suspend fun isChargingRequiredForVideoCompression(): Boolean =
-        dbHandler.preferences?.conversionOnCharging?.toBoolean() ?: true
-
-    override suspend fun setChargingRequiredForVideoCompression(chargingRequired: Boolean) {
-        dbHandler.setConversionOnCharging(chargingRequired)
-    }
-
-    override suspend fun getVideoCompressionSizeLimit(): Int =
-        dbHandler.preferences?.chargingOnSize?.toInt() ?: DEFAULT_CONVENTION_QUEUE_SIZE
-
-    override suspend fun setVideoCompressionSizeLimit(size: Int) =
-        dbHandler.setChargingOnSize(size)
 
     override suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo? =
         dbHandler.findNonContactByHandle(userHandle.toString())
@@ -226,31 +117,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun setShowCopyright(showCopyrights: Boolean) {
         dbHandler.setShowCopyright(showCopyrights)
-    }
-
-    override suspend fun setCamSyncLocalPath(path: String?) {
-        path?.let(dbHandler::setCamSyncLocalPath)
-    }
-
-    override suspend fun setPrimaryFolderInSDCard(isInSDCard: Boolean) {
-        dbHandler.setCameraFolderExternalSDCard(isInSDCard)
-    }
-
-    override suspend fun setCameraUploadsByWifi(wifiOnly: Boolean) {
-        dbHandler.setCamSyncWifi(wifiOnly)
-    }
-
-    override suspend fun setCamSyncFileUpload(fileUpload: Int) {
-        dbHandler.setCamSyncFileUpload(fileUpload)
-    }
-
-    override suspend fun setUploadVideoQuality(quality: Int) {
-        dbHandler.setCameraUploadVideoQuality(quality)
-    }
-
-    override suspend fun setCameraUploadsEnabled(enable: Boolean) = with(dbHandler) {
-        preferences?.camSyncEnabled = enable.toString()
-        setCamSyncEnabled(enable)
     }
 
     override suspend fun getAttributes(): MegaAttributes? =
@@ -321,9 +187,5 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun setTransferQueueStatus(isPause: Boolean) {
         dbHandler.transferQueueStatus = isPause
-    }
-
-    companion object {
-        private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }
 }

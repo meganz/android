@@ -513,37 +513,6 @@ class DefaultCameraUploadRepositoryTest {
             verify(cameraUploadsSettingsPreferenceGateway).setCameraUploadsLocalPath(testPath)
         }
 
-        @ParameterizedTest(name = "is in SD card: {0}")
-        @ValueSource(booleans = [true, false])
-        fun `test that the primary folder could be located in the SD card`(isInSDCard: Boolean) =
-            runTest {
-                whenever(localStorageGateway.isPrimaryFolderInSDCard()).thenReturn(isInSDCard)
-                assertThat(underTest.isPrimaryFolderInSDCard()).isEqualTo(isInSDCard)
-            }
-
-        @Test
-        fun `test that the new primary folder SD card path is set`() = runTest {
-            val testSDCardPath = "test/sd/card/path"
-
-            underTest.setPrimaryFolderSDCardUriPath(testSDCardPath)
-            verify(localStorageGateway).setPrimaryFolderSDCardUriPath(testSDCardPath)
-        }
-
-        @ParameterizedTest(name = "is in SD card: {0}")
-        @ValueSource(booleans = [true, false])
-        fun `test that the primary folder in the SD card is handled`(isInSDCard: Boolean) =
-            runTest {
-                underTest.setPrimaryFolderInSDCard(isInSDCard)
-                verify(localStorageGateway).setPrimaryFolderInSDCard(isInSDCard)
-            }
-
-        @Test
-        fun `test that the primary folder SD card URI path is retrieved`() = runTest {
-            val testPath = "test/sd/primary/directory/path"
-            whenever(localStorageGateway.getPrimaryFolderSDCardUriPath()).thenReturn(testPath)
-            assertThat(underTest.getPrimaryFolderSDCardUriPath()).isEqualTo(testPath)
-        }
-
         @Test
         fun `test that setup primary folder returns success when api set camera upload folders returns API_OK`() =
             runTest {

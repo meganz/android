@@ -338,34 +338,6 @@ interface CameraUploadRepository {
     suspend fun setUploadFileNamesKept(keepFileNames: Boolean)
 
     /**
-     * Checks whether the Primary Folder is located in an external SD Card or not
-     *
-     * @return true if the Primary Folder is located in an external SD Card, and false if otherwise
-     */
-    suspend fun isPrimaryFolderInSDCard(): Boolean
-
-    /**
-     * Sets whether the Primary Folder is located in an external SD Card or not
-     *
-     * @param isInSDCard Whether the Primary Folder is located in an external SD Card or not
-     */
-    suspend fun setPrimaryFolderInSDCard(isInSDCard: Boolean)
-
-    /**
-     * Retrieves the Primary Folder SD Card URI path
-     *
-     * @return A [String] that contains the Primary Folder SD Card URI path
-     */
-    suspend fun getPrimaryFolderSDCardUriPath(): String
-
-    /**
-     * Sets the new Primary Folder SD Card URI Path
-     *
-     * @param path the new Primary Folder SD Card URI path
-     */
-    suspend fun setPrimaryFolderSDCardUriPath(path: String)
-
-    /**
      * Is secondary media folder enabled
      *
      * @return true if secondary media folder enabled

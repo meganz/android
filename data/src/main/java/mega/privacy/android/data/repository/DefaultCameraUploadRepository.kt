@@ -336,22 +336,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             cameraUploadsSettingsPreferenceGateway.setUploadFileNamesKept(keepFileNames)
         }
 
-    override suspend fun isPrimaryFolderInSDCard(): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.isPrimaryFolderInSDCard()
-    }
-
-    override suspend fun setPrimaryFolderInSDCard(isInSDCard: Boolean) = withContext(ioDispatcher) {
-        localStorageGateway.setPrimaryFolderInSDCard(isInSDCard)
-    }
-
-    override suspend fun getPrimaryFolderSDCardUriPath() = withContext(ioDispatcher) {
-        localStorageGateway.getPrimaryFolderSDCardUriPath()
-    }
-
-    override suspend fun setPrimaryFolderSDCardUriPath(path: String) = withContext(ioDispatcher) {
-        localStorageGateway.setPrimaryFolderSDCardUriPath(path)
-    }
-
     override suspend fun isSecondaryMediaFolderEnabled() = withContext(ioDispatcher) {
         cameraUploadsSettingsPreferenceGateway.isMediaUploadsEnabled()
     }

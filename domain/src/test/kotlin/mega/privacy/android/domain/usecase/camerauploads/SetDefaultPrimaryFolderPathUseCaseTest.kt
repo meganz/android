@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -24,14 +23,12 @@ class SetDefaultPrimaryFolderPathUseCaseTest {
 
     private lateinit var underTest: SetDefaultPrimaryFolderPathUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val setPrimaryFolderLocalPathUseCase = mock<SetPrimaryFolderLocalPathUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = SetDefaultPrimaryFolderPathUseCase(
-            cameraUploadRepository = cameraUploadRepository,
             fileSystemRepository = fileSystemRepository,
             setPrimaryFolderLocalPathUseCase = setPrimaryFolderLocalPathUseCase,
         )
@@ -40,7 +37,6 @@ class SetDefaultPrimaryFolderPathUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            cameraUploadRepository,
             fileSystemRepository,
             setPrimaryFolderLocalPathUseCase,
         )
@@ -55,8 +51,6 @@ class SetDefaultPrimaryFolderPathUseCaseTest {
         }
         underTest()
 
-        verify(cameraUploadRepository).setPrimaryFolderInSDCard(false)
-        verify(cameraUploadRepository).setPrimaryFolderSDCardUriPath("")
         verify(setPrimaryFolderLocalPathUseCase).invoke(testDefaultPath)
     }
 
@@ -65,6 +59,6 @@ class SetDefaultPrimaryFolderPathUseCaseTest {
         runTest {
             whenever(fileSystemRepository.doesExternalStorageDirectoryExists()).thenReturn(false)
             underTest()
-            verifyNoInteractions(cameraUploadRepository, setPrimaryFolderLocalPathUseCase)
+            verifyNoInteractions(setPrimaryFolderLocalPathUseCase)
         }
 }

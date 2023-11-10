@@ -67,7 +67,8 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             mediaUploadsHandle = oldPreferences.megaHandleSecondaryFolder?.toLongOrNull(),
             cameraUploadsLocalPath = if (oldPreferences.cameraFolderExternalSDCard?.toBooleanStrictOrNull() == true) oldPreferences.uriExternalSDCard else oldPreferences.camSyncLocalPath,
             mediaUploadsLocalPath = oldPreferences.localPathSecondaryFolder,
-            areLocationTagsEnabled = oldPreferences.removeGPS?.toBooleanStrictOrNull() ?: false,
+            areLocationTagsEnabled = oldPreferences.removeGPS?.toBooleanStrictOrNull()?.not()
+                ?: false,
             uploadVideoQuality = oldPreferences.uploadVideoQuality?.toIntOrNull()
                 ?: VideoQuality.ORIGINAL.value,
             areUploadFileNamesKept = oldPreferences.keepFileNames?.toBooleanStrictOrNull() ?: false,

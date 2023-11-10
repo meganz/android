@@ -16,26 +16,6 @@ import mega.privacy.android.domain.entity.user.UserCredentials
 interface MegaLocalStorageGateway {
 
     /**
-     * Get Camera Uploads Primary handle
-     */
-    suspend fun getCamSyncHandle(): Long?
-
-    /**
-     * Get Camera Uploads Secondary handle
-     */
-    suspend fun getMegaHandleSecondaryFolder(): Long?
-
-    /**
-     * Set Camera Uploads Primary handle
-     */
-    suspend fun setPrimarySyncHandle(primaryHandle: Long)
-
-    /**
-     * Set Camera Uploads Secondary handle
-     */
-    suspend fun setSecondarySyncHandle(secondaryHandle: Long)
-
-    /**
      * Get cloud sort order
      * @return cloud sort order
      */
@@ -97,68 +77,6 @@ interface MegaLocalStorageGateway {
     suspend fun getUserCredentials(): UserCredentials?
 
     /**
-     * Checks if content in Camera Uploads should be uploaded through Wi-Fi only,
-     * or through Wi-Fi or Mobile Data
-     *
-     * @return If true, will only upload on Wi-Fi. It will also return true if the option has not
-     * been set (null)
-     * Otherwise, will upload through Wi-Fi or Mobile Data
-     */
-    suspend fun isCameraUploadsByWifi(): Boolean
-
-    /**
-     * Get sync file upload
-     */
-    suspend fun getCameraSyncFileUpload(): Int?
-
-    /**
-     * Sets the upload option of Camera Uploads
-     *
-     * @param uploadOption A specific [Int] from MegaPreferences
-     */
-    suspend fun setCameraSyncFileUpload(uploadOption: Int)
-
-    /**
-     * Get photo time stamp
-     */
-    suspend fun getPhotoTimeStamp(): String?
-
-    /**
-     * Get video time stamp
-     */
-    suspend fun getVideoTimeStamp(): String?
-
-    /**
-     * Get secondary photo time stamp
-     */
-    suspend fun getSecondaryPhotoTimeStamp(): String?
-
-    /**
-     * Get secondary video time stamp
-     */
-    suspend fun getSecondaryVideoTimeStamp(): String?
-
-    /**
-     * Set photo time stamp
-     */
-    suspend fun setPhotoTimeStamp(timeStamp: Long)
-
-    /**
-     * Set video time stamp
-     */
-    suspend fun setVideoTimeStamp(timeStamp: Long)
-
-    /**
-     * Set secondary photo time stamp
-     */
-    suspend fun setSecondaryPhotoTimeStamp(timeStamp: Long)
-
-    /**
-     * Set secondary video time stamp
-     */
-    suspend fun setSecondaryVideoTimeStamp(timeStamp: Long)
-
-    /**
      * Do user credentials exist
      */
     suspend fun doCredentialsExist(): Boolean
@@ -169,146 +87,9 @@ interface MegaLocalStorageGateway {
     suspend fun doPreferencesExist(): Boolean
 
     /**
-     * Do camera upload sync preference exist
-     */
-    suspend fun doesSyncEnabledExist(): Boolean
-
-    /**
-     * Is camera uploads enabled
-     */
-    suspend fun isCameraUploadsEnabled(): Boolean
-
-    /**
-     * Retrieves the Primary Folder local path
-     *
-     * @return A [String] that contains the Primary Folder local path, or an empty [String]
-     * if it does not exist
-     */
-    suspend fun getPrimaryFolderLocalPath(): String
-
-    /**
-     * Sets the new Primary Folder local path
-     *
-     * @param localPath The new Primary Folder local path
-     */
-    suspend fun setPrimaryFolderLocalPath(localPath: String)
-
-    /**
-     * Sets the new Secondary Folder local path
-     *
-     * @param localPath The new Secondary Folder local path
-     */
-    suspend fun setSecondaryFolderLocalPath(localPath: String)
-
-    /**
-     * Set secondary upload enabled
-     */
-    suspend fun setSecondaryEnabled(secondaryCameraUpload: Boolean)
-
-    /**
-     * Retrieves the Secondary Folder local path
-     *
-     * @return A [String] that contains the Primary Folder local path, or an empty [String] if it does not exist
-     */
-    suspend fun getSecondaryFolderLocalPath(): String
-
-    /**
-     * Checks the value in the Database, as to whether Location Tags should be added or not
-     * when uploading Photos
-     *
-     * @return true if Location Tags should be added when uploading Photos, and false if otherwise
-     * It will default to false when the value does not exist in the Database yet
-     */
-    suspend fun areLocationTagsEnabled(): Boolean
-
-    /**
-     * Sets the new value in the Database, as to whether Location Tags should be added or not
-     * when uploading Photos
-     *
-     * @param enable true if Location Tags should be added when uploading Photos, and false if otherwise
-     */
-    suspend fun setLocationTagsEnabled(enable: Boolean)
-
-    /**
-     * Get video quality for camera upload
-     */
-    suspend fun getUploadVideoQuality(): Int?
-
-    /**
-     * Checks whether the File Names are kept or not when uploading content
-     *
-     * @return true if the File Names should be left as is, and false if otherwise. It will also
-     * return false when the value does not exist in the Database
-     */
-    suspend fun areUploadFileNamesKept(): Boolean
-
-    /**
-     * Sets whether the File Names of files to be uploaded will be kept or not
-     *
-     * @param keepFileNames true if the File Names should now be left as is, and false if otherwise
-     */
-    suspend fun setUploadFileNamesKept(keepFileNames: Boolean)
-
-    /**
-     * Checks whether the Primary Folder is located in an external SD Card or not
-     *
-     * @return true if the Primary Folder is local in an external SD Card, and false if otherwise
-     */
-    suspend fun isPrimaryFolderInSDCard(): Boolean
-
-    /**
-     * Retrieves the Primary Folder SD Card URI path
-     *
-     * @return A [String] that contains the Primary Folder SD Card URI path, or an empty [String]
-     * if it does not exist
-     */
-    suspend fun getPrimaryFolderSDCardUriPath(): String
-
-    /**
-     * Sets the new Primary Folder SD Card URI Path
-     *
-     * @param path the new Primary Folder SD Card URI path
-     */
-    suspend fun setPrimaryFolderSDCardUriPath(path: String)
-
-    /**
-     * Is secondary media folder enabled
-     */
-    suspend fun isSecondaryMediaFolderEnabled(): Boolean
-
-    /**
      * Should clear sync records
      */
     suspend fun shouldClearSyncRecords(): Boolean
-
-    /**
-     * Checks whether compressing videos require the device to be charged or not
-     *
-     * @return true if the device needs to be charged to compress videos, and false if otherwise
-     * It will return true by default, if the value does not exist in the Database
-     */
-    suspend fun isChargingRequiredForVideoCompression(): Boolean
-
-    /**
-     * Sets whether compressing videos require the device to be charged or not
-     *
-     * @param chargingRequired Whether the device needs to be charged or not
-     */
-    suspend fun setChargingRequiredForVideoCompression(chargingRequired: Boolean)
-
-    /**
-     * Retrieves the maximum video file size that can be compressed
-     *
-     * @return An [Int] that represents the maximum video file size that can be compressed
-     */
-    suspend fun getVideoCompressionSizeLimit(): Int
-
-    /**
-     * Sets the maximum video file size that can be compressed
-     *
-     * @param size The maximum video file size that can be compressed
-     */
-    suspend fun setVideoCompressionSizeLimit(size: Int)
 
     /**
      * Get non contact by handle
@@ -388,49 +169,6 @@ interface MegaLocalStorageGateway {
      * @param showCopyrights
      */
     suspend fun setShowCopyright(showCopyrights: Boolean)
-
-    /**
-     * Set Camera Upload local path
-     *
-     * @param path
-     */
-    suspend fun setCamSyncLocalPath(path: String?)
-
-    /**
-     * Sets whether the Primary Folder is located in an external SD Card or not
-     *
-     * @param isInSDCard Whether the Primary Folder is located in an external SD Card or not
-     */
-    suspend fun setPrimaryFolderInSDCard(isInSDCard: Boolean)
-
-    /**
-     * Sets whether Camera Uploads should only run through Wi-Fi / Wi-Fi or Mobile Data
-     *
-     * @param wifiOnly If true, Camera Uploads will only run through Wi-Fi
-     * If false, Camera Uploads can run through either Wi-Fi or Mobile Data
-     */
-    suspend fun setCameraUploadsByWifi(wifiOnly: Boolean)
-
-    /**
-     * Set if camera upload only uploads images or images and videos
-     *
-     * @param fileUpload
-     */
-    suspend fun setCamSyncFileUpload(fileUpload: Int)
-
-    /**
-     * Sets the new Video Quality when uploading Videos through Camera Uploads
-     *
-     * @param quality The Video Quality, represented as an [Int]
-     */
-    suspend fun setUploadVideoQuality(quality: Int)
-
-    /**
-     * Set camera upload on/off
-     *
-     * @param enable
-     */
-    suspend fun setCameraUploadsEnabled(enable: Boolean)
 
     /**
      * Gets attributes from DB

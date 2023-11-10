@@ -45,18 +45,10 @@ interface DatabaseHandler {
     var chatVideoQuality: Int
 
     /**
-     * Sets the local path selected from an external SD card as Media Uploads local folder.
-     *
-     * @param uriMediaExternalSdCard local path
-     */
-    var uriMediaExternalSdCard: String?
-
-    /**
      * Sets the flag to indicate if the local path selected as Media Uploads local folder belongs to an external SD card.
      *
      * @param mediaFolderExternalSdCard true if the local path selected belongs to an external SD card, false otherwise
      */
-    var mediaFolderExternalSdCard: Boolean
     var passcodeLockType: String?
     var isPasscodeLockEnabled: Boolean
     var passcodeLockCode: String
@@ -129,11 +121,6 @@ interface DatabaseHandler {
     fun saveCredentials(userCredentials: UserCredentials)
     fun shouldClearCamsyncRecords(): Boolean
     fun saveShouldClearCamsyncRecords(should: Boolean)
-    fun findMaxTimestamp(isSecondary: Boolean, fileType: Int): Long?
-    fun setCameraUploadVideoQuality(quality: Int)
-    fun setConversionOnCharging(onCharging: Boolean)
-    fun setChargingOnSize(size: Int)
-    fun setRemoveGPS(removeGPS: Boolean)
     fun saveMyEmail(email: String?)
     fun saveMyFirstName(firstName: String?)
     fun saveMyLastName(lastName: String?)
@@ -165,19 +152,10 @@ interface DatabaseHandler {
     fun setSecondaryUploadEnabled(enabled: Boolean)
     fun setCamSyncHandle(handle: Long)
     fun setSecondaryFolderHandle(handle: Long)
-    fun setCamSyncLocalPath(localPath: String)
-    fun setUriExternalSDCard(uriExternalSDCard: String?)
-    fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean)
-    fun setSecondaryFolderPath(localPath: String?)
-    fun setCamSyncFileUpload(fileUpload: Int)
     fun setAccountDetailsTimeStamp()
     fun resetAccountDetailsTimeStamp()
     fun setExtendedAccountDetailsTimestamp()
     fun resetExtendedAccountDetailsTimestamp()
-    fun setCamSyncTimeStamp(camSyncTimeStamp: Long)
-    fun setCamVideoSyncTimeStamp(camVideoSyncTimeStamp: Long)
-    fun setSecSyncTimeStamp(secSyncTimeStamp: Long)
-    fun setSecVideoSyncTimeStamp(secVideoSyncTimeStamp: Long)
     fun setStorageAskAlways(storageAskAlways: Boolean)
     fun setStorageDownloadLocation(storageDownloadLocation: String?)
     fun setAttrAskSizeDownload(askSizeDownload: String?)

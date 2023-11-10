@@ -45,7 +45,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
-import java.util.Collections
 import java.util.Locale
 import javax.inject.Inject
 
@@ -107,118 +106,6 @@ class SqliteDatabaseHandler @Inject constructor(
         val sql =
             "UPDATE $TABLE_PREFERENCES SET $KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = '${encrypt(should.toString())}'"
         writableDatabase.execSQL(sql)
-    }
-
-    override fun findMaxTimestamp(isSecondary: Boolean, fileType: Int): Long? {
-        val selectQuery = "SELECT $KEY_SYNC_TIMESTAMP FROM $TABLE_SYNC_RECORDS  " +
-                "WHERE $KEY_SYNC_SECONDARY = '${encrypt(isSecondary.toString())}' " +
-                "AND $KEY_SYNC_TYPE = $fileType"
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val timestamps: MutableList<Long> = ArrayList(cursor.count)
-                    do {
-                        val timestamp = decrypt(cursor.getString(0))
-                        if (timestamp == null) {
-                            timestamps.add(0L)
-                        } else {
-                            timestamps.add(java.lang.Long.valueOf(timestamp))
-                        }
-                    } while (cursor.moveToNext())
-                    if (timestamps.isEmpty()) {
-                        return null
-                    }
-                    Collections.sort(timestamps, java.util.Comparator { o1, o2 ->
-                        if (o1 == o2) {
-                            return@Comparator 0
-                        }
-                        if (o1 > o2) -1 else 1
-                    })
-                    return timestamps[0]
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return null
-    }
-
-    override fun setCameraUploadVideoQuality(quality: Int) {
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_PREFERENCES SET $KEY_UPLOAD_VIDEO_QUALITY= '${encrypt(quality.toString())}' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_UPLOAD_VIDEO_QUALITY, encrypt(quality.toString()))
-                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun setConversionOnCharging(onCharging: Boolean) {
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_PREFERENCES SET $KEY_CONVERSION_ON_CHARGING= '${
-                            encrypt(onCharging.toString())
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_CONVERSION_ON_CHARGING, encrypt(onCharging.toString()))
-                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun setChargingOnSize(size: Int) {
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_PREFERENCES SET $KEY_CHARGING_ON_SIZE= '${encrypt(size.toString())}' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_CHARGING_ON_SIZE, encrypt(size.toString()))
-                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun setRemoveGPS(removeGPS: Boolean) {
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_PREFERENCES SET $KEY_REMOVE_GPS= '${encrypt(removeGPS.toString())}' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_REMOVE_GPS, encrypt(removeGPS.toString()))
-                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
     }
 
     override fun saveMyEmail(email: String?) {
@@ -854,28 +741,6 @@ class SqliteDatabaseHandler @Inject constructor(
             id, filename, type, state, size, handle, path,
             offline, timestamp, error, originalPath, parentHandle
         )
-    }
-
-    /**
-     * Gets a list with completed transfers depending on the query received by parameter.
-     *
-     * @param selectQuery the query which selects specific completed transfers
-     * @return The list with the completed transfers.
-     */
-    private fun getCompletedTransfers(selectQuery: String): ArrayList<CompletedTransfer> {
-        val cTs = ArrayList<CompletedTransfer>()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToLast()) {
-                    do {
-                        cTs.add(extractAndroidCompletedTransfer(cursor))
-                    } while (cursor.moveToPrevious())
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return cTs
     }
 
     /**
@@ -1732,111 +1597,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun setCamSyncLocalPath(localPath: String) {
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_PREFERENCES SET $KEY_CAM_SYNC_LOCAL_PATH= '${
-                            encrypt(localPath)
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_CAM_SYNC_LOCAL_PATH, encrypt(localPath))
-                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun setUriExternalSDCard(uriExternalSDCard: String?) {
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_PREFERENCES SET $KEY_URI_EXTERNAL_SD_CARD= '${
-                            encrypt(uriExternalSDCard)
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                    Timber.d("KEY_URI_EXTERNAL_SD_CARD URI: %s", UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_URI_EXTERNAL_SD_CARD, encrypt(uriExternalSDCard))
-                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-    /**
-     * Gets the local path selected in an external SD card as Media Uploads local folder.
-     *
-     * @return The Media Uploads path located in SD card
-     */
-    /**
-     * Sets the local path selected from an external SD card as Media Uploads local folder.
-     *
-     * @param uriMediaExternalSdCard local path
-     */
-    override var uriMediaExternalSdCard: String?
-        get() = getStringValue(TABLE_PREFERENCES, KEY_URI_MEDIA_EXTERNAL_SD_CARD, "")
-        set(uriMediaExternalSdCard) {
-            setStringValue(
-                TABLE_PREFERENCES,
-                KEY_URI_MEDIA_EXTERNAL_SD_CARD,
-                uriMediaExternalSdCard
-            )
-        }
-
-    override fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean) {
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_PREFERENCES SET $KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD= '${
-                            encrypt(cameraFolderExternalSDCard.toString())
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(
-                        KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD,
-                        encrypt(cameraFolderExternalSDCard.toString())
-                    )
-                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-    /**
-     * Gets the flag which indicates if the local path selected as Media Uploads local folder belongs to an external SD card.
-     *
-     * @return True if the local path belongs to an external SD card, false otherwise
-     */
-    /**
-     * Sets the flag to indicate if the local path selected as Media Uploads local folder belongs to an external SD card.
-     *
-     * @param mediaFolderExternalSdCard true if the local path selected belongs to an external SD card, false otherwise
-     */
-    override var mediaFolderExternalSdCard: Boolean
-        get() = getBooleanValue(TABLE_PREFERENCES, KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD, false)
-        set(mediaFolderExternalSdCard) {
-            setStringValue(
-                TABLE_PREFERENCES,
-                KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD,
-                mediaFolderExternalSdCard.toString()
-            )
-        }
-
     override var passcodeLockType: String?
         get() = getStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_TYPE, "")
         set(passcodeLockType) {
@@ -1864,49 +1624,6 @@ class SqliteDatabaseHandler @Inject constructor(
                 Timber.e(e, "Exception opening or managing DB cursor")
             }
         }
-
-    override fun setSecondaryFolderPath(localPath: String?) {
-        Timber.d("setSecondaryFolderPath: %s", localPath)
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_PREFERENCES SET $KEY_SEC_FOLDER_LOCAL_PATH= '${
-                            encrypt(localPath)
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_SEC_FOLDER_LOCAL_PATH, encrypt(localPath))
-                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun setCamSyncFileUpload(fileUpload: Int) {
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_PREFERENCES SET $KEY_CAM_SYNC_FILE_UPLOAD= '${
-                            encrypt(fileUpload.toString())
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_CAM_SYNC_FILE_UPLOAD, encrypt(fileUpload.toString()))
-                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
 
     override fun setAccountDetailsTimeStamp() {
         setAccountDetailsTimeStamp(System.currentTimeMillis() / 1000)
@@ -1991,26 +1708,6 @@ class SqliteDatabaseHandler @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")
         }
-    }
-
-    override fun setCamSyncTimeStamp(camSyncTimeStamp: Long) {
-        Timber.d("setCamSyncTimeStamp: %s", camSyncTimeStamp)
-        setLongValue(TABLE_PREFERENCES, KEY_CAM_SYNC_TIMESTAMP, camSyncTimeStamp)
-    }
-
-    override fun setCamVideoSyncTimeStamp(camVideoSyncTimeStamp: Long) {
-        Timber.d("setCamVideoSyncTimeStamp: %s", camVideoSyncTimeStamp)
-        setLongValue(TABLE_PREFERENCES, KEY_CAM_VIDEO_SYNC_TIMESTAMP, camVideoSyncTimeStamp)
-    }
-
-    override fun setSecSyncTimeStamp(secSyncTimeStamp: Long) {
-        Timber.d("setSecSyncTimeStamp: %s", secSyncTimeStamp)
-        setLongValue(TABLE_PREFERENCES, KEY_SEC_SYNC_TIMESTAMP, secSyncTimeStamp)
-    }
-
-    override fun setSecVideoSyncTimeStamp(secVideoSyncTimeStamp: Long) {
-        Timber.d("setSecVideoSyncTimeStamp: %s", secVideoSyncTimeStamp)
-        setLongValue(TABLE_PREFERENCES, KEY_SEC_VIDEO_SYNC_TIMESTAMP, secVideoSyncTimeStamp)
     }
 
     /**
