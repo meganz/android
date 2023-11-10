@@ -908,10 +908,27 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                 if (isCameraUploadsEnabledUseCase()) {
                     stopCameraUploads()
                 } else {
-                    handlePermissionsResult()
+                    if (hasMediaPermissionUseCase()) {
+                        handleEnableCameraUploads()
+                    } else {
+                        _state.update {
+                            it.copy(shouldTriggerPermissionDialog = true)
+                        }
+                    }
                 }
             }.onFailure {
                 Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * on Consume Trigger Permission Dialog
+     */
+    fun onConsumeTriggerPermissionDialog() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(shouldTriggerPermissionDialog = false)
             }
         }
     }

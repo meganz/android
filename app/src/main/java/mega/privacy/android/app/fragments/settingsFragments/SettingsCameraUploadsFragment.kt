@@ -565,6 +565,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 handleAccessMediaLocationPermissionRationale(it.accessMediaLocationRationaleText)
                 handleInvalidFolderSelectedPrompt(it.invalidFolderSelectedTextId)
                 handleShouldDisplayError(it.shouldShowError)
+                handleShouldTriggerPermissionDialog(it.shouldTriggerPermissionDialog)
             }
             collectFlow(viewModel.monitorCameraUploadsSettingsActions) {
                 when (it) {
@@ -967,6 +968,13 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
         }
         // Once the Prompt has been shown, notify the ViewModel
         viewModel.setInvalidFolderSelectedPromptShown(false)
+    }
+
+    private fun handleShouldTriggerPermissionDialog(shouldTriggerPermissionDialog: Boolean) {
+        if (shouldTriggerPermissionDialog) {
+            enableCameraUploadsPermissionLauncher.launch(permissionsList)
+            viewModel.onConsumeTriggerPermissionDialog()
+        }
     }
 
     /**
