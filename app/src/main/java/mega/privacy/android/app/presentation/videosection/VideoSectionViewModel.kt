@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionState
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import javax.inject.Inject
 
@@ -20,13 +21,14 @@ import javax.inject.Inject
 class VideoSectionViewModel @Inject constructor(
     private val getAllVideosUseCase: GetAllVideosUseCase,
     private val uiVideoMapper: UIVideoMapper,
+    private val getCloudSortOrder: GetCloudSortOrder,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
     val state: StateFlow<VideoSectionState> = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
-            getAllVideosUseCase().collect { videos ->
+            getAllVideosUseCase(getCloudSortOrder()).collect { videos ->
                 _state.update {
                     it.copy(allVideos = videos.map { videoNode ->
                         uiVideoMapper(videoNode)

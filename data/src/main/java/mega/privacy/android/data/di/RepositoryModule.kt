@@ -54,6 +54,7 @@ import mega.privacy.android.data.repository.SearchRepositoryImpl
 import mega.privacy.android.data.repository.SlideshowRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.VideoRepositoryImpl
+import mega.privacy.android.data.repository.VideoSectionRepositoryImpl
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
@@ -110,6 +111,7 @@ import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.repository.VideoRepository
+import mega.privacy.android.domain.repository.VideoSectionRepository
 import mega.privacy.android.domain.repository.ViewTypeRepository
 import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
@@ -319,4 +321,6 @@ internal abstract class RepositoryModule {
     @Binds
     abstract fun bindApiServerRepository(implementation: ApiServerRepositoryImpl): ApiServerRepository
 
+    @Binds
+    abstract fun bindVideosRepository(implementation: VideoSectionRepositoryImpl): VideoSectionRepository
 }

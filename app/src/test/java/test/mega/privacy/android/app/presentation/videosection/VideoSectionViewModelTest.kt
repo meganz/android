@@ -11,9 +11,11 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.VideoNode
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -33,6 +35,7 @@ class VideoSectionViewModelTest {
 
     private val getAllVideosUseCase = mock<GetAllVideosUseCase>()
     private val uiVideoMapper = mock<UIVideoMapper>()
+    private val getCloudSortOrder = mock<GetCloudSortOrder>()
 
     @BeforeAll
     fun initialise() {
@@ -43,13 +46,14 @@ class VideoSectionViewModelTest {
     fun setUp() {
         underTest = VideoSectionViewModel(
             getAllVideosUseCase = getAllVideosUseCase,
-            uiVideoMapper = uiVideoMapper
+            uiVideoMapper = uiVideoMapper,
+            getCloudSortOrder = getCloudSortOrder
         )
     }
 
     @AfterEach
     fun resetMocks() {
-        reset(getAllVideosUseCase, uiVideoMapper)
+        reset(getAllVideosUseCase, uiVideoMapper, getCloudSortOrder)
     }
 
     @AfterAll
@@ -75,7 +79,9 @@ class VideoSectionViewModelTest {
         val secondExpectedVideo = getVideoNode(secondExpectedHandle)
         val thirdExpectedVideo = getVideoNode(thirdExpectedHandle)
 
-        whenever(getAllVideosUseCase()).thenReturn(
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+
+        whenever(getAllVideosUseCase(SortOrder.ORDER_MODIFICATION_DESC)).thenReturn(
             flowOf(
                 listOf(firstExpectedVideo, secondExpectedVideo, thirdExpectedVideo)
             )
