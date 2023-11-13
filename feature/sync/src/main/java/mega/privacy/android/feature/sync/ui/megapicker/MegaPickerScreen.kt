@@ -88,7 +88,6 @@ private fun MegaPickerScreenContent(
             showSortOrder = true,
             showChangeViewType = true,
             listState = LazyListState(),
-            getThumbnail = { _, _ -> },
             onFolderClick = {
                 folderClicked(it)
             },

@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.core.R as CoreUIR
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
@@ -18,18 +17,17 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
-import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
-import java.io.File
+import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
+import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 
 @Composable
 internal fun MegaFolderPickerView(
@@ -40,7 +38,6 @@ internal fun MegaFolderPickerView(
     showSortOrder: Boolean,
     showChangeViewType: Boolean,
     listState: LazyListState,
-    getThumbnail: ((handle: Long, onFinished: (file: File?) -> Unit) -> Unit),
     onFolderClick: (TypedNode) -> Unit,
     modifier: Modifier = Modifier,
     fileTypeIconMapper: FileTypeIconMapper,
@@ -64,11 +61,6 @@ internal fun MegaFolderPickerView(
                 nodesList[it].id.longValue
             }) {
             val nodeEntity = nodesList[it]
-            val imageState = produceState<File?>(initialValue = null) {
-                getThumbnail(nodeEntity.id.longValue) { file ->
-                    value = file
-                }
-            }
 
             val icon = when (nodeEntity) {
                 is FolderNode -> {
@@ -88,6 +80,7 @@ internal fun MegaFolderPickerView(
                 folderInfo = (nodeEntity as? FolderNode)
                     ?.folderInfo(),
                 icon = icon,
+                thumbnailData = ThumbnailRequest(nodeEntity.id),
                 fileSize = (nodeEntity as? FileNode)
                     ?.let { node -> formatFileSize(node.size, LocalContext.current) },
                 modifiedDate = (nodeEntity as? FileNode)
@@ -104,7 +97,6 @@ internal fun MegaFolderPickerView(
                 isTakenDown = false,
                 isFavourite = false,
                 isSharedWithPublicLink = false,
-                imageState = imageState,
                 onClick = { onFolderClick(nodesList[it]) },
                 isEnabled = nodeEntity is FolderNode,
             )
@@ -129,7 +121,6 @@ private fun PreviewMegaFolderPickerView() {
             onChangeViewTypeClick = { },
             showSortOrder = true,
             listState = LazyListState(),
-            getThumbnail = { _, _ -> },
             modifier = Modifier,
             showChangeViewType = true,
             onFolderClick = {},
