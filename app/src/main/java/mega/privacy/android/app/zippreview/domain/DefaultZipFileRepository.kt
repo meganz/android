@@ -51,35 +51,40 @@ class DefaultZipFileRepository @Inject constructor(@IoDispatcher private val ioD
             val zipEntries = zipFile.entries()
             zipEntries.toList().forEach {
                 val zipDestination = File(unzipRootPath + it.name)
-                if (it.isDirectory) {
-                    if (!zipDestination.exists()) {
-                        zipDestination.mkdirs()
+                val canonicalPath = zipDestination.canonicalPath
+                if (canonicalPath.startsWith(unzipRootPath)) {
+                    if (it.isDirectory) {
+                        if (!zipDestination.exists()) {
+                            zipDestination.mkdirs()
+                        }
+                    } else {
+                        val inputStream = zipFile.getInputStream(it)
+                        //Get the parent file. If it is null or
+                        // doesn't exist, created the parent folder.
+                        val parentFile = zipDestination.parentFile
+                        if (parentFile != null) {
+                            if (!parentFile.exists()) {
+                                parentFile.mkdirs()
+                            }
+                            val byteArrayOutputStream = ByteArrayOutputStream()
+                            val buffer = ByteArray(1024)
+                            var count: Int
+                            FileOutputStream(zipDestination).use { outputStream ->
+                                //Write the file.
+                                while (inputStream.read(buffer)
+                                        .also { readCount -> count = readCount } != -1
+                                ) {
+                                    byteArrayOutputStream.write(buffer, 0, count)
+                                    val bytes = byteArrayOutputStream.toByteArray()
+                                    outputStream.write(bytes)
+                                    byteArrayOutputStream.reset()
+                                }
+                            }
+                            inputStream.close()
+                        }
                     }
                 } else {
-                    val inputStream = zipFile.getInputStream(it)
-                    //Get the parent file. If it is null or
-                    // doesn't exist, created the parent folder.
-                    val parentFile = zipDestination.parentFile
-                    if (parentFile != null) {
-                        if (!parentFile.exists()) {
-                            parentFile.mkdirs()
-                        }
-                        val byteArrayOutputStream = ByteArrayOutputStream()
-                        val buffer = ByteArray(1024)
-                        var count: Int
-                        FileOutputStream(zipDestination).use { outputStream ->
-                            //Write the file.
-                            while (inputStream.read(buffer)
-                                    .also { readCount -> count = readCount } != -1
-                            ) {
-                                byteArrayOutputStream.write(buffer, 0, count)
-                                val bytes = byteArrayOutputStream.toByteArray()
-                                outputStream.write(bytes)
-                                byteArrayOutputStream.reset()
-                            }
-                        }
-                        inputStream.close()
-                    }
+                    throw SecurityException()
                 }
             }
         } catch (e: Exception) {
