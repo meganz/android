@@ -18,7 +18,7 @@ import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFavouriteBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
-import mega.privacy.android.app.fetcher.ThumbnailRequest
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter
 import mega.privacy.android.app.presentation.favourites.model.Favourite

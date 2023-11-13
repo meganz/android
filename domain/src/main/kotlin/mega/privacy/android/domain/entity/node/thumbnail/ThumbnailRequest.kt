@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fetcher
+package mega.privacy.android.domain.entity.node.thumbnail
 
 import mega.privacy.android.domain.entity.node.NodeId
 

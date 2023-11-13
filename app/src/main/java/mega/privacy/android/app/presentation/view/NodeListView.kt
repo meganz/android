@@ -15,7 +15,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.fetcher.ThumbnailRequest
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.app.presentation.view.extension.getIcon

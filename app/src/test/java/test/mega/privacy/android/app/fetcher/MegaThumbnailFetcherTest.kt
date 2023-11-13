@@ -2,7 +2,7 @@ package test.mega.privacy.android.app.fetcher
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
-import mega.privacy.android.app.fetcher.ThumbnailRequest
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPublicNodeThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import org.junit.jupiter.api.BeforeAll

@@ -18,7 +18,7 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetManageTransferBinding
-import mega.privacy.android.app.fetcher.ThumbnailRequest
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
 import mega.privacy.android.app.utils.ColorUtils

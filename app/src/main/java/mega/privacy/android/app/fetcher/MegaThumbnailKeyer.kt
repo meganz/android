@@ -2,6 +2,7 @@ package mega.privacy.android.app.fetcher
 
 import coil.key.Keyer
 import coil.request.Options
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 
 /**
  * Mega thumbnail keyer to build the key for MegaNode thumbnail in the memory cache

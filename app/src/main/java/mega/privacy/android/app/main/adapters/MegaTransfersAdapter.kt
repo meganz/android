@@ -16,7 +16,7 @@ import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fetcher.ThumbnailRequest
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION

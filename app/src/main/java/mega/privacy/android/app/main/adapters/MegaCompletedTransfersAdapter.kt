@@ -13,7 +13,7 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fetcher.ThumbnailRequest
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.Util.dp2px
