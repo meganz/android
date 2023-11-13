@@ -216,10 +216,12 @@ class InMeetingRepository @Inject constructor(
     fun getMeToSpeakerView(chat: MegaChatRoom): Participant {
         var isAudioOn = true
         var isVideoOn = true
+        var isAudioDetected = false
 
         getMeeting(chat.chatId)?.let {
             isAudioOn = it.hasLocalAudio()
             isVideoOn = it.hasLocalVideo()
+            isAudioDetected = it.isAudioDetected
         }
 
         val avatar = getAvatarBitmap(megaApi.myUserHandleBinary)
@@ -232,6 +234,7 @@ class InMeetingRepository @Inject constructor(
             getOwnPrivileges(chat.chatId) == MegaChatRoom.PRIV_MODERATOR,
             isAudioOn,
             isVideoOn,
+            isAudioDetected,
             isContact = false,
             isSpeaker = true,
             hasHiRes = true,
@@ -474,6 +477,7 @@ class InMeetingRepository @Inject constructor(
             moderator,
             audio,
             video,
+            isAudioDetected = false,
             isGuest = megaApi.isEphemeralPlusPlus
         )
     }

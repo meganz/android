@@ -51,6 +51,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CH
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
 import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
@@ -835,6 +836,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_SESSION_ON_HOLD_CHANGE)
             .observe(this, sessionOnHoldObserver)
         LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AVFLAGS_CHANGE)
+            .observe(this, remoteAVFlagsObserver)
+        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AUDIO_LEVEL_CHANGE)
             .observe(this, remoteAVFlagsObserver)
         LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_SESSION_ON_HIRES_CHANGE)
             .observe(this, sessionHiResObserver)

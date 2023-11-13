@@ -78,6 +78,14 @@
             android:layout_gravity="center"
             android:src="@drawable/mic_off_participant_icon_thin"
             android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/speaker_speaking_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:src="@drawable/mic_speaking_participant_icon_thin"
+            android:visibility="gone" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

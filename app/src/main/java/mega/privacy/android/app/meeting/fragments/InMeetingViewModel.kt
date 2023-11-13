@@ -60,9 +60,9 @@ import mega.privacy.android.domain.entity.meeting.CallUIStatusType
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
+import mega.privacy.android.domain.usecase.meeting.EnableAudioLevelMonitorUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_CONNECTING
@@ -97,7 +97,8 @@ import javax.inject.Inject
  * @property passcodeManagement             [PasscodeManagement]
  * @property chatManagement                 [ChatManagement]
  * @property sendStatisticsMeetingsUseCase  [SendStatisticsMeetingsUseCase]
- * @property state                       Current view state as [InMeetingState]
+ * @property enableAudioLevelMonitorUseCase [EnableAudioLevelMonitorUseCase]
+ * @property state                          Current view state as [InMeetingState]
  */
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
@@ -114,7 +115,7 @@ class InMeetingViewModel @Inject constructor(
     private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
-    monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val enableAudioLevelMonitorUseCase: EnableAudioLevelMonitorUseCase,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -710,6 +711,10 @@ class InMeetingViewModel @Inject constructor(
             setCall(it.chatId, context)
             _chatTitle.value = getTitleChat(it)
         }
+
+        viewModelScope.launch {
+            enableAudioLevelMonitorUseCase(true, chatId)
+        }
     }
 
     /**
@@ -1282,6 +1287,7 @@ class InMeetingViewModel @Inject constructor(
             isModerator = participant.isModerator,
             isAudioOn = participant.isAudioOn,
             isVideoOn = participant.isVideoOn,
+            isAudioDetected = participant.isAudioDetected,
             isContact = participant.isContact,
             isSpeaker = true,
             hasHiRes = true,
@@ -1402,6 +1408,7 @@ class InMeetingViewModel @Inject constructor(
                 isModerator,
                 session.hasAudio(),
                 session.hasVideo(),
+                session.isAudioDetected,
                 isContact,
                 false,
                 hasHiRes,
@@ -1701,7 +1708,8 @@ class InMeetingViewModel @Inject constructor(
         var hasChanged = false
         participants.value = participants.value?.map { participant ->
             return@map when {
-                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isAudioOn != session.hasAudio() -> {
+                participant.peerId == session.peerid && participant.clientId == session.clientid &&
+                        (participant.isAudioOn != session.hasAudio() || participant.isAudioDetected != session.isAudioDetected) -> {
                     hasChanged = true
                     participant.copy(isAudioOn = session.hasAudio())
                 }

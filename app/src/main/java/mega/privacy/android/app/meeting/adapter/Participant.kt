@@ -19,6 +19,7 @@ data class Participant(
     var isModerator: Boolean,
     var isAudioOn: Boolean,
     var isVideoOn: Boolean,
+    var isAudioDetected: Boolean,
     var isContact: Boolean = true,
     var isSpeaker: Boolean = false,
     var hasHiRes: Boolean = false,

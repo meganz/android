@@ -679,4 +679,11 @@ internal class MegaChatApiFacade @Inject constructor(
     ) = chatApi.attachVoiceMessage(chatId, nodeHandle, listener)
 
     override suspend fun hasCallInChatRoom(chatId: Long) = chatApi.hasCallInChatRoom(chatId)
+
+    override suspend fun isAudioLevelMonitorEnabled(chatId: Long): Boolean =
+        chatApi.isAudioLevelMonitorEnabled(chatId)
+
+    override suspend fun enableAudioLevelMonitor(enable: Boolean, chatId: Long) {
+        chatApi.enableAudioLevelMonitor(enable, chatId, null)
+    }
 }

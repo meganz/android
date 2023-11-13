@@ -956,4 +956,14 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getMyUserHandle() = withContext(ioDispatcher) {
         megaChatApiGateway.getMyUserHandle()
     }
+
+    override suspend fun isAudioLevelMonitorEnabled(chatId: Long): Boolean =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.isAudioLevelMonitorEnabled(chatId)
+        }
+
+    override suspend fun enableAudioLevelMonitor(enable: Boolean, chatId: Long) =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.enableAudioLevelMonitor(enable = enable, chatId = chatId)
+        }
 }

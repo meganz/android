@@ -1202,4 +1202,30 @@ interface MegaChatApiGateway {
      * @return True if there is a call in a chatroom. False in other case
      */
     suspend fun hasCallInChatRoom(chatId: Long): Boolean
+
+    /**
+     * @brief Returns if audio level monitor is enabled
+     *
+     * It's false by default
+     *
+     * @note If there isn't a call in that chatroom in which user is participating,
+     * audio Level monitor will be always false
+     *
+     * @param chatId MegaChatHandle that identifies the chat room from we want know if audio level monitor is disabled
+     * @return true if audio level monitor is enabled
+     */
+    suspend fun isAudioLevelMonitorEnabled(chatId: Long): Boolean
+
+    /**
+     * Enable or disable audio level monitor.
+     *
+     * Audio level monitor detects when a peer starts or stops speaking, and triggers a callback
+     * (onChatSessionUpdate with change type CHANGE_TYPE_AUDIO_LEVEL) to inform apps about that event.
+     *
+     * It's false by default and it's app responsibility to enable it
+     *
+     * @param enable True for enable audio level monitor, False to disable
+     * @param chatId MegaChatHandle that identifies the chat room where we can enable audio level monitor
+     */
+    suspend fun enableAudioLevelMonitor(enable: Boolean, chatId: Long)
 }

@@ -42,6 +42,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
     private lateinit var speakerMuteIcon: ImageView
 
+    private lateinit var speakerSpeakingIcon: ImageView
+
     private lateinit var listView: RecyclerView
 
     private lateinit var adapter: VideoListViewAdapter
@@ -66,6 +68,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 Timber.d("Received remote audio level with clientId ${session.clientid}, same current speaker")
             }
         }
+
+        updateRemoteAudioVideo(Constants.TYPE_AUDIO, session)
     }
 
     private val participantsObserver = Observer<MutableList<Participant>> {
@@ -120,6 +124,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         speakerOnHoldIcon = dataBinding.speakerOnHoldIcon
         textViewName = dataBinding.name
         speakerMuteIcon = dataBinding.speakerMuteIcon
+        speakerSpeakingIcon = dataBinding.speakerSpeakingIcon
         surfaceContainer = dataBinding.parentSurfaceView
 
         return dataBinding.root
@@ -245,6 +250,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
         Timber.d("Update audio icon, clientId ${speaker.clientId}")
         speakerMuteIcon.isVisible = !speaker.isAudioOn
+        speakerSpeakingIcon.isVisible = speaker.isAudioDetected
     }
 
     /**
@@ -560,6 +566,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
                 speaker.isAudioOn = session.hasAudio()
                 speaker.isVideoOn = session.hasVideo()
+                speaker.isAudioDetected = session.isAudioDetected
 
                 when (type) {
                     Constants.TYPE_VIDEO -> {

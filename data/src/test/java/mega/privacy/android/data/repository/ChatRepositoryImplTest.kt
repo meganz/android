@@ -58,6 +58,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import kotlin.random.Random
 
@@ -641,4 +642,24 @@ class ChatRepositoryImplTest {
         whenever(megaChatApiGateway.getMyUserHandle()).thenReturn(123L)
         assertThat(underTest.getMyUserHandle()).isEqualTo(123L)
     }
+
+    @Test
+    fun `test that enable audio level monitor invokes megaApi correctly`() =
+        runTest {
+            val enable = true
+            whenever(megaChatApiGateway.enableAudioLevelMonitor(enable, chatId)).thenReturn(Unit)
+            underTest.enableAudioLevelMonitor(enable, chatId)
+            verify(megaChatApiGateway).enableAudioLevelMonitor(enable, chatId)
+            verifyNoMoreInteractions(megaChatApiGateway)
+        }
+
+    @Test
+    fun `test that is audio level monitor enabled invokes megaApi correctly`() =
+        runTest {
+            val enabled = true
+            whenever(megaChatApiGateway.isAudioLevelMonitorEnabled(chatId)).thenReturn(enabled)
+            assertThat(underTest.isAudioLevelMonitorEnabled(chatId)).isEqualTo(enabled)
+            verify(megaChatApiGateway).isAudioLevelMonitorEnabled(chatId)
+            verifyNoMoreInteractions(megaChatApiGateway)
+        }
 }

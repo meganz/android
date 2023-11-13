@@ -436,11 +436,25 @@ class VideoMeetingViewHolder(
         if (isInvalid(participant)) return
 
         Timber.d("Update audio icon")
-        (inMeetingViewModel.getSession(participant.clientId)
-            ?.hasAudio()?.not() == true).let { value ->
-            binding.muteIcon.isVisible = value
-            if (!isGrid) {
-                binding.participantInfoLayout.isVisible = value
+        inMeetingViewModel.getSession(participant.clientId)?.let { session ->
+            session.hasAudio().not().let { value ->
+                binding.muteIcon.isVisible = value
+                binding.speakingIcon.isVisible = false
+                binding.selectedForeground.isVisible = false
+                if (!isGrid) {
+                    binding.participantInfoLayout.isVisible = value
+                }
+            }
+
+            if (session.hasAudio()) {
+                session.isAudioDetected.let { value ->
+                    binding.speakingIcon.isVisible = value
+                    binding.selectedForeground.isVisible = value
+                    binding.muteIcon.isVisible = false
+                    if (!isGrid) {
+                        binding.participantInfoLayout.isVisible = value
+                    }
+                }
             }
         }
     }
