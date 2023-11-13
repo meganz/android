@@ -445,7 +445,9 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         if (megaApi != null) {
             megaApi.removeGlobalListener(this);
         }
-        handler.removeCallbacksAndMessages(null);
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
 
         unregisterReceiver(manageShareReceiver);
         unregisterReceiver(contactUpdateReceiver);
