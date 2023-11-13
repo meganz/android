@@ -93,6 +93,7 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -208,6 +209,7 @@ class ManagerViewModel @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
     private val passcodeManagement: PasscodeManagement,
+    private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
 ) : ViewModel() {
 
     /**
@@ -256,6 +258,13 @@ class ManagerViewModel @Inject constructor(
      * The latest incoming contact requests
      */
     val incomingContactRequests = _incomingContactRequests.asStateFlow()
+
+    private val _stalledIssuesCount = MutableStateFlow(0)
+
+    /**
+     * Sync stalled issues count
+     */
+    val stalledIssuesCount = _stalledIssuesCount.asStateFlow()
 
     /**
      * Is network connected
@@ -369,6 +378,12 @@ class ManagerViewModel @Inject constructor(
                     updateIncomingContactRequests()
                     checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE_AND_TOOLBAR_ICON)
                 }
+        }
+
+        viewModelScope.launch {
+            monitorSyncStalledIssuesUseCase().collect {
+                _stalledIssuesCount.value = it.size
+            }
         }
     }
 

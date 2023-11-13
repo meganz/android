@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.drawer
 
+import mega.privacy.android.feature.sync.R as syncR
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -173,6 +174,9 @@ internal class ManagerDrawerFragment : Fragment() {
         }
         viewLifecycleOwner.collectFlow(managerViewModel.incomingContactRequests) { pendingRequest ->
             setContactTitleSection(pendingRequest.size)
+        }
+        viewLifecycleOwner.collectFlow(managerViewModel.stalledIssuesCount) { stalledIssuesCount ->
+            setSyncStatus(stalledIssuesCount)
         }
     }
 
@@ -353,6 +357,20 @@ internal class ManagerDrawerFragment : Fragment() {
                     requireContext(),
                     ColorUtils.getColorHexString(requireContext(), R.color.red_600_red_300)
                 )
+        }
+    }
+
+    private fun setSyncStatus(count: Int) {
+        binding.syncSectionText.text = if (count == 0) {
+            getString(syncR.string.sync)
+        } else {
+            getString(
+                syncR.string.section_sync_with_notification,
+                count
+            ).spanABTextFontColour(
+                requireContext(),
+                ColorUtils.getColorHexString(requireContext(), R.color.red_600_red_300)
+            )
         }
     }
 }

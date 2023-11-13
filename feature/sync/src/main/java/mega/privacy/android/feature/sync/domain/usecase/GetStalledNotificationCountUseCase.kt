@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Get stalled notification use case
  */
-class GetStalledNotificationUseCase @Inject constructor(
+class GetStalledNotificationCountUseCase @Inject constructor(
     private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase,
 ) : GetFeatureNotificationCountUseCase {
 

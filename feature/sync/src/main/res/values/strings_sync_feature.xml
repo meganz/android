@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+    <string name="sync_toolbar_title">Sync</string>
+    <string name="start_screen_setting" />
+    <string name="general_select" />
+    <string name="sync_button_label">Sync</string>
+    <string name="file_browser_empty_folder" />
+    <string name="sync">Sync</string>
+    <string name="section_sync_with_notification">Sync [A](%1$d)[/A]</string>
+    <string name="general_select_to_download" />
+    <plurals name="num_files_with_parameter">
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
+    </plurals>
+    <plurals name="num_folders_with_parameter">
+        <item quantity="one">%d folder</item>
+        <item quantity="other">%d folders</item>
+    </plurals>
+    <plurals name="num_folders_num_files">
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
+    </plurals>
+    <plurals name="num_folders_num_files_2">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+</resources>

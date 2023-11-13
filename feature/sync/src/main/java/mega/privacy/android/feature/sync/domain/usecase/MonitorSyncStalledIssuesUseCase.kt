@@ -7,11 +7,19 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import javax.inject.Inject
 
-internal class MonitorSyncStalledIssuesUseCase @Inject constructor(
+/**
+ * Monitor the sync stalled issues
+ */
+class MonitorSyncStalledIssuesUseCase @Inject constructor(
     private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase,
     private val syncRepository: SyncRepository,
 ) {
 
+    /**
+     * Invoke.
+     *
+     * @return A [Flow] that emits the sync stalled issues
+     */
     suspend operator fun invoke(): Flow<List<StalledIssue>> =
         syncRepository
             .monitorSyncChanges()

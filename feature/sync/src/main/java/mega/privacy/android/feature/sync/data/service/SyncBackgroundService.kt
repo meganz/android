@@ -12,9 +12,12 @@ import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
+import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -48,6 +51,15 @@ internal class SyncBackgroundService : LifecycleService() {
     @Inject
     internal lateinit var monitorSyncsUseCase: MonitorSyncsUseCase
 
+    @Inject
+    lateinit var getNotificationCountUseCase: GetNotificationCountUseCase
+
+    @Inject
+    internal lateinit var broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase
+
+    @Inject
+    internal lateinit var monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase
+
     override fun onCreate() {
         super.onCreate()
         Timber.d("SyncBackgroundService created")
@@ -62,7 +74,12 @@ internal class SyncBackgroundService : LifecycleService() {
                 runCatching { backgroundFastLoginUseCase() }.getOrElse(Timber::e)
             }
         }
-
+        lifecycleScope.launch {
+            monitorSyncStalledIssuesUseCase().collect {
+                val notificationCount = getNotificationCountUseCase(false)
+                broadcastHomeBadgeCountUseCase(notificationCount)
+            }
+        }
         lifecycleScope.launch {
             combine(
                 monitorConnectivityUseCase(),

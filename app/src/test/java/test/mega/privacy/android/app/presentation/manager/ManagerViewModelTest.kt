@@ -102,6 +102,7 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -167,6 +168,7 @@ class ManagerViewModelTest {
         mock<GetCloudSortOrder> { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_ALPHABETICAL_ASC) }
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val monitorSyncStalledIssuesUseCase = mock<MonitorSyncStalledIssuesUseCase>()
     private val getFeatureFlagValueUseCase =
         mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(false) }
     private val shareDataList = listOf(
@@ -345,6 +347,7 @@ class ManagerViewModelTest {
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             chatManagement = chatManagement,
             passcodeManagement = passcodeManagement,
+            monitorSyncStalledIssuesUseCase = monitorSyncStalledIssuesUseCase
         )
     }
 
