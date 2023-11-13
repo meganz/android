@@ -784,6 +784,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             megaLocalRoomGateway.insertOrUpdateCameraUploadsRecords(records)
         }
 
+    override suspend fun getAllCameraUploadsRecords() =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getAllCameraUploadsRecords()
+        }
+
     override suspend fun getCameraUploadsRecordByUploadStatusAndTypes(
         uploadStatus: List<CameraUploadsRecordUploadStatus>,
         types: List<SyncRecordType>,

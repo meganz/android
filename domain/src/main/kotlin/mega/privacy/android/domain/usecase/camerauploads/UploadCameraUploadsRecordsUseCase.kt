@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
@@ -76,6 +77,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     private val compressVideoUseCase: CompressVideoUseCase,
     private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
     private val addCompletedTransferUseCase: AddCompletedTransferUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val fileSystemRepository: FileSystemRepository,
 ) {
 
@@ -461,6 +463,12 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         path: String,
     ) = channelFlow {
         val nodeId = NodeId(transferEvent.transfer.nodeHandle)
+            .takeIf { getNodeByIdUseCase(it) != null }
+            ?: run {
+                close()
+                return@channelFlow
+            }
+
         listOf(
             launch {
                 setOriginalFingerprintUseCase(
@@ -494,7 +502,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
             }
         ).joinAll()
         close()
-    }
+    }.cancellable()
 
     /**
      * Add the transfer to the completed transfer list

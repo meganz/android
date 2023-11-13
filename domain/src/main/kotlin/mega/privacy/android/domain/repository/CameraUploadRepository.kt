@@ -730,6 +730,13 @@ interface CameraUploadRepository {
     suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>)
 
     /**
+     * Get all camera uploads records
+     *
+     * @return the list of [CameraUploadsRecord]
+     */
+    suspend fun getAllCameraUploadsRecords(): List<CameraUploadsRecord>
+
+    /**
      * Get the records from the database
      *
      * @param uploadStatus a list of upload status to filter the result

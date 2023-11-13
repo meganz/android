@@ -825,6 +825,21 @@ internal class MegaLocalRoomFacadeTest {
             verify(cameraUploadsRecordDao).deleteCameraUploadsRecordsByFolderType(folderType)
         }
 
+    @Test
+    fun `test that getAllCameraUploadsRecords returns the corresponding items`() =
+        runTest {
+            val entities = listOf<CameraUploadsRecordEntity>(mock())
+            val expected = listOf<CameraUploadsRecord>(mock())
+            entities.mapIndexed { index, entity ->
+                whenever(cameraUploadsRecordModelMapper(entity)).thenReturn(expected[index])
+            }
+            whenever(
+                cameraUploadsRecordDao.getAllCameraUploadsRecords()
+            ).thenReturn(entities)
+
+            assertThat(underTest.getAllCameraUploadsRecords()).isEqualTo(expected)
+        }
+
     private fun provideDoesFileNameExistParameters() = Stream.of(
         Arguments.of(true, 1, true),
         Arguments.of(false, 1, true),

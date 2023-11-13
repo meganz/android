@@ -37,6 +37,11 @@ class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
         tempRoot: String,
     ): List<CameraUploadsRecord> = coroutineScope {
         val selectionQuery = cameraUploadRepository.getMediaSelectionQuery(parentPath)
+
+        val (recordsInPrimaryFolder, recordsInSecondaryFolder) =
+            cameraUploadRepository.getAllCameraUploadsRecords()
+                .partition { it.folderType == CameraUploadFolderType.Primary }
+
         return@coroutineScope types.flatMap {
             cameraUploadRepository.getMediaList(
                 mediaStoreFileType = it,
@@ -45,16 +50,40 @@ class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
                 async {
                     yield()
                     runCatching {
-                        cameraUploadsRecordMapper(
-                            media = it,
-                            folderType = folderType,
-                            fileType = fileType,
-                            tempRoot = tempRoot,
+                        val exists = checkCameraUploadsRecordAlreadyExists(
+                            cameraUploadsMedia = it,
+                            recordsToCheck =
+                            if (folderType == CameraUploadFolderType.Primary)
+                                recordsInPrimaryFolder
+                            else recordsInSecondaryFolder,
                         )
+                        if (!exists) {
+                            cameraUploadsRecordMapper(
+                                media = it,
+                                folderType = folderType,
+                                fileType = fileType,
+                                tempRoot = tempRoot,
+                            )
+                        } else null
                     }.getOrNull()
                 }
             }.awaitAll().filterNotNull()
         }
+    }
+
+    /**
+     * Check if the camera uploads media has already been inserted in the database
+     *
+     * @param cameraUploadsMedia the [CameraUploadsMedia] to check
+     * @param recordsToCheck the list of [CameraUploadsRecord] saved in the database
+     */
+    private fun checkCameraUploadsRecordAlreadyExists(
+        cameraUploadsMedia: CameraUploadsMedia,
+        recordsToCheck: List<CameraUploadsRecord>,
+    ): Boolean {
+        return recordsToCheck.find {
+            it.mediaId == cameraUploadsMedia.mediaId && it.timestamp == cameraUploadsMedia.timestamp
+        } != null
     }
 }
 

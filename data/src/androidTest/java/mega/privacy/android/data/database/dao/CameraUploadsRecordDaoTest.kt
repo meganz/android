@@ -170,4 +170,12 @@ class CameraUploadsRecordDaoTest {
 
             assertThat(cameraUploadsRecordDao.getAllCameraUploadsRecords().size).isEqualTo(expected)
         }
+
+    @Test
+    fun test_that_getAllCameraUploadsRecords_returns_all_the_corresponding_items() =
+        runTest {
+            val expected = generateEntities()
+            insertEntities(expected)
+            assertThat(cameraUploadsRecordDao.getAllCameraUploadsRecords()).isEqualTo(expected)
+        }
 }

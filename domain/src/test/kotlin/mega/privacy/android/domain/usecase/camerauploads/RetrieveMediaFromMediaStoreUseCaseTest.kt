@@ -103,6 +103,8 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
                 )
             }
 
+            whenever(cameraUploadRepository.getAllCameraUploadsRecords()).thenReturn(emptyList())
+
             val expected = cameraUploadsRecordList1 + cameraUploadsRecordList2
 
             assertThat(underTest(parentPath, types, folderType, fileType, tempRoot))
@@ -165,7 +167,58 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
                 )
             }
 
+            whenever(cameraUploadRepository.getAllCameraUploadsRecords()).thenReturn(emptyList())
+
             assertThat(underTest(parentPath, types, folderType, fileType, tempRoot))
                 .isEqualTo(cameraUploadsRecordList1)
+        }
+
+    @Test
+    fun `test that the record is filtered out if the cameraUploadsMedia already exists in the database`() =
+        runTest {
+            val parentPath = ""
+            val mediaStoreFileType1 = mock<MediaStoreFileType>()
+            val types = listOf(mediaStoreFileType1)
+            val folderType = mock<CameraUploadFolderType>()
+            val fileType = mock<SyncRecordType>()
+            val tempRoot = "tempRoot"
+            val selectionQuery = "selectionQuery"
+
+            val media1 = mock<CameraUploadsMedia> {
+                on { mediaId }.thenReturn(1111L)
+                on { timestamp }.thenReturn(1234L)
+            }
+
+            val cameraUploadsRecord1 = mock<CameraUploadsRecord> {
+                on { mediaId }.thenReturn(1111L)
+                on { timestamp }.thenReturn(1234L)
+                on { this.folderType }.thenReturn(CameraUploadFolderType.Primary)
+            }
+
+            val cameraUploadsMediaList1 = listOf(media1, mock())
+            whenever(cameraUploadRepository.getMediaSelectionQuery(parentPath))
+                .thenReturn(selectionQuery)
+            whenever(
+                cameraUploadRepository.getMediaList(mediaStoreFileType1, selectionQuery)
+            ).thenReturn(cameraUploadsMediaList1)
+
+            val cameraUploadsRecordList1 = listOf<CameraUploadsRecord>(mock(), mock())
+            cameraUploadsMediaList1.forEachIndexed { index, media ->
+                whenever(
+                    cameraUploadsRecordMapper(media, folderType, fileType, tempRoot)
+                ).thenReturn(
+                    cameraUploadsRecordList1[index]
+                )
+            }
+
+            whenever(cameraUploadRepository.getAllCameraUploadsRecords())
+                .thenReturn(listOf(cameraUploadsRecord1))
+
+
+            val expected =
+                cameraUploadsRecordList1.filterNot { it.mediaId == 1111L && it.timestamp == 1234L }
+
+            assertThat(underTest(parentPath, types, folderType, fileType, tempRoot))
+                .isEqualTo(expected)
         }
 }

@@ -17,12 +17,14 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
@@ -77,6 +79,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
     private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val addCompletedTransferUseCase = mock<AddCompletedTransferUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
 
     private val primaryUploadNodeId = NodeId(1111L)
     private val secondaryUploadNodeId = NodeId(2222L)
@@ -98,6 +101,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
     )
 
     private val existingNodeId = mock<NodeId>()
+    private val transferFinishedNode = mock<TypedFileNode>()
     private var cameraUploadsRecords = emptyList<CameraUploadsRecord>()
     private var uploadNodeId = NodeId(0L)
     private var record = record1
@@ -123,6 +127,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
             fileSystemRepository = fileSystemRepository,
             addCompletedTransferUseCase = addCompletedTransferUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
         )
     }
 
@@ -147,6 +152,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             getUploadVideoQualityUseCase,
             fileSystemRepository,
             addCompletedTransferUseCase,
+            getNodeByIdUseCase,
         )
     }
 
@@ -482,6 +488,8 @@ class UploadCameraUploadsRecordsUseCaseTest {
             mockStartUploadUseCase()
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
+            whenever(getNodeByIdUseCase(NodeId(transferFinished.nodeHandle)))
+                .thenReturn(transferFinishedNode)
 
             executeUnderTest().collect()
 
@@ -631,6 +639,8 @@ class UploadCameraUploadsRecordsUseCaseTest {
             mockStartUploadUseCase()
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
+            whenever(getNodeByIdUseCase(NodeId(transferFinished.nodeHandle)))
+                .thenReturn(transferFinishedNode)
 
             executeUnderTest().collect()
 
@@ -652,6 +662,8 @@ class UploadCameraUploadsRecordsUseCaseTest {
             mockStartUploadUseCase()
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
+            whenever(getNodeByIdUseCase(NodeId(transferFinished.nodeHandle)))
+                .thenReturn(transferFinishedNode)
 
             executeUnderTest().collect()
 
@@ -692,6 +704,8 @@ class UploadCameraUploadsRecordsUseCaseTest {
             mockStartUploadUseCase()
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
+            whenever(getNodeByIdUseCase(NodeId(transferFinished.nodeHandle)))
+                .thenReturn(transferFinishedNode)
 
             executeUnderTest().collect()
 
@@ -715,10 +729,56 @@ class UploadCameraUploadsRecordsUseCaseTest {
             mockStartUploadUseCase()
             whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
             whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
+            whenever(getNodeByIdUseCase(NodeId(transferFinished.nodeHandle)))
+                .thenReturn(transferFinishedNode)
 
             executeUnderTest().collect()
 
             verify(addCompletedTransferUseCase).invoke(
+                transferFinishedEvent.transfer,
+                transferFinishedEvent.error
+            )
+        }
+
+        @ParameterizedTest(name = "when folder type is {0}")
+        @MethodSource("provideParameters")
+        fun `test that no post transfer operations are done if node is not retrieved in the cloud after a transfer finish`(
+            cameraUploadFolderType: CameraUploadFolderType,
+        ) = runTest {
+            setInput(cameraUploadFolderType)
+            whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
+            whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
+            whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
+            mockStartUploadUseCase()
+            whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
+            whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
+            whenever(getNodeByIdUseCase(NodeId(transferFinished.nodeHandle)))
+                .thenReturn(null)
+
+            executeUnderTest().collect()
+
+            verify(setOriginalFingerprintUseCase, never()).invoke(
+                nodeId = NodeId(transferFinished.nodeHandle),
+                originalFingerprint = record.originalFingerprint,
+            )
+            verify(setCoordinatesUseCase, never()).invoke(
+                nodeId = NodeId(transferFinished.nodeHandle),
+                latitude = 0.0F.toDouble(),
+                longitude = 0.0F.toDouble(),
+            )
+            verify(deleteThumbnailUseCase, never()).invoke(transferFinished.nodeHandle)
+            verify(createImageOrVideoThumbnailUseCase, never())
+                .invoke(transferFinished.nodeHandle, File(record.filePath))
+            verify(deletePreviewUseCase, never()).invoke(transferFinished.nodeHandle)
+            verify(createImageOrVideoPreviewUseCase, never())
+                .invoke(transferFinished.nodeHandle, File(record.filePath))
+            verify(setCameraUploadsRecordUploadStatusUseCase, never()).invoke(
+                mediaId = record.mediaId,
+                timestamp = record.timestamp,
+                folderType = record.folderType,
+                uploadStatus = CameraUploadsRecordUploadStatus.UPLOADED,
+            )
+            verify(addCompletedTransferUseCase, never()).invoke(
                 transferFinishedEvent.transfer,
                 transferFinishedEvent.error
             )
