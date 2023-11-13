@@ -294,6 +294,7 @@ fun ImagePreviewScreen(
                             currentImageNode = currentImageNode,
                             photoState = photoState,
                             downloadImage = viewModel::monitorImageResult,
+                            getImagePath = viewModel::getImagePath,
                             onImageTap = { viewModel.switchFullScreenMode() },
                             onClickVideoPlay = onClickVideoPlay,
                             topAppBar = { imageNode ->
@@ -373,6 +374,7 @@ private fun ImagePreviewContent(
     topAppBar: @Composable (ImageNode) -> Unit,
     bottomAppBar: @Composable (ImageNode, Int) -> Unit,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
+    getImagePath: suspend (ImageResult?) -> String?,
     onClickVideoPlay: (ImageNode) -> Unit,
 ) {
     Box(
@@ -394,10 +396,14 @@ private fun ImagePreviewContent(
                 }
             }
 
+            val imagePath by produceState<String?>(initialValue = null, key1 = imageResult) {
+                value = getImagePath(imageResult)
+            }
+
             Box(modifier = Modifier.fillMaxSize()) {
                 val isVideo = imageNode.type is VideoFileTypeInfo
                 ImageContent(
-                    fullSizePath = imageResult?.getHighestResolutionAvailableUri(),
+                    fullSizePath = imagePath,
                     photoState = photoState,
                     onImageTap = onImageTap,
                     enableZoom = !isVideo

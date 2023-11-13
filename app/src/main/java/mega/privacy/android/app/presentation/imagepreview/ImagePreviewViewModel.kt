@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
@@ -45,7 +46,9 @@ import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
+import java.io.File
 import java.lang.ref.WeakReference
+import java.net.URI
 import javax.inject.Inject
 
 @HiltViewModel
@@ -68,6 +71,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val disableExportNodesUseCase: DisableExportNodesUseCase,
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
@@ -408,6 +412,24 @@ class ImagePreviewViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    suspend fun getImagePath(imageResult: ImageResult?): String? {
+        return imageResult?.run {
+            checkUri(fullSizeUri) ?: checkUri(previewUri) ?: checkUri(thumbnailUri)
+        }
+    }
+
+    private suspend fun checkUri(uriPath: String?): String? = withContext(ioDispatcher) {
+        try {
+            if (File(URI.create(uriPath).path).exists()) {
+                uriPath
+            } else {
+                null
+            }
+        } catch (_: Exception) {
+            null
         }
     }
 
