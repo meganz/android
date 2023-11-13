@@ -6,13 +6,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.upgradeAccount.view.ChooseAccountView
@@ -23,6 +22,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantAViewProPlansButtonEvent
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -71,7 +71,12 @@ class ChooseAccountFragment : Fragment() {
                 VariantAOnboardingDialogView(
                     state = uiState,
                     onSkipPressed = chooseAccountActivity::onFreeClick,
-                    onViewPlansPressed = { chooseAccountActivity.onPlanClicked(AccountType.PRO_I) },
+                    onViewPlansPressed = {
+                        Analytics.tracker.trackEvent(
+                            OnboardingUpsellingDialogVariantAViewProPlansButtonEvent
+                        )
+                        chooseAccountActivity.onPlanClicked(AccountType.PRO_I)
+                    },
                 )
             } else {
                 ChooseAccountView(
