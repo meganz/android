@@ -623,6 +623,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         ts: Long,
         lastNode: Long,
     ) = withContext(ioDispatcher) {
+        Timber.d("Sending BackupHeartBeat $backupId, $heartbeatStatus")
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("sendBackupHeartbeat") { }
             megaApiGateway.sendBackupHeartbeat(

@@ -45,10 +45,12 @@ class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
                 backgroundFastLoginUseCase()
                 Timber.d("backgroundFastLogin successful")
                 applicationWrapper.setHeartBeatAlive(true)
-                sendCameraUploadsBackupHeartBeatUseCase(
-                    heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
-                    lastNodeHandle = -1L
-                )
+                runCatching {
+                    sendCameraUploadsBackupHeartBeatUseCase(
+                        heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
+                        lastNodeHandle = -1L
+                    )
+                }.onFailure { Timber.e(it) }
                 Timber.d("Camera Uploads up to date heartbeat sent")
                 runCatching {
                     sendMediaUploadsBackupHeartBeatUseCase(

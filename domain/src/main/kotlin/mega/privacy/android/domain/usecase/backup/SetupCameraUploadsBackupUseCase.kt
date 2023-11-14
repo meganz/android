@@ -45,9 +45,11 @@ class SetupCameraUploadsBackupUseCase @Inject constructor(
         ).also {
             broadcastBackupInfoTypeUseCase(BackupInfoType.CAMERA_UPLOADS)
         }
-        sendCameraUploadsBackupHeartBeatUseCase(
-            heartbeatStatus = HeartbeatStatus.UNKNOWN,
-            lastNodeHandle = -1
-        )
+        runCatching {
+            sendCameraUploadsBackupHeartBeatUseCase(
+                heartbeatStatus = HeartbeatStatus.UNKNOWN,
+                lastNodeHandle = -1
+            )
+        }
     }
 }

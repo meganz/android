@@ -19,6 +19,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.BackupRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -117,6 +118,7 @@ internal class BackupRepositoryImpl @Inject constructor(
     ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("setBackup") {
+                Timber.d("setBackup $it")
                 backupMapper(it)
             }
             megaApiGateway.setBackup(
@@ -170,6 +172,8 @@ internal class BackupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveBackup(backup: Backup) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.saveBackup(backup)
+        megaLocalRoomGateway.saveBackup(backup).also {
+            Timber.d("Local Backup saved $backup")
+        }
     }
 }
