@@ -120,6 +120,7 @@ import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -149,6 +150,7 @@ import javax.inject.Inject
  * @property billingViewModel
  * @property monitorTransferOverQuotaUseCase
  * @property fetchPsaUseCase
+ * @property pauseAllTransfersUseCase
  */
 @AndroidEntryPoint
 abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionRequester,
@@ -195,6 +197,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     @Inject
     lateinit var monitorChatSignalPresenceUseCase: MonitorChatSignalPresenceUseCase
+
+    @Inject
+    lateinit var pauseAllTransfersUseCase: PauseAllTransfersUseCase
 
     @JvmField
     var nameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollision>>? = null
@@ -335,7 +340,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             ) return
 
             transfersManagement.hasResumeTransfersWarningAlreadyBeenShown = true
-            showResumeTransfersWarning(this@BaseActivity)
+            showResumeTransfersWarning(this@BaseActivity){
+                lifecycleScope.launch {
+                    pauseAllTransfersUseCase(false)
+                }
+            }
         }
     }
 
@@ -463,7 +472,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             )
 
             if (isResumeTransfersWarningShown) {
-                showResumeTransfersWarning(this@BaseActivity)
+                showResumeTransfersWarning(this@BaseActivity) {
+                    lifecycleScope.launch {
+                        pauseAllTransfersUseCase(false)
+                    }
+                }
             }
 
             if (getBoolean(SET_DOWNLOAD_LOCATION_SHOWN, false)) {

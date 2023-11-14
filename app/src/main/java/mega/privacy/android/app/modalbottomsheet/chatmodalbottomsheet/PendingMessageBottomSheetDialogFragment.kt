@@ -5,19 +5,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MsgNotSentBottomSheetBinding
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.PendingMessageState
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * BottomSheetDialog to show options for pendin messages
+ * @property areTransfersPausedUseCase
+ * @property pauseAllTransfersUseCase
  */
+@AndroidEntryPoint
 class PendingMessageBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
     View.OnClickListener {
     private var selectedChat: MegaChatRoom? = null
@@ -25,6 +34,13 @@ class PendingMessageBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
     private var messageId: Long = 0
     private var isUploadingMessage = false
     private lateinit var binding: MsgNotSentBottomSheetBinding
+
+    @Inject
+    lateinit var areTransfersPausedUseCase: AreTransfersPausedUseCase
+
+    @Inject
+    lateinit var pauseAllTransfersUseCase: PauseAllTransfersUseCase
+
 
     /**
      * on create view
@@ -62,7 +78,7 @@ class PendingMessageBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
         isUploadingMessage =
             pMsg != null && pMsg.state != PendingMessageState.ERROR_UPLOADING.value && pMsg.state != PendingMessageState.ERROR_ATTACHING.value
         if (isUploadingMessage) {
-            if (dbH.transferQueueStatus) {
+            if (areTransfersPausedUseCase()) {
                 titleSlidingPanel.setText(R.string.attachment_uploading_state_paused)
                 val resumeText = binding.msgNotSentRetryText
                 resumeText.setText(R.string.option_resume_transfers)
@@ -100,9 +116,11 @@ class PendingMessageBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
     override fun onClick(v: View) {
         val id = v.id
         if (id == R.id.msg_not_sent_retry_layout) {
-            if (dbH.transferQueueStatus && isUploadingMessage) {
-                megaApi.pauseTransfers(false)
-                (requireActivity() as ChatActivity).updatePausedUploadingMessages()
+            if (areTransfersPausedUseCase() && isUploadingMessage) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    pauseAllTransfersUseCase(false)
+                    (requireActivity() as ChatActivity).updatePausedUploadingMessages()
+                }
             } else {
                 (requireActivity() as ChatActivity).retryPendingMessage(messageId)
             }

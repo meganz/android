@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.transfers.BroadcastStopTransfersWorkU
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferIfNotExistUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.GetAllSdTransfersUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -84,6 +85,7 @@ class TransfersManagement @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getTransferByTagUseCase: GetTransferByTagUseCase,
     private val completedTransferMapper: CompletedTransferMapper,
+    private val pauseAllTransfersUseCase: PauseAllTransfersUseCase,
 ) {
 
     companion object {
@@ -328,7 +330,9 @@ class TransfersManagement @Inject constructor(
 
         if (areTransfersPausedUseCase()) {
             //Queue of transfers should be paused.
-            megaApi.pauseTransfers(true)
+            applicationScope.launch {
+                pauseAllTransfersUseCase(true)
+            }
         }
 
         Handler(Looper.getMainLooper()).postDelayed({

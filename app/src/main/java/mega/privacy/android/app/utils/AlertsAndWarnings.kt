@@ -68,7 +68,10 @@ object AlertsAndWarnings {
      * @param context current Context.
      */
     @JvmStatic
-    fun showResumeTransfersWarning(context: Context) {
+    fun showResumeTransfersWarning(
+        context: Context,
+        onResumePausedTransfers: () -> Unit,
+    ) {
         if (context is BaseActivity && context.resumeTransfersWarning?.isShowing == true) {
             return
         }
@@ -80,7 +83,7 @@ object AlertsAndWarnings {
             .setMessage(context.getString(R.string.warning_message_resume_transfers))
             .setCancelable(false)
             .setPositiveButton(context.getString(R.string.button_resume_individual_transfer)) { dialog, _ ->
-                MegaApplication.getInstance().megaApi.pauseTransfers(false)
+                onResumePausedTransfers()
 
                 if (context is ChatActivity) {
                     context.updatePausedUploadingMessages()
