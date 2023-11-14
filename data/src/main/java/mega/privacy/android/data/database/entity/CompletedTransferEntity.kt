@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import mega.privacy.android.data.database.MegaDatabaseConstant
 
 /**
- * Contact entity
+ * Completed transfer entity
  *
  * @property id
  * @property fileName

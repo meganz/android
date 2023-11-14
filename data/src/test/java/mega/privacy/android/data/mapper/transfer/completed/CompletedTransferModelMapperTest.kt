@@ -6,21 +6,32 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class CompletedTransferModelMapperTest {
     private lateinit var underTest: CompletedTransferModelMapper
 
     private val decryptData: DecryptData = mock()
 
 
-    @Before
-    fun setUp() {
+    @BeforeAll
+    fun setup() {
         underTest = CompletedTransferModelMapper(decryptData)
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            decryptData,
+        )
     }
 
     @Test
@@ -112,4 +123,50 @@ internal class CompletedTransferModelMapperTest {
 
         Truth.assertThat(underTest(entity)).isEqualTo(expected)
     }
+
+    @Test
+    fun `test that mapper returns default value when parsing the string to specific types fails`() =
+        runTest {
+            val entity = CompletedTransferEntity(
+                id = 0,
+                fileName = "2023-03-24 00.13.20_1.jpg",
+                type = "nonIntValue",
+                state = "nonIntValue",
+                size = "3.57 MB",
+                handle = "nonLongValue",
+                path = "Cloud drive/Camera uploads",
+                isOffline = "false",
+                timestamp = "nonLongValue",
+                error = "No error",
+                originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
+                parentHandle = "nonLongValue",
+            )
+            val expected = CompletedTransfer(
+                id = 0,
+                fileName = "2023-03-24 00.13.20_1.jpg",
+                type = -1,
+                state = -1,
+                size = "3.57 MB",
+                handle = -1L,
+                path = "Cloud drive/Camera uploads",
+                isOffline = false,
+                timestamp = -1L,
+                error = "No error",
+                originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
+                parentHandle = -1L,
+            )
+            whenever(decryptData(entity.fileName)).thenReturn(entity.fileName)
+            whenever(decryptData(entity.type)).thenReturn(entity.type)
+            whenever(decryptData(entity.state)).thenReturn(entity.state)
+            whenever(decryptData(entity.size)).thenReturn(entity.size)
+            whenever(decryptData(entity.handle)).thenReturn(entity.handle)
+            whenever(decryptData(entity.path)).thenReturn(entity.path)
+            whenever(decryptData(entity.isOffline)).thenReturn(entity.isOffline)
+            whenever(decryptData(entity.timestamp)).thenReturn(entity.timestamp)
+            whenever(decryptData(entity.error)).thenReturn(entity.error)
+            whenever(decryptData(entity.originalPath)).thenReturn(entity.originalPath)
+            whenever(decryptData(entity.parentHandle)).thenReturn(entity.parentHandle)
+
+            Truth.assertThat(underTest(entity)).isEqualTo(expected)
+        }
 }
