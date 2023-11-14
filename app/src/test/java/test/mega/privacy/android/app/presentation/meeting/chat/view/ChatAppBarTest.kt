@@ -686,6 +686,20 @@ class ChatAppBarTest {
             .assertDoesNotExist()
     }
 
+    @Test
+    fun `test that audio call is shown but disabled when chat is a waiting room and I am not a morerator`() {
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Standard,
+                isWaitingRoom = true
+            )
+        )
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).performClick()
+        verifyNoInteractions(actionPressed)
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatAppBar(

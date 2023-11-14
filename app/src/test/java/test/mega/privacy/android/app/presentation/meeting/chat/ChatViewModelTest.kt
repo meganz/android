@@ -1429,6 +1429,51 @@ internal class ChatViewModelTest {
         }
     }
 
+    @ParameterizedTest(name = " and value is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is waiting room is updated when chat is get`(
+        expectedIsWaitingRoom: Boolean
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { isWaitingRoom } doReturn expectedIsWaitingRoom
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+        }
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isWaitingRoom).isEqualTo(expectedIsWaitingRoom)
+        }
+    }
+
+    @ParameterizedTest(name = " and new value is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is waiting room is updated when a chat room update is received`(
+        expectedIsWaitingRoom: Boolean
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { isWaitingRoom } doReturn expectedIsWaitingRoom
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+        }
+        val updateFlow = MutableSharedFlow<ChatRoom>()
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isWaitingRoom).isEqualTo(expectedIsWaitingRoom)
+        }
+
+        val newChatRoom = mock<ChatRoom> {
+            on { isWaitingRoom } doReturn !expectedIsWaitingRoom
+            on { changes } doReturn listOf(ChatRoomChange.WaitingRoom)
+        }
+        updateFlow.emit(newChatRoom)
+        underTest.state.test {
+            assertThat(awaitItem().isWaitingRoom).isEqualTo(!expectedIsWaitingRoom)
+        }
+    }
+
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

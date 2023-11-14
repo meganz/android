@@ -123,7 +123,7 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
         if ((hasModeratorPermission || myPermission == ChatRoomPermission.Standard)
             && !isJoiningOrLeaving && !isPreviewMode
         ) {
-            add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat))
+            add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat && (!isWaitingRoom || hasModeratorPermission)))
 
             if (!isGroup) {
                 add(ChatRoomMenuAction.VideoCall(!hasACallInThisChat))

@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property openMeetingEvent Event to open a meeting.
  * @property allContactsParticipateInChat True if all contacts participate in this chat, false otherwise.
  * @property inviteToChatResultEvent Event to show the result of inviting contacts to a chat.
+ * @property isWaitingRoom True if the scheduled meeting has the waiting room setting enabled, false otherwise.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -66,4 +67,5 @@ data class ChatUiState(
     val openMeetingEvent: StateEventWithContent<Long> = consumed(),
     val allContactsParticipateInChat: Boolean = false,
     val inviteToChatResultEvent: StateEventWithContent<InviteContactToChatResult> = consumed(),
+    val isWaitingRoom: Boolean = false,
 )

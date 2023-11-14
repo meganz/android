@@ -238,6 +238,7 @@ internal class ChatViewModel @Inject constructor(
                                 isArchived = isArchived,
                                 isMeeting = isMeeting,
                                 participantsCount = getNumberParticipants(),
+                                isWaitingRoom = isWaitingRoom
                             )
                         }
                         if (peerHandlesList.isNotEmpty()) {
@@ -354,6 +355,12 @@ internal class ChatViewModel @Inject constructor(
                                         state.copy(participantsCount = getNumberParticipants())
                                     }
                                     monitorAllContactParticipantsInChat(peerHandlesList)
+                                }
+
+                                ChatRoomChange.WaitingRoom -> {
+                                    _state.update { state ->
+                                        state.copy(isWaitingRoom = isWaitingRoom)
+                                    }
                                 }
 
                                 else -> {}
