@@ -326,7 +326,7 @@ class TransfersManagement @Inject constructor(
             }
         }
 
-        if (dbH.transferQueueStatus) {
+        if (areTransfersPausedUseCase()) {
             //Queue of transfers should be paused.
             megaApi.pauseTransfers(true)
         }
@@ -663,16 +663,6 @@ class TransfersManagement @Inject constructor(
     }
 
     fun getAreFailedTransfers(): Boolean = areFailedTransfers
-
-    /**
-     * Adds the initial value for transferQueueStatus.
-     * Note: Please don't call this from anywhere, except from the creation of MegaApplication.
-     * The state of the transfer queue is monitored from [BackgroundRequestListener], so it is updated
-     * at the time it changes.
-     */
-    fun initPausedTransfers() = applicationScope.launch {
-        dbH.transferQueueStatus = areTransfersPausedUseCase()
-    }
 
     /**
      * Enum class allowing to identify from where the check comes.

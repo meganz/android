@@ -19,7 +19,6 @@ import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
@@ -33,6 +32,7 @@ import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
@@ -43,6 +43,7 @@ import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChat
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -103,6 +104,7 @@ class ChatViewModelTest {
     private val loadPendingMessagesUseCase = mock<LoadPendingMessagesUseCase> {
         onBlocking { invoke(any()) }.thenReturn(flowOf())
     }
+    private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
 
     @Before
     fun setUp() {
@@ -138,7 +140,8 @@ class ChatViewModelTest {
             monitorScheduledMeetingUpdates = monitorScheduledMeetingUpdates,
             monitorChatRoomUpdates = monitorChatRoomUpdates,
             startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
-            isConnectedToInternetUseCase = isConnectedToInternetUseCase
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
+            monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
         )
     }
 
@@ -284,4 +287,18 @@ class ChatViewModelTest {
             Truth.assertThat(state.openWaitingRoomScreen).isFalse()
         }
     }
+
+    @Test
+    fun `test that areTransfersPaused emits a new value when monitorPausedTransfersUseCase emits a value`() =
+        runTest {
+            whenever(monitorPausedTransfersUseCase()).thenReturn(
+                flowOf(false, true, false)
+            )
+            underTest.areTransfersPaused.test {
+                Truth.assertThat(awaitItem()).isFalse()
+                Truth.assertThat(awaitItem()).isTrue()
+                Truth.assertThat(awaitItem()).isFalse()
+                this.cancelAndIgnoreRemainingEvents()
+            }
+        }
 }

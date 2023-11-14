@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseC
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import org.junit.After
 import org.junit.Before
@@ -52,6 +53,7 @@ internal class TransfersViewModelTest {
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase = mock()
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
     private val monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase = mock()
+    private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
     private val getAllCompletedTransfersUseCase: GetAllCompletedTransfersUseCase = mock()
     private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase = mock()
     private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase = mock()
@@ -80,7 +82,8 @@ internal class TransfersViewModelTest {
             getFailedOrCanceledTransfersUseCase = getFailedOrCanceledTransfersUseCase,
             deleteCompletedTransferUseCase = deleteCompletedTransferUseCase,
             pauseTransferByTagUseCase = pauseTransferByTagUseCase,
-            cancelTransferByTagUseCase = cancelTransferByTagUseCase
+            cancelTransferByTagUseCase = cancelTransferByTagUseCase,
+            monitorPausedTransfersUseCase = monitorPausedTransfersUseCase
         )
     }
 
@@ -271,6 +274,20 @@ internal class TransfersViewModelTest {
             underTest.uiState.test {
                 val newItem = awaitItem()
                 assertThat(newItem.cancelTransfersResult).isNull()
+            }
+        }
+
+    @Test
+    fun `test that areTransfersPaused emits a new value when monitorPausedTransfersUseCase emits a value`() =
+        runTest {
+            whenever(monitorPausedTransfersUseCase()).thenReturn(
+                flowOf(false, true, false)
+            )
+            underTest.areTransfersPaused.test {
+                assertThat(awaitItem()).isFalse()
+                assertThat(awaitItem()).isTrue()
+                assertThat(awaitItem()).isFalse()
+                this.cancelAndIgnoreRemainingEvents()
             }
         }
 }

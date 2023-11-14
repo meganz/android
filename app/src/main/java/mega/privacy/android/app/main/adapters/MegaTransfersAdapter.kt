@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.RoundedCornersTransformation
-import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -40,12 +39,22 @@ class MegaTransfersAdapter(
     private val listView: RecyclerView,
     private val selectModeInterface: SelectModeInterface,
     private val transfersViewModel: TransfersViewModel,
-    private val dbH: LegacyDatabaseHandler,
     private val onPauseTransfer: (Transfer) -> Unit,
 ) : ListAdapter<Transfer, TransferViewHolder>(TRANSFER_DIFF_CALLBACK), RotatableAdapter {
 
     private var multipleSelect: Boolean = false
     private val selectedItems = mutableSetOf<Int>()
+
+    /**
+     * True if transfers are paused globally, false otherwise
+     */
+    var areTransfersPaused = false
+        set(value) {
+            if (field != value) {
+                field = value
+                notifyDataSetChanged()
+            }
+        }
 
     override fun submitList(list: List<Transfer>?) {
         super.submitList(list)
@@ -161,7 +170,7 @@ class MegaTransfersAdapter(
         holder.imageViewCompleted.setImageResource(R.drawable.ic_queue)
         holder.progressText.isVisible = true
 
-        if (dbH.transferQueueStatus) {
+        if (areTransfersPaused) {
             holder.progressText.text = getProgress(transfer)
             holder.speedText.text = context.getString(R.string.transfer_paused)
 

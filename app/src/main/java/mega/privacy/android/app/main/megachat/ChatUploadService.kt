@@ -67,6 +67,7 @@ import mega.privacy.android.domain.usecase.transfers.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.IsThereAnyChatUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
@@ -146,6 +147,9 @@ class ChatUploadService : LifecycleService() {
 
     @Inject
     lateinit var navigator: MegaNavigator
+
+    @Inject
+    lateinit var areTransfersPausedUseCase: AreTransfersPausedUseCase
 
     private var isForeground = false
     private var canceled = false
@@ -579,7 +583,7 @@ class ChatUploadService : LifecycleService() {
             )
         }
 
-        if (dbH.transferQueueStatus
+        if (areTransfersPausedUseCase()
             && !transfersManagement.hasResumeTransfersWarningAlreadyBeenShown
         ) {
             sendBroadcast(

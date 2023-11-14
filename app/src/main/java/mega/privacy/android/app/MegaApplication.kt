@@ -229,7 +229,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         //Logout check resumed pending transfers
         transfersManagement.apply {
             checkResumedPendingTransfers()
-            initPausedTransfers()
         }
 
         applicationScope.launch { runCatching { updateApiServerUseCase() } }

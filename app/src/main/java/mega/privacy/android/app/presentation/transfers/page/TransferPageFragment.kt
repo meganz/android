@@ -37,10 +37,10 @@ import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaTransfer
@@ -54,7 +54,7 @@ internal class TransferPageFragment : Fragment() {
     lateinit var transfersManagement: TransfersManagement
 
     @Inject
-    lateinit var dbH: DatabaseHandler
+    lateinit var areTransfersPausedUseCase: AreTransfersPausedUseCase
 
     @Inject
     lateinit var downloadNodeUseCase: DownloadNodeUseCase
@@ -285,7 +285,7 @@ internal class TransferPageFragment : Fragment() {
         if (transferTab == TransfersTab.PENDING_TAB
             && transfersViewModel.getActiveTransfers().isNotEmpty()
         ) {
-            if (dbH.transferQueueStatus) {
+            if (areTransfersPausedUseCase()) {
                 playTransfersMenuIcon?.isVisible = true
             } else {
                 pauseTransfersMenuIcon?.isVisible = true

@@ -100,6 +100,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloade
 import mega.privacy.android.domain.usecase.transfers.downloads.GetTotalDownloadsUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloadsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedLegacyUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.InsertSdTransferUseCase
@@ -230,6 +231,9 @@ internal class DownloadService : LifecycleService() {
 
     @Inject
     lateinit var broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase
+
+    @Inject
+    lateinit var areTransfersPausedUseCase: AreTransfersPausedUseCase
 
     @Inject
     @LoginMutex
@@ -1222,7 +1226,7 @@ internal class DownloadService : LifecycleService() {
             if (!isOverQuota) {
                 val now = System.currentTimeMillis()
                 lastUpdated =
-                    if (now - lastUpdated > ON_TRANSFER_UPDATE_REFRESH_MILLIS || dbH.transferQueueStatus) {
+                    if (now - lastUpdated > ON_TRANSFER_UPDATE_REFRESH_MILLIS || areTransfersPausedUseCase()) {
                         now
                     } else {
                         return

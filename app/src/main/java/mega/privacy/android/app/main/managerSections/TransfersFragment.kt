@@ -18,7 +18,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
-import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
@@ -37,7 +36,6 @@ import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.domain.entity.transfer.Transfer
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * The Fragment is used for displaying the transfer list.
@@ -45,11 +43,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     TransfersActionBarCallBack.TransfersActionCallback {
-    /**
-     * [LegacyDatabaseHandler]
-     */
-    @Inject
-    lateinit var dbH: LegacyDatabaseHandler
 
     private var adapter: MegaTransfersAdapter? = null
 
@@ -91,7 +84,6 @@ internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                 listView = recyclerView,
                 selectModeInterface = this,
                 transfersViewModel = viewModel,
-                dbH = dbH,
                 onPauseTransfer = ::handlePauseTransfers
             )
 
@@ -239,6 +231,10 @@ internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
         viewLifecycleOwner.collectFlow(viewModel.activeTransfer.sample(500L)) {
             adapter?.submitList(it)
             setEmptyView(it.size)
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.areTransfersPaused) {
+            adapter?.areTransfersPaused = it
         }
 
         viewLifecycleOwner.collectFlow(viewModel.uiState) { uiState ->

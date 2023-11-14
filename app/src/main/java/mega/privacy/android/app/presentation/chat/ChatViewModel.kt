@@ -49,7 +49,6 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
@@ -63,16 +62,18 @@ import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
-import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import javax.inject.Inject
@@ -140,6 +141,7 @@ class ChatViewModel @Inject constructor(
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatStateLegacy())
@@ -165,6 +167,11 @@ class ChatViewModel @Inject constructor(
      * Monitor connectivity event
      */
     val monitorConnectivityEvent = monitorConnectivityUseCase()
+
+    /**
+     * Flow emitting true if transfers are paused globally, false otherwise
+     */
+    val areTransfersPaused by lazy { monitorPausedTransfersUseCase() }
 
     val isConnected: Boolean
         get() = isConnectedToInternetUseCase()

@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseC
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
@@ -62,6 +63,7 @@ class TransfersViewModel @Inject constructor(
     private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase,
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
+    monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TransfersUiState())
 
@@ -89,6 +91,11 @@ class TransfersViewModel @Inject constructor(
      * Active transfer
      */
     val activeTransfer = _activeTransfers.asStateFlow()
+
+    /**
+     * Flow that emits true if transfers are paused globally or false otherwise
+     */
+    val areTransfersPaused by lazy { monitorPausedTransfersUseCase() }
 
     /**
      * Monitor transfer event
