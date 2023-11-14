@@ -7,8 +7,10 @@ import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.views.StalledIssueCard
+import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 
 @Composable
 internal fun StalledIssuesScreen(
@@ -28,11 +30,12 @@ private fun StalledIssuesScreenContent(
     moreClicked: (StalledIssueUiItem) -> Unit,
 ) {
     LazyColumn(state = LazyListState()) {
-        val itemsCount = stalledIssues.size
-        if (itemsCount == 0) {
+        if (stalledIssues.isEmpty()) {
             item {
-                NoStalledIssuesPlaceholder(
-                    modifier
+                SyncListNoItemsPlaceHolder(
+                    placeholderText = "No Stalled Issues",
+                    placeholderIcon = R.drawable.ic_no_stalled_issues,
+                    modifier = Modifier
                         .fillParentMaxHeight(0.8f)
                         .fillParentMaxWidth()
                 )

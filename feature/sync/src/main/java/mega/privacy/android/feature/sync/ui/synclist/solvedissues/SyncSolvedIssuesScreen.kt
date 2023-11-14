@@ -11,28 +11,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R
+import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
+import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWithBody
 
 @Composable
 internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
     LazyColumn(content = {
-        items(solvedIssues) { solvedIssue ->
-            MenuActionNodeHeaderWithBody(
-                title = solvedIssue.localPaths.first(),
-                body = solvedIssue.resolutionExplanation,
-                nodeIcon = solvedIssue.icon,
-                bodyIcon = R.drawable.ic_check_circle,
-                bodyIconColor = MaterialTheme.colors.secondary
-            )
-            Divider(
-                Modifier.padding(start = 72.dp)
-                    .testTag(SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY)
-            )
+        if (solvedIssues.isEmpty()) {
+            item {
+                SyncListNoItemsPlaceHolder(
+                    placeholderText = "No Solved Issues",
+                    placeholderIcon = R.drawable.ic_no_solved_issues,
+                    modifier = Modifier
+                        .fillParentMaxHeight(0.8f)
+                        .fillParentMaxWidth()
+                )
+            }
+        } else {
+            items(solvedIssues) { solvedIssue ->
+                MenuActionNodeHeaderWithBody(
+                    title = solvedIssue.localPaths.first(),
+                    body = solvedIssue.resolutionExplanation,
+                    nodeIcon = solvedIssue.icon,
+                    bodyIcon = CoreUiR.drawable.ic_check_circle,
+                    bodyIconColor = MaterialTheme.colors.secondary
+                )
+                Divider(
+                    Modifier.padding(start = 72.dp)
+                        .testTag(SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY)
+                )
+            }
         }
     })
 }
@@ -47,13 +61,13 @@ internal fun SyncSolvedIssuesScreenPreview() {
                     nodeIds = listOf(NodeId(1L)),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "Folders were merged",
-                    icon = R.drawable.ic_folder_list,
+                    icon = CoreUiR.drawable.ic_folder_list,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(2L)),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "Folders were merged",
-                    icon = R.drawable.ic_folder_list,
+                    icon = CoreUiR.drawable.ic_folder_list,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(3L)),

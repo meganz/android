@@ -214,8 +214,6 @@ private fun SelectedChipScreen(
     }
 }
 
-internal const val TAG_SYNC_LIST_SCREEN_NO_ITEMS = "sync_list_screen_no_items"
-
 @CombinedThemePreviews
 @Composable
 private fun SyncListScreenPreview() {

@@ -13,6 +13,7 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SOLVED_ISSUES_
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesRoute
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesState
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
+import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -70,5 +71,7 @@ class SyncSolvedIssueScreenTest {
 
         composeTestRule.onNodeWithTag(SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY)
             .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS)
+            .assertIsDisplayed()
     }
 }

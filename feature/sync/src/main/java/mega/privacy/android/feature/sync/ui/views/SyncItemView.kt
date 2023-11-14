@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.ui.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 
 @Composable
@@ -15,7 +16,7 @@ internal fun SyncItemView(
 ) {
     val sync = syncUiItems[itemIndex]
     SyncCard(
-        modifier = modifier,
+        modifier = modifier.testTag(TEST_TAG_SYNC_ITEM_VIEW),
         folderPairName = sync.folderPairName,
         status = sync.status,
         hasStalledIssues = sync.hasStalledIssues,
@@ -33,3 +34,5 @@ internal fun SyncItemView(
             removeFolderClicked(sync.id)
         })
 }
+
+internal const val TEST_TAG_SYNC_ITEM_VIEW = "sync_item_view:root"

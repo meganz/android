@@ -13,10 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
-import mega.privacy.android.feature.sync.ui.synclist.NoSyncsPlaceholder
 import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.CardExpanded
+import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 
 @Composable
 internal fun SyncFoldersScreen(
@@ -28,18 +29,18 @@ internal fun SyncFoldersScreen(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(state = LazyListState(), modifier = modifier) {
-        val itemsCount = syncUiItems.size
-
-        if (itemsCount == 0) {
+        if (syncUiItems.isEmpty()) {
             item {
-                NoSyncsPlaceholder(
-                    modifier
+                SyncListNoItemsPlaceHolder(
+                    placeholderText = "No Syncs",
+                    placeholderIcon = R.drawable.no_syncs_placeholder,
+                    modifier = Modifier
                         .fillParentMaxHeight(0.8f)
                         .fillParentMaxWidth()
                 )
             }
         } else {
-            items(count = itemsCount, key = {
+            items(count = syncUiItems.size, key = {
                 syncUiItems[it].id
             }) { itemIndex ->
                 SyncItemView(
