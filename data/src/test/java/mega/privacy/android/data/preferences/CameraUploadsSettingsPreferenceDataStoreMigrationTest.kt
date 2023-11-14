@@ -63,7 +63,7 @@ class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
         verify(dataStore).setVideoTimeStamp(0L)
         verify(dataStore).setMediaUploadsPhotoTimeStamp(0L)
         verify(dataStore).setMediaUploadsVideoTimeStamp(0L)
-        verify(dataStore).setUploadsByWifi(false)
+        verify(dataStore).setUploadsByWifi(true)
     }
 
     @Test

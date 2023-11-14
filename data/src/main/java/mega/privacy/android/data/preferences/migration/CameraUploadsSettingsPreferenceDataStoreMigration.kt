@@ -50,7 +50,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             videoTimeStamp = 0L,
             mediaUploadsPhotoTimeStamp = 0L,
             mediaUploadsVideoTimeStamp = 0L,
-            isUploadsByWifi = false,
+            isUploadsByWifi = true,
         )
     }
 
@@ -82,7 +82,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             videoTimeStamp = oldPreferences.camVideoSyncTimeStamp?.toLongOrNull() ?: 0L,
             mediaUploadsPhotoTimeStamp = oldPreferences.secSyncTimeStamp?.toLongOrNull() ?: 0L,
             mediaUploadsVideoTimeStamp = oldPreferences.secVideoSyncTimeStamp?.toLongOrNull() ?: 0L,
-            isUploadsByWifi = oldPreferences.camSyncWifi?.toBooleanStrictOrNull() ?: false,
+            isUploadsByWifi = oldPreferences.camSyncWifi?.toBooleanStrictOrNull() ?: true,
         )
     }
 
