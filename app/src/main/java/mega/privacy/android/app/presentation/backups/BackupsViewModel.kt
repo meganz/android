@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.backups
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +36,7 @@ import javax.inject.Inject
  * @property monitorBackupFolder [MonitorBackupFolder]
  * @property monitorNodeUpdates [MonitorNodeUpdates]
  * @property monitorViewType [MonitorViewType]
+ * @property savedStateHandle [SavedStateHandle]
  */
 @HiltViewModel
 class BackupsViewModel @Inject constructor(
@@ -45,6 +47,7 @@ class BackupsViewModel @Inject constructor(
     private val monitorBackupFolder: MonitorBackupFolder,
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val monitorViewType: MonitorViewType,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     /**
@@ -58,17 +61,19 @@ class BackupsViewModel @Inject constructor(
     val state: StateFlow<BackupsState> = _state
 
     /**
-     * The My Backups Folder Node
+     * The Backups Folder Node Id from [SavedStateHandle] when Backups was initialized
      */
-    private var myBackupsFolderNode: NodeId = NodeId(-1L)
+    private val originalBackupsNodeId =
+        NodeId(savedStateHandle.get<Long>(BackupsFragment.PARAM_BACKUPS_HANDLE) ?: -1L)
 
     /**
-     * Perform the following actions upon ViewModel initialization
+     * Performs the following actions upon ViewModel initialization
      */
     init {
         observeNodeUpdates()
-        observeMyBackupsFolderUpdates()
+        observeUserRootBackupsFolder()
         observeViewType()
+        handleOriginalBackupsNodeHandle()
     }
 
     /**
@@ -79,30 +84,76 @@ class BackupsViewModel @Inject constructor(
     fun state() = _state.value
 
     /**
-     * Uses [monitorNodeUpdates] to observe any Node updates
-     *
-     * A received Node update will refresh the list of nodes and hide the multiple item selection feature
+     * Retrieve and update the Child Backups Nodes from the Original Backups Handle received from
+     * the [SavedStateHandle]
      */
-    private fun observeNodeUpdates() = viewModelScope.launch {
-        monitorNodeUpdates().collect {
-            _state.update { it.copy(isPendingRefresh = true) }
+    private fun handleOriginalBackupsNodeHandle() = viewModelScope.launch {
+        runCatching {
+            refreshNodes(nodeHandle = originalBackupsNodeId.longValue).also { backupsNodePair ->
+                val parentBackupsNode = backupsNodePair.first
+                val toolbarName = getToolbarName(parentBackupsNode)
+
+                _state.update {
+                    it.copy(
+                        originalBackupsNodeId = originalBackupsNodeId,
+                        currentBackupsFolderNodeId = originalBackupsNodeId,
+                        nodes = backupsNodePair.second,
+                        currentBackupsFolderName = toolbarName,
+                    )
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+            _state.update { state ->
+                state.copy(
+                    originalBackupsNodeId = originalBackupsNodeId,
+                    currentBackupsFolderNodeId = originalBackupsNodeId,
+                    nodes = emptyList(),
+                    currentBackupsFolderName = null,
+                )
+            }
         }
     }
 
     /**
-     * Uses [monitorBackupFolder] to observe any updates in the My Backups folder
+     * Retrieves the Toolbar Title from the Backups node
+     *
+     * A null Toolbar Title is set if the Backups Node is null or both Backups Node and Root
+     * Backups Folder Node handles are the same
+     *
+     * @param backupsNode A potentially nullable Backups node
+     * @return a potentially nullable Toolbar Title
      */
-    private fun observeMyBackupsFolderUpdates() = viewModelScope.launch {
+    private fun getToolbarName(backupsNode: MegaNode?): String? = when {
+        backupsNode == null ||
+                backupsNode.handle == _state.value.rootBackupsFolderNodeId.longValue -> null
+
+        else -> backupsNode.name
+    }
+
+    /**
+     * Observes any Node Updates through [MonitorNodeUpdates]
+     */
+    private fun observeNodeUpdates() = viewModelScope.launch {
+        monitorNodeUpdates()
+            .catch { Timber.e(it) }
+            .collect { _state.update { it.copy(isPendingRefresh = true) } }
+    }
+
+    /**
+     * Observes the User's Root Backup Folder through [MonitorBackupFolder] and updates
+     * [BackupsState.rootBackupsFolderNodeId] when an Update is received
+     */
+    private fun observeUserRootBackupsFolder() = viewModelScope.launch {
         monitorBackupFolder()
-            .catch { Timber.w("Exception monitoring backups folder: $it") }
+            .catch { Timber.w("Exception monitoring the User's Root Backups Folder: $it") }
             .map {
-                // Emit an Invalid Handle if the Result is a failure
-                Timber.e("Unable to retrieve the My Backups Folder")
+                Timber.e("Unable to retrieve the User's Root Backups Folder")
                 it.getOrDefault(NodeId(MegaApiJava.INVALID_HANDLE))
             }
-            .collectLatest { newMyBackupsFolder ->
-                Timber.d("The My Backups Folder Handle is: ${newMyBackupsFolder.longValue}")
-                onMyBackupsFolderUpdateReceived(newMyBackupsFolder)
+            .collectLatest { updatedUserRootBackupsFolder ->
+                Timber.d("The updated User Root Backups Folder Handle is: ${updatedUserRootBackupsFolder.longValue}")
+                _state.update { it.copy(rootBackupsFolderNodeId = updatedUserRootBackupsFolder) }
             }
     }
 
@@ -110,111 +161,97 @@ class BackupsViewModel @Inject constructor(
      * Uses [monitorViewType] to observe any View Type updates
      */
     private fun observeViewType() = viewModelScope.launch {
-        monitorViewType().collect { viewType ->
-            _state.update { it.copy(currentViewType = viewType) }
-        }
-    }
-
-    /**
-     *
-     * Processes updates received from the My Backups Folder
-     *
-     * If the Backups Handle is invalid, use the My Backups Folder Handle to refresh the
-     * list of Nodes
-     *
-     * Update the UI State values after performing a successful refresh
-     *
-     * @param newMyBackupsFolder The updated My Backups Folder
-     */
-    private suspend fun onMyBackupsFolderUpdateReceived(newMyBackupsFolder: NodeId) {
-        myBackupsFolderNode = newMyBackupsFolder
-
-        _state.update { backupsState ->
-            if (backupsState.backupsHandle == -1L) {
-                refreshNodes(newMyBackupsFolder.longValue).let { updatedNodes ->
-                    backupsState.copy(
-                        backupsHandle = newMyBackupsFolder.longValue,
-                        nodes = updatedNodes,
-                    )
-                }
-            } else {
-                refreshNodes().let { updatedNodes ->
-                    backupsState.copy(nodes = updatedNodes)
-                }
-            }
-        }
+        monitorViewType()
+            .catch { Timber.e(it) }
+            .collect { viewType -> _state.update { it.copy(currentViewType = viewType) } }
     }
 
     /**
      * Refreshes Backups nodes and hides the selection
      */
     fun refreshBackupsNodesAndHideSelection() = viewModelScope.launch {
-        refreshNodes().let { updatedNodes ->
-            _state.update {
-                it.copy(
-                    hideMultipleItemSelection = true,
-                    nodes = updatedNodes,
-                )
+        runCatching {
+            refreshNodes().let { backupsNodePair ->
+                val toolbarName = getToolbarName(backupsNodePair.first)
+                _state.update {
+                    it.copy(
+                        hideMultipleItemSelection = true,
+                        nodes = backupsNodePair.second,
+                        currentBackupsFolderName = toolbarName,
+                    )
+                }
             }
-        }
+        }.onFailure { Timber.e(it) }
     }
 
     /**
      * Refreshes the list of Backups Nodes
      */
     fun refreshBackupsNodes() = viewModelScope.launch {
-        refreshNodes().also { setNodes(it) }
+        runCatching {
+            refreshNodes().also { backupsNodePair ->
+                val toolbarName = getToolbarName(backupsNodePair.first)
+                _state.update {
+                    it.copy(
+                        nodes = backupsNodePair.second,
+                        currentBackupsFolderName = toolbarName,
+                    )
+                }
+            }
+        }.onFailure { Timber.e(it) }
     }
 
     /**
-     * Retrieves the list of Nodes by performing the following steps:
+     * Retrieves the list of Nodes
      *
-     * 2. Check if [BackupsState.backupsHandle] equals -1L or [MegaApiJava.INVALID_HANDLE]. If either condition is true, return an empty list
-     * 3. Call the Use Case [getNodeByHandle] to retrieve the Parent Node from [BackupsState.backupsHandle]. If the Parent Node is null, return an empty list
-     * 4. Call the Use Case [getChildrenNode] to retrieve and return the list of Nodes under the Parent Node
+     * @param nodeHandle The Node Handle used to retrieve the current list of Nodes. Defaults to [BackupsState.currentBackupsFolderNodeId]
      *
-     * @param nodeHandle The Node Handle used to retrieve the current list of Nodes. Defaults to [BackupsState.backupsHandle]
-     *
-     * @return a List of Backup Nodes
+     * @return a Pair containing the potentially nullable Parent Backups Node and its Children Backups Nodes
      */
-    private suspend fun refreshNodes(nodeHandle: Long = _state.value.backupsHandle): List<MegaNode> =
-        if (nodeHandle != -1L) {
-            getNodeByHandle(nodeHandle)?.let { parentNode ->
-                getChildrenNode(
-                    parent = parentNode,
-                    order = getCloudSortOrder(),
-                )
-            }.orEmpty()
-        } else {
-            emptyList()
-        }
+    private suspend fun refreshNodes(nodeHandle: Long = _state.value.currentBackupsFolderNodeId.longValue): Pair<MegaNode?, List<MegaNode>> {
+        val parentBackupsNode = getNodeByHandle(nodeHandle)
+        val childrenBackupsNodes = parentBackupsNode?.let {
+            getChildrenNode(
+                parent = parentBackupsNode,
+                order = getCloudSortOrder()
+            )
+        } ?: emptyList()
+        return Pair(parentBackupsNode, childrenBackupsNodes)
+    }
 
     /**
-     * Handles the Back Press Behavior from Backups after checking certain conditions
+     * Handles the Back Press Behavior
+     *
+     * Either one of the following conditions will cause the User to exit the Backups page:
+     *
+     * 1. The User is in the same page as with the Original Backups Node Handle
+     * 2. The Parent Backup Node Handle of [BackupsState.currentBackupsFolderNodeId] is null
      */
     fun handleBackPress() {
         viewModelScope.launch {
-            // Either one of the following conditions will constitute the user exiting the screen:
-            // 1. The My Backups Folder Handle is -1L
-            // 2. The Handles of the My Backups Folder and the UI State are the same
-            // 3. The retrieved Parent Node Handle does not exist
-            val backupsHandle = _state.value.backupsHandle
-
-            if (myBackupsFolderNode.longValue == -1L || myBackupsFolderNode.longValue == backupsHandle) {
+            val currentBackupsFolderNodeId = _state.value.currentBackupsFolderNodeId
+            if (currentBackupsFolderNodeId == originalBackupsNodeId) {
                 onExitBackups(true)
             } else {
-                getParentNodeHandle(backupsHandle)?.let { parentNodeHandle ->
-                    // Proceed to retrieve the Nodes of the Parent Node
-                    _state.update { backupsState ->
-                        refreshNodes(parentNodeHandle).let { updatedNodes ->
-                            backupsState.copy(
-                                backupsHandle = parentNodeHandle,
-                                triggerBackPress = true,
-                                nodes = updatedNodes,
-                            )
+                runCatching {
+                    val parentBackupsNodeHandle =
+                        getParentNodeHandle(currentBackupsFolderNodeId.longValue)
+                    parentBackupsNodeHandle?.let { nonNullParentBackupsNodeHandle ->
+                        refreshNodes(nodeHandle = nonNullParentBackupsNodeHandle).also { backupsNodePair ->
+                            val toolbarName = getToolbarName(backupsNodePair.first)
+                            _state.update {
+                                it.copy(
+                                    currentBackupsFolderNodeId = NodeId(
+                                        nonNullParentBackupsNodeHandle
+                                    ),
+                                    triggerBackPress = true,
+                                    nodes = backupsNodePair.second,
+                                    currentBackupsFolderName = toolbarName,
+                                )
+                            }
                         }
-                    }
-                } ?: run { onExitBackups(true) }
+                    } ?: onExitBackups(true)
+                }.onFailure { Timber.e(it) }
             }
         }
     }
@@ -244,46 +281,38 @@ class BackupsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [BackupsState.nodes]
-     *
-     * @param nodes The List of Nodes
-     */
-    private fun setNodes(nodes: List<MegaNode>) {
-        _state.update { it.copy(nodes = nodes) }
-    }
-
-    /**
-     * Notifies [BackupsState.backupsHandle] that the Backups screen has handled the Backups Handle
+     * Updates the Current Backups Folder Node ID [BackupsState.currentBackupsFolderNodeId]
      *
      * @param nodeHandle The new Backups Handle
      */
     fun updateBackupsHandle(nodeHandle: Long) {
-        onBackupsHandle(nodeHandle)
+        _state.update { it.copy(currentBackupsFolderNodeId = NodeId(nodeHandle)) }
     }
 
     /**
-     * Checks whether the the Backups screen is currently on the Backups Folder level by comparing
-     * the Node Handles of [BackupsState.backupsHandle] and [myBackupsFolderNode]
+     * Returns the [Long] equivalent of Current Backups Folder Node ID [BackupsState.currentBackupsFolderNodeId]
      *
-     * @return true if both values are equal or [BackupsState.backupsHandle] is -1L, and false if otherwise
+     * @return The Current Backups Folder Handle
      */
-    fun isCurrentlyOnBackupFolderLevel(): Boolean = with(_state.value) {
-        (this.backupsHandle == myBackupsFolderNode.longValue) || this.backupsHandle == -1L
-    }
+    fun getCurrentBackupsFolderHandle() = _state.value.currentBackupsFolderNodeId.longValue
 
     /**
-     * Given a [Long], the function updates the value of [BackupsState.backupsHandle]
+     * Checks whether the User is currently in the Root Backups Folder level or not
      *
-     * @param backupsHandle The Backups Handle
+     * @return true if the User is currently in the Root Backups Folder level, and false if otherwise
      */
-    private fun onBackupsHandle(backupsHandle: Long) {
-        _state.update { it.copy(backupsHandle = backupsHandle) }
-    }
+    fun isUserInRootBackupsFolderLevel() = _state.value.isUserInRootBackupsFolderLevel
+
+    /**
+     * Returns the Toolbar Name from [BackupsState.currentBackupsFolderName]
+     *
+     * @return The Toolbar Name
+     */
+    fun getToolbarName() = _state.value.currentBackupsFolderName
 
     /**
      * Notifies [BackupsState.hideMultipleItemSelection] that the Backups screen has handled the hiding
      * of the Multiple Item Selection by setting its value to false
-     *
      */
     fun hideMultipleItemSelectionHandled() {
         _state.update { it.copy(hideMultipleItemSelection = false) }

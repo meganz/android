@@ -360,6 +360,8 @@ class ManagerViewModel @Inject constructor(
                     // Default to an Invalid Handle of -1L when an error occurs
                     it.getOrDefault(NodeId(-1L))
                 }.collectLatest { backupsFolderNodeId ->
+                    _state.update { it.copy(userRootBackupsFolderHandle = backupsFolderNodeId) }
+                    // This will be removed in a later refactor
                     MegaNodeUtil.myBackupHandle = backupsFolderNodeId.longValue
                 }
         }
@@ -410,7 +412,8 @@ class ManagerViewModel @Inject constructor(
 
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
-            AppFeatures.QRCodeCompose.takeIf { getFeatureFlagValueUseCase(it) }
+            AppFeatures.QRCodeCompose.takeIf { getFeatureFlagValueUseCase(it) },
+            AppFeatures.DeviceCenter.takeIf { getFeatureFlagValueUseCase(it) },
         )
     }
 

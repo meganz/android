@@ -59,7 +59,6 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.HasBackupsChildren
-import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
@@ -118,6 +117,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
 import kotlin.test.assertFalse
 
 @ExperimentalCoroutinesApi
@@ -254,7 +254,7 @@ class ManagerViewModelTest {
     private val getFullAccountInfoUseCase = mock<GetFullAccountInfoUseCase>()
     private val restoreNodesUseCase = mock<RestoreNodesUseCase>()
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
-    private val monitorBackupFolder = mock<MonitorBackupFolder>()
+    private val monitorBackupFolder = FakeMonitorBackupFolder()
     private val moveNodesToRubbishUseCase = mock<MoveNodesToRubbishUseCase>()
     private val deleteNodesUseCase = mock<DeleteNodesUseCase>()
     private val moveNodesUseCase = mock<MoveNodesUseCase>()
@@ -362,6 +362,20 @@ class ManagerViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
     }
+
+    @Test
+    fun `test that the user root backups folder node id is set when an update is received`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            underTest.state.map { it.userRootBackupsFolderHandle }.distinctUntilChanged()
+                .test {
+                    val newValue = NodeId(123456L)
+                    assertThat(awaitItem()).isEqualTo(NodeId(-1L))
+                    monitorBackupFolder.emit(Result.success(newValue))
+                    testScheduler.advanceUntilIdle()
+                    assertThat(awaitItem()).isEqualTo(newValue)
+                }
+        }
 
     @Test
     fun `test that is first navigation level is updated if new value provided`() = runTest {

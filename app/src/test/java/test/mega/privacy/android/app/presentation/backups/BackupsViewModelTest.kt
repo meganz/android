@@ -1,28 +1,26 @@
 package test.mega.privacy.android.app.presentation.backups
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.FakeMonitorViewType
 import nz.mega.sdk.MegaNode
 import org.junit.Rule
 import org.junit.jupiter.api.AfterAll
@@ -30,12 +28,18 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
+import java.util.stream.Stream
 
 /**
  * Test class for [BackupsViewModel]
@@ -52,33 +56,35 @@ internal class BackupsViewModelTest {
 
     private val monitorBackupFolder = FakeMonitorBackupFolder()
     private val monitorNodeUpdates = FakeMonitorUpdates()
-    private val monitorViewType = mock<MonitorViewType>()
+    private val monitorViewType = FakeMonitorViewType()
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @BeforeAll
-    internal fun setUp() {
+    fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     @BeforeEach
-    internal fun resetMocks() {
+    fun resetMocks() {
         reset(
             getChildrenNode,
             getCloudSortOrder,
             getNodeByHandle,
             getParentNodeHandle,
-            monitorViewType,
         )
     }
 
     @AfterAll
-    internal fun tearDown() {
+    fun tearDown() {
         Dispatchers.resetMain()
     }
 
-    private fun setUnderTest() {
+    private fun setUnderTest(originalBackupsHandle: Long = -1L) {
+        val savedStateHandle = SavedStateHandle(
+            mapOf(BackupsFragment.PARAM_BACKUPS_HANDLE to originalBackupsHandle)
+        )
         underTest = BackupsViewModel(
             getChildrenNode = getChildrenNode,
             getCloudSortOrder = getCloudSortOrder,
@@ -87,45 +93,133 @@ internal class BackupsViewModelTest {
             monitorBackupFolder = monitorBackupFolder,
             monitorNodeUpdates = monitorNodeUpdates,
             monitorViewType = monitorViewType,
+            savedStateHandle = savedStateHandle,
         )
     }
 
     @Test
-    internal fun `test that initial state is returned`() = runTest {
-        setUnderTest()
+    fun `test that the backups content is populated when the original backups node handle is set`() =
+        runTest {
+            val originalBackupsHandle = 123456L
+            val originalBackupsNodeId = NodeId(originalBackupsHandle)
+            val backupsNode = mock<MegaNode> {
+                on { name }.thenReturn("Parent Node Name")
+            }
+            val childBackupsNodeList = listOf(mock<MegaNode>())
 
-        underTest.state.test {
-            val initialState = awaitItem()
-            assertThat(initialState.hideMultipleItemSelection).isFalse()
-            assertThat(initialState.backupsHandle).isEqualTo(-1L)
-            assertThat(initialState.nodes).isEmpty()
-            assertThat(initialState.shouldExitBackups).isFalse()
-            assertThat(initialState.triggerBackPress).isFalse()
-            assertThat(initialState.currentViewType).isEqualTo(ViewType.LIST)
+            whenever(getNodeByHandle(any())).thenReturn(backupsNode)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(
+                getChildrenNode(
+                    parent = backupsNode,
+                    order = getCloudSortOrder(),
+                )
+            ).thenReturn(
+                childBackupsNodeList
+            )
+
+            setUnderTest(originalBackupsHandle = originalBackupsHandle)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.originalBackupsNodeId).isEqualTo(originalBackupsNodeId)
+                assertThat(state.currentBackupsFolderNodeId).isEqualTo(originalBackupsNodeId)
+                assertThat(state.nodes).isEqualTo(childBackupsNodeList)
+            }
         }
-    }
 
     @Test
-    internal fun `test that isPendingRefresh is true when receiving a node update`() = runTest {
-        val backupsNode = mock<MegaNode> {
-            on { this.handle }.thenReturn(BACKUPS_NODE_HANDLE)
-        }
-        val retrievedNode = mock<MegaNode> {
-            on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
-        }
-        whenever(getNodeByHandle(any())).thenReturn(backupsNode)
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(
-            getChildrenNode(
-                parent = backupsNode,
-                order = getCloudSortOrder(),
-            )
-        ).thenReturn(listOf(retrievedNode))
+    fun `test that the original and current backups node ids are still set when an exception occurs from populating the backups content`() =
+        runTest {
+            val originalBackupsHandle = 123456L
+            val originalBackupsNodeId = NodeId(originalBackupsHandle)
 
+            whenever(getNodeByHandle(any())).thenThrow(RuntimeException())
+
+            setUnderTest(originalBackupsHandle = originalBackupsHandle)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.originalBackupsNodeId).isEqualTo(originalBackupsNodeId)
+                assertThat(state.currentBackupsFolderNodeId).isEqualTo(originalBackupsNodeId)
+                assertThat(state.nodes).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that the current backups folder name is set when refreshing the backup nodes`() =
+        runTest {
+            val parentBackupsNodeName = "Parent Node Name"
+            val originalBackupsHandle = 123456L
+            val parentBackupsNode = mock<MegaNode> {
+                on { handle }.thenReturn(originalBackupsHandle)
+                on { name }.thenReturn(parentBackupsNodeName)
+            }
+
+            whenever(getNodeByHandle(any())).thenReturn(parentBackupsNode)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(
+                getChildrenNode(
+                    parent = parentBackupsNode,
+                    order = getCloudSortOrder(),
+                )
+            ).thenReturn(emptyList())
+
+            setUnderTest(originalBackupsHandle = originalBackupsHandle)
+            monitorBackupFolder.emit(Result.success(NodeId(789012L)))
+            underTest.refreshBackupsNodes()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.currentBackupsFolderName).isEqualTo(parentBackupsNodeName)
+            }
+        }
+
+    @Test
+    fun `test that the current backups folder name is null when refreshing the backup nodes and the parent node is null`() =
+        runTest {
+            whenever(getNodeByHandle(any())).thenReturn(null)
+
+            setUnderTest(originalBackupsHandle = 123456L)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.currentBackupsFolderName).isNull()
+            }
+        }
+
+    @Test
+    fun `test that the current backups folder name is null when refreshing the backup nodes and the user is in the root backups folder level`() =
+        runTest {
+            val originalBackupsHandle = 123456L
+            val parentBackupsNode = mock<MegaNode> {
+                on { handle }.thenReturn(originalBackupsHandle)
+                on { name }.thenReturn("Parent Node Name")
+            }
+
+            whenever(getNodeByHandle(any())).thenReturn(parentBackupsNode)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(
+                getChildrenNode(
+                    parent = parentBackupsNode,
+                    order = getCloudSortOrder(),
+                )
+            ).thenReturn(emptyList())
+
+            setUnderTest(originalBackupsHandle = originalBackupsHandle)
+            monitorBackupFolder.emit(Result.success(NodeId(originalBackupsHandle)))
+            underTest.refreshBackupsNodes()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.currentBackupsFolderName).isNull()
+            }
+        }
+
+    @Test
+    fun `test that a pending node refresh occurs when a node update is received`() = runTest {
         setUnderTest()
-
-        underTest.updateBackupsHandle(BACKUPS_NODE_HANDLE)
-        monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
+        monitorNodeUpdates.emit(NodeUpdate(mapOf()))
 
         underTest.state.test {
             val state = awaitItem()
@@ -134,14 +228,43 @@ internal class BackupsViewModelTest {
     }
 
     @Test
-    internal fun `test that nodes are not refreshed when receiving a node update and the backups handle is invalid`() =
+    fun `test that the user root backups folder node id is set when an update is received`() =
         runTest {
+            val updatedRootBackupsFolderNodeId = NodeId(123456L)
+
+            setUnderTest()
+            monitorBackupFolder.emit(Result.success(updatedRootBackupsFolderNodeId))
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.rootBackupsFolderNodeId).isEqualTo(updatedRootBackupsFolderNodeId)
+            }
+        }
+
+    @Test
+    fun `test that the view type is set when an update is received`() = runTest {
+        val updatedViewType = ViewType.GRID
+
+        setUnderTest()
+        monitorViewType.emit(updatedViewType)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.currentViewType).isEqualTo(ViewType.GRID)
+        }
+    }
+
+    @Test
+    fun `test that calling refreshBackupNodesAndHideSelection will refresh the backups content and hide the multiple item selection`() =
+        runTest {
+            val originalBackupsHandle = 123456L
             val backupsNode = mock<MegaNode> {
-                on { this.handle }.thenReturn(BACKUPS_NODE_HANDLE)
+                on { name }.thenReturn("Parent Node Name")
+                on { handle }.thenReturn(originalBackupsHandle)
             }
-            val retrievedNode = mock<MegaNode> {
-                on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
-            }
+            val childBackupsNodeList = listOf(mock<MegaNode>())
+
+            // Prepare values for when the ViewModel is initialized
             whenever(getNodeByHandle(any())).thenReturn(backupsNode)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
             whenever(
@@ -149,275 +272,117 @@ internal class BackupsViewModelTest {
                     parent = backupsNode,
                     order = getCloudSortOrder(),
                 )
-            ).thenReturn(listOf(retrievedNode))
-
-            setUnderTest()
-
-            val update = mapOf(mock<Node>() to emptyList<NodeChanges>())
-            monitorNodeUpdates.emit(NodeUpdate(update))
-
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.nodes).isEmpty()
-            }
-        }
-
-    @Test
-    internal fun `test that when receiving a my backups folder update, the nodes are refreshed`() =
-        runTest {
-            val backupsNode = mock<MegaNode> {
-                on { this.handle }.thenReturn(BACKUPS_NODE_HANDLE)
-            }
-            val myBackupsNode = mock<NodeId> {
-                on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
-            }
-            val retrievedNode = mock<MegaNode> {
-                on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
-            }
-            whenever(getNodeByHandle(any())).thenReturn(backupsNode)
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-            whenever(
-                getChildrenNode(
-                    parent = backupsNode,
-                    order = getCloudSortOrder(),
-                )
-            ).thenReturn(listOf(retrievedNode))
-
-            setUnderTest()
-
-            underTest.updateBackupsHandle(BACKUPS_NODE_HANDLE)
-            monitorBackupFolder.emit(Result.success(myBackupsNode))
-
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.backupsHandle).isEqualTo(BACKUPS_NODE_HANDLE)
-                assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
-            }
-        }
-
-    @Test
-    internal fun `test that when receiving a my backups folder update, the nodes are refreshed using the my backups folder node handle`() =
-        runTest {
-            val backupsNode = mock<MegaNode> {
-                on { this.handle }.thenReturn(BACKUPS_NODE_HANDLE)
-            }
-            val myBackupsNode = mock<NodeId> {
-                on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
-            }
-            val retrievedNode = mock<MegaNode> {
-                on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
-            }
-            whenever(getNodeByHandle(any())).thenReturn(backupsNode)
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-            whenever(
-                getChildrenNode(
-                    parent = backupsNode,
-                    order = getCloudSortOrder(),
-                )
-            ).thenReturn(listOf(retrievedNode))
-
-            setUnderTest()
-
-            monitorBackupFolder.emit(Result.success(myBackupsNode))
-
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.backupsHandle).isEqualTo(myBackupsNode.longValue)
-                assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
-            }
-        }
-
-    @Test
-    internal fun `test that the backups handle is updated if a new value is provided`() = runTest {
-        setUnderTest()
-
-        underTest.state.map { it.backupsHandle }.distinctUntilChanged()
-            .test {
-                val newHandle = 123456L
-                assertThat(awaitItem()).isEqualTo(-1L)
-                underTest.updateBackupsHandle(newHandle)
-                assertThat(awaitItem()).isEqualTo(newHandle)
-            }
-    }
-
-    @Test
-    internal fun `test that the multiple item selection has been handled`() = runTest {
-        setUnderTest()
-
-        underTest.hideMultipleItemSelectionHandled()
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.hideMultipleItemSelection).isFalse()
-        }
-    }
-
-    @Test
-    internal fun `test that exiting the backups page has been handled`() = runTest {
-        setUnderTest()
-
-        underTest.exitBackupsHandled()
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.shouldExitBackups).isFalse()
-        }
-    }
-
-    @Test
-    internal fun `test that the back press has been handled`() = runTest {
-        setUnderTest()
-
-        underTest.triggerBackPressHandled()
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.triggerBackPress).isFalse()
-        }
-    }
-
-    @Test
-    internal fun `test that the user is currently on the backup folder level`() = runTest {
-        val myBackupsNode = mock<NodeId> {
-            on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
-        }
-        val backupsNode = mock<MegaNode> {
-            on { this.handle }.thenReturn(BACKUPS_NODE_HANDLE)
-        }
-        val retrievedNode = mock<MegaNode> {
-            on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
-        }
-        whenever(getNodeByHandle(any())).thenReturn(backupsNode)
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(
-            getChildrenNode(
-                parent = backupsNode,
-                order = getCloudSortOrder(),
+            ).thenReturn(
+                childBackupsNodeList
             )
-        ).thenReturn(listOf(retrievedNode))
 
-        setUnderTest()
+            setUnderTest(originalBackupsHandle = originalBackupsHandle)
 
-        monitorBackupFolder.emit(Result.success(myBackupsNode))
+            val updatedChildBackupsNodeList = listOf(mock<MegaNode>())
 
-        assertThat(underTest.isCurrentlyOnBackupFolderLevel()).isTrue()
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.backupsHandle).isEqualTo(myBackupsNode.longValue)
-        }
-    }
+            // Prepare values for when the ViewModel function gets called
+            whenever(
+                getChildrenNode(
+                    parent = backupsNode,
+                    order = getCloudSortOrder(),
+                )
+            ).thenReturn(
+                updatedChildBackupsNodeList
+            )
 
-    @Test
-    internal fun `test that the user is currently on the backup folder level if the backups handle is invalid`() =
-        runTest {
-            setUnderTest()
-
-            assertThat(underTest.isCurrentlyOnBackupFolderLevel()).isTrue()
+            underTest.refreshBackupsNodesAndHideSelection()
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.backupsHandle).isEqualTo(-1L)
+                assertThat(state.hideMultipleItemSelection).isTrue()
+                assertThat(state.nodes).isEqualTo(updatedChildBackupsNodeList)
             }
         }
 
     @Test
-    internal fun `test that the user exits the backups page on back press if the my backups folder handle is -1L`() =
+    fun `test that calling updateBackupsHandle updates the current backups folder node id`() =
         runTest {
+            val updatedBackupsHandle = 123456L
+
             setUnderTest()
+            underTest.updateBackupsHandle(updatedBackupsHandle)
 
-            monitorBackupFolder.emit(Result.success(NodeId(-1L)))
-
-            underTest.state.map { it.shouldExitBackups }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isFalse()
-                    underTest.handleBackPress()
-                    assertThat(awaitItem()).isTrue()
-                }
-        }
-
-    @Test
-    internal fun `test that the user exits the backups page on back press if both the my backups folder and backups ui state have the same handles`() =
-        runTest {
-            val myBackupsNode = mock<NodeId> {
-                on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.currentBackupsFolderNodeId).isEqualTo(NodeId(updatedBackupsHandle))
             }
-            setUnderTest()
-
-            monitorBackupFolder.emit(Result.success(myBackupsNode))
-
-            underTest.state.map { it.shouldExitBackups }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isFalse()
-                    with(underTest) {
-                        updateBackupsHandle(MY_BACKUPS_HANDLE)
-                        handleBackPress()
-                    }
-                    assertThat(awaitItem()).isTrue()
-                }
         }
 
     @Test
-    internal fun `test that the user exits the backups page on back press if the parent node handle is null`() =
+    fun `test that calling getCurrentBackupsFolderHandle returns the current backups folder node handle`() =
         runTest {
-            val myBackupsNode = mock<NodeId> {
-                on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
-            }
-            whenever(getParentNodeHandle(any())).thenReturn(null)
-
-            setUnderTest()
-
-            monitorBackupFolder.emit(Result.success(myBackupsNode))
-
-            underTest.state.map { it.shouldExitBackups }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isFalse()
-                    with(underTest) {
-                        updateBackupsHandle(BACKUPS_NODE_HANDLE)
-                        handleBackPress()
-                    }
-                    assertThat(awaitItem()).isTrue()
-                }
+            val originalBackupsHandle = 123456L
+            setUnderTest(originalBackupsHandle = originalBackupsHandle)
+            assertThat(underTest.getCurrentBackupsFolderHandle()).isEqualTo(originalBackupsHandle)
         }
 
-    @Test
-    internal fun `test that the nodes are updated on back press`() = runTest {
-        val parentNode = mock<MegaNode> {
-            on { it.handle }.thenReturn(654L)
-        }
-        val myBackupsNode = mock<NodeId> {
-            on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
-        }
-        val retrievedNode = mock<MegaNode> {
-            on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
-        }
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(getParentNodeHandle(any())).thenReturn(654L)
-        whenever(getNodeByHandle(any())).thenReturn(parentNode)
-        whenever(
-            getChildrenNode(
-                parent = parentNode,
-                order = getCloudSortOrder()
-            )
-        ).thenReturn(listOf(retrievedNode))
+    @ParameterizedTest(name = "when the current backups handle is {0} and the root backups folder handle is {1}, then is user in root backups folder level is {2}")
+    @ArgumentsSource(RootBackupsFolderLevelTestArgumentsSource::class)
+    fun `test that the user could be in the root backups folder level`(
+        currentBackupsHandle: Long,
+        rootBackupsFolderHandle: Long,
+        isUserInRootBackupsFolderLevel: Boolean,
+    ) = runTest {
+        setUnderTest(originalBackupsHandle = currentBackupsHandle)
+        monitorBackupFolder.emit(Result.success(NodeId(rootBackupsFolderHandle)))
+        assertThat(underTest.isUserInRootBackupsFolderLevel()).isEqualTo(
+            isUserInRootBackupsFolderLevel
+        )
+    }
 
-        setUnderTest()
-
-        monitorBackupFolder.emit(Result.success(myBackupsNode))
-
-        with(underTest) {
-            updateBackupsHandle(BACKUPS_NODE_HANDLE)
-            handleBackPress()
-        }
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.backupsHandle).isEqualTo(654L)
-            assertThat(state.triggerBackPress).isTrue()
-            assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
-        }
+    /**
+     * The implementation of the [ArgumentsProvider] to test if the User is in the Root Backups
+     * Folder or not
+     */
+    private class RootBackupsFolderLevelTestArgumentsSource : ArgumentsProvider {
+        override fun provideArguments(context: ExtensionContext): Stream<out Arguments> = Stream.of(
+            Arguments.of(123456L, 123456L, true),
+            Arguments.of(789012L, 123456L, false),
+        )
     }
 
     @Test
-    internal fun `test that get order returns cloud sort order`() = runTest {
+    fun `test that calling exitBackupsHandled resets the should exit backups condition to false`() =
+        runTest {
+            setUnderTest()
+            underTest.exitBackupsHandled()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.shouldExitBackups).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that calling triggerBackPressHandled resets the trigger back press condition to false`() =
+        runTest {
+            setUnderTest()
+            underTest.triggerBackPressHandled()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.triggerBackPress).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that calling hideMultipleItemSelectionHandled resets the hide multiple item selection condition to false`() =
+        runTest {
+            setUnderTest()
+            underTest.hideMultipleItemSelectionHandled()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.hideMultipleItemSelection).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that calling getOrder returns the cloud sort order`() = runTest {
         val expected = SortOrder.ORDER_SIZE_DESC
         whenever(getCloudSortOrder()).thenReturn(expected)
 
@@ -426,9 +391,143 @@ internal class BackupsViewModelTest {
         assertThat(underTest.getOrder()).isEqualTo(expected)
     }
 
-    internal companion object {
-        private const val MY_BACKUPS_HANDLE = 12L
-        private const val BACKUPS_NODE_HANDLE = 34L
-        private const val RETRIEVED_NODE_HANDLE = 56L
-    }
+    @Test
+    fun `test that calling markHandledPendingRefresh resets the pending node refresh condition to false`() =
+        runTest {
+            setUnderTest()
+            underTest.markHandledPendingRefresh()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isPendingRefresh).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the user exits the backups page when doing a back navigation and the user is in the original backups folder level`() =
+        runTest {
+            val originalBackupsHandle = 123456L
+            setUnderTest(originalBackupsHandle = originalBackupsHandle)
+            underTest.handleBackPress()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.currentBackupsFolderNodeId).isEqualTo(NodeId(originalBackupsHandle))
+                assertThat(state.shouldExitBackups).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that the user exits the backups page when doing a back navigation and the parent backups node of the current backups node id is null`() =
+        runTest {
+            val originalBackupsHandle = 123456L
+            val newCurrentBackupsFolderNodeId = 789012L
+
+            whenever(getParentNodeHandle(any())).thenReturn(null)
+
+            // On ViewModel initialization, set the Original Backups Node ID to the current Backups Node ID
+            setUnderTest(originalBackupsHandle = originalBackupsHandle)
+            // Change the current Backups Node ID
+            underTest.updateBackupsHandle(newCurrentBackupsFolderNodeId)
+            // User does a Back navigation after the current Backups Node ID has been updated
+            underTest.handleBackPress()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.currentBackupsFolderNodeId).isNotEqualTo(
+                    NodeId(
+                        originalBackupsHandle
+                    )
+                )
+                assertThat(state.shouldExitBackups).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that the user goes back to the previous backups folder level when doing a back navigation`() =
+        runTest {
+            val originalBackupsHandle = 123456L
+            val originalBackupsNodeId = NodeId(originalBackupsHandle)
+            val newCurrentBackupsFolderNodeId = 789012L
+
+            val backupsNode = mock<MegaNode> {
+                on { name }.thenReturn("Parent Node Name")
+            }
+            val childBackupsNodeList = listOf(mock<MegaNode>())
+
+            // Prepare values for when the ViewModel is initialized
+            whenever(getNodeByHandle(any())).thenReturn(backupsNode)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(
+                getChildrenNode(
+                    parent = backupsNode,
+                    order = getCloudSortOrder(),
+                )
+            ).thenReturn(
+                childBackupsNodeList
+            )
+
+            // On ViewModel initialization, set the Original Backups Node ID to the current Backups Node ID
+            setUnderTest(originalBackupsHandle = originalBackupsHandle)
+            underTest.state.test {
+                // Verify the state values after initializing the ViewModel
+                val state = awaitItem()
+                assertThat(state.originalBackupsNodeId).isEqualTo(originalBackupsNodeId)
+                assertThat(state.currentBackupsFolderNodeId).isEqualTo(originalBackupsNodeId)
+                assertThat(state.nodes).isEqualTo(childBackupsNodeList)
+            }
+
+            val updatedBackupsNode = mock<MegaNode> {
+                on { name }.thenReturn("Updated Backups Node Name")
+            }
+            val updatedChildBackupsNodeList = listOf(mock<MegaNode>())
+
+            // Prepare values for when the Backups Nodes get refreshed
+            whenever(getNodeByHandle(any())).thenReturn(updatedBackupsNode)
+            whenever(
+                getChildrenNode(
+                    parent = updatedBackupsNode,
+                    order = getCloudSortOrder(),
+                )
+            ).thenReturn(
+                updatedChildBackupsNodeList
+            )
+
+            // Change the current Backups Node ID and refresh the Backups Nodes
+            underTest.updateBackupsHandle(newCurrentBackupsFolderNodeId)
+            underTest.refreshBackupsNodes()
+            underTest.state.test {
+                // Verify the state values after setting the new Current Backups Node ID and
+                // refreshing the Backups Nodes
+                val state = awaitItem()
+                assertThat(state.currentBackupsFolderNodeId).isEqualTo(
+                    NodeId(newCurrentBackupsFolderNodeId)
+                )
+                assertThat(state.nodes).isEqualTo(updatedChildBackupsNodeList)
+            }
+
+            // Prepare values for when the users performs a Back Navigation
+            // The content should be the same as when the ViewModel was initialized
+            whenever(getParentNodeHandle(any())).thenReturn(originalBackupsHandle)
+            whenever(getNodeByHandle(any())).thenReturn(backupsNode)
+            whenever(
+                getChildrenNode(
+                    parent = backupsNode,
+                    order = getCloudSortOrder(),
+                )
+            ).thenReturn(
+                childBackupsNodeList
+            )
+
+            // User performs a Back navigation
+            underTest.handleBackPress()
+            underTest.state.test {
+                // Verify the state values after performing a Back Navigation. The content should be
+                // the same as when the ViewModel was initialized
+                val state = awaitItem()
+                assertThat(state.currentBackupsFolderNodeId).isEqualTo(NodeId(originalBackupsHandle))
+                assertThat(state.nodes).isEqualTo(childBackupsNodeList)
+                assertThat(state.triggerBackPress).isTrue()
+            }
+        }
 }

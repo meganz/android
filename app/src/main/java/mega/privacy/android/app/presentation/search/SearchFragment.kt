@@ -704,13 +704,13 @@ class SearchFragment : RotatableFragment() {
      */
     private fun newSearchNodesTask() {
         searchViewModel.performSearch(
-            fileBrowserViewModel.state.value.fileBrowserHandle,
-            rubbishBinViewModel.state.value.rubbishBinHandle,
-            backupsViewModel.state.value.backupsHandle,
-            incomingSharesViewModel.state.value.incomingHandle,
-            outgoingSharesViewModel.state.value.outgoingHandle,
-            legacyLinksViewModel.state.value.linksHandle,
-            managerViewModel.state.value.isFirstNavigationLevel
+            browserParentHandle = fileBrowserViewModel.state.value.fileBrowserHandle,
+            rubbishBinParentHandle = rubbishBinViewModel.state.value.rubbishBinHandle,
+            backupsParentHandle = backupsViewModel.state.value.currentBackupsFolderNodeId.longValue,
+            incomingParentHandle = incomingSharesViewModel.state.value.incomingHandle,
+            outgoingParentHandle = outgoingSharesViewModel.state.value.outgoingHandle,
+            linksParentHandle = legacyLinksViewModel.state.value.linksHandle,
+            isFirstNavigationLevel = managerViewModel.state.value.isFirstNavigationLevel,
         )
     }
 

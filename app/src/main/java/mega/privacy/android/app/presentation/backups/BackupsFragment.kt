@@ -16,9 +16,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
+import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -99,7 +101,7 @@ class BackupsFragment : RotatableFragment() {
     private var lastPositionStack: Stack<Int>? = null
     private var actionMode: ActionMode? = null
 
-    private val viewModel by activityViewModels<BackupsViewModel>()
+    private val viewModel by viewModels<BackupsViewModel>()
     private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
 
     /**
@@ -321,7 +323,6 @@ class BackupsFragment : RotatableFragment() {
      */
     private fun setupToolbar() {
         (requireActivity() as? ManagerActivity)?.run {
-            this.setToolbarTitle()
             this.invalidateOptionsMenu()
         }
     }
@@ -334,7 +335,7 @@ class BackupsFragment : RotatableFragment() {
             requireActivity(),
             this,
             emptyList(),
-            state().backupsHandle,
+            state().currentBackupsFolderNodeId.longValue,
             binding?.backupsRecyclerView,
             Constants.BACKUPS_ADAPTER,
             if (state().currentViewType == ViewType.LIST) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
@@ -370,6 +371,9 @@ class BackupsFragment : RotatableFragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
                     Timber.d("Node Count from ViewModel is ${it.nodes.size}")
+                    val toolbarName = it.currentBackupsFolderName
+                        ?: getString(R.string.home_side_menu_backups_title)
+                    (requireActivity() as ManagerActivity).setToolbarTitle(toolbarName)
                     handleViewTypeUpdate(it.currentViewType)
                     setNodes(it.nodes.toMutableList())
                     setContent()
@@ -410,7 +414,7 @@ class BackupsFragment : RotatableFragment() {
             EventObserver { showSortByPanel() }
         )
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.refreshBackupsNodes()
+            refreshBackupsNodes()
         })
     }
 
@@ -453,8 +457,6 @@ class BackupsFragment : RotatableFragment() {
 
     /**
      * Invalidates the [NewGridRecyclerView]
-     *
-     * This function is used by [ManagerActivity.refreshBackupsList]
      */
     fun invalidateRecyclerView() = binding?.backupsRecyclerView?.invalidate()
 
@@ -728,11 +730,8 @@ class BackupsFragment : RotatableFragment() {
                         updateBackupsHandle(selectedNode.handle)
                         refreshBackupsNodes()
                     }
-                    // Notify ManagerActivity to invalidate the Options Menu and set the new Toolbar Title
-                    with(requireActivity() as ManagerActivity) {
-                        invalidateOptionsMenu()
-                        setToolbarTitle()
-                    }
+                    // Notify ManagerActivity to invalidate the Options Menu
+                    (requireActivity() as ManagerActivity).invalidateOptionsMenu()
 
                     // Update the RecyclerView scrolling behavior
                     binding?.backupsRecyclerView?.scrollToPosition(0)
@@ -789,7 +788,7 @@ class BackupsFragment : RotatableFragment() {
             if (megaNodeAdapter == null) {
                 // Call the method from ManagerActivity to move back to the previous Drawer Item
                 exitBackupsPage()
-            } else if (comesFromNotifications && comesFromNotificationHandle == state().backupsHandle) {
+            } else if (comesFromNotifications && comesFromNotificationHandle == state().currentBackupsFolderNodeId.longValue) {
                 // Handle behavior if the Backups Page is accessed through a Notification
                 comesFromNotifications = false
                 comesFromNotificationHandle = -1
@@ -807,12 +806,8 @@ class BackupsFragment : RotatableFragment() {
      * Executes certain behavior when a Back Press is handled
      */
     private fun onBackPressedHandled() {
-        // Notify ManagerActivity to invalidate the Options Menu and set the new Toolbar Title
-        with(requireActivity() as ManagerActivity) {
-            invalidateOptionsMenu()
-            setToolbarTitle()
-        }
-
+        // Notify ManagerActivity to invalidate the Options Menu
+        (requireActivity() as ManagerActivity).invalidateOptionsMenu()
         // Pop the last position stack
         popLastPositionStack()
     }
@@ -869,7 +864,7 @@ class BackupsFragment : RotatableFragment() {
             if (getNodeCount() == 0) {
                 backupsRecyclerView.visibility = View.GONE
                 backupsNoItemsGroup.visibility = View.VISIBLE
-                if (viewModel.isCurrentlyOnBackupFolderLevel()) {
+                if (viewModel.isUserInRootBackupsFolderLevel()) {
                     setEmptyFolderTextContent(
                         title = getString(R.string.backups_empty_state_title),
                         description = getString(R.string.backups_empty_state_body)
@@ -944,13 +939,49 @@ class BackupsFragment : RotatableFragment() {
         return HtmlCompat.fromHtml(textToFormat, HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 
+    /**
+     * Updates the Current Backups Handle
+     *
+     * @param backupsHandle The new Backups Handle
+     */
+    fun updateBackupsHandle(backupsHandle: Long) = viewModel.updateBackupsHandle(backupsHandle)
+
+    /**
+     * Returns the Current Backups Folder Handle
+     *
+     * @return The Current Backups Folder Handle
+     */
+    fun getCurrentBackupsFolderHandle(): Long = viewModel.getCurrentBackupsFolderHandle()
+
+    /**
+     * Returns the Toolbar Name
+     *
+     * @return The Toolbar Name
+     */
+    fun getToolbarName() = viewModel.getToolbarName()
+
+    /**
+     * Refreshes the list of Backups Nodes
+     */
+    fun refreshBackupsNodes() = viewModel.refreshBackupsNodes()
+
     companion object {
+
+        /**
+         * The Backups Handle used to load its contents
+         */
+        const val PARAM_BACKUPS_HANDLE = "PARAM_BACKUPS_HANDLE"
+
         /**
          * Creates a new instance of [BackupsFragment]
          */
-        fun newInstance(): BackupsFragment {
+        fun newInstance(backupsHandle: Long): BackupsFragment {
             Timber.d("newInstance()")
-            return BackupsFragment()
+            val fragment = BackupsFragment()
+            fragment.arguments = bundleOf(
+                PARAM_BACKUPS_HANDLE to backupsHandle,
+            )
+            return fragment
         }
     }
 }

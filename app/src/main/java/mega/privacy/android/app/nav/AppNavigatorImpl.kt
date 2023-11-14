@@ -17,9 +17,12 @@ internal interface AppNavigatorImpl : AppNavigator {
         )
     }
 
-    override fun openBackup(activity: Activity) {
+    override fun openNodeInBackups(activity: Activity, backupsHandle: Long) {
         if (activity is ManagerActivity) {
-            activity.selectDrawerItem(DrawerItem.BACKUPS)
+            activity.selectDrawerItem(
+                item = DrawerItem.BACKUPS,
+                backupsHandle = backupsHandle,
+            )
         }
     }
 

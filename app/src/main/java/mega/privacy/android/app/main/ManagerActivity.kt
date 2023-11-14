@@ -160,7 +160,6 @@ import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.backups.BackupsFragment
-import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsDownloadViewModel
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
@@ -375,7 +374,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     internal val fileBrowserViewModel: FileBrowserViewModel by viewModels()
     internal val incomingSharesViewModel: IncomingSharesViewModel by viewModels()
     internal val outgoingSharesViewModel: OutgoingSharesViewModel by viewModels()
-    internal val backupsViewModel: BackupsViewModel by viewModels()
     internal val legacyLinksViewModel: LegacyLinksViewModel by viewModels()
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
     internal val searchViewModel: SearchViewModel by viewModels()
@@ -1430,7 +1428,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                                     megaApi.inboxNode?.handle -> {
                                         drawerItem = DrawerItem.BACKUPS
-                                        backupsViewModel.updateBackupsHandle(handleIntent)
+                                        backupsFragment?.updateBackupsHandle(handleIntent)
                                         selectDrawerItem(drawerItem)
                                         selectDrawerItemPending = false
                                     }
@@ -2373,7 +2371,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 rubbishBinViewModel.setRubbishBinHandle(handleIntent)
                 DrawerItem.RUBBISH_BIN
             } else if (megaApi.isInInbox(parentIntentN)) {
-                backupsViewModel.updateBackupsHandle(handleIntent)
+                backupsFragment?.updateBackupsHandle(handleIntent)
                 DrawerItem.BACKUPS
             } else {
                 fileBrowserViewModel.setBrowserParentHandle(handleIntent)
@@ -2870,11 +2868,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            DrawerItem.SYNC,
-            DrawerItem.DEVICE_CENTER,
-            -> {
-                viewModel.setIsFirstNavigationLevel(false)
-            }
+            DrawerItem.SYNC -> viewModel.setIsFirstNavigationLevel(false)
 
             DrawerItem.RUBBISH_BIN -> {
                 supportActionBar?.subtitle = null
@@ -2895,23 +2889,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             DrawerItem.SHARED_ITEMS -> {
                 setToolbarForSharedItemsDrawerItem()
-            }
-
-            DrawerItem.BACKUPS -> {
-                supportActionBar?.subtitle = null
-                // If the Backups Parent Handle is equal to the My Backups Folder Handle or is -1L,
-                // then set the corresponding title and first navigation level
-                if (backupsViewModel.isCurrentlyOnBackupFolderLevel()) {
-                    supportActionBar?.title =
-                        resources.getString(R.string.home_side_menu_backups_title)
-                    viewModel.setIsFirstNavigationLevel(true)
-                } else {
-                    val node = withContext(ioDispatcher) {
-                        megaApi.getNodeByHandle(backupsViewModel.state().backupsHandle)
-                    }
-                    supportActionBar?.title = node?.name
-                    viewModel.setIsFirstNavigationLevel(false)
-                }
             }
 
             DrawerItem.NOTIFICATIONS -> {
@@ -3584,6 +3561,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *                  is a chat or a meeting and select the corresponding tab as the initial tab.
      * @param cloudDriveNodeHandle The Node Handle used to access the Cloud Drive feature. It is
      * set to -1 by default
+     * @param backupsHandle The Backups Node Handle used to load its contents in the Backups feature.
+     * The value is set to -1 by default if no other Backups Node Handle is passed
+     * @param isCalledFromBackNavigation True if this function is called as a result of a Back
+     * Navigation event, and false if otherwise
      */
     @SuppressLint("NewApi")
     @JvmOverloads
@@ -3591,6 +3572,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         item: DrawerItem?,
         chatId: Long? = null,
         cloudDriveNodeHandle: Long = -1L,
+        backupsHandle: Long = -1L,
+        isCalledFromBackNavigation: Boolean = false,
     ) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         if (!this::drawerLayout.isInitialized) {
@@ -3689,14 +3672,18 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             DrawerItem.DEVICE_CENTER -> {
-                deviceCenterFragment =
-                    supportFragmentManager.findFragmentByTag(FragmentTag.DEVICE_CENTER.tag) as? DeviceCenterFragment
-                        ?: DeviceCenterFragment.newInstance()
+                viewModel.setIsFirstNavigationLevel(true)
                 setBottomNavigationMenuItemChecked(NO_BNV)
                 supportInvalidateOptionsMenu()
-                deviceCenterFragment?.let { replaceFragment(it, FragmentTag.DEVICE_CENTER.tag) }
                 showFabButton()
                 hideAdsView()
+
+                if (!isCalledFromBackNavigation || deviceCenterFragment == null) {
+                    deviceCenterFragment = DeviceCenterFragment.newInstance()
+                }
+                deviceCenterFragment?.let {
+                    replaceFragment(it, FragmentTag.DEVICE_CENTER.tag)
+                }
             }
 
             DrawerItem.SYNC -> {
@@ -3762,22 +3749,26 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             DrawerItem.BACKUPS -> {
+                viewModel.setIsFirstNavigationLevel(false)
                 showHideBottomNavigationView(true)
                 appBarLayout.visibility = View.VISIBLE
-                backupsFragment =
-                    supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
-                if (backupsFragment == null) {
-                    backupsFragment = BackupsFragment.newInstance()
-                }
-                backupsFragment?.let { replaceFragment(it, FragmentTag.BACKUPS.tag) }
                 if (openFolderRefresh) {
                     onNodesBackupsUpdate()
                     openFolderRefresh = false
                 }
                 supportInvalidateOptionsMenu()
-                setToolbarTitle()
                 showFabButton()
                 hideAdsView()
+
+                // Default to the User's Root Backups Folder handle if no Backups Handle is passed
+                backupsFragment = BackupsFragment.newInstance(
+                    backupsHandle = if (backupsHandle == -1L) {
+                        viewModel.state().userRootBackupsFolderHandle.longValue
+                    } else backupsHandle
+                )
+                backupsFragment?.let {
+                    replaceFragment(it, FragmentTag.BACKUPS.tag)
+                }
             }
 
             DrawerItem.SHARED_ITEMS -> {
@@ -3843,13 +3834,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private suspend fun navigateToSearchActivity() {
         searchExpand = false
         val parentHandle = viewModel.getParentHandleForSearch(
-            fileBrowserViewModel.state.value.fileBrowserHandle,
-            rubbishBinViewModel.state.value.rubbishBinHandle,
-            backupsViewModel.state.value.backupsHandle,
-            incomingSharesViewModel.state.value.incomingHandle,
-            outgoingSharesViewModel.state.value.outgoingHandle,
-            legacyLinksViewModel.state.value.linksHandle,
-            searchType,
+            browserParentHandle = fileBrowserViewModel.state.value.fileBrowserHandle,
+            rubbishBinParentHandle = rubbishBinViewModel.state.value.rubbishBinHandle,
+            backupsParentHandle = backupsFragment?.getCurrentBackupsFolderHandle() ?: -1L,
+            incomingParentHandle = incomingSharesViewModel.state.value.incomingHandle,
+            outgoingParentHandle = outgoingSharesViewModel.state.value.outgoingHandle,
+            linksParentHandle = legacyLinksViewModel.state.value.linksHandle,
+            searchType = searchType,
         )
 
         val searchActivityIntent = SearchActivity.getIntent(
@@ -4090,11 +4081,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             DrawerItem.BACKUPS -> {
-                backupsFragment =
-                    supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
-                if (backupsFragment != null) {
-                    backupsFragment?.checkScroll()
-                }
+                backupsFragment?.checkScroll()
             }
 
             DrawerItem.SHARED_ITEMS -> {
@@ -4363,13 +4350,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     } else {
                         searchViewModel.setSearchQuery(newText)
                         searchViewModel.performSearch(
-                            fileBrowserViewModel.state().fileBrowserHandle,
-                            rubbishBinViewModel.state().rubbishBinHandle,
-                            backupsViewModel.state().backupsHandle,
-                            incomingSharesViewModel.state().incomingHandle,
-                            outgoingSharesViewModel.state().outgoingHandle,
-                            legacyLinksViewModel.state().linksHandle,
-                            viewModel.state().isFirstNavigationLevel
+                            browserParentHandle = fileBrowserViewModel.state().fileBrowserHandle,
+                            rubbishBinParentHandle = rubbishBinViewModel.state().rubbishBinHandle,
+                            backupsParentHandle = backupsFragment?.getCurrentBackupsFolderHandle()
+                                ?: -1L,
+                            incomingParentHandle = incomingSharesViewModel.state().incomingHandle,
+                            outgoingParentHandle = outgoingSharesViewModel.state().outgoingHandle,
+                            linksParentHandle = legacyLinksViewModel.state().linksHandle,
+                            isFirstNavigationLevel = viewModel.state().isFirstNavigationLevel,
                         )
                     }
                 }
@@ -4426,7 +4414,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 DrawerItem.PHOTOS -> {}
                 DrawerItem.BACKUPS -> {
                     moreMenuItem.isVisible = false
-                    if ((getBackupsFragment()?.getNodeCount() ?: 0) > 0) {
+                    if ((backupsFragment?.getNodeCount() ?: 0) > 0) {
                         searchMenuItem?.isVisible = true
                     }
                 }
@@ -4562,7 +4550,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         return when (item.itemId) {
             android.R.id.home -> {
                 if (isFirstNavigationLevel && drawerItem !== DrawerItem.SEARCH) {
-                    if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.TRANSFERS) {
+                    if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.TRANSFERS) {
                         backToDrawerItem(bottomNavigationCurrentItem)
                         if (transfersToImageViewer) {
                             switchImageViewerToFront()
@@ -4608,10 +4596,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             onBackPressedDispatcher.onBackPressed()
                         }
                     } else if (drawerItem === DrawerItem.BACKUPS) {
-                        backupsFragment =
-                            supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
-                        if (backupsFragment != null) {
-                            backupsFragment?.onBackPressed()
+                        backupsFragment?.let {
+                            it.onBackPressed()
                             return true
                         }
                     } else if (drawerItem === DrawerItem.SEARCH) {
@@ -4692,9 +4678,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         fullscreenOfflineFragment?.selectAll()
                     }
 
-                    DrawerItem.BACKUPS -> if (getBackupsFragment() != null) {
-                        backupsFragment?.selectAll()
-                    }
+                    DrawerItem.BACKUPS -> backupsFragment?.selectAll()
 
                     DrawerItem.SEARCH -> if (getSearchFragment() != null) {
                         searchFragment?.selectAll()
@@ -4830,15 +4814,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         rubbishBinViewModel.refreshNodes()
     }
 
-    /**
-     * Refreshes the contents of [BackupsFragment] once a sorting method has been selected
-     */
-    private fun refreshBackupsFragment() {
-        if (backupsFragment != null) {
-            backupsViewModel.refreshBackupsNodes()
-        }
-    }
-
     private fun refreshSearch() {
         if (getSearchFragment() != null) {
             searchFragment?.hideMultipleSelect()
@@ -4894,13 +4869,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 switchImageViewerToFront()
             }
         } else if (drawerItem === DrawerItem.BACKUPS) {
-            backupsFragment = supportFragmentManager
-                .findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
-            if (backupsFragment == null) {
-                backToDrawerItem(bottomNavigationCurrentItem)
-            } else {
-                backupsFragment?.onBackPressed()
-            }
+            backupsFragment?.onBackPressed() ?: backToDrawerItem(bottomNavigationCurrentItem)
         } else if (drawerItem === DrawerItem.NOTIFICATIONS) {
             backToDrawerItem(bottomNavigationCurrentItem)
         } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
@@ -5026,9 +4995,23 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     /**
      * Exits the Backups Page
+     *
+     * When the Device Center Feature Flag is enabled, exiting Backups will redirect the User back
+     * to Device Center
+     *
+     * Otherwise, the User goes back to the previous Bottom Navigation Fragment
      */
     fun exitBackupsPage() {
-        backToDrawerItem(bottomNavigationCurrentItem)
+        val isDeviceCenterFeatureFlagEnabled =
+            viewModel.state.value.enabledFlags.contains(AppFeatures.DeviceCenter)
+        if (isDeviceCenterFeatureFlagEnabled) {
+            selectDrawerItem(
+                item = DrawerItem.DEVICE_CENTER,
+                isCalledFromBackNavigation = true,
+            )
+        } else {
+            backToDrawerItem(bottomNavigationCurrentItem)
+        }
     }
 
     private fun backToDrawerItem(item: Int) {
@@ -5262,8 +5245,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
 
                 DrawerItem.BACKUPS -> {
-                    backupsViewModel.updateBackupsHandle(oldParentHandle)
-                    refreshBackupsList()
+                    backupsFragment?.let {
+                        it.updateBackupsHandle(oldParentHandle)
+                        it.invalidateRecyclerView()
+                    }
                 }
 
                 DrawerItem.SHARED_ITEMS -> {
@@ -5392,7 +5377,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 DrawerItem.CLOUD_DRIVE -> parentHandle =
                     fileBrowserViewModel.getSafeBrowserParentHandle()
 
-                DrawerItem.BACKUPS -> parentHandle = backupsViewModel.state().backupsHandle
+                DrawerItem.BACKUPS -> parentHandle =
+                    backupsFragment?.getCurrentBackupsFolderHandle() ?: -1L
+
                 DrawerItem.RUBBISH_BIN -> parentHandle =
                     rubbishBinViewModel.state().rubbishBinHandle
 
@@ -5434,7 +5421,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             }
 
                             DrawerItem.BACKUPS -> parentHandle =
-                                backupsViewModel.state().backupsHandle
+                                backupsFragment?.getCurrentBackupsFolderHandle() ?: -1L
 
                             else -> {}
                         }
@@ -5785,15 +5772,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         sharesPageAdapter.refreshFragment(SharesTab.LINKS_TAB.position)
     }
 
+    /**
+     * Refresh the Cloud Order
+     */
     fun refreshCloudOrder() {
-        // Refresh Cloud Fragment
         refreshCloudDrive()
-
-        // Refresh Rubbish Fragment
         refreshRubbishBin()
-
-        // Refresh Backups Fragment
-        refreshBackupsFragment()
+        backupsFragment?.refreshBackupsNodes()
         onNodesSharedUpdate()
         refreshSearch()
     }
@@ -5812,7 +5797,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun setParentHandleBackups(parentHandleBackups: Long) {
         Timber.d("setParentHandleBackups: %s", parentHandleBackups)
-        backupsViewModel.updateBackupsHandle(parentHandleBackups)
+        backupsFragment?.updateBackupsHandle(parentHandleBackups)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -7221,8 +7206,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 // Backups
                 drawerItem = DrawerItem.BACKUPS
                 openFolderRefresh = true
-                comesFromNotificationHandleSaved = backupsViewModel.state().backupsHandle
-                backupsViewModel.updateBackupsHandle(nodeHandle)
+
+                comesFromNotificationHandleSaved =
+                    backupsFragment?.getCurrentBackupsFolderHandle() ?: -1L
+                backupsFragment?.updateBackupsHandle(nodeHandle)
+
                 selectDrawerItem(drawerItem)
             }
 
@@ -7254,10 +7242,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     fun onNodesBackupsUpdate() {
-        backupsFragment =
-            supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
-        backupsFragment?.hideMultipleSelect()
-        backupsViewModel.refreshBackupsNodes()
+        backupsFragment?.let {
+            it.hideMultipleSelect()
+            it.refreshBackupsNodes()
+        }
     }
 
     fun onNodesSearchUpdate() {
@@ -7275,12 +7263,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun refreshLinks() {
         legacyLinksViewModel.refreshLinksSharesNode()
-    }
-
-    fun refreshBackupsList() {
-        backupsFragment =
-            supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
-        backupsFragment?.invalidateRecyclerView()
     }
 
     fun refreshSharesFragments() {
@@ -7660,7 +7642,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             DrawerItem.BACKUPS -> {
-                backupsViewModel.updateBackupsHandle(handle)
+                backupsFragment?.updateBackupsHandle(handle)
                 refreshFragment(FragmentTag.BACKUPS.tag)
             }
 
@@ -7879,12 +7861,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun getBackupsFragment(): BackupsFragment? {
-        return (supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment).also {
-            backupsFragment = it
-        }
-    }
-
     private val chatsFragment: ChatTabsFragment?
         get() = (supportFragmentManager.findFragmentByTag(FragmentTag.RECENT_CHAT.tag) as? ChatTabsFragment).also {
             chatTabsFragment = it
@@ -7900,7 +7876,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> refreshCloudDrive()
             DrawerItem.RUBBISH_BIN -> refreshRubbishBin()
-            DrawerItem.BACKUPS -> refreshBackupsList()
+            DrawerItem.BACKUPS -> backupsFragment?.invalidateRecyclerView()
             DrawerItem.SHARED_ITEMS -> {
                 refreshOutgoingShares()
                 refreshIncomingShares()

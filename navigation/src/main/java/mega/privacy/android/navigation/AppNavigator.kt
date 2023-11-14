@@ -16,11 +16,12 @@ interface AppNavigator {
     fun openSettingsCameraUploads(activity: Activity)
 
     /**
-     * Open backup
+     * Navigates to the Backups page to load the contents of the Backup Folder
      *
-     * @param activity
+     * @param activity the Activity
+     * @param backupsHandle The Backups Handle used to load its contents
      */
-    fun openBackup(activity: Activity)
+    fun openNodeInBackups(activity: Activity, backupsHandle: Long)
 
     /**
      * Navigates to the Cloud Drive page to view the selected Node

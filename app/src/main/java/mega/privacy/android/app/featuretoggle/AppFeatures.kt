@@ -97,12 +97,19 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables the Device Center functionality by displaying "Device center" in the Dashboard
-     * Side Menu
+     * Shows the Dashboard Side Menu entrypoint named "Device centre"
+     *
+     * The Device Center shows the list of Devices that have uploaded content through Camera Uploads
+     * or Backups.
+     *
+     * Enabling this Feature Flag will hide the "Backups" Dashboard Side Menu entrypoint, and Backups
+     * can only be accessed inside Device Center when clicking a Device Backup Folder
      */
     DeviceCenter(
-        "Enables the Device Center in the Dashboard Side Menu. The Device Center shows " +
-                "the list of Devices that have uploaded content through Camera Uploads or Backups.",
+        "Shows the Dashboard Side Menu entrypoint named \"Device centre\". The Device Center shows " +
+                "the list of Devices that have uploaded content through Camera Uploads or Backups. " +
+                "Enabling this Feature Flag will hide the \"Backups\" Dashboard Side Menu entrypoint, and " +
+                "Backups can only be accessed inside Device Center when clicking a Device Backup Folder.",
         false,
     ),
 
