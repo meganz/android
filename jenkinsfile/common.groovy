@@ -230,9 +230,12 @@ void checkoutMegaChatSdkByBranch(String megaChatBranch) {
 String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
-        link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
-        return link
+        try {
+            final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
+            link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
+        } catch (Exception e) {
+            link = "Failed to upload file ${fileName} to GitLab(${e.toString()})"
+        }
     }
     return link
 }

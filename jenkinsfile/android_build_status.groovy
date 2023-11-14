@@ -801,7 +801,8 @@ def archiveUnitTestReport(String reportPath, String targetFileName) {
 def unitTestArchiveLink(String reportPath, String archiveTargetName) {
     String result
     if (archiveUnitTestReport(reportPath, archiveTargetName)) {
-        unitTestFileLink = uploadFileToGitLab(archiveTargetName)
+        common = load('jenkinsfile/common.groovy')
+        unitTestFileLink = common.uploadFileToGitLab(archiveTargetName)
         result = "${unitTestFileLink}"
     } else {
         result = "Unit Test report not available, perhaps test code has compilation error. Please check full build log."
@@ -834,24 +835,6 @@ String getArtifactoryDevelopCodeCoverage(String coveragePath) {
             returnStdout: true).trim()
     print("artifactory develop coverage path(${coveragePath}): ${summary}")
     return summary
-}
-
-/**
- * upload file to GitLab and return the GitLab link
- * @param fileName the local file to be uploaded
- * @return file link on GitLab
- */
-private String uploadFileToGitLab(String fileName) {
-    String link = ""
-    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        try {
-            final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
-            link = new JsonSlurperClassic().parseText(response).markdown
-        } catch (Exception e) {
-            link = "Failed to upload file ${fileName} to GitLab(${e.toString()})"
-        }
-    }
-    return link
 }
 
 /**

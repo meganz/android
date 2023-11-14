@@ -50,7 +50,7 @@ pipeline {
                 common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
                 if (hasGitLabMergeRequest()) {
-                    String link = uploadFileToGitLab(CONSOLE_LOG_FILE)
+                    String link = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
 
                     def message = ""
                     if (triggeredByDeliverInternalAppSharing()) {
@@ -68,7 +68,7 @@ pipeline {
             script {
                 if (hasGitLabMergeRequest()) {
                     common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-                    String link = uploadFileToGitLab(CONSOLE_LOG_FILE)
+                    String link = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
 
                     if (triggeredByDeliverInternalAppSharing()) {
                         def message = releaseSuccessMessage("<br/>", common) +
@@ -382,20 +382,3 @@ private boolean triggeredByDeliverInternalAppSharing() {
             env.gitlabTriggerPhrase != null &&
             env.gitlabTriggerPhrase == "deliver_internalAppSharing"
 }
-
-/**
- * upload file to GitLab and return the GitLab link
- * @param fileName the local file to be uploaded
- * @return file link on GitLab
- */
-private String uploadFileToGitLab(String fileName) {
-    String link = ""
-    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        // upload Jenkins console log to GitLab and get download link
-        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
-        link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
-        return link
-    }
-    return link
-}
-
