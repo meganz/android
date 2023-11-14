@@ -86,13 +86,13 @@ class DefaultTransfersRepositoryTest {
 
     @BeforeAll
     fun setUp() = runTest {
-        //need to stub this methods as are called on init
-        whenever(megaApiGateway.areUploadTransfersPaused()).thenReturn(false)
-        whenever(megaApiGateway.areDownloadTransfersPaused()).thenReturn(false)
         underTest = createDefaultTransfersRepository()
     }
 
-    private fun createDefaultTransfersRepository(): DefaultTransfersRepository {
+    private suspend fun createDefaultTransfersRepository(paused: Boolean = false): DefaultTransfersRepository {
+        //need to stub this method as it's called on init
+        whenever(localStorageGateway.getTransferQueueStatus()).thenReturn(paused)
+        stubPauseTransfers(paused)
         return DefaultTransfersRepository(
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
@@ -746,13 +746,11 @@ class DefaultTransfersRepositoryTest {
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
-    fun `test that monitor paused transfers initial value is set by megaApiGateway current value`(
+    fun `test that paused transfers initial value is changed when MegaLocalStorageGateway indicates it should be paused`(
         expected: Boolean,
     ) = runTest {
-        whenever(megaApiGateway.areUploadTransfersPaused()).thenReturn(expected)
-        whenever(megaApiGateway.areDownloadTransfersPaused()).thenReturn(expected)
         //creating a new instance of DefaultTransfersRepository because monitorPausedTransfers is cached
-        val flow = createDefaultTransfersRepository().monitorPausedTransfers()
+        val flow = createDefaultTransfersRepository(expected).monitorPausedTransfers()
         assertThat(flow.value).isEqualTo(expected)
     }
 
@@ -761,13 +759,11 @@ class DefaultTransfersRepositoryTest {
     fun `test that monitor paused transfers is updated when pauseTransfers is updated`(
         expected: Boolean,
     ) = runTest {
-        whenever(megaApiGateway.areUploadTransfersPaused()).thenReturn(!expected)
-        whenever(megaApiGateway.areDownloadTransfersPaused()).thenReturn(!expected)
-        stubPauseTransfers(expected)
         //creating a new instance of DefaultTransfersRepository because monitorPausedTransfers is cached
-        val underTest = createDefaultTransfersRepository()
+        val underTest = createDefaultTransfersRepository(!expected)
         val flow = underTest.monitorPausedTransfers()
         assertThat(flow.value).isEqualTo(!expected) //just to be sure the value will be updated after emitting a new value
+        stubPauseTransfers(expected)
         underTest.pauseTransfers(expected)
         assertThat(flow.value).isEqualTo(expected)
     }

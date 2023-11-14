@@ -324,4 +324,11 @@ interface MegaLocalStorageGateway {
      * @param isPause
      */
     suspend fun setTransferQueueStatus(isPause: Boolean)
+
+    /**
+     * Get transfer queue status
+     *
+     * @return true if is paused, false otherwise
+     */
+    suspend fun getTransferQueueStatus(): Boolean
 }

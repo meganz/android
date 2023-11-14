@@ -104,9 +104,11 @@ internal class DefaultTransfersRepository @Inject constructor(
         HashMap<TransferType, MutableStateFlow<Map<Int, Long>>>()
 
     init {
-        //update monitorPausedTransfer with current sdk value
+        //pause transfers if db indicates it should be paused
         scope.launch {
-            monitorPausedTransfers.emit(megaApiGateway.areUploadTransfersPaused() || megaApiGateway.areDownloadTransfersPaused())
+            if (localStorageGateway.getTransferQueueStatus()) {
+                pauseTransfers(true)
+            }
         }
     }
 

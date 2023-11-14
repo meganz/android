@@ -188,4 +188,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun setTransferQueueStatus(isPause: Boolean) {
         dbHandler.transferQueueStatus = isPause
     }
+
+    override suspend fun getTransferQueueStatus() = dbHandler.transferQueueStatus
 }
