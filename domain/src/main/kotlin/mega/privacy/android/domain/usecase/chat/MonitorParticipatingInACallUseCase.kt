@@ -28,7 +28,7 @@ class MonitorParticipatingInACallUseCase @Inject constructor(
         .distinctUntilChanged()
         .mapNotNull {
             when (it) {
-                ChatCallStatus.Initial,
+                ChatCallStatus.InProgress,
                 ChatCallStatus.WaitingRoom,
                 -> true
 

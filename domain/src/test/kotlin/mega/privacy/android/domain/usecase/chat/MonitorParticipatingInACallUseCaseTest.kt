@@ -54,7 +54,7 @@ internal class MonitorParticipatingInACallUseCaseTest {
             }
             flow.emit(call)
             Truth.assertThat(awaitItem()).isEqualTo(
-                call.status == ChatCallStatus.Initial
+                call.status == ChatCallStatus.InProgress
                         || call.status == ChatCallStatus.WaitingRoom || isParticipatingInChatCall
             )
         }
@@ -86,11 +86,11 @@ internal class MonitorParticipatingInACallUseCaseTest {
     companion object {
         @JvmStatic
         private fun provideParameters(): Stream<Arguments> = Stream.of(
-            Arguments.of(ChatCallStatus.Initial, true),
+            Arguments.of(ChatCallStatus.InProgress, true),
             Arguments.of(ChatCallStatus.WaitingRoom, true),
             Arguments.of(ChatCallStatus.Destroyed, true),
             Arguments.of(ChatCallStatus.TerminatingUserParticipation, true),
-            Arguments.of(ChatCallStatus.Initial, false),
+            Arguments.of(ChatCallStatus.InProgress, false),
             Arguments.of(ChatCallStatus.WaitingRoom, false),
             Arguments.of(ChatCallStatus.Destroyed, false),
             Arguments.of(ChatCallStatus.TerminatingUserParticipation, false),
