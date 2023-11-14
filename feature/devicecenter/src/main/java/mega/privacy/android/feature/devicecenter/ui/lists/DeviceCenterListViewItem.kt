@@ -12,17 +12,18 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
-import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
+import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
+import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import java.io.File
 
 /**
@@ -39,13 +40,15 @@ internal const val DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG =
  * in the Device Center. Each entry also shows a [CustomDivider]
  *
  * @param uiNode The [DeviceCenterUINode] to be displayed
- * @param onMenuClicked Lambda that performs a specific action when the Menu icon is clicked
  * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
+ * @param onBackupFolderClicked Lambda that performs a specific action when a Backup Folder is clicked
+ * @param onMenuClicked Lambda that performs a specific action when the Menu icon is clicked
  */
 @Composable
 internal fun DeviceCenterListViewItem(
     uiNode: DeviceCenterUINode,
     onDeviceClicked: (DeviceUINode) -> Unit = {},
+    onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit = {},
     onMenuClicked: (DeviceCenterUINode) -> Unit,
 ) {
     ConstraintLayout(
@@ -81,7 +84,13 @@ internal fun DeviceCenterListViewItem(
             isFavourite = false,
             isSharedWithPublicLink = false,
             imageState = remember { mutableStateOf(null as File?) },
-            onClick = { if (uiNode is DeviceUINode) onDeviceClicked(uiNode) },
+            onClick = {
+                when (uiNode) {
+                    is DeviceUINode -> onDeviceClicked(uiNode)
+                    is BackupDeviceFolderUINode -> onBackupFolderClicked(uiNode)
+                    else -> Unit
+                }
+            },
             onMenuClick = { onMenuClicked(uiNode) },
         )
         CustomDivider(

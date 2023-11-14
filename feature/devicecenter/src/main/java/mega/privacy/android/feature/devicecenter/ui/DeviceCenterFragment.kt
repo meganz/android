@@ -71,6 +71,8 @@ class DeviceCenterFragment : Fragment() {
                         uiState = uiState,
                         snackbarHostState = snackbarHostState,
                         onDeviceClicked = viewModel::showDeviceFolders,
+                        // Functionality to be added
+                        onBackupFolderClicked = {},
                         onNodeMenuIconClicked = viewModel::setMenuClickedNode,
                         onCameraUploadsClicked = {
                             megaNavigator.openSettingsCameraUploads(requireActivity())
