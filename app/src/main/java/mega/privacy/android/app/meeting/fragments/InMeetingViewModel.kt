@@ -61,6 +61,7 @@ import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.meeting.EnableAudioLevelMonitorUseCase
+import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -84,21 +85,22 @@ import javax.inject.Inject
 /**
  * InMeetingFragment view model.
  *
- * @property inMeetingRepository            [InMeetingRepository]
- * @property getCallUseCase                 [GetCallUseCase]
- * @property startChatCall                  [StartChatCall]
- * @property getNetworkChangesUseCase       [GetNetworkChangesUseCase]
- * @property getCallStatusChangesUseCase    [GetCallStatusChangesUseCase]
- * @property endCallUseCase                 [EndCallUseCase]
- * @property getParticipantsChangesUseCase  [GetParticipantsChangesUseCase]
- * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
- * @property setChatVideoInDeviceUseCase    [SetChatVideoInDeviceUseCase]
- * @property megaChatApiGateway             [MegaChatApiGateway]
- * @property passcodeManagement             [PasscodeManagement]
- * @property chatManagement                 [ChatManagement]
- * @property sendStatisticsMeetingsUseCase  [SendStatisticsMeetingsUseCase]
- * @property enableAudioLevelMonitorUseCase [EnableAudioLevelMonitorUseCase]
- * @property state                          Current view state as [InMeetingState]
+ * @property inMeetingRepository                [InMeetingRepository]
+ * @property getCallUseCase                     [GetCallUseCase]
+ * @property startChatCall                      [StartChatCall]
+ * @property getNetworkChangesUseCase           [GetNetworkChangesUseCase]
+ * @property getCallStatusChangesUseCase        [GetCallStatusChangesUseCase]
+ * @property endCallUseCase                     [EndCallUseCase]
+ * @property getParticipantsChangesUseCase      [GetParticipantsChangesUseCase]
+ * @property rtcAudioManagerGateway             [RTCAudioManagerGateway]
+ * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
+ * @property megaChatApiGateway                 [MegaChatApiGateway]
+ * @property passcodeManagement                 [PasscodeManagement]
+ * @property chatManagement                     [ChatManagement]
+ * @property sendStatisticsMeetingsUseCase      [SendStatisticsMeetingsUseCase]
+ * @property enableAudioLevelMonitorUseCase     [EnableAudioLevelMonitorUseCase]
+ * @property isAudioLevelMonitorEnabledUseCase  [IsAudioLevelMonitorEnabledUseCase]
+ * @property state                              Current view state as [InMeetingState]
  */
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
@@ -116,6 +118,7 @@ class InMeetingViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val enableAudioLevelMonitorUseCase: EnableAudioLevelMonitorUseCase,
+    private val isAudioLevelMonitorEnabledUseCase: IsAudioLevelMonitorEnabledUseCase,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -712,8 +715,19 @@ class InMeetingViewModel @Inject constructor(
             _chatTitle.value = getTitleChat(it)
         }
 
+        enableAudioLevelMonitor(chatId)
+    }
+
+    /**
+     * Enable audio level monitor
+     *
+     * @param chatId MegaChatHandle of the chat room where enable audio level monitor
+     */
+    fun enableAudioLevelMonitor(chatId: Long) {
         viewModelScope.launch {
-            enableAudioLevelMonitorUseCase(true, chatId)
+            if (!isAudioLevelMonitorEnabledUseCase(chatId)) {
+                enableAudioLevelMonitorUseCase(true, chatId)
+            }
         }
     }
 

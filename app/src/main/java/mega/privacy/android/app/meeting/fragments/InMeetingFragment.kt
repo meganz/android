@@ -1860,6 +1860,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             initLocal(chatId)
         }
 
+        inMeetingViewModel.enableAudioLevelMonitor(chatId)
+
         when {
             !isManualModeView -> {
                 inMeetingViewModel.getCall()?.let {
