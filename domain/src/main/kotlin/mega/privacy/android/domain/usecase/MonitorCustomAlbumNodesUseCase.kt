@@ -1,14 +1,14 @@
 package mega.privacy.android.domain.usecase
 
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.merge
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import javax.inject.Inject
@@ -16,21 +16,32 @@ import javax.inject.Inject
 /**
  * Get custom album nodes use case
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class MonitorCustomAlbumNodesUseCase @Inject constructor(
     private val albumRepository: AlbumRepository,
     private val photosRepository: PhotosRepository,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) {
+    @Volatile
+    private var elements: List<AlbumPhotoId> = listOf()
+
     operator fun invoke(albumId: AlbumId): Flow<List<ImageNode>> = flow {
         emit(getAlbumNodes(albumId))
         emitAll(monitorAlbumNodes(albumId))
-    }.flowOn(defaultDispatcher)
+    }
 
     private suspend fun getAlbumNodes(albumId: AlbumId): List<ImageNode> =
-        albumRepository.getAlbumElementIDs(albumId, refresh = false)
-            .mapNotNull { photosRepository.getImageNode(it.nodeId) }
+        albumRepository.getAlbumElementIDs(albumId, refresh = false).let {
+            elements = it
+            refreshNodes()
+        }
 
-    private fun monitorAlbumNodes(albumId: AlbumId): Flow<List<ImageNode>> =
+    private fun monitorAlbumNodes(albumId: AlbumId): Flow<List<ImageNode>> = merge(
         albumRepository.monitorAlbumElementIds(albumId)
-            .mapLatest { getAlbumNodes(albumId) }
+            .mapLatest { getAlbumNodes(albumId) },
+        photosRepository.monitorImageNodes()
+            .mapLatest { refreshNodes() },
+    )
+
+    private suspend fun refreshNodes(): List<ImageNode> =
+        elements.mapNotNull { photosRepository.getImageNode(it.nodeId) }
 }
