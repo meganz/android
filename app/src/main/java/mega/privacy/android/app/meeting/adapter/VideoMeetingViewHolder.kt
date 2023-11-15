@@ -440,7 +440,7 @@ class VideoMeetingViewHolder(
             session.hasAudio().not().let { value ->
                 binding.muteIcon.isVisible = value
                 binding.speakingIcon.isVisible = false
-                binding.selectedForeground.isVisible = false
+                binding.speakingForeground.isVisible = false
                 if (!isGrid) {
                     binding.participantInfoLayout.isVisible = value
                 }
@@ -449,7 +449,7 @@ class VideoMeetingViewHolder(
             if (session.hasAudio()) {
                 session.isAudioDetected.let { value ->
                     binding.speakingIcon.isVisible = value
-                    binding.selectedForeground.isVisible = value
+                    binding.speakingForeground.isVisible = value
                     binding.muteIcon.isVisible = false
                     if (!isGrid) {
                         binding.participantInfoLayout.isVisible = value
@@ -546,7 +546,8 @@ class VideoMeetingViewHolder(
         if (participant.isSpeaker) {
             Timber.d("Participant is speaker")
             setRoundedCorners(binding.selectedForeground)
-            binding.selectedForeground.isVisible = true
+            setRoundedCorners(binding.speakingForeground)
+            binding.selectedForeground.isVisible = !inMeetingViewModel.isSpeakerSelectionAutomatic
         } else {
             Timber.d("Participant is not selected")
             binding.selectedForeground.isVisible = false
