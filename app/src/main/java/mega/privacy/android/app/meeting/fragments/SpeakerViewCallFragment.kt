@@ -548,6 +548,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             )?.let { participant ->
                 Timber.d("Update the peer selected")
                 textViewName.text = participant.name
+                inMeetingViewModel.getSession(participant.clientId)?.let { session ->
+                    updateRemoteAudioVideo(Constants.TYPE_AUDIO, session)
+                }
                 adapter.updatePeerSelected(participant)
             }
         }
