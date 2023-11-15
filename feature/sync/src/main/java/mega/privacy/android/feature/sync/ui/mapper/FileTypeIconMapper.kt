@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.mapper
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import java.util.TreeMap
 import javax.inject.Inject
 
 /**
@@ -14,7 +15,7 @@ class FileTypeIconMapper @Inject constructor() {
      * @param typedFileNode [TypedFileNode]
      */
     operator fun invoke(fileNode: FileNode): Int =
-        mergedMap[fileNode.type.extension] ?: iconPackR.drawable.ic_generic_list
+        treeMap[fileNode.type.extension] ?: iconPackR.drawable.ic_generic_list
 }
 
 private val textExtensionMap =
@@ -374,3 +375,6 @@ private val mergedMap =
             vectorMap + vobVideoMap + worldMap + pagesMap + xdMap + keyNodeMap +
             numbersMap + sketchMap + urlMap + openFileMap + afterEffectsMap + videoMap
 
+private val treeMap = TreeMap<String, Int>(String.CASE_INSENSITIVE_ORDER).apply {
+    putAll(mergedMap)
+}

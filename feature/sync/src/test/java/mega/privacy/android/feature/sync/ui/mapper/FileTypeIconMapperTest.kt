@@ -35,6 +35,17 @@ class FileTypeIconMapperTest {
         Truth.assertThat(iconRes).isEqualTo(R.drawable.ic_generic_list)
     }
 
+    @Test
+    fun `test that case random cased extension file type will return default icon`() {
+        val typeFileNode = mock<TypedFileNode>()
+        val fileTypeInfo = mock<UnknownFileTypeInfo> { fileType ->
+            whenever(fileType.extension).thenReturn("JpeG")
+        }
+        whenever(typeFileNode.type).thenReturn(fileTypeInfo)
+        val iconRes = underTest(typeFileNode)
+        Truth.assertThat(iconRes).isEqualTo(R.drawable.ic_image_list)
+    }
+
     companion object {
         private val extensionMap =
             arrayOf(
