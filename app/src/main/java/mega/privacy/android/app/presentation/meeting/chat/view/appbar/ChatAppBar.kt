@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
@@ -15,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -78,8 +80,19 @@ internal fun ChatAppBar(
     MegaAppBar(
         appBarType = AppBarType.BACK_NAVIGATION,
         title = uiState.title.orEmpty(),
+        subtitle = getSubtitle(uiState = uiState),
+        modifier = Modifier.clickable {
+            with(uiState) {
+                if (!isJoiningOrLeaving && !isPreviewMode && isConnected
+                    && (isGroup || myPermission != ChatRoomPermission.ReadOnly)
+                ) {
+                    showGroupOrContactInfoActivity()
+                }
+            }
+        },
         onNavigationPressed = onBackPressed,
         titleIcons = { TitleIcons(uiState) },
+        marqueeSubtitle = uiState.userLastGreen != null,
         actions = getChatRoomActions(uiState),
         onActionPressed = onActionPressed@{
             when (it) {
@@ -110,9 +123,7 @@ internal fun ChatAppBar(
             }
         },
         maxActionsToShow = MENU_ACTIONS_TO_SHOW,
-        subtitle = getSubtitle(uiState = uiState),
-        marqueeSubtitle = uiState.userLastGreen != null,
-        elevation = 0.dp
+        elevation = 0.dp,
     )
 }
 

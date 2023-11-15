@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_NOTIFICATION_MUTE
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_PRIVATE_ICON
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_USER_CHAT_STATE
+import mega.privacy.android.core.ui.controls.appbar.TEST_TAG_APP_BAR
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -25,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import test.mega.privacy.android.app.onNodeWithPlural
 import test.mega.privacy.android.app.onNodeWithText
@@ -32,6 +34,7 @@ import test.mega.privacy.android.app.onNodeWithText
 @RunWith(AndroidJUnit4::class)
 class ChatAppBarTest {
     private val actionPressed = mock<(ChatRoomMenuAction) -> Unit>()
+    private val showGroupOrContactInfoActivity = mock<() -> Unit>()
 
     @get:Rule
     var composeTestRule = createAndroidComposeRule<ComponentActivity>()
@@ -67,7 +70,7 @@ class ChatAppBarTest {
         initComposeRuleContent(
             ChatUiState(userChatStatus = UserChatStatus.Online)
         )
-        composeTestRule.onNodeWithTag(TEST_TAG_USER_CHAT_STATE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_USER_CHAT_STATE, true).assertIsDisplayed()
     }
 
 
@@ -76,7 +79,7 @@ class ChatAppBarTest {
         initComposeRuleContent(
             ChatUiState(isChatNotificationMute = true)
         )
-        composeTestRule.onNodeWithTag(TEST_TAG_NOTIFICATION_MUTE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_NOTIFICATION_MUTE, true).assertIsDisplayed()
     }
 
     @Test
@@ -92,7 +95,7 @@ class ChatAppBarTest {
         initComposeRuleContent(
             ChatUiState(isPrivateChat = true)
         )
-        composeTestRule.onNodeWithTag(TEST_TAG_PRIVATE_ICON).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_PRIVATE_ICON, true).assertIsDisplayed()
     }
 
     @Test
@@ -107,43 +110,50 @@ class ChatAppBarTest {
     @Test
     fun `test that audio call is hidden when my permission is unknown`() {
         initComposeRuleContent(ChatUiState())
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that audio call is hidden when my permission is removed`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Removed))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that audio call is hidden when my permission is read only`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.ReadOnly))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that audio call is hidden when is joining or leaving`() {
         initComposeRuleContent(ChatUiState(isJoiningOrLeaving = true))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that audio call is hidden when is preview mode`() {
         initComposeRuleContent(ChatUiState(isPreviewMode = true))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that audio call is shown and enabled when my permission is standard`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Standard))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION, true)
+            .assertIsDisplayed()
     }
 
     @Test
     fun `test that audio call is shown and enabled when my permission is moderator`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Moderator))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION, true)
+            .assertIsDisplayed()
     }
 
     @Test
@@ -154,57 +164,68 @@ class ChatAppBarTest {
                 hasACallInThisChat = true
             )
         )
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).performClick()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION, true)
+            .apply {
+                assertIsDisplayed()
+                performClick()
+            }
         verifyNoInteractions(actionPressed)
     }
 
     @Test
     fun `test that video call is hidden when my permission is unknown`() {
         initComposeRuleContent(ChatUiState())
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that video call is hidden when my permission is removed`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Removed))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that video call is hidden when my permission is read only`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.ReadOnly))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that video call is hidden when is joining or leaving`() {
         initComposeRuleContent(ChatUiState(isJoiningOrLeaving = true))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that video call is hidden when is preview mode`() {
         initComposeRuleContent(ChatUiState(isPreviewMode = true))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that video call is hidden when the chat is a group`() {
         initComposeRuleContent(ChatUiState(isGroup = true))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that video call is shown and enabled when my permission is standard`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Standard))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION, true)
+            .assertIsDisplayed()
     }
 
     @Test
     fun `test that video call is shown and enabled when my permission is moderator`() {
         initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Moderator))
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION, true)
+            .assertIsDisplayed()
     }
 
     @Test
@@ -215,8 +236,11 @@ class ChatAppBarTest {
                 hasACallInThisChat = true
             )
         )
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).performClick()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION, true)
+            .apply {
+                assertIsDisplayed()
+                performClick()
+            }
         verifyNoInteractions(actionPressed)
     }
 
@@ -228,9 +252,12 @@ class ChatAppBarTest {
                 myPermission = ChatRoomPermission.Moderator
             )
         )
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION).assertExists()
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION)
+            .assertExists()
     }
 
     @Test
@@ -241,30 +268,36 @@ class ChatAppBarTest {
                 isOpenInvite = true
             )
         )
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION)
+            .assertIsDisplayed()
     }
 
     @Test
     fun `test that add participants is not available when the chat is not a group`() {
         initComposeRuleContent(ChatUiState(isGroup = false))
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that add participants is not available when is joining or leaving`() {
         initComposeRuleContent(ChatUiState(isJoiningOrLeaving = true))
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
     fun `test that add participants is not available when the group is not active`() {
         initComposeRuleContent(ChatUiState(isGroup = true, isActive = false))
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
@@ -282,7 +315,8 @@ class ChatAppBarTest {
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION)
+            .assertDoesNotExist()
     }
 
 
@@ -398,7 +432,7 @@ class ChatAppBarTest {
                 myPermission = ChatRoomPermission.Moderator
             )
         )
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_INFO_ACTION).assertIsDisplayed()
     }
 
@@ -413,7 +447,7 @@ class ChatAppBarTest {
                 isGroup = true,
             )
         )
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_INFO_ACTION).assertIsDisplayed()
     }
 
@@ -694,10 +728,100 @@ class ChatAppBarTest {
                 isWaitingRoom = true
             )
         )
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION).performClick()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
         verifyNoInteractions(actionPressed)
+    }
+
+    @Test
+    fun `test that toolbar tap is disabled if is joining or leaving`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isJoiningOrLeaving = true
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_APP_BAR).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        verifyNoInteractions(showGroupOrContactInfoActivity)
+    }
+
+    @Test
+    fun `test that toolbar tap is disabled if is preview mode`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isPreviewMode = true
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_APP_BAR).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        verifyNoInteractions(showGroupOrContactInfoActivity)
+    }
+
+    @Test
+    fun `test that toolbar tap is disabled if is not connected`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = false
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_APP_BAR).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        verifyNoInteractions(showGroupOrContactInfoActivity)
+    }
+
+    @Test
+    fun `test that toolbar tap is disabled if not a group and my permission is read only`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                isGroup = false,
+                myPermission = ChatRoomPermission.ReadOnly,
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_APP_BAR).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        verifyNoInteractions(showGroupOrContactInfoActivity)
+    }
+
+    @Test
+    fun `test that toolbar tap is enabled if is a group`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                isGroup = true
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_APP_BAR).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        verify(showGroupOrContactInfoActivity).invoke()
+    }
+
+    @Test
+    fun `test that toolbar tap is enabled if is not a group and I have moderator permission`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                isGroup = false,
+                myPermission = ChatRoomPermission.Moderator,
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_APP_BAR).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        verify(showGroupOrContactInfoActivity).invoke()
     }
 
     private fun initComposeRuleContent(state: ChatUiState) {
@@ -705,7 +829,8 @@ class ChatAppBarTest {
             ChatAppBar(
                 uiState = state,
                 onBackPressed = {},
-                onMenuActionPressed = actionPressed
+                onMenuActionPressed = actionPressed,
+                showGroupOrContactInfoActivity = showGroupOrContactInfoActivity
             )
         }
     }

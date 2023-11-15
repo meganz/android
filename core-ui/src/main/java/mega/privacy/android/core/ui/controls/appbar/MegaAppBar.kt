@@ -217,8 +217,8 @@ internal fun BaseMegaAppBar(
 internal fun BaseMegaAppBar(
     appBarType: AppBarType,
     titleAndSubtitle: @Composable () -> Unit,
-    actions: List<MenuAction>? = null,
     modifier: Modifier = Modifier,
+    actions: List<MenuAction>? = null,
     onNavigationPressed: (() -> Unit)? = null,
     badgeCount: Int? = null,
     onActionPressed: ((MenuAction) -> Unit)? = null,
@@ -229,7 +229,7 @@ internal fun BaseMegaAppBar(
     TopAppBar(
         title = titleAndSubtitle,
         backgroundColor = MegaTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha),
-        modifier = modifier,
+        modifier = modifier.testTag(TEST_TAG_APP_BAR),
         navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
             Box {
                 NavigationIcon(
@@ -411,6 +411,11 @@ private fun MegaAppBarPreviewWithMarqueeSubtitle() {
 
 internal const val APP_BAR_BACK_BUTTON_TAG = "appbar:button_back"
 internal const val APP_BAR_BADGE = "appbar:text_badge"
+
+/**
+ * Test Tag App Bar
+ */
+const val TEST_TAG_APP_BAR = "appbar"
 
 /**
  * Enum class defining the app bar types.

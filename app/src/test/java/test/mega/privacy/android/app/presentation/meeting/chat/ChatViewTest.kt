@@ -38,8 +38,10 @@ class ChatViewTest {
                 isParticipatingInACall = true
             )
         )
-        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.ongoing_call_content))
             .assertIsDisplayed()
     }
@@ -52,8 +54,10 @@ class ChatViewTest {
                 isParticipatingInACall = false
             )
         )
-        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.ongoing_call_content))
             .assertDoesNotExist()
     }
@@ -82,7 +86,7 @@ class ChatViewTest {
                 isGroup = true,
             )
         )
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
         composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).performClick()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.chat_add_participants_no_contacts_message))
             .assertIsDisplayed()
@@ -115,8 +119,10 @@ class ChatViewTest {
                 hasAnyContact = true,
             )
         )
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
         composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).performClick()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.chat_add_participants_no_contacts_left_to_add_message))
             .assertIsDisplayed()
