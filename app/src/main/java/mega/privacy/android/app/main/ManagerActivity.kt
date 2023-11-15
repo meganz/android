@@ -3485,6 +3485,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     hideAdsView()
                 }
 
+                R.id.videoSectionFragment -> {
+                    homepageScreen = HomepageScreen.VIDEO
+                    hideAdsView()
+                }
+
                 R.id.fullscreen_offline -> {
                     homepageScreen = HomepageScreen.FULLSCREEN_OFFLINE
                     hideAdsView()

@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -34,6 +35,7 @@ import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.bannerview.utils.BannerUtils
 import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -154,11 +156,6 @@ class HomepageFragment : Fragment() {
                 categoryAudio -> {
                     Analytics.tracker.trackEvent(HomeScreenAudioTilePressedEvent)
                     HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
-                }
-
-                categoryVideo -> {
-                    Analytics.tracker.trackEvent(HomeScreenVideosTilePressedEvent)
-                    HomepageFragmentDirections.actionHomepageFragmentToVideoFragment()
                 }
 
                 else -> return@with
@@ -515,7 +512,26 @@ class HomepageFragment : Fragment() {
         viewDataBinding.category.categoryFavourites.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryDocument.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryAudio.setOnClickListener(categoryClickListener)
-        viewDataBinding.category.categoryVideo.setOnClickListener(categoryClickListener)
+        viewDataBinding.category.categoryVideo.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                clickVideoSectionTileAndAnalysis()
+            }
+        }
+    }
+
+    private suspend fun clickVideoSectionTileAndAnalysis() {
+        Analytics.tracker.trackEvent(HomeScreenVideosTilePressedEvent)
+        findNavController().run {
+            if (currentDestination?.id == R.id.homepageFragment) {
+                val destination =
+                    if (getFeatureFlagValueUseCase(AppFeatures.NewVideoSection)) {
+                        HomepageFragmentDirections.actionHomepageFragmentToVideoSectionFragment()
+                    } else {
+                        HomepageFragmentDirections.actionHomepageFragmentToVideoFragment()
+                    }
+                navigate(destination)
+            }
+        }
     }
 
     /**

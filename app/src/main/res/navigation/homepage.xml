@@ -31,6 +31,9 @@
             android:id="@+id/action_homepageFragment_to_videoFragment"
             app:destination="@id/videoFragment" />
         <action
+            android:id="@+id/action_homepageFragment_to_videoSectionFragment"
+            app:destination="@id/videoSectionFragment" />
+        <action
             android:id="@+id/action_homepageFragment_to_favourites"
             app:destination="@id/favouritesFragment" />
         <action
@@ -107,6 +110,18 @@
         android:id="@+id/videoFragment"
         android:name="mega.privacy.android.app.fragments.homepage.video.VideoFragment"
         android:label="VideoFragment">
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
+            app:destination="@id/offlineFragmentCompose" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/videoSectionFragment"
+        android:name="mega.privacy.android.app.presentation.videosection.VideoSectionFragment"
+        android:label="VideoSectionFragment">
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
