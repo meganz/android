@@ -88,7 +88,7 @@ fun GenericDescriptionTextField(
         val textFieldColors = TextFieldDefaults.textFieldColors(
             textColor = if (isFocused) MegaTheme.colors.text.primary else MegaTheme.colors.text.onColorDisabled,
             backgroundColor = MegaTheme.colors.background.pageBackground,
-            cursorColor = MegaTheme.colors.icon.accent,
+            cursorColor = MegaTheme.colors.border.strongSelected,
             errorCursorColor = MegaTheme.colors.text.error,
             errorIndicatorColor = MegaTheme.colors.support.error,
             focusedLabelColor = MegaTheme.colors.text.primary,
@@ -99,8 +99,8 @@ fun GenericDescriptionTextField(
         )
 
         val customTextSelectionColors = TextSelectionColors(
-            handleColor = MegaTheme.colors.icon.accent,
-            backgroundColor = MegaTheme.colors.icon.accent
+            handleColor = MegaTheme.colors.border.strongSelected,
+            backgroundColor = MegaTheme.colors.border.strongSelected
         )
 
         val keyboardOption = KeyboardOptions(

@@ -43,9 +43,8 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.preview.TextFieldProvider
 import mega.privacy.android.core.ui.preview.TextFieldState
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.extensions.autofill
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 
 /**
  * Text field for password.
@@ -71,22 +70,22 @@ fun PasswordTextField(
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isError = errorText != null
     val colors = TextFieldDefaults.textFieldColors(
-        textColor = MaterialTheme.colors.grey_alpha_012_white_alpha_038,
-        backgroundColor = Color.Transparent,
-        cursorColor = MaterialTheme.colors.secondary,
-        errorCursorColor = MaterialTheme.colors.error,
-        errorIndicatorColor = MaterialTheme.colors.error,
-        focusedIndicatorColor = MaterialTheme.colors.secondary,
-        unfocusedIndicatorColor = MaterialTheme.colors.grey_alpha_012_white_alpha_038,
-        focusedLabelColor = MaterialTheme.colors.onPrimary,
-        unfocusedLabelColor = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
-        errorLabelColor = MaterialTheme.colors.error,
+        textColor = MegaTheme.colors.text.primary,
+        backgroundColor = MegaTheme.colors.background.pageBackground,
+        cursorColor = MegaTheme.colors.border.strongSelected,
+        errorCursorColor = MegaTheme.colors.text.error,
+        errorIndicatorColor = MegaTheme.colors.support.error,
+        focusedIndicatorColor = MegaTheme.colors.border.strongSelected,
+        unfocusedIndicatorColor = MegaTheme.colors.border.disabled,
+        focusedLabelColor = MegaTheme.colors.text.accent,
+        unfocusedLabelColor = MegaTheme.colors.text.placeholder,
+        errorLabelColor = MegaTheme.colors.text.error,
     )
     var isFocused by remember { mutableStateOf(false) }
     var showPassword by remember { mutableStateOf(false) }
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = MaterialTheme.colors.secondary,
-        backgroundColor = MaterialTheme.colors.secondary
+        handleColor = MegaTheme.colors.border.strongSelected,
+        backgroundColor = MegaTheme.colors.border.strongSelected
     )
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
@@ -99,14 +98,12 @@ fun PasswordTextField(
                 .fillMaxWidth()
                 .onFocusChanged { isFocused = it.isFocused }
                 .autofill(
-                    autofillTypes = listOf(AutofillType.Password),
-                    onAutoFilled = onTextChange
+                    autofillTypes = listOf(AutofillType.Password), onAutoFilled = onTextChange
                 ),
-            textStyle = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.onPrimary),
+            textStyle = MaterialTheme.typography.subtitle1.copy(color = MegaTheme.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = imeAction
+                keyboardType = KeyboardType.Password, imeAction = imeAction
             ),
             keyboardActions = keyboardActions,
             visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
@@ -127,33 +124,31 @@ fun PasswordTextField(
                         text = hintString,
                         modifier = Modifier.padding(bottom = if (isFocused) 6.dp else 0.dp),
                         style = when {
-                            isError && isFocused -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error)
-                            isError && text.isEmpty() -> MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.error)
-                            isFocused -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.secondary)
-                            text.isNotEmpty() -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.grey_alpha_038_white_alpha_038)
-                            else -> MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.grey_alpha_038_white_alpha_038)
+                            isError && isFocused -> MaterialTheme.typography.caption.copy(color = MegaTheme.colors.text.error)
+                            isError && text.isEmpty() -> MaterialTheme.typography.body1.copy(color = MegaTheme.colors.text.error)
+                            isFocused -> MaterialTheme.typography.caption.copy(color = MegaTheme.colors.text.accent)
+                            text.isNotEmpty() -> MaterialTheme.typography.caption.copy(color = MegaTheme.colors.text.placeholder)
+                            else -> MaterialTheme.typography.body1.copy(color = MegaTheme.colors.text.placeholder)
                         }
                     )
                 },
                 trailingIcon = {
                     if (isFocused) {
                         Icon(
-                            modifier = Modifier
-                                .clickable(
-                                    interactionSource = interactionSource,
-                                    indication = null,
-                                    onClick = { showPassword = !showPassword },
-                                ),
+                            modifier = Modifier.clickable(
+                                interactionSource = interactionSource,
+                                indication = null,
+                                onClick = { showPassword = !showPassword },
+                            ),
                             painter = painterResource(id = R.drawable.ic_visibility_outline),
-                            tint = if (showPassword) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_alpha_012_white_alpha_038,
+                            tint = if (showPassword) MegaTheme.colors.icon.accent else MegaTheme.colors.icon.disabled,
                             contentDescription = "see"
                         )
                     }
                 },
                 colors = colors,
                 contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
-                    start = 0.dp,
-                    bottom = 7.dp
+                    start = 0.dp, bottom = 7.dp
                 )
             )
         }

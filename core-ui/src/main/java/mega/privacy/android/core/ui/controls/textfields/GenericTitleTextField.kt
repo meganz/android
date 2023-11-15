@@ -84,7 +84,7 @@ fun GenericTitleTextField(
         val textFieldColors = TextFieldDefaults.textFieldColors(
             textColor = MegaTheme.colors.text.primary,
             backgroundColor = MegaTheme.colors.background.pageBackground,
-            cursorColor = MegaTheme.colors.icon.accent,
+            cursorColor = MegaTheme.colors.border.strongSelected,
             errorCursorColor = MegaTheme.colors.support.error,
             errorIndicatorColor = MegaTheme.colors.support.error,
             focusedLabelColor = MegaTheme.colors.text.primary,
@@ -95,8 +95,8 @@ fun GenericTitleTextField(
         )
 
         val customTextSelectionColors = TextSelectionColors(
-            handleColor = MegaTheme.colors.icon.accent,
-            backgroundColor = MegaTheme.colors.icon.accent
+            handleColor = MegaTheme.colors.border.strongSelected,
+            backgroundColor = MegaTheme.colors.border.strongSelected
         )
 
         val keyboardOption = KeyboardOptions(
