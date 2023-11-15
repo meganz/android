@@ -32,9 +32,9 @@ import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -72,7 +72,7 @@ class ChatViewModelTest {
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
     private val getChatCall: GetChatCall = mock()
     private val getChatRoom: GetChatRoom = mock()
-    private val monitorChatCallUpdates: MonitorChatCallUpdates = mock()
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val endCallUseCase: EndCallUseCase = mock()
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase = mock()
     private val getContactLinkUseCase: GetContactLinkUseCase = mock()
@@ -92,9 +92,10 @@ class ChatViewModelTest {
     private val monitorLeaveChatUseCase = mock<MonitorLeaveChatUseCase> {
         onBlocking { invoke() }.thenReturn(flowOf(1234L))
     }
-    private val monitorScheduledMeetingUpdates = mock<MonitorScheduledMeetingUpdates> {
-        onBlocking { invoke() }.thenReturn(flowOf())
-    }
+    private val monitorScheduledMeetingUpdatesUseCase =
+        mock<MonitorScheduledMeetingUpdatesUseCase> {
+            onBlocking { invoke() }.thenReturn(flowOf())
+        }
     private val monitorChatRoomUpdates = mock<MonitorChatRoomUpdates> {
         onBlocking { invoke(any()) }.thenReturn(flowOf())
     }
@@ -124,7 +125,7 @@ class ChatViewModelTest {
             getScheduledMeetingByChat = getScheduledMeetingByChat,
             getChatCall = getChatCall,
             getChatRoom = getChatRoom,
-            monitorChatCallUpdates = monitorChatCallUpdates,
+            monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             endCallUseCase = endCallUseCase,
             sendStatisticsMeetingsUseCase = sendStatisticsMeetingsUseCase,
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
@@ -137,7 +138,7 @@ class ChatViewModelTest {
             isContactRequestSentUseCase = isContactRequestSentUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             loadPendingMessagesUseCase = loadPendingMessagesUseCase,
-            monitorScheduledMeetingUpdates = monitorScheduledMeetingUpdates,
+            monitorScheduledMeetingUpdates = monitorScheduledMeetingUpdatesUseCase,
             monitorChatRoomUpdates = monitorChatRoomUpdates,
             startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,

@@ -40,6 +40,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property shouldPinToSpeakerView                     True, if should change to speaker view. False, if not.
  * @property chatIdToOpen                               Chat Id of the chat that should be opened.
  * @property callType                                   [CallType]
+ * @property isParticipantSharingScreen                 True, if a participant is sharing the screen. False, if not.
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -71,6 +72,7 @@ data class MeetingState(
     val shouldPinToSpeakerView: Boolean = false,
     val chatIdToOpen: Long = -1L,
     val callType: CallType = CallType.OneToOne,
+    val isParticipantSharingScreen: Boolean = false,
 ) {
     /**
      * Check if waiting room is opened

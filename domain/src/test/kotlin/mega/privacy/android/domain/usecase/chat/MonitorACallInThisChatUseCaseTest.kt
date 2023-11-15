@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,7 +25,7 @@ import org.mockito.kotlin.whenever
 internal class MonitorACallInThisChatUseCaseTest {
     private lateinit var underTest: MonitorACallInThisChatUseCase
     private val sharedFlow = MutableSharedFlow<ChatCall>()
-    private val monitorChatCallUpdates: MonitorChatCallUpdates = mock {
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock {
         on { invoke() } doReturn sharedFlow
     }
     private val hasACallInThisChatByChatIdUseCase: HasACallInThisChatByChatIdUseCase = mock()
@@ -34,7 +34,7 @@ internal class MonitorACallInThisChatUseCaseTest {
     @BeforeAll
     fun setup() {
         underTest =
-            MonitorACallInThisChatUseCase(monitorChatCallUpdates, hasACallInThisChatByChatIdUseCase)
+            MonitorACallInThisChatUseCase(monitorChatCallUpdatesUseCase, hasACallInThisChatByChatIdUseCase)
     }
 
     @BeforeEach

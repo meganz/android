@@ -57,7 +57,7 @@ import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatConnectedToInitiateCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -108,7 +108,7 @@ class ContactInfoViewModel @Inject constructor(
     private val setUserAliasUseCase: SetUserAliasUseCase,
     private val removeContactByEmailUseCase: RemoveContactByEmailUseCase,
     private val getInSharesUseCase: GetInSharesUseCase,
-    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val startConversationUseCase: StartConversationUseCase,
@@ -179,7 +179,7 @@ class ContactInfoViewModel @Inject constructor(
     init {
         getContactUpdates()
         monitorCallUpdates()
-        monitorChatSessionUpdates()
+        startMonitorChatSessionUpdates()
         chatMuteUpdates()
         monitorNodeChanges()
         monitorChatOnlineStatusUpdates()
@@ -230,24 +230,33 @@ class ContactInfoViewModel @Inject constructor(
         }
     }
 
-    private fun monitorChatSessionUpdates() = viewModelScope.launch {
-        monitorChatSessionUpdatesUseCase().takeWhile {
-            it.changes in listOf(
-                ChatSessionChanges.Status,
-                ChatSessionChanges.RemoteAvFlags,
-                ChatSessionChanges.SessionSpeakRequested,
-                ChatSessionChanges.SessionOnHiRes,
-                ChatSessionChanges.SessionOnLowRes,
-                ChatSessionChanges.SessionOnHold,
-                ChatSessionChanges.AudioLevel,
-            )
-        }.collect {
-            _state.update { it.copy(callStatusChanged = true) }
+    /**
+     * Get chat session updates
+     */
+    private fun startMonitorChatSessionUpdates() =
+        viewModelScope.launch {
+            monitorChatSessionUpdatesUseCase()
+                .collectLatest { result ->
+                    result.session?.let { session ->
+
+                        session.changes?.apply {
+                            if (contains(ChatSessionChanges.Status) ||
+                                contains(ChatSessionChanges.RemoteAvFlags) ||
+                                contains(ChatSessionChanges.SessionSpeakRequested) ||
+                                contains(ChatSessionChanges.SessionOnHiRes) ||
+                                contains(ChatSessionChanges.SessionOnLowRes) ||
+                                contains(ChatSessionChanges.SessionOnHold) ||
+                                contains(ChatSessionChanges.AudioLevel)
+                            ) {
+                                _state.update { it.copy(callStatusChanged = true) }
+                            }
+                        }
+                    }
+                }
         }
-    }
 
     private fun monitorCallUpdates() = viewModelScope.launch {
-        monitorChatCallUpdates()
+        monitorChatCallUpdatesUseCase()
             .collectLatest { call ->
                 call.changes?.apply {
                     if (contains(Status)) observeCallStatus(call)

@@ -23,19 +23,19 @@ import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.meeting.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallInProgress
 import mega.privacy.android.domain.usecase.meeting.KickUsersFromCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * Waiting room management view model
  *
- * @property monitorChatCallUpdates                 [MonitorChatCallUpdates]
+ * @property monitorChatCallUpdatesUseCase          [MonitorChatCallUpdatesUseCase]
  * @property getMessageSenderNameUseCase            [GetMessageSenderNameUseCase]
  * @property getScheduledMeetingByChat              [GetScheduledMeetingByChat]
  * @property getChatCallInProgress                  [GetChatCallInProgress]
- * @property monitorScheduledMeetingUpdates         [MonitorScheduledMeetingUpdates]
+ * @property monitorScheduledMeetingUpdatesUseCase  [MonitorScheduledMeetingUpdatesUseCase]
  * @property allowUsersJoinCallUseCase              [AllowUsersJoinCallUseCase]
  * @property getPluralStringFromStringResMapper     [GetPluralStringFromStringResMapper]
  * @property kickUsersFromCallUseCase               [KickUsersFromCallUseCase]
@@ -44,10 +44,10 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class WaitingRoomManagementViewModel @Inject constructor(
-    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
-    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
+    private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
     private val getChatCallInProgress: GetChatCallInProgress,
     private val allowUsersJoinCallUseCase: AllowUsersJoinCallUseCase,
     private val kickUsersFromCallUseCase: KickUsersFromCallUseCase,
@@ -140,7 +140,7 @@ class WaitingRoomManagementViewModel @Inject constructor(
      * Get chat call updates
      */
     private fun startMonitoringChatCallUpdates() = viewModelScope.launch {
-        monitorChatCallUpdates().collectLatest { call ->
+        monitorChatCallUpdatesUseCase().collectLatest { call ->
             call.changes?.apply {
                 if (contains(ChatCallChanges.Status)) {
                     if (call.chatId == state.value.chatId && (call.status == ChatCallStatus.UserNoPresent || call.status == ChatCallStatus.Destroyed)) {
@@ -184,7 +184,7 @@ class WaitingRoomManagementViewModel @Inject constructor(
      * Get scheduled meeting updates
      */
     private fun startMonitoringScheduledMeetingUpdates() = viewModelScope.launch {
-        monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
+        monitorScheduledMeetingUpdatesUseCase().collectLatest { scheduledMeetReceived ->
             if (scheduledMeetReceived.chatId != state.value.chatId) return@collectLatest
 
             scheduledMeetReceived.changes?.let { changes ->

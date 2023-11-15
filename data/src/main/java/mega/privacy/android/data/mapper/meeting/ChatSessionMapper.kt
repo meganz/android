@@ -10,9 +10,9 @@ internal class ChatSessionMapper @Inject constructor(
     private val chatSessionTermCodeMapper: ChatSessionTermCodeMapper,
 ) {
     operator fun invoke(session: MegaChatSession) = ChatSession(
-        status = chatSessionStatusMapper(session.status),
         peerId = session.peerid,
         clientId = session.clientid,
+        status = chatSessionStatusMapper(session.status),
         isSpeakAllowed = session.isSpeakAllowed,
         hasAudio = session.hasAudio(),
         hasVideo = session.hasVideo(),

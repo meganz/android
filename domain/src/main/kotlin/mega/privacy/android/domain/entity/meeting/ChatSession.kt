@@ -47,7 +47,7 @@ data class ChatSession(
     val isHiResScreenShare: Boolean,
     val isLowResScreenShare: Boolean,
     val isOnHold: Boolean,
-    val changes: ChatSessionChanges,
+    val changes: List<ChatSessionChanges>? = null,
     val termCode: ChatSessionTermCode,
     val hasPendingSpeakRequest: Boolean,
     val isAudioDetected: Boolean,

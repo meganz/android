@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSession
+import mega.privacy.android.domain.entity.meeting.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 
 /**
@@ -260,9 +261,9 @@ interface CallRepository {
     /**
      * Monitor chat session updates
      *
-     * @return A flow of [ChatSession]
+     * @return A flow of [ChatSessionUpdatesResult]
      */
-    fun monitorChatSessionUpdates(): Flow<ChatSession>
+    fun monitorChatSessionUpdates(): Flow<ChatSessionUpdatesResult>
 
     /**
      * Monitor updates on scheduled meetings

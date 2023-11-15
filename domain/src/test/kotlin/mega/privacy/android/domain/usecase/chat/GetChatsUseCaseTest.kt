@@ -24,9 +24,9 @@ import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -53,11 +53,11 @@ internal class GetChatsUseCaseTest {
     private val chatRoomItemStatusMapper = mock<ChatRoomItemStatusMapper>()
     private val contactsRepository = mock<ContactsRepository>()
     private val getChatCall = mock<GetChatCall>()
-    private val monitorChatCallUpdates = mock<MonitorChatCallUpdates>()
+    private val monitorChatCallUpdatesUseCase = mock<MonitorChatCallUpdatesUseCase>()
     private val getUserOnlineStatusByHandleUseCase = mock<GetUserOnlineStatusByHandleUseCase>()
     private val getUserEmail = mock<GetContactEmail>()
-    private val monitorScheduledMeetingUpdates = mock<MonitorScheduledMeetingUpdates>()
-    private val monitorScheduledMeetingOccurrencesUpdates = mock<MonitorScheduledMeetingOccurrencesUpdates>()
+    private val monitorScheduledMeetingUpdatesUseCase = mock<MonitorScheduledMeetingUpdatesUseCase>()
+    private val monitorScheduledMeetingOccurrencesUpdatesUseCase = mock<MonitorScheduledMeetingOccurrencesUpdatesUseCase>()
     private val notificationsRepository = mock<NotificationsRepository>()
 
     private val lastMessage: suspend (Long) -> String = { "test" }
@@ -101,11 +101,11 @@ internal class GetChatsUseCaseTest {
             chatRoomItemStatusMapper,
             contactsRepository,
             getChatCall,
-            monitorChatCallUpdates,
+            monitorChatCallUpdatesUseCase,
             getUserOnlineStatusByHandleUseCase,
             getUserEmail,
-            monitorScheduledMeetingUpdates,
-            monitorScheduledMeetingOccurrencesUpdates,
+            monitorScheduledMeetingUpdatesUseCase,
+            monitorScheduledMeetingOccurrencesUpdatesUseCase,
             notificationsRepository,
         )
 
@@ -120,11 +120,11 @@ internal class GetChatsUseCaseTest {
             whenever(getUserEmail(any())).thenReturn(null)
             whenever(getScheduleMeetingDataUseCase.invoke(any(), any())).thenReturn(null)
             whenever(pushesRepository.monitorPushNotificationSettings()).thenReturn(emptyFlow())
-            whenever(monitorChatCallUpdates.invoke()).thenReturn(emptyFlow())
+            whenever(monitorChatCallUpdatesUseCase.invoke()).thenReturn(emptyFlow())
             whenever(chatRepository.monitorChatListItemUpdates()).thenReturn(emptyFlow())
             whenever(contactsRepository.monitorChatOnlineStatusUpdates()).thenReturn(emptyFlow())
-            whenever(monitorScheduledMeetingUpdates()).thenReturn(emptyFlow())
-            whenever(monitorScheduledMeetingOccurrencesUpdates()).thenReturn(emptyFlow())
+            whenever(monitorScheduledMeetingUpdatesUseCase()).thenReturn(emptyFlow())
+            whenever(monitorScheduledMeetingOccurrencesUpdatesUseCase()).thenReturn(emptyFlow())
         }
     }
 
@@ -348,6 +348,6 @@ internal class GetChatsUseCaseTest {
             headerTimeMapper = headerTimeMapper,
         ).take(2).last()
 
-        verify(monitorChatCallUpdates, times(1)).invoke()
+        verify(monitorChatCallUpdatesUseCase, times(1)).invoke()
     }
 }

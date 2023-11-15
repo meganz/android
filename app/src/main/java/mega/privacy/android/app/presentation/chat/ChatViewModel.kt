@@ -62,9 +62,9 @@ import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -92,7 +92,7 @@ import javax.inject.Inject
  * @property startMeetingInWaitingRoomChatUseCase           [StartMeetingInWaitingRoomChatUseCase]
  * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
  * @property getChatCall                                    [GetChatCall]
- * @property monitorChatCallUpdates                         [MonitorChatCallUpdates]
+ * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
  * @property endCallUseCase                                 [EndCallUseCase]
  * @property sendStatisticsMeetingsUseCase                  [SendStatisticsMeetingsUseCase]
  * @property isConnected                                    True if the app has some network connection, false otherwise.
@@ -104,7 +104,7 @@ import javax.inject.Inject
  * @property broadcastChatArchivedUseCase                   [BroadcastChatArchivedUseCase]
  * @property monitorJoinedSuccessfullyUseCase               [MonitorJoinedSuccessfullyUseCase]
  * @property monitorLeaveChatUseCase                        [MonitorLeaveChatUseCase]
- * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdates]
+ * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdatesUseCase]
  * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
  * @property leaveChatUseCase                               [LeaveChatUseCase]
  */
@@ -124,7 +124,7 @@ class ChatViewModel @Inject constructor(
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getChatCall: GetChatCall,
     private val getChatRoom: GetChatRoom,
-    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val endCallUseCase: EndCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
@@ -138,7 +138,7 @@ class ChatViewModel @Inject constructor(
     private val isContactRequestSentUseCase: IsContactRequestSentUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val loadPendingMessagesUseCase: LoadPendingMessagesUseCase,
-    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
+    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdatesUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
@@ -505,7 +505,7 @@ class ChatViewModel @Inject constructor(
      */
     private fun getChatCallUpdates() =
         viewModelScope.launch {
-            monitorChatCallUpdates()
+            monitorChatCallUpdatesUseCase()
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
                     call.changes?.apply {

@@ -48,14 +48,13 @@ import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
-import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -77,7 +76,7 @@ import javax.inject.Inject
  * @property chatManagement                                 [ChatManagement]
  * @property startConversationUseCase                       [StartConversationUseCase]
  * @property openOrStartCall                                [OpenOrStartCall]
- * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdates]
+ * @property monitorScheduledMeetingUpdatesUseCase          [MonitorScheduledMeetingUpdatesUseCase]
  * @property monitorConnectivityUseCase                     [MonitorConnectivityUseCase]
  * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
  * @property monitorUpdatePushNotificationSettingsUseCase   [MonitorUpdatePushNotificationSettingsUseCase]
@@ -106,7 +105,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val startConversationUseCase: StartConversationUseCase,
     private val openOrStartCall: OpenOrStartCall,
-    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
+    private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
@@ -386,7 +385,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     private fun getScheduledMeetingUpdates() =
         viewModelScope.launch {
-            monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
+            monitorScheduledMeetingUpdatesUseCase().collectLatest { scheduledMeetReceived ->
                 if (!isSameScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
                     return@collectLatest
                 }

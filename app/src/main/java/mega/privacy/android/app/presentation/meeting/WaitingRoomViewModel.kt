@@ -43,8 +43,8 @@ import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.waitingroom.IsValidWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.mobile.analytics.event.WaitingRoomTimeoutEvent
@@ -57,28 +57,28 @@ import javax.inject.Inject
 /**
  * Waiting room view model
  *
- * @property monitorConnectivityUseCase         [MonitorConnectivityUseCase]
- * @property getScheduleMeetingDataUseCase      [GetScheduleMeetingDataUseCase]
- * @property timestampMapper                    [ChatRoomTimestampMapper]
- * @property getMyAvatarFileUseCase             [GetMyAvatarFileUseCase]
- * @property getMyAvatarColorUseCase            [GetMyAvatarColorUseCase]
- * @property getUserFullNameUseCase             [GetUserFullNameUseCase]
- * @property isValidWaitingRoomUseCase          [IsValidWaitingRoomUseCase]
- * @property monitorChatCallUpdates             [MonitorChatCallUpdates]
- * @property monitorScheduledMeetingUpdates     [MonitorScheduledMeetingUpdates]
- * @property getChatCall                        [GetChatCall]
- * @property getChatLocalVideoUpdatesUseCase    [GetChatLocalVideoUpdatesUseCase]
- * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
- * @property startVideoDeviceUseCase            [StartVideoDeviceUseCase]
- * @property answerChatCallUseCase              [AnswerChatCallUseCase]
- * @property initGuestChatSessionUseCase        [InitGuestChatSessionUseCase]
- * @property joinGuestChatCallUseCase           [JoinGuestChatCallUseCase]
- * @property checkChatLinkUseCase               [CheckChatLinkUseCase]
- * @property isUserLoggedIn                     [IsUserLoggedIn]
- * @property isEphemeralPlusPlusUseCase         [IsEphemeralPlusPlusUseCase]
- * @property logoutUseCase                      [LogoutUseCase]
- * @property hangChatCallUseCase                [HangChatCallUseCase]
- * @property joinChatCallUseCase                [JoinChatCallUseCase]
+ * @property monitorConnectivityUseCase                 [MonitorConnectivityUseCase]
+ * @property getScheduleMeetingDataUseCase              [GetScheduleMeetingDataUseCase]
+ * @property timestampMapper                            [ChatRoomTimestampMapper]
+ * @property getMyAvatarFileUseCase                     [GetMyAvatarFileUseCase]
+ * @property getMyAvatarColorUseCase                    [GetMyAvatarColorUseCase]
+ * @property getUserFullNameUseCase                     [GetUserFullNameUseCase]
+ * @property isValidWaitingRoomUseCase                  [IsValidWaitingRoomUseCase]
+ * @property monitorChatCallUpdatesUseCase              [MonitorChatCallUpdatesUseCase]
+ * @property monitorScheduledMeetingUpdatesUseCase      [MonitorScheduledMeetingUpdatesUseCase]
+ * @property getChatCall                                [GetChatCall]
+ * @property getChatLocalVideoUpdatesUseCase            [GetChatLocalVideoUpdatesUseCase]
+ * @property setChatVideoInDeviceUseCase                [SetChatVideoInDeviceUseCase]
+ * @property startVideoDeviceUseCase                    [StartVideoDeviceUseCase]
+ * @property answerChatCallUseCase                      [AnswerChatCallUseCase]
+ * @property initGuestChatSessionUseCase                [InitGuestChatSessionUseCase]
+ * @property joinGuestChatCallUseCase                   [JoinGuestChatCallUseCase]
+ * @property checkChatLinkUseCase                       [CheckChatLinkUseCase]
+ * @property isUserLoggedIn                             [IsUserLoggedIn]
+ * @property isEphemeralPlusPlusUseCase                 [IsEphemeralPlusPlusUseCase]
+ * @property logoutUseCase                              [LogoutUseCase]
+ * @property hangChatCallUseCase                        [HangChatCallUseCase]
+ * @property joinChatCallUseCase                        [JoinChatCallUseCase]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -90,8 +90,8 @@ class WaitingRoomViewModel @Inject constructor(
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val isValidWaitingRoomUseCase: IsValidWaitingRoomUseCase,
-    private val monitorChatCallUpdates: MonitorChatCallUpdates,
-    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
     private val getChatCall: GetChatCall,
     private val getChatLocalVideoUpdatesUseCase: GetChatLocalVideoUpdatesUseCase,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
@@ -267,7 +267,7 @@ class WaitingRoomViewModel @Inject constructor(
      */
     private fun monitorCallUpdates() {
         viewModelScope.launch {
-            monitorChatCallUpdates()
+            monitorChatCallUpdatesUseCase()
                 .filter { it.chatId == _state.value.chatId }
                 .distinctUntilChanged()
                 .collectLatest { it.updateUiState() }
@@ -279,7 +279,7 @@ class WaitingRoomViewModel @Inject constructor(
      */
     private fun monitorMeetingUpdates() {
         viewModelScope.launch {
-            monitorScheduledMeetingUpdates()
+            monitorScheduledMeetingUpdatesUseCase()
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { retrieveMeetingDetails() }
         }

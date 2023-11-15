@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.app.Dialog
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
@@ -933,6 +934,32 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     inMeetingViewModel.onItemClick(it)
                     sharedModel.onPinToSpeakerView(false)
                 }
+            }
+
+            speakerViewMenuItem?.apply {
+                isEnabled = !state.isParticipantSharingScreen
+                iconTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        if (state.isParticipantSharingScreen) R.color.white_alpha_038 else R.color.white
+                    )
+                )
+
+            }
+            gridViewMenuItem?.apply {
+                isEnabled = !state.isParticipantSharingScreen
+                iconTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        if (state.isParticipantSharingScreen) R.color.white_alpha_038 else R.color.white
+                    )
+                )
+            }
+
+            if (state.isParticipantSharingScreen) {
+                Timber.d("Change to speaker view. Some participant is sharing screen")
+                isManualModeView = true
+                initSpeakerViewMode()
             }
         }
 

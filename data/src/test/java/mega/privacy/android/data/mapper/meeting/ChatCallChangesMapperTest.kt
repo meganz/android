@@ -63,5 +63,4 @@ class ChatCallChangesMapperTest {
         Truth.assertThat(underTest(MegaChatCall.CHANGE_TYPE_WR_PUSHED_FROM_CALL))
             .contains(ChatCallChanges.WaitingRoomPushedFromCall)
     }
-
 }

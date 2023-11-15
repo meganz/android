@@ -45,7 +45,7 @@ import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.GetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.UpdateOccurrenceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -75,7 +75,7 @@ import javax.inject.Inject
  * @property getFeatureFlagValue                        [GetFeatureFlagValueUseCase]
  * @property getWaitingRoomRemindersUseCase             [GetWaitingRoomRemindersUseCase]
  * @property setWaitingRoomRemindersUseCase             [SetWaitingRoomRemindersUseCase]
- * @property monitorChatCallUpdates                     [MonitorChatCallUpdates]
+ * @property monitorChatCallUpdatesUseCase              [MonitorChatCallUpdatesUseCase]
  * @property getChatCall                                [GetChatCall]
  * @property state                                      Current view state as [ScheduledMeetingManagementState]setWaitingRoom
  */
@@ -100,7 +100,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val getWaitingRoomRemindersUseCase: GetWaitingRoomRemindersUseCase,
     private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
-    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val getChatCall: GetChatCall,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ScheduledMeetingManagementState())
@@ -674,7 +674,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      */
     private fun getChatCallUpdates() =
         viewModelScope.launch {
-            monitorChatCallUpdates()
+            monitorChatCallUpdatesUseCase()
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
                     call.changes?.apply {

@@ -18,8 +18,8 @@ import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
@@ -32,8 +32,8 @@ import javax.inject.Inject
  * @property fetchScheduledMeetingOccurrencesByChat                 [FetchScheduledMeetingOccurrencesByChat]
  * @property fetchNumberOfScheduledMeetingOccurrencesByChat         [FetchNumberOfScheduledMeetingOccurrencesByChat]
  * @property getChatParticipants                                    [GetChatParticipants]
- * @property monitorScheduledMeetingUpdates                         [MonitorScheduledMeetingUpdates]
- * @property monitorScheduledMeetingOccurrencesUpdates              [MonitorScheduledMeetingOccurrencesUpdates]
+ * @property monitorScheduledMeetingUpdates                         [MonitorScheduledMeetingUpdatesUseCase]
+ * @property monitorScheduledMeetingOccurrencesUpdatesUseCase       [MonitorScheduledMeetingOccurrencesUpdatesUseCase]
  * @property state                                                  Current view state as [RecurringMeetingInfoState]
  */
 @HiltViewModel
@@ -45,8 +45,8 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     private val fetchNumberOfScheduledMeetingOccurrencesByChat: FetchNumberOfScheduledMeetingOccurrencesByChat,
     private val getChatParticipants: GetChatParticipants,
     private val deviceGateway: DeviceGateway,
-    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
-    private val monitorScheduledMeetingOccurrencesUpdates: MonitorScheduledMeetingOccurrencesUpdates,
+    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdatesUseCase,
+    private val monitorScheduledMeetingOccurrencesUpdatesUseCase: MonitorScheduledMeetingOccurrencesUpdatesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(RecurringMeetingInfoState())
     val state: StateFlow<RecurringMeetingInfoState> = _state
@@ -286,7 +286,7 @@ class RecurringMeetingInfoViewModel @Inject constructor(
      */
     private fun getOccurrencesUpdates() =
         viewModelScope.launch {
-            monitorScheduledMeetingOccurrencesUpdates().collectLatest { result ->
+            monitorScheduledMeetingOccurrencesUpdatesUseCase().collectLatest { result ->
                 if (!result.append && state.value.chatId == result.chatId) {
                     getOccurrences(needsToRefreshOccurs = true)
                 }

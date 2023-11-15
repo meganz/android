@@ -2,7 +2,9 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -34,7 +36,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.ChatSession
+import mega.privacy.android.domain.entity.meeting.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CallRepository
@@ -420,11 +422,17 @@ internal class CallRepositoryImpl @Inject constructor(
         .map { chatCallMapper(it) }
         .flowOn(dispatcher)
 
-    override fun monitorChatSessionUpdates(): Flow<ChatSession> = megaChatApiGateway.chatCallUpdates
-        .filterIsInstance<ChatCallUpdate.OnChatSessionUpdate>()
-        .mapNotNull { it.session }
-        .map { chatSessionMapper(it) }
-        .flowOn(dispatcher)
+    override fun monitorChatSessionUpdates(): Flow<ChatSessionUpdatesResult> =
+        megaChatApiGateway.chatCallUpdates
+            .filterIsInstance<ChatCallUpdate.OnChatSessionUpdate>()
+            .map {
+                ChatSessionUpdatesResult(
+                    session = if (it.session != null) chatSessionMapper(it.session) else null,
+                    callId = it.callId,
+                    chatId = it.chatId
+                )
+            }
+            .flowOn(dispatcher)
 
     override fun monitorScheduledMeetingUpdates(): Flow<ChatScheduledMeeting> =
         megaChatApiGateway.scheduledMeetingUpdates

@@ -14,7 +14,7 @@ class MonitorChatSessionUpdatesUseCase @Inject constructor(private val callRepos
      * Invoke
      *
      * Calls monitor chat session flow from [CallRepository]
-     * @return [Flow<ChatSessionUpdate>]
+     * @return [Flow<ChatSessionUpdatesResult>]
      */
     operator fun invoke() = callRepository.monitorChatSessionUpdates()
 }

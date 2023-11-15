@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall
@@ -53,7 +53,7 @@ class GetCallSoundsUseCase @Inject constructor(
     private val endCallUseCase: EndCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
-    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) {
 
@@ -211,7 +211,7 @@ class GetCallSoundsUseCase @Inject constructor(
                 .addTo(disposable)
 
             sharingScope.launch {
-                monitorChatCallUpdates()
+                monitorChatCallUpdatesUseCase()
                     .collectLatest { call ->
                         call.changes?.apply {
                             Timber.d("Monitor chat call updated, changes $this")

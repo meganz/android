@@ -40,9 +40,9 @@ import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import javax.inject.Inject
 
 /**
@@ -58,11 +58,11 @@ class GetChatsUseCase @Inject constructor(
     private val chatRoomItemStatusMapper: ChatRoomItemStatusMapper,
     private val contactsRepository: ContactsRepository,
     private val getChatCall: GetChatCall,
-    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val getUserEmail: GetContactEmail,
-    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
-    private val monitorScheduledMeetingOccurrencesUpdates: MonitorScheduledMeetingOccurrencesUpdates,
+    private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
+    private val monitorScheduledMeetingOccurrencesUpdatesUseCase: MonitorScheduledMeetingOccurrencesUpdatesUseCase,
     private val notificationsRepository: NotificationsRepository,
 ) {
 
@@ -186,7 +186,8 @@ class GetChatsUseCase @Inject constructor(
         val avatarItems = async { getParticipantsAvatar(chatId) }
         val isMuted = async { isChatMuted(chatId) }
         val lastMessage = async { runCatching { getLastMessage(chatId) }.getOrNull() }
-        val lastTimestampFormatted = async { runCatching { lastTimeMapper(lastTimestamp) }.getOrNull() }
+        val lastTimestampFormatted =
+            async { runCatching { lastTimeMapper(lastTimestamp) }.getOrNull() }
         val currentCall = async { getCurrentCall(chatId) }
         val userStatus = async { getUserOnlineStatus() }
         val peerEmail = async { getUserEmail() }
@@ -253,7 +254,7 @@ class GetChatsUseCase @Inject constructor(
         chatRoomType: ChatRoomType,
     ): Flow<List<ChatRoomItem>> =
         if (chatRoomType != ChatRoomType.ARCHIVED_CHATS) {
-            monitorChatCallUpdates()
+            monitorChatCallUpdatesUseCase()
                 .filter { containsKey(it.chatId) }
                 .mapNotNull { chatCall ->
                     chatCall.let(chatRoomItemStatusMapper::invoke).let { chatCallItem ->
@@ -277,40 +278,41 @@ class GetChatsUseCase @Inject constructor(
         mutex: Mutex,
         chatRoomType: ChatRoomType,
         meetingTimeMapper: (Long, Long) -> String,
-    ): Flow<List<ChatRoomItem>> =
-        if (chatRoomType == ChatRoomType.MEETINGS) {
-            merge(monitorScheduledMeetingUpdates(), monitorScheduledMeetingOccurrencesUpdates())
-                .mapNotNull { update ->
-                    when (update) {
-                        is ResultOccurrenceUpdate -> update.chatId
-                        is ChatScheduledMeeting -> update.chatId
-                        else -> null
-                    }
-                }
-                .filter(::containsKey)
-                .mapNotNull { chatId ->
-                    getMeetingScheduleData(chatId, meetingTimeMapper)?.let { schedData ->
-                        mutex.withLock {
-                            get(chatId)?.let { currentItem ->
-                                val newItem = currentItem.copyChatRoomItem(
-                                    schedId = schedData.schedId,
-                                    title = schedData.title ?: currentItem.title,
-                                    isPending = schedData.isPending,
-                                    isRecurringDaily = schedData.isRecurringDaily,
-                                    isRecurringWeekly = schedData.isRecurringWeekly,
-                                    isRecurringMonthly = schedData.isRecurringMonthly,
-                                    scheduledStartTimestamp = schedData.scheduledStartTimestamp,
-                                    scheduledEndTimestamp = schedData.scheduledEndTimestamp,
-                                )
-                                if (currentItem != newItem) {
-                                    put(currentItem.chatId, newItem)
-                                }
+    ): Flow<List<ChatRoomItem>> = if (chatRoomType == ChatRoomType.MEETINGS) {
+        merge(
+            monitorScheduledMeetingUpdatesUseCase(),
+            monitorScheduledMeetingOccurrencesUpdatesUseCase()
+        ).mapNotNull { update ->
+            when (update) {
+                is ResultOccurrenceUpdate -> update.chatId
+                is ChatScheduledMeeting -> update.chatId
+                else -> null
+            }
+        }
+            .filter(::containsKey)
+            .mapNotNull { chatId ->
+                getMeetingScheduleData(chatId, meetingTimeMapper)?.let { schedData ->
+                    mutex.withLock {
+                        get(chatId)?.let { currentItem ->
+                            val newItem = currentItem.copyChatRoomItem(
+                                schedId = schedData.schedId,
+                                title = schedData.title ?: currentItem.title,
+                                isPending = schedData.isPending,
+                                isRecurringDaily = schedData.isRecurringDaily,
+                                isRecurringWeekly = schedData.isRecurringWeekly,
+                                isRecurringMonthly = schedData.isRecurringMonthly,
+                                scheduledStartTimestamp = schedData.scheduledStartTimestamp,
+                                scheduledEndTimestamp = schedData.scheduledEndTimestamp,
+                            )
+                            if (currentItem != newItem) {
+                                put(currentItem.chatId, newItem)
                             }
                         }
-                        values.toList()
                     }
+                    values.toList()
                 }
-        } else emptyFlow()
+            }
+    } else emptyFlow()
 
     private fun MutableMap<Long, ChatRoomItem>.monitorChatUpdates(
         mutex: Mutex,

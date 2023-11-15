@@ -49,7 +49,7 @@ import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatConnectedToInitiateCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -93,7 +93,7 @@ class ContactInfoViewModelTest {
     private var setUserAliasUseCase: SetUserAliasUseCase = mock()
     private var removeContactByEmailUseCase: RemoveContactByEmailUseCase = mock()
     private var getInSharesUseCase: GetInSharesUseCase = mock()
-    private var monitorChatCallUpdates: MonitorChatCallUpdates = mock()
+    private var monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private var monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private var monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase =
         mock()
@@ -170,7 +170,7 @@ class ContactInfoViewModelTest {
             setUserAliasUseCase = setUserAliasUseCase,
             removeContactByEmailUseCase = removeContactByEmailUseCase,
             getInSharesUseCase = getInSharesUseCase,
-            monitorChatCallUpdates = monitorChatCallUpdates,
+            monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             createChatRoomUseCase = createChatRoomUseCase,

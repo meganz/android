@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -67,6 +68,7 @@ import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.CreateChatLink
@@ -86,7 +88,8 @@ import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
@@ -114,13 +117,13 @@ import javax.inject.Inject
  * @property checkChatLink                  [CheckChatLinkUseCase]
  * @property logoutUseCase                  [LogoutUseCase]
  * @property monitorFinishActivityUseCase   [MonitorFinishActivityUseCase]
- * @property monitorChatCallUpdates         [MonitorChatCallUpdates]
+ * @property monitorChatCallUpdatesUseCase  [MonitorChatCallUpdatesUseCase]
  * @property getChatRoomByChatIdUseCase     [GetChatRoom]
  * @property getChatCall                    [GetChatCall]
  * @property getFeatureFlagValue            [GetFeatureFlagValueUseCase]
- * @property setOpenInvite                  [MonitorChatRoomUpdates]
+ * @property setOpenInvite                  [SetOpenInvite]
  * @property chatParticipantMapper          [ChatParticipantMapper]
- * @property monitorChatRoomUpdates         [MonitorChatCallUpdates]
+ * @property monitorChatRoomUpdates         [MonitorChatRoomUpdates]
  * @property queryChatLink                  [QueryChatLink]
  * @property isEphemeralPlusPlusUseCase     [IsEphemeralPlusPlusUseCase]
  * @property createChatLink                 [CreateChatLink]
@@ -146,7 +149,8 @@ class MeetingActivityViewModel @Inject constructor(
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
-    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val getChatRoomByChatIdUseCase: GetChatRoom,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val queryChatLink: QueryChatLink,
@@ -288,6 +292,7 @@ class MeetingActivityViewModel @Inject constructor(
             .observeForever(meetingCreatedObserver)
 
         startMonitoringChatCallUpdates()
+        startMonitorChatSessionUpdates()
 
         getCallUseCase.getCallEnded()
             .subscribeOn(Schedulers.io())
@@ -421,7 +426,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun startMonitoringChatCallUpdates() =
         viewModelScope.launch {
-            monitorChatCallUpdates()
+            monitorChatCallUpdatesUseCase()
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
                     call.changes?.apply {
@@ -459,6 +464,27 @@ class MeetingActivityViewModel @Inject constructor(
                                     }
                                     checkParticipantLists()
                                 }
+                            }
+                        }
+                    }
+                }
+        }
+
+    /**
+     * Get chat session updates
+     */
+    private fun startMonitorChatSessionUpdates() =
+        viewModelScope.launch {
+            monitorChatSessionUpdatesUseCase()
+                .filter { it.chatId == _state.value.chatId }
+                .collectLatest { result ->
+                    result.session?.let { session ->
+
+                        session.changes?.apply {
+                            if (contains(ChatSessionChanges.RemoteAvFlags)) {
+                                val isScreenSharing = session.hasScreenShare
+
+                                _state.update { it.copy(isParticipantSharingScreen = isScreenSharing) }
                             }
                         }
                     }

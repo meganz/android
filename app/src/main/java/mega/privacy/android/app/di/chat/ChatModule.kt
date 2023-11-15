@@ -31,9 +31,6 @@ import mega.privacy.android.domain.usecase.meeting.DefaultOpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 
@@ -149,27 +146,6 @@ abstract class ChatModule {
         @Provides
         fun provideQueryChatLink(chatRepository: ChatRepository): QueryChatLink =
             QueryChatLink(chatRepository::queryChatLink)
-
-        /**
-         * Provides the Use Case [MonitorScheduledMeetingOccurrencesUpdates]
-         */
-        @Provides
-        fun provideMonitorScheduledMeetingOccurrencesUpdates(callRepository: CallRepository): MonitorScheduledMeetingOccurrencesUpdates =
-            MonitorScheduledMeetingOccurrencesUpdates(callRepository::monitorScheduledMeetingOccurrencesUpdates)
-
-        /**
-         * Provides the Use Case [MonitorScheduledMeetingUpdates]
-         */
-        @Provides
-        fun provideMonitorScheduledMeetingUpdates(callRepository: CallRepository): MonitorScheduledMeetingUpdates =
-            MonitorScheduledMeetingUpdates(callRepository::monitorScheduledMeetingUpdates)
-
-        /**
-         * Provides the Use Case [MonitorChatCallUpdates]
-         */
-        @Provides
-        fun provideMonitorChatCallUpdates(callRepository: CallRepository): MonitorChatCallUpdates =
-            MonitorChatCallUpdates(callRepository::monitorChatCallUpdates)
 
         /**
          * Provides the Use Case [MonitorChatRoomUpdates]

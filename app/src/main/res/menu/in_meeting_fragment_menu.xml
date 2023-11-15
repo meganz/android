@@ -4,7 +4,7 @@
     <item
         android:id="@+id/swap_camera"
         android:enabled="true"
-        android:icon="@drawable/ic_camera_swap"
+        android:icon="@drawable/camera_rotate_icon"
         android:orderInCategory="100"
         android:title="Swap camera"
         app:iconTint="@color/white"
@@ -13,7 +13,7 @@
     <item
         android:id="@+id/grid_view"
         android:enabled="true"
-        android:icon="@drawable/ic_grid_view"
+        android:icon="@drawable/grid_view_icon"
         android:orderInCategory="110"
         android:title="@string/action_grid"
         android:visible="false"
@@ -22,7 +22,7 @@
     <item
         android:id="@+id/speaker_view"
         android:enabled="true"
-        android:icon="@drawable/ic_speaker_view"
+        android:icon="@drawable/main_view_icon"
         android:orderInCategory="120"
         android:title="@string/main_view"
         android:visible="true"

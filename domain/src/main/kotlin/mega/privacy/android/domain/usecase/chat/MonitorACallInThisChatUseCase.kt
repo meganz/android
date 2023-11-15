@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import javax.inject.Inject
 
 /**
@@ -12,14 +12,14 @@ import javax.inject.Inject
  *
  */
 class MonitorACallInThisChatUseCase @Inject constructor(
-    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val hasACallInThisChatByChatIdUseCase: HasACallInThisChatByChatIdUseCase,
 ) {
     /**
      * Invoke
      *
      */
-    operator fun invoke(chatId: Long) = monitorChatCallUpdates()
+    operator fun invoke(chatId: Long) = monitorChatCallUpdatesUseCase()
         .filter { it.chatId == chatId && (it.status == ChatCallStatus.Initial || it.status == ChatCallStatus.Destroyed) }
         .map { it.status == ChatCallStatus.Initial }
         .onStart { emit(hasACallInThisChatByChatIdUseCase(chatId)) }

@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,14 +25,14 @@ import java.util.stream.Stream
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MonitorParticipatingInACallUseCaseTest {
-    private val monitorChatCallUpdates: MonitorChatCallUpdates = mock()
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase = mock()
     private lateinit var underTest: MonitorParticipatingInACallUseCase
 
     @BeforeAll
     fun setup() {
         underTest = MonitorParticipatingInACallUseCase(
-            monitorChatCallUpdates,
+            monitorChatCallUpdatesUseCase,
             isParticipatingInChatCallUseCase,
         )
     }
@@ -46,7 +46,7 @@ internal class MonitorParticipatingInACallUseCaseTest {
         // GIVEN
         val flow = MutableSharedFlow<ChatCall>()
         whenever(isParticipatingInChatCallUseCase()).thenReturn(isParticipatingInChatCall)
-        whenever(monitorChatCallUpdates()).thenReturn(flow)
+        whenever(monitorChatCallUpdatesUseCase()).thenReturn(flow)
         underTest.invoke().test {
             Truth.assertThat(awaitItem()).isEqualTo(isParticipatingInChatCall)
             val call = mock<ChatCall> {
@@ -64,7 +64,7 @@ internal class MonitorParticipatingInACallUseCaseTest {
     fun `test that no user present status returns no value`() = runTest{
         val flow = MutableSharedFlow<ChatCall>()
         whenever(isParticipatingInChatCallUseCase()).thenReturn(false)
-        whenever(monitorChatCallUpdates()).thenReturn(flow)
+        whenever(monitorChatCallUpdatesUseCase()).thenReturn(flow)
         underTest().test {
             Truth.assertThat(awaitItem()).isFalse()
             val call = mock<ChatCall> {
@@ -78,7 +78,7 @@ internal class MonitorParticipatingInACallUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            monitorChatCallUpdates,
+            monitorChatCallUpdatesUseCase,
             isParticipatingInChatCallUseCase,
         )
     }

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import javax.inject.Inject
 
 /**
@@ -14,7 +14,7 @@ import javax.inject.Inject
  *
  */
 class MonitorParticipatingInACallUseCase @Inject constructor(
-    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
 ) {
     /**
@@ -23,7 +23,7 @@ class MonitorParticipatingInACallUseCase @Inject constructor(
      * If the call status is Destroyed or TerminatingUserParticipation, we have to check other calls to see if the user is participating in any of them.
      * @return flow of boolean, true if user is participating in any call, false if user is not participating in any calls
      */
-    operator fun invoke() = monitorChatCallUpdates()
+    operator fun invoke() = monitorChatCallUpdatesUseCase()
         .map { it.status }
         .distinctUntilChanged()
         .mapNotNull {
