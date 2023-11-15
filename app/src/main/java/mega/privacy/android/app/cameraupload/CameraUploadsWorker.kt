@@ -667,14 +667,14 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun isPrimaryFolderEstablished(): Boolean {
         val primarySyncHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)
-        if (primarySyncHandle == MegaApiJava.INVALID_HANDLE) {
+        Timber.d("primarySyncHandle $primarySyncHandle")
+        if (primarySyncHandle == MegaApiJava.INVALID_HANDLE || isNodeInRubbishOrDeletedUseCase(
+                primarySyncHandle
+            )
+        ) {
             return false
         }
-        val isPrimaryFolderInRubbish = isNodeInRubbishOrDeletedUseCase(primarySyncHandle)
-        val result =
-            !isPrimaryFolderInRubbish || (getPrimaryFolderHandle() != MegaApiJava.INVALID_HANDLE)
-        Timber.d("Primary Folder Established $result")
-        return result
+        return true
     }
 
     /**
@@ -683,13 +683,15 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @return true if the Secondary Folder handle is a valid handle, and false if otherwise
      */
     private suspend fun isSecondaryFolderEstablished(): Boolean {
-        val secondarySyncHandle = getSecondaryFolderHandle()
-        if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE) {
+        val secondarySyncHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
+        Timber.d("secondarySyncHandle $secondarySyncHandle")
+        if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE || isNodeInRubbishOrDeletedUseCase(
+                secondarySyncHandle
+            )
+        ) {
             return false
         }
-        val isSecondaryFolderInRubbish = isNodeInRubbishOrDeletedUseCase(getSecondaryFolderHandle())
-        Timber.d("Secondary Folder Established ${!isSecondaryFolderInRubbish}")
-        return !isSecondaryFolderInRubbish
+        return true
     }
 
     /**
@@ -703,7 +705,8 @@ class CameraUploadsWorker @AssistedInject constructor(
         if (!isPrimaryFolderEstablished()) {
             Timber.w("The Primary Folder is missing")
 
-            val primaryHandle = getPrimaryFolderHandle()
+            val primaryHandle =
+                getDefaultNodeHandleUseCase(context.getString(R.string.section_photo_sync))
 
             if (primaryHandle == MegaApiJava.INVALID_HANDLE) {
                 Timber.d("Proceed to create the Primary Folder")
@@ -718,10 +721,11 @@ class CameraUploadsWorker @AssistedInject constructor(
         if (isSecondaryFolderEnabled() && !isSecondaryFolderEstablished()) {
             Timber.w("The local secondary folder is missing")
 
-            val secondaryHandle = getSecondaryFolderHandle()
+            val secondaryHandle =
+                getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads))
 
             if (secondaryHandle == MegaApiJava.INVALID_HANDLE) {
-                Timber.d("Proceed to create the Primary Folder")
+                Timber.d("Proceed to create the Secondary Folder")
                 createAndSetupSecondaryUploadFolder()
             } else {
                 Timber.d("Secondary Handle retrieved from getSecondaryFolderHandle(): $secondaryHandle")
@@ -978,7 +982,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @param progressEvent
      */
     private suspend fun processUploadInProgressTransferTemporaryErrorEvent(
-        progressEvent: CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError
+        progressEvent: CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError,
     ) {
         progressEvent.transferEvent.error?.let { handleTransferError(it) }
     }
@@ -1447,32 +1451,6 @@ class CameraUploadsWorker @AssistedInject constructor(
             Timber.e("isLoggingIn lock not available, cannot perform backgroundFastLogin. Stop process")
             false
         }
-    }
-
-    /**
-     * Gets the Primary Folder handle
-     *
-     * @return the Primary Folder handle
-     */
-    private suspend fun getPrimaryFolderHandle(): Long =
-        getDefaultNodeHandleUseCase(context.getString(R.string.section_photo_sync))
-
-    /**
-     * Gets the Secondary Folder handle
-     *
-     * @return the Secondary Folder handle
-     */
-    private suspend fun getSecondaryFolderHandle(): Long {
-        // get Secondary folder handle of user
-        val secondarySyncHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
-        if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE || getNodeByIdUseCase(
-                NodeId(secondarySyncHandle)
-            ) == null
-        ) {
-            // if it's invalid or deleted then return the default value
-            return getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads))
-        }
-        return secondarySyncHandle
     }
 
     /**

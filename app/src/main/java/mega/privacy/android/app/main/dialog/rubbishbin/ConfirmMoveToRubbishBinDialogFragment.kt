@@ -46,8 +46,6 @@ internal class ConfirmMoveToRubbishBinDialogFragment : DialogFragment() {
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
                 val message = when {
                     uiState.isNodeInRubbish -> stringResource(id = R.string.confirmation_delete_from_mega)
-                    uiState.isPrimaryCuFolderHandle -> stringResource(id = R.string.confirmation_move_cu_folder_to_rubbish)
-                    uiState.isSecondaryCuFolderHandle -> stringResource(id = R.string.confirmation_move_mu_folder_to_rubbish)
                     else -> stringResource(id = R.string.confirmation_move_to_rubbish)
                 }
                 val positiveText = if (uiState.isNodeInRubbish) {

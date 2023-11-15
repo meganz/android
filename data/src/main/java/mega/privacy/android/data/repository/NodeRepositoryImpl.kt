@@ -441,7 +441,7 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getDefaultNodeHandle(folderName: String) = withContext(ioDispatcher) {
         megaApiGateway.getNodeByPath(folderName, megaApiGateway.getRootNode())
-            ?.takeIf { it.isFolder && megaApiGateway.isInRubbish(it) }?.let { NodeId(it.handle) }
+            ?.takeIf { it.isFolder }?.let { NodeId(it.handle) }
     }
 
     override suspend fun checkNodeCanBeMovedToTargetNode(
