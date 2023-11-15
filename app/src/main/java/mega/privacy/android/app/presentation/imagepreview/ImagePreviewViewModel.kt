@@ -127,6 +127,7 @@ class ImagePreviewViewModel @Inject constructor(
                     currentImageNode?.isAvailableOffline ?: false
                 _state.update {
                     it.copy(
+                        isInitialized = true,
                         showSlideshowOption = shouldShowSlideshowOption(imageNodes),
                         imageNodes = imageNodes,
                         currentImageNodeIndex = currentImageNodeIndex,
@@ -415,9 +416,15 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
-    suspend fun getImagePath(imageResult: ImageResult?): String? {
+    suspend fun getHighestResolutionImagePath(imageResult: ImageResult?): String? {
         return imageResult?.run {
             checkUri(fullSizeUri) ?: checkUri(previewUri) ?: checkUri(thumbnailUri)
+        }
+    }
+
+    suspend fun getLowestResolutionImagePath(imageResult: ImageResult?): String? {
+        return imageResult?.run {
+            checkUri(thumbnailUri) ?: checkUri(previewUri) ?: checkUri(fullSizeUri)
         }
     }
 

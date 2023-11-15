@@ -3,7 +3,6 @@
 package mega.privacy.android.app.presentation.imagepreview.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,59 +13,51 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.core.R.drawable.link_ic
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
-
-@OptIn(ExperimentalMaterialApi::class)
-@CombinedThemePreviews
-@Composable
-internal fun ImagePreviewBottomSheetPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        val modalSheetState = rememberModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.HalfExpanded,
-            skipHalfExpanded = false,
-        )
-        ImagePreviewBottomSheet(
-            modalSheetState = modalSheetState,
-        )
-    }
-}
+import nz.mega.sdk.MegaNode
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun ImagePreviewBottomSheet(
     modalSheetState: ModalBottomSheetState,
-    imageName: String = "",
-    imageInfo: String = "",
-    isFavourite: Boolean = false,
-    isExported: Boolean = false,
-    showLabel: Boolean = false,
-    labelColorText: String = "",
-    labelColor: Color = Color.Unspecified,
+    imageNode: ImageNode,
     isAvailableOffline: Boolean = false,
-    imageThumbnailPath: String? = "",
+    showDisputeTakeDown: Boolean = false,
+    showSlideShow: Boolean = false,
+    showForward: Boolean = false,
+    showRestore: Boolean = false,
+    showRemoveFromOffline: Boolean = false,
+    showRemove: Boolean = false,
+    downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
+    getImageThumbnailPath: suspend (ImageResult?) -> String?,
     onClickInfo: () -> Unit = {},
     onClickFavourite: () -> Unit = {},
     onClickLabel: () -> Unit = {},
@@ -87,25 +78,27 @@ internal fun ImagePreviewBottomSheet(
     onClickRemoveFromOffline: () -> Unit = {},
     onClickRemove: () -> Unit = {},
     onClickMoveToRubbishBin: () -> Unit = {},
-    showDisputeTakeDown: Boolean = false,
-    showSlideShow: Boolean = false,
-    showForward: Boolean = false,
-    showRemoveLink: Boolean = false,
-    showRestore: Boolean = false,
-    showRemoveFromOffline: Boolean = false,
-    showRemove: Boolean = false,
-    content: (@Composable () -> Unit)? = null,
 ) {
+    val context = LocalContext.current
+
     BottomSheet(
         modalSheetState = modalSheetState,
         sheetHeader = {
             ImagePreviewMenuActionHeader(
-                imageName = imageName,
-                imageInfo = imageInfo,
-                imageThumbnailPath = imageThumbnailPath,
+                imageNode = imageNode,
+                downloadImage = downloadImage,
+                getImageThumbnailPath = getImageThumbnailPath,
             )
         },
         sheetBody = {
+            val labelColorResId = remember(imageNode) {
+                MegaNodeUtil.getNodeLabelColor(imageNode.label)
+            }
+
+            val labelColorText = remember(imageNode) {
+                MegaNodeUtil.getNodeLabelText(imageNode.label, context)
+            }
+
             LazyColumn {
                 item {
                     MenuActionListTile(
@@ -115,18 +108,20 @@ internal fun ImagePreviewBottomSheet(
                         addSeparator = false,
                     )
                 }
+
                 item {
                     MenuActionListTile(
                         icon = painterResource(
-                            id = if (isFavourite) R.drawable.ic_remove_favourite
+                            id = if (imageNode.isFavourite) R.drawable.ic_remove_favourite
                             else R.drawable.ic_add_favourite
                         ),
-                        text = if (isFavourite) stringResource(id = R.string.file_properties_unfavourite)
+                        text = if (imageNode.isFavourite) stringResource(id = R.string.file_properties_unfavourite)
                         else stringResource(id = R.string.file_properties_favourite),
                         onActionClicked = onClickFavourite,
                         addSeparator = false,
                     )
                 }
+
                 item {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_label),
@@ -134,11 +129,11 @@ internal fun ImagePreviewBottomSheet(
                         onActionClicked = onClickLabel,
                         addSeparator = true,
                         trailingItem = {
-                            if (showLabel) {
+                            if (imageNode.label != MegaNode.NODE_LBL_UNKNOWN) {
                                 Row {
                                     Text(
                                         text = labelColorText,
-                                        color = labelColor,
+                                        color = colorResource(id = labelColorResId),
                                     )
                                     Box(
                                         modifier = Modifier
@@ -146,7 +141,8 @@ internal fun ImagePreviewBottomSheet(
                                             .padding(start = 4.dp)
                                             .size(10.dp)
                                             .background(
-                                                shape = CircleShape, color = labelColor
+                                                shape = CircleShape,
+                                                color = colorResource(id = labelColorResId),
                                             )
                                     )
                                 }
@@ -154,6 +150,7 @@ internal fun ImagePreviewBottomSheet(
                         }
                     )
                 }
+
                 if (showDisputeTakeDown) {
                     item {
                         MenuActionListTile(
@@ -164,6 +161,7 @@ internal fun ImagePreviewBottomSheet(
                         )
                     }
                 }
+
                 if (showSlideShow) {
                     item {
                         MenuActionListTile(
@@ -174,6 +172,7 @@ internal fun ImagePreviewBottomSheet(
                         )
                     }
                 }
+
                 item {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_open_with),
@@ -182,6 +181,7 @@ internal fun ImagePreviewBottomSheet(
                         addSeparator = true,
                     )
                 }
+
                 if (showForward) {
                     item {
                         MenuActionListTile(
@@ -192,6 +192,7 @@ internal fun ImagePreviewBottomSheet(
                         )
                     }
                 }
+
                 item {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_save_to_device),
@@ -200,6 +201,7 @@ internal fun ImagePreviewBottomSheet(
                         addSeparator = false,
                     )
                 }
+
                 item {
                     MenuActionListTile(
                         text = stringResource(id = R.string.file_properties_available_offline),
@@ -212,10 +214,11 @@ internal fun ImagePreviewBottomSheet(
                         )
                     }
                 }
+
                 item {
                     MenuActionListTile(
                         icon = painterResource(id = link_ic),
-                        text = if (isExported) {
+                        text = if (imageNode.exportedData != null) {
                             stringResource(id = R.string.edit_link_option)
                         } else {
                             LocalContext.current.resources.getQuantityString(
@@ -227,7 +230,8 @@ internal fun ImagePreviewBottomSheet(
                         addSeparator = false,
                     )
                 }
-                if (showRemoveLink) {
+
+                if (imageNode.exportedData != null) {
                     item {
                         MenuActionListTile(
                             icon = painterResource(id = R.drawable.ic_remove_link),
@@ -237,6 +241,7 @@ internal fun ImagePreviewBottomSheet(
                         )
                     }
                 }
+
                 item {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_send_to_contact),
@@ -245,6 +250,7 @@ internal fun ImagePreviewBottomSheet(
                         addSeparator = false,
                     )
                 }
+
                 item {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_social_share_white),
@@ -253,6 +259,7 @@ internal fun ImagePreviewBottomSheet(
                         addSeparator = true,
                     )
                 }
+
                 item {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_rename),
@@ -261,6 +268,7 @@ internal fun ImagePreviewBottomSheet(
                         addSeparator = false,
                     )
                 }
+
                 item {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_move),
@@ -269,6 +277,7 @@ internal fun ImagePreviewBottomSheet(
                         addSeparator = false,
                     )
                 }
+
                 item {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_menu_copy),
@@ -277,6 +286,7 @@ internal fun ImagePreviewBottomSheet(
                         addSeparator = true,
                     )
                 }
+
                 if (showRestore) {
                     item {
                         MenuActionListTile(
@@ -287,6 +297,7 @@ internal fun ImagePreviewBottomSheet(
                         )
                     }
                 }
+
                 if (showRemoveFromOffline) {
                     item {
                         MenuActionListTile(
@@ -297,6 +308,7 @@ internal fun ImagePreviewBottomSheet(
                         )
                     }
                 }
+
                 if (showRemove) {
                     item {
                         MenuActionListTile(
@@ -307,6 +319,7 @@ internal fun ImagePreviewBottomSheet(
                         )
                     }
                 }
+
                 item {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_rubbish_bin),
@@ -318,16 +331,27 @@ internal fun ImagePreviewBottomSheet(
                 }
             }
         },
-        content = content,
     )
 }
 
 @Composable
 internal fun ImagePreviewMenuActionHeader(
-    imageName: String,
-    imageInfo: String,
-    imageThumbnailPath: String?,
+    imageNode: ImageNode,
+    downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
+    getImageThumbnailPath: suspend (ImageResult?) -> String?,
 ) {
+    val context = LocalContext.current
+
+    val imageThumbnailPath by produceState<String?>(null, imageNode) {
+        downloadImage(imageNode).collectLatest { imageResult ->
+            value = getImageThumbnailPath(imageResult)
+        }
+    }
+
+    val imageInfo = remember(imageNode) {
+        MegaNode.unserialize(imageNode.serializedData).getInfoText(context)
+    }
+
     Row(
         modifier = Modifier.padding(all = 16.dp)
     ) {
@@ -346,7 +370,7 @@ internal fun ImagePreviewMenuActionHeader(
             modifier = Modifier.padding(start = 16.dp)
         ) {
             MiddleEllipsisText(
-                text = imageName,
+                text = imageNode.name,
                 color = MaterialTheme.colors.textColorPrimary,
             )
             MiddleEllipsisText(
