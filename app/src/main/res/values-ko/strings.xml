@@ -60,8 +60,6 @@
     <string name="error_general_nodes">오류. 다시 시도하세요.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-복구키</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">보조 미디어 폴더가 존재하지 않습니다, 새 폴더를 선택하세요</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">외부 저장 공간이 감지되지 않았습니다</string>
     <!-- Button where the user can sign off or logout -->
@@ -579,7 +577,7 @@
     </string-array>
     <!-- choose the way the new user’s email is inserted, import from phone option -->
     <string-array name="add_contact_array">
-        <item>Write the user’s email</item>
+        <item></item>
         <item>장치에서 들여오기</item>
     </string-array>
     <!-- settings option -->
@@ -1039,8 +1037,6 @@
     <string name="confirm_logout_from_sms_verification">현재 계정에서 로그아웃 하시겠습니까?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">이 메시지는 %1$s님에 의해 삭제되었습니다</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">대화 기록이 삭제되었습니다</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">%1$s님에 의해 기록이 삭제되었습니다</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -4570,7 +4566,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;자동 백업</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite는 최대 90일, Pro&#160;I, II, 그리고 III은 최대 365일 되돌리기 기능 (출시 예정)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III (coming soon)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;7일과 10년 사이의 휴지통 비우기 예약</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4971,4 +4967,28 @@
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA는 당신의 소통을 필수적인 안전 보증을 제공하는 영지식 암호화를 통해 보호합니다:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
+    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_get_pro_title">Pro 요금제로 더 받기</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan for more storage and lots of extra features. Our plans start at %s a month.</string>
+    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_some_features_title">기대할 수 있는 몇 가지 기능은 다음과 같습니다:</string>
+    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_storage">넉넉한 저장소</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Store unlimited data, starting from %s.</string>
+    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_transfer">전송 공유</string>
+    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_transfer">당신이 데이터를 공유해준 사람들이 당신이 공유해준 것을 다운로드 하거나 스트림 하기 위해 당신의 전송 할당량을 이용할 수 있습니다.</string>
+    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_security">공유할 때 추가 보안</string>
+    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_security">파일과 폴더 링크에 암호와 만료일을 설정</string>
+    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
+    <string name="dialog_onboarding_button_view_pro_plan">Pro 요금제 보기</string>
+    <!-- Label indicating that a participant is presenting in the main view of the call -->
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s is presenting</string>
+    <!-- Warning indicating that a participant is sharing the screen-->
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">이 사람이 화면을 공유 중입니다</string>
 </resources>

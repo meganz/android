@@ -60,8 +60,6 @@
     <string name="error_general_nodes">エラー。もう一度やり直してください。</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-回復キー</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">セカンダリメディアフォルダが存在しません。新しいフォルダを選択してください</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">外部ストレージが検出されませんでした</string>
     <!-- Button where the user can sign off or logout -->
@@ -1039,8 +1037,6 @@
     <string name="confirm_logout_from_sms_verification">現在のアカウントからログアウトしてもよろしいですか？</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">このメッセージは%1$sによって削除されました</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">チャット履歴がクリアされました</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">%1$sさんがチャット履歴をクリアしました</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -4570,7 +4566,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;自動バックアップ</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Liteでは最大90日、Pro&#160;I、II、IIIでは最大365日巻き戻し（近日公開予定）</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Liteでは最大90日、Pro&#160;I、II、IIIでは最大180日巻き戻し（近日公開予定）</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;ごみ箱を空にするのを7日から10年の間でスケジュールする</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4971,4 +4967,28 @@
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGAは、必須の安全保証をご提供するゼロ知識暗号化を使用してお客様の通信を保護いたします：</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">このシステムは、受信したデータが表示された送信者からのものであり、そのコンテンツが転送中に操作されていないことを保証します。</string>
+    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_get_pro_title">Proプランでさらに充実</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Proプランにアップグレードしていただくと、より多くのストレージと多くの追加機能をご利用いただけます。当社のプランは月額%sから始まります。</string>
+    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_some_features_title">ご期待いただける機能としては次のようなものがあります。</string>
+    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_storage">豊富なストレージ</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">無制限にデータを保管できます（%sから）。</string>
+    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_transfer">転送共有</string>
+    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_transfer">データを共有する相手は、お客様の転送容量を使用して、お客様が共有した項目をダウンロードしてストリーミングできます。</string>
+    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_security">共有時のセキュリティの強化</string>
+    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_security">ファイルとフォルダのリンクのパスワードと有効期限を設定できます。</string>
+    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
+    <string name="dialog_onboarding_button_view_pro_plan">Proプランを見る</string>
+    <!-- Label indicating that a participant is presenting in the main view of the call -->
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$sさんがプレゼン中です</string>
+    <!-- Warning indicating that a participant is sharing the screen-->
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">この方は画面共有中です</string>
 </resources>

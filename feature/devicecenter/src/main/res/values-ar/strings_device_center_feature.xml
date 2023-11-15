@@ -65,9 +65,9 @@
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">لا يمكن مزامنة الملف بشكل فردي. تحتاج إلى إعداد المزامنة من المجلد.</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed"></string>
+    <string name="device_center_list_view_item_sub_state_initial_scan_failed">فشل الفحص الأولي. ستحتاج إلى إعادة تمكين المزامنة أو النسخ الاحتياطي من تطبيق الحاسوب المكتبي.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="device_center_list_view_item_sub_state_remote_node_not_found"></string>
+    <string name="device_center_list_view_item_sub_state_remote_node_not_found">لا يمكن تحديد موقع المجلد الموجود في ميغا MEGA نظرًا لأنه تم نقله أو حذفه، أو ربما ليس لديك إذن للوصول إليه.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota"></string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
@@ -79,7 +79,7 @@
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">لا يمكن مزامنة المجلد لأنه مجلد مشترك بدون إذن وصول كامل.</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error"></string>
+    <string name="device_center_list_view_item_sub_state_put_nodes_error">لا يمكن مزامنة الملفات الموجودة في هذا المجلد أو نسخها احتياطيًا. ستحتاج إلى إعادة تمكين المزامنة أو النسخ الاحتياطي من تطبيق الحاسوب المكتبي.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_below_path">لا يمكن مزامنة المجلد لأنه يحتوي بالفعل على مجلدات متزامنة.</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
@@ -91,7 +91,7 @@
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="device_center_list_view_item_sub_state_too_many_action_packets">تمت إعادة تحميل الحساب. لم يتم تطبيق أي تحديثات فائتة على النسخ الاحتياطية أو المزامنات الخاصة بك.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="device_center_list_view_item_sub_state_logged_out"></string>
+    <string name="device_center_list_view_item_sub_state_logged_out">تم إيقاف المزامنة أو النسخ الاحتياطي حيث يبدو أنك قمت بتسجيل الخروج من تطبيق الحاسوب المكتبي. قم بتسجيل الدخول مرة أخرى عبر تطبيق الحاسوب المكتبي واستأنف المزامنة أو النسخ الاحتياطي.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="device_center_list_view_item_sub_state_missing_parent_node"></string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
@@ -99,7 +99,7 @@
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_same_path"></string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes"></string>
+    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">فشلت عملية إعادة التسمية.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file"></string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
@@ -117,17 +117,17 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database"></string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
-    <string name="device_center_list_view_item_sub_state_insufficient_disk_space"></string>
+    <string name="device_center_list_view_item_sub_state_insufficient_disk_space">مساحة غير كافية للتحميل.</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage"></string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="device_center_list_view_item_sub_state_message_unknown_error"></string>
+    <string name="device_center_list_view_item_sub_state_message_unknown_error">خطأ غير معروف.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="device_center_list_view_item_sub_state_message_something_went_wrong"></string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">لا يمكن مزامنة المجلد أو نسخه احتياطيًا لأن مجلد ميغا MEGA موجود في سلة المحذوفات.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now"></string>
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">لا يمكن تحديد موقع المجلد الموجود في جهازك الآن، حاول مرة أخرى لاحقًا.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive"></string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
@@ -146,4 +146,6 @@
     <string name="device_center_rename_device_dialog_error_message_invalid_characters">المحارف التالية غير مسموح بها: %1$s</string>
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
     <string name="device_center_snackbar_message_rename_device_successful">تمت إعادة تسمية الجهاز</string>
+    <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
+    <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">Maximum 32 characters</string>
 </resources>

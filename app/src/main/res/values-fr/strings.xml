@@ -60,8 +60,6 @@
     <string name="error_general_nodes">Erreur. Veuillez réessayer.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-CLÉdeRÉCUPÉRATION</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">Le dossier secondaire de médias n’existe pas, veuillez choisir un nouveau dossier</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Aucune mémoire externe n’a été détectée</string>
     <!-- Button where the user can sign off or logout -->
@@ -1071,8 +1069,6 @@
     <string name="confirm_logout_from_sms_verification">Voulez-vous vraiment vous déconnecter du compte actuel ?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Ce message a été supprimé par %1$s</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">L’historique de la conversation a été effacé</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">L’historique de la conversation a été effacé par %1$s</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -4996,7 +4992,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Sauvegardes automatiques</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Retour en arrière jusqu\’à 90&#160;jours pour Pro&#160;Lite et jusqu\’à 365&#160;jours pour Pro&#160;I, II et III (offert bientôt)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Retour en arrière jusqu\’à 90&#160;jours pour Pro&#160;Lite et jusqu\’à 180&#160;jours pour Pro&#160;I, II et III (offert bientôt)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Programmation du vidage de la corbeille entre 7&#160;jours et 10&#160;ans.</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5441,4 +5437,28 @@
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA protège vos communications grâce à notre système de chiffrement à divulgation nulle de connaissance apportant ainsi une garantie de sécurité essentielle&#160;:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">Le système garantit que les données reçues proviennent de l’expéditeur indiqué et que le contenu n’a pas été manipulé pendant le transfert.</string>
+    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_get_pro_title">Obtenir davantage avec un abonnement Pro</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Passez à un abonnement Pro et obtenez davantage d’espace de stockage et de nombreuses fonctions supplémentaires. Nos abonnements commencent à %s par mois.</string>
+    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_some_features_title">Voici ce que vous obtiendrez&#160;:</string>
+    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_storage">Espace de stockage généreux</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Stockez des données sans limite, à partir de %s</string>
+    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_transfer">Partage des transferts</string>
+    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_transfer">Les personnes avec qui vous partagez des données peuvent utiliser votre quota de transfert pour télécharger ou diffuser en continu les éléments que vous avez partagés.</string>
+    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_security">Sécurité supplémentaire lors de partages</string>
+    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_security">Définissez des mots de passe et des dates d’expiration pour les liens de fichier et de dossier.</string>
+    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
+    <string name="dialog_onboarding_button_view_pro_plan">Afficher les abonnements Pro</string>
+    <!-- Label indicating that a participant is presenting in the main view of the call -->
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s présente</string>
+    <!-- Warning indicating that a participant is sharing the screen-->
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Cette personne partage son écran</string>
 </resources>

@@ -60,8 +60,6 @@
     <string name="error_general_nodes">Terjadi kesalahan. Harap, coba kembali.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-KUNCIPEMULIHAN</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">Folder media sekunder tidak ada, silahkan pilih folder  baru</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Tidak ada penyimpanan eksternal yang terdeteksi</string>
     <!-- Button where the user can sign off or logout -->
@@ -1039,8 +1037,6 @@
     <string name="confirm_logout_from_sms_verification">Apakah anda yakin ingin keluar dari akun saat ini?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Pesan ini telah dihapus oleh %1$s</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">Riwayat obrolan telah dihapus</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">Riwayat obrolan dihapus oleh %1$s</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -3358,7 +3354,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">Anda sudah memiliki langganan. Jika anda membeli satu lagi anda akan dikenakan biaya dua kali. Untuk menghindarinya, batalkan langganan anda saat ini melalui %1$s. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your Apple account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">Anda sudah berlangganan. Jika anda membeli yang lain, anda akan dikenakan biaya dua kali. Untuk menghindari hal ini, batalkan langganan anda saat ini dari akun Apple anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Anda sudah memiliki langganan. Jika anda membeli satu lagi, anda akan dikenakan biaya dua kali. Untuk menghindarinya, batalkan langganan anda saat ini dengan membuka MEGA di browser web desktop atau seluler. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3372,7 +3368,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Anda memiliki langganan MEGA yang aktif. Ini akan dibatalkan secara otomatis setelah akun dihapus. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your Apple account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_itunes_platform_subscription">Anda memiliki langganan MEGA aktif dengan Apple. Anda harus membatalkannya secara terpisah dari akun Apple anda, karena MEGA tidak dapat membatalkannya untuk anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Kunjungi %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -3654,13 +3650,13 @@
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] diubah menjadi hanya-baca oleh  [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to a standard participant by [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] diubah menjadi peserta standar oleh  [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] diubah menjadi tuan rumah oleh [/B][A]%2$s[/A]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s diubah menjadi hanya-baca oleh %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to a standard participant by %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s diubah menjadi peserta standar oleh %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s diubah menjadi tuan rumah oleh %2$s</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
@@ -3800,7 +3796,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Secara otomatis membuka folder yang hanya berisi gambar dan video dalam tampilan penemuan media. Ini memungkinkan anda melihat media dalam mode galeri dan memfilter berdasarkan tanggal.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Karena folder ini hanya berisi gambar dan video, kami secara otomatis membukanya dalam tampilan penemuan media. Anda dapat menikmati konten visual anda dengan tata letak yang lebih mendalam. Anda dapat menonaktifkan ini di Pengaturan.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Pengaturan</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4570,7 +4566,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Cadangan otomatis</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Mundur hingga 90 hari di Pro&#160;Lite dan hingga 365 hari di Pro&#160;I, II, dan III (segera hadir)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III (coming soon)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Jadwalkan pembersihan tempat sampah antara 7 hari dan 10 tahun</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4826,7 +4822,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Ruang tunggu</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Only participants admitted by the host can join the meeting.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">Hanya peserta yang diakui oleh tuan rumah yang dapat mengikuti rapat.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Peserta yang ditambahkan oleh non-host selama panggilan tidak akan dikirim ke ruang tunggu.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
@@ -4871,8 +4867,7 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">Lihat ruang tunggu</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one">%1$d participant is waiting to join the call.</item>
-        <item quantity="other">%1$d participants are waiting to join the call.</item>
+        <item quantity="other">%1$d peserta sedang menunggu untuk bergabung dalam panggilan.</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">Tolak %1$s masuk?</string>
@@ -4909,7 +4904,7 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Penemuan media di subfolder</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in media discovery view.</string>
+    <string name="settings_media_discovery_sub_folder_context">Gambar dan video dari subfolder juga akan disertakan dalam tampilan penemuan media.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Tidak ada hasil</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4933,38 +4928,34 @@
     <!-- Option to show the list of participants who are not on the call in the meeting screen -->
     <string name="meetings_bottom_panel_participants_not_in_call_button">Tidak sedang menelepon</string>
     <!-- Label to show the number of participants in the waiting room-->
-    <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Waiting (%d)</string>
+    <string name="meetings_bottom_panel_number_of_participants_in_the_waiting_room_label">Sedang menunggu (%d)</string>
     <!-- Text of button to show all participants in the waiting room in call UI -->
     <string name="meetings_waiting_room_call_ui_see_all_button">Lihat semua</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
-    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Don’t deny</string>
+    <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Jangan tolak</string>
     <!--  -->
-    <string name="camera_uploads_up_to_date">Camera uploads updated</string>
+    <string name="camera_uploads_up_to_date">Unggahan kamera diperbarui</string>
     <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">Uploading paused due to no internet connection</string>
+    <string name="camera_uploads_paused_due_to_no_internet">Pengunggahan dijeda karena tidak ada koneksi internet</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="one">Camera uploads in progress, %1$d file pending</item>
-        <item quantity="other">Camera uploads in progress, %1$d files pending</item>
+        <item quantity="other">Pengunggahan kamera sedang berlangsung, %1$d file tertunda</item>
     </plurals>
     <!--  -->
     <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
-        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+        <item quantity="other">Unggahan kamera selesai, %1$d file diunggah</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA memiliki akses terbatas ke perpustakaan foto dan tidak dapat mencadangkan semua foto anda.</string>
     <!-- camera uploads change permissions -->
-    <string name="camera_uploads_change_permissions">Tap to change permissions.</string>
+    <string name="camera_uploads_change_permissions">Ketuk untuk mengubah izin.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
     <plurals name="meetings_bottom_panel_number_of_participants_not_in_call_label">
-        <item quantity="one">Invitee (%d)</item>
-        <item quantity="other">Invitees (%d)</item>
+        <item quantity="other">Para undangan (%d)</item>
     </plurals>
     <!-- Subtitle Not in call participants screen. Plural of i. 2 invitees -->
     <plurals name="meetings_meeting_not_in_call_section_subtitle">
-        <item quantity="one">%d invitee</item>
-        <item quantity="other">%d invitees</item>
+        <item quantity="other">%d undangan</item>
     </plurals>
     <!-- Title of button to share the chat link in bottom panel in the group call screen -->
     <string name="meetings_group_call_bottom_panel_share_chat_link_button">Bagikan tautan obrolan</string>
@@ -4975,5 +4966,29 @@
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA melindungi komunikasi anda dengan sistem enkripsi tanpa pengetahuan kami yang memberikan jaminan keamanan penting:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
-    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">Sistem memastikan bahwa data yang diterima berasal dari pengirim yang ditampilkan, dan isinya tidak dimanipulasi selama transit.</string>
+    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_get_pro_title">Dapatkan lebih banyak dengan paket Pro</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Tingkatkan ke paket Pro untuk penyimpanan lebih besar dan banyak fitur tambahan. Rencana kami dimulai pada %s per bulan.</string>
+    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_some_features_title">Beberapa fitur yang dinantikan adalah:</string>
+    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_storage">Penyimpanan murah hati</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Menyimpan data tanpa batas, mulai dari %s.</string>
+    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_transfer">Berbagi transfer</string>
+    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_transfer">Orang yang anda bagikan datanya dapat menggunakan kuota transfer anda untuk mengunduh dan melakukan streaming item yang anda bagikan.</string>
+    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_security">Keamanan tambahan saat berbagi</string>
+    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_security">Tetapkan kata sandi dan tanggal kedaluwarsa untuk tautan file dan folder.</string>
+    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
+    <string name="dialog_onboarding_button_view_pro_plan">Lihat paket Pro</string>
+    <!-- Label indicating that a participant is presenting in the main view of the call -->
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s is presenting</string>
+    <!-- Warning indicating that a participant is sharing the screen-->
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">This person is screen sharing</string>
 </resources>

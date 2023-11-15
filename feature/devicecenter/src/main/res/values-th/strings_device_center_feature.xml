@@ -65,9 +65,9 @@
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">ไม่สามารถซิงค์ไฟล์ทีละไฟล์ได้ คุณต้องตั้งค่าการซิงค์จากโฟลเดอร์แทน</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed"></string>
+    <string name="device_center_list_view_item_sub_state_initial_scan_failed">การสแกนเริ่มต้นล้มเหลว คุณจะต้องเปิดใช้งานการซิงค์หรือสำรองข้อมูลจากแอปเดสก์ทอปของคุณใหม่</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="device_center_list_view_item_sub_state_remote_node_not_found"></string>
+    <string name="device_center_list_view_item_sub_state_remote_node_not_found">ไม่สามารถหาโฟลเดอร์ใน MEGAได้ อาจถูกย้ายหรือลบออก หรือคุณอาจไม่สามารถเข้าถึงได้</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota"></string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
@@ -79,7 +79,7 @@
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">ไม่สามารถซิงค์โฟลเดอร์นี้ได้เนื่องจากเป็นโฟลเดอร์ที่มีการแชร์โดยไม่มีการเข้าถึงแบบเต็ม</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error"></string>
+    <string name="device_center_list_view_item_sub_state_put_nodes_error">ไฟล์ในโฟลเดอร์นี้ไม่สามารถซิงค์หรือสำรองข้อมูลได้ คุณต้องเปิดใช้งานการซิงค์หรือการสำรองข้อมูลใหม่จากแอปบนเดสก์ท็อปก่อน</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_below_path">ไม่สามารถซิงค์โฟลเดอร์นี้ได้เนื่องจากอยู่ในโฟลเดอร์ที่มีการซิงค์อยู่แล้ว</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
@@ -91,7 +91,7 @@
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="device_center_list_view_item_sub_state_too_many_action_packets">บัญชีของคุณถูกโหลดซ้ำ การเปลี่ยนแปลงที่หายไปจะไม่มีผลกับการสำรองข้อมูลหรือการซิงค์ของคุณ</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="device_center_list_view_item_sub_state_logged_out"></string>
+    <string name="device_center_list_view_item_sub_state_logged_out">การซิงค์หรือการสำรองข้อมูลถูกหยุดลง ซึ่งดูเหมือนว่าคุณได้ออกจากระบบแอปเดสก์ท็อปแล้ว กรุณาเข้าสู่ระบบผ่านแอปเดสก์ท็อปแล้วเริ่มต้นการซิงค์หรือการสำรองข้อมูลใหม่อีกครั้ง</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="device_center_list_view_item_sub_state_missing_parent_node"></string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
@@ -99,7 +99,7 @@
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_same_path"></string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes"></string>
+    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">การเปลี่ยนชื่อไม่สำเร็จ</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file"></string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
@@ -117,17 +117,17 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database"></string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
-    <string name="device_center_list_view_item_sub_state_insufficient_disk_space"></string>
+    <string name="device_center_list_view_item_sub_state_insufficient_disk_space">มีพื้นที่ไม่เพียงพอที่จะดาวน์โหลด</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage"></string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="device_center_list_view_item_sub_state_message_unknown_error"></string>
+    <string name="device_center_list_view_item_sub_state_message_unknown_error">ข้อผิดพลาดที่ไม่รู้จัก</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="device_center_list_view_item_sub_state_message_something_went_wrong"></string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">ไม่สามารถซิงค์หรือสำรองข้อมูลโฟลเดอร์ได้เนื่องจากโฟลเดอร์ MEGA อยู่ในถังขยะ</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now"></string>
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">ไม่สามารถหาโฟลเดอร์ในอุปกรณ์ของคุณได้ในขณะนี้ กรุณาลองอีกครั้งในภายหลัง</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive"></string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
@@ -146,4 +146,6 @@
     <string name="device_center_rename_device_dialog_error_message_invalid_characters">ไม่อนุญาตให้ใช้อักขระต่อไปนี้: %1$s</string>
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
     <string name="device_center_snackbar_message_rename_device_successful">เปลี่ยนชื่ออุปกรณ์แล้ว</string>
+    <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
+    <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">Maximum 32 characters</string>
 </resources>

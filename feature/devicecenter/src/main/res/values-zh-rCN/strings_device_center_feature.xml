@@ -59,15 +59,15 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="device_center_list_view_item_sub_state_no_sync_error"></string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="device_center_list_view_item_sub_state_unsupported_file_system"></string>
+    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA无法同步或备份此文件夹，因为尚不支持您设备上的文件系统。</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_remote_type"></string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">无法单独同步文件。您需要从文件夹设置同步。</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed"></string>
+    <string name="device_center_list_view_item_sub_state_initial_scan_failed">初始扫描失败。您需要从桌面应用程序重新启用同步或备份。</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="device_center_list_view_item_sub_state_remote_node_not_found"></string>
+    <string name="device_center_list_view_item_sub_state_remote_node_not_found">MEGA中的文件夹已被移动或删除，因此无法定位，或者您可能没有访问权限。</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota"></string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
@@ -79,11 +79,11 @@
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">无法同步文件夹，因为它是没有完全访问权限的共享文件夹。</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error"></string>
+    <string name="device_center_list_view_item_sub_state_put_nodes_error">无法同步或备份此文件夹中的文件。您需要从桌面应用程序重新启用同步或备份。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_below_path">无法同步文件夹，因为它已经包含已同步的文件夹。</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported"></string>
+    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA无法同步或备份VirtualBox文件夹。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
     <string name="device_center_list_view_item_sub_state_account_blocked"></string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
@@ -91,7 +91,7 @@
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="device_center_list_view_item_sub_state_too_many_action_packets">帐户已重新加载。对备份或同步的任何更新尚未应用。</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="device_center_list_view_item_sub_state_logged_out"></string>
+    <string name="device_center_list_view_item_sub_state_logged_out">由于您似乎已登出桌面应用程序，因此同步或备份已停止。通过桌面应用程序重新登录，然后恢复同步或备份。</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="device_center_list_view_item_sub_state_missing_parent_node"></string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
@@ -99,7 +99,7 @@
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_same_path"></string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes"></string>
+    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">重命名失败。</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file"></string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
@@ -117,17 +117,17 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database"></string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
-    <string name="device_center_list_view_item_sub_state_insufficient_disk_space"></string>
+    <string name="device_center_list_view_item_sub_state_insufficient_disk_space">空间不足，无法下载。</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage"></string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="device_center_list_view_item_sub_state_message_unknown_error"></string>
+    <string name="device_center_list_view_item_sub_state_message_unknown_error">未知错误。</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="device_center_list_view_item_sub_state_message_something_went_wrong"></string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">由于MEGA文件夹位于回收站中，文件夹无法同步或备份。</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now"></string>
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">现在无法定位您设备中的文件夹，请稍后再试。</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive"></string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
@@ -146,4 +146,6 @@
     <string name="device_center_rename_device_dialog_error_message_invalid_characters">不允许使用这些字符：%1$s</string>
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
     <string name="device_center_snackbar_message_rename_device_successful">设备已重命名</string>
+    <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
+    <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">最多32个字符（16个中文字）</string>
 </resources>

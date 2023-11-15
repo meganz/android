@@ -60,8 +60,6 @@
     <string name="error_general_nodes">發生錯誤。請再試一次。</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-還原金鑰</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">第二媒體資料夾不存在，請選擇一個新的資料夾</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">未能偵測到外部儲存裝置</string>
     <!-- Button where the user can sign off or logout -->
@@ -1039,8 +1037,6 @@
     <string name="confirm_logout_from_sms_verification">您確定要登出目前帳戶嗎？</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">此訊息已被%1$s刪除</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">對話紀錄已清空</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">對話記錄已被%1$s清除</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -4570,7 +4566,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;自動備份</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite最多可回溯90天，Pro&#160;I、II和III最多可回溯365天（即將推出）</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite最多可回溯90天，Pro&#160;I、II和III最多可回溯180天（即將推出）</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;垃圾筒清理排程7天至10年</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4971,4 +4967,28 @@
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA透過我們的零知識加密系統保護您的通訊，提供必要的安全保障：</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">我們的系統能確保收到的資料是來自所顯示的發送人，且其內容在傳輸過程中不會被篡改。</string>
+    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_get_pro_title">透過Pro方案獲得更多功能</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">升級到Pro方案可獲得更多儲存空間和更多額外的功能。我們的會員方案從每月%s起。</string>
+    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_some_features_title">一些值得期待的功能：</string>
+    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_storage">大容量儲存空間</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">儲存無限資料，從%s起。</string>
+    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_transfer">傳輸流量共享</string>
+    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_transfer">與您共享資料的人可以使用您的傳輸配額來下載和串流播放您所共享的項目。</string>
+    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_security">共享時的額外安全性</string>
+    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_security">為檔案和資料夾連結設定密碼和到期日期。</string>
+    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
+    <string name="dialog_onboarding_button_view_pro_plan">查看Pro方案</string>
+    <!-- Label indicating that a participant is presenting in the main view of the call -->
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s正在展示</string>
+    <!-- Warning indicating that a participant is sharing the screen-->
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">此人正在螢幕共享</string>
 </resources>

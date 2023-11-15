@@ -60,8 +60,6 @@
     <string name="error_general_nodes">ผิดพลาด กรุณาลองใหม่อีกครั้ง</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-คีย์การกู้คืน</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">ไม่มีโฟลเดอร์มีเดียสำรองอยู่ กรุณาเลือกโฟลเดอร์ใหม่</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">ไม่พบที่เก็บข้อมูลภายนอก</string>
     <!-- Button where the user can sign off or logout -->
@@ -1039,8 +1037,6 @@
     <string name="confirm_logout_from_sms_verification">คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบบัญชีปัจจุบันนี้</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">ข้อความนี้ถูกลบโดย %1$s</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">ล้างประวัติการแชทแล้ว</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">ประวัติแชทถูกล้างออกโดย %1$s</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -4570,7 +4566,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;ตั้งค่าการสำรองข้อมูลอัตโนมัติได้</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;ใช้ฟีเจอร์ย้อนกลับไฟล์ได้ โดย Pro&#160;Lite ย้อนกลับได้ถึง 90 วัน ส่วน Pro&#160;I, II และ III ย้อนกลับได้ถึง 365 วัน (จะมาในเร็ว ๆ นี้)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;ใช้ฟีเจอร์ย้อนกลับไฟล์ได้ โดย Pro&#160;Lite ย้อนกลับได้ถึง 90 วัน ส่วน Pro&#160;I, II และ III ย้อนกลับได้ถึง 180 วัน (จะมาในเร็ว ๆ นี้)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;สร้างกำหนดการล้างถังขยะได้ตั้งแต่ 7 วันถึง 10 ปี</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4971,4 +4967,28 @@
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA ปกป้องการสื่อสารของคุณด้วยการเข้ารหัสแบบซีโร่-นอว์เลจเพื่อให้คุณมั่นใจได้ในเรื่องความปลอดภัยข้อมูลของคุณอย่างสูงสุด</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">ระบบตรวจสอบความถูกต้องของข้อมูลที่ได้รับ โดยตรวจสอบว่าข้อมูลนั้นมาจากผู้ส่งที่ถูกต้อง และเนื้อหาของข้อมูลนั้นไม่ได้ถูกแก้ไขในระหว่างการขนส่ง</string>
+    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_get_pro_title">รับสิทธิประโยชน์เพิ่มเติมด้วยการอัปเกรดเป็นแผน Pro</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">อัปเกรดเป็นแผน Pro เพื่อเพิ่มพื้นที่เก็บข้อมูลและคุณสมบัติพิเศษอีกมากมาย แผนของเราเริ่มต้นที่ %s ต่อเดือน</string>
+    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_some_features_title">คุณสมบัติที่คุณจะได้สัมผัสอย่างเต็มอิ่มคือ:</string>
+    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_storage">พื้นที่เก็บข้อมูลจุได้ไม่อั้น</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">เก็บข้อมูลได้ไม่จำกัด เริ่มต้นที่ %s</string>
+    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_transfer">แชร์การถ่ายโอนของคุณให้คนอื่นได้</string>
+    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_transfer">คนที่คุณแชร์ข้อมูลด้วย สามารถใช้โควต้าการถ่ายโอนของคุณเพื่อดาวน์โหลดและสตรีมรายการที่คุณแชร์ได้</string>
+    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_security">เพิ่มความปลอดภัยเมื่อแชร์ข้อมูล</string>
+    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_security">ลิงก์ไฟล์และโฟลเดอร์สามารถตั้งรหัสผ่านและวันหมดอายุได้</string>
+    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
+    <string name="dialog_onboarding_button_view_pro_plan">ดูแผน Pro</string>
+    <!-- Label indicating that a participant is presenting in the main view of the call -->
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s is presenting</string>
+    <!-- Warning indicating that a participant is sharing the screen-->
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">This person is screen sharing</string>
 </resources>

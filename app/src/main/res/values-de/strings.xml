@@ -60,8 +60,6 @@
     <string name="error_general_nodes">Fehler. Bitte versuchen Sie es später erneut.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-RETTUNGSSCHLUESSEL</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">Der Zweitmedienordner existiert nicht. Bitte wählen Sie einen anderen Ordner</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Kein externes Speichermedium gefunden</string>
     <!-- Button where the user can sign off or logout -->
@@ -305,7 +303,7 @@
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Sie haben keine App installiert, die diesen Dateityp unterstützt</string>
     <!-- create a link of a file and send it using an app from the device -->
-    <string name="context_get_link">Linkfreigabe</string>
+    <string name="context_get_link">Link teilen</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">Link löschen</string>
     <!-- Title alert before leaving a share. -->
@@ -1055,8 +1053,6 @@
     <string name="confirm_logout_from_sms_verification">Sind Sie sicher, dass Sie sich ausloggen möchten?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Diese Nachricht wurde von %1$s gelöscht</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">Chatverlauf gelöscht</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">Der Chatverlauf wurde von %1$s gelöscht</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -4783,7 +4779,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatische Backups</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind – bis zu 90 Tage für Pro&#160;Lite und bis zu 365 Tage für Pro&#160;I, II und III (demnächst)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III (coming soon)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Planmäßige Leerung des Papierkorbs – Intervall 7 Tage bis 10 Jahre</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5205,5 +5201,29 @@
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA schützt Ihre Kommunikation mit einer Zero-Knowledge-Verschlüsselung, die wichtige Sicherheitsgarantien bietet:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
-    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">Das System stellt sicher, dass die empfangenen Daten tatsächlich vom angezeigten Benutzer stammen und zwischenzeitlich nicht verändert wurden.</string>
+    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_get_pro_title">Mit einem Pro-Paket bekommen Sie mehr</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Ein Pro-Paket bietet Ihnen mehr Speicherplatz und viele zusätzliche Funktionen. Unsere Pakete erhalten Sie bereits ab %s pro Monat.</string>
+    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_some_features_title">Sie können sich unter anderem auf folgende Funktionen freuen:</string>
+    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_storage">Großzügiger Speicherplatz</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Speichern Sie beliebig viele Daten, beginnend mit %s.</string>
+    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_transfer">Transfervolumen teilen</string>
+    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_transfer">Die Personen, für die Sie Daten freigeben, können Ihr Transfervolumen nutzen, um die von Ihnen freigegebenen Inhalte herunterzuladen und zu streamen.</string>
+    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_security">Mehr Sicherheit beim Teilen</string>
+    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_security">Schützen Sie Datei- und Ordnerlinks mit Passwort und Ablaufdatum.</string>
+    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
+    <string name="dialog_onboarding_button_view_pro_plan">Pro-Pakete ansehen</string>
+    <!-- Label indicating that a participant is presenting in the main view of the call -->
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s is presenting</string>
+    <!-- Warning indicating that a participant is sharing the screen-->
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">This person is screen sharing</string>
 </resources>

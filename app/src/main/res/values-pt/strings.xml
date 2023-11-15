@@ -60,8 +60,6 @@
     <string name="error_general_nodes">Erro. Por favor, tente novamente.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-CHAVEDERECUPERACAO</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">A pasta secundária de mídia não existe. Por favor, selecione uma pasta nova</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Não foi detectado nenhum dispositivo de armazenamento externo</string>
     <!-- Button where the user can sign off or logout -->
@@ -1071,8 +1069,6 @@
     <string name="confirm_logout_from_sms_verification">Você tem certeza de que quer fazer logout desta conta?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Esta mensagem foi deletada por %1$s</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">O histórico do chat foi deletado</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">O histórico do chat foi deletado por %1$s</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -4996,7 +4992,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backups automáticos</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Retroceder até 90 dias com o plano Pro&#160;Lite e até 365 dias com os planos Pro&#160;I, II e III (em breve)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Retroceder até 90 dias com o plano Pro&#160;Lite e até 180 dias com os planos Pro&#160;I, II e III (em breve)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Programação da limpeza da lixeira entre 7 dias e 10 anos</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5276,7 +5272,7 @@
     <!-- Approve button text in approve credentials screen -->
     <string name="contact_approve_credentials_button_text">Confirmar</string>
     <!-- Toolbar title text in approve credentials screen -->
-    <string name="contact_approve_credentials_toolbar_title">Verifique as credenciais</string>
+    <string name="contact_approve_credentials_toolbar_title">Validar credenciais</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Sala de espera</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
@@ -5441,4 +5437,28 @@
     <string name="chat_chatroom_first_message_header_mega_info_text">O MEGA protege a sua comunicação com o nosso sistema de criptografia de conhecimento zero, proporcionando garantias de segurança essenciais:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">O sistema garante que os dados recebidos sejam do remetente exibido, e que o conteúdo não tenha sido manipulado durante o trânsito.</string>
+    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_get_pro_title">Obtenha mais com um plano Pro</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Faça o upgrade a um plano Pro para obter mais armazenamento e muitos recursos adicionais. O nossos planos são a partir de %s por mês.</string>
+    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_some_features_title">Alguns dos recursos incluídos são:</string>
+    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_storage">Amplo espaço de armazenamento</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Armazene uma quantidade ilimitada de dados, a partir de %s.</string>
+    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_transfer">Compartilhamento de transferência</string>
+    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_transfer">As pessoas com as quais você compartilhar dados podem usar a sua cota de transferência para fazer download e streaming dos itens que você compartilhou.</string>
+    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_security">Segurança adicional ao compartilhar</string>
+    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_security">Adicione senhas e datas de validade para links de arquivos e de pastas.</string>
+    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
+    <string name="dialog_onboarding_button_view_pro_plan">Conheça os planos Pro</string>
+    <!-- Label indicating that a participant is presenting in the main view of the call -->
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s está apresentando</string>
+    <!-- Warning indicating that a participant is sharing the screen-->
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Esta pessoa está compartilhando a tela.</string>
 </resources>

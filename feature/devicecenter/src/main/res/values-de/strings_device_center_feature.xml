@@ -65,9 +65,9 @@
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">Dateien können nicht einzeln synchronisiert werden. Sie müssen die Synchronisierung für einen Ordner einrichten.</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed"></string>
+    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Der Anfangsscan ist fehlgeschlagen. Sie müssen die Synchronisierung bzw. das Backup in der Desktop-App wieder aktivieren.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="device_center_list_view_item_sub_state_remote_node_not_found"></string>
+    <string name="device_center_list_view_item_sub_state_remote_node_not_found">Der Ordner wurde auf MEGA nicht gefunden, da er verschoben oder gelöscht wurde oder Sie keinen Zugriff auf ihn haben.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota"></string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
@@ -79,7 +79,7 @@
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">Der Ordner kann nicht synchronisiert werden, da es sich um einen freigegebenen Ordner handelt, auf den Sie keinen Vollzugriff haben.</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error"></string>
+    <string name="device_center_list_view_item_sub_state_put_nodes_error">Die Dateien in diesem Ordner können nicht synchronisiert oder gesichert werden. Sie müssen die Synchronisierung bzw. das Backup in der Desktop-App wieder aktivieren.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_below_path">Der Ordner kann nicht synchronisiert werden, da er bereits synchronisierte Ordner enthält.</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
@@ -91,7 +91,7 @@
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="device_center_list_view_item_sub_state_too_many_action_packets">Account neu geladen. Verpasste Updates Ihrer Backups oder Synchronisierungen wurden nicht übernommen.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="device_center_list_view_item_sub_state_logged_out"></string>
+    <string name="device_center_list_view_item_sub_state_logged_out">Die Synchronisierung oder das Backup wurde angehalten, da Sie sich anscheinend in der Desktop-App ausgeloggt haben. Loggen Sie sich in der Desktop-App wieder ein und aktivieren Sie die Synchronisierung bzw. das Backup erneut.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="device_center_list_view_item_sub_state_missing_parent_node"></string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
@@ -99,7 +99,7 @@
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_same_path"></string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes"></string>
+    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Die Umbenennung ist fehlgeschlagen.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file"></string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
@@ -117,17 +117,17 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database"></string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
-    <string name="device_center_list_view_item_sub_state_insufficient_disk_space"></string>
+    <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Nicht genügend Speicherplatz für den Download.</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage"></string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="device_center_list_view_item_sub_state_message_unknown_error"></string>
+    <string name="device_center_list_view_item_sub_state_message_unknown_error">Unbekannter Fehler.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="device_center_list_view_item_sub_state_message_something_went_wrong"></string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Der Ordner kann nicht synchronisiert oder gesichert werden, da sich der MEGA-Ordner im Papierkorb befindet.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now"></string>
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Der Ordner auf Ihrem Gerät kann derzeit nicht gefunden werden, bitte versuchen Sie es später erneut.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive"></string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
@@ -146,4 +146,6 @@
     <string name="device_center_rename_device_dialog_error_message_invalid_characters">Die folgenden Zeichen sind nicht zulässig: %1$s</string>
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
     <string name="device_center_snackbar_message_rename_device_successful">Gerät umbenannt</string>
+    <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
+    <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">Maximum 32 characters</string>
 </resources>

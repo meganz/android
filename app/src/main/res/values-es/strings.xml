@@ -60,8 +60,6 @@
     <string name="error_general_nodes">Error. Inténtalo de nuevo.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-CLAVEDERECUPERACION</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">La carpeta secundaria no existe, por favor elige una nueva</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">No se ha detectado ningún dispositivo de almacenamiento externo</string>
     <!-- Button where the user can sign off or logout -->
@@ -1071,8 +1069,6 @@
     <string name="confirm_logout_from_sms_verification">¿Confirmas que desea cerrar sesión y salir de tu cuenta?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">%1$s ha eliminado el mensaje</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">Se ha limpiado el historial del chat</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">%1$s ha limpiado el historial del chat</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -2850,7 +2846,7 @@
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">No verificadas</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Verificado</string>
+    <string name="label_verified">Verificadas</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Credenciales de autenticidad</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3544,7 +3540,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">Ya tienes una suscripción activa. Si compras otra, se te cobrará dos veces. Para evitarlo, cancela primero la suscripción actual a través de %1$s. Visita nuestro Centro de ayuda para obtener más información.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your Apple account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">Ya tienes una suscripción activa. Si compras otra, se te cobrará dos veces. Para evitarlo, cancela primero la suscripción actual desde tu cuenta de Apple. Visita nuestro Centro de ayuda para obtener más información.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Ya tienes una suscripción activa. Si compras otra, se te cobrará dos veces. Para evitarlo, cancela primero la suscripción actual accediendo a tu cuenta de MEGA desde el navegador. Visita nuestro Centro de ayuda para obtener más información.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3558,7 +3554,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Tienes una suscripción a MEGA activa. Se cancelará automáticamente al eliminar tu cuenta de MEGA. Visita nuestro Centro de ayuda para obtener más información.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your Apple account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_itunes_platform_subscription">Tienes una suscripción a MEGA activa con Apple. Debes cancelarla desde los ajustes del dispositivo en tu cuenta de Apple, ya que MEGA no puede cancelarla por ti. Visita nuestro Centro de ayuda para más información.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Ir a %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -4996,7 +4992,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backups automáticos</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rebobinado hasta 90 días en Pro&#160;Lite y hasta 365 días en Pro&#160;I, II y III (próximamente)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rebobinado hasta 90 días en Pro&#160;Lite y hasta 180 días en Pro&#160;I, II y III (próximamente)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Limpieza automática de la papelera entre 7 días y 10 años</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5298,7 +5294,7 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Permitir el acceso a archivos de audio</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Verificado</string>
+    <string name="contact_approve_credentials_approved_text">Verificadas</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
     <string name="contact_approve_credentials_not_approved_text">No verificadas</string>
     <!-- Photos action menu zoom in -->
@@ -5440,5 +5436,29 @@
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA protege tus comunicaciones con cifrado de conocimiento cero, proporcionando sólidas garantías de seguridad:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
-    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">El sistema comprueba que los datos recibidos procedan del remitente original y que su contenido no haya sido manipulado durante la transmisión.</string>
+    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_get_pro_title">Obtén más con un plan Pro</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Amplía a un plan Pro para obtener más almacenamiento y muchas funciones adicionales. Nuestros planes comienzan desde %s al mes.</string>
+    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_some_features_title">Algunas de las características que esperamos con ansias son:</string>
+    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_storage">Almacenamiento generoso</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Almacena datos ilimitados, a partir de %s.</string>
+    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_transfer">Transferencia compartida</string>
+    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_transfer">Las personas con las que compartes datos pueden usar tu cuota de transferencia para descargar y hacer streaming de lo que has compartido.</string>
+    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_security">Seguridad adicional al compartir</string>
+    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_security">Establece contraseñas y fechas de caducidad para los enlaces a carpetas y archivos.</string>
+    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
+    <string name="dialog_onboarding_button_view_pro_plan">Descubre los planes Pro</string>
+    <!-- Label indicating that a participant is presenting in the main view of the call -->
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s is presenting</string>
+    <!-- Warning indicating that a participant is sharing the screen-->
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Esta persona está compartiendo pantalla</string>
 </resources>

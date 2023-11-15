@@ -60,8 +60,6 @@
     <string name="error_general_nodes">Errore. Per favore, riprova.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-CHIAVEDIRECUPERO</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">La cartella per i caricamenti secondari dei media non esiste, per favore scegli una nuova cartella</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Nessuno spazio esterno rilevato</string>
     <!-- Button where the user can sign off or logout -->
@@ -1071,8 +1069,6 @@
     <string name="confirm_logout_from_sms_verification">Sei sicuro di voler effettuare il logout dall’account corrente?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Questo messaggio è stato eliminato da %1$s</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">La cronologia della chat è stata pulita</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">La storia della chat è stata cancellata da %1$s</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -3544,7 +3540,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">Già hai un abbonamento attivo. Se ne acquisti un altro, ti verranno addebitati entrambi. Per evitare ciò, annulla il tuo abbonamento corrente tramite %1$s. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your Apple account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">Hai già un abbonamento attivo. Se ne acquisti un altro, ti verranno addebitati entrambi. Per evitare ciò, annulla il tuo abbonamento corrente dal tuo account Apple. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Già hai un abbonamento attivo. Se ne acquisti un altro, ti verranno addebitati entrambi. Per evitare ciò, annulla il tuo abbonamento corrente andando su MEGA da un browser desktop o mobile. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3558,7 +3554,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Hai un abbonamento MEGA attivo. Verrà annullato automaticamente dopo che l\’account viene eliminato. Visita il nostro Centro di Assistenza per maggiori informazioni.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your Apple account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_itunes_platform_subscription">Hai già un abbonamento MEGA attivo con Apple. Devi annullarlo separatamente tramite il tuo account Apple, in quanto MEGA non può farlo al posto tuo. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Visita %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -4996,7 +4992,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backup automatici</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Riavvolgimento fino a 90 giorni su Pro&#160;Lite e fino a 365 giorni su Pro&#160;I, II, e III (in arrivo)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Ripristina fino a 90 giorni su Pro&#160;Lite e fino a 180 giorni su Pro&#160;I, II, e III (in arrivo)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Pulizia regolare del Cestino programmabile tra 7 giorni e 10 anni</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5440,5 +5436,29 @@
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA protegge le tue comunicazioni con il nostro sistema di criptazione a conoscenza zero che fornisce rassicurazioni essenziali sulla sicurezza:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
-    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">Il sistema assicura che i dati ricevuti sono arrivati dal mittente mostrato, e i suoi contenuti non sono stati manipolati durante l’invio.</string>
+    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_get_pro_title">Ottieni di più con un piano Pro</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Effettua l\’upgrade ad un piano Pro per maggiore spazio di archiviazione e molte funzioni extra. I nostri piani partono da %s al mese.</string>
+    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_some_features_title">Alcune funzioni che puoi trovare sono:</string>
+    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_storage">Grande archivio</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Archivia dati illimitati, a partire da %s.</string>
+    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_transfer">Condivisione della banda di trasferimento</string>
+    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_transfer">Le persone con cui condividi dati possono utilizzare la tua banda di trasferimento per scaricare ed effettuare lo streaming degli oggetti che hai condiviso.</string>
+    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_security">Sicurezza addizionale nella condivisione</string>
+    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_security">Imposta password e date di scadenza per i link di file e cartelle.</string>
+    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
+    <string name="dialog_onboarding_button_view_pro_plan">Vedi i piani Pro</string>
+    <!-- Label indicating that a participant is presenting in the main view of the call -->
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s is presenting</string>
+    <!-- Warning indicating that a participant is sharing the screen-->
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">This person is screen sharing</string>
 </resources>

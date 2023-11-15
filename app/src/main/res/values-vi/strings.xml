@@ -29,7 +29,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="general_leave">Rời khỏi</string>
     <!-- button -->
-    <string name="general_decryp">Giải khóa mã</string>
+    <string name="general_decryp">Giải mã</string>
     <!-- button -->
     <string name="general_export">Xuất</string>
     <!-- Answer for confirmation dialog. -->
@@ -60,10 +60,8 @@
     <string name="error_general_nodes">Lỗi. Xin vui lòng thử lại.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">CHIAKHOAPHUCHOI-MEGA</string>
-    <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">Không tìm thấy thư&#160;mục phương&#160;tiện số bổ&#160;sung, xin chọn một thư&#160;mục mới</string>
     <!-- when no external card exists -->
-    <string name="no_external_SD_card_detected">Không phát hiện bộ lưu trữ ngoài</string>
+    <string name="no_external_SD_card_detected">Không phát&#160;hiện bộ lưu&#160;trữ ngoài</string>
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">Đăng&#160;xuất</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -363,13 +361,13 @@
     <!-- menu item -->
     <string name="context_delete">Xóa</string>
     <!-- success message when removing a contact request -->
-    <string name="context_contact_invitation_deleted">Đã xóa bỏ yêu cầu</string>
+    <string name="context_contact_invitation_deleted">Đã xóa bỏ yêu&#160;cầu</string>
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Thư mời đã được gửi lại lần nữa</string>
     <!-- success message when sending a contact request -->
     <string name="context_contact_request_sent">Lời&#160;mời đã được gửi tới %s. Vào tab Gửi&#160;Đi để xem các yêu&#160;cầu đã gửi.</string>
     <!-- success message when removing a contact -->
-    <string name="context_contact_removed">Đã xóa tên liên lạc</string>
+    <string name="context_contact_removed">Đã xóa tên liên&#160;lạc</string>
     <!-- error message -->
     <string name="context_contact_not_removed">Lỗi. Chưa xóa được tên liên lạc</string>
     <!-- success message when chaning the permissionss -->
@@ -1039,8 +1037,6 @@
     <string name="confirm_logout_from_sms_verification">Bạn co chắc muốn đăng xuất khỏi tài khoản hiện tại?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Tin nhắn này đã bị xóa bởi %1$s</string>
-    <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">Lịch sử chát được được dọn sạch</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">Lịch sử nội dung chat đã bị xóa bởi %1$s</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -2700,9 +2696,9 @@
         <item quantity="other">%d ngày</item>
     </plurals>
     <!-- Time in hours. The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="label_time_in_hours">%dg</string>
+    <string name="label_time_in_hours">%dh</string>
     <!-- Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="label_time_in_minutes">%dp</string>
+    <string name="label_time_in_minutes">%dph</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d giây</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
@@ -3358,7 +3354,7 @@
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
     <string name="message_subscription_from_android_platform">Bạn đã có một gói đăng ký dịch vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng ký gói hiện tại bằng cách vào MEGA thông qua %1$s. Tới trang Thư Viện Hướng Dẫn để có thêm chi tiết.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your Apple account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">Bạn đã có một gói đăng&#160;ký dịch&#160;vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng&#160;ký gói hiện&#160;tại bằng cách vào MEGA thông qua trang tài&#160;khoản Apple của bạn. Tham&#160;khảo Trung&#160;Tâm Hướng&#160;Dẫn để có thêm chi&#160;tiết.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Bạn đã có đăng ký một gói dịch vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng ký gói hiện tại bằng cách vào MEGA với trình duyệt web trên máy tính hoặc điện thoại. Tới trang Thư Viện Hướng Dẫn để có thêm chi tiết.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
@@ -3372,7 +3368,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Bạn hiện đang có một gói đăng ký dịch vụ với MEGA. Gói dịch vụ đó sẽ tự động huỷ sau khi tài khoản bị xóa. Truy cập Thư Viện Hướng Dẫn để có thêm thông tin.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your Apple account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_itunes_platform_subscription">Bạn hiện đang có một gói đăng&#160;ký dịch&#160;vụ MEGA được mua với Apple. Bạn cần phải tự tiến&#160;hành hủy&#160;bỏ trong tài&#160;khoản Apple của mình, vì MEGA không thể thực&#160;hiện thay cho bạn được. Than&#160;khảo Trung&#160;Tâm Hướng&#160;Dẫn để có thêm thông&#160;tin.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Truy cập %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -4570,7 +4566,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Sao&#160;lưu dự&#160;phòng tự&#160;động</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Tua lại phiên&#160;bản lên đến 90 ngày với hạng Pro&#160;Lite và đến 365 ngày với hạng Pro&#160;I, II, và III (sớm có mặt)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Tua lại phiên&#160;bản lên đến 90 ngày với hạng Pro&#160;Lite và đến 180 ngày với hạng Pro&#160;I, II, và III (sớm có mặt)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Lên lịch dọn dẹp thùng&#160;rác từ 7 ngày đến 10 năm</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4970,5 +4966,29 @@
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA bảo&#160;vệ các giao&#160;tiếp của bạn nghiêm&#160;ngặt với mô&#160;hình mã&#160;hóa vô&#160;kiến&#160;thức cung&#160;cấp sự đảm&#160;bảo an&#160;toàn cần&#160;thiết:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
-    <string name="chat_chatroom_first_message_header_authenticity_info_text">The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit.</string>
+    <string name="chat_chatroom_first_message_header_authenticity_info_text">Hệ&#160;thống đảm&#160;bảo rằng các dữ&#160;liệu nhận được từ người gửi sẽ hiển&#160;thị rõ&#160;ràng, và nội&#160;dung bên trong không bị chế&#160;tác trong quá&#160;trình truyền&#160;tải.</string>
+    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_get_pro_title">Nhận được nhiều hơn với gói Pro</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Nâng&#160;cấp lên gói Pro để có thêm không&#160;gian lưu&#160;trữ và nhiều tính&#160;năng bổ&#160;sung. Các gói của chúng&#160;tôi có giá từ %s mỗi tháng.</string>
+    <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_some_features_title">Một số tính&#160;năng được mong&#160;đợi là:</string>
+    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_storage">Không gian hào phóng</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Lưu&#160;trữ dữ&#160;liệu không giới&#160;hạn, bắt&#160;đầu từ %s.</string>
+    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_transfer">Chia&#160;sẻ lượng truyền&#160;tải</string>
+    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_transfer">Những người bạn chia&#160;sẻ dữ&#160;liệu có thể sử&#160;dụng băng&#160;thông truyền&#160;tải của bạn để tải&#160;xuống và truyền trực&#160;tuyến các mục bạn đã chia&#160;sẻ.</string>
+    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_security">Lớp bảo&#160;mật bổ&#160;sung khi chia&#160;sẻ</string>
+    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_security">Đặt mật&#160;khẩu và ngày hết hạn cho các đường liên&#160;kết tệp&#160;tin và thư&#160;mục.</string>
+    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
+    <string name="dialog_onboarding_button_view_pro_plan">Xem các gói Pro</string>
+    <!-- Label indicating that a participant is presenting in the main view of the call -->
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s hiện đang trình&#160;bày</string>
+    <!-- Warning indicating that a participant is sharing the screen-->
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Người này đang chiếu chia&#160;sẻ màn&#160;hình</string>
 </resources>
