@@ -1,9 +1,9 @@
 package mega.privacy.android.feature.sync.data.mapper
 
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStallList
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
+import nz.mega.sdk.MegaSyncStallList
+import nz.mega.sdk.MegaSyncStall
 import javax.inject.Inject
 
 internal class StalledIssuesMapper @Inject constructor(

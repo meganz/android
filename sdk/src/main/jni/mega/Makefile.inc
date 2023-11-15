@@ -36,6 +36,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/share.cpp \
     sdk/src/sharenodekeys.cpp \
     sdk/src/sync.cpp \
+    sdk/src/syncfilter.cpp \
     sdk/src/transfer.cpp \
     sdk/src/transferslot.cpp \
     sdk/src/proxy.cpp \
@@ -66,7 +67,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/heartbeats.cpp \
     sdk/src/textchat.cpp \
     sdk/src/setandelement.cpp
-    
+
 C_SOURCES = sdk/src/mega_glob.c
 
 HEADERS= sdk/include/mega.h \
@@ -76,6 +77,7 @@ HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/base64.h \
 	    sdk/include/mega/command.h \
 	    sdk/include/mega/console.h \
+	    sdk/include/mega/syncfilter.h \
 	    sdk/include/mega/db.h \
 	    sdk/include/mega/file.h \
 	    sdk/include/mega/fileattributefetch.h \

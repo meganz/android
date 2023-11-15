@@ -1,22 +1,22 @@
 package mega.privacy.android.feature.sync.data.mapper
 
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.CannotCreateFolder
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.CannotPerformDeletion
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.DeleteOrMoveWaitingOnScanning
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.DeleteWaitingOnMoves
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.DownloadIssue
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.FileIssue
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.FolderMatchedAgainstFile
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.LocalAndRemotePreviouslyUnsyncedDiffer_userMustChoose
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.MoveOrRenameCannotOccur
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.NamesWouldClashWhenSynced
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.NoReason
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.SyncItemExceedsSupportedTreeDepth
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.SyncStallReason_LastPlusOne
-import mega.privacy.android.feature.sync.data.mock.MegaSyncStall.SyncStallReason.UploadIssue
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
+import nz.mega.sdk.MegaSyncStall
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.CannotCreateFolder
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.CannotPerformDeletion
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.DeleteOrMoveWaitingOnScanning
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.DeleteWaitingOnMoves
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.DownloadIssue
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.FileIssue
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.FolderMatchedAgainstFile
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.LocalAndRemotePreviouslyUnsyncedDiffer_userMustChoose
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.MoveOrRenameCannotOccur
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.NamesWouldClashWhenSynced
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.NoReason
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.SyncItemExceedsSupportedTreeDepth
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.SyncStallReason_LastPlusOne
+import nz.mega.sdk.MegaSyncStall.SyncStallReason.UploadIssue
 import javax.inject.Inject
 
 internal class StalledIssueTypeMapper @Inject constructor() {
