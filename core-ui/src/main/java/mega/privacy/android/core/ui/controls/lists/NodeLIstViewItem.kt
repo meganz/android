@@ -22,6 +22,7 @@ import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 /**
  * Generic two line list item
@@ -75,7 +76,11 @@ fun NodeLisViewItem(
         },
         title = {
             if (enableMiddleEllipsisTitle) {
-                MiddleEllipsisText(text = title, modifier = Modifier.testTag(TITLE_TAG))
+                MiddleEllipsisText(
+                    text = title,
+                    modifier = Modifier.testTag(TITLE_TAG),
+                    color = TextColor.Primary
+                )
             } else {
                 Text(
                     text = title,
@@ -118,6 +123,7 @@ fun NodeLisViewItem(
                 MiddleEllipsisText(
                     modifier = Modifier.testTag(SUBTITLE_TAG),
                     text = subtitle,
+                    color = TextColor.Secondary
                 )
             } else {
                 Text(

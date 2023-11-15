@@ -39,7 +39,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.getPainter
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
-import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
+import mega.privacy.android.legacy.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.extensions.background_white_alpha_005
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400

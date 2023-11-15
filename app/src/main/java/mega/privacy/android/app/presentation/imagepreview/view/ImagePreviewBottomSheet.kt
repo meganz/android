@@ -35,13 +35,13 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.core.R.drawable.link_ic
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.legacy.core.ui.controls.text.MiddleEllipsisText
 import nz.mega.sdk.MegaNode
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -123,8 +123,7 @@ internal fun ImagePreviewBottomSheet(
                 }
 
                 item {
-                    MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_label),
+                    MenuActionListTile(icon = painterResource(id = R.drawable.ic_label),
                         text = stringResource(id = R.string.file_properties_label),
                         onActionClicked = onClickLabel,
                         addSeparator = true,
@@ -147,8 +146,7 @@ internal fun ImagePreviewBottomSheet(
                                     )
                                 }
                             }
-                        }
-                    )
+                        })
                 }
 
                 if (showDisputeTakeDown) {
@@ -356,10 +354,8 @@ internal fun ImagePreviewMenuActionHeader(
         modifier = Modifier.padding(all = 16.dp)
     ) {
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageThumbnailPath)
-                .crossfade(true)
-                .build(),
+            model = ImageRequest.Builder(LocalContext.current).data(imageThumbnailPath)
+                .crossfade(true).build(),
             placeholder = painterResource(id = android.R.drawable.ic_menu_camera),
             error = painterResource(id = android.R.drawable.ic_menu_camera),
             contentDescription = null,

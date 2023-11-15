@@ -43,7 +43,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
-import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
+import mega.privacy.android.legacy.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400

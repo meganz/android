@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.text
+package mega.privacy.android.legacy.core.ui.controls.text
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.LocalTextStyle
@@ -23,8 +23,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.MegaTheme
-import mega.privacy.android.core.ui.theme.tokens.TextColor
 import java.text.BreakIterator
 
 /**
@@ -36,10 +34,14 @@ import java.text.BreakIterator
  *
  **/
 @Composable
+@Deprecated(
+    message = "This has been deprecated in favour of MiddleEllipsisText core component in core-ui module that uses TextColor to ensure usage of design system color tokens",
+    replaceWith = ReplaceWith("mega.privacy.android.core.ui.controls.text.MiddleEllipsisText")
+)
 fun MiddleEllipsisText(
     text: String,
     modifier: Modifier = Modifier,
-    color: TextColor,
+    color: Color = Color.Unspecified,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,
@@ -59,7 +61,7 @@ fun MiddleEllipsisText(
     if (text.isEmpty()) {
         Text(
             text = text,
-            color = MegaTheme.textColor(textColor = color),
+            color = color,
             fontSize = fontSize,
             fontStyle = fontStyle,
             fontWeight = fontWeight,
@@ -91,7 +93,7 @@ fun MiddleEllipsisText(
             subcompose("MiddleEllipsisText_calculate") {
                 Text(
                     text = text + ellipsisChar,
-                    color = MegaTheme.textColor(textColor = color),
+                    color = color,
                     fontSize = fontSize,
                     fontStyle = fontStyle,
                     fontWeight = fontWeight,
@@ -111,7 +113,8 @@ fun MiddleEllipsisText(
                         if (value.getBoundingBox(text.lastIndex).right <= constraints.maxWidth) {
                             text
                         } else {
-                            val ellipsisCharWidth = value.getBoundingBox(text.lastIndex + 1).width
+                            val ellipsisCharWidth =
+                                value.getBoundingBox(text.lastIndex + 1).width
                             val ellipsisTextWidth: Float = ellipsisCharWidth * ellipsisCharCount
                             val remainingWidth = constraints.maxWidth - ellipsisTextWidth
                             var leftPoint = 0
@@ -130,11 +133,15 @@ fun MiddleEllipsisText(
                                         return@run
                                     }
 
-                                    val leftTextBoundingBox = value.getBoundingBox(leftPoint)
-                                    val rightTextBoundingBox = value.getBoundingBox(rightPoint)
+                                    val leftTextBoundingBox =
+                                        value.getBoundingBox(leftPoint)
+                                    val rightTextBoundingBox =
+                                        value.getBoundingBox(rightPoint)
 
                                     // For multibyte string handling
-                                    if (leftTextWidth <= rightTextWidth && leftTextWidth + leftTextBoundingBox.width + rightTextWidth <= remainingWidth) {
+                                    if (leftTextWidth <= rightTextWidth &&
+                                        leftTextWidth + leftTextBoundingBox.width + rightTextWidth <= remainingWidth
+                                    ) {
                                         val remainingTargetCodePoints = if (realLeftIndex == 0) {
                                             charSplitIndexList[realLeftIndex]
                                         } else {
@@ -145,9 +152,10 @@ fun MiddleEllipsisText(
                                         repeat(remainingTargetCodePoints) {
                                             runCatching {
                                                 targetText.add(text[leftPoint])
-                                                val leftTextBoundingBoxWidth = value.getBoundingBox(
-                                                    leftPoint
-                                                ).width
+                                                val leftTextBoundingBoxWidth =
+                                                    value.getBoundingBox(
+                                                        leftPoint
+                                                    ).width
                                                 leftTextWidth += leftTextBoundingBoxWidth
                                                 leftPoint += 1
                                             }.onFailure {
@@ -158,7 +166,9 @@ fun MiddleEllipsisText(
                                             textFromStart.addAll(targetText)
                                             realLeftIndex += 1
                                         }
-                                    } else if (leftTextWidth >= rightTextWidth && leftTextWidth + rightTextWidth + rightTextBoundingBox.width <= remainingWidth) {
+                                    } else if (leftTextWidth >= rightTextWidth &&
+                                        leftTextWidth + rightTextWidth + rightTextBoundingBox.width <= remainingWidth
+                                    ) {
                                         val remainingTargetCodePoints =
                                             charSplitIndexList[realRightIndex] - charSplitIndexList[realRightIndex - 1]
                                         val targetText = mutableListOf<Char>()
@@ -186,14 +196,15 @@ fun MiddleEllipsisText(
                                 }
                             }
 
-                            textFromStart.joinToString(separator = "") + ellipsisText + textFromEnd.joinToString(
-                                separator = ""
-                            )
+                            textFromStart.joinToString(separator = "") + ellipsisText + textFromEnd
+                                .joinToString(
+                                    separator = ""
+                                )
                         }
                     }
                     Text(
                         text = combinedText,
-                        color = MegaTheme.textColor(textColor = color),
+                        color = color,
                         fontSize = fontSize,
                         fontStyle = fontStyle,
                         fontWeight = fontWeight,
@@ -224,7 +235,8 @@ private fun PreviewMiddleEllipsisText(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MiddleEllipsisText(
-            text = text, color = TextColor.Primary
+            text = text,
+            color = Color.Green
         )
     }
 }
