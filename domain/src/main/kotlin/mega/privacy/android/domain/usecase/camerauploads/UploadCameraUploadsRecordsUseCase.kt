@@ -106,7 +106,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
      * @param secondaryUploadNodeId The secondary upload node id
      * @param tempRoot The file path to the temporary folder to generate temp files
      */
-    suspend operator fun invoke(
+    operator fun invoke(
         cameraUploadsRecords: List<CameraUploadsRecord>,
         primaryUploadNodeId: NodeId,
         secondaryUploadNodeId: NodeId,

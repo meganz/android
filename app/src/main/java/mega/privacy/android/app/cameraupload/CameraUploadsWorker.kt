@@ -392,17 +392,33 @@ class CameraUploadsWorker @AssistedInject constructor(
                     if (useCameraUploadsRecordsEnabled) {
                         tracePerformance(PerfScanFilesTrace) { scanFiles() }
                         tracePerformance(PerfUploadFilesTrace) {
-                            uploadFiles(tempRoot)
-                                .flowOn(ioDispatcher)
-                                .catch {
-                                    Timber.w(it)
-                                    endService(it.message ?: "", aborted = true)
-                                }
-                                .collect { progressEvent ->
-                                    launch(ioDispatcher) {
-                                        processProgressEvent(progressEvent)
+                            val primaryUploadNodeId =
+                                NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
+                            val secondaryUploadNodeId =
+                                NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
+
+                            getAndPrepareRecords(
+                                primaryUploadNodeId,
+                                secondaryUploadNodeId
+                            ).let { records ->
+                                startHeartbeat()
+                                uploadCameraUploadsRecords(
+                                    records,
+                                    primaryUploadNodeId,
+                                    secondaryUploadNodeId,
+                                    tempRoot
+                                ).flowOn(ioDispatcher)
+                                    .catch { throwable ->
+                                        Timber.w(throwable)
+                                        endService(throwable.message ?: "", aborted = true)
                                     }
-                                }
+                                    .collect { progressEvent ->
+                                        launch(ioDispatcher) {
+                                            processProgressEvent(progressEvent)
+                                        }
+                                    }
+                            }
+
                         }
                     } else {
                         tracePerformance(PerfScanFilesTrace) { checkUploadNodes() }
@@ -724,21 +740,19 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * Retrieve the files and upload them
+     * Get pending records from the database and populate them with required information for upload
      * - Retrieve the pending camera uploads records from the database
      * - Filter the camera uploads based on video compression size condition
      * - Rename the camera uploads records
-     * - Upload the camera uploads records
      *
-     * @param tempRoot the root path of the temporary files
-     * @return a flow of [CameraUploadsTransferProgress]
+     * @param primaryUploadNodeId the primary target [NodeId]
+     * @param secondaryUploadNodeId the secondary target [NodeId]
+     * @return the list of pending [CameraUploadsRecord] to upload
      */
-    private suspend fun uploadFiles(tempRoot: String): Flow<CameraUploadsTransferProgress> {
-        val primaryUploadNodeId =
-            NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
-        val secondaryUploadNodeId =
-            NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
-
+    private suspend fun getAndPrepareRecords(
+        primaryUploadNodeId: NodeId,
+        secondaryUploadNodeId: NodeId,
+    ): List<CameraUploadsRecord> {
         Timber.d("Get Pending Files from Database")
         return getPendingCameraUploadsRecords()
             .let { pendingRecords ->
@@ -764,16 +778,6 @@ class CameraUploadsWorker @AssistedInject constructor(
             .let { renamedRecordsWithExistenceInTargetNode ->
                 Timber.d("Retrieve gps coordinates for ${renamedRecordsWithExistenceInTargetNode.size} files")
                 getGpsCoordinates(renamedRecordsWithExistenceInTargetNode)
-            }
-            .let { records ->
-                Timber.d("Start uploading ${records.size} files")
-                startHeartbeat()
-                uploadCameraUploadsRecords(
-                    records,
-                    primaryUploadNodeId,
-                    secondaryUploadNodeId,
-                    tempRoot,
-                )
             }
     }
 
@@ -850,20 +854,26 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      * Upload the camera uploads records
      *
+     * @param records the list of [CameraUploadsRecord] to upload
+     * @param primaryUploadNodeId the primary target [NodeId]
+     * @param secondaryUploadNodeId the secondary target [NodeId]
+     * @param tempRoot the root path of the temporary files
      * @return a flow of [CameraUploadsTransferProgress]
      */
-    private suspend fun uploadCameraUploadsRecords(
+    private fun uploadCameraUploadsRecords(
         records: List<CameraUploadsRecord>,
         primaryUploadNodeId: NodeId,
         secondaryUploadNodeId: NodeId,
         tempRoot: String,
-    ): Flow<CameraUploadsTransferProgress> =
-        uploadCameraUploadsRecordsUseCase(
+    ): Flow<CameraUploadsTransferProgress> {
+        Timber.d("Start uploading ${records.size} files")
+        return uploadCameraUploadsRecordsUseCase(
             records,
             primaryUploadNodeId,
             secondaryUploadNodeId,
             tempRoot,
         )
+    }
 
     /**
      *  Process the progress event based on his type
