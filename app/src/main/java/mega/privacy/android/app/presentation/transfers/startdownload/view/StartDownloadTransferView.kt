@@ -57,11 +57,11 @@ internal fun StartDownloadTransferView(
         action = {
             when (it) {
                 is StartDownloadForOffline -> {
-                    viewModel.startDownloadForOffline(it.typedNode)
+                    viewModel.startDownloadForOffline(it.node)
                 }
 
                 is StartDownloadNode -> {
-                    viewModel.startDownloadNodes(it.typedNodes)
+                    viewModel.startDownloadNodes(it.nodes)
                 }
             }
         })

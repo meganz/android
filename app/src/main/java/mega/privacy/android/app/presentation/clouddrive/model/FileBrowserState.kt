@@ -1,8 +1,11 @@
 package mega.privacy.android.app.presentation.clouddrive.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -31,6 +34,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property shouldShowBannerVisibility
  * @property bannerTime timer
  * @property showMediaDiscoveryIcon showMediaDiscoveryIcon
+ * @property downloadEvent download event
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -53,4 +57,5 @@ data class FileBrowserState(
     val shouldShowBannerVisibility: Boolean = false,
     val bannerTime: Long = 0L,
     val showMediaDiscoveryIcon: Boolean = false,
+    val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
 )

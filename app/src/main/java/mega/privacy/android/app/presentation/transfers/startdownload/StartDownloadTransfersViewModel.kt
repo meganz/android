@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferEvent
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
-import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
@@ -55,9 +55,9 @@ class StartDownloadTransfersViewModel @Inject constructor(
 
     /**
      * It starts downloading the node with the appropriate use case
-     * @param siblingNodes the [TypedNode]s to be download, they must belong to same parent folder
+     * @param siblingNodes the [Node]s to be download, they must belong to same parent folder
      */
-    fun startDownloadNodes(siblingNodes: List<TypedNode>) {
+    fun startDownloadNodes(siblingNodes: List<Node>) {
         if (siblingNodes.isEmpty()) return
         val firstSibling = siblingNodes.first()
         val parentId = firstSibling.parentId
@@ -78,18 +78,18 @@ class StartDownloadTransfersViewModel @Inject constructor(
 
     /**
      * It starts downloading the node for offline with the appropriate use case
-     * @param typedNode the [TypedNode] to be saved offline
+     * @param nodes the [Node] to be saved offline
      */
-    fun startDownloadForOffline(typedNode: TypedNode) {
+    fun startDownloadForOffline(nodes: Node) {
         currentInProgressJob = viewModelScope.launch {
             startDownloadNodes(
-                typedNodes = listOf(typedNode),
+                nodes = listOf(nodes),
                 getPath = {
-                    getOfflinePathForNodeUseCase(typedNode)
+                    getOfflinePathForNodeUseCase(nodes)
                 },
                 toDoAfterProcessing = {
-                    saveOfflineNodeInformationUseCase(typedNode.id)
-                    broadcastOfflineFileAvailabilityUseCase(typedNode.id.longValue)
+                    saveOfflineNodeInformationUseCase(nodes.id)
+                    broadcastOfflineFileAvailabilityUseCase(nodes.id.longValue)
                 }
             )
         }
@@ -99,7 +99,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
      * common logic to start downloading nodes, either for offline or ordinary download
      */
     private suspend fun startDownloadNodes(
-        typedNodes: List<TypedNode>,
+        nodes: List<Node>,
         toDoAfterProcessing: (suspend () -> Unit)? = null,
         getPath: suspend () -> String?,
     ) {
@@ -121,7 +121,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
             .getOrNull()?.let { path ->
                 startDownloadUseCase(
                     destinationPath = path,
-                    nodes = typedNodes,
+                    nodes = nodes,
                     appData = null,
                     isHighPriority = false
                 ).catch {
@@ -142,7 +142,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
                 else -> {
                     StartDownloadTransferEvent.FinishProcessing(
                         exception = lastError?.takeIf { terminalEvent == null },
-                        totalNodes = typedNodes.size,
+                        totalNodes = nodes.size,
                     )
                 }
             }
