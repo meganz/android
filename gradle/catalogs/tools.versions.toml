@@ -1,8 +1,10 @@
 [versions]
 lint = "31.1.1"
+mega-gradle = "0.10"
 
 [libraries]
 lint = { module = "com.android.tools.lint:lint", version.ref = "lint" }
 lint-api = { module = "com.android.tools.lint:lint-api", version.ref = "lint" }
 lint-checks = { module = "com.android.tools.lint:lint-checks", version.ref = "lint" }
 lint-tests = { module = "com.android.tools.lint:lint-tests", version.ref = "lint" }
+mega-gradle = { module = "mega.privacy:megagradle", version.ref = "mega-gradle" }
