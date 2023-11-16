@@ -158,7 +158,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         observeViewModel()
         initLiveEventBus()
 
-        if (inMeetingViewModel.getCurrentSpeakerParticipant() == null) {
+        inMeetingViewModel.getCurrentSpeakerParticipant()?.let { currentSpeaker ->
+            textViewName.text = currentSpeaker.name
+        } ?: {
             inMeetingViewModel.getFirstParticipant(MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE)
                 ?.let {
                     selectSpeaker(it.peerId, it.clientId)

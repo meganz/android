@@ -1412,6 +1412,10 @@ class InMeetingViewModel @Inject constructor(
                 isGuest = true
             }
 
+            val isSpeaker = getCurrentSpeakerParticipant()?.let { participant ->
+                participant.clientId == session.clientid && participant.peerId == session.peerid && participant.isSpeaker
+            } ?: false
+
             Timber.d("Participant created")
             return Participant(
                 session.peerid,
@@ -1424,7 +1428,7 @@ class InMeetingViewModel @Inject constructor(
                 session.hasVideo(),
                 session.isAudioDetected,
                 isContact,
-                false,
+                isSpeaker,
                 hasHiRes,
                 null,
                 false,
