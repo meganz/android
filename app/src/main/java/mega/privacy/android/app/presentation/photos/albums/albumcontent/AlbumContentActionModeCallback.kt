@@ -5,9 +5,11 @@ import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.mobile.analytics.event.AlbumContentRemoveItemsEvent
 
 class AlbumContentActionModeCallback(
     private val fragment: AlbumContentFragment,
@@ -57,6 +59,7 @@ class AlbumContentActionModeCallback(
             }
 
             R.id.cab_menu_remove_photos -> {
+                Analytics.tracker.trackEvent(AlbumContentRemoveItemsEvent)
                 showRemoveDialog()
             }
         }

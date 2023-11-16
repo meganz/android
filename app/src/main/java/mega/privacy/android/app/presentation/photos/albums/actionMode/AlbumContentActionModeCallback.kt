@@ -3,9 +3,11 @@ package mega.privacy.android.app.presentation.photos.albums.actionMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.mobile.analytics.event.AlbumContentRemoveItemsEvent
 
 class AlbumContentActionModeCallback(
     private val fragment: AlbumDynamicContentFragment,
@@ -49,6 +51,7 @@ class AlbumContentActionModeCallback(
                 fragment.actionRemoveFavourites()
             }
             R.id.cab_menu_remove_photos -> {
+                Analytics.tracker.trackEvent(AlbumContentRemoveItemsEvent)
                 fragment.actionShowRemovePhotosFromAlbumDialog()
             }
         }
