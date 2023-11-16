@@ -19,4 +19,18 @@ interface AppInfoPreferencesGateway {
      *
      */
     fun monitorLastVersionCode(): Flow<Int>
+
+    /**
+     * Set is first launch
+     *
+     * @param isFirstLaunch
+     */
+    suspend fun setIsFirstLaunch(isFirstLaunch: Boolean)
+
+    /**
+     * Monitor is first launch
+     *
+     * @return value  of first launch boolean or null if not set
+     */
+    fun monitorIsFirstLaunch(): Flow<Boolean?>
 }
