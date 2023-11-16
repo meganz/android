@@ -1282,6 +1282,7 @@ public class ChatUtil {
      * Dialog to confirm if you want to delete the history of a chat.
      *
      * @param chat The MegaChatRoom.
+     * @deprecated Use ClearChatConfirmationDialog Compose view instead.
      */
     public static void showConfirmationClearChat(Activity context, MegaChatRoom chat) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);

@@ -679,19 +679,21 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun clearChatHistory(chatId: Long) =
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaChatApiGateway.clearChatHistory(
-                    chatId = chatId,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
-                            if (error.errorCode == MegaChatError.ERROR_OK) {
-                                continuation.resume(Unit)
-                            } else {
-                                continuation.failWithError(error, "clearChatHistory")
-                            }
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
+                        if (error.errorCode == MegaChatError.ERROR_OK) {
+                            localStorageGateway.removePendingMessageByChatId(chatId)
+                            continuation.resume(Unit)
+                        } else {
+                            continuation.failWithError(error, "clearChatHistory")
                         }
-                    )
+                    }
                 )
+                megaChatApiGateway.clearChatHistory(chatId = chatId, listener = listener)
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(listener)
+                }
             }
         }
 

@@ -824,6 +824,90 @@ class ChatAppBarTest {
         verify(showGroupOrContactInfoActivity).invoke()
     }
 
+    @Test
+    fun `test that Clear menu action is not available when is not connected`() {
+        initComposeRuleContent(
+            ChatUiState(isConnected = false)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Clear menu action is not available when is preview mode`() {
+        initComposeRuleContent(
+            ChatUiState(isPreviewMode = true)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Clear menu action is not available when is joining or leaving`() {
+        initComposeRuleContent(
+            ChatUiState(isJoiningOrLeaving = true)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Clear menu action is not available in group chat with standard permissions`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                isGroup = true,
+                myPermission = ChatRoomPermission.Standard,
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Clear menu action is not available in 1on1 chat with read only permissions`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                isGroup = false,
+                myPermission = ChatRoomPermission.ReadOnly,
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Clear menu action is available in group chat with moderator permissions`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                isGroup = true,
+                myPermission = ChatRoomPermission.Moderator,
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that Clear menu action is available in 1on1 chat with standard permissions`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                isGroup = false,
+                myPermission = ChatRoomPermission.Standard,
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertIsDisplayed()
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatAppBar(

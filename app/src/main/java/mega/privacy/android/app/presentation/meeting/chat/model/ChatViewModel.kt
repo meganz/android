@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
@@ -27,6 +28,8 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.GetAnotherCallParticipatingUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
@@ -87,6 +90,7 @@ internal class ChatViewModel @Inject constructor(
     private val monitorAllContactParticipantsInChatUseCase: MonitorAllContactParticipantsInChatUseCase,
     private val inviteToChatUseCase: InviteToChatUseCase,
     private val inviteParticipantResultMapper: InviteParticipantResultMapper,
+    private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -501,8 +505,9 @@ internal class ChatViewModel @Inject constructor(
         when (action) {
             is ChatRoomMenuAction.AudioCall -> {}
             is ChatRoomMenuAction.VideoCall -> {}
-            is ChatRoomMenuAction.Info -> {}
-            is ChatRoomMenuAction.AddParticipants -> {}
+            ChatRoomMenuAction.Info -> {}
+            ChatRoomMenuAction.AddParticipants -> {}
+            ChatRoomMenuAction.Clear -> {}
         }
     }
 
@@ -523,6 +528,25 @@ internal class ChatViewModel @Inject constructor(
 
     fun onInviteContactsResultConsumed() {
         _state.update { state -> state.copy(inviteToChatResultEvent = consumed()) }
+    }
+
+    fun clearChatHistory() {
+        viewModelScope.launch {
+            chatId?.let {
+                runCatching { clearChatHistoryUseCase(it) }
+                    .onSuccess {
+                        _state.update { state -> state.copy(infoToShowEvent = triggered(R.string.clear_history_success)) }
+                    }
+                    .onFailure {
+                        Timber.e("Error clearing chat history $it")
+                        _state.update { state -> state.copy(infoToShowEvent = triggered(R.string.clear_history_error)) }
+                    }
+            }
+        }
+    }
+
+    fun onInfoToShowEventConsumed() {
+        _state.update { state -> state.copy(infoToShowEvent = consumed()) }
     }
 
     companion object {

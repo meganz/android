@@ -28,7 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
@@ -41,6 +40,11 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuActi
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
+import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContactsAddedDialog
+import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
+import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactToAddDialog
+import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
+import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
@@ -71,6 +75,8 @@ internal fun ChatView(
         enablePasscodeCheck = viewModel::enablePasscodeCheck,
         inviteContactsToChat = viewModel::inviteContactsToChat,
         onInviteContactsResultConsumed = viewModel::onInviteContactsResultConsumed,
+        onClearChatHistory = viewModel::clearChatHistory,
+        onInfoToShowConsumed = viewModel::onInfoToShowEventConsumed,
     )
 }
 
@@ -88,6 +94,9 @@ internal fun ChatView(
     onMenuActionPressed: (ChatRoomMenuAction) -> Unit,
     inviteContactsToChat: (Long, List<String>) -> Unit = { _, _ -> },
     onInviteContactsResultConsumed: () -> Unit = {},
+    getAnotherCallParticipating: () -> Unit = {},
+    onClearChatHistory: () -> Unit = {},
+    onInfoToShowConsumed: () -> Unit = {},
     enablePasscodeCheck: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -96,6 +105,7 @@ internal fun ChatView(
     var showParticipatingInACallDialog by rememberSaveable { mutableStateOf(false) }
     var showNoContactToAddDialog by rememberSaveable { mutableStateOf(false) }
     var showAllContactsParticipateInChat by rememberSaveable { mutableStateOf(false) }
+    var showClearChat by rememberSaveable { mutableStateOf(false) }
 
     val addContactLauncher =
         rememberLauncherForActivityResult(
@@ -140,6 +150,9 @@ internal fun ChatView(
                         chatId = uiState.chatId,
                         addContactLauncher = addContactLauncher
                     )
+                },
+                showClearChatConfirmationDialog = {
+                    showClearChat = true
                 }
             )
         },
@@ -188,16 +201,29 @@ internal fun ChatView(
             }
         }
 
-        EventEffect(
-            event = uiState.inviteToChatResultEvent,
-            onConsumed = onInviteContactsResultConsumed
-        ) { inviteResult ->
-            coroutineScope.launch {
-                snackBarHostState.showSnackbar(
-                    inviteResult.toString(context)
-                )
-            }
+        if (showClearChat) {
+            ClearChatConfirmationDialog(
+                isMeeting = uiState.isMeeting,
+                onDismiss = { showClearChat = false },
+                onConfirm = {
+                    showClearChat = false
+                    onClearChatHistory()
+                })
         }
+    }
+
+    EventEffect(
+        event = uiState.inviteToChatResultEvent,
+        onConsumed = onInviteContactsResultConsumed
+    ) { inviteResult ->
+        snackBarHostState.showSnackbar(inviteResult.toString(context))
+    }
+
+    EventEffect(
+        event = uiState.infoToShowEvent,
+        onConsumed = onInfoToShowConsumed
+    ) { info ->
+        snackBarHostState.showSnackbar(context.getString(info))
     }
 }
 

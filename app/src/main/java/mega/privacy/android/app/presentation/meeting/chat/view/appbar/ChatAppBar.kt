@@ -56,6 +56,7 @@ internal fun ChatAppBar(
     onMenuActionPressed: (ChatRoomMenuAction) -> Unit = {},
     onStartCall: (Boolean) -> Unit = {},
     openAddContactActivity: () -> Unit = {},
+    showClearChatConfirmationDialog: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -107,16 +108,20 @@ internal fun ChatAppBar(
                     }
                 }
 
-                is ChatRoomMenuAction.Info -> {
+                ChatRoomMenuAction.Info -> {
                     showGroupOrContactInfoActivity()
                 }
 
-                is ChatRoomMenuAction.AddParticipants -> {
+                ChatRoomMenuAction.AddParticipants -> {
                     when {
                         !uiState.hasAnyContact -> showNoContactToAddDialog()
                         uiState.allContactsParticipateInChat -> showAllContactsParticipateInChat()
                         else -> openAddContactActivity()
                     }
+                }
+
+                ChatRoomMenuAction.Clear -> {
+                    showClearChatConfirmationDialog()
                 }
 
                 else -> (it as ChatRoomMenuAction).let(onMenuActionPressed)
@@ -129,11 +134,11 @@ internal fun ChatAppBar(
 
 private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> = buildList {
     with(uiState) {
+        if (isJoiningOrLeaving) return@buildList
+
         val hasModeratorPermission = myPermission == ChatRoomPermission.Moderator
 
-        if ((hasModeratorPermission || myPermission == ChatRoomPermission.Standard)
-            && !isJoiningOrLeaving && !isPreviewMode
-        ) {
+        if ((hasModeratorPermission || myPermission == ChatRoomPermission.Standard) && !isPreviewMode) {
             add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat && (!isWaitingRoom || hasModeratorPermission)))
 
             if (!isGroup) {
@@ -141,14 +146,19 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
             }
         }
 
-        if (isJoiningOrLeaving.not() && isPreviewMode.not() && isConnected
-            && (isGroup || myPermission != ChatRoomPermission.ReadOnly)
-        ) {
-            add(ChatRoomMenuAction.Info(true))
+        if (isGroup && (hasModeratorPermission || isActive && isOpenInvite)) {
+            add(ChatRoomMenuAction.AddParticipants)
         }
 
-        if (!isJoiningOrLeaving && isGroup && (hasModeratorPermission || isActive && isOpenInvite)) {
-            add(ChatRoomMenuAction.AddParticipants)
+        if (isPreviewMode.not() && isConnected && (isGroup || myPermission != ChatRoomPermission.ReadOnly)
+        ) {
+            add(ChatRoomMenuAction.Info)
+        }
+
+        if (!isPreviewMode && isConnected
+            && ((isGroup && hasModeratorPermission) || (!isGroup && myPermission != ChatRoomPermission.ReadOnly))
+        ) {
+            add(ChatRoomMenuAction.Clear)
         }
     }
 }

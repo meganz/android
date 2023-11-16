@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
@@ -58,6 +59,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import kotlin.random.Random
@@ -661,5 +663,43 @@ class ChatRepositoryImplTest {
             assertThat(underTest.isAudioLevelMonitorEnabled(chatId)).isEqualTo(enabled)
             verify(megaChatApiGateway).isAudioLevelMonitorEnabled(chatId)
             verifyNoMoreInteractions(megaChatApiGateway)
+        }
+
+    @Test
+    fun `test that clear chat history invokes megaChatApi and localStorageGateway if request finish with success`() =
+        runTest {
+            whenever(megaChatApiGateway.clearChatHistory(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    megaChatErrorSuccess,
+                )
+            }
+
+            underTest.clearChatHistory(chatId)
+            verify(megaChatApiGateway).clearChatHistory(eq(chatId), any())
+            verify(localStorageGateway).removePendingMessageByChatId(chatId)
+            verifyNoMoreInteractions(megaChatApiGateway)
+            verifyNoMoreInteractions(localStorageGateway)
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that clear chat history invokes megaChatApi and do not invokes localStorageGateway if request finish with error`() =
+        runTest {
+            val error = mock<MegaChatError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_ACCESS)
+            }
+            whenever(megaChatApiGateway.clearChatHistory(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    error,
+                )
+            }
+
+            underTest.clearChatHistory(chatId)
+            verify(megaChatApiGateway).clearChatHistory(eq(chatId), any())
+            verifyNoMoreInteractions(megaChatApiGateway)
+            verifyNoInteractions(localStorageGateway)
         }
 }

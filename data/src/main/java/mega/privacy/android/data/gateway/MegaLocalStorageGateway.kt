@@ -331,4 +331,11 @@ interface MegaLocalStorageGateway {
      * @return true if is paused, false otherwise
      */
     suspend fun getTransferQueueStatus(): Boolean
+
+    /**
+     * Remove pending message by chat id
+     *
+     * @param chatId Chat id.
+     */
+    fun removePendingMessageByChatId(chatId: Long)
 }

@@ -55,7 +55,6 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.TruncateHistoryListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
@@ -64,6 +63,7 @@ import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MeetingUtil;
 import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.data.model.chat.NonContactInfo;
 import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
@@ -129,11 +129,23 @@ public class ChatController {
         }
     }
 
+    /**
+     * Clear chat history.
+     *
+     * @param chat MegaChatRoom
+     * @deprecated Use ClearChatHistoryUseCase instead.
+     */
     public void clearHistory(MegaChatRoom chat) {
         Timber.d("Chat ID: %s", chat.getChatId());
         clearHistory(chat.getChatId());
     }
 
+    /**
+     * Clear chat history.
+     *
+     * @param chatId MegaChatRoom
+     * @deprecated Use ClearChatHistoryUseCase instead.
+     */
     public void clearHistory(long chatId) {
         Timber.d("Chat ID: %s", chatId);
         dbH.removePendingMessageByChatId(chatId);

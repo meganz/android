@@ -1,12 +1,8 @@
-package mega.privacy.android.app.presentation.meeting.chat.view
+package mega.privacy.android.app.presentation.meeting.chat.view.dialog
 
-import android.content.Intent
-import androidx.camera.camera2.internal.compat.workaround.ForceCloseCaptureSession.OnConfigured
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 
 /**

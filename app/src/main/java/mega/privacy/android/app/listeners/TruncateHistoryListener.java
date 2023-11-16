@@ -14,6 +14,9 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
 import timber.log.Timber;
 
+/**
+ * @deprecated Use ClearChatHistoryUseCase instead.
+ */
 public class TruncateHistoryListener extends ChatBaseListener {
 
     public TruncateHistoryListener(Context context) {

@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.R
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
@@ -35,6 +36,8 @@ import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsExcept
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.GetAnotherCallParticipatingUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
@@ -144,6 +147,7 @@ internal class ChatViewModelTest {
     private val inviteToChatUseCase: InviteToChatUseCase = mock()
 
     private val inviteParticipantResultMapper: InviteParticipantResultMapper = mock()
+    private val clearChatHistoryUseCase = mock<ClearChatHistoryUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -172,6 +176,7 @@ internal class ChatViewModelTest {
             getCustomSubtitleListUseCase,
             inviteToChatUseCase,
             inviteParticipantResultMapper,
+            clearChatHistoryUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -222,6 +227,7 @@ internal class ChatViewModelTest {
             monitorAllContactParticipantsInChatUseCase = monitorAllContactParticipantsInChatUseCase,
             inviteToChatUseCase = inviteToChatUseCase,
             inviteParticipantResultMapper = inviteParticipantResultMapper,
+            clearChatHistoryUseCase = clearChatHistoryUseCase,
         )
     }
 
@@ -1452,6 +1458,23 @@ internal class ChatViewModelTest {
         }
     }
 
+    @ParameterizedTest(name = " with success {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that chat history finish`(
+        success: Boolean,
+    ) = runTest {
+        if (success) {
+            whenever(clearChatHistoryUseCase(chatId = chatId)).thenReturn(Unit)
+        } else {
+            whenever(clearChatHistoryUseCase(chatId = chatId)).thenThrow(RuntimeException())
+        }
+
+        underTest.clearChatHistory()
+        underTest.state.test {
+            assertThat((awaitItem().infoToShowEvent as StateEventWithContentTriggered).content)
+                .isEqualTo(if (success) R.string.clear_history_success else R.string.clear_history_error)
+        }
+    }
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

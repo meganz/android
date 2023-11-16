@@ -11,9 +11,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_ADD_PARTICIPANTS_ACTION
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_CLEAR_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_VIDEO_CALL_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
+import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import org.junit.Rule
@@ -99,16 +101,6 @@ class ChatViewTest {
         composeTestRule.onAllNodesWithText(expectedTitle)[1].assertExists()
     }
 
-    private fun initComposeRuleContent(state: ChatUiState) {
-        composeTestRule.setContent {
-            ChatView(
-                uiState = state,
-                onBackPressed = {},
-                onMenuActionPressed = actionPressed
-            )
-        }
-    }
-
     @Test
     fun `test that all contacts added in a call dialog show when click to add participants to call`() {
         initComposeRuleContent(
@@ -128,5 +120,32 @@ class ChatViewTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.chat_add_participants_no_contacts_left_to_add_title))
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that clear chat confirmation dialog show when click clear`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                myPermission = ChatRoomPermission.Moderator,
+                isGroup = true,
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_ACTION).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG).assertIsDisplayed()
+    }
+
+    private fun initComposeRuleContent(state: ChatUiState) {
+        composeTestRule.setContent {
+            ChatView(
+                uiState = state,
+                onBackPressed = {},
+                onMenuActionPressed = actionPressed
+            )
+        }
     }
 }
