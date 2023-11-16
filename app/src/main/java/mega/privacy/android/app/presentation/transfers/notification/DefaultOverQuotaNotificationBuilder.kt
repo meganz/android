@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.AreCredentialsNullUseCase
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import nz.mega.sdk.MegaAccountDetails
+import mega.privacy.android.icon.pack.R as iconPackR
 import javax.inject.Inject
 
 /**
@@ -95,7 +96,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             context,
             CreateTransferNotificationChannelsUseCase.NOTIFICATION_CHANNEL_DOWNLOAD_ID
         ).apply {
-            setSmallIcon(R.drawable.ic_stat_notify)
+            setSmallIcon(iconPackR.drawable.ic_stat_notify)
             color = ContextCompat.getColor(context, R.color.red_600_red_300)
             setStyle(NotificationCompat.DecoratedCustomViewStyle())
             setContent(customView)

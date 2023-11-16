@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUs
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.GetAllSdTransfersUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
@@ -126,7 +127,7 @@ class TransfersManagement @Inject constructor(
             mBuilder: Notification.Builder,
         ): Notification {
             mBuilder.apply {
-                setSmallIcon(R.drawable.ic_stat_notify)
+                setSmallIcon(iconPackR.drawable.ic_stat_notify)
                 setColor(getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
                 setContentTitle(
                     MegaApplication.getInstance().getString(R.string.download_preparing_files)
@@ -165,7 +166,7 @@ class TransfersManagement @Inject constructor(
             mNotificationManager.createNotificationChannel(channel)
 
             mBuilderCompat.apply {
-                setSmallIcon(R.drawable.ic_stat_notify)
+                setSmallIcon(iconPackR.drawable.ic_stat_notify)
                 color = getColor(MegaApplication.getInstance(), R.color.red_600_red_300)
                 setContentTitle(
                     MegaApplication.getInstance().getString(R.string.download_preparing_files)

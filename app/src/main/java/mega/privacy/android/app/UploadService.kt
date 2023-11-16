@@ -76,6 +76,7 @@ import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpe
 import mega.privacy.android.domain.usecase.transfers.uploads.GetNumPendingUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -530,7 +531,7 @@ internal class UploadService : LifecycleService() {
             notificationManager?.createNotificationChannel(channel)
             val builderCompatOreo =
                 NotificationCompat.Builder(applicationContext, channelId).also {
-                    it.setSmallIcon(R.drawable.ic_stat_notify)
+                    it.setSmallIcon(iconPackR.drawable.ic_stat_notify)
                         .setColor(ContextCompat.getColor(getInstance(), R.color.red_600_red_300))
                         .setContentIntent(
                             PendingIntent.getActivity(
@@ -548,7 +549,7 @@ internal class UploadService : LifecycleService() {
             notificationManager?.notify(notificationId, builderCompatOreo.build())
         } else {
             notificationBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify)
+                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                 .setColor(ContextCompat.getColor(getInstance(), R.color.red_600_red_300))
                 .setContentIntent(
                     PendingIntent.getActivity(
@@ -658,7 +659,7 @@ internal class UploadService : LifecycleService() {
             NotificationCompat.Builder(
                 applicationContext,
                 Constants.NOTIFICATION_CHANNEL_UPLOAD_ID
-            ).setSmallIcon(R.drawable.ic_stat_notify)
+            ).setSmallIcon(iconPackR.drawable.ic_stat_notify)
                 .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                 .setProgress(100, progressPercent, false)
                 .setContentIntent(pendingIntent)
@@ -670,7 +671,7 @@ internal class UploadService : LifecycleService() {
                 .build()
         } else {
             notificationBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify)
+                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                 .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                 .setProgress(100, progressPercent, false)
                 .setContentIntent(pendingIntent)
@@ -981,7 +982,7 @@ internal class UploadService : LifecycleService() {
                 Constants.NOTIFICATION_CHANNEL_UPLOAD_ID
             ).also { mBuilderCompatO ->
                 mBuilderCompatO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                     .setContentIntent(
                         PendingIntent.getActivity(
                             applicationContext,
@@ -1002,7 +1003,7 @@ internal class UploadService : LifecycleService() {
         } else {
             notificationBuilderCompat.let { builder ->
                 builder
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                     .setContentIntent(
                         PendingIntent.getActivity(
                             applicationContext,

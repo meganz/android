@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
+import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
@@ -98,7 +99,7 @@ internal object ChatMessageNotification {
         val builder =
             NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_CHAT_ID)
                 .apply {
-                    setSmallIcon(R.drawable.ic_stat_notify)
+                    setSmallIcon(iconPackR.drawable.ic_stat_notify)
                     setAutoCancel(true)
                     setShowWhen(true)
                     setGroup(GROUP_KEY)

@@ -14,6 +14,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.icon.pack.R as iconPackR
 import javax.inject.Inject
 
 /**
@@ -64,7 +65,7 @@ class DefaultTransfersFinishedNotificationMapper @Inject constructor(
         )
 
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
-            .setSmallIcon(R.drawable.ic_stat_notify)
+            .setSmallIcon(iconPackR.drawable.ic_stat_notify)
             .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
             .setContentIntent(pendingIntent)
             .setAutoCancel(true).setTicker(notificationTitle)

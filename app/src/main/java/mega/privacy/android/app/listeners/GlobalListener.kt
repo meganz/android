@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetIncomingContactRequestsNotificationListUseCase
 import mega.privacy.android.domain.usecase.monitoring.EnablePerformanceReporterUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -362,7 +363,7 @@ class GlobalListener @Inject constructor(
                 .getDrawable(CoreUiR.drawable.ic_folder_incoming, appContext.theme)
             val notificationBuilder: NotificationCompat.Builder =
                 NotificationCompat.Builder(appContext, notificationChannelId)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                     .setContentTitle(notificationTitle)
                     .setContentText(notificationContent)
                     .setStyle(NotificationCompat.BigTextStyle().bigText(notificationContent))

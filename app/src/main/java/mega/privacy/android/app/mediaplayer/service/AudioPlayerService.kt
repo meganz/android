@@ -51,6 +51,7 @@ import mega.privacy.android.app.utils.ChatUtil.getAudioFocus
 import mega.privacy.android.app.utils.ChatUtil.getRequest
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.icon.pack.R as iconPackR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -250,7 +251,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 ),
                 thumbnail = viewModelGateway.getPlayingThumbnail(),
-                smallIcon = R.drawable.ic_stat_notify,
+                smallIcon = iconPackR.drawable.ic_stat_notify,
                 onNotificationPostedCallback = { notificationId, notification, ongoing ->
                     if (ongoing && isForeground) {
                         // Make sure the service will not get destroyed while playing media.

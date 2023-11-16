@@ -14,6 +14,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.icon.pack.R as iconPackR
 import javax.inject.Inject
 
 /**
@@ -69,7 +70,7 @@ class DefaultDownloadNotificationMapper @Inject constructor(
             context,
             CreateTransferNotificationChannelsUseCase.NOTIFICATION_CHANNEL_DOWNLOAD_ID
         ).apply {
-            setSmallIcon(R.drawable.ic_stat_notify)
+            setSmallIcon(iconPackR.drawable.ic_stat_notify)
             setOngoing(true)
             setContentTitle(title)
             setStyle(NotificationCompat.BigTextStyle().bigText(content))

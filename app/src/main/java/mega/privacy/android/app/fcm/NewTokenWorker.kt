@@ -14,7 +14,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.usecase.GetPushToken
 import mega.privacy.android.domain.usecase.pushnotifications.RegisterPushNotificationsUseCase
@@ -83,7 +83,7 @@ class NewTokenWorker @AssistedInject constructor(
             applicationContext,
             RETRIEVING_NEW_TOKEN_ID
         ).apply {
-            setSmallIcon(R.drawable.ic_stat_notify)
+            setSmallIcon(iconPackR.drawable.ic_stat_notify)
         }
 
         return builder.build()

@@ -40,6 +40,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -325,7 +326,7 @@ class CallService : Service() {
                     this@CallService,
                     R.color.red_600_red_300
                 )
-                val smallIcon = R.drawable.ic_stat_notify
+                val smallIcon = iconPackR.drawable.ic_stat_notify
                 val largeIcon: Bitmap =
                     if (chat.isGroup)
                         createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title)

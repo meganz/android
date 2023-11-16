@@ -371,7 +371,7 @@ public final class ChatAdvancedNotificationBuilder {
 
             NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, channelId);
             notificationBuilderO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                     .setCustomHeadsUpContentView(contentView)
                     .setCustomContentView(collapsedViews)
@@ -389,7 +389,7 @@ public final class ChatAdvancedNotificationBuilder {
         } else {
             long[] noVibrationPattern = new long[]{0L};
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                     .setCustomHeadsUpContentView(contentView)
                     .setCustomContentView(collapsedViews)
@@ -479,7 +479,7 @@ public final class ChatAdvancedNotificationBuilder {
 
             NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_INCOMING_CALLS_ID);
             notificationBuilderO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                     .setCustomHeadsUpContentView(expandedView)
                     .setCustomContentView(collapsedViews)
@@ -498,7 +498,7 @@ public final class ChatAdvancedNotificationBuilder {
             long[] pattern = {0, 1000};
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                     .setCustomHeadsUpContentView(expandedView)
                     .setCustomContentView(collapsedViews)
@@ -588,7 +588,7 @@ public final class ChatAdvancedNotificationBuilder {
             notificationManager.createNotificationChannel(channel);
             NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID);
             notificationBuilderO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setContentTitle(context.getString(R.string.missed_call_notification_title))
                     .setContentText(notificationContent)
                     .setAutoCancel(true)
@@ -609,7 +609,7 @@ public final class ChatAdvancedNotificationBuilder {
             notify(notificationId, notificationBuilderO.build());
         } else {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setContentTitle(context.getString(R.string.missed_call_notification_title))
                     .setContentText(notificationContent)
                     .setAutoCancel(true)

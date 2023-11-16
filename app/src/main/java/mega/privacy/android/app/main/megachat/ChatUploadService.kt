@@ -73,6 +73,7 @@ import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTran
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
@@ -897,7 +898,7 @@ class ChatUploadService : LifecycleService() {
             channel.setSound(null, null)
             mNotificationManager?.createNotificationChannel(channel)
             mBuilderCompat?.apply {
-                setSmallIcon(R.drawable.ic_stat_notify)
+                setSmallIcon(iconPackR.drawable.ic_stat_notify)
                 setProgress(100, progressPercent.toInt(), false)
                 setContentIntent(pendingIntent)
                 setOngoing(true).setContentTitle(message)
@@ -908,7 +909,7 @@ class ChatUploadService : LifecycleService() {
             notification = mBuilderCompat!!.build()
         } else {
             mBuilder?.apply {
-                setSmallIcon(R.drawable.ic_stat_notify)
+                setSmallIcon(iconPackR.drawable.ic_stat_notify)
                 setProgress(100, progressPercent.toInt(), false)
                 setContentIntent(pendingIntent)
                 setOngoing(true).setContentTitle(message)
@@ -1346,7 +1347,7 @@ class ChatUploadService : LifecycleService() {
             channel.setSound(null, null)
             mNotificationManager!!.createNotificationChannel(channel)
             mBuilderCompat?.apply {
-                setSmallIcon(R.drawable.ic_stat_notify)
+                setSmallIcon(iconPackR.drawable.ic_stat_notify)
                 color = ContextCompat.getColor(this@ChatUploadService, R.color.red_600_red_300)
                 setContentIntent(
                     PendingIntent.getActivity(
@@ -1364,7 +1365,7 @@ class ChatUploadService : LifecycleService() {
         } else {
             mBuilder?.apply {
                 setColor(ContextCompat.getColor(this@ChatUploadService, R.color.red_600_red_300))
-                setSmallIcon(R.drawable.ic_stat_notify)
+                setSmallIcon(iconPackR.drawable.ic_stat_notify)
                 setContentIntent(
                     PendingIntent.getActivity(
                         applicationContext,

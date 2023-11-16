@@ -108,6 +108,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
+import mega.privacy.android.icon.pack.R as iconPackR
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
@@ -888,7 +889,7 @@ internal class DownloadService : LifecycleService() {
                     applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
                 )
                 mBuilderCompatO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true).setTicker(notificationTitle)
@@ -901,7 +902,7 @@ internal class DownloadService : LifecycleService() {
             } else {
                 val builder = NotificationCompat.Builder(this)
                 builder
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true).setTicker(notificationTitle)
@@ -957,7 +958,7 @@ internal class DownloadService : LifecycleService() {
                                     applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
                                 )
                                 mBuilderCompatO
-                                    .setSmallIcon(R.drawable.ic_stat_notify)
+                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                                     .setContentIntent(pendingIntent)
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
@@ -969,7 +970,7 @@ internal class DownloadService : LifecycleService() {
                             } else {
                                 val builder = NotificationCompat.Builder(this)
                                 builder
-                                    .setSmallIcon(R.drawable.ic_stat_notify)
+                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                                     .setContentIntent(pendingIntent)
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
@@ -1001,7 +1002,7 @@ internal class DownloadService : LifecycleService() {
                                     applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
                                 )
                                 mBuilderCompatO
-                                    .setSmallIcon(R.drawable.ic_stat_notify)
+                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                                     .setContentIntent(pendingIntent)
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
@@ -1013,7 +1014,7 @@ internal class DownloadService : LifecycleService() {
                             } else {
                                 val builder = NotificationCompat.Builder(this)
                                 builder
-                                    .setSmallIcon(R.drawable.ic_stat_notify)
+                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                                     .setContentIntent(pendingIntent)
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
@@ -1042,7 +1043,7 @@ internal class DownloadService : LifecycleService() {
                                     applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
                                 )
                                 mBuilderCompatO
-                                    .setSmallIcon(R.drawable.ic_stat_notify)
+                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                                     .setContentIntent(pendingIntent)
                                     .setAutoCancel(true).setTicker(notificationTitle)
@@ -1055,7 +1056,7 @@ internal class DownloadService : LifecycleService() {
                             } else {
                                 val builder = NotificationCompat.Builder(this)
                                 builder
-                                    .setSmallIcon(R.drawable.ic_stat_notify)
+                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                                     .setContentIntent(pendingIntent)
                                     .setAutoCancel(true).setTicker(notificationTitle)
@@ -1083,7 +1084,7 @@ internal class DownloadService : LifecycleService() {
                                 applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
                             )
                             mBuilderCompatO
-                                .setSmallIcon(R.drawable.ic_stat_notify)
+                                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                                 .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                                 .setContentIntent(pendingIntent)
                                 .setAutoCancel(true).setTicker(notificationTitle)
@@ -1096,7 +1097,7 @@ internal class DownloadService : LifecycleService() {
                         } else {
                             val builder = NotificationCompat.Builder(this)
                             builder
-                                .setSmallIcon(R.drawable.ic_stat_notify)
+                                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                                 .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                                 .setContentIntent(pendingIntent)
                                 .setAutoCancel(true).setTicker(notificationTitle)
@@ -1125,7 +1126,7 @@ internal class DownloadService : LifecycleService() {
                             applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
                         )
                         mBuilderCompatO
-                            .setSmallIcon(R.drawable.ic_stat_notify)
+                            .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                             .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                             .setContentIntent(pendingIntent)
                             .setAutoCancel(true).setTicker(notificationTitle)
@@ -1138,7 +1139,7 @@ internal class DownloadService : LifecycleService() {
                     } else {
                         val builder = NotificationCompat.Builder(this)
                         builder
-                            .setSmallIcon(R.drawable.ic_stat_notify)
+                            .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                             .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                             .setContentIntent(pendingIntent)
                             .setAutoCancel(true).setTicker(notificationTitle)
@@ -1167,7 +1168,7 @@ internal class DownloadService : LifecycleService() {
                         applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
                     )
                     mBuilderCompatO
-                        .setSmallIcon(R.drawable.ic_stat_notify)
+                        .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                         .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                         .setContentIntent(pendingIntent)
                         .setAutoCancel(true).setTicker(notificationTitle)
@@ -1180,7 +1181,7 @@ internal class DownloadService : LifecycleService() {
                 } else {
                     val builder = NotificationCompat.Builder(this)
                     builder
-                        .setSmallIcon(R.drawable.ic_stat_notify)
+                        .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                         .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                         .setContentIntent(pendingIntent)
                         .setAutoCancel(true).setTicker(notificationTitle)
@@ -1288,7 +1289,7 @@ internal class DownloadService : LifecycleService() {
                     Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
                 )
                 mBuilderCompat
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
@@ -1299,7 +1300,7 @@ internal class DownloadService : LifecycleService() {
             } else {
                 val mBuilder = Notification.Builder(this@DownloadService)
                 mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)

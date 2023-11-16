@@ -156,7 +156,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify)
+                .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                 .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
@@ -246,7 +246,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
             NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSimple);
             notificationBuilderO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setContentTitle(context.getString(R.string.title_contact_request_notification))
                     .setContentText(notificationContent)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationContent))
@@ -272,7 +272,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         } else {
 
             Notification.Builder notificationBuilder = new Notification.Builder(context)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setContentTitle(context.getString(R.string.title_contact_request_notification))
                     .setContentText(notificationContent)
@@ -329,7 +329,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
             NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSimple);
             notificationBuilderO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setContentTitle(title)
                     .setContentText(email)
                     .setAutoCancel(true)
@@ -352,7 +352,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         } else {
 
             Notification.Builder notificationBuilder = new Notification.Builder(context)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setContentTitle(title)
                     .setContentText(email)
@@ -406,7 +406,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
             NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSummary);
             notificationBuilderO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setShowWhen(true)
                     .setGroup(groupKey)
                     .setGroupSummary(true)
@@ -418,7 +418,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         } else {
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-            builder.setSmallIcon(R.drawable.ic_stat_notify)
+            builder.setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setShowWhen(true)
                     .setGroup(groupKey)
@@ -446,7 +446,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
             NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSummary);
             notificationBuilderO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setShowWhen(true)
                     .setGroup(groupKey)
                     .setGroupSummary(true)
@@ -459,7 +459,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 
-            builder.setSmallIcon(R.drawable.ic_stat_notify)
+            builder.setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setShowWhen(true)
                     .setGroup(groupKey)
@@ -508,7 +508,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
             NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSimple);
             notificationBuilderO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true).setTicker(title)
                     .setContentTitle(title).setContentText(email)
@@ -536,7 +536,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
             }
 
             mBuilderCompat
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true).setTicker(title)

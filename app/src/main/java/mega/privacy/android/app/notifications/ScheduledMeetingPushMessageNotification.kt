@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.pushes.PushMessage.ScheduledMeetingPus
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationJoinButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationMessageButtonEvent
+import mega.privacy.android.icon.pack.R as iconPackR
 import javax.inject.Inject
 
 /**
@@ -72,7 +73,7 @@ class ScheduledMeetingPushMessageNotification @Inject constructor(
                     .setPriority(priority)
                     .setContentIntent(showMeetingIntent)
                     .setAutoCancel(true)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .apply {
                         if (pushMessage.isStartReminder) {

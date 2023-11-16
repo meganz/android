@@ -25,6 +25,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AreCredentialsNullUseCase
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 
@@ -123,7 +124,7 @@ internal object TransferOverQuotaNotification {
                     applicationContext,
                     Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
                 )
-                builderCompat.setSmallIcon(R.drawable.ic_stat_notify)
+                builderCompat.setSmallIcon(iconPackR.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(applicationContext, R.color.red_600_red_300))
                     .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                     .setContent(customView)
@@ -136,7 +137,7 @@ internal object TransferOverQuotaNotification {
                 )
             } else {
                 val builder = Notification.Builder(applicationContext)
-                builder.setSmallIcon(R.drawable.ic_stat_notify)
+                builder.setSmallIcon(iconPackR.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(applicationContext, R.color.red_600_red_300))
                     .setContent(customView)
                     .setContentIntent(clickPendingIntent)

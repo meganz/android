@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
 import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import timber.log.Timber
 
 /**
@@ -173,11 +174,11 @@ class PushMessageWorker @AssistedInject constructor(
         val notification = when (pushMessageMapper(inputData)) {
             is CallPushMessage -> getNotification(R.drawable.ic_call_started)
             is ChatPushMessage -> getNotification(
-                R.drawable.ic_stat_notify,
+                iconPackR.drawable.ic_stat_notify,
                 R.string.notification_chat_undefined_content
             )
 
-            else -> getNotification(R.drawable.ic_stat_notify)
+            else -> getNotification(iconPackR.drawable.ic_stat_notify)
         }
 
         return ForegroundInfo(NOTIFICATION_CHANNEL_ID, notification)
