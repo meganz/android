@@ -68,6 +68,7 @@ import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -114,6 +115,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
@@ -250,6 +252,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val doesCameraUploadsRecordExistsInTargetNodeUseCase: DoesCameraUploadsRecordExistsInTargetNodeUseCase,
     private val extractGpsCoordinatesUseCase: ExtractGpsCoordinatesUseCase,
     private val uploadCameraUploadsRecordsUseCase: UploadCameraUploadsRecordsUseCase,
+    private val getUploadOptionUseCase: GetUploadOptionUseCase,
     private val fileSystemRepository: FileSystemRepository,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
@@ -792,7 +795,11 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun getPendingCameraUploadsRecords(): List<CameraUploadsRecord> =
         getPendingCameraUploadsRecordsUseCase(
-            listOf(SyncRecordType.TYPE_PHOTO, SyncRecordType.TYPE_VIDEO)
+            when (getUploadOptionUseCase()) {
+                UploadOption.PHOTOS -> listOf(SyncRecordType.TYPE_PHOTO)
+                UploadOption.VIDEOS -> listOf(SyncRecordType.TYPE_VIDEO)
+                else -> listOf(SyncRecordType.TYPE_PHOTO, SyncRecordType.TYPE_VIDEO)
+            }
         )
 
     /**

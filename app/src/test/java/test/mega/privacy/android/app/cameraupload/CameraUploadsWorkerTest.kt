@@ -62,6 +62,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
@@ -217,6 +218,7 @@ class CameraUploadsWorkerTest {
         mock()
     private val extractGpsCoordinatesUseCase: ExtractGpsCoordinatesUseCase = mock()
     private val uploadCameraUploadsRecordsUseCase: UploadCameraUploadsRecordsUseCase = mock()
+    private val getUploadOptionUseCase: GetUploadOptionUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
 
     @Before
@@ -332,6 +334,7 @@ class CameraUploadsWorkerTest {
             uploadCameraUploadsRecordsUseCase = uploadCameraUploadsRecordsUseCase,
             doesCameraUploadsRecordExistsInTargetNodeUseCase = doesCameraUploadsRecordExistsInTargetNodeUseCase,
             extractGpsCoordinatesUseCase = extractGpsCoordinatesUseCase,
+            getUploadOptionUseCase = getUploadOptionUseCase,
             fileSystemRepository = fileSystemRepository,
         )
     }
