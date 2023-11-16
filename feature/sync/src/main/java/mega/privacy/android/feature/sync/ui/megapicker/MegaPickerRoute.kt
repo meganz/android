@@ -104,7 +104,7 @@ private fun selectCurrentFolder(
 ) {
     viewModel.handleAction(
         MegaPickerAction.CurrentFolderSelected(
-            allFilesAccessPermissionGranted = syncPermissionsManager.isManageExternalStoragePermissionGranted(),
+            allFilesAccessPermissionGranted = syncPermissionsManager.isManageExternalStoragePermissionGranted(context),
             disableBatteryOptimizationPermissionGranted = syncPermissionsManager.isDisableBatteryOptimizationGranted(
                 context
             )

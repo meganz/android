@@ -28,7 +28,7 @@ internal fun SyncNewFolderScreenRoute(
     val context = LocalContext.current
 
     var showAllFilesAccessBanner by remember {
-        mutableStateOf(!syncPermissionsManager.isManageExternalStoragePermissionGranted())
+        mutableStateOf(!syncPermissionsManager.isManageExternalStoragePermissionGranted(context))
     }
     var showDisableBatteryOptimizationsBanner by remember {
         mutableStateOf(
@@ -42,13 +42,14 @@ internal fun SyncNewFolderScreenRoute(
         ActivityResultContracts.StartActivityForResult()
     ) { _ ->
         showAllFilesAccessBanner =
-            !syncPermissionsManager.isManageExternalStoragePermissionGranted()
+            !syncPermissionsManager.isManageExternalStoragePermissionGranted(context)
         showDisableBatteryOptimizationsBanner =
             !showAllFilesAccessBanner &&
                     !syncPermissionsManager.isDisableBatteryOptimizationGranted(context)
     }
 
-    SyncNewFolderScreen(folderPairName = state.value.folderPairName,
+    SyncNewFolderScreen(
+        folderPairName = state.value.folderPairName,
         selectedLocalFolder = state.value.selectedLocalFolder,
         selectedMegaFolder = state.value.selectedMegaFolder,
         localFolderSelected = { viewModel.handleAction(LocalFolderSelected(it)) },
@@ -76,7 +77,8 @@ internal fun SyncNewFolderScreenRoute(
         syncClicked = {
             viewModel.handleAction(NextClicked)
             openNextScreen(state.value)
-        }
+        },
+        syncPermissionsManager = syncPermissionsManager
     )
 
     val onBack = {

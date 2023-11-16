@@ -3,6 +3,8 @@ package mega.privacy.android.feature.sync.ui.newfolderpair
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -14,6 +16,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +29,7 @@ import mega.privacy.android.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
 
 @Composable
@@ -42,6 +46,7 @@ internal fun SyncNewFolderScreen(
     folderNameChanged: (String) -> Unit,
     selectMegaFolderClicked: () -> Unit,
     syncClicked: () -> Unit,
+    syncPermissionsManager: SyncPermissionsManager,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -59,19 +64,20 @@ internal fun SyncNewFolderScreen(
             )
         }, content = { paddingValues ->
             SyncNewFolderScreenContent(
-                localFolderSelected,
-                showDisableBatteryOptimizationsBanner,
-                batteryOptimizationLearnMoreButtonClicked,
-                batteryOptimizationAllowButtonClicked,
-                showAllFilesAccessBanner,
-                allFilesAccessBannerClicked,
-                selectMegaFolderClicked,
-                folderNameChanged,
-                folderPairName,
-                selectedLocalFolder,
-                selectedMegaFolder,
-                syncClicked,
-                Modifier.padding(paddingValues)
+                modifier = Modifier.padding(paddingValues),
+                localFolderSelected = localFolderSelected,
+                showDisableBatteryOptimizationsBanner = showDisableBatteryOptimizationsBanner,
+                batteryOptimizationLearnMoreButtonClicked = batteryOptimizationLearnMoreButtonClicked,
+                batteryOptimizationAllowButtonClicked = batteryOptimizationAllowButtonClicked,
+                showAllFilesAccessBanner = showAllFilesAccessBanner,
+                allFilesAccessBannerClicked = allFilesAccessBannerClicked,
+                selectMegaFolderClicked = selectMegaFolderClicked,
+                folderNameChanged = folderNameChanged,
+                folderPairName = folderPairName,
+                selectedLocalFolder = selectedLocalFolder,
+                selectedMegaFolder = selectedMegaFolder,
+                syncClicked = syncClicked,
+                syncPermissionsManager = syncPermissionsManager
             )
         }
     )
@@ -79,6 +85,7 @@ internal fun SyncNewFolderScreen(
 
 @Composable
 private fun SyncNewFolderScreenContent(
+    modifier: Modifier = Modifier,
     localFolderSelected: (Uri) -> Unit,
     showDisableBatteryOptimizationsBanner: Boolean,
     batteryOptimizationLearnMoreButtonClicked: () -> Unit,
@@ -91,11 +98,22 @@ private fun SyncNewFolderScreenContent(
     selectedLocalFolder: String,
     selectedMegaFolder: RemoteFolder?,
     syncClicked: () -> Unit,
-    modifier: Modifier = Modifier,
+    syncPermissionsManager: SyncPermissionsManager
 ) {
     Column(modifier) {
         val folderPicker = launchFolderPicker {
             localFolderSelected(it)
+        }
+
+        val context = LocalContext.current
+        val launcher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                folderPicker.launch(null)
+            } else {
+                // Permission Denied: Do something
+            }
         }
 
         if (showDisableBatteryOptimizationsBanner) {
@@ -123,7 +141,11 @@ private fun SyncNewFolderScreenContent(
         InputSyncInformationView(
             Modifier.padding(top = 24.dp, start = 16.dp, end = 16.dp, bottom = 48.dp),
             selectDeviceFolderClicked = {
-                folderPicker.launch(null)
+                if (syncPermissionsManager.isManageExternalStoragePermissionGranted(context)) {
+                    folderPicker.launch(null)
+                } else {
+                    launcher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                }
             },
             selectMEGAFolderClicked = {
                 selectMegaFolderClicked()
@@ -181,7 +203,8 @@ private fun PreviewSyncNewFolderScreen() {
             localFolderSelected = {},
             folderNameChanged = {},
             selectMegaFolderClicked = {},
-            syncClicked = {}
+            syncClicked = {},
+            syncPermissionsManager = SyncPermissionsManager()
         )
     }
 }

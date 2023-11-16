@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui
 
+import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -176,7 +177,7 @@ class SyncNewFolderScreenRouteTest {
         val emptyState = SyncNewFolderState(selectedMegaFolder = RemoteFolder(0, ""))
         whenever(state.value).thenReturn(emptyState)
         whenever(viewModel.state).thenReturn(state)
-        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted())
+        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted(composeTestRule.activity))
             .thenReturn(false)
         whenever(syncPermissionsManager.isDisableBatteryOptimizationGranted(composeTestRule.activity))
             .thenReturn(false)
@@ -205,7 +206,7 @@ class SyncNewFolderScreenRouteTest {
         val emptyState = SyncNewFolderState(selectedMegaFolder = RemoteFolder(0, ""))
         whenever(state.value).thenReturn(emptyState)
         whenever(viewModel.state).thenReturn(state)
-        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted())
+        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted(composeTestRule.activity))
             .thenReturn(true)
         whenever(syncPermissionsManager.isDisableBatteryOptimizationGranted(composeTestRule.activity))
             .thenReturn(false)
