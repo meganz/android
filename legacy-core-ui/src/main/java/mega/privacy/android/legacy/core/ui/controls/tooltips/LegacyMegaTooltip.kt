@@ -27,7 +27,7 @@ import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.skydoves.balloon.compose.rememberBalloonBuilder
 import com.skydoves.balloon.compose.setBackgroundColor
-import mega.privacy.android.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.extensions.body2medium
 import mega.privacy.android.core.ui.theme.extensions.dark_blue_tooltip_white

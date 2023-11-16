@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
-import mega.privacy.android.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_500_grey_400

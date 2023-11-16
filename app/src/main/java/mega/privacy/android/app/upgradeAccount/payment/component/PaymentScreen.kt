@@ -35,7 +35,7 @@ import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.upgradeAccount.model.UserSubscription
 import mega.privacy.android.app.upgradeAccount.payment.PaymentViewModel
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.AndroidTheme
 

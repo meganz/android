@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.extensions.dark_blue_500_dark_blue_200
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary

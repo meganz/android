@@ -1,6 +1,5 @@
-package mega.privacy.android.core.ui.controls.text
+package mega.privacy.android.legacy.core.ui.controls.text
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
@@ -11,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -21,12 +21,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import mega.privacy.android.core.ui.model.MegaSpanStyle
-import mega.privacy.android.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.MegaTheme
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.legacy.core.ui.model.SpanStyleWithAnnotation
 
 /**
  * High light text from mega format
@@ -41,26 +37,59 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
  * @param color the color apply for all text
  * @param maxLines Maximum number of lines for the text to span
  * @param overflow How visual overflow should be handled
- * @param textAlign to align text
  */
+@Deprecated(
+    message = "This has been deprecated in favour of MegaSpannedText core component in core-ui module that uses TextColor to ensure usage of design system color tokens",
+    replaceWith = ReplaceWith("mega.privacy.android.core.ui.controls.text.MegaSpannedText")
+)
 @Composable
 fun MegaSpannedText(
     value: String,
     baseStyle: TextStyle,
-    styles: Map<SpanIndicator, MegaSpanStyle>,
-    color: TextColor,
+    styles: Map<SpanIndicator, SpanStyle>,
     modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
-    textAlign: TextAlign? = null
 ) {
     Text(
         modifier = modifier,
         text = spannedText(value, styles),
-        color = MegaTheme.textColor(textColor = color),
         style = baseStyle,
+        color = color,
         maxLines = maxLines,
         overflow = overflow,
+    )
+}
+
+/**
+ * High light text from mega format
+ * [A]Billed monthly[/A] %s/month
+ * [A]Google Pay[/A] (subscription)
+ *
+ * @param value
+ * @param baseStyle the style apply for all text
+ * @param styles the list of the tag and the custom style
+ * key is [SpanIndicator] for open and close tags, value is the [SpanStyle]
+ * @param modifier
+ * @param textAlign to align text
+ */
+@Composable
+@Deprecated(
+    message = "This has been deprecated in favour of MegaSpannedAlignedText core component in core-ui module that uses TextColor to ensure usage of design system color tokens",
+    replaceWith = ReplaceWith("mega.privacy.android.core.ui.controls.text.MegaSpannedAlignedText")
+)
+fun MegaSpannedAlignedText(
+    value: String,
+    baseStyle: TextStyle,
+    styles: Map<SpanIndicator, SpanStyle>,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign,
+) {
+    Text(
+        modifier = modifier,
+        text = spannedText(value, styles),
+        style = baseStyle,
         textAlign = textAlign
     )
 }
@@ -77,11 +106,14 @@ fun MegaSpannedText(
  * @param onAnnotationClick will receive clicks on spanned text with not null annotation
  * @param modifier
  */
+@Deprecated(
+    message = "This has been deprecated in favour of MegaSpannedClickableText core component in core-ui module that uses TextColor to ensure usage of design system color tokens",
+    replaceWith = ReplaceWith("mega.privacy.android.core.ui.controls.text.MegaSpannedClickableText")
+)
 @Composable
 fun MegaSpannedClickableText(
     value: String,
-    styles: Map<SpanIndicator, MegaSpanStyleWithAnnotation>,
-    color: TextColor,
+    styles: Map<SpanIndicator, SpanStyleWithAnnotation>,
     onAnnotationClick: (annotation: String) -> Unit,
     modifier: Modifier = Modifier,
     baseStyle: TextStyle = LocalTextStyle.current,
@@ -90,7 +122,7 @@ fun MegaSpannedClickableText(
     ClickableText(
         modifier = modifier,
         text = annotatedLinkString,
-        style = baseStyle.copy(color = MegaTheme.textColor(textColor = color)),
+        style = baseStyle,
         onClick = { position ->
             annotatedLinkString.getStringAnnotations(ANNOTATION_TAG, position, position + 1)
                 .firstOrNull()?.let { onAnnotationClick(it.item) }
@@ -98,17 +130,15 @@ fun MegaSpannedClickableText(
     )
 }
 
-@Composable
-private fun spannedText(value: String, styles: Map<SpanIndicator, MegaSpanStyle>) =
+private fun spannedText(value: String, styles: Map<SpanIndicator, SpanStyle>) =
     spannedTextWithAnnotation(value, styles.mapValues {
-        MegaSpanStyleWithAnnotation(it.value, null)
+        SpanStyleWithAnnotation(it.value, null)
     })
 
 @OptIn(ExperimentalTextApi::class)
-@Composable
 private fun spannedTextWithAnnotation(
     value: String,
-    styles: Map<SpanIndicator, MegaSpanStyleWithAnnotation>,
+    styles: Map<SpanIndicator, SpanStyleWithAnnotation>,
 ) =
     buildAnnotatedString {
         var temp = value
@@ -130,17 +160,14 @@ private fun spannedTextWithAnnotation(
                     val contentStart = start + tag.openTag.length
                     if (contentStart < end) {
                         val spanStyleWithAnnotation = styles[tag]
-                        val spanStyle = spanStyleWithAnnotation?.megaSpanStyle?.toSpanStyle()
-                        spanStyleWithAnnotation?.annotation?.let { annotation ->
-                            spanStyle?.let {
-                                withAnnotation(ANNOTATION_TAG, annotation) {
-                                    withStyle(spanStyle) {
-                                        append(temp.substring(contentStart, end))
-                                    }
+                        spanStyleWithAnnotation?.annotation?.let {
+                            withAnnotation(ANNOTATION_TAG, it) {
+                                withStyle(spanStyleWithAnnotation.spanStyle) {
+                                    append(temp.substring(contentStart, end))
                                 }
                             }
                         } ?: run {
-                            spanStyle?.let { style ->
+                            spanStyleWithAnnotation?.spanStyle?.let { style ->
                                 withStyle(style) {
                                     append(temp.substring(contentStart, end))
                                 }
@@ -171,16 +198,13 @@ private const val ANNOTATION_TAG = "annotationTag"
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedTextPreviewOne() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MegaSpannedText(
-            value = "[A]Google Pay[/A] (subscription)",
-            baseStyle = MaterialTheme.typography.subtitle1,
-            styles = hashMapOf(
-                SpanIndicator('A') to MegaSpanStyle(color = TextColor.Error)
-            ),
-            color = TextColor.Placeholder
-        )
-    }
+    MegaSpannedText(
+        value = "[A]Google Pay[/A] (subscription)",
+        baseStyle = MaterialTheme.typography.subtitle1,
+        styles = hashMapOf(
+            SpanIndicator('A') to SpanStyle(color = Color.Red)
+        ),
+    )
 }
 
 /**
@@ -190,16 +214,13 @@ fun MegaSpannedTextPreviewOne() {
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedTextPreviewTwo() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MegaSpannedText(
-            value = "Do you want to [A]Google Pay[/A] (subscription)",
-            baseStyle = MaterialTheme.typography.subtitle1,
-            styles = hashMapOf(
-                SpanIndicator('A') to MegaSpanStyle(color = TextColor.Error)
-            ),
-            color = TextColor.Primary
+    MegaSpannedText(
+        value = "Do you want to [A]Google Pay[/A] (subscription)",
+        baseStyle = MaterialTheme.typography.subtitle1,
+        styles = hashMapOf(
+            SpanIndicator('A') to SpanStyle(color = Color.Red)
         )
-    }
+    )
 }
 
 /**
@@ -209,17 +230,14 @@ fun MegaSpannedTextPreviewTwo() {
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedTextPreviewThree() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MegaSpannedText(
-            value = "Do you want to [A]Google Pay[/A] [B]Huawei[/B] (subscription)",
-            baseStyle = MaterialTheme.typography.subtitle1,
-            styles = hashMapOf(
-                SpanIndicator('B') to MegaSpanStyle(color = TextColor.Accent),
-                SpanIndicator('A') to MegaSpanStyle(color = TextColor.Error)
-            ),
-            color = TextColor.Secondary
+    MegaSpannedText(
+        value = "Do you want to [A]Google Pay[/A] [B]Huawei[/B] (subscription)",
+        baseStyle = MaterialTheme.typography.subtitle1,
+        styles = hashMapOf(
+            SpanIndicator('B') to SpanStyle(color = Color.Green),
+            SpanIndicator('A') to SpanStyle(color = Color.Red)
         )
-    }
+    )
 }
 
 /**
@@ -229,33 +247,28 @@ fun MegaSpannedTextPreviewThree() {
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedTextPreviewFour() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MegaSpannedText(
-            value = "Choose [A]Google Pay[/A] (subscription)",
-            baseStyle = MaterialTheme.typography.subtitle1,
-            styles = hashMapOf(
-                SpanIndicator('A') to MegaSpanStyle(color = TextColor.Error)
-            ),
-            color = TextColor.Placeholder
-        )
-    }
+    MegaSpannedText(
+        value = "Choose [A]Google Pay[/A] (subscription)",
+        baseStyle = MaterialTheme.typography.subtitle1,
+        styles = hashMapOf(
+            SpanIndicator('A') to SpanStyle(color = Color.Red)
+        ),
+        color = Color.Gray
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedAlignedTextPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MegaSpannedText(
-            value = "Do you want to [A]Google Pay[/A] [B]Huawei[/B]\n (subscription)",
-            baseStyle = MaterialTheme.typography.subtitle1,
-            styles = hashMapOf(
-                SpanIndicator('B') to MegaSpanStyle(color = TextColor.Accent),
-                SpanIndicator('A') to MegaSpanStyle(color = TextColor.Error)
-            ),
-            textAlign = TextAlign.Center,
-            color = TextColor.Primary
-        )
-    }
+    MegaSpannedAlignedText(
+        value = "Do you want to [A]Google Pay[/A] [B]Huawei[/B]\n (subscription)",
+        baseStyle = MaterialTheme.typography.subtitle1,
+        styles = hashMapOf(
+            SpanIndicator('B') to SpanStyle(color = Color.Green),
+            SpanIndicator('A') to SpanStyle(color = Color.Red)
+        ),
+        textAlign = TextAlign.Center
+    )
 }
 
 /**
@@ -264,38 +277,31 @@ fun MegaSpannedAlignedTextPreview() {
 @Preview(showBackground = true)
 @Composable
 fun MegaSpannedClickableTextPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        var counter by remember { mutableStateOf(1) }
-        MegaSpannedClickableText(
-            value = "Click [A]here[/A] to increase the counter: [B]$counter[/B]\n and [R]here[/R] to reset",
-            styles = hashMapOf(
-                SpanIndicator('A') to MegaSpanStyleWithAnnotation(
-                    MegaSpanStyle(
-                        SpanStyle(textDecoration = TextDecoration.Underline),
-                        color = TextColor.Accent,
-                    ), "url or whatever you want to receive in onAnnotationClick"
-                ),
-                SpanIndicator('R') to MegaSpanStyleWithAnnotation(
-                    MegaSpanStyle(
-                        SpanStyle(textDecoration = TextDecoration.Underline),
-                        color = TextColor.Info,
-                    ), "reset"
-                ),
-                SpanIndicator('B') to MegaSpanStyleWithAnnotation(
-                    MegaSpanStyle(
-                        color = TextColor.Error,
-                    ), "d"
-                )
+    var counter by remember { mutableStateOf(1) }
+    MegaSpannedClickableText(
+        value = "Click [A]here[/A] to increase the counter: [B]$counter[/B]\n and [R]here[/R] to reset",
+        styles = hashMapOf(
+            SpanIndicator('A') to SpanStyleWithAnnotation(
+                SpanStyle(
+                    color = Color.Blue,
+                    textDecoration = TextDecoration.Underline,
+                ), "url or whatever you want to receive in onAnnotationClick"
             ),
-            onAnnotationClick = { annotation ->
-                if (annotation == "reset") {
-                    counter = 1
-                } else {
-                    counter += 1
-                }
-            },
-            baseStyle = MaterialTheme.typography.subtitle1,
-            color = TextColor.Primary
-        )
-    }
+            SpanIndicator('R') to SpanStyleWithAnnotation(
+                SpanStyle(
+                    color = Color.Green,
+                    textDecoration = TextDecoration.Underline,
+                ), "reset"
+            ),
+            SpanIndicator('B') to SpanStyleWithAnnotation(SpanStyle(color = Color.Red), "d")
+        ),
+        onAnnotationClick = { annotation ->
+            if (annotation == "reset") {
+                counter = 1
+            } else {
+                counter += 1
+            }
+        },
+        baseStyle = MaterialTheme.typography.subtitle1
+    )
 }

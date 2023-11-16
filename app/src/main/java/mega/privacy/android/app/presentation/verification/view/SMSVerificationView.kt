@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.em
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
-import mega.privacy.android.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.AndroidTheme

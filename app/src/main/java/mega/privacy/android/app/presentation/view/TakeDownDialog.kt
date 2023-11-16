@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.text.MegaSpannedClickableText
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.core.ui.model.SpanStyleWithAnnotation
+import mega.privacy.android.legacy.core.ui.model.SpanStyleWithAnnotation
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
