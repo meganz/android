@@ -21,7 +21,7 @@ enum class DataFeatures(
      */
     UseCameraUploadsRecords(
         "Use Camera Uploads Records",
-        false
+        true
     );
 
     companion object : FeatureFlagValueProvider {
