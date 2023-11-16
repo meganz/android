@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -44,6 +45,8 @@ import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
+import mega.privacy.mobile.analytics.event.AlbumItemSelected
+import mega.privacy.mobile.analytics.event.AlbumItemSelectedEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -560,8 +563,14 @@ class AlbumsViewModel @Inject constructor(
     fun togglePhotoSelection(photo: Photo) {
         val selectedPhotos = _state.value.selectedPhotos.toMutableSet()
         if (photo in selectedPhotos) {
+            Analytics.tracker.trackEvent(
+                AlbumItemSelectedEvent(selectionType = AlbumItemSelected.SelectionType.MultiRemove)
+            )
             selectedPhotos.remove(photo)
         } else {
+            Analytics.tracker.trackEvent(
+                AlbumItemSelectedEvent(selectionType = AlbumItemSelected.SelectionType.MultiAdd)
+            )
             selectedPhotos.add(photo)
         }
         _state.update {
