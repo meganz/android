@@ -29,7 +29,6 @@ import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
-import mega.privacy.android.domain.usecase.chat.GetAnotherCallParticipatingUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
@@ -488,13 +487,6 @@ internal class ChatViewModel @Inject constructor(
         passcodeManagement.showPasscodeScreen = true
     }
 
-    /**
-     * Consume open meeting event
-     *
-     */
-    fun onOpenMeetingEventConsumed() {
-        _state.update { state -> state.copy(openMeetingEvent = consumed()) }
-    }
 
     /**
      * Handle action press

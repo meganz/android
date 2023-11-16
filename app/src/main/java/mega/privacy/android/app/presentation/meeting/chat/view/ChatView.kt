@@ -57,16 +57,8 @@ import timber.log.Timber
 internal fun ChatView(
     viewModel: ChatViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
-    EventEffect(
-        event = uiState.openMeetingEvent,
-        onConsumed = viewModel::onOpenMeetingEventConsumed,
-    ) { chatId ->
-        startMeetingActivity(context, chatId)
-    }
 
     ChatView(
         uiState = uiState,
