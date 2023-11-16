@@ -35,7 +35,7 @@ class ChatViewTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Standard,
-                isParticipatingInACall = true
+                currentCall = 123L
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION, true).apply {
@@ -51,7 +51,7 @@ class ChatViewTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Standard,
-                isParticipatingInACall = false
+                currentCall = null
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION, true).apply {

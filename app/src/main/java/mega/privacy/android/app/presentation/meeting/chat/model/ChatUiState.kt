@@ -19,7 +19,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property myPermission [ChatRoomPermission] of the current logged in user.
  * @property isPreviewMode True if the current logged in user is in a chat link in preview mode (not participating).
  * @property isJoiningOrLeaving True if the current logged in user is joining or leaving this chat, false otherwise.
- * @property isParticipatingInACall True if the current logged in user is participating in a call, false otherwise.
+ * @property currentCall True if the current logged in user is participating in a call, false otherwise.
  * @property hasACallInThisChat True if the current logged in user has a call in this chat, false otherwise.
  * @property isGroup True if is a chat group, false otherwise.
  * @property storageState [StorageState] of the chat.
@@ -49,7 +49,7 @@ data class ChatUiState(
     val myPermission: ChatRoomPermission = ChatRoomPermission.Unknown,
     val isPreviewMode: Boolean = false,
     val isJoiningOrLeaving: Boolean = false,
-    val isParticipatingInACall: Boolean = false,
+    val currentCall: Long? = null,
     val hasACallInThisChat: Boolean = false,
     val isGroup: Boolean = false,
     val storageState: StorageState = StorageState.Unknown,

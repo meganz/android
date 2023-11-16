@@ -3,7 +3,6 @@ package test.mega.privacy.android.app.presentation.meeting.chat
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +35,6 @@ import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsExcept
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.chat.GetAnotherCallParticipatingUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
@@ -65,6 +63,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -135,7 +134,6 @@ internal class ChatViewModelTest {
     private val monitorHasAnyContactUseCase = mock<MonitorHasAnyContactUseCase> {
         onBlocking { invoke() } doReturn emptyFlow()
     }
-    private val getAnotherCallParticipatingUseCase: GetAnotherCallParticipatingUseCase = mock()
     private val passcodeManagement: PasscodeManagement = mock()
     private val getCustomSubtitleListUseCase = mock<GetCustomSubtitleListUseCase>()
 
@@ -171,9 +169,7 @@ internal class ChatViewModelTest {
             getParticipantFirstNameUseCase,
             getScheduledMeetingByChat,
             passcodeManagement,
-            getAnotherCallParticipatingUseCase,
             getCustomSubtitleListUseCase,
-            getAnotherCallParticipatingUseCase,
             inviteToChatUseCase,
             inviteParticipantResultMapper,
         )
@@ -220,7 +216,6 @@ internal class ChatViewModelTest {
             getMyUserHandleUseCase = getMyUserHandleUseCase,
             getScheduledMeetingByChatUseCase = getScheduledMeetingByChat,
             monitorHasAnyContactUseCase = monitorHasAnyContactUseCase,
-            getAnotherCallParticipatingUseCase = getAnotherCallParticipatingUseCase,
             passcodeManagement = passcodeManagement,
             getCustomSubtitleListUseCase = getCustomSubtitleListUseCase,
             savedStateHandle = savedStateHandle,
@@ -462,16 +457,17 @@ internal class ChatViewModelTest {
     }
 
     @ParameterizedTest(name = " returns {0}")
-    @ValueSource(booleans = [true, false])
+    @NullSource
+    @ValueSource(longs = [123L])
     fun `test that is participating in a call has correct state if use case`(
-        isParticipatingInChatCall: Boolean,
+        isParticipatingInChatCall: Long?,
     ) = runTest {
-        val flow = MutableSharedFlow<Boolean>()
+        val flow = MutableSharedFlow<Long?>()
         whenever(monitorParticipatingInACallUseCase()).thenReturn(flow)
         initTestClass()
         flow.emit(isParticipatingInChatCall)
         underTest.state.test {
-            assertThat(awaitItem().isParticipatingInACall).isEqualTo(isParticipatingInChatCall)
+            assertThat(awaitItem().currentCall).isEqualTo(isParticipatingInChatCall)
         }
     }
 
@@ -1231,34 +1227,12 @@ internal class ChatViewModelTest {
     }
 
     @Test
-    fun `test that triggers open meeting event when get another call participant use case returns the chat id`() =
+    fun `test that enable passcode check enables the passcode check`() =
         runTest {
-            val expectedChatId = 234L
-            whenever(getAnotherCallParticipatingUseCase(chatId)).thenReturn(expectedChatId)
-            underTest.getAnotherCallParticipating()
+            underTest.enablePasscodeCheck()
             verify(passcodeManagement).showPasscodeScreen = true
-            underTest.state.test {
-                assertThat((awaitItem().openMeetingEvent as StateEventWithContentTriggered).content).isEqualTo(
-                    expectedChatId
-                )
-            }
         }
 
-    @Test
-    fun `test that consumed meeting event when call consumeOpenMeetingEvent`() = runTest {
-        val expectedChatId = 234L
-        whenever(getAnotherCallParticipatingUseCase(chatId)).thenReturn(expectedChatId)
-        underTest.getAnotherCallParticipating()
-        underTest.state.test {
-            assertThat((awaitItem().openMeetingEvent as StateEventWithContentTriggered).content).isEqualTo(
-                expectedChatId
-            )
-        }
-        underTest.onOpenMeetingEventConsumed()
-        underTest.state.test {
-            assertThat(awaitItem().openMeetingEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
-        }
-    }
 
     @Test
     fun `test that monitor all contacts participant in the chat call when monitor chat room updates with participant change`() =
@@ -1307,7 +1281,9 @@ internal class ChatViewModelTest {
             Result.success(chatRequest),
         )
 
-        whenever(inviteToChatUseCase(chatId = chatId, contactList = contactList)).thenReturn(resultList)
+        whenever(inviteToChatUseCase(chatId = chatId, contactList = contactList)).thenReturn(
+            resultList
+        )
         whenever(inviteParticipantResultMapper(resultList)).thenReturn(
             InviteContactToChatResult.MultipleContactsAdded(
                 success = 2
@@ -1329,7 +1305,9 @@ internal class ChatViewModelTest {
         val chatRequest: ChatRequest = mock()
         val resultList = listOf(Result.success(chatRequest))
 
-        whenever(inviteToChatUseCase(chatId = chatId, contactList = contactList)).thenReturn(resultList)
+        whenever(inviteToChatUseCase(chatId = chatId, contactList = contactList)).thenReturn(
+            resultList
+        )
         whenever(inviteParticipantResultMapper(resultList)).thenReturn(InviteContactToChatResult.OnlyOneContactAdded)
 
         initTestClass()
@@ -1432,7 +1410,7 @@ internal class ChatViewModelTest {
     @ParameterizedTest(name = " and value is {0}")
     @ValueSource(booleans = [true, false])
     fun `test that is waiting room is updated when chat is get`(
-        expectedIsWaitingRoom: Boolean
+        expectedIsWaitingRoom: Boolean,
     ) = runTest {
         val chatRoom = mock<ChatRoom> {
             on { isWaitingRoom } doReturn expectedIsWaitingRoom
@@ -1449,7 +1427,7 @@ internal class ChatViewModelTest {
     @ParameterizedTest(name = " and new value is {0}")
     @ValueSource(booleans = [true, false])
     fun `test that is waiting room is updated when a chat room update is received`(
-        expectedIsWaitingRoom: Boolean
+        expectedIsWaitingRoom: Boolean,
     ) = runTest {
         val chatRoom = mock<ChatRoom> {
             on { isWaitingRoom } doReturn expectedIsWaitingRoom

@@ -68,7 +68,7 @@ internal fun ChatView(
         uiState = uiState,
         onBackPressed = { onBackPressedDispatcher?.onBackPressed() },
         onMenuActionPressed = viewModel::handleActionPress,
-        getAnotherCallParticipating = viewModel::getAnotherCallParticipating,
+        enablePasscodeCheck = viewModel::enablePasscodeCheck,
         inviteContactsToChat = viewModel::inviteContactsToChat,
         onInviteContactsResultConsumed = viewModel::onInviteContactsResultConsumed,
     )
@@ -88,7 +88,7 @@ internal fun ChatView(
     onMenuActionPressed: (ChatRoomMenuAction) -> Unit,
     inviteContactsToChat: (Long, List<String>) -> Unit = { _, _ -> },
     onInviteContactsResultConsumed: () -> Unit = {},
-    getAnotherCallParticipating: () -> Unit = {},
+    enablePasscodeCheck: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
@@ -164,7 +164,10 @@ internal fun ChatView(
                 onConfirm = {
                     showParticipatingInACallDialog = false
                     // return to active call
-                    getAnotherCallParticipating()
+                    uiState.currentCall?.let {
+                        enablePasscodeCheck()
+                        startMeetingActivity(context, it)
+                    }
                 }
             )
         }

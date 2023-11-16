@@ -2,9 +2,7 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -361,7 +359,7 @@ internal class CallRepositoryImpl @Inject constructor(
         cancelled: Boolean,
         flags: ChatScheduledFlags?,
         rules: ChatScheduledRules?,
-        updateChatTitle: Boolean
+        updateChatTitle: Boolean,
     ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getChatRequestListener(

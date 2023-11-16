@@ -1,20 +1,21 @@
 package mega.privacy.android.domain.usecase.chat
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.testutils.hotFlow
+import mega.privacy.android.domain.usecase.meeting.GetCurrentChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -25,75 +26,86 @@ import java.util.stream.Stream
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MonitorParticipatingInACallUseCaseTest {
-    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
-    private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase = mock()
     private lateinit var underTest: MonitorParticipatingInACallUseCase
+
+    private val monitorChatCallUpdates: MonitorChatCallUpdatesUseCase = mock()
+    private val getCurrentChatCallUseCase: GetCurrentChatCallUseCase = mock()
 
     @BeforeAll
     fun setup() {
         underTest = MonitorParticipatingInACallUseCase(
-            monitorChatCallUpdatesUseCase,
-            isParticipatingInChatCallUseCase,
+            monitorChatCallUpdatesUseCase = monitorChatCallUpdates,
+            getCurrentChatCallUseCase = getCurrentChatCallUseCase,
         )
     }
 
-    @ParameterizedTest(name = "chat call status is {0} and isParticipatingInChatCall is {1}")
+    @ParameterizedTest(name = "chat call status is {0} and getCurrentChatCallUseCase is {1}")
     @MethodSource("provideParameters")
     fun `test that user is participating in a call when`(
         chatCallStatus: ChatCallStatus,
-        isParticipatingInChatCall: Boolean,
+        currentChatCall: Long?,
     ) = runTest {
         // GIVEN
-        val flow = MutableSharedFlow<ChatCall>()
-        whenever(isParticipatingInChatCallUseCase()).thenReturn(isParticipatingInChatCall)
-        whenever(monitorChatCallUpdatesUseCase()).thenReturn(flow)
+        val callId = 1234L
+        whenever(getCurrentChatCallUseCase()).thenReturn(currentChatCall)
+        val call = mock<ChatCall> {
+            on { this.status } doReturn chatCallStatus
+            on { this.chatId } doReturn (callId)
+        }
+        whenever(monitorChatCallUpdates()).thenReturn(hotFlow(call))
+
+
         underTest.invoke().test {
-            Truth.assertThat(awaitItem()).isEqualTo(isParticipatingInChatCall)
-            val call = mock<ChatCall> {
-                on { this.status } doReturn chatCallStatus
-            }
-            flow.emit(call)
-            Truth.assertThat(awaitItem()).isEqualTo(
-                call.status == ChatCallStatus.InProgress
-                        || call.status == ChatCallStatus.WaitingRoom || isParticipatingInChatCall
+            assertThat(awaitItem()).isEqualTo(currentChatCall)
+            assertThat(awaitItem()).isEqualTo(
+                if (call.status == ChatCallStatus.Initial
+                    || call.status == ChatCallStatus.WaitingRoom
+                ) callId else currentChatCall
             )
         }
     }
 
-    @Test
-    fun `test that no user present status returns no value`() = runTest{
+    @ParameterizedTest(name = "test that {0} status returns no events")
+    @EnumSource(
+        value = ChatCallStatus::class,
+        names = ["UserNoPresent", "Connecting", "Joining", "InProgress", "Unknown"]
+    )
+    fun `test that non monitored status returns no value`(status: ChatCallStatus) = runTest {
         val flow = MutableSharedFlow<ChatCall>()
-        whenever(isParticipatingInChatCallUseCase()).thenReturn(false)
-        whenever(monitorChatCallUpdatesUseCase()).thenReturn(flow)
+        whenever(getCurrentChatCallUseCase()).thenReturn(null)
+        whenever(monitorChatCallUpdates()).thenReturn(flow)
         underTest().test {
-            Truth.assertThat(awaitItem()).isFalse()
+            assertThat(awaitItem()).isNull()
             val call = mock<ChatCall> {
-                on { this.status } doReturn ChatCallStatus.UserNoPresent
+                on { this.status } doReturn status
             }
             flow.emit(call)
-            Truth.assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
+            assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
         }
     }
+
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            monitorChatCallUpdatesUseCase,
-            isParticipatingInChatCallUseCase,
+            monitorChatCallUpdates,
+            getCurrentChatCallUseCase,
         )
     }
 
     companion object {
+        private const val currentCallId = 9876L
+
         @JvmStatic
         private fun provideParameters(): Stream<Arguments> = Stream.of(
-            Arguments.of(ChatCallStatus.InProgress, true),
-            Arguments.of(ChatCallStatus.WaitingRoom, true),
-            Arguments.of(ChatCallStatus.Destroyed, true),
-            Arguments.of(ChatCallStatus.TerminatingUserParticipation, true),
-            Arguments.of(ChatCallStatus.InProgress, false),
-            Arguments.of(ChatCallStatus.WaitingRoom, false),
-            Arguments.of(ChatCallStatus.Destroyed, false),
-            Arguments.of(ChatCallStatus.TerminatingUserParticipation, false),
+            Arguments.of(ChatCallStatus.Initial, currentCallId),
+            Arguments.of(ChatCallStatus.WaitingRoom, currentCallId),
+            Arguments.of(ChatCallStatus.Destroyed, currentCallId),
+            Arguments.of(ChatCallStatus.TerminatingUserParticipation, currentCallId),
+            Arguments.of(ChatCallStatus.Initial, null),
+            Arguments.of(ChatCallStatus.WaitingRoom, null),
+            Arguments.of(ChatCallStatus.Destroyed, null),
+            Arguments.of(ChatCallStatus.TerminatingUserParticipation, null),
         )
     }
 }

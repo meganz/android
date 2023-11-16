@@ -27,7 +27,6 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.chat.GetAnotherCallParticipatingUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
@@ -83,7 +82,6 @@ internal class ChatViewModel @Inject constructor(
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChat,
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
-    private val getAnotherCallParticipatingUseCase: GetAnotherCallParticipatingUseCase,
     private val passcodeManagement: PasscodeManagement,
     private val getCustomSubtitleListUseCase: GetCustomSubtitleListUseCase,
     private val monitorAllContactParticipantsInChatUseCase: MonitorAllContactParticipantsInChatUseCase,
@@ -442,7 +440,8 @@ internal class ChatViewModel @Inject constructor(
             monitorParticipatingInACallUseCase()
                 .catch { Timber.e(it) }
                 .collect {
-                    _state.update { state -> state.copy(isParticipatingInACall = it) }
+                    Timber.d("Monitor call in progress returned chat id: $it")
+                    _state.update { state -> state.copy(currentCall = it) }
                 }
         }
     }
@@ -481,20 +480,8 @@ internal class ChatViewModel @Inject constructor(
      * Get another call participating
      *
      */
-    fun getAnotherCallParticipating() {
-        if (chatId == null) return
-        viewModelScope.launch {
-            runCatching {
-                getAnotherCallParticipatingUseCase(chatId)
-            }.onSuccess { anotherCallId ->
-                if (anotherCallId != INVALID_HANDLE) {
-                    passcodeManagement.showPasscodeScreen = true
-                    _state.update { state -> state.copy(openMeetingEvent = triggered(anotherCallId)) }
-                }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
+    fun enablePasscodeCheck() {
+        passcodeManagement.showPasscodeScreen = true
     }
 
     /**
