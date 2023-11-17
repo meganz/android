@@ -13,15 +13,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
@@ -58,12 +55,13 @@ import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadTransferView
+import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
@@ -151,53 +149,53 @@ class FileBrowserComposeFragment : Fragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by fileBrowserViewModel.state.collectAsStateWithLifecycle()
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
-                    Box {//this box should be a scaffold, but toolbar is not included yet and we need to align SnackbarHost to the bottom
-                        FileBrowserComposeView(
-                            uiState = uiState,
-                            emptyState = getEmptyFolderDrawable(uiState.isFileBrowserEmpty),
-                            onItemClick = fileBrowserViewModel::onItemClicked,
-                            onLongClick = {
-                                fileBrowserViewModel.onLongItemClicked(it)
-                                if (actionMode == null) {
-                                    actionMode =
-                                        (activity as? AppCompatActivity)?.startSupportActionMode(
-                                            ActionBarCallBack()
-                                        )
-                                }
-                            },
-                            onMenuClick = ::showOptionsMenuForItem,
-                            sortOrder = getString(
-                                SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
-                                    ?: R.string.sortby_name
-                            ),
-                            onSortOrderClick = { showSortByPanel() },
-                            onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
-                            onLinkClicked = ::navigateToLink,
-                            onDisputeTakeDownClicked = ::navigateToLink,
-                            onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,
-                            onUpgradeClicked = {
-                                fileBrowserViewModel::onBannerDismissClicked
-                                (activity as? ManagerActivity)?.navigateToUpgradeAccount()
-                            },
-                            onEnterMediaDiscoveryClick = {
-                                disableSelectMode()
-                                showMediaDiscovery(isOpenByMDIcon = true)
+                    FileBrowserComposeView(
+                        uiState = uiState,
+                        emptyState = getEmptyFolderDrawable(uiState.isFileBrowserEmpty),
+                        onItemClick = fileBrowserViewModel::onItemClicked,
+                        onLongClick = {
+                            fileBrowserViewModel.onLongItemClicked(it)
+                            if (actionMode == null) {
+                                actionMode =
+                                    (activity as? AppCompatActivity)?.startSupportActionMode(
+                                        ActionBarCallBack()
+                                    )
                             }
-                        )
-                        val snackbarHostState = remember { SnackbarHostState() }
-                        SnackbarHost(
-                            hostState = snackbarHostState,
-                            modifier = Modifier.align(Alignment.BottomCenter)
-                        )
-                        StartDownloadTransferView(
-                            uiState.downloadEvent,
-                            {
-                                fileBrowserViewModel.consumeDownloadEvent()
-                                disableSelectMode()
-                            },
-                            snackBarHostState = snackbarHostState,
-                        )
+                        },
+                        onMenuClick = ::showOptionsMenuForItem,
+                        sortOrder = getString(
+                            SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
+                                ?: R.string.sortby_name
+                        ),
+                        onSortOrderClick = { showSortByPanel() },
+                        onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
+                        onLinkClicked = ::navigateToLink,
+                        onDisputeTakeDownClicked = ::navigateToLink,
+                        onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,
+                        onUpgradeClicked = {
+                            fileBrowserViewModel::onBannerDismissClicked
+                            (activity as? ManagerActivity)?.navigateToUpgradeAccount()
+                        },
+                        onEnterMediaDiscoveryClick = {
+                            disableSelectMode()
+                            showMediaDiscovery(isOpenByMDIcon = true)
+                        }
+                    )
+                    val snackbarHostState = remember { SnackbarHostState() }
+                    //snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet
+                    LaunchedEffect(snackbarHostState.currentSnackbarData) {
+                        snackbarHostState.currentSnackbarData?.message?.let {
+                            Util.showSnackbar(activity, it)
+                        }
                     }
+                    StartDownloadTransferComponent(
+                        uiState.downloadEvent,
+                        {
+                            fileBrowserViewModel.consumeDownloadEvent()
+                            disableSelectMode()
+                        },
+                        snackBarHostState = snackbarHostState,
+                    )
                 }
                 performItemOptionsClick(uiState.optionsItemInfo)
                 updateActionModeTitle(

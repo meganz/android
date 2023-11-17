@@ -1,23 +1,33 @@
 package mega.privacy.android.app.presentation.transfers.startdownload.view
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.view.View
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
@@ -32,7 +42,9 @@ import mega.privacy.android.app.presentation.transfers.startdownload.model.Trans
 import mega.privacy.android.app.presentation.transfers.view.TransferInProgressDialog
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.utils.MinimumTimeVisibility
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
@@ -44,7 +56,7 @@ import timber.log.Timber
  * (scanning in progress dialog, not enough space snackbar, start download snackbar, quota exceeded, etc.)
  */
 @Composable
-internal fun StartDownloadTransferView(
+internal fun StartDownloadTransferComponent(
     event: StateEventWithContent<TransferTriggerEvent>,
     onConsumeEvent: () -> Unit,
     snackBarHostState: SnackbarHostState,
@@ -65,7 +77,7 @@ internal fun StartDownloadTransferView(
                 }
             }
         })
-    StartDownloadTransferView(
+    StartDownloadTransferComponent(
         uiState = uiState,
         onConsumed = viewModel::consumeOneOffEvent,
         onCancelledConfirmed = viewModel::cancelCurrentJob,
@@ -73,8 +85,42 @@ internal fun StartDownloadTransferView(
     )
 }
 
+/**
+ * Helper function to wrap [StartDownloadTransferComponent] into a [ComposeView] so it can be used in screens using View system
+ * @param activity the parent activity where this view will be added, it should implement [SnackbarShower] to show the generated Snackbars
+ * @param downloadEventState flow that usually comes from the view model and triggers the download Transfer events
+ * @param onConsumeEvent lambda to consume the download event, typically it will launch the corresponding consume event in the view model
+ */
+fun createStartDownloadTransferView(
+    activity: Activity,
+    downloadEventState: Flow<StateEventWithContent<TransferTriggerEvent>>,
+    onConsumeEvent: () -> Unit,
+): View = ComposeView(activity).apply {
+    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    setContent {
+        val downloadEvent by downloadEventState.collectAsStateWithLifecycle(
+            (downloadEventState as? StateFlow)?.value ?: consumed()
+        )
+        AndroidTheme(isDark = isSystemInDarkTheme()) {
+            val snackbarHostState = remember { SnackbarHostState() }
+            //if we need this view is because we are not using compose views, so we don't have a scaffold to show snack bars and need to launch a View snackbar
+            LaunchedEffect(snackbarHostState.currentSnackbarData) {
+                snackbarHostState.currentSnackbarData?.message?.let {
+                    Util.showSnackbar(activity, it)
+                }
+            }
+            StartDownloadTransferComponent(
+                downloadEvent,
+                onConsumeEvent,
+                snackBarHostState = snackbarHostState,
+            )
+        }
+    }
+}
+
+
 @Composable
-private fun StartDownloadTransferView(
+private fun StartDownloadTransferComponent(
     uiState: StartDownloadTransferViewState,
     onConsumed: () -> Unit,
     onCancelledConfirmed: () -> Unit,
