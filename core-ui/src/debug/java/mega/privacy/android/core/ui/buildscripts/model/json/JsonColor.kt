@@ -2,7 +2,7 @@ package mega.privacy.android.core.ui.buildscripts.model.json
 
 import androidx.compose.ui.graphics.Color
 import com.google.gson.annotations.SerializedName
-import mega.privacy.android.core.ui.buildscripts.getPropertyName
+import mega.privacy.android.core.ui.buildscripts.kotlingenerator.getPropertyName
 
 /**
  * Color following json structure

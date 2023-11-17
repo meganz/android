@@ -16,6 +16,8 @@ internal data class MegaColors(
     val isLight: Boolean,
 ) : SemanticTokens by semanticTokens {
 
+    val isDark = !isLight
+
     val buttonsColors
         @Composable
         get() = ButtonDefaults.buttonColors(

@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.buildscripts
+package mega.privacy.android.core.ui.buildscripts.kotlingenerator
 
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -9,33 +9,34 @@ import mega.privacy.android.core.ui.buildscripts.model.json.JsonCoreUiObject
 import mega.privacy.android.core.ui.buildscripts.model.json.JsonGroup
 import mega.privacy.android.core.ui.buildscripts.model.json.JsonLeaf
 import mega.privacy.android.core.ui.buildscripts.model.json.SemanticValueRef
+import mega.privacy.android.core.ui.controls.text.MegaText
 import java.io.File
 import java.security.InvalidParameterException
 import kotlin.reflect.KClass
 
 /**
  * Utility class to generate a kotlin file with all the tokens of the given type
- * @param type the type of [JsonCoreUiObject] we want to generate
- * @param coreObject the object we want to generate
- * @param fileName the name of the kotlin file that will be generated
  * @param generationType defines what it will be generated
- * @param packageName the package where we want to put this file
+ * @param coreObject the object we want to generate
+ * @param type the type of [JsonCoreUiObject] we want to generate
+ * @param appPrefix a prefix to be added to generated classes to easily distinguish them from other implementations.
+ * @param fileName the name of the kotlin file that will be generated (with [appPrefix])
+ * @param destinationPackageName the package where we want to put this file
  * @param destinationPath the root path where this file will be added (without packages)
  */
 
 internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
-    private val type: KClass<T>,
-    private val coreObject: JsonCoreUiObject,
-    private val fileName: String,
     private val generationType: TokenGenerationType,
-    private val packageName: String = THEME_TOKENS_PACKAGE,
-    private val destinationPath: String = DESTINATION_PATH,
-    private val exposeAsEnum: List<String> = emptyList(),
-    private val enumSuffix: String? = null,
+    private val coreObject: JsonCoreUiObject,
+    private val type: KClass<T>,
+    private val appPrefix: String,
+    private val fileName: String,
+    private val destinationPackageName: String,
+    private val destinationPath: String,
 ) {
     fun generateFile() {
         val coreUiFile = FileSpec
-            .builder(packageName, fileName)
+            .builder(destinationPackageName, "$appPrefix$fileName")
             .indent("    ")
         coreUiFile.addFileComment(
             """
@@ -44,15 +45,19 @@ internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
             |Do not modify this file manually.
             |""".trimMargin()
         )
-        if (generationType == TokenGenerationType.InterfaceDefinition) {
-            addDataClasses(coreUiFile, coreObject)
+        if (generationType is TokenGenerationType.InterfaceDefinition) {
+            addDataClasses(coreUiFile, coreObject, generationType)
         }
         addRootObject(coreUiFile, coreObject)
         val destination = File(destinationPath)
         coreUiFile.build().writeTo(destination)
     }
 
-    private fun addDataClasses(file: FileSpec.Builder, coreUiObject: JsonCoreUiObject) {
+    private fun addDataClasses(
+        file: FileSpec.Builder,
+        coreUiObject: JsonCoreUiObject,
+        interfaceDefinition: TokenGenerationType.InterfaceDefinition,
+    ) {
         if (coreUiObject is JsonGroup) {
             coreUiObject.children
                 .filterIsInstance(type.java)
@@ -64,16 +69,17 @@ internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
                         it.getPropertyInitializer()
                     )
                 }.takeIf { it.isNotEmpty() }?.let { properties ->
-                    val enumName = if (coreUiObject.name.jsonNameToKotlinName() in exposeAsEnum) {
-                        coreUiObject.name.jsonNameToKotlinName() + (enumSuffix ?: "Enum")
-                    } else {
-                        null
-                    }
+                    val enumName = interfaceDefinition.exposeGroupsAsEnums
+                        ?.takeIf { coreUiObject.name.jsonNameToKotlinName() in it.groupsToExpose }
+                        ?.let { exposeAsEnum ->
+                            coreUiObject.name.jsonNameToKotlinName() + exposeAsEnum.enumSuffix
+                        }
                     file.addType(
                         createDataClass(
                             coreUiObject.name.jsonNameToKotlinName(),
                             properties,
-                            enumName
+                            destinationPackageName,
+                            enumName,
                         )
                     )
                     enumName?.let {
@@ -83,7 +89,7 @@ internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
                     }
                 }
             coreUiObject.children.forEach {
-                addDataClasses(file, it)
+                addDataClasses(file, it, interfaceDefinition)
             }
         }
     }
@@ -112,10 +118,10 @@ internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
         if (!group.hasChildOfType(type)) return
         val mainType = when (generationType) {
             is TokenGenerationType.InterfaceImplementation -> {
-                TypeSpec.objectBuilder(group.name.jsonNameToKotlinName())
+                TypeSpec.objectBuilder("$appPrefix${group.name.jsonNameToKotlinName()}")
                     .addSuperinterface(
                         ClassName(
-                            THEME_TOKENS_PACKAGE,
+                            generationType.interfacePackage ?: destinationPackageName,
                             generationType.interfaceName
                         )
                     )
@@ -129,7 +135,9 @@ internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
                 TypeSpec.objectBuilder(group.name.jsonNameToKotlinName())
             }
         }
-        mainType.addModifiers(KModifier.INTERNAL)
+        if (generationType !is TokenGenerationType.InterfaceDefinition) {
+            mainType.addModifiers(KModifier.INTERNAL)
+        }
         if (generationType is TokenGenerationType.NestedObjects) {
             group.children.forEach {
                 addChildObjectRecursively(mainType, it, group.name)
@@ -157,7 +165,11 @@ internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
                 val propertyName = child.name.jsonNameToKotlinName().lowercaseFirstChar()
                 val propSpecBuilder = PropertySpec.builder(
                     propertyName,
-                    ClassName(THEME_TOKENS_PACKAGE, className)
+                    ClassName(
+                        packageName = (generationType as? TokenGenerationType.InterfaceImplementation)?.interfacePackage
+                            ?: destinationPackageName,
+                        className,
+                    )
                 )
                 if (generationType is TokenGenerationType.InterfaceImplementation) {
                     propSpecBuilder
@@ -211,13 +223,16 @@ internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
         } else {
             null
         }
-
-    companion object {
-
-        internal const val THEME_TOKENS_PACKAGE = "mega.privacy.android.core.ui.theme.tokens"
-        private const val DESTINATION_PATH = "core-ui/src/main/java"
-    }
 }
+
+/**
+ *
+ * @param groupsToExpose a list of groups that will be exposed as public enums, to be used to assign tokens from outside of core-ui module, see an example in [MegaText]
+ */
+internal data class ExposeGroupsAsEnums(
+    val groupsToExpose: List<String>,
+    val enumSuffix: String,
+)
 
 /**
  * Defines what it will be generated
@@ -231,10 +246,15 @@ internal sealed class TokenGenerationType {
     /**
      * An Interface and all related data classes will be generated
      */
-    data object InterfaceDefinition : TokenGenerationType()
+    data class InterfaceDefinition(
+        val exposeGroupsAsEnums: ExposeGroupsAsEnums?,
+    ) : TokenGenerationType()
 
     /**
      * An object implementing the corresponding interface will be generated
      */
-    data class InterfaceImplementation(val interfaceName: String) : TokenGenerationType()
+    data class InterfaceImplementation(
+        val interfaceName: String,
+        val interfacePackage: String?,
+    ) : TokenGenerationType()
 }

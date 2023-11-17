@@ -59,7 +59,6 @@ import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
-import mega.privacy.android.core.ui.theme.darkColorPalette
 
 /**
  * ScaffoldWithCollapsibleHeader
@@ -93,10 +92,15 @@ fun ScaffoldWithCollapsibleHeader(
     ) {
         // calculate the dimensions and colors that are derived from scrollState
         val density = LocalDensity.current.density
-        val iconTintColorBase = MegaTheme.colors.icon.primary
-        val titleColorBase = MegaTheme.colors.text.primary
-        val targetAppBarElevation = LocalMegaAppBarElevation.current
         val hasHeaderBelowSystemBar = headerIncludingSystemBar != null
+        val needsInverseTitleColors = hasHeaderBelowSystemBar && MegaTheme.colors.isLight
+        val iconTintColorBase = MegaTheme.colors.icon.primary
+        val iconTintColorExpanded =
+            if (needsInverseTitleColors) MegaTheme.colors.icon.inverse else iconTintColorBase
+        val titleColorBase = MegaTheme.colors.text.primary
+        val titleColorExpanded =
+            if (needsInverseTitleColors) MegaTheme.colors.text.inverse else titleColorBase
+        val targetAppBarElevation = LocalMegaAppBarElevation.current
 
         val headerHeight by remember {
             derivedStateOf {
@@ -133,8 +137,8 @@ fun ScaffoldWithCollapsibleHeader(
 
         val iconTintColor by remember(hasHeaderBelowSystemBar) {
             derivedStateOf {
-                if (hasHeaderBelowSystemBar) {
-                    lerp(iconTintColorBase, darkColorPalette.icon.primary, headerAlpha)
+                if (needsInverseTitleColors) {
+                    lerp(iconTintColorBase, iconTintColorExpanded, headerAlpha)
                 } else {
                     iconTintColorBase
                 }
@@ -142,8 +146,8 @@ fun ScaffoldWithCollapsibleHeader(
         }
         val titleColor by remember(hasHeaderBelowSystemBar) {
             derivedStateOf {
-                if (hasHeaderBelowSystemBar) {
-                    lerp(titleColorBase, darkColorPalette.text.primary, headerAlpha)
+                if (needsInverseTitleColors) {
+                    lerp(titleColorBase, titleColorExpanded, headerAlpha)
                 } else {
                     titleColorBase
                 }

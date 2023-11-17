@@ -6,11 +6,11 @@ package mega.privacy.android.core.ui.theme.tokens
 
 import androidx.compose.ui.graphics.Color
 
-internal data class Focus(
+public data class Focus(
     public val colorFocus: Color = Color.Magenta,
 )
 
-internal data class Indicator(
+public data class Indicator(
     public val magenta: Color = Color.Magenta,
     public val yellow: Color = Color.Magenta,
     public val orange: Color = Color.Magenta,
@@ -20,14 +20,14 @@ internal data class Indicator(
     public val pink: Color = Color.Magenta,
 )
 
-internal data class Support(
+public data class Support(
     public val error: Color = Color.Magenta,
     public val warning: Color = Color.Magenta,
     public val success: Color = Color.Magenta,
     public val info: Color = Color.Magenta,
 )
 
-internal data class Button(
+public data class Button(
     public val disabled: Color = Color.Magenta,
     public val errorPressed: Color = Color.Magenta,
     public val errorHover: Color = Color.Magenta,
@@ -47,7 +47,7 @@ internal data class Button(
     public val primary: Color = Color.Magenta,
 )
 
-internal data class Text(
+public data class Text(
     public val inverse: Color = Color.Magenta,
     public val disabled: Color = Color.Magenta,
     public val warning: Color = Color.Magenta,
@@ -95,7 +95,7 @@ public enum class TextColor {
     InverseAccent,
 }
 
-internal data class Background(
+public data class Background(
     public val blur: Color = Color.Magenta,
     public val surface2: Color = Color.Magenta,
     public val surface3: Color = Color.Magenta,
@@ -104,7 +104,7 @@ internal data class Background(
     public val pageBackground: Color = Color.Magenta,
 )
 
-internal data class Icon(
+public data class Icon(
     public val disabled: Color = Color.Magenta,
     public val inverse: Color = Color.Magenta,
     public val onColorDisabled: Color = Color.Magenta,
@@ -115,26 +115,26 @@ internal data class Icon(
     public val primary: Color = Color.Magenta,
 )
 
-internal data class Components(
+public data class Components(
     public val toastBackground: Color = Color.Magenta,
     public val interactive: Color = Color.Magenta,
     public val selectionControl: Color = Color.Magenta,
 )
 
-internal data class Link(
+public data class Link(
     public val visited: Color = Color.Magenta,
     public val inverse: Color = Color.Magenta,
     public val primary: Color = Color.Magenta,
 )
 
-internal data class Notifications(
+public data class Notifications(
     public val notificationInfo: Color = Color.Magenta,
     public val notificationError: Color = Color.Magenta,
     public val notificationWarning: Color = Color.Magenta,
     public val notificationSuccess: Color = Color.Magenta,
 )
 
-internal data class Border(
+public data class Border(
     public val disabled: Color = Color.Magenta,
     public val strong: Color = Color.Magenta,
     public val interactive: Color = Color.Magenta,
@@ -143,7 +143,7 @@ internal data class Border(
     public val strongSelected: Color = Color.Magenta,
 )
 
-internal interface SemanticTokens {
+public interface SemanticTokens {
     public val focus: Focus
 
     public val indicator: Indicator

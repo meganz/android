@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.buildscripts
+package mega.privacy.android.core.ui.buildscripts.kotlingenerator
 
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
@@ -6,13 +6,13 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import mega.privacy.android.core.ui.buildscripts.KotlinTokensGenerator.Companion.THEME_TOKENS_PACKAGE
 import kotlin.reflect.KClass
 
 
 internal fun createDataClass(
     name: String,
     properties: List<Triple<String, KClass<*>, String>>,
+    packageName: String,
     enumName: String? = null,
 ): TypeSpec {
     val dataClassBuilder = TypeSpec.classBuilder(name)
@@ -30,7 +30,6 @@ internal fun createDataClass(
                 .build()
         )
     }
-    dataClassBuilder.addModifiers(KModifier.INTERNAL)
     dataClassBuilder.primaryConstructor(constructor.build())
 
     if (enumName != null) {
@@ -47,7 +46,7 @@ internal fun createDataClass(
                 .addParameter(
                     ParameterSpec.builder(
                         enumName.lowercaseFirstChar(),
-                        ClassName(THEME_TOKENS_PACKAGE, enumName)
+                        ClassName(packageName, enumName)
                     ).build()
                 )
                 .addCode(funCode.toString())

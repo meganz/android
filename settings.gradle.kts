@@ -41,6 +41,7 @@ include(":baselineprofile")
 include(":navigation")
 include(":legacy-core-ui")
 include(":icon-pack")
+include(":core:theme")
 
 println("isServerBuild = ${isServerBuild()}")
 buildCache {

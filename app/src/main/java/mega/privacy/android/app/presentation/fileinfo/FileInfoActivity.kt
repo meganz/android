@@ -59,7 +59,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncoming
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.theme.tokens.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -138,7 +138,7 @@ class FileInfoActivity : BaseActivity() {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val snackBarHostState = remember { SnackbarHostState() }
-            AndroidTheme(isDark = themeMode.isDarkMode()) {
+            MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 EventEffect(
                     event = uiState.oneOffViewEvent,
                     onConsumed = viewModel::consumeOneOffEvent,

@@ -4,7 +4,7 @@
 //
 package mega.privacy.android.core.ui.theme.tokens
 
-internal object SemanticTokensLight : SemanticTokens {
+internal object DefaultSemanticTokensLight : SemanticTokens {
     override val focus: Focus = Focus(
             colorFocus = Colors.Secondary.Indigo.n200,
             )

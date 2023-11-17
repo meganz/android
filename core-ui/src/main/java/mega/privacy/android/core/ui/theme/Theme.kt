@@ -10,6 +10,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalView
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import mega.privacy.android.core.ui.theme.tokens.Background
+import mega.privacy.android.core.ui.theme.tokens.Border
+import mega.privacy.android.core.ui.theme.tokens.Button
+import mega.privacy.android.core.ui.theme.tokens.Components
+import mega.privacy.android.core.ui.theme.tokens.DefaultSemanticTokensDark
+import mega.privacy.android.core.ui.theme.tokens.DefaultSemanticTokensLight
+import mega.privacy.android.core.ui.theme.tokens.Focus
+import mega.privacy.android.core.ui.theme.tokens.Icon
+import mega.privacy.android.core.ui.theme.tokens.Indicator
+import mega.privacy.android.core.ui.theme.tokens.Link
+import mega.privacy.android.core.ui.theme.tokens.Notifications
+import mega.privacy.android.core.ui.theme.tokens.SemanticTokens
+import mega.privacy.android.core.ui.theme.tokens.Support
+import mega.privacy.android.core.ui.theme.tokens.Text
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 
@@ -20,8 +34,30 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
  * @param content
  */
 @Composable
+@Deprecated(message = "Usage of AndroidTheme without setting the color tokens is deprecated, please use app specific theme with colours defined")
 fun AndroidTheme(
     isDark: Boolean,
+    content: @Composable () -> Unit,
+) = AndroidTheme(
+    isDark = isDark,
+    darkColorTokens = DefaultSemanticTokensDark,
+    lightColorTokens = DefaultSemanticTokensLight,
+    content = content,
+)
+
+/**
+ * Android theme
+ *
+ * @param isDark
+ * @param darkColorTokens [SemanticTokens] for dark mode
+ * @param lightColorTokens [SemanticTokens] for light mode
+ * @param content
+ */
+@Composable
+fun AndroidTheme(
+    isDark: Boolean,
+    darkColorTokens: SemanticTokens,
+    lightColorTokens: SemanticTokens,
     content: @Composable () -> Unit,
 ) {
     val legacyColors = if (isDark) {
@@ -30,11 +66,12 @@ fun AndroidTheme(
         LegacyLightColorPalette
     }
 
-    val colors = if (isDark) {
-        darkColorPalette
+    val semanticTokens = if (isDark) {
+        darkColorTokens
     } else {
-        lightColorPalette
+        lightColorTokens
     }
+    val colors = MegaColors(semanticTokens, !isDark)
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -77,5 +114,25 @@ internal object MegaTheme {
 private val LocalMegaColors = staticCompositionLocalOf {
     testColorPalette
 }
+
+/**
+ * [MegaColors] default palette for testing purposes, all magenta to easily detect it.
+ */
+private val testColorPalette = MegaColors(
+    object : SemanticTokens {
+        override val focus = Focus()
+        override val indicator = Indicator()
+        override val support = Support()
+        override val button = Button()
+        override val text = Text()
+        override val background = Background()
+        override val icon = Icon()
+        override val components = Components()
+        override val link = Link()
+        override val notifications = Notifications()
+        override val border = Border()
+    },
+    false,
+)
 
 

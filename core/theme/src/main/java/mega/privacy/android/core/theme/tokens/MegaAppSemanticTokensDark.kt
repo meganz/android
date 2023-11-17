@@ -2,9 +2,22 @@
 // Generated automatically by KotlinTokensGenerator.
 // Do not modify this file manually.
 //
-package mega.privacy.android.core.ui.theme.tokens
+package mega.privacy.android.core.theme.tokens
 
-internal object SemanticTokensDark : SemanticTokens {
+import mega.privacy.android.core.ui.theme.tokens.Background
+import mega.privacy.android.core.ui.theme.tokens.Border
+import mega.privacy.android.core.ui.theme.tokens.Button
+import mega.privacy.android.core.ui.theme.tokens.Components
+import mega.privacy.android.core.ui.theme.tokens.Focus
+import mega.privacy.android.core.ui.theme.tokens.Icon
+import mega.privacy.android.core.ui.theme.tokens.Indicator
+import mega.privacy.android.core.ui.theme.tokens.Link
+import mega.privacy.android.core.ui.theme.tokens.Notifications
+import mega.privacy.android.core.ui.theme.tokens.SemanticTokens
+import mega.privacy.android.core.ui.theme.tokens.Support
+import mega.privacy.android.core.ui.theme.tokens.Text
+
+internal object MegaAppSemanticTokensDark : SemanticTokens {
     override val focus: Focus = Focus(
             colorFocus = Colors.Secondary.Indigo.n700,
             )
