@@ -38,12 +38,14 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.toString
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContactsAddedDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactToAddDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
+import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
@@ -65,10 +67,9 @@ internal fun ChatView(
         onMenuActionPressed = viewModel::handleActionPress,
         enablePasscodeCheck = viewModel::enablePasscodeCheck,
         inviteContactsToChat = viewModel::inviteContactsToChat,
-        onInviteContactsResultConsumed = viewModel::onInviteContactsResultConsumed,
-        onPushNotificationMuteOptionEventConsumed = viewModel::onPushNotificationMuteOptionEventConsumed,
         onClearChatHistory = viewModel::clearChatHistory,
         onInfoToShowConsumed = viewModel::onInfoToShowEventConsumed,
+        archiveChat = viewModel::archiveChat,
         endCallForAll = viewModel::endCall,
     )
 }
@@ -85,11 +86,10 @@ internal fun ChatView(
     onBackPressed: () -> Unit,
     onMenuActionPressed: (ChatRoomMenuAction) -> Unit,
     inviteContactsToChat: (Long, List<String>) -> Unit = { _, _ -> },
-    onInviteContactsResultConsumed: () -> Unit = {},
-    onPushNotificationMuteOptionEventConsumed: () -> Unit = {},
     onClearChatHistory: () -> Unit = {},
     onInfoToShowConsumed: () -> Unit = {},
     enablePasscodeCheck: () -> Unit = {},
+    archiveChat: () -> Unit = {},
     endCallForAll: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -147,6 +147,7 @@ internal fun ChatView(
                 showClearChatConfirmationDialog = {
                     showClearChat = true
                 },
+                archiveChat = archiveChat,
                 showEndCallForAllDialog = {
                     showEndCallForAllDialog = true
                 },
@@ -206,12 +207,7 @@ internal fun ChatView(
                     onClearChatHistory()
                 })
         }
-        EventEffect(
-            event = uiState.pushNotificationMuteOptionEvent,
-            onConsumed = onPushNotificationMuteOptionEventConsumed
-        ) { muteOption ->
-            snackBarHostState.showSnackbar(muteOption.toString(context))
-        }
+
         if (showEndCallForAllDialog) {
             EndCallForAllDialog(
                 onDismiss = { showEndCallForAllDialog = false },
@@ -221,20 +217,15 @@ internal fun ChatView(
                 }
             )
         }
-    }
 
-    EventEffect(
-        event = uiState.inviteToChatResultEvent,
-        onConsumed = onInviteContactsResultConsumed
-    ) { inviteResult ->
-        snackBarHostState.showSnackbar(inviteResult.toString(context))
-    }
-
-    EventEffect(
-        event = uiState.infoToShowEvent,
-        onConsumed = onInfoToShowConsumed
-    ) { info ->
-        snackBarHostState.showSnackbar(context.getString(info))
+        EventEffect(
+            event = uiState.infoToShowEvent,
+            onConsumed = onInfoToShowConsumed
+        ) { info ->
+            info?.let {
+                getInfoToShow(info, context)?.let { snackBarHostState.showSnackbar(it) }
+            } ?: context.findActivity()?.finish()
+        }
     }
 }
 
@@ -290,6 +281,16 @@ private fun startMeetingActivity(context: Context, chatId: Long) {
         putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
     })
+}
+
+private fun getInfoToShow(infoToShow: InfoToShow, context: Context): String? = with(infoToShow) {
+    inviteContactToChatResult?.toString(context)
+        ?: chatPushNotificationMuteOption?.toString(context)
+        ?: if (args.isNotEmpty()) {
+            stringId?.let { context.getString(it, *args.toTypedArray()) }
+        } else {
+            stringId?.let { context.getString(it) }
+        }
 }
 
 @Preview

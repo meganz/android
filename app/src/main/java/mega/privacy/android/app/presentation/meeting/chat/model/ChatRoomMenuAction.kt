@@ -45,13 +45,6 @@ sealed interface ChatRoomMenuAction : MenuAction {
         override val orderInCategory = 110
     }
 
-    object Unmute : MenuActionWithoutIcon(
-        descriptionRes = R.string.general_unmute,
-        testTag = TEST_TAG_UNMUTE_ACTION,
-    ), ChatRoomMenuAction {
-        override val orderInCategory = 120
-    }
-
     /**
      * Info
      */
@@ -59,7 +52,7 @@ sealed interface ChatRoomMenuAction : MenuAction {
         descriptionRes = R.string.general_info,
         testTag = TEST_TAG_INFO_ACTION,
     ), ChatRoomMenuAction {
-        override val orderInCategory: Int = 120
+        override val orderInCategory: Int = 125
     }
 
     /**
@@ -73,6 +66,16 @@ sealed interface ChatRoomMenuAction : MenuAction {
     }
 
     /**
+     * Clear
+     */
+    object Archive : MenuActionWithoutIcon(
+        descriptionRes = R.string.general_archive,
+        testTag = TEST_TAG_ARCHIVE_ACTION,
+    ), ChatRoomMenuAction {
+        override val orderInCategory: Int = 135
+    }
+
+    /**
      * Add participants
      */
     object EndCallForAll : MenuActionWithoutIcon(
@@ -80,6 +83,16 @@ sealed interface ChatRoomMenuAction : MenuAction {
         testTag = TEST_TAG_END_CALL_FOR_ALL_ACTION,
     ), ChatRoomMenuAction {
         override val orderInCategory = 145
+    }
+
+    /**
+     * Unmute
+     */
+    object Unmute : MenuActionWithoutIcon(
+        descriptionRes = R.string.general_unmute,
+        testTag = TEST_TAG_UNMUTE_ACTION,
+    ), ChatRoomMenuAction {
+        override val orderInCategory = 155
     }
 
     /**
@@ -115,10 +128,20 @@ sealed interface ChatRoomMenuAction : MenuAction {
 
          */
         const val TEST_TAG_UNMUTE_ACTION = "chat_view:action_unmute"
+
         /**
          * Test Tag Clear Action
          */
         const val TEST_TAG_CLEAR_ACTION = "chat_view:action_chat_clear"
+
+        /**
+         * Test Tag Archive Action
+         */
+        const val TEST_TAG_ARCHIVE_ACTION = "chat_view:action_chat_archive"
+
+        /**
+         * Test Tag End Call For All Action
+         */
         const val TEST_TAG_END_CALL_FOR_ALL_ACTION = "chat_view:action_end_call_for_all"
     }
 }

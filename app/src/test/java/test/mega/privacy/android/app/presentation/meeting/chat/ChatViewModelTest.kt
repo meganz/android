@@ -39,6 +39,7 @@ import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsExcept
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
@@ -156,6 +157,7 @@ internal class ChatViewModelTest {
     private val clearChatHistoryUseCase = mock<ClearChatHistoryUseCase>()
     private val endCallUseCase = mock<EndCallUseCase>()
     private val sendStatisticsMeetingsUseCase = mock<SendStatisticsMeetingsUseCase>()
+    private val archiveChatUseCase = mock<ArchiveChatUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -188,6 +190,7 @@ internal class ChatViewModelTest {
             clearChatHistoryUseCase,
             endCallUseCase,
             sendStatisticsMeetingsUseCase,
+            archiveChatUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -242,6 +245,7 @@ internal class ChatViewModelTest {
             clearChatHistoryUseCase = clearChatHistoryUseCase,
             endCallUseCase = endCallUseCase,
             sendStatisticsMeetingsUseCase = sendStatisticsMeetingsUseCase,
+            archiveChatUseCase = archiveChatUseCase
         )
     }
 
@@ -1313,9 +1317,9 @@ internal class ChatViewModelTest {
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {
-            assertThat((awaitItem().inviteToChatResultEvent as StateEventWithContentTriggered).content).isInstanceOf(
-                InviteContactToChatResult.MultipleContactsAdded::class.java
-            )
+            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content?.inviteContactToChatResult
+            assertThat(result).isInstanceOf(InviteContactToChatResult.MultipleContactsAdded::class.java)
         }
     }
 
@@ -1333,9 +1337,9 @@ internal class ChatViewModelTest {
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {
-            assertThat((awaitItem().inviteToChatResultEvent as StateEventWithContentTriggered).content).isInstanceOf(
-                InviteContactToChatResult.OnlyOneContactAdded::class.java
-            )
+            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content?.inviteContactToChatResult
+            assertThat(result).isInstanceOf(InviteContactToChatResult.OnlyOneContactAdded::class.java)
         }
     }
 
@@ -1358,9 +1362,9 @@ internal class ChatViewModelTest {
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {
-            assertThat((awaitItem().inviteToChatResultEvent as StateEventWithContentTriggered).content).isInstanceOf(
-                InviteContactToChatResult.AlreadyExistsError::class.java
-            )
+            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content?.inviteContactToChatResult
+            assertThat(result).isInstanceOf(InviteContactToChatResult.AlreadyExistsError::class.java)
         }
     }
 
@@ -1385,9 +1389,9 @@ internal class ChatViewModelTest {
             initTestClass()
             underTest.inviteContactsToChat(chatId, contactList)
             underTest.state.test {
-                assertThat((awaitItem().inviteToChatResultEvent as StateEventWithContentTriggered).content).isInstanceOf(
-                    InviteContactToChatResult.GeneralError::class.java
-                )
+                val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                    .content?.inviteContactToChatResult
+                assertThat(result).isInstanceOf(InviteContactToChatResult.GeneralError::class.java)
             }
         }
 
@@ -1417,8 +1421,8 @@ internal class ChatViewModelTest {
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {
-            val result =
-                (awaitItem().inviteToChatResultEvent as StateEventWithContentTriggered).content
+            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content?.inviteContactToChatResult
             assertThat(result).isInstanceOf(InviteContactToChatResult.SomeAddedSomeNot::class.java)
             (result as InviteContactToChatResult.SomeAddedSomeNot).let {
                 assertThat(it.success).isEqualTo(2)
@@ -1478,9 +1482,9 @@ internal class ChatViewModelTest {
             initTestClass()
             underTest.handleActionPress(ChatRoomMenuAction.Unmute)
             underTest.state.test {
-                assertThat((awaitItem().pushNotificationMuteOptionEvent as StateEventWithContentTriggered).content).isInstanceOf(
-                    ChatPushNotificationMuteOption.Unmute::class.java
-                )
+                val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                    .content?.chatPushNotificationMuteOption
+                assertThat(result).isInstanceOf(ChatPushNotificationMuteOption.Unmute::class.java)
             }
         }
 
@@ -1493,9 +1497,8 @@ internal class ChatViewModelTest {
             initTestClass()
             underTest.handleActionPress(ChatRoomMenuAction.Unmute)
             underTest.state.test {
-                assertThat(awaitItem().pushNotificationMuteOptionEvent).isInstanceOf(
-                    StateEventWithContentConsumed::class.java
-                )
+                assertThat(awaitItem().infoToShowEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
             }
         }
 
@@ -1512,8 +1515,12 @@ internal class ChatViewModelTest {
 
         underTest.clearChatHistory()
         underTest.state.test {
-            assertThat((awaitItem().infoToShowEvent as StateEventWithContentTriggered).content)
-                .isEqualTo(if (success) R.string.clear_history_success else R.string.clear_history_error)
+            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content?.stringId
+            assertThat(result).isEqualTo(
+                if (success) R.string.clear_history_success
+                else R.string.clear_history_error
+            )
         }
     }
 
@@ -1524,6 +1531,25 @@ internal class ChatViewModelTest {
         verify(sendStatisticsMeetingsUseCase).invoke(any())
     }
 
+    @ParameterizedTest(name = " with success {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that archive finish`(
+        success: Boolean,
+    ) = runTest {
+        if (success) {
+            whenever(archiveChatUseCase(chatId = chatId, true)).thenReturn(Unit)
+        } else {
+            whenever(archiveChatUseCase(chatId = chatId, true)).thenThrow(RuntimeException())
+        }
+
+        underTest.archiveChat()
+        underTest.state.test {
+            val actual = awaitItem()
+            val result = (actual.infoToShowEvent as StateEventWithContentTriggered)
+                .content?.stringId
+            assertThat(result).isEqualTo(if (success) null else R.string.error_archive_chat)
+        }
+    }
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

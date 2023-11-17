@@ -1,11 +1,16 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.dialog
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.core.ui.preview.BooleanProvider
+import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * The dialog to show when it is trying to clear the chat history.
@@ -30,5 +35,19 @@ fun ClearChatConfirmationDialog(
     onConfirm = onConfirm,
     modifier = Modifier.testTag(TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG)
 )
+
+@CombinedTextAndThemePreviews
+@Composable
+private fun ClearChatConfirmationDialogPreview(
+    @PreviewParameter(BooleanProvider::class) isMeeting: Boolean,
+) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        ClearChatConfirmationDialog(
+            isMeeting = isMeeting,
+            onDismiss = {},
+            onConfirm = {},
+        )
+    }
+}
 
 internal const val TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG = "chat_view:dialog_chat_clear:history"

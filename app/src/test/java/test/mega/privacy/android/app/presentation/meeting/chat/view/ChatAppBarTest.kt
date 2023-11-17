@@ -985,7 +985,7 @@ class ChatAppBarTest {
                 myPermission = ChatRoomPermission.ReadOnly,
             )
         )
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertDoesNotExist()
     }
 
@@ -1046,6 +1046,55 @@ class ChatAppBarTest {
         }
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_END_CALL_FOR_ALL_ACTION)
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Archive menu action is not available if is joining or leaving`() {
+        initComposeRuleContent(
+            ChatUiState(isJoiningOrLeaving = true)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Archive menu action is not available if is preview mode`() {
+        initComposeRuleContent(
+            ChatUiState(isPreviewMode = true)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Archive menu action is not available if not connected`() {
+        initComposeRuleContent(
+            ChatUiState(isConnected = false)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Archive menu action is not available if already archived`() {
+        initComposeRuleContent(
+            ChatUiState(isArchived = true)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Archive menu action is available if is not archived`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                isArchived = false,
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ARCHIVE_ACTION)
+            .assertIsDisplayed()
     }
 
     private fun initComposeRuleContent(state: ChatUiState) {

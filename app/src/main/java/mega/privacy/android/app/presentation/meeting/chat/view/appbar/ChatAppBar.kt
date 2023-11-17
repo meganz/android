@@ -57,6 +57,7 @@ internal fun ChatAppBar(
     onStartCall: (Boolean) -> Unit = {},
     openAddContactActivity: () -> Unit = {},
     showClearChatConfirmationDialog: () -> Unit = {},
+    archiveChat: () -> Unit = {},
     showEndCallForAllDialog: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -125,7 +126,12 @@ internal fun ChatAppBar(
                     showClearChatConfirmationDialog()
                 }
 
+                ChatRoomMenuAction.Archive -> {
+                    archiveChat()
+                }
+
                 ChatRoomMenuAction.EndCallForAll -> showEndCallForAllDialog()
+
                 else -> (it as ChatRoomMenuAction).let(onMenuActionPressed)
             }
         },
@@ -163,14 +169,18 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
             add(ChatRoomMenuAction.Clear)
         }
 
-        if (!isJoiningOrLeaving && isChatNotificationMute && !isPreviewMode && isConnected &&
-            ((isGroup && isActive) || (!isGroup && hasModeratorPermission))
-        ) {
-            add(ChatRoomMenuAction.Unmute)
+        if (!isPreviewMode && isConnected && !isArchived) {
+            add(ChatRoomMenuAction.Archive)
         }
 
         if (hasModeratorPermission && (uiState.isGroup || uiState.isMeeting) && uiState.hasACallInThisChat) {
             add(ChatRoomMenuAction.EndCallForAll)
+        }
+
+        if (isChatNotificationMute && !isPreviewMode && isConnected &&
+            ((isGroup && isActive) || (!isGroup && hasModeratorPermission))
+        ) {
+            add(ChatRoomMenuAction.Unmute)
         }
     }
 }

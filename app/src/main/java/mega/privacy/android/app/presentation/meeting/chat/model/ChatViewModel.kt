@@ -30,6 +30,7 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
@@ -96,6 +97,7 @@ internal class ChatViewModel @Inject constructor(
     private val inviteParticipantResultMapper: InviteParticipantResultMapper,
     private val unmuteChatNotificationUseCase: UnmuteChatNotificationUseCase,
     private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
+    private val archiveChatUseCase: ArchiveChatUseCase,
     private val endCallUseCase: EndCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     savedStateHandle: SavedStateHandle,
@@ -515,8 +517,10 @@ internal class ChatViewModel @Inject constructor(
                     unmuteChatNotificationUseCase(chatId)
                     _state.update {
                         it.copy(
-                            pushNotificationMuteOptionEvent = triggered(
-                                ChatPushNotificationMuteOption.Unmute
+                            infoToShowEvent = triggered(
+                                InfoToShow(
+                                    chatPushNotificationMuteOption = ChatPushNotificationMuteOption.Unmute
+                                )
                             )
                         )
                     }
@@ -532,7 +536,11 @@ internal class ChatViewModel @Inject constructor(
             }.onSuccess { result ->
                 _state.update { state ->
                     state.copy(
-                        inviteToChatResultEvent = triggered(inviteParticipantResultMapper(result))
+                        infoToShowEvent = triggered(
+                            InfoToShow(
+                                inviteContactToChatResult = inviteParticipantResultMapper(result)
+                            )
+                        )
                     )
                 }
             }.onFailure {
@@ -540,24 +548,24 @@ internal class ChatViewModel @Inject constructor(
             }
         }
 
-    fun onInviteContactsResultConsumed() {
-        _state.update { state -> state.copy(inviteToChatResultEvent = consumed()) }
-    }
-
-    fun onPushNotificationMuteOptionEventConsumed() {
-        _state.update { state -> state.copy(pushNotificationMuteOptionEvent = consumed()) }
-    }
-
     fun clearChatHistory() {
         viewModelScope.launch {
             chatId?.let {
                 runCatching { clearChatHistoryUseCase(it) }
                     .onSuccess {
-                        _state.update { state -> state.copy(infoToShowEvent = triggered(R.string.clear_history_success)) }
+                        _state.update { state ->
+                            state.copy(
+                                infoToShowEvent = triggered(InfoToShow(stringId = R.string.clear_history_success))
+                            )
+                        }
                     }
                     .onFailure {
                         Timber.e("Error clearing chat history $it")
-                        _state.update { state -> state.copy(infoToShowEvent = triggered(R.string.clear_history_error)) }
+                        _state.update { state ->
+                            state.copy(
+                                infoToShowEvent = triggered(InfoToShow(stringId = R.string.clear_history_error))
+                            )
+                        }
                     }
             }
         }
@@ -576,6 +584,33 @@ internal class ChatViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e(it)
                 }
+            }
+        }
+    }
+
+    fun archiveChat() {
+        viewModelScope.launch {
+            chatId?.let {
+                runCatching { archiveChatUseCase(it, true) }
+                    .onSuccess {
+                        _state.update { state ->
+                            state.copy(infoToShowEvent = triggered(null))
+                        }
+                    }
+                    .onFailure {
+                        Timber.e("Error archiving chat $it")
+                        _state.update { state ->
+                            state.copy(
+                                infoToShowEvent = triggered(
+                                    InfoToShow(
+                                        stringId = R.string.error_archive_chat,
+                                        args = state.title?.let { title -> listOf(title) }
+                                            ?: emptyList()
+                                    )
+                                )
+                            )
+                        }
+                    }
             }
         }
     }

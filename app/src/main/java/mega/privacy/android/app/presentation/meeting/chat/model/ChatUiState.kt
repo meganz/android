@@ -4,7 +4,6 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
@@ -36,10 +35,8 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property customSubtitleList List of names for building a custom subtitle if the title is custom too, null otherwise.
  * @property participantsCount Number of participants if the chat is a group, null otherwise.
  * @property allContactsParticipateInChat True if all contacts participate in this chat, false otherwise.
- * @property inviteToChatResultEvent Event to show the result of inviting contacts to a chat.
  * @property isWaitingRoom True if the scheduled meeting has the waiting room setting enabled, false otherwise.
- * @property pushNotificationMuteOptionEvent Event to show the result of muting/unmuting chat notifications.
- * @property infoToShowEvent Event to show some info.
+ * @property infoToShowEvent Event to show some info. Set it to null in case the activity needs to be closed.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -67,8 +64,6 @@ data class ChatUiState(
     val customSubtitleList: List<String>? = null,
     val participantsCount: Long? = null,
     val allContactsParticipateInChat: Boolean = false,
-    val inviteToChatResultEvent: StateEventWithContent<InviteContactToChatResult> = consumed(),
     val isWaitingRoom: Boolean = false,
-    val pushNotificationMuteOptionEvent: StateEventWithContent<ChatPushNotificationMuteOption> = consumed(),
-    val infoToShowEvent: StateEventWithContent<Int> = consumed(),
+    val infoToShowEvent: StateEventWithContent<InfoToShow?> = consumed(),
 )
