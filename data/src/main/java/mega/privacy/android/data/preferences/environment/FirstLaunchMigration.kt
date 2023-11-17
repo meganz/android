@@ -17,7 +17,7 @@ internal class FirstLaunchMigration @Inject constructor(
         currentData.asMap().keys.map { it.name }.contains(IS_FIRST_LAUNCH_KEY).not()
 
     override suspend fun migrate(currentData: Preferences): Preferences {
-        val firstLaunch = databaseHandler.preferences?.firstTime.toBoolean()
+        val firstLaunch = databaseHandler.preferences?.firstTime?.toBooleanStrictOrNull() ?: true
         val mutablePreferences = currentData.toMutablePreferences()
         mutablePreferences.let {
             AppInfoPreferencesDatastore(
