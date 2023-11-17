@@ -160,6 +160,14 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
         ) {
             add(ChatRoomMenuAction.Clear)
         }
+
+        if (!isJoiningOrLeaving && isChatNotificationMute && !isPreviewMode && isConnected &&
+            ((isGroup && isActive) || (!isGroup && hasModeratorPermission))
+        ) {
+            add(ChatRoomMenuAction.Unmute)
+        }
+
+
     }
 }
 

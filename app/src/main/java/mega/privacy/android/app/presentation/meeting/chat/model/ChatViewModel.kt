@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipa
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -36,6 +37,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
@@ -89,6 +91,7 @@ internal class ChatViewModel @Inject constructor(
     private val monitorAllContactParticipantsInChatUseCase: MonitorAllContactParticipantsInChatUseCase,
     private val inviteToChatUseCase: InviteToChatUseCase,
     private val inviteParticipantResultMapper: InviteParticipantResultMapper,
+    private val unmuteChatNotificationUseCase: UnmuteChatNotificationUseCase,
     private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -497,9 +500,27 @@ internal class ChatViewModel @Inject constructor(
         when (action) {
             is ChatRoomMenuAction.AudioCall -> {}
             is ChatRoomMenuAction.VideoCall -> {}
-            ChatRoomMenuAction.Info -> {}
-            ChatRoomMenuAction.AddParticipants -> {}
-            ChatRoomMenuAction.Clear -> {}
+            is ChatRoomMenuAction.Info -> {}
+            is ChatRoomMenuAction.AddParticipants -> {}
+            is ChatRoomMenuAction.Clear -> {}
+            is ChatRoomMenuAction.Unmute -> unmutePushNotification()
+        }
+    }
+
+    private fun unmutePushNotification() {
+        chatId?.let { chatId ->
+            viewModelScope.launch {
+                runCatching {
+                    unmuteChatNotificationUseCase(chatId)
+                    _state.update {
+                        it.copy(
+                            pushNotificationMuteOptionEvent = triggered(
+                                ChatPushNotificationMuteOption.Unmute
+                            )
+                        )
+                    }
+                }.onFailure { Timber.e(it) }
+            }
         }
     }
 
@@ -520,6 +541,10 @@ internal class ChatViewModel @Inject constructor(
 
     fun onInviteContactsResultConsumed() {
         _state.update { state -> state.copy(inviteToChatResultEvent = consumed()) }
+    }
+
+    fun onPushNotificationMuteOptionEventConsumed() {
+        _state.update { state -> state.copy(pushNotificationMuteOptionEvent = consumed()) }
     }
 
     fun clearChatHistory() {

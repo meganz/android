@@ -45,6 +45,13 @@ sealed interface ChatRoomMenuAction : MenuAction {
         override val orderInCategory = 110
     }
 
+    object Unmute : MenuActionWithoutIcon(
+        descriptionRes = R.string.general_unmute,
+        testTag = TEST_TAG_UNMUTE_ACTION,
+    ), ChatRoomMenuAction {
+        override val orderInCategory = 120
+    }
+
     /**
      * Info
      */
@@ -93,6 +100,11 @@ sealed interface ChatRoomMenuAction : MenuAction {
          */
         const val TEST_TAG_ADD_PARTICIPANTS_ACTION = "chat_view:action_add_participants"
 
+        /**
+         * Test Tag Unmute Action
+
+         */
+        const val TEST_TAG_UNMUTE_ACTION = "chat_view:action_unmute"
         /**
          * Test Tag Clear Action
          */

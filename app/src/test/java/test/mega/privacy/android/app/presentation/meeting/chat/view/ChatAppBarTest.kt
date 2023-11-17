@@ -825,6 +825,115 @@ class ChatAppBarTest {
     }
 
     @Test
+    fun `test that unmute menu action is shown shown when a group chat meets the conditions`() {
+        initComposeRuleContent(
+            uiStateToShowUnmuteInGroupChat()
+        )
+
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION).assertExists()
+    }
+
+    @Test
+    fun `test that unmute menu action is shown shown when a non-group chat meets the conditions`() {
+        initComposeRuleContent(
+            uiStateToShowUnmuteIn1on1Chat()
+        )
+
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION).assertIsDisplayed()
+    }
+
+    private fun uiStateToShowUnmuteIn1on1Chat() =
+        ChatUiState(
+            isGroup = false,
+            isPreviewMode = false,
+            isJoiningOrLeaving = false,
+            isChatNotificationMute = true,
+            isConnected = true,
+            myPermission = ChatRoomPermission.Moderator,
+        )
+
+    private fun uiStateToShowUnmuteInGroupChat(): ChatUiState =
+        ChatUiState(
+            isGroup = true,
+            isPreviewMode = false,
+            isJoiningOrLeaving = false,
+            isChatNotificationMute = true,
+            isConnected = true,
+            isActive = true,
+        )
+
+    @Test
+    fun `test that unmute menu action is not shown when it is joining or leaving`() {
+        initComposeRuleContent(
+            uiStateToShowUnmuteIn1on1Chat().copy(isJoiningOrLeaving = true)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
+
+    fun `test that unmute menu action is not shown when mute notification is set to true`() {
+        initComposeRuleContent(
+            uiStateToShowUnmuteIn1on1Chat().copy(isChatNotificationMute = true)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
+
+    fun `test that unmute menu action is not shown when chat is in preview mode`() {
+        initComposeRuleContent(
+            uiStateToShowUnmuteIn1on1Chat().copy(isPreviewMode = true)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that unmute menu action is not shown when chat is disconnected`() {
+        initComposeRuleContent(
+            uiStateToShowUnmuteIn1on1Chat().copy(isConnected = false)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that unmute menu action is not shown when it is a group chat but not active`() {
+        initComposeRuleContent(
+            uiStateToShowUnmuteInGroupChat().copy(isActive = false)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that unmute menu action is not shown when it is a 1on1 chat but I am not a moderator`() {
+        initComposeRuleContent(
+            uiStateToShowUnmuteIn1on1Chat().copy(myPermission = ChatRoomPermission.ReadOnly)
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun `test that Clear menu action is not available when is not connected`() {
         initComposeRuleContent(
             ChatUiState(isConnected = false)
@@ -878,11 +987,9 @@ class ChatAppBarTest {
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION)
-            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertDoesNotExist()
     }
 
-    @Test
     fun `test that Clear menu action is available in group chat with moderator permissions`() {
         initComposeRuleContent(
             ChatUiState(

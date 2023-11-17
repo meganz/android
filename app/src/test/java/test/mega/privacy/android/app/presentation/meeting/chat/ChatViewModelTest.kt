@@ -3,6 +3,7 @@ package test.mega.privacy.android.app.presentation.meeting.chat
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,6 +18,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
 import mega.privacy.android.app.utils.Constants
@@ -27,6 +29,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -44,6 +47,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
@@ -146,6 +150,7 @@ internal class ChatViewModelTest {
     private val inviteToChatUseCase: InviteToChatUseCase = mock()
 
     private val inviteParticipantResultMapper: InviteParticipantResultMapper = mock()
+    private val unmuteChatNotificationUseCase: UnmuteChatNotificationUseCase = mock()
     private val clearChatHistoryUseCase = mock<ClearChatHistoryUseCase>()
 
     @BeforeAll
@@ -175,6 +180,7 @@ internal class ChatViewModelTest {
             getCustomSubtitleListUseCase,
             inviteToChatUseCase,
             inviteParticipantResultMapper,
+            unmuteChatNotificationUseCase,
             clearChatHistoryUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
@@ -225,6 +231,7 @@ internal class ChatViewModelTest {
             savedStateHandle = savedStateHandle,
             monitorAllContactParticipantsInChatUseCase = monitorAllContactParticipantsInChatUseCase,
             inviteToChatUseCase = inviteToChatUseCase,
+            unmuteChatNotificationUseCase = unmuteChatNotificationUseCase,
             inviteParticipantResultMapper = inviteParticipantResultMapper,
             clearChatHistoryUseCase = clearChatHistoryUseCase,
         )
@@ -1456,6 +1463,33 @@ internal class ChatViewModelTest {
             assertThat(awaitItem().isWaitingRoom).isEqualTo(!expectedIsWaitingRoom)
         }
     }
+
+    @Test
+    fun `test that push notification unmute event is not triggered when unmute push notification succeeds`() =
+        runTest {
+            initTestClass()
+            underTest.handleActionPress(ChatRoomMenuAction.Unmute)
+            underTest.state.test {
+                assertThat((awaitItem().pushNotificationMuteOptionEvent as StateEventWithContentTriggered).content).isInstanceOf(
+                    ChatPushNotificationMuteOption.Unmute::class.java
+                )
+            }
+        }
+
+    @Test
+    fun `test that push notification unmute event is triggered when unmute push notification fails`() =
+        runTest {
+            whenever(unmuteChatNotificationUseCase(chatId)).thenAnswer {
+                throw Exception("unmute chat failed")
+            }
+            initTestClass()
+            underTest.handleActionPress(ChatRoomMenuAction.Unmute)
+            underTest.state.test {
+                assertThat(awaitItem().pushNotificationMuteOptionEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+            }
+        }
 
     @ParameterizedTest(name = " with success {0}")
     @ValueSource(booleans = [true, false])

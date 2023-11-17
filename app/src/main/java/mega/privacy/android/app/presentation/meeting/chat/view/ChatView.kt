@@ -67,6 +67,7 @@ internal fun ChatView(
         enablePasscodeCheck = viewModel::enablePasscodeCheck,
         inviteContactsToChat = viewModel::inviteContactsToChat,
         onInviteContactsResultConsumed = viewModel::onInviteContactsResultConsumed,
+        onPushNotificationMuteOptionEventConsumed = viewModel::onPushNotificationMuteOptionEventConsumed,
         onClearChatHistory = viewModel::clearChatHistory,
         onInfoToShowConsumed = viewModel::onInfoToShowEventConsumed,
     )
@@ -86,7 +87,7 @@ internal fun ChatView(
     onMenuActionPressed: (ChatRoomMenuAction) -> Unit,
     inviteContactsToChat: (Long, List<String>) -> Unit = { _, _ -> },
     onInviteContactsResultConsumed: () -> Unit = {},
-    getAnotherCallParticipating: () -> Unit = {},
+    onPushNotificationMuteOptionEventConsumed: () -> Unit = {},
     onClearChatHistory: () -> Unit = {},
     onInfoToShowConsumed: () -> Unit = {},
     enablePasscodeCheck: () -> Unit = {},
@@ -201,6 +202,12 @@ internal fun ChatView(
                     showClearChat = false
                     onClearChatHistory()
                 })
+        }
+        EventEffect(
+            event = uiState.pushNotificationMuteOptionEvent,
+            onConsumed = onPushNotificationMuteOptionEventConsumed
+        ) { muteOption ->
+            snackBarHostState.showSnackbar(muteOption.toString(context))
         }
     }
 
