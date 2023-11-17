@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.retryWhen
@@ -148,7 +149,6 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
@@ -196,7 +196,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val setPrimarySyncHandle: SetPrimarySyncHandle,
     private val setSecondarySyncHandle: SetSecondarySyncHandle,
     private val getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase,
-    private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -351,11 +350,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private var monitorStorageOverQuotaStatusJob: Job? = null
 
     /**
-     * True if all transfers paused
-     */
-    private var areUploadsPaused: Boolean = false
-
-    /**
      * In order to not overload the memory of the app,
      * limit the number of concurrent uploads to [CONCURRENT_UPLOADS_LIMIT]
      */
@@ -455,7 +449,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private fun monitorUploadPauseStatus() {
         monitorUploadPauseStatusJob = scope?.launch(ioDispatcher) {
             monitorPausedTransfersUseCase().collect {
-                areUploadsPaused = it
                 updateBackupState(if (it) BackupState.PAUSE_UPLOADS else BackupState.ACTIVE)
                 displayUploadProgress()
             }
@@ -1109,8 +1102,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         finalList: List<SyncRecord>,
         isCompressedVideo: Boolean,
     ) = coroutineScope {
-        areUploadsPaused = areTransfersPausedUseCase()
-
         val primaryUploadNode =
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
         val secondaryUploadNode =
@@ -1244,7 +1235,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     private suspend fun startHeartbeat() {
-        updateBackupState(if (areUploadsPaused) BackupState.PAUSE_UPLOADS else BackupState.ACTIVE)
+        updateBackupState(if (areTransfersPaused()) BackupState.PAUSE_UPLOADS else BackupState.ACTIVE)
 
         sendBackupHeartbeatJob =
             scope?.launch(ioDispatcher) {
@@ -1927,7 +1918,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                         totalUploadedBytes,
                         totalUploadBytes,
                         progressPercent,
-                        areUploadsPaused,
+                        areTransfersPaused()
                     )
                 }
             }
@@ -2053,6 +2044,14 @@ class CameraUploadsWorker @AssistedInject constructor(
             )
         }.onFailure { Timber.e(it) }
     }
+
+    /**
+     * Check if transfers paused
+     *
+     * @return true if transfers paused
+     */
+    private suspend fun areTransfersPaused(): Boolean =
+        monitorPausedTransfersUseCase().firstOrNull() == true
 
     /**
      * Trace performance if feature flag is enabled
