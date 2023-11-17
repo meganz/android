@@ -12,6 +12,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_ADD_PARTICIPANTS_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_CLEAR_ACTION
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_END_CALL_FOR_ALL_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_VIDEO_CALL_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
@@ -139,12 +140,32 @@ class ChatViewTest {
         composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that end call for all dialog show when click to end call for all menu option`() {
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Moderator,
+                hasACallInThisChat = true,
+                isGroup = true,
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        composeTestRule.onNodeWithTag(TEST_TAG_END_CALL_FOR_ALL_ACTION).performClick()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.meetings_chat_screen_dialog_title_end_call_for_all))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.meetings_chat_screen_dialog_description_end_call_for_all))
+            .assertIsDisplayed()
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatView(
                 uiState = state,
                 onBackPressed = {},
-                onMenuActionPressed = actionPressed
+                onMenuActionPressed = actionPressed,
             )
         }
     }

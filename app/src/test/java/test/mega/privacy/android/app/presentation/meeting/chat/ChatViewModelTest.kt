@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
@@ -57,6 +58,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUs
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
+import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaChatError
@@ -152,6 +154,8 @@ internal class ChatViewModelTest {
     private val inviteParticipantResultMapper: InviteParticipantResultMapper = mock()
     private val unmuteChatNotificationUseCase: UnmuteChatNotificationUseCase = mock()
     private val clearChatHistoryUseCase = mock<ClearChatHistoryUseCase>()
+    private val endCallUseCase = mock<EndCallUseCase>()
+    private val sendStatisticsMeetingsUseCase = mock<SendStatisticsMeetingsUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -182,6 +186,8 @@ internal class ChatViewModelTest {
             inviteParticipantResultMapper,
             unmuteChatNotificationUseCase,
             clearChatHistoryUseCase,
+            endCallUseCase,
+            sendStatisticsMeetingsUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -234,6 +240,8 @@ internal class ChatViewModelTest {
             unmuteChatNotificationUseCase = unmuteChatNotificationUseCase,
             inviteParticipantResultMapper = inviteParticipantResultMapper,
             clearChatHistoryUseCase = clearChatHistoryUseCase,
+            endCallUseCase = endCallUseCase,
+            sendStatisticsMeetingsUseCase = sendStatisticsMeetingsUseCase,
         )
     }
 
@@ -1508,6 +1516,14 @@ internal class ChatViewModelTest {
                 .isEqualTo(if (success) R.string.clear_history_success else R.string.clear_history_error)
         }
     }
+
+    @Test
+    fun `test that endCall invokes correct use cases when call this function`() = runTest {
+        underTest.endCall()
+        verify(endCallUseCase).invoke(chatId)
+        verify(sendStatisticsMeetingsUseCase).invoke(any())
+    }
+
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

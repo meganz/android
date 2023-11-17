@@ -968,4 +968,18 @@ internal class ChatRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             megaChatApiGateway.enableAudioLevelMonitor(enable = enable, chatId = chatId)
         }
+
+    override suspend fun endChatCall(chatId: Long): Boolean = withContext(ioDispatcher) {
+        val chatCall = megaChatApiGateway.getChatCall(chatId) ?: return@withContext false
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener("endChatCall") {
+                it.flag
+            }
+            megaChatApiGateway.endChatCall(chatCall.callId, listener)
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
 }

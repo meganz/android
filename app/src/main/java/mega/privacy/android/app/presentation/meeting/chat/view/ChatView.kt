@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -70,6 +69,7 @@ internal fun ChatView(
         onPushNotificationMuteOptionEventConsumed = viewModel::onPushNotificationMuteOptionEventConsumed,
         onClearChatHistory = viewModel::clearChatHistory,
         onInfoToShowConsumed = viewModel::onInfoToShowEventConsumed,
+        endCallForAll = viewModel::endCall,
     )
 }
 
@@ -78,7 +78,6 @@ internal fun ChatView(
  *
  * @param uiState [ChatUiState]
  * @param onBackPressed Action to perform for back button.
- * @param onMenuActionPressed Action to perform for menu buttons.
  */
 @Composable
 internal fun ChatView(
@@ -91,14 +90,15 @@ internal fun ChatView(
     onClearChatHistory: () -> Unit = {},
     onInfoToShowConsumed: () -> Unit = {},
     enablePasscodeCheck: () -> Unit = {},
+    endCallForAll: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
     var showParticipatingInACallDialog by rememberSaveable { mutableStateOf(false) }
     var showNoContactToAddDialog by rememberSaveable { mutableStateOf(false) }
     var showAllContactsParticipateInChat by rememberSaveable { mutableStateOf(false) }
     var showClearChat by rememberSaveable { mutableStateOf(false) }
+    var showEndCallForAllDialog by rememberSaveable { mutableStateOf(false) }
 
     val addContactLauncher =
         rememberLauncherForActivityResult(
@@ -146,7 +146,10 @@ internal fun ChatView(
                 },
                 showClearChatConfirmationDialog = {
                     showClearChat = true
-                }
+                },
+                showEndCallForAllDialog = {
+                    showEndCallForAllDialog = true
+                },
             )
         },
         snackbarHost = {
@@ -208,6 +211,15 @@ internal fun ChatView(
             onConsumed = onPushNotificationMuteOptionEventConsumed
         ) { muteOption ->
             snackBarHostState.showSnackbar(muteOption.toString(context))
+        }
+        if (showEndCallForAllDialog) {
+            EndCallForAllDialog(
+                onDismiss = { showEndCallForAllDialog = false },
+                onConfirm = {
+                    showEndCallForAllDialog = false
+                    endCallForAll()
+                }
+            )
         }
     }
 

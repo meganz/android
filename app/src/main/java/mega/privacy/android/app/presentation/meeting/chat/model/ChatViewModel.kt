@@ -26,10 +26,12 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
@@ -47,6 +49,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUs
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
+import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
@@ -93,6 +96,8 @@ internal class ChatViewModel @Inject constructor(
     private val inviteParticipantResultMapper: InviteParticipantResultMapper,
     private val unmuteChatNotificationUseCase: UnmuteChatNotificationUseCase,
     private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
+    private val endCallUseCase: EndCallUseCase,
+    private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -498,12 +503,8 @@ internal class ChatViewModel @Inject constructor(
      */
     fun handleActionPress(action: ChatRoomMenuAction) {
         when (action) {
-            is ChatRoomMenuAction.AudioCall -> {}
-            is ChatRoomMenuAction.VideoCall -> {}
-            is ChatRoomMenuAction.Info -> {}
-            is ChatRoomMenuAction.AddParticipants -> {}
-            is ChatRoomMenuAction.Clear -> {}
             is ChatRoomMenuAction.Unmute -> unmutePushNotification()
+            else -> {}
         }
     }
 
@@ -564,6 +565,19 @@ internal class ChatViewModel @Inject constructor(
 
     fun onInfoToShowEventConsumed() {
         _state.update { state -> state.copy(infoToShowEvent = consumed()) }
+    }
+
+    fun endCall() {
+        chatId?.let {
+            viewModelScope.launch {
+                runCatching {
+                    endCallUseCase(chatId)
+                    sendStatisticsMeetingsUseCase(EndCallForAll())
+                }.onFailure {
+                    Timber.e(it)
+                }
+            }
+        }
     }
 
     companion object {

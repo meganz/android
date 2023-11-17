@@ -422,7 +422,7 @@ interface ChatRepository {
         userHandles: List<Long>,
         speakRequest: Boolean,
         waitingRoom: Boolean,
-        openInvite: Boolean
+        openInvite: Boolean,
     ): Long
 
     /**
@@ -441,7 +441,7 @@ interface ChatRepository {
         userHandles: List<Long>,
         speakRequest: Boolean,
         waitingRoom: Boolean,
-        openInvite: Boolean
+        openInvite: Boolean,
     ): Long
 
     /**
@@ -729,4 +729,12 @@ interface ChatRepository {
      * @param chatId MegaChatHandle that identifies the chat room where we can enable audio level monitor
      */
     suspend fun enableAudioLevelMonitor(enable: Boolean, chatId: Long)
+
+    /**
+     * End chat call
+     *
+     * @param chatId   Call id
+     * @return True if the call was ended, false otherwise.
+     */
+    suspend fun endChatCall(chatId: Long): Boolean
 }

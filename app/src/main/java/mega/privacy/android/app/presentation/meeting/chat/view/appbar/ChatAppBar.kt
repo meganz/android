@@ -57,6 +57,7 @@ internal fun ChatAppBar(
     onStartCall: (Boolean) -> Unit = {},
     openAddContactActivity: () -> Unit = {},
     showClearChatConfirmationDialog: () -> Unit = {},
+    showEndCallForAllDialog: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -124,6 +125,7 @@ internal fun ChatAppBar(
                     showClearChatConfirmationDialog()
                 }
 
+                ChatRoomMenuAction.EndCallForAll -> showEndCallForAllDialog()
                 else -> (it as ChatRoomMenuAction).let(onMenuActionPressed)
             }
         },
@@ -167,7 +169,9 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
             add(ChatRoomMenuAction.Unmute)
         }
 
-
+        if (hasModeratorPermission && (uiState.isGroup || uiState.isMeeting) && uiState.hasACallInThisChat) {
+            add(ChatRoomMenuAction.EndCallForAll)
+        }
     }
 }
 

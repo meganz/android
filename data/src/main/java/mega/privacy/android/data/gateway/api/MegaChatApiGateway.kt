@@ -1023,7 +1023,7 @@ interface MegaChatApiGateway {
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
-        listener: MegaChatVideoListenerInterface
+        listener: MegaChatVideoListenerInterface,
     )
 
     /**
@@ -1042,7 +1042,7 @@ interface MegaChatApiGateway {
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
-        listener: MegaChatVideoListenerInterface?
+        listener: MegaChatVideoListenerInterface?,
     )
 
     /**
@@ -1228,4 +1228,17 @@ interface MegaChatApiGateway {
      * @param chatId MegaChatHandle that identifies the chat room where we can enable audio level monitor
      */
     suspend fun enableAudioLevelMonitor(enable: Boolean, chatId: Long)
+
+    /**
+     * End a call in a chat room (user must be moderator)
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_HANG_CHAT_CALL
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the call identifier
+     * - MegaChatRequest::getFlag - Returns true
+     *
+     * @param callId MegaChatHandle that identifies the chat room
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun endChatCall(callId: Long, listener: MegaChatRequestListenerInterface)
 }

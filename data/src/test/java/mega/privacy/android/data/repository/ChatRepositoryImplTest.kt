@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ChatRepository
+import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatListItem
@@ -702,4 +703,22 @@ class ChatRepositoryImplTest {
             verifyNoMoreInteractions(megaChatApiGateway)
             verifyNoInteractions(localStorageGateway)
         }
+
+    @Test
+    fun `test that endChatCall returns correctly when megaApi returns the flags`() = runTest {
+        val expectedResult = true
+        val callId = 123L
+        val megaChatRequest = mock<MegaChatRequest> { on { flag }.thenReturn(expectedResult) }
+        val call = mock<MegaChatCall> { on { this.callId }.thenReturn(callId) }
+        whenever(megaChatApiGateway.getChatCall(any())).thenReturn(call)
+        whenever(megaChatApiGateway.endChatCall(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaChatRequest,
+                megaChatErrorSuccess,
+            )
+        }
+        val actual = underTest.endChatCall(chatId)
+        assertThat(actual).isEqualTo(expectedResult)
+    }
 }

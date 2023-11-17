@@ -39,7 +39,6 @@ class ChatAppBarTest {
     @get:Rule
     var composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-
     @Test
     fun `test that title shows correctly when passing title to uiState`() {
         val title = "my chat room title"
@@ -1015,6 +1014,40 @@ class ChatAppBarTest {
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that end call for all is available when the chat is a group my permission is moderator and has a call in this chat`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                myPermission = ChatRoomPermission.Moderator,
+                hasACallInThisChat = true
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_END_CALL_FOR_ALL_ACTION)
+            .assertExists()
+    }
+
+    @Test
+    fun `test that end call for all is not available when the chat is a group my permission is moderator and hasn't a call in this chat`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isGroup = true,
+                myPermission = ChatRoomPermission.Moderator,
+                hasACallInThisChat = false
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_END_CALL_FOR_ALL_ACTION)
+            .assertDoesNotExist()
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatAppBar(
@@ -1032,7 +1065,7 @@ class ChatAppBarTest {
             ChatView(
                 uiState = state,
                 onBackPressed = {},
-                onMenuActionPressed = actionPressed
+                onMenuActionPressed = actionPressed,
             )
             lastGreen = getLastSeenString(lastGreen = state.userLastGreen) ?: ""
         }

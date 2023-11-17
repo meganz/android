@@ -24,6 +24,7 @@ class EndCallUseCase @Inject constructor(
      *
      * @param chatId Chat ID
      */
+    @Deprecated("Use [EndCallUseCase] domain use case instead")
     fun endCallForAllWithChatId(
         chatId: Long,
     ): Completable =

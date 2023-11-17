@@ -686,4 +686,8 @@ internal class MegaChatApiFacade @Inject constructor(
     override suspend fun enableAudioLevelMonitor(enable: Boolean, chatId: Long) {
         chatApi.enableAudioLevelMonitor(enable, chatId, null)
     }
+
+    override fun endChatCall(callId: Long, listener: MegaChatRequestListenerInterface) {
+        chatApi.endChatCall(callId, listener)
+    }
 }

@@ -73,6 +73,16 @@ sealed interface ChatRoomMenuAction : MenuAction {
     }
 
     /**
+     * Add participants
+     */
+    object EndCallForAll : MenuActionWithoutIcon(
+        descriptionRes = R.string.meetings_chat_screen_menu_option_end_call_for_all,
+        testTag = TEST_TAG_END_CALL_FOR_ALL_ACTION,
+    ), ChatRoomMenuAction {
+        override val orderInCategory = 145
+    }
+
+    /**
      * Selection mode action.
      * All the actions which may be available in select mode should be defined here.
      */
@@ -109,5 +119,6 @@ sealed interface ChatRoomMenuAction : MenuAction {
          * Test Tag Clear Action
          */
         const val TEST_TAG_CLEAR_ACTION = "chat_view:action_chat_clear"
+        const val TEST_TAG_END_CALL_FOR_ALL_ACTION = "chat_view:action_end_call_for_all"
     }
 }
