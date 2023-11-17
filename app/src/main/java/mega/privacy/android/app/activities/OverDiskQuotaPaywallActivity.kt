@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
 import android.widget.Button
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.text.HtmlCompat
@@ -16,6 +15,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
@@ -30,6 +31,8 @@ import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
 import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
 import mega.privacy.android.app.utils.Util.setDrawUnderStatusBar
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -39,6 +42,13 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
 
     @Inject
     lateinit var getUserDataUseCase: GetUserDataUseCase
+
+    @Inject
+    @ApplicationScope
+    lateinit var globalScope: CoroutineScope
+
+    @Inject
+    lateinit var isFirstLaunchUseCase: IsFirstLaunchUseCase
 
     private val viewModel: OverDiskQuotaPaywallViewModel by viewModels()
 
@@ -104,16 +114,11 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
             R.id.dismiss_button -> {
                 Timber.i("Over Disk Quota Paywall warning dismissed")
                 if (isTaskRoot) {
-                    var askPermissions: Boolean? = true
-                    if (dbH.preferences?.firstTime != null) {
-                        askPermissions = dbH.preferences?.firstTime?.toBoolean()
-                    }
-                    val intent = Intent(applicationContext, ManagerActivity::class.java)
-                        .putExtra(EXTRA_ASK_PERMISSIONS, askPermissions)
-                    startActivity(intent)
+                    launchManagerActivity()
                 }
                 finish()
             }
+
             R.id.upgrade_button -> {
                 Timber.i("Starting upgrade process after Over Disk Quota Paywall")
 
@@ -123,6 +128,15 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
                 startActivity(intent)
                 finish()
             }
+        }
+    }
+
+    private fun launchManagerActivity() {
+        globalScope.launch {
+            val askPermissions = isFirstLaunchUseCase()
+            val intent = Intent(applicationContext, ManagerActivity::class.java)
+                .putExtra(EXTRA_ASK_PERMISSIONS, askPermissions)
+            startActivity(intent)
         }
     }
 
@@ -213,10 +227,12 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
                 text =
                     String.format(getString(R.string.over_disk_quota_paywall_deletion_warning_no_data))
             }
+
             TimeUnit.MILLISECONDS.toSeconds(time) <= 0 -> {
                 text =
                     String.format(getString(R.string.over_disk_quota_paywall_deletion_warning_no_time_left))
             }
+
             else -> {
                 text = String.format(
                     getString(R.string.over_disk_quota_paywall_deletion_warning),

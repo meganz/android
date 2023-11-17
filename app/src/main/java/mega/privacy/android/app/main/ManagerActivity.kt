@@ -306,6 +306,7 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
+import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
@@ -446,6 +447,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var navigator: MegaNavigator
+
+    @Inject
+    lateinit var isFirstLaunchUseCase: IsFirstLaunchUseCase
 
     //GET PRO ACCOUNT PANEL
     private lateinit var getProLayout: LinearLayout
@@ -1263,12 +1267,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             return true
         }
-        prefs = dbH.preferences
-        firstTimeAfterInstallation =
-            if (prefs == null || prefs?.firstTime == null) true
-            else prefs?.firstTime.toBoolean()
+        setIsFirstLaunch()
 
         return false
+    }
+
+    private fun setIsFirstLaunch() {
+        runBlocking {
+            runCatching {
+                firstTimeAfterInstallation = isFirstLaunchUseCase()
+            }
+        }
     }
 
     private fun handleDuplicateLaunches(): Boolean {
