@@ -276,8 +276,9 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getChatFilesFolderId(): NodeId? =
+    override suspend fun getChatFilesFolderId(): NodeId? = withContext(ioDispatcher) {
         localStorageGateway.getChatFilesFolderHandle()?.let { NodeId(it) }
+    }
 
     override suspend fun getAllChatRooms(): List<CombinedChatRoom> =
         withContext(ioDispatcher) {

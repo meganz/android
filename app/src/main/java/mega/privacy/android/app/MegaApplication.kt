@@ -231,13 +231,15 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             checkResumedPendingTransfers()
         }
 
-        applicationScope.launch { runCatching { updateApiServerUseCase() } }
+        applicationScope.launch {
+            runCatching { updateApiServerUseCase() }
+            dbH.resetExtendedAccountDetailsTimestamp()
+        }
 
         val useHttpsOnly = java.lang.Boolean.parseBoolean(dbH.useHttpsOnly)
         Timber.d("Value of useHttpsOnly: %s", useHttpsOnly)
         megaApi.useHttpsOnly(useHttpsOnly)
         myAccountInfo.resetDefaults()
-        dbH.resetExtendedAccountDetailsTimestamp()
 
         // clear the cache files stored in the external cache folder.
         clearPublicCache()
@@ -250,6 +252,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
+            .addLastModifiedToFileCacheKey(false)
             .components {
                 if (SDK_INT >= Build.VERSION_CODES.P) {
                     add(ImageDecoderDecoder.Factory())

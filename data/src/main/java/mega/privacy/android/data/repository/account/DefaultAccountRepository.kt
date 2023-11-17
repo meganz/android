@@ -260,8 +260,9 @@ internal class DefaultAccountRepository @Inject constructor(
         megaApiGateway.getNumUnreadUserAlerts()
     }
 
-    override suspend fun getSession(): String? =
+    override suspend fun getSession(): String? = withContext(ioDispatcher) {
         localStorageGateway.getUserCredentials()?.session
+    }
 
     override suspend fun retryChatPendingConnections(disconnect: Boolean) =
         withContext(ioDispatcher) {
@@ -568,7 +569,9 @@ internal class DefaultAccountRepository @Inject constructor(
         accountSessionMapper(email, session, myUserHandle)
     }
 
-    override suspend fun getAccountCredentials() = localStorageGateway.getUserCredentials()
+    override suspend fun getAccountCredentials() = withContext(ioDispatcher) {
+        localStorageGateway.getUserCredentials()
+    }
 
     override suspend fun changeEmail(email: String): String = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
