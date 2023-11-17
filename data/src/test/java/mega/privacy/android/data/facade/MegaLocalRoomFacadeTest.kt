@@ -706,11 +706,12 @@ internal class MegaLocalRoomFacadeTest {
             }
             val status = listOf<CameraUploadsRecordUploadStatus>(mock())
             val types = listOf<SyncRecordType>(mock())
+            val folderTypes = listOf<CameraUploadFolderType>(mock())
             whenever(
-                cameraUploadsRecordDao.getCameraUploadsRecordByUploadStatusAndTypes(status, types)
+                cameraUploadsRecordDao.getCameraUploadsRecordsBy(status, types, folderTypes)
             ).thenReturn(entities)
 
-            assertThat(underTest.getCameraUploadsRecordByUploadStatusAndTypes(status, types))
+            assertThat(underTest.getCameraUploadsRecordsBy(status, types, folderTypes))
                 .isEqualTo(expected)
         }
 

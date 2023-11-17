@@ -94,14 +94,19 @@ class CameraUploadsRecordDaoTest {
                 CameraUploadsRecordUploadStatus.FAILED,
             )
             val types = listOf(SyncRecordType.TYPE_PHOTO)
+            val folderTypes = listOf(CameraUploadFolderType.Primary)
             val expected =
-                entities.filter { status.contains(it.uploadStatus) && types.contains(it.fileType) }.size
+                entities.filter {
+                    status.contains(it.uploadStatus)
+                            && types.contains(it.fileType)
+                            && folderTypes.contains(it.folderType)
+                }.size
 
             insertEntities(entities)
 
             assertThat(
                 cameraUploadsRecordDao
-                    .getCameraUploadsRecordByUploadStatusAndTypes(status, types).size,
+                    .getCameraUploadsRecordsBy(status, types, folderTypes).size,
             ).isEqualTo(expected)
         }
 

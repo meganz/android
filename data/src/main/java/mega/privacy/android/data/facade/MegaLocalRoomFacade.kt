@@ -349,13 +349,15 @@ internal class MegaLocalRoomFacade @Inject constructor(
             cameraUploadsRecordModelMapper(it)
         }
 
-    override suspend fun getCameraUploadsRecordByUploadStatusAndTypes(
+    override suspend fun getCameraUploadsRecordsBy(
         uploadStatus: List<CameraUploadsRecordUploadStatus>,
         types: List<SyncRecordType>,
+        folderTypes: List<CameraUploadFolderType>,
     ): List<CameraUploadsRecord> =
-        cameraUploadsRecordDao.getCameraUploadsRecordByUploadStatusAndTypes(
+        cameraUploadsRecordDao.getCameraUploadsRecordsBy(
             uploadStatus,
             types,
+            folderTypes,
         ).map {
             cameraUploadsRecordModelMapper(it)
         }

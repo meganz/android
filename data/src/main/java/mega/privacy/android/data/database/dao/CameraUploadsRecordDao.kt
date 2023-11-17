@@ -5,9 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import mega.privacy.android.data.database.MegaDatabaseConstant
-import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
@@ -21,10 +19,11 @@ internal interface CameraUploadsRecordDao {
     @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_CAMERA_UPLOADS_RECORDS}")
     suspend fun getAllCameraUploadsRecords(): List<CameraUploadsRecordEntity>
 
-    @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_CAMERA_UPLOADS_RECORDS} WHERE upload_status IN (:uploadStatus) AND file_type IN (:types)")
-    suspend fun getCameraUploadsRecordByUploadStatusAndTypes(
+    @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_CAMERA_UPLOADS_RECORDS} WHERE upload_status IN (:uploadStatus) AND file_type IN (:types) AND folder_type IN (:folderTypes)")
+    suspend fun getCameraUploadsRecordsBy(
         uploadStatus: List<CameraUploadsRecordUploadStatus>,
         types: List<SyncRecordType>,
+        folderTypes: List<CameraUploadFolderType>
     ): List<CameraUploadsRecordEntity>
 
 

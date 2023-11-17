@@ -737,15 +737,17 @@ interface CameraUploadRepository {
     suspend fun getAllCameraUploadsRecords(): List<CameraUploadsRecord>
 
     /**
-     * Get the records from the database
+     * Get the records from the database based on given upload status, types and folder types
      *
      * @param uploadStatus a list of upload status to filter the result
      * @param types a list of types (Photos, Videos or both) to filter the result
+     * @param folderTypes a list of folder types (Primary, Secondary or both) to filter the result
      * @return the list of CameraUploadsRecord with matching status
      */
-    suspend fun getCameraUploadsRecordByUploadStatusAndTypes(
+    suspend fun getCameraUploadsRecordsBy(
         uploadStatus: List<CameraUploadsRecordUploadStatus>,
         types: List<SyncRecordType>,
+        folderTypes: List<CameraUploadFolderType>,
     ): List<CameraUploadsRecord>
 
     /**

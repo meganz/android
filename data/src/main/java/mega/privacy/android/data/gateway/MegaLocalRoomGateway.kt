@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -359,11 +358,13 @@ interface MegaLocalRoomGateway {
      *
      * @param uploadStatus a list of upload status to filter the result
      * @param types a list of types (Photos, Videos or both) to filter the result
+     * @param folderTypes a list of folder types (Primary, Secondary or both) to filter the list with
      * @return the list of CameraUploadsRecord with matching status
      */
-    suspend fun getCameraUploadsRecordByUploadStatusAndTypes(
+    suspend fun getCameraUploadsRecordsBy(
         uploadStatus: List<CameraUploadsRecordUploadStatus>,
-        types: List<SyncRecordType>
+        types: List<SyncRecordType>,
+        folderTypes: List<CameraUploadFolderType>
     ): List<CameraUploadsRecord>
 
     /**
