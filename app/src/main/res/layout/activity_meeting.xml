@@ -67,6 +67,15 @@
                         android:textColor="@color/white"
                         android:textSize="12sp"
                         android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/rec_indicator"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="6dp"
+                        android:src="@drawable/rec_indicator_circle"
+                        android:visibility="gone" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.appbar.MaterialToolbar>
