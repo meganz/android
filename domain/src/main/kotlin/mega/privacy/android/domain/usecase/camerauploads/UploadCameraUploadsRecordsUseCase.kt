@@ -381,15 +381,8 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                 record.timestamp,
             )
         )
-    }.retry(60) { cause ->
-        return@retry if (cause is NotEnoughStorageException) {
-            // total delay (1 second times 60 attempts) = 60 seconds
-            delay(TimeUnit.SECONDS.toMillis(1))
-            true
-        } else {
-            // not storage exception, no need to retry
-            false
-        }
+    }.retry(59) { cause ->
+        return@retry (cause is NotEnoughStorageException).also { delay(TimeUnit.SECONDS.toMillis(1)) }
     }.cancellable()
 
     /**

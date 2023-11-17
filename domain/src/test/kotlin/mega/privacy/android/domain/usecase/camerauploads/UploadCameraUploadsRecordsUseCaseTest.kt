@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -167,7 +168,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             CameraUploadFolderType.Secondary -> secondaryUploadNodeId
         }
 
-    private suspend fun executeUnderTest() =
+    private fun executeUnderTest() =
         underTest(
             cameraUploadsRecords,
             primaryUploadNodeId,
@@ -934,11 +935,37 @@ class UploadCameraUploadsRecordsUseCaseTest {
             executeUnderTest().collect()
 
 
-            verify(createTempFileAndRemoveCoordinatesUseCase, times(61)).invoke(
+            verify(createTempFileAndRemoveCoordinatesUseCase, times(60)).invoke(
                 tempRoot,
                 record.filePath,
                 record.tempFilePath,
                 record.timestamp,
+            )
+        }
+
+        @ParameterizedTest(name = "when folder type is {0}")
+        @MethodSource("provideParameters")
+        fun `test that if a temporary file is created and fails with error NotEnoughStorageException, it will emit a NotEnoughStorageException error after 60 attempt`(
+            cameraUploadFolderType: CameraUploadFolderType,
+        ) = runTest {
+            val expected = NotEnoughStorageException()
+            setInput(cameraUploadFolderType)
+            whenever(areLocationTagsEnabledUseCase()).thenReturn(false)
+            whenever(
+                createTempFileAndRemoveCoordinatesUseCase(
+                    tempRoot,
+                    record.filePath,
+                    record.tempFilePath,
+                    record.timestamp
+                )
+            ).thenAnswer { throw expected }
+
+            val event = executeUnderTest().firstOrNull()
+            assertThat(event).isEqualTo(
+                CameraUploadsTransferProgress.Error(
+                    record = record,
+                    error = expected
+                )
             )
         }
 

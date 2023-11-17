@@ -902,9 +902,8 @@ class CameraUploadsWorker @AssistedInject constructor(
             is CameraUploadsTransferProgress.Compressing.Successful,
             -> processCompressingSuccessful()
 
-            is CameraUploadsTransferProgress.Error -> {
-                Timber.e(progressEvent.error)
-            }
+            is CameraUploadsTransferProgress.Error,
+            -> processError(progressEvent.error)
         }
     }
 
@@ -1030,6 +1029,22 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private fun processCompressingSuccessful() {
         cameraUploadsNotificationManagerWrapper.cancelCompressionNotification()
+    }
+
+    /**
+     * Process a progress event of type [CameraUploadsTransferProgress.Error]
+     *
+     * @param error the throwable returned in the progress event
+     */
+    private suspend fun processError(error: Throwable) {
+        when (error) {
+            is NotEnoughStorageException -> {
+                showNotEnoughStorageStatus()
+                endService(error.message ?: "", true)
+            }
+
+            else -> Timber.e(error)
+        }
     }
 
     /**
