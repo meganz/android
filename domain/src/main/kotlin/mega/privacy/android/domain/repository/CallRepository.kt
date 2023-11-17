@@ -377,4 +377,48 @@ interface CallRepository {
         userList: List<Long>,
         all: Boolean,
     ): ChatRequest
+
+    /**
+     * Request high resolution video from a client
+     *
+     * @param chatId Chat id
+     * @param clientId Client id
+     */
+    suspend fun requestHiResVideo(
+        chatId: Long,
+        clientId: Long,
+    ): ChatRequest
+
+    /**
+     * Stop high resolution video from a list of clients
+     *
+     * @param chatId Chat id
+     * @param clientIds List of client ids
+     */
+    suspend fun stopHiResVideo(
+        chatId: Long,
+        clientIds: List<Long>,
+    ): ChatRequest
+
+    /**
+     * Request low resolution video from a list of clients
+     *
+     * @param chatId Chat id
+     * @param clientIds List of client ids
+     */
+    suspend fun requestLowResVideo(
+        chatId: Long,
+        clientIds: List<Long>,
+    ): ChatRequest
+
+    /**
+     * Stop low resolution video from a list of clients
+     *
+     * @param chatId Chat id
+     * @param clientIds List of client ids
+     */
+    suspend fun stopLowResVideo(
+        chatId: Long,
+        clientIds: List<Long>,
+    ): ChatRequest
 }

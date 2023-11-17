@@ -687,6 +687,38 @@ internal class MegaChatApiFacade @Inject constructor(
         chatApi.enableAudioLevelMonitor(enable, chatId, null)
     }
 
+    override fun requestHiResVideo(
+        chatId: Long,
+        clientId: Long,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        chatApi.requestHiResVideo(chatId, clientId, listener)
+    }
+
+    override fun stopHiResVideo(
+        chatId: Long,
+        clientIds: MegaHandleList?,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        chatApi.stopHiResVideo(chatId, clientIds, listener)
+    }
+
+    override fun requestLowResVideo(
+        chatId: Long,
+        clientIds: MegaHandleList?,
+        listener: MegaChatRequestListenerInterface,
+    ) {
+        chatApi.requestLowResVideo(chatId, clientIds, listener)
+    }
+
+    override fun stopLowResVideo(
+        chatId: Long,
+        clientIds: MegaHandleList?,
+        listener: MegaChatRequestListenerInterface,
+    ) {
+        chatApi.stopLowResVideo(chatId, clientIds, listener)
+    }
+
     override fun endChatCall(callId: Long, listener: MegaChatRequestListenerInterface) {
         chatApi.endChatCall(callId, listener)
     }

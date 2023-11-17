@@ -583,4 +583,92 @@ internal class CallRepositoryImpl @Inject constructor(
             continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
+
+    override suspend fun requestHiResVideo(chatId: Long, clientId: Long): ChatRequest =
+        withContext(dispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val callback = continuation.getChatRequestListener(
+                    methodName = "requestHiResVideo",
+                    chatRequestMapper::invoke
+                )
+
+                megaChatApiGateway.requestHiResVideo(
+                    chatId,
+                    clientId,
+                    callback
+                )
+
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(
+                        callback
+                    )
+                }
+            }
+        }
+
+    override suspend fun stopHiResVideo(chatId: Long, clientIds: List<Long>): ChatRequest =
+        withContext(dispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val callback = continuation.getChatRequestListener(
+                    methodName = "stopHiResVideo",
+                    chatRequestMapper::invoke
+                )
+
+                megaChatApiGateway.stopHiResVideo(
+                    chatId,
+                    megaHandleListMapper(clientIds),
+                    callback
+                )
+
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(
+                        callback
+                    )
+                }
+            }
+        }
+
+    override suspend fun requestLowResVideo(chatId: Long, clientIds: List<Long>): ChatRequest =
+        withContext(dispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val callback = continuation.getChatRequestListener(
+                    methodName = "requestLowResVideo",
+                    chatRequestMapper::invoke
+                )
+
+                megaChatApiGateway.requestLowResVideo(
+                    chatId,
+                    megaHandleListMapper(clientIds),
+                    callback
+                )
+
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(
+                        callback
+                    )
+                }
+            }
+        }
+
+    override suspend fun stopLowResVideo(chatId: Long, clientIds: List<Long>): ChatRequest =
+        withContext(dispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val callback = continuation.getChatRequestListener(
+                    methodName = "stopLowResVideo",
+                    chatRequestMapper::invoke
+                )
+
+                megaChatApiGateway.stopLowResVideo(
+                    chatId,
+                    megaHandleListMapper(clientIds),
+                    callback
+                )
+
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(
+                        callback
+                    )
+                }
+            }
+        }
 }

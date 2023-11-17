@@ -20,6 +20,8 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -37,8 +39,6 @@ import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
-import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
-import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.model.InMeetingState
 import mega.privacy.android.app.usecase.call.EndCallUseCase
@@ -57,13 +57,19 @@ import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
+import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.meeting.EnableAudioLevelMonitorUseCase
 import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.RequestHighResolutionVideoUseCase
+import mega.privacy.android.domain.usecase.meeting.RequestLowResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StopHighResolutionVideoUseCase
+import mega.privacy.android.domain.usecase.meeting.StopLowResolutionVideoUseCase
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_CONNECTING
@@ -100,6 +106,11 @@ import javax.inject.Inject
  * @property sendStatisticsMeetingsUseCase      [SendStatisticsMeetingsUseCase]
  * @property enableAudioLevelMonitorUseCase     [EnableAudioLevelMonitorUseCase]
  * @property isAudioLevelMonitorEnabledUseCase  [IsAudioLevelMonitorEnabledUseCase]
+ * @property monitorChatSessionUpdatesUseCase   [MonitorChatSessionUpdatesUseCase]
+ * @property requestHighResolutionVideoUseCase  [RequestHighResolutionVideoUseCase]
+ * @property requestLowResolutionVideoUseCase   [RequestLowResolutionVideoUseCase]
+ * @property stopHighResolutionVideoUseCase     [StopHighResolutionVideoUseCase]
+ * @property stopLowResolutionVideoUseCase      [StopLowResolutionVideoUseCase]
  * @property state                              Current view state as [InMeetingState]
  */
 @HiltViewModel
@@ -119,6 +130,11 @@ class InMeetingViewModel @Inject constructor(
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val enableAudioLevelMonitorUseCase: EnableAudioLevelMonitorUseCase,
     private val isAudioLevelMonitorEnabledUseCase: IsAudioLevelMonitorEnabledUseCase,
+    private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
+    private val requestHighResolutionVideoUseCase: RequestHighResolutionVideoUseCase,
+    private val requestLowResolutionVideoUseCase: RequestLowResolutionVideoUseCase,
+    private val stopHighResolutionVideoUseCase: StopHighResolutionVideoUseCase,
+    private val stopLowResolutionVideoUseCase: StopLowResolutionVideoUseCase,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -181,6 +197,7 @@ class InMeetingViewModel @Inject constructor(
 
     private val _showAssignModeratorBottomPanel = MutableLiveData<Boolean>()
     val showAssignModeratorBottomPanel: LiveData<Boolean> = _showAssignModeratorBottomPanel
+
 
     /**
      * Participant in carousel clicked
@@ -348,6 +365,8 @@ class InMeetingViewModel @Inject constructor(
             )
             .addTo(composite)
 
+        startMonitorChatSessionUpdates()
+
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .observeForever(updateCallObserver)
 
@@ -364,6 +383,25 @@ class InMeetingViewModel @Inject constructor(
             .observeForever(openInviteChangeObserver)
 
     }
+
+    /**
+     * Get chat session updates
+     */
+    private fun startMonitorChatSessionUpdates() =
+        viewModelScope.launch {
+            monitorChatSessionUpdatesUseCase()
+                .filter { it.chatId == currentChatId }
+                .collectLatest { result ->
+                    result.session?.let { session ->
+
+                        session.changes?.apply {
+                            if (contains(ChatSessionChanges.RemoteAvFlags)) {
+                                val isScreenSharing = session.hasScreenShare
+                            }
+                        }
+                    }
+                }
+        }
 
     /**
      * Method to check if only me dialog and the call will end banner should be displayed.
@@ -1890,11 +1928,15 @@ class InMeetingViewModel @Inject constructor(
         session?.let { sessionParticipant ->
             if (!sessionParticipant.canRecvVideoHiRes() && sessionParticipant.isHiResVideo) {
                 Timber.d("Adding HiRes for remote video, clientId ${sessionParticipant.clientid}")
-                inMeetingRepository.requestHiResVideo(
-                    chatId,
-                    sessionParticipant.clientid,
-                    RequestHiResVideoListener(MegaApplication.getInstance().applicationContext)
-                )
+                viewModelScope.launch {
+                    runCatching {
+                        requestHighResolutionVideoUseCase(chatId, sessionParticipant.clientid)
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                    }.onSuccess { request ->
+                        Timber.d("Request high res video: chatId = ${request.chatHandle}, hires? ${request.flag}, clientId = ${request.userHandle}")
+                    }
+                }
             }
         }
     }
@@ -1912,13 +1954,15 @@ class InMeetingViewModel @Inject constructor(
         session?.let { sessionParticipant ->
             if (sessionParticipant.canRecvVideoHiRes()) {
                 Timber.d("Removing HiRes for remote video, clientId ${sessionParticipant.clientid}")
-                val list: MegaHandleList = MegaHandleList.createInstance()
-                list.addMegaHandle(sessionParticipant.clientid)
-                inMeetingRepository.stopHiResVideo(
-                    chatId,
-                    list,
-                    RequestHiResVideoListener(MegaApplication.getInstance().applicationContext)
-                )
+                viewModelScope.launch {
+                    runCatching {
+                        stopHighResolutionVideoUseCase(chatId, sessionParticipant.clientid)
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                    }.onSuccess { request ->
+                        Timber.d("Stop high res video: chatId = ${request.chatHandle}, hires? ${request.flag}, clientId = ${request.userHandle}")
+                    }
+                }
             }
         }
     }
@@ -1936,13 +1980,15 @@ class InMeetingViewModel @Inject constructor(
         session?.let { sessionParticipant ->
             if (!sessionParticipant.canRecvVideoLowRes() && sessionParticipant.isLowResVideo) {
                 Timber.d("Adding LowRes for remote video, clientId ${sessionParticipant.clientid}")
-                val list: MegaHandleList = MegaHandleList.createInstance()
-                list.addMegaHandle(sessionParticipant.clientid)
-                inMeetingRepository.requestLowResVideo(
-                    chatId,
-                    list,
-                    RequestLowResVideoListener(MegaApplication.getInstance().applicationContext)
-                )
+                viewModelScope.launch {
+                    runCatching {
+                        requestLowResolutionVideoUseCase(chatId, sessionParticipant.clientid)
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                    }.onSuccess { request ->
+                        Timber.d("Request low res video: chatId = ${request.chatHandle}, lowRes? ${request.flag}, clientId = ${request.userHandle}")
+                    }
+                }
             }
         }
     }
@@ -1953,20 +1999,22 @@ class InMeetingViewModel @Inject constructor(
      * @param session MegaChatSession of a participant
      * @param chatId Chat ID
      */
-    fun stopLowResVideo(
+    private fun stopLowResVideo(
         session: MegaChatSession?,
         chatId: Long,
     ) {
         session?.let { sessionParticipant ->
             if (sessionParticipant.canRecvVideoLowRes()) {
                 Timber.d("Removing LowRes for remote video, clientId ${sessionParticipant.clientid}")
-                val list: MegaHandleList = MegaHandleList.createInstance()
-                list.addMegaHandle(sessionParticipant.clientid)
-                inMeetingRepository.stopLowResVideo(
-                    chatId,
-                    list,
-                    RequestLowResVideoListener(MegaApplication.getInstance().applicationContext)
-                )
+                viewModelScope.launch {
+                    runCatching {
+                        stopLowResolutionVideoUseCase(chatId, sessionParticipant.clientid)
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                    }.onSuccess { request ->
+                        Timber.d("Stop low res video: chatId = ${request.chatHandle}, lowRes? ${request.flag}, clientId = ${request.userHandle}")
+                    }
+                }
             }
         }
     }

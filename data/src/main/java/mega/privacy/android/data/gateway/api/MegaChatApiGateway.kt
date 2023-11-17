@@ -1230,6 +1230,83 @@ interface MegaChatApiGateway {
     suspend fun enableAudioLevelMonitor(enable: Boolean, chatId: Long)
 
     /**
+     * Request high resolution video from a client
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_REQUEST_HIGH_RES_VIDEO
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getFlag - true -> indicate that request high resolution video
+     * - MegaChatRequest::getUserHandle - Returns the clientId of the user
+     * - MegaChatRequest::getPrivilege - Returns MegaChatCall::CALL_QUALITY_HIGH_DEF
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param clientId MegaChatHandle that identifies client
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun requestHiResVideo(
+        chatId: Long,
+        clientId: Long,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Stop high resolution video from a list of clients
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_REQUEST_HIGH_RES_VIDEO
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getFlag - false -> indicate that stop high resolution video
+     * - MegaChatRequest::getMegaHandleList - Returns the list of clients Ids
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param clientIds List of clients Ids
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun stopHiResVideo(
+        chatId: Long,
+        clientIds: MegaHandleList?,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Request low resolution video from a list of clients
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_REQUEST_LOW_RES_VIDEO
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getFlag - true -> indicate that request low resolution video
+     * - MegaChatRequest::getMegaHandleList - Returns the list of client Ids
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param clientIds List of clients Ids
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun requestLowResVideo(
+        chatId: Long,
+        clientIds: MegaHandleList?,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Stop low resolution video from a list of clients
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_REQUEST_LOW_RES_VIDEO
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getFlag - false -> indicate that stop low resolution video
+     * - MegaChatRequest::getMegaHandleList - Returns the list of clients Ids
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param clientIds List of clients Ids
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun stopLowResVideo(
+        chatId: Long,
+        clientIds: MegaHandleList?,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
      * End a call in a chat room (user must be moderator)
      *
      * The associated request type with this request is MegaChatRequest::TYPE_HANG_CHAT_CALL
