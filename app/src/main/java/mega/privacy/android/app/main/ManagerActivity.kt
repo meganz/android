@@ -83,6 +83,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -303,9 +304,11 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
+import mega.privacy.android.domain.usecase.environment.AfterFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
@@ -454,6 +457,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var syncNavigator: SyncNavigator
+
+    @Inject
+    lateinit var afterFirstLaunchUseCase: AfterFirstLaunchUseCase
+
+    @Inject
+    @ApplicationScope
+    lateinit var appScope: CoroutineScope
 
     //GET PRO ACCOUNT PANEL
     private lateinit var getProLayout: LinearLayout
@@ -2774,7 +2784,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.d("Its first time")
             userInfoViewModel.refreshContactDatabase(true)
             firstTimeAfterInstallation = false
-            dbH.setFirstTime(false)
+            appScope.launch {
+                afterFirstLaunchUseCase()
+            }
         }
         cookieDialogHandler.showDialogIfNeeded(this)
     }

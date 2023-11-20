@@ -94,4 +94,11 @@ interface EnvironmentRepository {
      * @return ip address [String]
      */
     fun getIpAddress(): String?
+
+    /**
+     * Set is first launch
+     *
+     * @param isFirstLaunch
+     */
+    suspend fun setIsFirstLaunch(isFirstLaunch: Boolean)
 }
