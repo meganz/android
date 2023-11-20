@@ -40,18 +40,18 @@ class PasscodeProcessLifecycleOwner private constructor() {
 
     var observer: PasscodeProcessLifeCycleObserver? = null
 
-    private val initializationListener: ReportFragment.ActivityInitializationListener =
-        object : ReportFragment.ActivityInitializationListener {
-            override fun onCreate() {}
+    inner class ActivityInitializationListener(private val activity: Activity) :
+        ReportFragment.ActivityInitializationListener {
+        override fun onCreate() {}
 
-            override fun onStart() {
-                activityStarted(null)
-            }
-
-            override fun onResume() {
-                activityResumed()
-            }
+        override fun onStart() {
+            activityStarted(activity)
         }
+
+        override fun onResume() {
+            activityResumed()
+        }
+    }
 
     companion object {
         private val newInstance = PasscodeProcessLifecycleOwner()
@@ -147,7 +147,11 @@ class PasscodeProcessLifecycleOwner private constructor() {
                 // onActivityPostStarted and onActivityPostResumed callbacks registered in
                 // onActivityPreCreated()
                 if (Build.VERSION.SDK_INT < 29) {
-                    activity.reportFragment.setProcessListener(initializationListener)
+                    activity.reportFragment.setProcessListener(
+                        ActivityInitializationListener(
+                            activity
+                        )
+                    )
                 }
             }
 
