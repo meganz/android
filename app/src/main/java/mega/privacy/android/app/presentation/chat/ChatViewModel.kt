@@ -542,13 +542,11 @@ class ChatViewModel @Inject constructor(
         runCatching {
             openOrStartCallUseCase(chatId = _state.value.chatId, video = video)
         }.onSuccess { call ->
-            call?.apply {
-                chatId.takeIf { it != INVALID_HANDLE }?.let {
-                    Timber.d("Call started")
-                    openCurrentCall(call = this)
-                }
+            call?.let {
+                Timber.d("Call started")
+                openCurrentCall(call = it)
             }
-        }.onFailure { Timber.w("Exception opening or starting call: $it") }
+        }.onFailure { Timber.e("Exception opening or starting call: $it") }
     }
 
     /**

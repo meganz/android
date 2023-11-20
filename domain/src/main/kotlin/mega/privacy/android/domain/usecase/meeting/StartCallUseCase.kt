@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.usecase.meeting
 
 import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.exception.chat.StartCallException
 import mega.privacy.android.domain.repository.CallRepository
+import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
 /**
@@ -9,6 +11,7 @@ import javax.inject.Inject
  */
 class StartCallUseCase @Inject constructor(
     private val callRepository: CallRepository,
+    private val chatRepository: ChatRepository,
 ) {
 
     /**
@@ -18,15 +21,18 @@ class StartCallUseCase @Inject constructor(
      * @param video True if should enable video, false otherwise.
      * @return [ChatCall] if any, null otherwise.
      */
-    suspend operator fun invoke(chatId: Long, video: Boolean) =
-        if (chatId == -1L) {
-            null
+    suspend operator fun invoke(chatId: Long, video: Boolean): ChatCall? =
+        if (chatId == chatRepository.getChatInvalidHandle()) {
+            throw StartCallException(chatId)
         } else {
-            runCatching {
+            val result = runCatching {
                 callRepository.startCallRinging(chatId, video, true)
-            }.fold(
-                onSuccess = { request -> callRepository.getChatCall(request.chatHandle) },
-                onFailure = { null }
-            )
+            }
+
+            if (result.isSuccess) {
+                callRepository.getChatCall(result.getOrNull()?.chatHandle)
+            } else {
+                throw result.exceptionOrNull() ?: StartCallException(chatId)
+            }
         }
 }

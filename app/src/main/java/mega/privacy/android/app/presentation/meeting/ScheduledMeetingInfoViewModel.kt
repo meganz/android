@@ -668,17 +668,20 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun openOrStartChatCall(chatCallId: Long) {
         viewModelScope.launch {
             setChatVideoInDeviceUseCase()
-            openOrStartCallUseCase(chatCallId, video = false)?.let { call ->
-                Timber.d("Call started")
-                MegaApplication.isWaitingForCall = false
-                CallUtil.addChecksForACall(call.chatId, false)
-                if (call.isOutgoing) {
-                    chatManagement.setRequestSentCall(call.callId, true)
-                }
-                passcodeManagement.showPasscodeScreen = true
-                getInstance().openCallService(chatCallId)
-                openChatCall(call.chatId)
-            }
+            runCatching { openOrStartCallUseCase(chatCallId, video = false) }
+                .onSuccess { call ->
+                    call?.let {
+                        Timber.d("Call started")
+                        MegaApplication.isWaitingForCall = false
+                        CallUtil.addChecksForACall(call.chatId, false)
+                        if (call.isOutgoing) {
+                            chatManagement.setRequestSentCall(call.callId, true)
+                        }
+                        passcodeManagement.showPasscodeScreen = true
+                        getInstance().openCallService(chatCallId)
+                        openChatCall(call.chatId)
+                    }
+                }.onFailure { Timber.e("Exception opening or starting call: $it") }
         }
     }
 

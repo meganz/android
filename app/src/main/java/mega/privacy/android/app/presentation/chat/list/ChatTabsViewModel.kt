@@ -247,9 +247,13 @@ class ChatTabsViewModel @Inject constructor(
                                                 ?.let(::openCurrentCall)
                                         }
                                     } else {
-                                        openOrStartCallUseCase(chatId = chatId, video = false)
-                                            ?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
-                                            ?.let(::openCurrentCall)
+                                        runCatching {
+                                            openOrStartCallUseCase(chatId = chatId, video = false)
+                                        }.onSuccess { call ->
+                                            call?.let { openCurrentCall(it) }
+                                        }.onFailure {
+                                            Timber.e("Exception opening or starting call: $it")
+                                        }
                                     }
                                 }
                             }
