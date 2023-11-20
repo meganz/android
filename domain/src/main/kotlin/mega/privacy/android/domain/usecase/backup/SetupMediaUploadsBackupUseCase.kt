@@ -45,9 +45,11 @@ class SetupMediaUploadsBackupUseCase @Inject constructor(
         ).also {
             broadcastBackupInfoTypeUseCase(BackupInfoType.MEDIA_UPLOADS)
         }
-        sendMediaUploadsBackupHeartBeatUseCase(
-            heartbeatStatus = HeartbeatStatus.UNKNOWN,
-            lastNodeHandle = -1
-        )
+        runCatching {
+            sendMediaUploadsBackupHeartBeatUseCase(
+                heartbeatStatus = HeartbeatStatus.UNKNOWN,
+                lastNodeHandle = -1
+            )
+        }
     }
 }

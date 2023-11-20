@@ -102,6 +102,7 @@ import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
+import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
@@ -250,6 +251,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val doesCameraUploadsRecordExistsInTargetNodeUseCase: DoesCameraUploadsRecordExistsInTargetNodeUseCase,
     private val extractGpsCoordinatesUseCase: ExtractGpsCoordinatesUseCase,
     private val uploadCameraUploadsRecordsUseCase: UploadCameraUploadsRecordsUseCase,
+    private val initializeBackupsUseCase: InitializeBackupsUseCase,
     private val fileSystemRepository: FileSystemRepository,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
@@ -558,6 +560,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 && isSecondaryFolderConfigured()
                 && areCameraUploadsSyncHandlesEstablished()
                 && areFoldersCheckedAndEstablished()
+                && isBackupInitialized()
 
     /**
      * Check if the account has enough cloud storage space
@@ -573,8 +576,18 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     private suspend fun areCameraUploadsSyncHandlesEstablished(): Boolean {
-        establishCameraUploadsSyncHandlesUseCase()
-        return true
+        return runCatching {
+            establishCameraUploadsSyncHandlesUseCase()
+        }.onFailure {
+            Timber.e(it)
+        }.isSuccess
+    }
+
+    private suspend fun isBackupInitialized(): Boolean {
+        Timber.d("Setting up Backup")
+        return runCatching { initializeBackupsUseCase() }.onFailure {
+            Timber.e(it)
+        }.isSuccess
     }
 
     private suspend fun areFoldersCheckedAndEstablished(): Boolean {
@@ -893,10 +906,10 @@ class CameraUploadsWorker @AssistedInject constructor(
             is CameraUploadsTransferProgress.Copied,
             -> processCopiedEvent(progressEvent)
 
-            is CameraUploadsTransferProgress.UploadInProgress.TransferUpdate
+            is CameraUploadsTransferProgress.UploadInProgress.TransferUpdate,
             -> processUploadInProgressTransferUpdateEvent(progressEvent)
 
-            is CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError
+            is CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError,
             -> processUploadInProgressTransferTemporaryErrorEvent(progressEvent)
 
             is CameraUploadsTransferProgress.Uploaded,
@@ -925,7 +938,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @param progressEvent
      */
     private suspend fun processToCopyOrUploadEvent(
-        progressEvent: CameraUploadsTransferProgress
+        progressEvent: CameraUploadsTransferProgress,
     ) {
         updateToUploadCount(
             filePath = progressEvent.record.tempFilePath
@@ -947,7 +960,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @param progressEvent
      */
     private suspend fun processCopiedEvent(
-        progressEvent: CameraUploadsTransferProgress.Copied
+        progressEvent: CameraUploadsTransferProgress.Copied,
     ) {
         updateUploadedCountAfterCopy(
             folderType = progressEvent.record.folderType,
@@ -965,7 +978,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @param progressEvent
      */
     private suspend fun processUploadInProgressTransferUpdateEvent(
-        progressEvent: CameraUploadsTransferProgress.UploadInProgress.TransferUpdate
+        progressEvent: CameraUploadsTransferProgress.UploadInProgress.TransferUpdate,
     ) {
         updateUploadedCountAfterTransfer(
             folderType = progressEvent.record.folderType,
@@ -996,7 +1009,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @param progressEvent
      */
     private suspend fun processUploadedEvent(
-        progressEvent: CameraUploadsTransferProgress.Uploaded
+        progressEvent: CameraUploadsTransferProgress.Uploaded,
     ) {
         with(progressEvent.transferEvent) {
             error?.let { handleTransferError(it) }
@@ -1016,7 +1029,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @param progressEvent
      */
     private suspend fun processCompressingProgress(
-        progressEvent: CameraUploadsTransferProgress.Compressing.Progress
+        progressEvent: CameraUploadsTransferProgress.Compressing.Progress,
     ) {
         showVideoCompressionProgress(progressEvent.progress, 1, 1)
     }
