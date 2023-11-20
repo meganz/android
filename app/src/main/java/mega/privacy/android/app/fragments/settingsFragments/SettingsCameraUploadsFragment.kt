@@ -25,14 +25,12 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestMultiple
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.TwoLineCheckPreference
@@ -64,7 +62,6 @@ import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_CAMERA_
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER
 import mega.privacy.android.app.extensions.navigateToAppSettings
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
@@ -560,7 +557,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 if (it.isCameraUploadsEnabled) {
                     handlePrimaryFolderName(it.primaryFolderName)
                 }
-                handleTriggerCameraUploads(it.shouldTriggerCameraUploads)
                 handleMediaPermissionsRationale(it.shouldShowMediaPermissionsRationale)
                 handleAccessMediaLocationPermissionRationale(it.accessMediaLocationRationaleText)
                 handleInvalidFolderSelectedPrompt(it.invalidFolderSelectedTextId)
@@ -880,26 +876,13 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 .setNegativeButton(R.string.general_cancel) { _, _ -> }
                 // Clicking this Button will enable Camera Uploads
                 .setPositiveButton(R.string.general_enable) { _, _ ->
-                    viewModel.setTriggerCameraUploadsState(true)
+                    viewModel.onCameraUploadsEnabled()
                 }
                 .setCancelable(false)
                 // Reset the Business Account Prompt State when the Dialog is dismissed
                 .setOnDismissListener { viewModel.resetBusinessAccountPromptState() }
             businessCameraUploadsAlertDialog = builder.create()
             businessCameraUploadsAlertDialog?.show()
-        }
-    }
-
-    /**
-     * Handle the Camera Uploads trigger when a UI State change happens
-     *
-     * @param shouldTrigger If true, enable Camera Uploads
-     */
-    private fun handleTriggerCameraUploads(shouldTrigger: Boolean) {
-        if (shouldTrigger) {
-            enableCameraUploads()
-            // After enabling Camera Uploads, reset the Trigger Camera Uploads state
-            viewModel.setTriggerCameraUploadsState(false)
         }
     }
 
@@ -1199,29 +1182,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     }
 
     /**
-     * Enables the Camera Uploads functionality
-     */
-    private fun enableCameraUploads() {
-        Timber.d("Camera Uploads Enabled")
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (!getFeatureFlagValueUseCase(AppFeatures.NewCU)) return@launch
-
-            val message = getString(R.string.settings_camera_notif_initializing_title)
-            snackbarCallBack?.showSnackbar(message)
-        }
-
-        viewModel.onCameraUploadsEnabled()
-
-        cameraUploadOnOff?.isChecked = true
-
-        // Configured to prevent Camera Uploads from rapidly being switched on/off.
-        // After setting the Backup, it will be re-enabled
-        cameraUploadOnOff?.isEnabled = false
-        optionLocalCameraFolder?.isEnabled = false
-        megaCameraFolder?.isEnabled = false
-    }
-
-    /**
      * Disable Media Uploads UI-related process
      */
     private fun disableMediaUploadUIProcess() {
@@ -1231,19 +1191,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
 
         localSecondaryFolder?.let { preferenceScreen.removePreference(it) }
         megaSecondaryFolder?.let { preferenceScreen.removePreference(it) }
-    }
-
-    /**
-     * Disable Camera Uploads UI-related process
-     */
-    private fun disableCameraUploadUIProcess() {
-        Timber.d("Camera Uploads Disabled")
-        cameraUploadOnOff?.isChecked = false
-
-        megaCameraFolder?.let { preferenceScreen.removePreference(it) }
-        secondaryMediaFolderOn?.let { preferenceScreen.removePreference(it) }
-
-        disableMediaUploadUIProcess()
     }
 
     /**

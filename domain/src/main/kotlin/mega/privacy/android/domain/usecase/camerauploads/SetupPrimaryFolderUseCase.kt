@@ -28,5 +28,4 @@ class SetupPrimaryFolderUseCase @Inject constructor(
                 setPrimarySyncHandle(it)
             }
     }
-
 }

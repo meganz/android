@@ -45,7 +45,6 @@ data class SettingsCameraUploadsState(
     val secondaryFolderName: String = "",
     val secondaryFolderPath: String = "",
     val shouldShowBusinessAccountPrompt: Boolean = false,
-    val shouldTriggerCameraUploads: Boolean = false,
     val shouldShowMediaPermissionsRationale: Boolean = false,
     val uploadConnectionType: UploadConnectionType? = null,
     val uploadOption: UploadOption? = null,

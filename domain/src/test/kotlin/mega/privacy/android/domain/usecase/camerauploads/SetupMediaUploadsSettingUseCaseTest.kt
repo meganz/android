@@ -4,7 +4,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.backup.SetupMediaUploadsBackupUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -26,14 +25,12 @@ class SetupMediaUploadsSettingUseCaseTest {
     private lateinit var underTest: SetupMediaUploadsSettingUseCase
 
     private val cameraUploadRepository: CameraUploadRepository = mock()
-    private val setupMediaUploadsBackupUseCase: SetupMediaUploadsBackupUseCase = mock()
     private val removeBackupFolderUseCase: RemoveBackupFolderUseCase = mock()
 
     @BeforeAll
     fun setUp() {
         underTest = SetupMediaUploadsSettingUseCase(
             cameraUploadRepository = cameraUploadRepository,
-            setupMediaUploadsBackupUseCase = setupMediaUploadsBackupUseCase,
             removeBackupFolderUseCase = removeBackupFolderUseCase
         )
     }
@@ -42,7 +39,6 @@ class SetupMediaUploadsSettingUseCaseTest {
     fun resetMocks() {
         reset(
             cameraUploadRepository,
-            setupMediaUploadsBackupUseCase,
             removeBackupFolderUseCase
         )
     }
@@ -54,12 +50,10 @@ class SetupMediaUploadsSettingUseCaseTest {
         whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(mediaUploadsName)
         underTest(isEnabled)
         verify(cameraUploadRepository).setSecondaryEnabled(isEnabled)
-        if (isEnabled) {
-            verify(setupMediaUploadsBackupUseCase).invoke(mediaUploadsName)
-            verifyNoInteractions(removeBackupFolderUseCase)
-        } else {
+        if (!isEnabled) {
             verify(removeBackupFolderUseCase).invoke(CameraUploadFolderType.Secondary)
-            verifyNoInteractions(setupMediaUploadsBackupUseCase)
+        } else {
+            verifyNoInteractions(removeBackupFolderUseCase)
         }
     }
 }

@@ -31,8 +31,6 @@ import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
-import mega.privacy.android.domain.usecase.backup.SetupOrUpdateCameraUploadsBackupUseCase
-import mega.privacy.android.domain.usecase.backup.SetupOrUpdateMediaUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
@@ -142,10 +140,6 @@ class SettingsCameraUploadsViewModelTest {
     private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase = mock()
     private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase = mock()
     private val setupCameraUploadsSyncHandleUseCase: SetupCameraUploadsSyncHandleUseCase = mock()
-    private val setupOrUpdateCameraUploadsBackupUseCase: SetupOrUpdateCameraUploadsBackupUseCase =
-        mock()
-    private val setupOrUpdateMediaUploadsBackupUseCase: SetupOrUpdateMediaUploadsBackupUseCase =
-        mock()
     private val broadcastBusinessAccountExpiredUseCase =
         mock<BroadcastBusinessAccountExpiredUseCase>()
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
@@ -213,8 +207,6 @@ class SettingsCameraUploadsViewModelTest {
             setupCameraUploadsSettingUseCase,
             setupMediaUploadsSettingUseCase,
             setupCameraUploadsSyncHandleUseCase,
-            setupOrUpdateCameraUploadsBackupUseCase,
-            setupOrUpdateMediaUploadsBackupUseCase,
             broadcastBusinessAccountExpiredUseCase,
             getPrimarySyncHandleUseCase,
             getNodeByIdUseCase,
@@ -277,8 +269,6 @@ class SettingsCameraUploadsViewModelTest {
             setupMediaUploadsSettingUseCase = setupMediaUploadsSettingUseCase,
             setupCameraUploadsSyncHandleUseCase = setupCameraUploadsSyncHandleUseCase,
             monitorBackupInfoTypeUseCase = mock(),
-            setupOrUpdateCameraUploadsBackupUseCase = setupOrUpdateCameraUploadsBackupUseCase,
-            setupOrUpdateMediaUploadsBackupUseCase = setupOrUpdateMediaUploadsBackupUseCase,
             broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
             monitorCameraUploadsFolderDestinationUseCase = mock(),
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
@@ -338,7 +328,6 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(state.invalidFolderSelectedTextId).isNull()
             assertThat(state.primaryFolderPath).isEqualTo("/path/to/CU")
             assertThat(state.shouldShowBusinessAccountPrompt).isFalse()
-            assertThat(state.shouldTriggerCameraUploads).isFalse()
             assertThat(state.shouldShowMediaPermissionsRationale).isFalse()
             assertThat(state.uploadConnectionType).isEqualTo(UploadConnectionType.WIFI)
             assertThat(state.uploadOption).isEqualTo(UploadOption.PHOTOS_AND_VIDEOS)
@@ -384,19 +373,6 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that shouldTriggerCameraUploads is true when checkEnableCameraUploadsStatus returns CAN_ENABLE_CAMERA_UPLOADS`() =
-        runTest {
-            setupUnderTest()
-
-            handleEnableCameraUploads(status = EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
-
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.shouldTriggerCameraUploads).isTrue()
-            }
-        }
-
-    @Test
     fun `test that shouldShowBusinessAccountPrompt is false when calling resetBusinessAccountPromptState`() =
         runTest {
             setupUnderTest()
@@ -419,20 +395,6 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(awaitItem()).isTrue()
 
             underTest.setCameraUploadsEnabled(false)
-            assertThat(awaitItem()).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that shouldTriggerCameraUploads is updated correctly`() = runTest {
-        setupUnderTest()
-
-        underTest.setTriggerCameraUploadsState(true)
-
-        underTest.state.map { it.shouldTriggerCameraUploads }.distinctUntilChanged().test {
-            assertThat(awaitItem()).isTrue()
-
-            underTest.setTriggerCameraUploadsState(false)
             assertThat(awaitItem()).isFalse()
         }
     }
@@ -628,10 +590,6 @@ class SettingsCameraUploadsViewModelTest {
         verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
         verify(clearCacheDirectory).invoke()
         verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
-        verify(setupOrUpdateCameraUploadsBackupUseCase).invoke(
-            localFolder = testPath,
-            targetNode = null
-        )
         underTest.state.test {
             assertThat(awaitItem().primaryFolderPath).isEqualTo(testPath)
         }
@@ -803,10 +761,6 @@ class SettingsCameraUploadsViewModelTest {
             val mediaUploadsFolderPath = "/path/to/media uploads"
             whenever(isSecondaryFolderPathValidUseCase(mediaUploadsFolderPath)).thenReturn(true)
             underTest.updateMediaUploadsLocalFolder(mediaUploadsFolderPath)
-            verify(setupOrUpdateMediaUploadsBackupUseCase).invoke(
-                localFolder = mediaUploadsFolderPath,
-                targetNode = null
-            )
             verify(setSecondaryFolderLocalPathUseCase).invoke(mediaUploadsFolderPath)
             verify(restoreSecondaryTimestamps).invoke()
             verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)

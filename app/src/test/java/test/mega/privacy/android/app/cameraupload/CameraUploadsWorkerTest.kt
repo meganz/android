@@ -50,6 +50,7 @@ import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
+import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
@@ -216,6 +217,7 @@ class CameraUploadsWorkerTest {
     private val extractGpsCoordinatesUseCase: ExtractGpsCoordinatesUseCase = mock()
     private val uploadCameraUploadsRecordsUseCase: UploadCameraUploadsRecordsUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
+    private val initializeBackupsUseCase: InitializeBackupsUseCase = mock()
 
     @Before
     fun setUp() {
@@ -330,6 +332,7 @@ class CameraUploadsWorkerTest {
             doesCameraUploadsRecordExistsInTargetNodeUseCase = doesCameraUploadsRecordExistsInTargetNodeUseCase,
             extractGpsCoordinatesUseCase = extractGpsCoordinatesUseCase,
             fileSystemRepository = fileSystemRepository,
+            initializeBackupsUseCase = initializeBackupsUseCase
         )
     }
 

@@ -31,8 +31,6 @@ import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.backup.MonitorBackupInfoTypeUseCase
-import mega.privacy.android.domain.usecase.backup.SetupOrUpdateCameraUploadsBackupUseCase
-import mega.privacy.android.domain.usecase.backup.SetupOrUpdateMediaUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
@@ -163,8 +161,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase,
     private val setupCameraUploadsSyncHandleUseCase: SetupCameraUploadsSyncHandleUseCase,
     monitorBackupInfoTypeUseCase: MonitorBackupInfoTypeUseCase,
-    private val setupOrUpdateCameraUploadsBackupUseCase: SetupOrUpdateCameraUploadsBackupUseCase,
-    private val setupOrUpdateMediaUploadsBackupUseCase: SetupOrUpdateMediaUploadsBackupUseCase,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
     monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
@@ -233,10 +229,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * determined by the Use Case [checkEnableCameraUploadsStatus]
      */
     fun handleEnableCameraUploads() = viewModelScope.launch {
+        Timber.d("checkEnableCameraUploadsStatus")
         runCatching { checkEnableCameraUploadsStatus() }.onSuccess { status ->
             when (status) {
                 EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS -> {
-                    _state.update { it.copy(shouldTriggerCameraUploads = true) }
+                    onCameraUploadsEnabled()
                 }
 
                 EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT -> {
@@ -255,13 +252,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun resetBusinessAccountPromptState() =
         _state.update { it.copy(shouldShowBusinessAccountPrompt = false) }
-
-    /**
-     * Sets the value of [SettingsCameraUploadsState.shouldTriggerCameraUploads]
-     * @param updatedValue the updated Boolean value of the parameter
-     */
-    fun setTriggerCameraUploadsState(updatedValue: Boolean) =
-        _state.update { it.copy(shouldTriggerCameraUploads = updatedValue) }
 
     /**
      * If the handle matches the previous primary folder's handle, restore the time stamp from stamps
@@ -540,10 +530,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     }
                     resetTimestampsAndCacheDirectory()
                     clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Primary))
-                    setupOrUpdateCameraUploadsBackupUseCase(
-                        localFolder = newPath,
-                        targetNode = null
-                    )
                     stopCameraUploadsUseCase(shouldReschedule = true)
                     refreshPrimaryFolderPath()
                 } else {
@@ -786,21 +772,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * update Media Uploads Backup
-     * @param mediaUploadsFolderPath
-     */
-    private suspend fun updateMediaUploadsBackup(mediaUploadsFolderPath: String?) {
-        runCatching {
-            setupOrUpdateMediaUploadsBackupUseCase(
-                localFolder = mediaUploadsFolderPath,
-                targetNode = null
-            )
-        }.onFailure {
-            Timber.e(it)
-        }
-    }
-
-    /**
      * on Enable or Disable MediaUpload
      */
     fun onEnableOrDisableMediaUpload() {
@@ -847,8 +818,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     }
                     restoreSecondaryTimestamps()
                     clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Secondary))
-                    // Update Sync when the Secondary Local Folder has changed
-                    updateMediaUploadsBackup(mediaUploadPath)
                     stopCameraUploadsUseCase(shouldReschedule = true)
                     _state.update {
                         it.copy(secondaryFolderPath = mediaUploadPath.orEmpty())

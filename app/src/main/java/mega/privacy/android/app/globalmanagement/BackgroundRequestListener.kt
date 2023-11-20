@@ -15,7 +15,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
-import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
+import mega.privacy.android.domain.usecase.backup.SetupDeviceNameUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
@@ -61,7 +61,7 @@ class BackgroundRequestListener @Inject constructor(
     private val broadcastPushNotificationSettingsUseCase: BroadcastPushNotificationSettingsUseCase,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
-    private val initializeBackupsUseCase: InitializeBackupsUseCase,
+    private val setupDeviceNameUseCase: SetupDeviceNameUseCase,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
     @LoginMutex private val loginMutex: Mutex,
 ) : MegaRequestListenerInterface {
@@ -186,7 +186,7 @@ class BackgroundRequestListener @Inject constructor(
             applicationScope.launch {
                 // Init CU sync data after login successfully
                 runCatching {
-                    initializeBackupsUseCase()
+                    setupDeviceNameUseCase()
                 }.onFailure {
                     Timber.e(it)
                 }
