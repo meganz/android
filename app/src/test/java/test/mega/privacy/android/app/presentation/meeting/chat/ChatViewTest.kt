@@ -145,7 +145,7 @@ class ChatViewTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Moderator,
-                hasACallInThisChat = true,
+                callInThisChat = mock(),
                 isGroup = true,
             )
         )

@@ -160,7 +160,7 @@ class ChatAppBarTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Moderator,
-                hasACallInThisChat = true
+                callInThisChat = mock()
             )
         )
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION, true)
@@ -232,7 +232,7 @@ class ChatAppBarTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Moderator,
-                hasACallInThisChat = true
+                callInThisChat = mock()
             )
         )
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION, true)
@@ -1126,7 +1126,7 @@ class ChatAppBarTest {
             ChatUiState(
                 isGroup = true,
                 myPermission = ChatRoomPermission.Moderator,
-                hasACallInThisChat = true
+                callInThisChat = mock()
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
@@ -1143,7 +1143,7 @@ class ChatAppBarTest {
             ChatUiState(
                 isGroup = true,
                 myPermission = ChatRoomPermission.Moderator,
-                hasACallInThisChat = false
+                callInThisChat = null
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {

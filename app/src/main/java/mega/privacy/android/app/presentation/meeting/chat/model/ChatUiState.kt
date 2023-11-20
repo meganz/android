@@ -4,6 +4,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
@@ -20,7 +21,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property isPreviewMode True if the current logged in user is in a chat link in preview mode (not participating).
  * @property isJoiningOrLeaving True if the current logged in user is joining or leaving this chat, false otherwise.
  * @property currentCall True if the current logged in user is participating in a call, false otherwise.
- * @property hasACallInThisChat True if the current logged in user has a call in this chat, false otherwise.
+ * @property callInThisChat [ChatCall] if the current logged in user has a call in this chat, null otherwise.
  * @property isGroup True if is a chat group, false otherwise.
  * @property storageState [StorageState] of the chat.
  * @property isConnected True if current chat is connected.
@@ -38,6 +39,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property isWaitingRoom True if the scheduled meeting has the waiting room setting enabled, false otherwise.
  * @property infoToShowEvent Event to show some info. Set it to null in case the activity needs to be closed.
  * @property sendingText Text that is being sent.
+ * @property isStartingCall True if it is starting a call, false otherwise.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -50,7 +52,7 @@ data class ChatUiState(
     val isPreviewMode: Boolean = false,
     val isJoiningOrLeaving: Boolean = false,
     val currentCall: Long? = null,
-    val hasACallInThisChat: Boolean = false,
+    val callInThisChat: ChatCall? = null,
     val isGroup: Boolean = false,
     val storageState: StorageState = StorageState.Unknown,
     val isConnected: Boolean = false,
@@ -68,4 +70,11 @@ data class ChatUiState(
     val isWaitingRoom: Boolean = false,
     val infoToShowEvent: StateEventWithContent<InfoToShow?> = consumed(),
     val sendingText: String = "",
-)
+    val isStartingCall: Boolean = false,
+) {
+
+    /**
+     * Has a call in this chat.
+     */
+    fun hasACallInThisChat() = callInThisChat != null
+}

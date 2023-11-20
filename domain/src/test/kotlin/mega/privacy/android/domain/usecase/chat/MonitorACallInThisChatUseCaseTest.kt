@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -23,23 +24,26 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MonitorACallInThisChatUseCaseTest {
+
     private lateinit var underTest: MonitorACallInThisChatUseCase
+
     private val sharedFlow = MutableSharedFlow<ChatCall>()
+
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock {
         on { invoke() } doReturn sharedFlow
     }
-    private val hasACallInThisChatByChatIdUseCase: HasACallInThisChatByChatIdUseCase = mock()
+    private val callRepository = mock<CallRepository>()
 
 
     @BeforeAll
     fun setup() {
         underTest =
-            MonitorACallInThisChatUseCase(monitorChatCallUpdatesUseCase, hasACallInThisChatByChatIdUseCase)
+            MonitorACallInThisChatUseCase(monitorChatCallUpdatesUseCase, callRepository)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(hasACallInThisChatByChatIdUseCase)
+        reset(callRepository)
     }
 
     @ParameterizedTest(name = "returns {0}")
@@ -47,39 +51,41 @@ internal class MonitorACallInThisChatUseCaseTest {
     fun `test that flow emits correct value when HasACallInThisChatByChatIdUseCase`(hasACall: Boolean) =
         runTest {
             val chatId = 1L
-            whenever(hasACallInThisChatByChatIdUseCase(chatId)).thenReturn(hasACall)
-            Truth.assertThat(underTest(chatId).first()).isEqualTo(hasACall)
+            val call = if (hasACall) mock<ChatCall>() else null
+            whenever(callRepository.getChatCall(chatId)).thenReturn(call)
+            Truth.assertThat(underTest(chatId).first()).isEqualTo(call)
         }
 
     @Test
-    fun `test that flow emits true when MonitorChatCallUpdates emit a call with Initial status`() =
+    fun `test that flow emits call when MonitorChatCallUpdates emit a call with Initial status`() =
         runTest {
             val chatId = 1L
-            whenever(hasACallInThisChatByChatIdUseCase(chatId)).thenReturn(false)
+            val call = mock<ChatCall> {
+                on { this.chatId } doReturn chatId
+                on { this.status } doReturn ChatCallStatus.Initial
+            }
+            whenever(callRepository.getChatCall(chatId)).thenReturn(null).thenReturn(call)
             underTest(chatId).test {
-                Truth.assertThat(awaitItem()).isEqualTo(false)
-                val call = mock<ChatCall> {
-                    on { this.chatId } doReturn chatId
-                    on { this.status } doReturn ChatCallStatus.Initial
-                }
+                Truth.assertThat(awaitItem()).isEqualTo(null)
                 sharedFlow.emit(call)
-                Truth.assertThat(awaitItem()).isEqualTo(true)
+                Truth.assertThat(awaitItem()).isEqualTo(call)
             }
         }
 
     @Test
-    fun `test that flow emits false when MonitorChatCallUpdates emit a call with Destroyed status`() =
+    fun `test that flow emits null when MonitorChatCallUpdates emit a call with Destroyed status`() =
         runTest {
             val chatId = 1L
-            whenever(hasACallInThisChatByChatIdUseCase(chatId)).thenReturn(true)
+            val call = mock<ChatCall>()
+            whenever(callRepository.getChatCall(chatId)).thenReturn(call)
             underTest(chatId).test {
-                Truth.assertThat(awaitItem()).isEqualTo(true)
-                val call = mock<ChatCall> {
+                Truth.assertThat(awaitItem()).isEqualTo(call)
+                val newCall = mock<ChatCall> {
                     on { this.chatId } doReturn chatId
                     on { this.status } doReturn ChatCallStatus.Destroyed
                 }
-                sharedFlow.emit(call)
-                Truth.assertThat(awaitItem()).isEqualTo(false)
+                sharedFlow.emit(newCall)
+                Truth.assertThat(awaitItem()).isEqualTo(null)
             }
         }
 }

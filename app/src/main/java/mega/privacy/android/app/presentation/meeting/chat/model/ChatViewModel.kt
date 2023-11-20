@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
+import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
@@ -100,6 +102,8 @@ internal class ChatViewModel @Inject constructor(
     private val archiveChatUseCase: ArchiveChatUseCase,
     private val endCallUseCase: EndCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
+    private val startCallUseCase: StartCallUseCase,
+    private val chatManagement: ChatManagement,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -464,7 +468,7 @@ internal class ChatViewModel @Inject constructor(
             monitorACallInThisChatUseCase(chatId)
                 .catch { Timber.e(it) }
                 .collect {
-                    _state.update { state -> state.copy(hasACallInThisChat = it) }
+                    _state.update { state -> state.copy(callInThisChat = it) }
                 }
         }
     }
@@ -613,6 +617,31 @@ internal class ChatViewModel @Inject constructor(
                     }
             }
         }
+    }
+
+    fun startCall(video: Boolean) {
+        viewModelScope.launch {
+            chatId?.let {
+                runCatching { startCallUseCase(it, video) }
+                    .onSuccess { call ->
+                        call?.let {
+                            chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
+                            chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
+                            passcodeManagement.showPasscodeScreen = true
+                        }
+                        _state.update { state ->
+                            state.copy(callInThisChat = call, isStartingCall = true)
+                        }
+                    }.onFailure { Timber.e("Exception starting call $it") }
+            }
+        }
+    }
+
+    /**
+     * On call started.
+     */
+    fun onCallStarted() {
+        _state.update { state -> state.copy(isStartingCall = false) }
     }
 
     companion object {

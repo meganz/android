@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
@@ -60,6 +62,7 @@ import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
+import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaChatError
@@ -68,8 +71,11 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.NullSource
@@ -80,6 +86,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.util.stream.Stream
@@ -158,6 +165,8 @@ internal class ChatViewModelTest {
     private val endCallUseCase = mock<EndCallUseCase>()
     private val sendStatisticsMeetingsUseCase = mock<SendStatisticsMeetingsUseCase>()
     private val archiveChatUseCase = mock<ArchiveChatUseCase>()
+    private val startCallUseCase = mock<StartCallUseCase>()
+    private val chatManagement = mock<ChatManagement>()
 
     @BeforeAll
     fun setup() {
@@ -191,6 +200,8 @@ internal class ChatViewModelTest {
             endCallUseCase,
             sendStatisticsMeetingsUseCase,
             archiveChatUseCase,
+            startCallUseCase,
+            chatManagement,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -245,7 +256,9 @@ internal class ChatViewModelTest {
             clearChatHistoryUseCase = clearChatHistoryUseCase,
             endCallUseCase = endCallUseCase,
             sendStatisticsMeetingsUseCase = sendStatisticsMeetingsUseCase,
-            archiveChatUseCase = archiveChatUseCase
+            archiveChatUseCase = archiveChatUseCase,
+            startCallUseCase = startCallUseCase,
+            chatManagement = chatManagement,
         )
     }
 
@@ -553,13 +566,14 @@ internal class ChatViewModelTest {
     fun `test that has a call in this chat has correct state if the flow`(
         hasACallInThisChat: Boolean,
     ) = runTest {
-        val flow = MutableSharedFlow<Boolean>()
+        val flow = MutableSharedFlow<ChatCall?>()
+        val call = if (hasACallInThisChat) mock<ChatCall>() else null
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(monitorACallInThisChatUseCase(chatId)).thenReturn(flow)
         initTestClass()
-        flow.emit(hasACallInThisChat)
+        flow.emit(call)
         underTest.state.test {
-            assertThat(awaitItem().hasACallInThisChat).isEqualTo(hasACallInThisChat)
+            assertThat(awaitItem().callInThisChat).isEqualTo(call)
         }
     }
 
@@ -1551,6 +1565,62 @@ internal class ChatViewModelTest {
         }
     }
 
+    @ParameterizedTest(name = " when request success {0} and starts with video {1}")
+    @ArgumentsSource(StartCallArgumentsProvider::class)
+    fun `test that start call finish with success`(
+        success: Boolean,
+        video: Boolean,
+    ) = runTest {
+        val callId = 321L
+        val call = mock<ChatCall> {
+            on { this.chatId } doReturn chatId
+            on { this.callId } doReturn callId
+            on { hasLocalVideo } doReturn video
+            on { isOutgoing } doReturn true
+        }
+
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+
+        if (success) {
+            whenever(startCallUseCase(chatId, video)).thenReturn(call)
+        } else {
+            whenever(startCallUseCase(chatId, video)).thenThrow(RuntimeException())
+        }
+
+        underTest.startCall(video)
+
+        if (success) {
+            verify(chatManagement).setSpeakerStatus(chatId, video)
+            verify(chatManagement).setRequestSentCall(callId, true)
+            verifyNoMoreInteractions(chatManagement)
+            verify(passcodeManagement).showPasscodeScreen = true
+            verifyNoMoreInteractions(passcodeManagement)
+        } else {
+            verifyNoInteractions(chatManagement)
+            verifyNoInteractions(passcodeManagement)
+        }
+
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.callInThisChat).isEqualTo(if (success) call else null)
+            assertThat(actual.isStartingCall).isEqualTo(success)
+        }
+    }
+
+    @Test
+    fun `test that on call started updates is starting call`() = runTest {
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(startCallUseCase(chatId = chatId, false)).thenReturn(mock())
+        underTest.startCall(false)
+        underTest.state.test {
+            assertThat(awaitItem().isStartingCall).isTrue()
+        }
+        underTest.onCallStarted()
+        underTest.state.test {
+            assertThat(awaitItem().isStartingCall).isFalse()
+        }
+    }
+
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown
             && ownPrivilege != ChatRoomPermission.Removed
@@ -1573,4 +1643,16 @@ internal class ChatViewModelTest {
         Arguments.of(ChatRoomChange.Closed, true),
         Arguments.of(ChatRoomChange.Participants, true),
     )
+}
+
+internal class StartCallArgumentsProvider : ArgumentsProvider {
+
+    override fun provideArguments(context: ExtensionContext): Stream<out Arguments>? {
+        return Stream.of(
+            Arguments.of(false, false),
+            Arguments.of(false, true),
+            Arguments.of(true, false),
+            Arguments.of(true, true),
+        )
+    }
 }
