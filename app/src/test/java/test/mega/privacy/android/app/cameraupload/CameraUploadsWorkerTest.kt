@@ -84,8 +84,6 @@ import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBack
 import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
-import mega.privacy.android.domain.usecase.monitoring.StartTracePerformanceUseCase
-import mega.privacy.android.domain.usecase.monitoring.StopTracePerformanceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -205,8 +203,6 @@ class CameraUploadsWorkerTest {
     private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper = mock()
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase =
         mock()
-    private val startTracePerformanceUseCase: StartTracePerformanceUseCase = mock()
-    private val stopTracePerformanceUseCase: StopTracePerformanceUseCase = mock()
     private var isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val processCameraUploadsMediaUseCase: ProcessCameraUploadsMediaUseCase = mock()
     private val getPendingCameraUploadsRecordsUseCase: GetPendingCameraUploadsRecordsUseCase =
@@ -321,8 +317,6 @@ class CameraUploadsWorkerTest {
             cameraUploadsNotificationManagerWrapper = cameraUploadsNotificationManagerWrapper,
             cookieEnabledCheckWrapper = cookieEnabledCheckWrapper,
             broadcastCameraUploadsSettingsActionUseCase = broadcastCameraUploadsSettingsActionUseCase,
-            startTracePerformanceUseCase = startTracePerformanceUseCase,
-            stopTracePerformanceUseCase = stopTracePerformanceUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             loginMutex = mock(),
             processCameraUploadsMediaUseCase = processCameraUploadsMediaUseCase,

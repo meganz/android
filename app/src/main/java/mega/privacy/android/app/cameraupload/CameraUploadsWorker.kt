@@ -137,8 +137,6 @@ import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBack
 import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
-import mega.privacy.android.domain.usecase.monitoring.StartTracePerformanceUseCase
-import mega.privacy.android.domain.usecase.monitoring.StopTracePerformanceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -241,8 +239,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper,
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
-    private val startTracePerformanceUseCase: StartTracePerformanceUseCase,
-    private val stopTracePerformanceUseCase: StopTracePerformanceUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val processCameraUploadsMediaUseCase: ProcessCameraUploadsMediaUseCase,
     private val getPendingCameraUploadsRecordsUseCase: GetPendingCameraUploadsRecordsUseCase,
@@ -260,11 +256,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         private const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 1000
         private const val CONCURRENT_UPLOADS_LIMIT = 16
 
-        private const val PerfUploadFilesTrace = "camera_uploads_upload_files"
-        private const val PerfScanFilesTrace = "camera_uploads_scan_files"
-        private const val PerfCompressVideosTrace = "camera_uploads_compress_videos"
-        private const val PerfUploadCompressedVideosTrace =
-            "camera_uploads_upload_compressed_videos"
         private const val APP_DATA_CU = "CU_UPLOAD"
         private const val INVALID_NON_NULL_VALUE = "-1"
     }
@@ -358,11 +349,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val semaphore = Semaphore(CONCURRENT_UPLOADS_LIMIT)
 
     /**
-     * Flag to check if performance benchmark is enabled
-     */
-    private var performanceEnabled: Boolean = false
-
-    /**
      * Flag to check if upload process with camera uploads records is enabled
      */
     private var useCameraUploadsRecordsEnabled: Boolean = false
@@ -376,8 +362,6 @@ class CameraUploadsWorker @AssistedInject constructor(
             setForegroundAsync(getForegroundInfo())
 
             withContext(ioDispatcher) {
-                performanceEnabled =
-                    getFeatureFlagValueUseCase(DataFeatures.CameraUploadsPerformance)
                 useCameraUploadsRecordsEnabled =
                     getFeatureFlagValueUseCase(DataFeatures.UseCameraUploadsRecords)
                 initService()
@@ -386,41 +370,29 @@ class CameraUploadsWorker @AssistedInject constructor(
                     cameraUploadsNotificationManagerWrapper.cancelNotifications()
 
                     if (useCameraUploadsRecordsEnabled) {
-                        tracePerformance(PerfScanFilesTrace) { scanFiles() }
-                        tracePerformance(PerfUploadFilesTrace) {
-                            val primaryUploadNodeId =
-                                NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
-                            val secondaryUploadNodeId =
-                                NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
+                        scanFiles()
 
-                            getAndPrepareRecords(
+                        val primaryUploadNodeId =
+                            NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
+                        val secondaryUploadNodeId =
+                            NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
+
+                        getAndPrepareRecords(
+                            primaryUploadNodeId,
+                            secondaryUploadNodeId
+                        ).let { records ->
+                            uploadFiles(
+                                records,
                                 primaryUploadNodeId,
-                                secondaryUploadNodeId
-                            ).let { records ->
-                                startHeartbeat()
-                                uploadCameraUploadsRecords(
-                                    records,
-                                    primaryUploadNodeId,
-                                    secondaryUploadNodeId,
-                                    tempRoot
-                                ).flowOn(ioDispatcher)
-                                    .catch { throwable ->
-                                        Timber.w(throwable)
-                                        endService(throwable.message ?: "", aborted = true)
-                                    }
-                                    .collect { progressEvent ->
-                                        launch(ioDispatcher) {
-                                            processProgressEvent(progressEvent)
-                                        }
-                                    }
-                            }
-
+                                secondaryUploadNodeId,
+                                tempRoot
+                            )
                         }
                     } else {
-                        tracePerformance(PerfScanFilesTrace) { checkUploadNodes() }
-                        tracePerformance(PerfUploadFilesTrace) { upload() }
-                        tracePerformance(PerfCompressVideosTrace) { compressVideos() }
-                        tracePerformance(PerfUploadCompressedVideosTrace) { uploadCompressedVideos() }
+                        checkUploadNodes()
+                        upload()
+                        compressVideos()
+                        uploadCompressedVideos()
                     }
                     endService()
                     Result.success()
@@ -433,14 +405,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         } catch (throwable: Throwable) {
             Timber.e(throwable, "Worker cancelled")
             endService(aborted = true)
-            stopTracePerformanceUseCase(
-                listOf(
-                    PerfScanFilesTrace,
-                    PerfUploadFilesTrace,
-                    PerfCompressVideosTrace,
-                    PerfUploadCompressedVideosTrace
-                )
-            )
             Result.failure()
         }
     }
@@ -743,6 +707,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      * Retrieve the files from the media store and insert them in the database
      */
+    //@Karma
     private suspend fun scanFiles() {
         Timber.d("Get Pending Files from Media Store")
         showCheckUploadStatus()
@@ -759,6 +724,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @param secondaryUploadNodeId the secondary target [NodeId]
      * @return the list of pending [CameraUploadsRecord] to upload
      */
+    //@Karma
     private suspend fun getAndPrepareRecords(
         primaryUploadNodeId: NodeId,
         secondaryUploadNodeId: NodeId,
@@ -790,6 +756,41 @@ class CameraUploadsWorker @AssistedInject constructor(
                 getGpsCoordinates(renamedRecordsWithExistenceInTargetNode)
             }
     }
+
+    /**
+     * Upload the [CameraUploadsRecord]
+     * The upload function will trigger a flow that is collected to handle the progress update
+     *
+     * @param records the list of [CameraUploadsRecord] to upload
+     * @param primaryUploadNodeId the primary target [NodeId]
+     * @param secondaryUploadNodeId the secondary target [NodeId]
+     * @param tempRoot the root path of the temporary files
+     */
+    //@Karma
+    private suspend fun uploadFiles(
+        records: List<CameraUploadsRecord>,
+        primaryUploadNodeId: NodeId,
+        secondaryUploadNodeId: NodeId,
+        tempRoot: String
+    ) = coroutineScope {
+        startHeartbeat()
+        uploadCameraUploadsRecords(
+            records,
+            primaryUploadNodeId,
+            secondaryUploadNodeId,
+            tempRoot
+        ).flowOn(ioDispatcher)
+            .catch { throwable ->
+                Timber.e(throwable)
+                endService(throwable.message ?: "", aborted = true)
+            }
+            .collect { progressEvent ->
+                launch(ioDispatcher) {
+                    processProgressEvent(progressEvent)
+                }
+            }
+    }
+
 
     /**
      * Retrieve the pending camera uploads records from the database
@@ -1077,6 +1078,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
 
+    //@Karma
     private suspend fun checkUploadNodes() {
         Timber.d("Get Pending Files from Media Store Database")
         showCheckUploadStatus()
@@ -1101,6 +1103,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         )
     }
 
+    //@Karma
     private suspend fun upload() {
         val finalList = getPendingSyncRecords().also {
             Timber.d("Total File to upload ${it.size}")
@@ -1111,6 +1114,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
+    //@Karma
     private suspend fun compressVideos() {
         if (compressedVideoPending()) {
             startVideoCompression()
@@ -1118,6 +1122,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
+    //@Karma
     private suspend fun uploadCompressedVideos() {
         val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
         if (compressedList.isNotEmpty()) {
@@ -2080,20 +2085,6 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun areTransfersPaused(): Boolean =
         monitorPausedTransfersUseCase().firstOrNull() == true
-
-    /**
-     * Trace performance if feature flag is enabled
-     *
-     * @param traceName
-     * @param block
-     */
-    private suspend fun <T> tracePerformance(traceName: String, block: suspend () -> T) {
-        if (performanceEnabled) {
-            startTracePerformanceUseCase(traceName) {
-                block()
-            }
-        } else block()
-    }
 
     /**
      * Update the timestamp of the last actions

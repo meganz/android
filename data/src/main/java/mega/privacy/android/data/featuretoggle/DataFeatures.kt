@@ -15,13 +15,6 @@ enum class DataFeatures(
     override val description: String,
     private val defaultValue: Boolean,
 ) : Feature {
-    /**
-     * Enable Camera Uploads Performance benchmark
-     */
-    CameraUploadsPerformance(
-        "Enable Camera Uploads Performance benchmark",
-        false
-    ),
 
     /**
      * Use new camera uploads records
