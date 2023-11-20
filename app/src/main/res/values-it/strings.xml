@@ -4957,8 +4957,6 @@
     <string name="album_import_error_access_title">Impossibile accedere all\’album</string>
     <!-- Album import error access description -->
     <string name="album_import_error_access_description">Il link dell\’album è stato rimosso o l\’album è stato eliminato. Contatta la persona che ha condiviso il link con te.</string>
-    <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">OK, capito</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Audio</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -5461,4 +5459,14 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s is presenting</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">This person is screen sharing</string>
+    <!-- Title of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_title">This call is being recorded</string>
+    <!-- Message of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_message">By staying in the call you give permission to be recorded. The recording is only stored on the device of the person who records it.</string>
+    <!-- Label for the positive or confirm button of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_positive_button">OK, capito</string>
+    <!-- Label for the negative or cancel button of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_negative_button">Lascia la chiamata</string>
+    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
+    <string name="meetings_call_recording_consent_dialog_learn_more_option"></string>
 </resources>

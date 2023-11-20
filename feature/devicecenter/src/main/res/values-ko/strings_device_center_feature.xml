@@ -25,7 +25,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
     <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% 업데이트 중...</string>
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
-    <string name="device_center_list_view_item_status_no_camera_uploads">카메라 업로드 없음</string>
+    <string name="device_center_list_view_item_status_no_camera_uploads">No camera uploads</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
     <string name="device_center_list_view_item_status_disabled">해제됨</string>
     <!-- The name of the Device or Folder Status which signifies that it is offline -->
@@ -63,11 +63,11 @@
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_remote_type"></string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
-    <string name="device_center_list_view_item_sub_state_invalid_local_type">파일은 개별적으로 동기화할 수 없습니다. 폴더에서 동기화를 설정하여야 합니다.</string>
+    <string name="device_center_list_view_item_sub_state_invalid_local_type">A file cannot be synced individually. You need to set up the sync from a folder.</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">초기 탐색 실패. 데스크톱 앱에서 동기화 또는 백업을 다시 활성화 해야 합니다.</string>
+    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Initial scan failed. You will need to re-enable your sync or backup from the Desktop app.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="device_center_list_view_item_sub_state_remote_node_not_found">MEGA의 폴더가 이동 되었거나, 삭제 되었거나, 접근 권한이 없어서 찾을 수 없습니다.</string>
+    <string name="device_center_list_view_item_sub_state_remote_node_not_found">Folder in MEGA can’t be located as it’s been moved or deleted, or you might not have access.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota"></string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
@@ -75,13 +75,13 @@
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="device_center_list_view_item_sub_state_foreign_target_overshare"></string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">MEGA에서 폴더가 이동 되어 찾을 수 없습니다.</string>
+    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">Folder in MEGA can’t be located as it’s been moved.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="device_center_list_view_item_sub_state_share_non_full_access">전체 권한 없이 공유된 폴더이기 때문에 폴더를 동기화할 수 없습니다.</string>
+    <string name="device_center_list_view_item_sub_state_share_non_full_access">Folder can’t be synced as it’s a shared folder without full access.</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error">이 폴더의 파일을 동기화 또는 백업할 수 없습니다. 데스크톱 앱에서 동기화 또는 백업을 다시 활성화 해야 합니다.</string>
+    <string name="device_center_list_view_item_sub_state_put_nodes_error">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the Desktop app.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_below_path">동기화된 폴더가 포함되어 있는 폴더이기 때문에 동기화할 수 없습니다.</string>
+    <string name="device_center_list_view_item_sub_state_active_sync_below_path">Folder can’t be synced as it already contains synced folders.</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
     <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported"></string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
@@ -89,17 +89,17 @@
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="device_center_list_view_item_sub_state_unknown_temporary_error"></string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
-    <string name="device_center_list_view_item_sub_state_too_many_action_packets">계정을 다시 불러왔습니다. 백업 또는 동기화에 누락된 변경사항이 적용되지 않습니다.</string>
+    <string name="device_center_list_view_item_sub_state_too_many_action_packets">Account reloaded. Any missed updates to your backups or syncs haven’t been applied.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="device_center_list_view_item_sub_state_logged_out">데스크톱 앱에서 로그아웃한 것으로 나타나서 동기화 또는 백업이 멈추었습니다. 데스크톱 앱에서 다시 로그인하고, 동기화 또는 백업을 재개하세요.</string>
+    <string name="device_center_list_view_item_sub_state_logged_out">Sync or backup has been stopped as you appear to have logged out of the Desktop app. Log back in via the Desktop app, and resume the sync or backup.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="device_center_list_view_item_sub_state_missing_parent_node"></string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
-    <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">외부 드라이브에 있는 폴더를 찾을 수 없습니다.</string>
+    <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">Folder in external drive can’t be located.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_same_path"></string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">이름 변경 실패.</string>
+    <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Renaming failed.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file"></string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
@@ -117,17 +117,17 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database"></string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
-    <string name="device_center_list_view_item_sub_state_insufficient_disk_space">다운로드에 필요한 공간 부족</string>
+    <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Insufficient space for download.</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage"></string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="device_center_list_view_item_sub_state_message_unknown_error">알 수 없는 오류.</string>
+    <string name="device_center_list_view_item_sub_state_message_unknown_error">Unknown error.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="device_center_list_view_item_sub_state_message_something_went_wrong"></string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">MEGA 폴더가 휴지통에 있어서 폴더를 동기화 또는 백업할 수 없습니다.</string>
+    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Folder can’t be synced or backed up as MEGA folder is in the Rubbish bin.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">장치의 폴더를 찾을 수 없습니다, 나중에 다시 시도하세요.</string>
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Folder in your device can’t be located now, try again later.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive"></string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
@@ -135,7 +135,7 @@
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue"></string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">동기화된 폴더 안에 위치한 폴더이기 때문에 동기화할 수 없습니다.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder.</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">카메라 업로드 비활성화됨</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
@@ -147,5 +147,5 @@
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
     <string name="device_center_snackbar_message_rename_device_successful">장치 이름 변경됨</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
-    <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">Maximum 32 characters</string>
+    <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">최대 32자</string>
 </resources>
