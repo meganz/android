@@ -9,24 +9,33 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
@@ -48,6 +57,8 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMess
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
+import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
+import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -80,6 +91,7 @@ internal fun ChatView(
  * @param uiState [ChatUiState]
  * @param onBackPressed Action to perform for back button.
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun ChatView(
     uiState: ChatUiState,
@@ -93,6 +105,7 @@ internal fun ChatView(
     endCallForAll: () -> Unit = {},
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
     var showParticipatingInACallDialog by rememberSaveable { mutableStateOf(false) }
     var showNoContactToAddDialog by rememberSaveable { mutableStateOf(false) }
@@ -115,107 +128,131 @@ internal fun ChatView(
             }
         }
 
-    Scaffold(
-        topBar = {
-            ChatAppBar(
-                uiState = uiState,
-                snackBarHostState = snackBarHostState,
-                onBackPressed = onBackPressed,
-                onMenuActionPressed = onMenuActionPressed,
-                showParticipatingInACallDialog = {
-                    showParticipatingInACallDialog = true
-                },
-                showAllContactsParticipateInChat = {
-                    showAllContactsParticipateInChat = true
-                },
-                showGroupOrContactInfoActivity = {
-                    showGroupOrContactInfoActivity(context, uiState)
-                },
-                showNoContactToAddDialog = {
-                    showNoContactToAddDialog = true
-                },
-                onStartCall = { isVideoCall ->
-                    // start a call here
-                },
-                openAddContactActivity = {
-                    openAddContactActivity(
-                        context = context,
-                        chatId = uiState.chatId,
-                        addContactLauncher = addContactLauncher
-                    )
-                },
-                showClearChatConfirmationDialog = {
-                    showClearChat = true
-                },
-                archiveChat = archiveChat,
-                showEndCallForAllDialog = {
-                    showEndCallForAllDialog = true
-                },
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+    )
+
+    BottomSheet(
+        modalSheetState = modalSheetState,
+        sheetBody = {
+            // place holder sheet
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
             )
         },
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState) { data ->
-                MegaSnackbar(snackbarData = data)
-            }
-        }
-    )
-    { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            item("first_message_header") { FirstMessageHeader(uiState) }
-        }
-
-        if (showParticipatingInACallDialog) {
-            ParticipatingInACallDialog(
-                onDismiss = { showParticipatingInACallDialog = false },
-                onConfirm = {
-                    showParticipatingInACallDialog = false
-                    // return to active call
-                    uiState.currentCall?.let {
-                        enablePasscodeCheck()
-                        startMeetingActivity(context, it)
+    ) {
+        Scaffold(
+            topBar = {
+                ChatAppBar(
+                    uiState = uiState,
+                    snackBarHostState = snackBarHostState,
+                    onBackPressed = onBackPressed,
+                    onMenuActionPressed = onMenuActionPressed,
+                    showParticipatingInACallDialog = {
+                        showParticipatingInACallDialog = true
+                    },
+                    showAllContactsParticipateInChat = {
+                        showAllContactsParticipateInChat = true
+                    },
+                    showGroupOrContactInfoActivity = {
+                        showGroupOrContactInfoActivity(context, uiState)
+                    },
+                    showNoContactToAddDialog = {
+                        showNoContactToAddDialog = true
+                    },
+                    onStartCall = { isVideoCall ->
+                        // start a call here
+                    },
+                    openAddContactActivity = {
+                        openAddContactActivity(
+                            context = context,
+                            chatId = uiState.chatId,
+                            addContactLauncher = addContactLauncher
+                        )
+                    },
+                    showClearChatConfirmationDialog = {
+                        showClearChat = true
+                    },
+                    archiveChat = archiveChat,showEndCallForAllDialog = {
+                        showEndCallForAllDialog = true
+                    },
+                )
+            },
+            snackbarHost = {
+                SnackbarHost(hostState = snackBarHostState) { data ->
+                    MegaSnackbar(snackbarData = data)
+                }
+            },
+            bottomBar = {
+                ChatInputTextToolbar(
+                    onAttachmentClick = {
+                        coroutineScope.launch {
+                            modalSheetState.show()
+                        }
                     }
-                }
-            )
-        }
-
-        if (showNoContactToAddDialog) {
-            NoContactToAddDialog(
-                onDismiss = { showNoContactToAddDialog = false },
-                onConfirm = {
-                    showNoContactToAddDialog = false
-                    context.startActivity(Intent(context, InviteContactActivity::class.java))
-                }
-            )
-        }
-
-        if (showAllContactsParticipateInChat) {
-            AllContactsAddedDialog {
-                showAllContactsParticipateInChat = false
+                )
             }
-        }
+        )
+        { paddingValues ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                item("first_message_header") { FirstMessageHeader(uiState) }
+            }
 
-        if (showClearChat) {
-            ClearChatConfirmationDialog(
-                isMeeting = uiState.isMeeting,
-                onDismiss = { showClearChat = false },
-                onConfirm = {
-                    showClearChat = false
-                    onClearChatHistory()
-                })
-        }
+            if (showParticipatingInACallDialog) {
+                ParticipatingInACallDialog(
+                    onDismiss = { showParticipatingInACallDialog = false },
+                    onConfirm = {
+                        showParticipatingInACallDialog = false
+                        // return to active call
+                        uiState.currentCall?.let {
+                            enablePasscodeCheck()
+                            startMeetingActivity(context, it)
+                        }
+                    }
+                )
+            }
 
-        if (showEndCallForAllDialog) {
-            EndCallForAllDialog(
-                onDismiss = { showEndCallForAllDialog = false },
-                onConfirm = {
-                    showEndCallForAllDialog = false
-                    endCallForAll()
+            if (showNoContactToAddDialog) {
+                NoContactToAddDialog(
+                    onDismiss = { showNoContactToAddDialog = false },
+                    onConfirm = {
+                        showNoContactToAddDialog = false
+                        context.startActivity(Intent(context, InviteContactActivity::class.java))
+                    }
+                )
+            }
+
+            if (showAllContactsParticipateInChat) {
+                AllContactsAddedDialog {
+                    showAllContactsParticipateInChat = false
                 }
-            )
+            }
+
+            if (showClearChat) {
+                ClearChatConfirmationDialog(
+                    isMeeting = uiState.isMeeting,
+                    onDismiss = { showClearChat = false },
+                    onConfirm = {
+                        showClearChat = false
+                        onClearChatHistory()
+                    })
+            }
+
+            if (showEndCallForAllDialog) {
+                EndCallForAllDialog(
+                    onDismiss = { showEndCallForAllDialog = false },
+                    onConfirm = {
+                        showEndCallForAllDialog = false
+                        endCallForAll()
+                    }
+                )
+            }
         }
 
         EventEffect(
