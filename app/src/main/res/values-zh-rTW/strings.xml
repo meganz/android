@@ -243,7 +243,7 @@
     <!-- When the file/folder was last modified -->
     <string name="file_properties_info_last_modified">最後修改</string>
     <!-- Label to display the date and time when a file/folder has been added (uploaded) to MEGA. -->
-    <string name="file_properties_info_added">新增時間</string>
+    <string name="file_properties_info_added">新增於</string>
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
     <string name="file_properties_shared_folder_permissions">權限</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
@@ -2924,7 +2924,7 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">您的隱私</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">我們使用Cookies和類似技術（“Cookies”）來提供並增強您對我們服務的體驗。在您開始到訪時就接受我們所使用的Cookies或在Cookie設定中自訂Cookies選項。您可以在我們的[A]Cookie政策[/A]瞭解更多訊息。</string>
+    <string name="dialog_cookie_alert_message">我們使用Cookies和類似技術（“Cookies”）來提供並增強我們服務的體驗。在您開始到訪時就接受我們所使用的Cookies或在Cookie設定中自訂Cookies選項。閱讀我們的[A]Cookie政策[/A]以瞭解更多資訊。</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie設定未儲存。</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -4531,8 +4531,6 @@
     <string name="album_import_error_access_title">無法存取相簿</string>
     <!-- Album import error access description -->
     <string name="album_import_error_access_description">相簿連結已被移除或相簿已被刪除。請聯繫與您共享連結的人。</string>
-    <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">好的，明白了</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">語音</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4991,4 +4989,14 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s正在展示</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">此人正在螢幕共享</string>
+    <!-- Title of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_title">此通話正在錄音</string>
+    <!-- Message of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_message">留在通話中即表示您同意錄音。錄音內容僅儲存在錄音者的裝置上。</string>
+    <!-- Label for the positive or confirm button of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_positive_button">好的，明白了</string>
+    <!-- Label for the negative or cancel button of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_negative_button">離開通話</string>
+    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
+    <string name="meetings_call_recording_consent_dialog_learn_more_option"></string>
 </resources>

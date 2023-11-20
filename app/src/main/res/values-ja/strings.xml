@@ -4531,8 +4531,6 @@
     <string name="album_import_error_access_title">アルバムにアクセスできません</string>
     <!-- Album import error access description -->
     <string name="album_import_error_access_description">アルバムへのリンクが削除されているか、アルバムが削除されています。リンクを共有した人に連絡してください。</string>
-    <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">はい、わかりました。</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">音声</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4991,4 +4989,14 @@
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$sさんがプレゼン中です</string>
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">この方は画面共有中です</string>
+    <!-- Title of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_title">この通話は録音されています</string>
+    <!-- Message of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_message">通話を続けることで、録音を許可したことになります。録音は、録音した人のデバイスにのみ保存されます。</string>
+    <!-- Label for the positive or confirm button of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_positive_button">はい、わかりました。</string>
+    <!-- Label for the negative or cancel button of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_negative_button">通話から離れる</string>
+    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
+    <string name="meetings_call_recording_consent_dialog_learn_more_option"></string>
 </resources>
