@@ -311,6 +311,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncFragment
+import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.CloudDriveSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
@@ -450,6 +451,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var isFirstLaunchUseCase: IsFirstLaunchUseCase
+
+    @Inject
+    lateinit var syncNavigator: SyncNavigator
 
     //GET PRO ACCOUNT PANEL
     private lateinit var getProLayout: LinearLayout
@@ -1896,6 +1900,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             managerState.chatLinkContent?.let {
                 handleCheckLinkResult(it)
                 viewModel.markHandleCheckLinkResult()
+            }
+
+            if (managerState.androidSyncServiceEnabled) {
+                syncNavigator.startSyncService(this)
+            } else {
+                syncNavigator.stopSyncService(this)
             }
         }
         this.collectFlow(

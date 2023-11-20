@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property moveRequestResult
  * @property message
  * @property chatLinkContent Result of check link request
+ * @property androidSyncServiceEnabled indicates if need to enable android sync service
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -44,4 +45,5 @@ data class ManagerState(
     val moveRequestResult: Result<MoveRequestResult>? = null,
     val message: String? = null,
     val chatLinkContent: Result<ChatLinkContent>? = null,
+    val androidSyncServiceEnabled: Boolean = false
 )

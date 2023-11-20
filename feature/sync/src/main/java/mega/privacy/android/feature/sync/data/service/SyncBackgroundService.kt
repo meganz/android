@@ -1,7 +1,11 @@
 package mega.privacy.android.feature.sync.data.service
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,6 +23,9 @@ import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCount
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
+import android.app.Notification
+import android.graphics.Color
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -63,6 +70,45 @@ internal class SyncBackgroundService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         Timber.d("SyncBackgroundService created")
+        serviceInstance = this
+        startForegroundOnAndroid14()
+    }
+
+    /*
+     * Background Service doesn't work on Android 14, so we have to start it as Foreground Service
+     */
+    private fun startForegroundOnAndroid14() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            createNotificationChannel()
+            startForeground(NOTIFICATION_ID, getNotification())
+        }
+    }
+
+    private fun createNotificationChannel() {
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        if (notificationManager.getNotificationChannel(NOTIFICATION_CHANNEL_SYNC_SERVICE_ID) == null) {
+            val channel = NotificationChannel(
+                NOTIFICATION_CHANNEL_SYNC_SERVICE_ID,
+                NOTIFICATION_CHANNEL_SYNC_SERVICE_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            channel.setShowBadge(false)
+            channel.setSound(null, null)
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun getNotification(): Notification {
+        val builderCompat = NotificationCompat.Builder(
+            applicationContext,
+            NOTIFICATION_CHANNEL_SYNC_SERVICE_ID
+        )
+
+        return builderCompat
+            .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+            .setColor(Color.parseColor("#F30C14")) // the color doesn't have a token yet
+            .setOngoing(true).setContentTitle("Sync monitoring")
+            .build()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -96,7 +142,9 @@ internal class SyncBackgroundService : LifecycleService() {
 
     override fun onDestroy() {
         super.onDestroy()
+        serviceInstance = null
         Timber.d("SyncBackgroundService destroyed")
+        stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
     internal companion object {
@@ -107,5 +155,18 @@ internal class SyncBackgroundService : LifecycleService() {
             val serviceIntent = Intent(context, SyncBackgroundService::class.java)
             context.startService(serviceIntent)
         }
+
+        fun stop(context: Context) {
+            val serviceIntent = Intent(context, SyncBackgroundService::class.java)
+            context.stopService(serviceIntent)
+        }
+
+        fun isRunning() = serviceInstance != null
+
+        private var serviceInstance: SyncBackgroundService? = null
+
+        const val NOTIFICATION_ID = 80
+        const val NOTIFICATION_CHANNEL_SYNC_SERVICE_ID = "SyncServiceNotification"
+        const val NOTIFICATION_CHANNEL_SYNC_SERVICE_NAME = "Background Syncs"
     }
 }

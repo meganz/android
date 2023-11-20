@@ -10,4 +10,6 @@ import android.app.Activity
 interface SyncNavigator {
 
     fun startSyncService(activity: Activity)
+
+    fun stopSyncService(activity: Activity)
 }

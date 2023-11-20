@@ -47,7 +47,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -64,9 +63,6 @@ internal class ManagerDrawerFragment : Fragment() {
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var syncNavigator: SyncNavigator
 
     private val outMetrics: DisplayMetrics by lazy { resources.displayMetrics }
     private lateinit var drawerManager: NavigationDrawerManager
@@ -158,9 +154,6 @@ internal class ManagerDrawerFragment : Fragment() {
                 !uiState.enabledFlags.contains(AppFeatures.DeviceCenter) && uiState.hasBackupsChildren
             setDrawerLayout(uiState.isRootNodeExist && uiState.isConnected)
             binding.navigationDrawerAddPhoneNumberContainer.isVisible = uiState.canVerifyPhoneNumber
-            if (uiState.enabledFlags.contains(AppFeatures.AndroidSync)) {
-                syncNavigator.startSyncService(requireActivity())
-            }
             binding.syncSection.isVisible = uiState.enabledFlags.contains(AppFeatures.AndroidSync)
             binding.deviceCenterSection.isVisible =
                 uiState.enabledFlags.contains(AppFeatures.DeviceCenter)

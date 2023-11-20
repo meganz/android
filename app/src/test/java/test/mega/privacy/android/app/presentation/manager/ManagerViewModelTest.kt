@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -102,7 +103,11 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature.sync.domain.entity.FolderPair
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -271,6 +276,7 @@ class ManagerViewModelTest {
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val chatManagement: ChatManagement = mock()
     private val passcodeManagement: PasscodeManagement = mock()
+    private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -347,7 +353,8 @@ class ManagerViewModelTest {
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             chatManagement = chatManagement,
             passcodeManagement = passcodeManagement,
-            monitorSyncStalledIssuesUseCase = monitorSyncStalledIssuesUseCase
+            monitorSyncStalledIssuesUseCase = monitorSyncStalledIssuesUseCase,
+            monitorSyncsUseCase = monitorSyncsUseCase
         )
     }
 
@@ -1138,5 +1145,52 @@ class ManagerViewModelTest {
                 underTest.markHandleCheckLinkResult()
                 assertThat(awaitItem().chatLinkContent).isNull()
             }
+        }
+
+    @Test
+    fun `test that if Android Sync feature is on and syncs are not empty Sync service is enabled`() =
+        runTest {
+            val mockFolderPair = FolderPair(
+                1L,
+                "folder name",
+                "folder name",
+                RemoteFolder(1L, "folder name"),
+                SyncStatus.SYNCING
+            )
+            whenever(getFeatureFlagValueUseCase(AppFeatures.AndroidSync)).thenReturn(true)
+            whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(mockFolderPair)))
+            testScheduler.advanceUntilIdle()
+            underTest
+                .state
+                .test {
+                    assertThat(awaitItem().androidSyncServiceEnabled).isTrue()
+                }
+        }
+
+    @Test
+    fun `test that if Android Sync feature is on and syncs are empty Sync service is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.AndroidSync)).thenReturn(true)
+            whenever(monitorSyncsUseCase()).thenReturn(flowOf((listOf())))
+            testScheduler.advanceUntilIdle()
+
+            underTest
+                .state
+                .test {
+                    assertThat(awaitItem().androidSyncServiceEnabled).isFalse()
+                }
+        }
+
+    @Test
+    fun `test that if Android Sync feature is off Sync service is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.AndroidSync)).thenReturn(false)
+            testScheduler.advanceUntilIdle()
+
+            underTest
+                .state
+                .test {
+                    assertThat(awaitItem().androidSyncServiceEnabled).isFalse()
+                }
         }
 }

@@ -12,7 +12,7 @@ import javax.inject.Inject
 /**
  * Use case for monitoring syncs
  */
-internal class MonitorSyncsUseCase @Inject constructor(
+class MonitorSyncsUseCase @Inject constructor(
     private val getFolderPairsUseCase: GetFolderPairsUseCase,
     private val syncRepository: SyncRepository,
 ) {

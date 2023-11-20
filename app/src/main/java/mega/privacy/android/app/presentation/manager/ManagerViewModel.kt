@@ -94,6 +94,7 @@ import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompl
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -210,6 +211,7 @@ class ManagerViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val passcodeManagement: PasscodeManagement,
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
+    private val monitorSyncsUseCase: MonitorSyncsUseCase,
 ) : ViewModel() {
 
     /**
@@ -383,6 +385,18 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             monitorSyncStalledIssuesUseCase().collect {
                 _stalledIssuesCount.value = it.size
+            }
+        }
+
+        viewModelScope.launch {
+            val androidSyncEnabled =
+                getFeatureFlagValueUseCase(AppFeatures.AndroidSync)
+
+            if (androidSyncEnabled) {
+                monitorSyncsUseCase().collect { syncFolders ->
+                    val isServiceEnabled = syncFolders.isNotEmpty()
+                    _state.update { it.copy(androidSyncServiceEnabled = isServiceEnabled) }
+                }
             }
         }
     }
