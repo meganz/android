@@ -45,6 +45,20 @@ sealed interface ChatRoomMenuAction : MenuAction {
         override val orderInCategory = 110
     }
 
+    object Mute : MenuActionWithoutIcon(
+        descriptionRes = R.string.general_mute,
+        testTag = TEST_TAG_MUTE_ACTION,
+    ), ChatRoomMenuAction {
+        override val orderInCategory = 150
+    }
+
+    object Unmute : MenuActionWithoutIcon(
+        descriptionRes = R.string.general_unmute,
+        testTag = TEST_TAG_UNMUTE_ACTION,
+    ), ChatRoomMenuAction {
+        override val orderInCategory = 155
+    }
+
     /**
      * Info
      */
@@ -86,16 +100,6 @@ sealed interface ChatRoomMenuAction : MenuAction {
     }
 
     /**
-     * Unmute
-     */
-    object Unmute : MenuActionWithoutIcon(
-        descriptionRes = R.string.general_unmute,
-        testTag = TEST_TAG_UNMUTE_ACTION,
-    ), ChatRoomMenuAction {
-        override val orderInCategory = 155
-    }
-
-    /**
      * Selection mode action.
      * All the actions which may be available in select mode should be defined here.
      */
@@ -128,6 +132,11 @@ sealed interface ChatRoomMenuAction : MenuAction {
 
          */
         const val TEST_TAG_UNMUTE_ACTION = "chat_view:action_unmute"
+
+        /**
+         * Test Tag Mute Action
+         */
+        const val TEST_TAG_MUTE_ACTION = "chat_view:action_mute"
 
         /**
          * Test Tag Clear Action

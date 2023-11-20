@@ -51,6 +51,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContactsAddedDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
+import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EndCallForAllDialog
+import mega.privacy.android.app.presentation.meeting.chat.view.dialog.MutePushNotificationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactToAddDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
@@ -112,7 +114,7 @@ internal fun ChatView(
     var showAllContactsParticipateInChat by rememberSaveable { mutableStateOf(false) }
     var showClearChat by rememberSaveable { mutableStateOf(false) }
     var showEndCallForAllDialog by rememberSaveable { mutableStateOf(false) }
-
+    var showMutePushNotificationDialog by rememberSaveable { mutableStateOf(false) }
     val addContactLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
@@ -175,7 +177,8 @@ internal fun ChatView(
                     showClearChatConfirmationDialog = {
                         showClearChat = true
                     },
-                    archiveChat = archiveChat,showEndCallForAllDialog = {
+                    archiveChat = archiveChat,
+                    showEndCallForAllDialog = {
                         showEndCallForAllDialog = true
                     },
                 )
@@ -215,6 +218,13 @@ internal fun ChatView(
                             startMeetingActivity(context, it)
                         }
                     }
+                )
+            }
+
+            if (showMutePushNotificationDialog) {
+                MutePushNotificationDialog(
+                    onCancel = { showMutePushNotificationDialog = false },
+                    onConfirm = { /* TODO */ }
                 )
             }
 
