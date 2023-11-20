@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -59,7 +58,7 @@ import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatConnectedToInitiateCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -119,7 +118,7 @@ class ContactInfoViewModel @Inject constructor(
     private val monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase,
     private val monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase,
     private val isChatConnectedToInitiateCallUseCase: IsChatConnectedToInitiateCallUseCase,
-    private val openOrStartCall: OpenOrStartCall,
+    private val openOrStartCallUseCase: OpenOrStartCallUseCase,
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -329,16 +328,15 @@ class ContactInfoViewModel @Inject constructor(
      * Starts a call
      *
      * @param hasVideo Start call with video on or off
-     * @param hasAudio Start call with audio on or off
      */
-    fun joinCall(hasVideo: Boolean, hasAudio: Boolean) = viewModelScope.launch {
+    fun joinCall(hasVideo: Boolean) = viewModelScope.launch {
         val chatId = chatId ?: return@launch
         Timber.d("Start call")
         _state.update { it.copy(enableCallLayout = false, shouldInitiateCall = false) }
         MegaApplication.isWaitingForCall = false
         runCatching {
             setChatVideoInDeviceUseCase()
-            openOrStartCall(chatId = chatId, video = hasVideo, audio = hasAudio)
+            openOrStartCallUseCase(chatId = chatId, video = hasVideo)
         }.onSuccess { call ->
             call?.let { chatCall ->
                 Timber.d("Call started")

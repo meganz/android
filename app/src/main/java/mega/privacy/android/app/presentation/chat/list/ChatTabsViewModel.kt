@@ -46,10 +46,9 @@ import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -65,7 +64,7 @@ import javax.inject.Inject
  * @property getLastMessageUseCase                      [GetLastMessageUseCase]
  * @property chatRoomTimestampMapper                    [ChatRoomTimestampMapper]
  * @property startChatCallNoRingingUseCase              [StartChatCallNoRingingUseCase]
- * @property openOrStartCall                            [OpenOrStartCall]
+ * @property openOrStartCallUseCase                     [OpenOrStartCallUseCase]
  * @property answerChatCallUseCase                      [AnswerChatCallUseCase]
  * @property chatManagement                             [ChatManagement]
  * @property passcodeManagement                         [PasscodeManagement]
@@ -90,7 +89,7 @@ class ChatTabsViewModel @Inject constructor(
     private val getLastMessageUseCase: GetLastMessageUseCase,
     private val chatRoomTimestampMapper: ChatRoomTimestampMapper,
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
-    private val openOrStartCall: OpenOrStartCall,
+    private val openOrStartCallUseCase: OpenOrStartCallUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val chatManagement: ChatManagement,
     private val passcodeManagement: PasscodeManagement,
@@ -248,11 +247,8 @@ class ChatTabsViewModel @Inject constructor(
                                                 ?.let(::openCurrentCall)
                                         }
                                     } else {
-                                        openOrStartCall(
-                                            chatId = chatId,
-                                            video = false,
-                                            audio = true
-                                        )?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
+                                        openOrStartCallUseCase(chatId = chatId, video = false)
+                                            ?.takeIf { it.chatId != megaChatApiGateway.getChatInvalidHandle() }
                                             ?.let(::openCurrentCall)
                                     }
                                 }

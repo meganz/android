@@ -32,10 +32,10 @@ import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
@@ -68,7 +68,7 @@ class ChatViewModelTest {
     private val chatManagement: ChatManagement = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase = mock()
-    private val openOrStartCall: OpenOrStartCall = mock()
+    private val openOrStartCallUseCase: OpenOrStartCallUseCase = mock()
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
     private val getChatCall: GetChatCall = mock()
     private val getChatRoom: GetChatRoom = mock()
@@ -121,7 +121,7 @@ class ChatViewModelTest {
             chatManagement = chatManagement,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             startChatCallNoRingingUseCase = startChatCallNoRingingUseCase,
-            openOrStartCall = openOrStartCall,
+            openOrStartCallUseCase = openOrStartCallUseCase,
             getScheduledMeetingByChat = getScheduledMeetingByChat,
             getChatCall = getChatCall,
             getChatRoom = getChatRoom,

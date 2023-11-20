@@ -1044,11 +1044,21 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun verifyPermissionAndJoinCall() {
         val audio = hasPermissions(this, Manifest.permission.RECORD_AUDIO)
+
+        if (!audio) {
+            showSnackbar(
+                Constants.PERMISSIONS_TYPE,
+                getString(R.string.allow_acces_calls_subtitle_microphone),
+                -1
+            )
+            return
+        }
+
         var video = startVideo
         if (video) {
             video = hasPermissions(this, Manifest.permission.CAMERA)
         }
-        viewModel.joinCall(video, audio)
+        viewModel.joinCall(video)
     }
 
     private fun handleOneOffEvents(contactInfoState: ContactInfoState) {

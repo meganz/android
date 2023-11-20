@@ -62,10 +62,10 @@ import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
@@ -120,7 +120,7 @@ class ChatViewModel @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
-    private val openOrStartCall: OpenOrStartCall,
+    private val openOrStartCallUseCase: OpenOrStartCallUseCase,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getChatCall: GetChatCall,
     private val getChatRoom: GetChatRoom,
@@ -540,7 +540,7 @@ class ChatViewModel @Inject constructor(
     private fun startCall(video: Boolean) = viewModelScope.launch {
         Timber.d("Start call")
         runCatching {
-            openOrStartCall(chatId = _state.value.chatId, video = video, audio = true)
+            openOrStartCallUseCase(chatId = _state.value.chatId, video = video)
         }.onSuccess { call ->
             call?.apply {
                 chatId.takeIf { it != INVALID_HANDLE }?.let {

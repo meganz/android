@@ -51,7 +51,7 @@ import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatConnectedToInitiateCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -108,7 +108,7 @@ class ContactInfoViewModelTest {
     private var createShareKey: CreateShareKey = mock()
     private var checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
     private val copyNodesUseCase: CopyNodesUseCase = mock()
-    private var openOrStartCall: OpenOrStartCall = mock()
+    private var openOrStartCallUseCase: OpenOrStartCallUseCase = mock()
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
@@ -183,7 +183,7 @@ class ContactInfoViewModelTest {
             monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,
             monitorChatPresenceLastGreenUpdatesUseCase = monitorChatPresenceLastGreenUpdatesUseCase,
             isChatConnectedToInitiateCallUseCase = isChatConnectedToInitiateCallUseCase,
-            openOrStartCall = openOrStartCall,
+            openOrStartCallUseCase = openOrStartCallUseCase,
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             copyNodesUseCase = copyNodesUseCase,
         )

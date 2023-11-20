@@ -37,7 +37,6 @@ import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
@@ -48,8 +47,9 @@ import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -75,7 +75,7 @@ import javax.inject.Inject
  * @property passcodeManagement                             [PasscodeManagement]
  * @property chatManagement                                 [ChatManagement]
  * @property startConversationUseCase                       [StartConversationUseCase]
- * @property openOrStartCall                                [OpenOrStartCall]
+ * @property openOrStartCallUseCase                         [OpenOrStartCallUseCase]
  * @property monitorScheduledMeetingUpdatesUseCase          [MonitorScheduledMeetingUpdatesUseCase]
  * @property monitorConnectivityUseCase                     [MonitorConnectivityUseCase]
  * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
@@ -104,7 +104,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
     private val startConversationUseCase: StartConversationUseCase,
-    private val openOrStartCall: OpenOrStartCall,
+    private val openOrStartCallUseCase: OpenOrStartCallUseCase,
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -668,7 +668,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun openOrStartChatCall(chatCallId: Long) {
         viewModelScope.launch {
             setChatVideoInDeviceUseCase()
-            openOrStartCall(chatCallId, video = false, audio = true)?.let { call ->
+            openOrStartCallUseCase(chatCallId, video = false)?.let { call ->
                 Timber.d("Call started")
                 MegaApplication.isWaitingForCall = false
                 CallUtil.addChecksForACall(call.chatId, false)

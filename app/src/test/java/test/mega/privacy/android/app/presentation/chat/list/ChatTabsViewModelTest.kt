@@ -30,7 +30,7 @@ import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import org.junit.jupiter.api.AfterAll
@@ -55,7 +55,7 @@ internal class ChatTabsViewModelTest {
     private val getLastMessageUseCase: GetLastMessageUseCase = mock()
     private val chatRoomTimestampMapper: ChatRoomTimestampMapper = mock()
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase = mock()
-    private val openOrStartCall: OpenOrStartCall = mock()
+    private val openOrStartCallUseCase: OpenOrStartCallUseCase = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
     private val chatManagement: ChatManagement = mock()
     private val passcodeManagement: PasscodeManagement = mock()
@@ -95,7 +95,7 @@ internal class ChatTabsViewModelTest {
             getLastMessageUseCase,
             chatRoomTimestampMapper,
             startChatCallNoRingingUseCase,
-            openOrStartCall,
+            openOrStartCallUseCase,
             answerChatCallUseCase,
             chatManagement,
             passcodeManagement,
@@ -122,7 +122,7 @@ internal class ChatTabsViewModelTest {
             getLastMessageUseCase,
             chatRoomTimestampMapper,
             startChatCallNoRingingUseCase,
-            openOrStartCall,
+            openOrStartCallUseCase,
             answerChatCallUseCase,
             chatManagement,
             passcodeManagement,
