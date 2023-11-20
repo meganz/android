@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.data.cryptography.DecryptData2
-import mega.privacy.android.data.cryptography.EncryptData2
+import mega.privacy.android.data.cryptography.DecryptData
+import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import javax.inject.Inject
@@ -24,15 +24,15 @@ internal const val cameraUploadsSettingsPreferenceDataStoreName = "cameraUploads
 internal class CameraUploadsSettingsPreferenceDataStore(
     private val getPreferenceFlow: () -> Flow<Preferences>,
     private val editPreferences: suspend (suspend (MutablePreferences) -> Unit) -> Preferences,
-    private val encryptData: EncryptData2,
-    private val decryptData: DecryptData2,
+    private val encryptData: EncryptData,
+    private val decryptData: DecryptData,
 ) : CameraUploadsSettingsPreferenceGateway {
 
     @Inject
     constructor(
         @Named(cameraUploadsSettingsPreferenceDataStoreName) dataStore: DataStore<Preferences>,
-        encryptData: EncryptData2,
-        decryptData: DecryptData2,
+        encryptData: EncryptData,
+        decryptData: DecryptData,
     ) : this(
         getPreferenceFlow = dataStore::data,
         editPreferences = dataStore::edit,
@@ -42,8 +42,8 @@ internal class CameraUploadsSettingsPreferenceDataStore(
 
     constructor(
         preferences: MutablePreferences,
-        encryptData: EncryptData2,
-        decryptData: DecryptData2,
+        encryptData: EncryptData,
+        decryptData: DecryptData,
     ) : this(
         getPreferenceFlow = { flowOf(preferences) },
         editPreferences = { preferences.apply { it(this) } },

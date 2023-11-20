@@ -11,8 +11,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.cryptography.DecryptData2
-import mega.privacy.android.data.cryptography.EncryptData2
+import mega.privacy.android.data.cryptography.DecryptData
+import mega.privacy.android.data.cryptography.EncryptData
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -29,8 +29,8 @@ import org.mockito.kotlin.verifyBlocking
 internal class CameraUploadsSettingsPreferenceDataStoreTest {
     private lateinit var underTest: CameraUploadsSettingsPreferenceDataStore
 
-    private val encryptData = mock<EncryptData2>()
-    private val decryptData = mock<DecryptData2>()
+    private val encryptData = mock<EncryptData>()
+    private val decryptData = mock<DecryptData>()
     private val preferences = mock<Preferences> {
         on { get<String>(any()) }.thenReturn("encrypted data")
     }
