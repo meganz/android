@@ -106,6 +106,7 @@ dependencies {
     implementation(androidx.room)
     ksp(androidx.room.compiler)
     implementation(google.material)
+    implementation(google.accompanist.permissions)
     implementation(androidx.lifecycle.viewmodel)
     implementation(androidx.lifecycle.runtime.compose)
     implementation(androidx.lifecycle.service)

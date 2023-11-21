@@ -105,7 +105,6 @@ private fun SyncNewFolderScreenContent(
             localFolderSelected(it)
         }
 
-        val context = LocalContext.current
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
@@ -141,7 +140,7 @@ private fun SyncNewFolderScreenContent(
         InputSyncInformationView(
             Modifier.padding(top = 24.dp, start = 16.dp, end = 16.dp, bottom = 48.dp),
             selectDeviceFolderClicked = {
-                if (syncPermissionsManager.isManageExternalStoragePermissionGranted(context)) {
+                if (syncPermissionsManager.isManageExternalStoragePermissionGranted()) {
                     folderPicker.launch(null)
                 } else {
                     launcher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -204,7 +203,7 @@ private fun PreviewSyncNewFolderScreen() {
             folderNameChanged = {},
             selectMegaFolderClicked = {},
             syncClicked = {},
-            syncPermissionsManager = SyncPermissionsManager()
+            syncPermissionsManager = SyncPermissionsManager(LocalContext.current)
         )
     }
 }

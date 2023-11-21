@@ -1,11 +1,9 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
-import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
@@ -25,12 +23,10 @@ internal fun MegaPickerRoute(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
-
     val permissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { _ ->
-        selectCurrentFolder(viewModel, syncPermissionsManager, context)
+        selectCurrentFolder(viewModel, syncPermissionsManager)
     }
 
     state.value.nodes?.let { nodes ->
@@ -39,7 +35,7 @@ internal fun MegaPickerRoute(
             nodes = nodes,
             folderClicked = { viewModel.handleAction(FolderClicked(it)) },
             currentFolderSelected = {
-                selectCurrentFolder(viewModel, syncPermissionsManager, context)
+                selectCurrentFolder(viewModel, syncPermissionsManager)
             },
             fileTypeIconMapper = fileTypeIconMapper
         )
@@ -57,9 +53,7 @@ internal fun MegaPickerRoute(
         AllFilesAccessDialog(
             onConfirm = {
                 permissionsLauncher.launch(
-                    syncPermissionsManager.getManageExternalStoragePermissionIntent(
-                        context
-                    )
+                    syncPermissionsManager.getManageExternalStoragePermissionIntent()
                 )
                 viewModel.handleAction(MegaPickerAction.AllFilesAccessPermissionDialogShown)
             },
@@ -72,9 +66,7 @@ internal fun MegaPickerRoute(
         DisableBatteryOptimizationDialog(
             onConfirm = {
                 permissionsLauncher.launch(
-                    syncPermissionsManager.getDisableBatteryOptimizationsIntent(
-                        context
-                    )
+                    syncPermissionsManager.getDisableBatteryOptimizationsIntent()
                 )
                 viewModel.handleAction(MegaPickerAction.DisableBatteryOptimizationsDialogShown)
             },
@@ -100,14 +92,11 @@ internal fun MegaPickerRoute(
 private fun selectCurrentFolder(
     viewModel: MegaPickerViewModel,
     syncPermissionsManager: SyncPermissionsManager,
-    context: Context,
 ) {
     viewModel.handleAction(
         MegaPickerAction.CurrentFolderSelected(
-            allFilesAccessPermissionGranted = syncPermissionsManager.isManageExternalStoragePermissionGranted(context),
-            disableBatteryOptimizationPermissionGranted = syncPermissionsManager.isDisableBatteryOptimizationGranted(
-                context
-            )
+            allFilesAccessPermissionGranted = syncPermissionsManager.isManageExternalStoragePermissionGranted(),
+            disableBatteryOptimizationPermissionGranted = syncPermissionsManager.isDisableBatteryOptimizationGranted()
         )
     )
 }

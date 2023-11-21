@@ -28,13 +28,11 @@ internal fun SyncNewFolderScreenRoute(
     val context = LocalContext.current
 
     var showAllFilesAccessBanner by remember {
-        mutableStateOf(!syncPermissionsManager.isManageExternalStoragePermissionGranted(context))
+        mutableStateOf(!syncPermissionsManager.isManageExternalStoragePermissionGranted())
     }
     var showDisableBatteryOptimizationsBanner by remember {
         mutableStateOf(
-            !showAllFilesAccessBanner && !syncPermissionsManager.isDisableBatteryOptimizationGranted(
-                context
-            )
+            !showAllFilesAccessBanner && !syncPermissionsManager.isDisableBatteryOptimizationGranted()
         )
     }
 
@@ -42,10 +40,10 @@ internal fun SyncNewFolderScreenRoute(
         ActivityResultContracts.StartActivityForResult()
     ) { _ ->
         showAllFilesAccessBanner =
-            !syncPermissionsManager.isManageExternalStoragePermissionGranted(context)
+            !syncPermissionsManager.isManageExternalStoragePermissionGranted()
         showDisableBatteryOptimizationsBanner =
             !showAllFilesAccessBanner &&
-                    !syncPermissionsManager.isDisableBatteryOptimizationGranted(context)
+                    !syncPermissionsManager.isDisableBatteryOptimizationGranted()
     }
 
     SyncNewFolderScreen(
@@ -58,9 +56,7 @@ internal fun SyncNewFolderScreenRoute(
         showDisableBatteryOptimizationsBanner = showDisableBatteryOptimizationsBanner && state.value.selectedMegaFolder != null,
         batteryOptimizationAllowButtonClicked = {
             permissionsLauncher.launch(
-                syncPermissionsManager.getDisableBatteryOptimizationsIntent(
-                    context
-                )
+                syncPermissionsManager.getDisableBatteryOptimizationsIntent()
             )
         },
         batteryOptimizationLearnMoreButtonClicked = {
@@ -69,9 +65,7 @@ internal fun SyncNewFolderScreenRoute(
         showAllFilesAccessBanner = showAllFilesAccessBanner && state.value.selectedMegaFolder != null,
         allFilesAccessBannerClicked = {
             permissionsLauncher.launch(
-                syncPermissionsManager.getManageExternalStoragePermissionIntent(
-                    context
-                )
+                syncPermissionsManager.getManageExternalStoragePermissionIntent()
             )
         },
         syncClicked = {

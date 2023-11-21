@@ -2,10 +2,8 @@ package mega.privacy.android.feature.sync.ui.synclist
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
@@ -23,12 +21,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.legacy.core.ui.controls.chips.PhotoChip
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -36,6 +34,7 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.model.SyncModalSheetContent
+import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.STALLED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
@@ -44,6 +43,8 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssu
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesRoute
 import mega.privacy.android.feature.sync.ui.views.ConflictDetailsDialog
 import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
+import mega.privacy.android.feature.sync.ui.views.SyncPermissionWarningBanner
+import mega.privacy.android.legacy.core.ui.controls.chips.PhotoChip
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -52,6 +53,7 @@ internal fun SyncListScreen(
     addFolderClicked: () -> Unit,
     actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction) -> Unit,
     snackBarHostState: SnackbarHostState,
+    syncPermissionsManager: SyncPermissionsManager,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -111,9 +113,9 @@ internal fun SyncListScreen(
                 )
             }, content = { paddingValues ->
                 SyncListScreenContent(
-                    Modifier
+                    modifier = Modifier
                         .padding(paddingValues),
-                    stalledIssuesCount,
+                    stalledIssuesCount = stalledIssuesCount,
                     stalledIssuesDetailsClicked = { stalledIssueItem ->
                         sheetContent = SyncModalSheetContent.DetailedInfo(stalledIssueItem)
                         coroutineScope.launch {
@@ -126,7 +128,8 @@ internal fun SyncListScreen(
                             modalSheetState.show()
                         }
                     },
-                    addFolderClicked
+                    addFolderClicked = addFolderClicked,
+                    syncPermissionsManager = syncPermissionsManager
                 )
             },
             snackbarHost = {
@@ -152,12 +155,24 @@ private fun SyncListScreenContent(
     stalledIssuesDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
     addFolderClicked: () -> Unit,
+    syncPermissionsManager: SyncPermissionsManager,
 ) {
     var checkedChip by remember { mutableStateOf(SYNC_FOLDERS) }
 
     Column(modifier) {
-        HeaderChips(checkedChip, stalledIssuesCount, { checkedChip = it })
-        SelectedChipScreen(addFolderClicked, stalledIssuesDetailsClicked, moreClicked, checkedChip)
+        SyncPermissionWarningBanner(
+            syncPermissionsManager = syncPermissionsManager
+        )
+        HeaderChips(
+            selectedChip = checkedChip,
+            stalledIssuesCount = stalledIssuesCount,
+            onChipSelected = { checkedChip = it })
+        SelectedChipScreen(
+            addFolderClicked = addFolderClicked,
+            stalledIssueDetailsClicked = stalledIssuesDetailsClicked,
+            moreClicked = moreClicked,
+            checkedChip = checkedChip
+        )
     }
 }
 
@@ -222,7 +237,8 @@ private fun SyncListScreenPreview() {
             stalledIssuesCount = 3,
             addFolderClicked = {},
             actionSelected = { _, _ -> },
-            snackBarHostState = SnackbarHostState()
+            snackBarHostState = SnackbarHostState(),
+            syncPermissionsManager = SyncPermissionsManager(LocalContext.current)
         )
     }
 }

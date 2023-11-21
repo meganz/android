@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,12 +20,12 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.navigation.syncNavGraph
 import mega.privacy.android.feature.sync.navigation.syncRoute
 import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import javax.inject.Inject
 
 /**
  * Screen for syncing local folder with MEGA
  */
-@OptIn(ExperimentalAnimationApi::class)
 @AndroidEntryPoint
 class SyncFragment : Fragment() {
 
@@ -50,6 +49,9 @@ class SyncFragment : Fragment() {
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
+    @Inject
+    lateinit var syncPermissionsManager: SyncPermissionsManager
+
     private val viewModel by viewModels<SyncViewModel>()
 
     override fun onCreateView(
@@ -71,7 +73,10 @@ class SyncFragment : Fragment() {
                             startDestination = syncRoute,
                         ) {
                             syncNavGraph(
-                                showOnboarding, animatedNavController, fileTypeIconMapper
+                                showOnboardingScreen = showOnboarding,
+                                navController = animatedNavController,
+                                fileTypeIconMapper = fileTypeIconMapper,
+                                syncPermissionsManager = syncPermissionsManager
                             )
                         }
                     }

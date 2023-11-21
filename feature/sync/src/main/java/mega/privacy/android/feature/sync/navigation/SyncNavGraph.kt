@@ -22,7 +22,8 @@ private const val syncList = "sync/list"
 internal fun NavGraphBuilder.syncNavGraph(
     showOnboardingScreen: Boolean,
     navController: NavController,
-    fileTypeIconMapper: FileTypeIconMapper
+    fileTypeIconMapper: FileTypeIconMapper,
+    syncPermissionsManager: SyncPermissionsManager
 ) {
     navigation(
         startDestination = if (showOnboardingScreen) {
@@ -40,7 +41,7 @@ internal fun NavGraphBuilder.syncNavGraph(
         composable(route = syncNewFolderRoute) {
             SyncNewFolderScreenRoute(
                 hiltViewModel(),
-                SyncPermissionsManager(),
+                syncPermissionsManager,
                 openSelectMegaFolderScreen = {
                     navController.navigate(syncMegaPicker)
                 }, openNextScreen = {
@@ -53,7 +54,7 @@ internal fun NavGraphBuilder.syncNavGraph(
         composable(route = syncMegaPicker) {
             MegaPickerRoute(
                 hiltViewModel(),
-                SyncPermissionsManager(),
+                syncPermissionsManager,
                 folderSelected = {
                     navController.popBackStack()
                 }, backClicked = {
@@ -65,6 +66,7 @@ internal fun NavGraphBuilder.syncNavGraph(
         composable(route = syncList) {
             SyncListRoute(
                 hiltViewModel(),
+                syncPermissionsManager,
                 addFolderClicked = {
                     navController.navigate(syncNewFolderRoute)
                 }
