@@ -1,10 +1,7 @@
 package mega.privacy.android.core.ui.controls.dialogs
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -30,7 +26,7 @@ import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.lists.SettingsItemWithRadioButton
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 
@@ -122,12 +118,7 @@ fun <T> ConfirmationDialogWithRadioButtons(
 
 
                 if (!cancelButtonText.isNullOrEmpty() || !confirmButtonText.isNullOrEmpty()) {
-                    Row(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .align(Alignment.End),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
+                    AlertDialogFlowRow {
                         if (!cancelButtonText.isNullOrEmpty()) {
                             TextMegaButton(
                                 text = cancelButtonText,
@@ -163,7 +154,7 @@ private fun ScrollSeparator() = Spacer(
 private fun ConfirmationDialogWithRadioButtonsPreview() {
     val options = listOf("Light", "Dark", "Busy", "System default")
     var selected by remember { mutableStateOf(options[0]) }
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         ConfirmationDialogWithRadioButtons(
             titleText = "Dialog title",
             cancelButtonText = "Cancel",
@@ -187,12 +178,12 @@ private fun ConfirmationDialogWithRadioButtonsWithCancelPreview() {
         "System default",
     )
     var selected by remember { mutableStateOf(options[0]) }
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         ConfirmationDialogWithRadioButtons(
             titleText = "Dialog title",
             subTitleText = "Subtitle",
-            cancelButtonText = "Cancel",
-            confirmButtonText = "OK",
+            cancelButtonText = "Cancel very very long",
+            confirmButtonText = "OK very very really long",
             initialSelectedOption = selected,
             radioOptions = options,
             onOptionSelected = { selected = it },
@@ -213,7 +204,7 @@ private fun ConfirmationDialogWithRadioButtonsWithScrollPreview() {
         "Yet another one",
     )
     var selected by remember { mutableStateOf(options[0]) }
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         ConfirmationDialogWithRadioButtons(
             modifier = Modifier.height(350.dp),
             titleText = "Dialog title",

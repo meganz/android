@@ -1,11 +1,8 @@
 package mega.privacy.android.core.ui.controls.dialogs
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
@@ -23,13 +20,13 @@ import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.preview.PreviewAlertDialogParametersProvider
 import mega.privacy.android.core.ui.controls.preview.PreviewStringParameters
 import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.utils.composeLet
 
 
 /**
- * Alert dialog with a text an a confirmation button with optional title and cancel button
+ * Alert dialog with a text an a confirmation button with optional cancel button
  * Confirm and cancel button will be placed horizontally if there are enough room, vertically if not.
  *
  * @param text main text to be shown
@@ -65,7 +62,7 @@ fun MegaAlertDialog(
 )
 
 /**
- * Alert dialog with a text an a confirmation button with optional title and cancel button
+ * Alert dialog with a text an a confirmation button with optional cancel button
  * Confirm and cancel button will be placed horizontally if there are enough room, vertically if not.
  *
  * @param text main text to be shown
@@ -160,12 +157,7 @@ internal fun BaseMegaAlertDialog(
         text = text,
         onDismissRequest = onDismiss,
         buttons = {
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
+            AlertDialogFlowRow {
                 cancelButtonText?.let {
                     TextMegaButton(
                         modifier = Modifier.testTag(CANCEL_TAG),
@@ -189,16 +181,15 @@ internal fun BaseMegaAlertDialog(
 
 @CombinedThemeRtlPreviews
 @Composable
-private fun BaseMegaAlertDialogPreview(
+private fun MegaAlertDialogPreview(
     @PreviewParameter(PreviewAlertDialogParametersProvider::class) texts: PreviewStringParameters,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews() {
         PreviewBox {
-            ConfirmationDialog(
+            MegaAlertDialog(
                 text = texts.text.getText(),
                 confirmButtonText = texts.confirmButtonText.getText(),
                 cancelButtonText = texts.cancelButtonText?.getText(),
-                title = texts.title?.getText() ?: "title",
                 onConfirm = {},
                 onDismiss = {},
             )

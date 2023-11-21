@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -40,6 +41,16 @@ fun AndroidTheme(
     content: @Composable () -> Unit,
 ) = AndroidTheme(
     isDark = isDark,
+    darkColorTokens = DefaultSemanticTokensDark,
+    lightColorTokens = DefaultSemanticTokensLight,
+    content = content,
+)
+
+@Composable
+internal fun AndroidThemeForPreviews(
+    content: @Composable () -> Unit,
+) = AndroidTheme(
+    isDark = isSystemInDarkTheme(),
     darkColorTokens = DefaultSemanticTokensDark,
     lightColorTokens = DefaultSemanticTokensLight,
     content = content,

@@ -4,7 +4,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.PreviewTextValue
 
-internal class PreviewAlertDialogParametersProvider :
+internal open class PreviewAlertDialogParametersProvider :
     PreviewParameterProvider<PreviewStringParameters> {
     override val values: Sequence<PreviewStringParameters>
         get() = sequenceOf(
@@ -25,4 +25,9 @@ internal class PreviewAlertDialogParametersProvider :
                 cancelButtonText = PreviewTextValue(R.string.cancel),
             )
         )
+}
+
+internal class PreviewStringsParametersProviderWithTitle : PreviewAlertDialogParametersProvider() {
+    override val values: Sequence<PreviewStringParameters>
+        get() = super.values.filter { it.title != null }
 }
