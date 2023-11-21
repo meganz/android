@@ -345,7 +345,6 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
-import org.jetbrains.anko.contentView
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -1071,7 +1070,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun addStartDownloadTransferView() {
-        (this.contentView as? ViewGroup)?.addView(
+        findViewById<ViewGroup>(R.id.root_content_layout).addView(
             createStartDownloadTransferView(
                 this,
                 nodeOptionsDownloadViewModel.state,
