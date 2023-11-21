@@ -163,6 +163,7 @@ import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsDownloadViewModel
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
 import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
@@ -233,6 +234,7 @@ import mega.privacy.android.app.presentation.startconversation.StartConversation
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadTransferView
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
@@ -343,6 +345,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
+import org.jetbrains.anko.contentView
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -384,6 +387,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val transferPageViewModel: TransferPageViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
     private val adsViewModel: AdsViewModel by viewModels()
+    private val nodeOptionsDownloadViewModel: NodeOptionsDownloadViewModel by viewModels()
     private val searchResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -1027,6 +1031,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         Timber.d("Set view")
         setContentView(R.layout.activity_manager)
         initialiseViews()
+        addStartDownloadTransferView()
         setInitialViewProperties()
         setViewListeners()
     }
@@ -1063,6 +1068,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         callInProgressChrono = findViewById(R.id.call_in_progress_chrono)
         callInProgressText = findViewById(R.id.call_in_progress_text)
         navHostView = findViewById(R.id.nav_host_fragment)
+    }
+
+    private fun addStartDownloadTransferView() {
+        (this.contentView as? ViewGroup)?.addView(
+            createStartDownloadTransferView(
+                this,
+                nodeOptionsDownloadViewModel.state,
+                nodeOptionsDownloadViewModel::consumeDownloadEvent
+            )
+        )
     }
 
 

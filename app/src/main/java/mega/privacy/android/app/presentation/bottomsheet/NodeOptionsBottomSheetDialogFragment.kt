@@ -17,12 +17,12 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -102,6 +102,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private val nodeOptionsViewModel: NodeOptionsViewModel by viewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
+    private val nodeOptionsDownloadViewModel: NodeOptionsDownloadViewModel by activityViewModels()
 
     /**
      * onCreateView
@@ -856,13 +857,19 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun onDownloadClicked(node: MegaNode) {
-        (requireActivity() as ManagerActivity).saveNodesToDevice(
-            nodes = listOf(node),
-            highPriority = false,
-            isFolderLink = false,
-            fromMediaViewer = false,
-            fromChat = false
-        )
+        lifecycleScope.launch {
+            if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                nodeOptionsDownloadViewModel.onDownloadClicked(NodeId(node.handle))
+            } else {
+                (requireActivity() as ManagerActivity).saveNodesToDevice(
+                    nodes = listOf(node),
+                    highPriority = false,
+                    isFolderLink = false,
+                    fromMediaViewer = false,
+                    fromChat = false
+                )
+            }
+        }
         setStateBottomSheetBehaviorHidden()
     }
 
@@ -888,7 +895,13 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             refreshView()
             Util.showSnackbar(activity, resources.getString(R.string.file_removed_offline))
         } else {
-            saveForOffline(node)
+            lifecycleScope.launch {
+                if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                    nodeOptionsDownloadViewModel.onSaveOfflineClicked(NodeId(node.handle))
+                } else {
+                    saveForOffline(node)
+                }
+            }
         }
         setStateBottomSheetBehaviorHidden()
     }

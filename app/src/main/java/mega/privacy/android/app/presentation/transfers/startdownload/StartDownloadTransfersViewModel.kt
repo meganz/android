@@ -18,9 +18,11 @@ import mega.privacy.android.app.presentation.transfers.startdownload.model.Start
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
@@ -42,6 +44,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
 
     private var currentInProgressJob: Job? = null
@@ -77,21 +80,47 @@ class StartDownloadTransfersViewModel @Inject constructor(
     }
 
     /**
-     * It starts downloading the node for offline with the appropriate use case
-     * @param nodes the [Node] to be saved offline
+     * It starts downloading the node with the appropriate use case
+     * @param siblingNodeIds the [NodeId]s of the nodes to be download, they must belong to same parent folder
      */
-    fun startDownloadForOffline(nodes: Node) {
+    fun startDownloadNodesWithId(siblingNodeIds: List<NodeId>) {
+        viewModelScope.launch {
+            startDownloadNodes(siblingNodeIds.mapNotNull { getNodeByIdUseCase(it) })
+        }
+    }
+
+    /**
+     * It starts downloading the node for offline with the appropriate use case
+     * @param node the [Node] to be saved offline
+     */
+    fun startDownloadForOffline(node: Node) {
         currentInProgressJob = viewModelScope.launch {
             startDownloadNodes(
-                nodes = listOf(nodes),
+                nodes = listOf(node),
                 getPath = {
-                    getOfflinePathForNodeUseCase(nodes)
+                    getOfflinePathForNodeUseCase(node)
                 },
                 toDoAfterProcessing = {
-                    saveOfflineNodeInformationUseCase(nodes.id)
-                    broadcastOfflineFileAvailabilityUseCase(nodes.id.longValue)
+                    saveOfflineNodeInformationUseCase(node.id)
+                    broadcastOfflineFileAvailabilityUseCase(node.id.longValue)
                 }
             )
+        }
+    }
+
+    /**
+     * It starts downloading the node for offline with the appropriate use case
+     * @param nodeId the [NodeId] of the node to be saved offline
+     */
+    fun startDownloadForOffline(nodeId: NodeId) {
+        viewModelScope.launch {
+            val node = getNodeByIdUseCase(nodeId)
+            if (node == null) {
+                Timber.e("Node with $nodeId must exist")
+                _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
+            } else {
+                startDownloadForOffline(node)
+            }
         }
     }
 

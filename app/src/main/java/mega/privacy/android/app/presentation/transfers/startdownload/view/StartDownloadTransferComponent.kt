@@ -43,8 +43,8 @@ import mega.privacy.android.app.presentation.transfers.view.TransferInProgressDi
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.theme.tokens.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.utils.MinimumTimeVisibility
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
@@ -72,8 +72,16 @@ internal fun StartDownloadTransferComponent(
                     viewModel.startDownloadForOffline(it.node)
                 }
 
+                is TransferTriggerEvent.StartDownloadForOfflineWithId -> {
+                    viewModel.startDownloadForOffline(it.nodeId)
+                }
+
                 is StartDownloadNode -> {
                     viewModel.startDownloadNodes(it.nodes)
+                }
+
+                is TransferTriggerEvent.StartDownloadNodeWithId -> {
+                    viewModel.startDownloadNodesWithId(it.nodeIds)
                 }
             }
         })
@@ -101,7 +109,7 @@ fun createStartDownloadTransferView(
         val downloadEvent by downloadEventState.collectAsStateWithLifecycle(
             (downloadEventState as? StateFlow)?.value ?: consumed()
         )
-        AndroidTheme(isDark = isSystemInDarkTheme()) {
+        MegaAppTheme(isDark = isSystemInDarkTheme()) {
             val snackbarHostState = remember { SnackbarHostState() }
             //if we need this view is because we are not using compose views, so we don't have a scaffold to show snack bars and need to launch a View snackbar
             LaunchedEffect(snackbarHostState.currentSnackbarData) {

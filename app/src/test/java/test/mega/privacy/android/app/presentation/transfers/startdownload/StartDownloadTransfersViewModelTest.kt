@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
@@ -58,6 +59,8 @@ class StartDownloadTransfersViewModelTest {
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val clearActiveTransfersIfFinishedUseCase =
         mock<ClearActiveTransfersIfFinishedUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
     private val parentNode: TypedFolderNode = mock()
@@ -72,7 +75,8 @@ class StartDownloadTransfersViewModelTest {
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
             clearActiveTransfersIfFinishedUseCase,
-            isConnectedToInternetUseCase
+            isConnectedToInternetUseCase,
+            getNodeByIdUseCase,
         )
 
     }
@@ -88,6 +92,7 @@ class StartDownloadTransfersViewModelTest {
             node,
             parentNode,
             clearActiveTransfersIfFinishedUseCase,
+            getNodeByIdUseCase,
         )
     }
 
@@ -105,10 +110,42 @@ class StartDownloadTransfersViewModelTest {
         }
 
     @Test
+    fun `test that getNodeByIdUseCase is invoked when startDownloadNode with id is invoked`() =
+        runTest {
+            stubNodeForDownload()
+            underTest.startDownloadNodesWithId(listOf(nodeId))
+            verify(getNodeByIdUseCase).invoke(nodeId)
+        }
+
+    @Test
+    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startDownloadNode with id is invoked`() =
+        runTest {
+            stubNodeForDownload()
+            underTest.startDownloadNodesWithId(listOf(nodeId))
+            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
+        }
+
+    @Test
     fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startDownloadForOffline is invoked`() =
         runTest {
             stubNodeForDownload()
             underTest.startDownloadForOffline(node)
+            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
+        }
+
+    @Test
+    fun `test that getNodeByIdUseCase is invoked when startDownloadForOffline with id is invoked`() =
+        runTest {
+            stubNodeForDownload()
+            underTest.startDownloadForOffline(nodeId)
+            verify(getNodeByIdUseCase).invoke(nodeId)
+        }
+
+    @Test
+    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startDownloadForOffline with id is invoked`() =
+        runTest {
+            stubNodeForDownload()
+            underTest.startDownloadForOffline(nodeId)
             verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
         }
 
@@ -121,11 +158,28 @@ class StartDownloadTransfersViewModelTest {
         }
 
     @Test
+    fun `test that start download use case is invoked with correct parameters when startDownloadNode with id is invoked`() =
+        runTest {
+            stubNodeForDownload()
+            underTest.startDownloadNodesWithId(listOf(nodeId))
+            verify(startDownloadUseCase).invoke(nodes, destination, null, false)
+        }
+
+    @Test
     fun `test that start download use case is invoked with correct parameters when startDownloadForOffline is invoked`() =
         runTest {
             stubNodeForDownload()
             whenever(getOfflinePathForNodeUseCase(any())).thenReturn(destination)
             underTest.startDownloadForOffline(node)
+            verify(startDownloadUseCase).invoke(listOf(node), destination, null, false)
+        }
+
+    @Test
+    fun `test that start download use case is invoked with correct parameters when startDownloadForOffline with Id is invoked`() =
+        runTest {
+            stubNodeForDownload()
+            whenever(getOfflinePathForNodeUseCase(any())).thenReturn(destination)
+            underTest.startDownloadForOffline(nodeId)
             verify(startDownloadUseCase).invoke(listOf(node), destination, null, false)
         }
 
@@ -212,6 +266,7 @@ class StartDownloadTransfersViewModelTest {
         whenever(getDownloadLocationForNodeUseCase(node)).thenReturn(destination)
 
         whenever(isConnectedToInternetUseCase()).thenReturn(internetConnection)
+        whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
     }
 
     private fun stubStartDownload(flow: Flow<DownloadNodesEvent>) {

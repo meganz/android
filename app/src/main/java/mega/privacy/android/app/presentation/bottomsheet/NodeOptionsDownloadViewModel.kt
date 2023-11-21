@@ -1,0 +1,87 @@
+package mega.privacy.android.app.presentation.bottomsheet
+
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import javax.inject.Inject
+
+/**
+ * View model to be shared by [NodeOptionsBottomSheetDialogFragment] and its caller to receive download events through a state flow instead of of directly calling legacy download methods
+ * Once [NodeOptionsBottomSheetDialogFragment] is migrated to compose this view model should be removed and the state added to the corresponding view model (the same state that will trigger the event to show the bottom sheet).
+ */
+@HiltViewModel
+class NodeOptionsDownloadViewModel @Inject constructor(
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+) : ViewModel() {
+
+    private val _state = MutableStateFlow<StateEventWithContent<TransferTriggerEvent>>(consumed())
+
+    /**
+     * State flow that emits [TransferTriggerEvent]s
+     */
+    val state = _state.asStateFlow()
+
+    /**
+     * DownloadsWorker is still under feature flag, so this method should be used to check the usage of this view model
+     * This should be removed once the feature flag is removed
+     */
+    suspend fun shouldDownloadWithDownloadWorker() =
+        getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)
+
+    /**
+     * Triggers the event related to download a node with [nodeId]
+     * @param nodeId
+     */
+    fun onDownloadClicked(nodeId: NodeId) {
+        _state.update {
+            triggered(TransferTriggerEvent.StartDownloadNodeWithId(listOf(nodeId)))
+        }
+    }
+
+    /**
+     * Triggers the event related to download a node
+     * @param node
+     */
+    fun onDownloadClicked(node: Node) {
+        _state.update {
+            triggered(TransferTriggerEvent.StartDownloadNode(listOf(node)))
+        }
+    }
+
+    /**
+     * Triggers the event related to save offline a node with [nodeId]
+     * @param nodeId
+     */
+    fun onSaveOfflineClicked(nodeId: NodeId) {
+        _state.update {
+            triggered(TransferTriggerEvent.StartDownloadForOfflineWithId(nodeId))
+        }
+    }
+
+    /**
+     * Triggers the event related to save offline a node
+     * @param node
+     */
+    fun onSaveOfflineClicked(node: Node) {
+        _state.update {
+            triggered(TransferTriggerEvent.StartDownloadForOffline(node))
+        }
+    }
+
+    /**
+     * consume the event once it's processed by the view
+     */
+    fun consumeDownloadEvent() {
+        _state.update { consumed() }
+    }
+}
