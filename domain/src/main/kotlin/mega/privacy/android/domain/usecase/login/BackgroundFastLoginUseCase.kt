@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.security.LoginRepository
@@ -32,17 +31,23 @@ class BackgroundFastLoginUseCase @Inject constructor(
      *
      */
     suspend operator fun invoke(): String {
-        loginMutex.withLock {
-            val session =
-                getSessionUseCase() ?: throw SessionNotRetrievedException()
-            if (!getRootNodeExistsUseCase()) {
-                initialiseMegaChatUseCase(session)
-                loginRepository.fastLogin(session)
-                loginRepository.fetchNodes()
-                // return new session
-                return getSessionUseCase().orEmpty()
-            }
-            return session
+        loginMutex.lock()
+
+        val session =
+            getSessionUseCase() ?: throw SessionNotRetrievedException()
+
+        if (!getRootNodeExistsUseCase()) {
+            initialiseMegaChatUseCase(session)
+            loginRepository.fastLogin(session)
+            loginRepository.fetchNodes()
+            // return new session
+            runCatching { loginMutex.unlock() }
+            return getSessionUseCase().orEmpty()
         }
+
+        runCatching { loginMutex.unlock() }
+
+        return session
+
     }
 }

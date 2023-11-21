@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.security.LoginRepository
 import javax.inject.Inject
@@ -32,10 +31,10 @@ class CompleteFastLoginUseCase @Inject constructor(
      * @param session Account session.
      */
     suspend operator fun invoke(session: String) {
-        loginMutex.withLock {
-            initialiseMegaChatUseCase(session)
-            loginRepository.fastLogin(session)
-            loginRepository.fetchNodes()
-        }
+        loginMutex.lock()
+        initialiseMegaChatUseCase(session)
+        loginRepository.fastLogin(session)
+        loginRepository.fetchNodes()
+        runCatching { loginMutex.unlock() }
     }
 }
