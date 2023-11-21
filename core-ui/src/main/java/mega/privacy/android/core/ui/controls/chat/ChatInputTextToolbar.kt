@@ -8,6 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -26,16 +31,36 @@ internal const val TEST_TAG_ATTACHMENT_ICON = "chat_input_text_toolbar:attachmen
  * @param onAttachmentClick click listener for attachment icon
  */
 @Composable
-fun ChatInputTextToolbar(modifier: Modifier = Modifier, onAttachmentClick: () -> Unit) {
-    Row(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
+fun ChatInputTextToolbar(
+    text: String,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    onAttachmentClick: () -> Unit,
+) {
+    var input by rememberSaveable(text) {
+        mutableStateOf(text)
+    }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Icon(
             modifier = Modifier
                 .size(24.dp)
+                .padding(end = 8.dp)
                 .testTag(TEST_TAG_ATTACHMENT_ICON)
                 .clickable(onClick = onAttachmentClick),
             painter = painterResource(id = R.drawable.ic_plus),
             contentDescription = "Attachment icon",
             tint = MegaTheme.colors.icon.secondary,
+        )
+
+        ChatTextField(
+            text = input,
+            placeholder = placeholder,
+            onTextChange = { input = it },
         )
     }
 }
@@ -44,6 +69,6 @@ fun ChatInputTextToolbar(modifier: Modifier = Modifier, onAttachmentClick: () ->
 @Composable
 private fun ChatInputTextToolbarPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        ChatInputTextToolbar {}
+        ChatInputTextToolbar("", "Message") {}
     }
 }

@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property allContactsParticipateInChat True if all contacts participate in this chat, false otherwise.
  * @property isWaitingRoom True if the scheduled meeting has the waiting room setting enabled, false otherwise.
  * @property infoToShowEvent Event to show some info. Set it to null in case the activity needs to be closed.
+ * @property sendingText Text that is being sent.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -66,4 +67,5 @@ data class ChatUiState(
     val allContactsParticipateInChat: Boolean = false,
     val isWaitingRoom: Boolean = false,
     val infoToShowEvent: StateEventWithContent<InfoToShow?> = consumed(),
+    val sendingText: String = "",
 )

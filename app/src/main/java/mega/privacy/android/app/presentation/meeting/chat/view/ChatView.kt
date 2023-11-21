@@ -30,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -194,7 +195,12 @@ internal fun ChatView(
                         coroutineScope.launch {
                             modalSheetState.show()
                         }
-                    }
+                    },
+                    text = uiState.sendingText,
+                    placeholder = stringResource(
+                        R.string.type_message_hint_with_customized_title,
+                        uiState.title.orEmpty()
+                    ),
                 )
             }
         )
