@@ -37,7 +37,7 @@ import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorACallInThisChatUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
@@ -81,7 +81,7 @@ internal class ChatViewModel @Inject constructor(
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase,
     private val monitorParticipatingInACallUseCase: MonitorParticipatingInACallUseCase,
-    private val monitorACallInThisChatUseCase: MonitorACallInThisChatUseCase,
+    private val monitorCallInChatUseCase: MonitorCallInChatUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase,
@@ -465,7 +465,7 @@ internal class ChatViewModel @Inject constructor(
 
     private fun monitorACallInThisChat(chatId: Long) {
         viewModelScope.launch {
-            monitorACallInThisChatUseCase(chatId)
+            monitorCallInChatUseCase(chatId)
                 .catch { Timber.e(it) }
                 .collect {
                     _state.update { state -> state.copy(callInThisChat = it) }

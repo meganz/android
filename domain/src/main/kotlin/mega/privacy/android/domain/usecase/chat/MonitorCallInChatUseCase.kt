@@ -12,7 +12,7 @@ import javax.inject.Inject
  * Monitor A Call In This Chat Use Case
  *
  */
-class MonitorACallInThisChatUseCase @Inject constructor(
+class MonitorCallInChatUseCase @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val callRepository: CallRepository,
 ) {
@@ -21,12 +21,12 @@ class MonitorACallInThisChatUseCase @Inject constructor(
      *
      */
     operator fun invoke(chatId: Long) = monitorChatCallUpdatesUseCase()
-        .filter { it.chatId == chatId && (it.status == ChatCallStatus.Initial || it.status == ChatCallStatus.Destroyed) }
+        .filter { it.chatId == chatId }
         .map {
-            if (it.status == ChatCallStatus.Initial) {
-                callRepository.getChatCall(chatId)
-            } else {
+            if (it.status == ChatCallStatus.Destroyed || it.status == ChatCallStatus.Unknown) {
                 null
+            } else {
+                callRepository.getChatCall(chatId)
             }
         }
         .onStart { emit(callRepository.getChatCall(chatId)) }
