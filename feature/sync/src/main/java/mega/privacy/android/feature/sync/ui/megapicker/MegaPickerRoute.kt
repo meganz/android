@@ -52,10 +52,8 @@ internal fun MegaPickerRoute(
     if (state.value.showAllFilesAccessDialog) {
         AllFilesAccessDialog(
             onConfirm = {
-                permissionsLauncher.launch(
-                    syncPermissionsManager.getManageExternalStoragePermissionIntent()
-                )
                 viewModel.handleAction(MegaPickerAction.AllFilesAccessPermissionDialogShown)
+                selectCurrentFolder(viewModel, syncPermissionsManager)
             },
             onDismiss = {
                 viewModel.handleAction(MegaPickerAction.AllFilesAccessPermissionDialogShown)
@@ -101,18 +99,21 @@ private fun selectCurrentFolder(
     )
 }
 
+/**
+ * Allow File access permission
+ */
 @Composable
-private fun AllFilesAccessDialog(
+fun AllFilesAccessDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     ConfirmationDialog(
-        text = "Allow MEGA to read, modify or delete all files on this device.",
-        confirmButtonText = "Allow",
-        cancelButtonText = "Cancel",
+        text = " To back up your files, MEGA needs access to the files and folders in this device. Your data is always safe with us.",
+        confirmButtonText = "Continue",
+        cancelButtonText = "Not Now",
         onConfirm = onConfirm,
         onDismiss = onDismiss,
-        title = "Allow MEGA to access all files",
+        title = "All files access",
     )
 }
 

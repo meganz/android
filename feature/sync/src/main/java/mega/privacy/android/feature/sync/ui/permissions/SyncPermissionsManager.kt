@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.Settings
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.core.content.ContextCompat
@@ -28,17 +29,23 @@ class SyncPermissionsManager @Inject constructor(@ActivityContext private val co
      * Checks if external storage permission is granted
      */
     fun isManageExternalStoragePermissionGranted(): Boolean =
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R || ContextCompat.checkSelfPermission(
-            context,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
+        if (isSDKAboveOrEqualToR())
+            Environment.isExternalStorageManager()
+        else
+            ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
 
     /**
      * Get manage external storage permission intent
      */
-    @SuppressLint("InlinedApi")
     fun getManageExternalStoragePermissionIntent() =
-        Intent(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION else Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        Intent(
+            if (isSDKAboveOrEqualToR())
+                Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
+            else Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        )
             .addCategory("android.intent.category.DEFAULT")
             .setData(Uri.parse("package:${context.packageName}"))
 
@@ -51,15 +58,6 @@ class SyncPermissionsManager @Inject constructor(@ActivityContext private val co
             .setData(Uri.parse("package:${context.packageName}"))
 
     /**
-     * Get learn more page intent
-     */
-    fun getLearnMorePageIntent(): Intent =
-        Intent(
-            Intent.ACTION_VIEW,
-            Uri.parse("https://www.tac.vic.gov.au/__data/assets/pdf_file/0006/621456/How-to-disable-the-battery-optimization-on-Android-ammended-for-web-DPY-002.pdf")
-        )
-
-    /**
      * When android SDK is 11 or above
      */
     @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.R)
@@ -68,7 +66,6 @@ class SyncPermissionsManager @Inject constructor(@ActivityContext private val co
     /**
      * Launch all files/storage permission from app settings
      */
-    @SuppressLint("InlinedApi")
     fun launchAppSettingFileStorageAccess() {
         val intent = getManageExternalStoragePermissionIntent()
         runCatching {
@@ -81,7 +78,6 @@ class SyncPermissionsManager @Inject constructor(@ActivityContext private val co
     /**
      * Launch all files/storage permission from app settings
      */
-    @SuppressLint("InlinedApi")
     fun launchAppSettingBatteryOptimisation() {
         val intent = getDisableBatteryOptimizationsIntent()
         runCatching {

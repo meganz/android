@@ -1,19 +1,24 @@
 package mega.privacy.android.feature.sync.ui.newfolderpair
 
+import android.Manifest
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,13 +27,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacyTopAppBar
-import mega.privacy.android.core.ui.controls.banners.TwoActionsBanner
 import mega.privacy.android.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.ui.megapicker.AllFilesAccessDialog
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
 
@@ -37,11 +42,6 @@ internal fun SyncNewFolderScreen(
     folderPairName: String,
     selectedLocalFolder: String,
     selectedMegaFolder: RemoteFolder?,
-    showDisableBatteryOptimizationsBanner: Boolean,
-    batteryOptimizationAllowButtonClicked: () -> Unit,
-    batteryOptimizationLearnMoreButtonClicked: () -> Unit,
-    showAllFilesAccessBanner: Boolean,
-    allFilesAccessBannerClicked: () -> Unit,
     localFolderSelected: (Uri) -> Unit,
     folderNameChanged: (String) -> Unit,
     selectMegaFolderClicked: () -> Unit,
@@ -66,11 +66,6 @@ internal fun SyncNewFolderScreen(
             SyncNewFolderScreenContent(
                 modifier = Modifier.padding(paddingValues),
                 localFolderSelected = localFolderSelected,
-                showDisableBatteryOptimizationsBanner = showDisableBatteryOptimizationsBanner,
-                batteryOptimizationLearnMoreButtonClicked = batteryOptimizationLearnMoreButtonClicked,
-                batteryOptimizationAllowButtonClicked = batteryOptimizationAllowButtonClicked,
-                showAllFilesAccessBanner = showAllFilesAccessBanner,
-                allFilesAccessBannerClicked = allFilesAccessBannerClicked,
                 selectMegaFolderClicked = selectMegaFolderClicked,
                 folderNameChanged = folderNameChanged,
                 folderPairName = folderPairName,
@@ -87,19 +82,21 @@ internal fun SyncNewFolderScreen(
 private fun SyncNewFolderScreenContent(
     modifier: Modifier = Modifier,
     localFolderSelected: (Uri) -> Unit,
-    showDisableBatteryOptimizationsBanner: Boolean,
-    batteryOptimizationLearnMoreButtonClicked: () -> Unit,
-    batteryOptimizationAllowButtonClicked: () -> Unit,
-    showAllFilesAccessBanner: Boolean,
-    allFilesAccessBannerClicked: () -> Unit,
     selectMegaFolderClicked: () -> Unit,
     folderNameChanged: (String) -> Unit,
     folderPairName: String,
     selectedLocalFolder: String,
     selectedMegaFolder: RemoteFolder?,
     syncClicked: () -> Unit,
-    syncPermissionsManager: SyncPermissionsManager
+    syncPermissionsManager: SyncPermissionsManager,
 ) {
+    var showSyncPermissionBanner by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var showAllowAppAccessDialog by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     Column(modifier) {
         val folderPicker = launchFolderPicker {
             localFolderSelected(it)
@@ -111,29 +108,31 @@ private fun SyncNewFolderScreenContent(
             if (isGranted) {
                 folderPicker.launch(null)
             } else {
-                // Permission Denied: Do something
+                showSyncPermissionBanner = true
             }
         }
 
-        if (showDisableBatteryOptimizationsBanner) {
-            TwoActionsBanner(
-                modifier = Modifier.padding(top = 20.dp),
-                mainText = "Battery optimisation permission allows MEGA to run " +
-                        "in the background. You can change this any time by going to " +
-                        "Settings -> Apps.",
-                leftActionText = "Learn more",
-                rightActionText = "Allow",
-                leftActionClicked = batteryOptimizationLearnMoreButtonClicked,
-                rightActionClicked = batteryOptimizationAllowButtonClicked,
-            )
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
-        }
-
-        if (showAllFilesAccessBanner) {
+        AnimatedVisibility(showSyncPermissionBanner) {
             WarningBanner(
                 textString = "We need to access your device storage in order to sync your local folder. Click here to grant access.",
                 onCloseClick = null,
-                modifier = Modifier.clickable { allFilesAccessBannerClicked() }
+                modifier = Modifier.clickable {
+                    syncPermissionsManager.launchAppSettingFileStorageAccess()
+                    showSyncPermissionBanner = false
+                }
+            )
+        }
+
+        if (showAllowAppAccessDialog) {
+            AllFilesAccessDialog(
+                onConfirm = {
+                    syncPermissionsManager.launchAppSettingFileStorageAccess()
+                    showAllowAppAccessDialog = false
+                },
+                onDismiss = {
+                    showSyncPermissionBanner = true
+                    showAllowAppAccessDialog = false
+                }
             )
         }
 
@@ -143,7 +142,16 @@ private fun SyncNewFolderScreenContent(
                 if (syncPermissionsManager.isManageExternalStoragePermissionGranted()) {
                     folderPicker.launch(null)
                 } else {
-                    launcher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                    if (showSyncPermissionBanner) {
+                        syncPermissionsManager.launchAppSettingFileStorageAccess()
+                        showSyncPermissionBanner = false
+                    } else {
+                        if (syncPermissionsManager.isSDKAboveOrEqualToR()) {
+                            showAllowAppAccessDialog = true
+                        } else {
+                            launcher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        }
+                    }
                 }
             },
             selectMEGAFolderClicked = {
@@ -166,7 +174,7 @@ private fun SyncNewFolderScreenContent(
             val buttonEnabled =
                 selectedLocalFolder.isNotBlank()
                         && selectedMegaFolder != null
-                        && !showAllFilesAccessBanner
+                        && syncPermissionsManager.isManageExternalStoragePermissionGranted()
 
             RaisedDefaultMegaButton(
                 modifier = Modifier
@@ -194,11 +202,6 @@ private fun PreviewSyncNewFolderScreen() {
             folderPairName = "",
             selectedLocalFolder = "",
             selectedMegaFolder = null,
-            showDisableBatteryOptimizationsBanner = true,
-            batteryOptimizationAllowButtonClicked = {},
-            batteryOptimizationLearnMoreButtonClicked = {},
-            showAllFilesAccessBanner = true,
-            allFilesAccessBannerClicked = {},
             localFolderSelected = {},
             folderNameChanged = {},
             selectMegaFolderClicked = {},

@@ -38,8 +38,8 @@ internal fun SyncPermissionWarningBanner(
             } else {
                 storagePermission.status.isGranted
             }
-            hasUnrestrictedBatteryUsage = allFileAccess.not() &&
-                    syncPermissionsManager.isDisableBatteryOptimizationGranted()
+            hasUnrestrictedBatteryUsage =
+                syncPermissionsManager.isDisableBatteryOptimizationGranted()
         }
     }
     if (allFileAccess.not()) {
@@ -59,7 +59,7 @@ internal fun SyncPermissionWarningBanner(
             }
         )
     }
-    if (hasUnrestrictedBatteryUsage.not()) {
+    if (allFileAccess && hasUnrestrictedBatteryUsage.not()) {
         WarningBanner(
             textString = "To continuously sync your files and folders, allow MEGA to run in the background. ",
             onCloseClick = null,

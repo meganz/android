@@ -191,41 +191,6 @@ class SyncNewFolderScreenRouteTest {
         }
 
         composeTestRule.onNodeWithText("We need to access your device storage in order to sync your local folder. Click here to grant access.")
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithText(
-            "Battery optimisation permission allows MEGA to run " +
-                    "in the background. You can change this any time by going to " +
-                    "Settings -> Apps."
-        )
             .assertDoesNotExist()
-    }
-
-    @Test
-    fun `test that only battery optimization banner is shown when disable battery optimization permission is not granted`() {
-        val emptyState = SyncNewFolderState(selectedMegaFolder = RemoteFolder(0, ""))
-        whenever(state.value).thenReturn(emptyState)
-        whenever(viewModel.state).thenReturn(state)
-        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted())
-            .thenReturn(true)
-        whenever(syncPermissionsManager.isDisableBatteryOptimizationGranted())
-            .thenReturn(false)
-        composeTestRule.setContent {
-            SyncNewFolderScreenRoute(
-                viewModel,
-                openNextScreen = {},
-                syncPermissionsManager = syncPermissionsManager,
-                openSelectMegaFolderScreen = { },
-                onBackClicked = {}
-            )
-        }
-
-        composeTestRule.onNodeWithText("We need to access your device storage in order to sync your local folder. Click here to grant access.")
-            .assertDoesNotExist()
-        composeTestRule.onNodeWithText(
-            "Battery optimisation permission allows MEGA to run " +
-                    "in the background. You can change this any time by going to " +
-                    "Settings -> Apps."
-        )
-            .assertIsDisplayed()
     }
 }
