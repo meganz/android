@@ -2122,10 +2122,6 @@ public class ChatActivity extends PasscodeActivity
             }
             return Unit.INSTANCE;
         });
-        ViewExtensionsKt.collectFlow(this, viewModel.getAreTransfersPaused(), Lifecycle.State.STARTED, areTransfersPaused -> {
-            adapter.areTransfersPaused = areTransfersPaused;
-            return Unit.INSTANCE;
-        });
         viewModel.onPendingMessageLoaded().observe(this, this::onPendingMessageLoaded);
         ViewExtensionsKt.collectFlow(this, waitingRoomManagementViewModel.getState(), Lifecycle.State.STARTED, waitingRoomManagementState -> {
             if (waitingRoomManagementState.getShowParticipantsInWaitingRoomDialog()) {
