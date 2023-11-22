@@ -26,8 +26,3 @@ internal open class PreviewAlertDialogParametersProvider :
             )
         )
 }
-
-internal class PreviewStringsParametersProviderWithTitle : PreviewAlertDialogParametersProvider() {
-    override val values: Sequence<PreviewStringParameters>
-        get() = super.values.filter { it.title != null }
-}

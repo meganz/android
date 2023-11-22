@@ -4,8 +4,8 @@ package mega.privacy.android.core.ui.controls.dialogs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import mega.privacy.android.core.ui.controls.preview.PreviewAlertDialogParametersProvider
 import mega.privacy.android.core.ui.controls.preview.PreviewStringParameters
-import mega.privacy.android.core.ui.controls.preview.PreviewStringsParametersProviderWithTitle
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.core.ui.theme.AndroidThemeForPreviews
@@ -120,4 +120,10 @@ private fun BaseMegaAlertDialogPreview(
             )
         }
     }
+}
+
+
+internal class PreviewStringsParametersProviderWithTitle : PreviewAlertDialogParametersProvider() {
+    override val values: Sequence<PreviewStringParameters>
+        get() = super.values.filter { it.title != null }
 }
