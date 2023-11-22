@@ -3,7 +3,7 @@ package mega.privacy.android.core.ui.controls.preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.core.ui.preview.PreviewTextValue
 
-internal class PreviewAlertDialogParametersProvider :
+internal open class PreviewAlertDialogParametersProvider :
     PreviewParameterProvider<PreviewStringParameters> {
     override val values: Sequence<PreviewStringParameters>
         get() = sequenceOf(
