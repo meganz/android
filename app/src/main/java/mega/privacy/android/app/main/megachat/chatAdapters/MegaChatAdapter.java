@@ -277,8 +277,6 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private GetAvatarUseCase getAvatarUseCase;
     private GetNodeUseCase getNodeUseCase;
 
-    public boolean areTransfersPaused;
-
     private class ChatVoiceClipAsyncTask extends AsyncTask<MegaNodeList, Void, Integer> {
         MegaChatAdapter.ViewHolderMessageChat holder;
         int position;
@@ -1579,6 +1577,8 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             File voiceClipDir = CacheFolderManager.getCacheFolder(CacheFolderManager.VOICE_CLIP_FOLDER);
             String name = message.getPendingMessage().getName();
             int type = message.getPendingMessage().getType();
+
+            boolean areTransfersPaused = viewModel.getAreTransfersPaused();
 
             if (areTransfersPaused
                     && message.getPendingMessage().getState() != PendingMessageState.ERROR_UPLOADING.getValue()
@@ -7461,6 +7461,8 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
                         holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
                     }
+
+                    boolean areTransfersPaused = viewModel.getAreTransfersPaused();
 
                     if (message.getPendingMessage().getState() == PendingMessageState.ERROR_UPLOADING.getValue() || message.getPendingMessage().getState() == PendingMessageState.ERROR_ATTACHING.getValue()
                             || areTransfersPaused) {

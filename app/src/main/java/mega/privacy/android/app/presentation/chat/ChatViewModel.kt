@@ -11,10 +11,12 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -171,7 +173,15 @@ class ChatViewModel @Inject constructor(
     /**
      * Flow emitting true if transfers are paused globally, false otherwise
      */
-    val areTransfersPaused by lazy { monitorPausedTransfersUseCase() }
+    val areTransfersPausedFlow by lazy {
+        monitorPausedTransfersUseCase()
+            .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    }
+
+    /**
+     * Current value of areTransfersPausedFlow
+     */
+    val areTransfersPaused get() = areTransfersPausedFlow.value
 
     val isConnected: Boolean
         get() = isConnectedToInternetUseCase()

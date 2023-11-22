@@ -295,7 +295,7 @@ class ChatViewModelTest {
             whenever(monitorPausedTransfersUseCase()).thenReturn(
                 flowOf(false, true, false)
             )
-            underTest.areTransfersPaused.test {
+            underTest.areTransfersPausedFlow.test {
                 Truth.assertThat(awaitItem()).isFalse()
                 Truth.assertThat(awaitItem()).isTrue()
                 Truth.assertThat(awaitItem()).isFalse()
