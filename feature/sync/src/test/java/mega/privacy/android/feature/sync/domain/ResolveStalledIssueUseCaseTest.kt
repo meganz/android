@@ -6,10 +6,12 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
@@ -38,6 +40,8 @@ class ResolveStalledIssueUseCaseTest {
     private val getFileByPathUseCase: GetFileByPathUseCase = mock()
     private val setSyncSolvedIssueUseCase: SetSyncSolvedIssueUseCase = mock()
     private val stalledIssueToSolvedIssueMapper: StalledIssueToSolvedIssueMapper = mock()
+    private val renameNodeUseCase: RenameNodeUseCase = mock()
+    private val getFingerprintUseCase: GetFingerprintUseCase = mock()
 
     private val underTest = ResolveStalledIssueUseCase(
         deleteFileUseCase,
@@ -45,6 +49,8 @@ class ResolveStalledIssueUseCaseTest {
         getNodeByHandleUseCase,
         getFileByPathUseCase,
         setSyncSolvedIssueUseCase,
+        renameNodeUseCase,
+        getFingerprintUseCase,
         stalledIssueToSolvedIssueMapper
     )
 
@@ -168,6 +174,46 @@ class ResolveStalledIssueUseCaseTest {
 
             verify(deleteFileUseCase).invoke(localPath)
             verifyNoInteractions(moveNodesToRubbishUseCase)
+        }
+
+    @Test
+    fun `test that rename all action invokes renameNodeUseCase on every file node after first node`() =
+        runTest {
+            val stalledIssueResolutionAction = StalledIssueResolutionAction(
+                actionName = "Rename all items",
+                resolutionActionType = StalledIssueResolutionActionType.RENAME_ALL_ITEMS
+            )
+            val stalledIssue = StalledIssue(
+                nodeIds = listOf(NodeId(1L), NodeId(2L)),
+                nodeNames = listOf("/folder12/aa.txt", "/folder12/AA.txt"),
+                localPaths = emptyList(),
+                issueType = StallIssueType.NamesWouldClashWhenSynced,
+                conflictName = "Names would clash when synced"
+            )
+
+            underTest(stalledIssueResolutionAction, stalledIssue)
+
+            verify(renameNodeUseCase).invoke(2L, "AA (1).txt")
+        }
+
+    @Test
+    fun `test that rename all action invokes renameNodeUseCase on every folder node after first node`() =
+        runTest {
+            val stalledIssueResolutionAction = StalledIssueResolutionAction(
+                actionName = "Rename all items",
+                resolutionActionType = StalledIssueResolutionActionType.RENAME_ALL_ITEMS
+            )
+            val stalledIssue = StalledIssue(
+                nodeIds = listOf(NodeId(1L), NodeId(2L)),
+                nodeNames = listOf("/folder12/aa", "/folder12/AA"),
+                localPaths = emptyList(),
+                issueType = StallIssueType.NamesWouldClashWhenSynced,
+                conflictName = "Names would clash when synced"
+            )
+
+            underTest(stalledIssueResolutionAction, stalledIssue)
+
+            verify(renameNodeUseCase).invoke(2L, "AA (1)")
         }
 
     @Test

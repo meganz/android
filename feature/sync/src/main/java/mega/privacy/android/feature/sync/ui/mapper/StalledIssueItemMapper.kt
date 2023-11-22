@@ -24,7 +24,7 @@ internal class StalledIssueItemMapper @Inject constructor(
                 iconPackR.drawable.ic_generic_list
             },
             detailedInfo = getMockStalledIssueResolveInfo(),
-            actions = stalledIssueResolutionActionMapper(stalledIssueEntity.issueType)
+            actions = stalledIssueResolutionActionMapper(stalledIssueEntity.issueType, isFolder)
         )
 
     operator fun invoke(stalledIssueUiItem: StalledIssueUiItem): StalledIssue =

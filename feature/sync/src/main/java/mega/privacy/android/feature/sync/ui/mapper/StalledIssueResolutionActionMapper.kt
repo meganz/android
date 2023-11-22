@@ -10,27 +10,39 @@ import javax.inject.Inject
 
 internal class StalledIssueResolutionActionMapper @Inject constructor() {
 
-    operator fun invoke(issueType: StallIssueType): List<StalledIssueResolutionAction> =
+    operator fun invoke(
+        issueType: StallIssueType,
+        isFolder: Boolean,
+    ): List<StalledIssueResolutionAction> =
         when (issueType) {
             NamesWouldClashWhenSynced -> {
-                listOf(
-                    StalledIssueResolutionAction(
-                        "Rename all items",
-                        StalledIssueResolutionActionType.RENAME_ALL_ITEMS
-                    ),
-                    StalledIssueResolutionAction(
-                        "Remove duplicates",
-                        StalledIssueResolutionActionType.REMOVE_DUPLICATES
-                    ),
-                    StalledIssueResolutionAction(
-                        "Merge folders",
-                        StalledIssueResolutionActionType.MERGE_FOLDERS
-                    ),
-                    StalledIssueResolutionAction(
-                        "Remove duplicates and rename the rest",
-                        StalledIssueResolutionActionType.REMOVE_DUPLICATES_AND_REMOVE_THE_REST
-                    ),
-                )
+                if (isFolder) {
+                    listOf(
+                        StalledIssueResolutionAction(
+                            "Rename all items",
+                            StalledIssueResolutionActionType.RENAME_ALL_ITEMS
+                        ),
+                        StalledIssueResolutionAction(
+                            "Merge folders",
+                            StalledIssueResolutionActionType.MERGE_FOLDERS
+                        ),
+                    )
+                } else {
+                    listOf(
+                        StalledIssueResolutionAction(
+                            "Rename all items",
+                            StalledIssueResolutionActionType.RENAME_ALL_ITEMS
+                        ),
+                        StalledIssueResolutionAction(
+                            "Remove duplicates",
+                            StalledIssueResolutionActionType.REMOVE_DUPLICATES
+                        ),
+                        StalledIssueResolutionAction(
+                            "Remove duplicates and rename the rest",
+                            StalledIssueResolutionActionType.REMOVE_DUPLICATES_AND_REMOVE_THE_REST
+                        ),
+                    )
+                }
             }
 
             LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,

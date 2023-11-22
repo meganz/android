@@ -42,7 +42,8 @@ internal class SyncFoldersViewModel @Inject constructor(
                     val stalledIssues = getSyncStalledIssuesUseCase()
                     syncs.map { sync ->
                         sync.copy(hasStalledIssues = stalledIssues.any {
-                            it.localPaths.first().contains(sync.deviceStoragePath)
+                            it.localPaths.firstOrNull()?.contains(sync.deviceStoragePath)
+                                ?: (it.nodeNames.first().contains(sync.megaStoragePath))
                         })
                     }
                 }

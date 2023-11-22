@@ -3,13 +3,16 @@ package mega.privacy.android.feature.sync.domain.usecase
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.domain.mapper.StalledIssueToSolvedIssueMapper
 import mega.privacy.android.feature.sync.domain.usecase.solvedissues.SetSyncSolvedIssueUseCase
+import java.io.File
 import javax.inject.Inject
 
 internal class ResolveStalledIssueUseCase @Inject constructor(
@@ -18,6 +21,8 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val getFileByPathUseCase: GetFileByPathUseCase,
     private val setSyncSolvedIssueUseCase: SetSyncSolvedIssueUseCase,
+    private val renameNodeUseCase: RenameNodeUseCase,
+    private val getFingerprintUseCase: GetFingerprintUseCase,
     private val stalledIssueToSolvedIssueMapper: StalledIssueToSolvedIssueMapper,
 ) {
 
@@ -38,7 +43,27 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
     ) {
         when (stalledIssueResolutionAction.resolutionActionType) {
             StalledIssueResolutionActionType.RENAME_ALL_ITEMS -> {
-                // will be implemented in a separate MR
+                var counter = 1
+                stalledIssue.nodeIds.forEachIndexed { index, nodeId ->
+                    if (index == 0) {
+                        return@forEachIndexed
+                    }
+                    val nodeNameWithFullPath = stalledIssue.nodeNames[index]
+                    val nodeName = nodeNameWithFullPath.substringAfterLast(File.separator)
+                    val nodeNameWithoutExtension = nodeName.substringBeforeLast(".")
+                    val nodeExtension =
+                        nodeName.substringAfterLast(".", missingDelimiterValue = "")
+                    val fullNodeExtension = if (nodeExtension.isNotEmpty()) {
+                        ".$nodeExtension"
+                    } else {
+                        ""
+                    }
+                    renameNodeUseCase(
+                        nodeId.longValue,
+                        "$nodeNameWithoutExtension ($counter)$fullNodeExtension"
+                    )
+                    counter++
+                }
             }
 
             StalledIssueResolutionActionType.REMOVE_DUPLICATES -> {
