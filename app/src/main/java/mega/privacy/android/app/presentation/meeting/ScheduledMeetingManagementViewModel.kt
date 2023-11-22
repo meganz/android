@@ -41,7 +41,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.meeting.BroadcastScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingOccurrenceUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
@@ -76,7 +76,7 @@ import javax.inject.Inject
  * @property getWaitingRoomRemindersUseCase             [GetWaitingRoomRemindersUseCase]
  * @property setWaitingRoomRemindersUseCase             [SetWaitingRoomRemindersUseCase]
  * @property monitorChatCallUpdatesUseCase              [MonitorChatCallUpdatesUseCase]
- * @property getChatCall                                [GetChatCall]
+ * @property getChatCallUseCase                         [GetChatCallUseCase]
  * @property state                                      Current view state as [ScheduledMeetingManagementState]setWaitingRoom
  */
 @HiltViewModel
@@ -101,7 +101,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val getWaitingRoomRemindersUseCase: GetWaitingRoomRemindersUseCase,
     private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
-    private val getChatCall: GetChatCall,
+    private val getChatCallUseCase: GetChatCallUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ScheduledMeetingManagementState())
     val state: StateFlow<ScheduledMeetingManagementState> = _state
@@ -365,7 +365,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
 
     private fun getChatCall() = viewModelScope.launch {
         runCatching {
-            _state.value.chatId?.let { chatId -> getChatCall(chatId) }
+            _state.value.chatId?.let { chatId -> getChatCallUseCase(chatId) }
         }.onSuccess { chatCall ->
             chatCall?.let { call ->
                 call.status?.let {

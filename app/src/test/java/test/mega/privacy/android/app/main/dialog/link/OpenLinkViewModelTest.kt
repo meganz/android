@@ -23,7 +23,7 @@ import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import org.junit.jupiter.api.AfterAll
@@ -45,7 +45,7 @@ internal class OpenLinkViewModelTest {
     private val getHandleFromContactLinkUseCase: GetHandleFromContactLinkUseCase = mock()
     private val getChatLinkContentUseCase: GetChatLinkContentUseCase = mock()
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
-    private val getChatCallUseCase: GetChatCall = mock()
+    private val getChatCallUseCase: GetChatCallUseCase = mock()
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()

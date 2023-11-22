@@ -56,7 +56,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         val callId = callAndSession.first
         val session = callAndSession.second
 
-        if (inMeetingViewModel.isSameCall(callId) && inMeetingViewModel.isSpeakerSelectionAutomatic) {
+        if (inMeetingViewModel.isSameCall(callId) && inMeetingViewModel.state.value.isSpeakerSelectionAutomatic) {
             val currentSpeaker = inMeetingViewModel.getCurrentSpeakerParticipant()
             if (currentSpeaker == null || currentSpeaker.peerId != session.peerid || currentSpeaker.clientId != session.clientid) {
                 Timber.d("Received remote audio level with clientId ${session.clientid}")
@@ -185,7 +185,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             EventObserver { participantClicked ->
                 Timber.d("Clicked in participant with clientId ${participantClicked.clientId}")
 
-                if (inMeetingViewModel.isSpeakerSelectionAutomatic) {
+                if (inMeetingViewModel.state.value.isSpeakerSelectionAutomatic) {
                     inMeetingViewModel.setSpeakerSelection(false)
                 } else {
                     inMeetingViewModel.getCurrentSpeakerParticipant()?.let {
@@ -482,7 +482,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                     if (!session.canRecvVideoHiRes() && session.isHiResVideo) {
                         inMeetingViewModel.requestHiResVideo(
                             session,
-                            inMeetingViewModel.currentChatId
+                            inMeetingViewModel.getChatId()
                         )
                     } else {
                         Timber.d("Already have LowRes/HiRes video, clientId ${speaker.clientId}")

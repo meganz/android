@@ -11,7 +11,7 @@ import javax.inject.Inject
  * Use case to start or join scheduled meeting
  */
 class StartScheduledMeetingUseCase @Inject constructor(
-    private val getChatCall: GetChatCall,
+    private val getChatCallUseCase: GetChatCallUseCase,
     private val getChatCallByCallIdUseCase: GetChatCallByCallIdUseCase,
     private val getChatCallIdsUseCase: GetChatCallIdsUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
@@ -35,7 +35,7 @@ class StartScheduledMeetingUseCase @Inject constructor(
         enableVideo: Boolean,
         enableAudio: Boolean,
     ): ChatCall? {
-        val currentChatCall = getChatCall(chatId)
+        val currentChatCall = getChatCallUseCase(chatId)
         val activeChatCalls = getActiveChatCalls(currentChatCall?.callId)
 
         return when {

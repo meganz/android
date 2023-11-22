@@ -30,7 +30,6 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
@@ -40,7 +39,7 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.meeting.model.InMeetingState
+import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
@@ -56,13 +55,23 @@ import mega.privacy.android.app.utils.Constants.NAME_CHANGE
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.meeting.AnotherCallType
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
+import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
+import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.meeting.EnableAudioLevelMonitorUseCase
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestLowResolutionVideoUseCase
@@ -73,9 +82,7 @@ import mega.privacy.android.domain.usecase.meeting.StopLowResolutionVideoUseCase
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_CONNECTING
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_INITIAL
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_JOINING
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
@@ -111,7 +118,10 @@ import javax.inject.Inject
  * @property requestLowResolutionVideoUseCase   [RequestLowResolutionVideoUseCase]
  * @property stopHighResolutionVideoUseCase     [StopHighResolutionVideoUseCase]
  * @property stopLowResolutionVideoUseCase      [StopLowResolutionVideoUseCase]
- * @property state                              Current view state as [InMeetingState]
+ * @property getChatCallUseCase                 [GetChatCallUseCase]
+ * @property getChatRoomUseCase                 [GetChatRoom]
+ * @property monitorChatRoomUpdates             [MonitorChatRoomUpdates]
+ * @property state                              Current view state as [InMeetingUiState]
  */
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
@@ -131,43 +141,26 @@ class InMeetingViewModel @Inject constructor(
     private val enableAudioLevelMonitorUseCase: EnableAudioLevelMonitorUseCase,
     private val isAudioLevelMonitorEnabledUseCase: IsAudioLevelMonitorEnabledUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val requestHighResolutionVideoUseCase: RequestHighResolutionVideoUseCase,
     private val requestLowResolutionVideoUseCase: RequestLowResolutionVideoUseCase,
     private val stopHighResolutionVideoUseCase: StopHighResolutionVideoUseCase,
     private val stopLowResolutionVideoUseCase: StopLowResolutionVideoUseCase,
+    private val getChatCallUseCase: GetChatCallUseCase,
+    private val getChatRoomUseCase: GetChatRoom,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
 
     /**
      * private UI state
      */
-    private val _state = MutableStateFlow(InMeetingState())
+    private val _state = MutableStateFlow(InMeetingUiState())
 
     /**
      * public UI State
      */
-    val state: StateFlow<InMeetingState> = _state
-
-    /**
-     * Enum defining the type of call subtitle.
-     */
-    enum class SubtitleCallType {
-        TYPE_CONNECTING, TYPE_CALLING, TYPE_ESTABLISHED
-    }
-
-    /**
-     * Enum defining the type of another call.
-     */
-    enum class AnotherCallType {
-        TYPE_NO_CALL, TYPE_IN_PROGRESS, TYPE_ON_HOLD
-    }
-
-    var currentChatId: Long = MEGACHAT_INVALID_HANDLE
-    var previousState: Int = CALL_STATUS_INITIAL
-
-    var isSpeakerSelectionAutomatic: Boolean = true
-
-    private var haveConnection: Boolean = false
+    val state: StateFlow<InMeetingUiState> = _state
 
     private var anotherCallInProgressDisposable: Disposable? = null
     private var networkQualityDisposable: Disposable? = null
@@ -176,8 +169,32 @@ class InMeetingViewModel @Inject constructor(
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
 
-    private val _showCallDuration = MutableStateFlow(false)
-    val showCallDuration: StateFlow<Boolean> get() = _showCallDuration
+    /**
+     * Participant in carousel clicked
+     *
+     * @param participant Participant clicked
+     */
+    fun onItemClick(participant: Participant) {
+        _pinItemEvent.value = Event(participant)
+    }
+
+    /**
+     * Chat participant select to be in speaker view
+     *
+     * @param chatParticipant [ChatParticipant]
+     */
+    fun onItemClick(chatParticipant: ChatParticipant) =
+        participants.value?.find { it.peerId == chatParticipant.handle }?.let {
+            onItemClick(participant = it)
+        }
+
+    // Meeting
+    private val _callLiveData = MutableLiveData<MegaChatCall?>(null)
+    val callLiveData: LiveData<MegaChatCall?> = _callLiveData
+
+    // Call ID
+    private val _updateCallId = MutableStateFlow(MEGACHAT_INVALID_HANDLE)
+    val updateCallId: StateFlow<Long> get() = _updateCallId
 
     private val _showPoorConnectionBanner = MutableStateFlow(false)
     val showPoorConnectionBanner: StateFlow<Boolean> get() = _showPoorConnectionBanner
@@ -199,44 +216,6 @@ class InMeetingViewModel @Inject constructor(
     val showAssignModeratorBottomPanel: LiveData<Boolean> = _showAssignModeratorBottomPanel
 
 
-    /**
-     * Participant in carousel clicked
-     *
-     * @param participant Participant clicked
-     */
-    fun onItemClick(participant: Participant) {
-        _pinItemEvent.value = Event(participant)
-    }
-
-    /**
-     * Chat participant select to be in speaker view
-     *
-     * @param chatParticipant [ChatParticipant]
-     */
-    fun onItemClick(chatParticipant: ChatParticipant) =
-        participants.value?.find { it.peerId == chatParticipant.handle }?.let {
-            onItemClick(participant = it)
-        }
-
-    private var waitingForMeetingLink: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
-
-    // Meeting
-    private val _callLiveData = MutableLiveData<MegaChatCall?>(null)
-    val callLiveData: LiveData<MegaChatCall?> = _callLiveData
-
-    // Call ID
-    private val _updateCallId = MutableStateFlow(MEGACHAT_INVALID_HANDLE)
-    val updateCallId: StateFlow<Long> get() = _updateCallId
-
-    // Chat title
-    private val _chatTitle: MutableLiveData<String> =
-        MutableLiveData<String>(" ")
-    val chatTitle: LiveData<String> = _chatTitle
-
-    // Call subtitle
-    private val _updateCallSubtitle = MutableStateFlow(SubtitleCallType.TYPE_CONNECTING)
-    val updateCallSubtitle: StateFlow<SubtitleCallType> get() = _updateCallSubtitle
-
     // List of participants in the meeting
     val participants: MutableLiveData<MutableList<Participant>> = MutableLiveData(mutableListOf())
 
@@ -247,35 +226,9 @@ class InMeetingViewModel @Inject constructor(
     // List of visible participants in the meeting
     var visibleParticipants: MutableList<Participant> = mutableListOf()
 
-    private val _allowClickingOnToolbar = MutableStateFlow(false)
-    val allowClickingOnToolbar: StateFlow<Boolean> get() = _allowClickingOnToolbar
-
-    // Another call banner
-    private val _updateAnotherCallBannerType = MutableStateFlow(AnotherCallType.TYPE_NO_CALL)
-    val updateAnotherCallBannerType: StateFlow<AnotherCallType> get() = _updateAnotherCallBannerType
-
-    // Another chat title
-    private val _anotherChatTitle = MutableStateFlow(" ")
-    val anotherChatTitle: StateFlow<String> get() = _anotherChatTitle
-
     private val _getParticipantsChanges =
         MutableStateFlow<Pair<Int, ((Context) -> String)?>>(Pair(TYPE_JOIN, null))
     val getParticipantsChanges: StateFlow<Pair<Int, ((Context) -> String)?>> get() = _getParticipantsChanges
-
-    // Name of moderators
-    private val _updateModeratorsName = MutableStateFlow(" ")
-    val updateModeratorsName: StateFlow<String> get() = _updateModeratorsName
-
-    // Num of participants
-    private val _updateNumParticipants = MutableStateFlow(1)
-    val updateNumParticipants: StateFlow<Int> get() = _updateNumParticipants
-
-    private val openInviteChangeObserver =
-        Observer<MegaChatRoom> { chat ->
-            _state.update {
-                it.copy(resultSetOpenInvite = chat.isOpenInvite)
-            }
-        }
 
     private val updateCallObserver =
         Observer<MegaChatCall> {
@@ -284,19 +237,12 @@ class InMeetingViewModel @Inject constructor(
             }
         }
 
-    private val updateCallStatusObserver =
-        Observer<MegaChatCall> { call ->
-            if (isSameChatRoom(call.chatid)) {
-                checkSubtitleToolbar(call.status, call.isOutgoing)
-                previousState = call.status
-            }
-        }
-
     private val noOutgoingCallObserver = Observer<Long> {
-        if (isSameCall(it)) {
-            getCall()?.let { call ->
-                Timber.d("The call is no longer an outgoing call")
-                checkSubtitleToolbar(call.status, call.isOutgoing)
+        _state.value.call?.apply {
+            if (it == chatId) {
+                status?.let {
+                    checkSubtitleToolbar(it, isOutgoing)
+                }
             }
         }
     }
@@ -305,7 +251,7 @@ class InMeetingViewModel @Inject constructor(
         Observer<Pair<Long, Boolean>> { result ->
             val chatId: Long = result.first
             val onlyMeInTheCall: Boolean = result.second
-            if (currentChatId == chatId) {
+            if (_state.value.currentChatId == chatId) {
                 if (onlyMeInTheCall) {
                     _showWaitingForOthersBanner.value = false
                     if (!MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
@@ -321,7 +267,7 @@ class InMeetingViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { (chatId, typeChange, peers) ->
-                    if (currentChatId == chatId) {
+                    if (_state.value.currentChatId == chatId) {
                         getChat()?.let { chat ->
                             if (chat.isMeeting || chat.isGroup) {
                                 peers?.let { list ->
@@ -340,7 +286,7 @@ class InMeetingViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { (chatId, onlyMeInTheCall, waitingForOthers, isReceivedChange) ->
-                    if (currentChatId == chatId) {
+                    if (_state.value.currentChatId == chatId) {
                         val millisecondsOnlyMeInCallDialog =
                             TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog)
 
@@ -366,37 +312,112 @@ class InMeetingViewModel @Inject constructor(
             .addTo(composite)
 
         startMonitorChatSessionUpdates()
+        startMonitorChatCallUpdates()
 
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .observeForever(updateCallObserver)
-
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observeForever(updateCallStatusObserver)
 
         LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
             .observeForever(noOutgoingCallObserver)
 
         LiveEventBus.get<Pair<Long, Boolean>>(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
             .observeForever(waitingForOthersBannerObserver)
-
-        LiveEventBus.get(EventConstants.EVENT_CHAT_OPEN_INVITE, MegaChatRoom::class.java)
-            .observeForever(openInviteChangeObserver)
-
     }
 
     /**
-     * Get chat session updates
+     * Get chat room
      */
-    private fun startMonitorChatSessionUpdates() =
+    private fun getChatRoom() {
         viewModelScope.launch {
-            monitorChatSessionUpdatesUseCase()
-                .filter { it.chatId == currentChatId }
-                .collectLatest { result ->
-                    result.session?.let { session ->
+            runCatching {
+                getChatRoomUseCase(_state.value.currentChatId)
+            }.onSuccess { chatRoom ->
+                chatRoom?.let { chat ->
+                    _state.update { state ->
+                        state.copy(
+                            chatTitle = chat.title,
+                            isOpenInvite = chat.isOpenInvite,
+                            isOneToOneCall = !chat.isGroup && !chat.isMeeting,
+                            isPublicChat = chat.isPublic
+                        )
+                    }
+                }
+                startMonitorChatRoomUpdates()
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
 
-                        session.changes?.apply {
-                            if (contains(ChatSessionChanges.RemoteAvFlags)) {
-                                val isScreenSharing = session.hasScreenShare
+    /**
+     * Get chat call
+     */
+    private fun getChatCall(context: Context) {
+        viewModelScope.launch {
+            runCatching {
+                getChatCallUseCase(_state.value.currentChatId)
+            }.onSuccess { chatCall ->
+                chatCall?.let { call ->
+                    _state.update { it.copy(call = call) }
+                    call.status?.let { status ->
+                        checkSubtitleToolbar(status, call.isOutgoing)
+                        setCall(_state.value.currentChatId, context)
+                        if (status != ChatCallStatus.Initial && _state.value.previousState == ChatCallStatus.Initial) {
+                            _state.update {
+                                it.copy(
+                                    previousState = status,
+                                )
+                            }
+                        }
+                    }
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    /**
+     * Get chat room updates
+     */
+    private fun startMonitorChatRoomUpdates() =
+        viewModelScope.launch {
+            monitorChatRoomUpdates(_state.value.currentChatId).collectLatest { chat ->
+                if (chat.hasChanged(ChatRoomChange.Title)) {
+                    Timber.d("Changes in chat title")
+                    _state.update { state ->
+                        state.copy(
+                            chatTitle = chat.title,
+                        )
+                    }
+                }
+                if (chat.hasChanged(ChatRoomChange.OpenInvite)) {
+                    _state.update {
+                        it.copy(isOpenInvite = chat.isOpenInvite)
+                    }
+                }
+            }
+        }
+
+    /**
+     * Get chat call updates
+     */
+    private fun startMonitorChatCallUpdates() =
+        viewModelScope.launch {
+            monitorChatCallUpdatesUseCase()
+                .filter { it.chatId == _state.value.currentChatId }
+                .collectLatest { call ->
+                    _state.update { it.copy(call = call) }
+
+                    call.changes?.apply {
+                        if (contains(ChatCallChanges.Status)) {
+                            call.status?.let { status ->
+                                checkSubtitleToolbar(status, call.isOutgoing)
+                                _state.update { state ->
+                                    state.copy(
+                                        previousState = status,
+                                    )
+                                }
                             }
                         }
                     }
@@ -404,10 +425,42 @@ class InMeetingViewModel @Inject constructor(
         }
 
     /**
+     * Get chat session updates
+     */
+    private fun startMonitorChatSessionUpdates() =
+        viewModelScope.launch {
+            monitorChatSessionUpdatesUseCase()
+                .filter { it.chatId == _state.value.currentChatId }
+                .collectLatest { result ->
+                    result.session?.let { session ->
+                        session.changes?.apply {
+                            if (contains(ChatSessionChanges.RemoteAvFlags)) {
+                                val isScreenSharing = session.hasScreenShare
+                                //val isAudioChange =
+                                //  inMeetingViewModel.changesInRemoteAudioFlag(callAndSession.second)
+                                // val isVideoChange =
+                                // inMeetingViewModel.changesInRemoteVideoFlag(callAndSession.second)
+                            }
+                        }
+                    }
+                }
+        }
+
+    /**
+     * Show meeting info dialog
+     *
+     * @param shouldShowDialog True,show dialog.
+     */
+    fun onToolbarTap(shouldShowDialog: Boolean) =
+        _state.update {
+            it.copy(showMeetingInfoFragment = !it.isOneToOneCall && shouldShowDialog)
+        }
+
+    /**
      * Method to check if only me dialog and the call will end banner should be displayed.
      */
     fun checkShowOnlyMeBanner() {
-        if (isOneToOneCall())
+        if (_state.value.isOneToOneCall)
             return
 
         _callLiveData.value?.let { call ->
@@ -423,6 +476,7 @@ class InMeetingViewModel @Inject constructor(
             }
         }
     }
+
 
     /**
      * Method to get right text to display on the banner
@@ -470,30 +524,49 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method to check the subtitle in the toolbar
      *
-     * @param callStatus The current status of the call
+     * @param callStatus The current status of the call [ChatCallStatus]
      * @param isOutgoingCall If the current call is an outgoing call
      */
-    private fun checkSubtitleToolbar(callStatus: Int, isOutgoingCall: Boolean) {
+    private fun checkSubtitleToolbar(callStatus: ChatCallStatus, isOutgoingCall: Boolean) {
         when (callStatus) {
-            CALL_STATUS_CONNECTING -> {
-                _updateCallSubtitle.value = SubtitleCallType.TYPE_CONNECTING
-                _showCallDuration.value = false
+            ChatCallStatus.Connecting -> {
+                _state.update { state ->
+                    state.copy(
+                        showCallDuration = false,
+                        updateCallSubtitle = SubtitleCallType.Connecting
+                    )
+                }
             }
 
-            CALL_STATUS_IN_PROGRESS, CALL_STATUS_JOINING -> {
+            ChatCallStatus.InProgress, ChatCallStatus.Joining -> {
                 getChat()?.let { chat ->
                     if (!chat.isMeeting && isRequestSent() && isOutgoingCall) {
-                        _updateCallSubtitle.value = SubtitleCallType.TYPE_CALLING
-                        _showCallDuration.value = false
-                    } else if (callStatus == CALL_STATUS_JOINING) {
-                        _updateCallSubtitle.value = SubtitleCallType.TYPE_CONNECTING
-                        _showCallDuration.value = false
+                        _state.update { state ->
+                            state.copy(
+                                showCallDuration = false,
+                                updateCallSubtitle = SubtitleCallType.Calling
+                            )
+                        }
+                    } else if (callStatus == ChatCallStatus.Joining) {
+                        _state.update { state ->
+                            state.copy(
+                                showCallDuration = false,
+                                updateCallSubtitle = SubtitleCallType.Connecting
+                            )
+                        }
                     } else {
-                        _updateCallSubtitle.value = SubtitleCallType.TYPE_ESTABLISHED
-                        _showCallDuration.value = true
+                        _state.update { state ->
+                            state.copy(
+                                showCallDuration = true,
+                                updateCallSubtitle = SubtitleCallType.Established
+
+                            )
+                        }
                     }
                 }
             }
+
+            else -> {}
         }
     }
 
@@ -508,33 +581,44 @@ class InMeetingViewModel @Inject constructor(
     private fun checkAnotherCallBanner() {
         anotherCallInProgressDisposable?.dispose()
 
-        anotherCallInProgressDisposable = getCallUseCase.checkAnotherCall(currentChatId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    if (it == MEGACHAT_INVALID_HANDLE) {
-                        _updateAnotherCallBannerType.value = AnotherCallType.TYPE_NO_CALL
-                    } else {
-                        val call: MegaChatCall? = getCallUseCase.getMegaChatCall(it).blockingGet()
-                        if (call != null) {
-                            if (call.isOnHold && _updateAnotherCallBannerType.value != AnotherCallType.TYPE_ON_HOLD) {
-                                _updateAnotherCallBannerType.value = AnotherCallType.TYPE_ON_HOLD
-                            } else if (!call.isOnHold && _updateAnotherCallBannerType.value != AnotherCallType.TYPE_IN_PROGRESS) {
-                                _updateAnotherCallBannerType.value =
-                                    AnotherCallType.TYPE_IN_PROGRESS
+        anotherCallInProgressDisposable =
+            getCallUseCase.checkAnotherCall(_state.value.currentChatId).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribeBy(
+                    onNext = {
+                        if (it == MEGACHAT_INVALID_HANDLE) {
+                            _state.update { state ->
+                                state.copy(
+                                    updateAnotherCallBannerType = AnotherCallType.NotCall,
+                                )
+                            }
+                        } else {
+                            val call: MegaChatCall =
+                                getCallUseCase.getMegaChatCall(it).blockingGet()
+                            if (call.isOnHold && _state.value.updateAnotherCallBannerType != AnotherCallType.CallOnHold) {
+                                _state.update { state ->
+                                    state.copy(
+                                        updateAnotherCallBannerType = AnotherCallType.CallOnHold,
+                                    )
+                                }
+
+                            } else if (!call.isOnHold && _state.value.updateAnotherCallBannerType != AnotherCallType.CallInProgress) {
+                                _state.update { state ->
+                                    state.copy(
+                                        updateAnotherCallBannerType = AnotherCallType.CallInProgress,
+                                    )
+                                }
                             }
 
                             inMeetingRepository.getChatRoom(it)?.let { chat ->
-                                _anotherChatTitle.value = getTitleChat(chat)
+                                _state.update { state ->
+                                    state.copy(
+                                        anotherChatTitle = getTitleChat(chat),
+                                    )
+                                }
                             }
-                        } else {
-                            _updateAnotherCallBannerType.value = AnotherCallType.TYPE_NO_CALL
                         }
-                    }
-                },
-                onError = Timber::e
-            ).addTo(composite)
+                    }, onError = Timber::e
+                ).addTo(composite)
     }
 
     /**
@@ -572,19 +656,12 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Method that controls whether the toolbar should be clickable or not.
-     */
-    private fun checkToolbarClickability() {
-        _allowClickingOnToolbar.value = !isOneToOneCall()
-    }
-
-    /**
      * Start the counter to end the call after the previous banner has been hidden
      */
     fun startCounterTimerAfterBanner() {
         MegaApplication.getChatManagement().stopCounterToFinishCall()
         MegaApplication.getChatManagement()
-            .startCounterToFinishCall(currentChatId)
+            .startCounterToFinishCall(_state.value.currentChatId)
     }
 
     /**
@@ -607,7 +684,7 @@ class InMeetingViewModel @Inject constructor(
      */
     private fun checkNetworkQualityChanges() {
         networkQualityDisposable?.dispose()
-        networkQualityDisposable = getNetworkChangesUseCase.get(currentChatId)
+        networkQualityDisposable = getNetworkChangesUseCase.get(_state.value.currentChatId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -624,15 +701,16 @@ class InMeetingViewModel @Inject constructor(
      */
     private fun checkReconnectingChanges() {
         reconnectingDisposable?.dispose()
-        reconnectingDisposable = getCallStatusChangesUseCase.getReconnectingStatus(currentChatId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    _showReconnectingBanner.value = it
-                },
-                onError = Timber::e
-            ).addTo(composite)
+        reconnectingDisposable =
+            getCallStatusChangesUseCase.getReconnectingStatus(_state.value.currentChatId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        _showReconnectingBanner.value = it
+                    },
+                    onError = Timber::e
+                ).addTo(composite)
     }
 
     /**
@@ -641,15 +719,8 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if it's public. False, otherwise
      */
     fun isChatRoomPublic(): Boolean =
-        inMeetingRepository.getChatRoom(currentChatId)?.let { return it.isPublic } ?: false
-
-    /**
-     * Method to know if it's open invite enabled
-     *
-     * @return True, if it's enabled. False, otherwise
-     */
-    fun isOpenInvite(): Boolean =
-        inMeetingRepository.getChatRoom(currentChatId)?.let { return it.isOpenInvite } ?: false
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let { return it.isPublic }
+            ?: false
 
     /**
      * Method to know if it is the same chat
@@ -658,7 +729,7 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if it is the same. False, otherwise
      */
     fun isSameChatRoom(chatId: Long): Boolean =
-        chatId != MEGACHAT_INVALID_HANDLE && currentChatId == chatId
+        chatId != MEGACHAT_INVALID_HANDLE && _state.value.currentChatId == chatId
 
     /**
      * Method to know if it is the same call
@@ -680,17 +751,11 @@ class InMeetingViewModel @Inject constructor(
             _callLiveData.value?.let {
                 if (_updateCallId.value != it.callId) {
                     _updateCallId.value = it.callId
-                    checkSubtitleToolbar(it.status, it.isOutgoing)
                     checkAnotherCallBanner()
-                    checkToolbarClickability()
                     checkParticipantsList(context)
                     checkNetworkQualityChanges()
                     checkReconnectingChanges()
                     updateMeetingInfoBottomPanel(context)
-                }
-
-                if (it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL) {
-                    previousState = it.status
                 }
             }
         }
@@ -702,8 +767,8 @@ class InMeetingViewModel @Inject constructor(
      * @return MegaChatCall
      */
     fun getCall(): MegaChatCall? =
-        if (currentChatId == MEGACHAT_INVALID_HANDLE) null
-        else inMeetingRepository.getChatRoom(currentChatId)
+        if (_state.value.currentChatId == MEGACHAT_INVALID_HANDLE) null
+        else inMeetingRepository.getChatRoom(_state.value.currentChatId)
             ?.let { inMeetingRepository.getMeeting(it.chatId) }
 
     /**
@@ -714,7 +779,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun amIAloneOnTheCall(chatId: Long): Boolean {
         if (isSameChatRoom(chatId)) {
-            inMeetingRepository.getMeeting(currentChatId)?.let { call ->
+            inMeetingRepository.getMeeting(_state.value.currentChatId)?.let { call ->
                 val sessionsInTheCall: MegaHandleList? = call.sessionsClientid
                 if (sessionsInTheCall != null && sessionsInTheCall.size() > 0) {
                     Timber.d("I am not the only participant in the call, num of session in the call is ${sessionsInTheCall.size()}")
@@ -735,25 +800,26 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return MegaChatRoom
      */
-    fun getChat(): MegaChatRoom? = inMeetingRepository.getChatRoom(currentChatId)
+    fun getChat(): MegaChatRoom? = inMeetingRepository.getChatRoom(_state.value.currentChatId)
 
     /**
      * Method to set a chat
      *
-     * @param chatId chat ID
+     * @param newChatId chat ID
      */
-    fun setChatId(chatId: Long, context: Context) {
-        if (chatId == MEGACHAT_INVALID_HANDLE || currentChatId == chatId)
+    fun setChatId(newChatId: Long, context: Context) {
+        if (newChatId == MEGACHAT_INVALID_HANDLE || _state.value.currentChatId == newChatId)
             return
 
-        currentChatId = chatId
-
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            setCall(it.chatId, context)
-            _chatTitle.value = getTitleChat(it)
+        _state.update { state ->
+            state.copy(
+                currentChatId = newChatId,
+            )
         }
 
-        enableAudioLevelMonitor(chatId)
+        getChatRoom()
+        getChatCall(context)
+        enableAudioLevelMonitor(_state.value.currentChatId)
     }
 
     /**
@@ -774,16 +840,19 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return chat ID
      */
-    fun getChatId(): Long = currentChatId
+    fun getChatId(): Long = _state.value.currentChatId
 
     /**
      * Set speaker selection automatic or manual
      *
      * @param isAutomatic True, if it's automatic. False, if it's manual
      */
-    fun setSpeakerSelection(isAutomatic: Boolean) {
-        isSpeakerSelectionAutomatic = isAutomatic
-    }
+    fun setSpeakerSelection(isAutomatic: Boolean) =
+        _state.update {
+            it.copy(
+                isSpeakerSelectionAutomatic = isAutomatic,
+            )
+        }
 
     /**
      * Method to know if it's me
@@ -794,13 +863,6 @@ class InMeetingViewModel @Inject constructor(
     fun isMe(peerId: Long?): Boolean = inMeetingRepository.isMe(peerId)
 
     /**
-     * Method to know if I have asked for a chat link and I am waiting
-     *
-     * @return True, if I'm waiting for link. False, otherwise
-     */
-    fun isWaitingForLink(): Boolean = waitingForMeetingLink.value ?: false
-
-    /**
      * Get the session of a participant
      *
      * @param clientId client ID of a participant
@@ -809,15 +871,6 @@ class InMeetingViewModel @Inject constructor(
     fun getSession(clientId: Long): MegaChatSession? =
         if (clientId != MEGACHAT_INVALID_HANDLE) _callLiveData.value?.getMegaChatSession(clientId)
         else null
-
-    /**
-     * Method to set up if I have requested a chat link and I am waiting
-     *
-     * @param isWaiting True, if I'm waiting for a meeting link. False, if not
-     */
-    fun setWaitingForLink(isWaiting: Boolean) {
-        waitingForMeetingLink.value = isWaiting
-    }
 
     /**
      * Method to know if a one-to-one call is audio only
@@ -842,24 +895,6 @@ class InMeetingViewModel @Inject constructor(
 
         return false
     }
-
-    /**
-     *  Method to know if it is a one-to-one chat call
-     *
-     *  @return True, if it is a one-to-one chat call. False, otherwise
-     */
-    fun isOneToOneCall(): Boolean =
-        inMeetingRepository.getChatRoom(currentChatId)?.let { (!it.isGroup && !it.isMeeting) }
-            ?: false
-
-    /**
-     *  Method to know if it is a traditional group chat call
-     *
-     *  @return True, if it is a traditional group chat call. False, otherwise
-     */
-    fun isGroupCall(): Boolean =
-        inMeetingRepository.getChatRoom(currentChatId)?.let { (it.isGroup && !it.isMeeting) }
-            ?: false
 
     /**
      * Method to know if a call is in progress status
@@ -901,37 +936,11 @@ class InMeetingViewModel @Inject constructor(
      */
     private fun isSessionOnHoldOfOneToOneCall(): Boolean {
         _callLiveData.value?.let { call ->
-            if (isOneToOneCall()) {
+            if (_state.value.isOneToOneCall) {
                 val session = inMeetingRepository.getSessionOneToOneCall(call)
                 session?.let {
                     return it.isOnHold
                 }
-            }
-        }
-
-        return false
-    }
-
-    /**
-     * Method to know if a call is on hold another call
-     *
-     * @param anotherCallChatId chat ID
-     * @return True, if is on hold. False, otherwise
-     */
-    fun isAnotherCallOneToOneCall(anotherCallChatId: Long): Boolean =
-        inMeetingRepository.getChatRoom(anotherCallChatId)?.let { !it.isGroup } ?: false
-
-    /**
-     * Method to know if a session is on hold in one to one another call
-     *
-     * @param anotherCall MegaChatCall
-     * @return True, if is on hold. False, otherwise
-     */
-    fun isSessionOnHoldAnotherOneToOneCall(anotherCall: MegaChatCall): Boolean {
-        anotherCall.let {
-            val session = inMeetingRepository.getSessionOneToOneCall(anotherCall)
-            session?.let { sessionParticipant ->
-                return sessionParticipant.isOnHold
             }
         }
 
@@ -953,7 +962,7 @@ class InMeetingViewModel @Inject constructor(
      * @return MegaChatCall the another call
      */
     fun getAnotherCall(): MegaChatCall? {
-        val anotherCallChatId = CallUtil.getAnotherCallParticipating(currentChatId)
+        val anotherCallChatId = CallUtil.getAnotherCallParticipating(_state.value.currentChatId)
         if (anotherCallChatId != MEGACHAT_INVALID_HANDLE) {
             val anotherCall = inMeetingRepository.getMeeting(anotherCallChatId)
             anotherCall?.let {
@@ -1004,7 +1013,7 @@ class InMeetingViewModel @Inject constructor(
         context: Context,
     ): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             participants.value = participants.value?.map { participant ->
                 return@map when {
                     participant.peerId == peerId && typeChange == NAME_CHANGE -> {
@@ -1032,7 +1041,7 @@ class InMeetingViewModel @Inject constructor(
      * Method that makes the necessary changes to the participant list when my own privileges have changed.
      */
     fun updateOwnPrivileges(context: Context) {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             participants.value = participants.value?.map { participant ->
                 return@map participant.copy(
                     hasOptionsAllowed = shouldParticipantsOptionBeVisible(
@@ -1052,7 +1061,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun updateParticipantsPrivileges(context: Context): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             participants.value = participants.value?.map { participant ->
                 return@map when {
                     participant.isModerator != isParticipantModerator(participant.peerId) -> {
@@ -1075,7 +1084,7 @@ class InMeetingViewModel @Inject constructor(
      * @param isCallOnHold True, if I am going to put it on hold. False, otherwise
      */
     fun setCallOnHold(isCallOnHold: Boolean) {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             inMeetingRepository.setCallOnHold(it.chatId, isCallOnHold)
         }
     }
@@ -1120,7 +1129,7 @@ class InMeetingViewModel @Inject constructor(
 
         //Check mute call or session
         _callLiveData.value?.let { call ->
-            if (isOneToOneCall()) {
+            if (_state.value.isOneToOneCall) {
                 inMeetingRepository.getSessionOneToOneCall(call)?.let { session ->
                     if (!session.hasAudio() && session.peerid != MEGACHAT_INVALID_HANDLE) {
                         bannerIcon?.let {
@@ -1188,19 +1197,19 @@ class InMeetingViewModel @Inject constructor(
         enableAudio: Boolean,
     ): LiveData<Long> {
         val chatIdResult = MutableLiveData<Long>()
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             Timber.d("The chat exists")
             if (CallUtil.isStatusConnected(
                     MegaApplication.getInstance().applicationContext,
                     it.chatId
                 )
             ) {
-                megaChatApiGateway.getChatCall(currentChatId)?.let {
+                megaChatApiGateway.getChatCall(_state.value.currentChatId)?.let {
                     Timber.d("There is a call, open it")
                     chatIdResult.value = it.chatid
                     CallUtil.openMeetingInProgress(
                         MegaApplication.getInstance().applicationContext,
-                        currentChatId,
+                        _state.value.currentChatId,
                         true,
                         passcodeManagement
                     )
@@ -1214,12 +1223,12 @@ class InMeetingViewModel @Inject constructor(
                 viewModelScope.launch {
                     runCatching {
                         setChatVideoInDeviceUseCase()
-                        startChatCall(currentChatId, enableVideo, enableAudio)
+                        startChatCall(_state.value.currentChatId, enableVideo, enableAudio)
                     }.onFailure { exception ->
                         Timber.e(exception)
                     }.onSuccess { resultStartCall ->
                         val chatId = resultStartCall.chatHandle
-                        if (chatId != null && chatId != MEGACHAT_INVALID_HANDLE) {
+                        if (chatId != MEGACHAT_INVALID_HANDLE) {
                             chatManagement.setSpeakerStatus(chatId, resultStartCall.flag)
                             megaChatApiGateway.getChatCall(chatId)?.let { call ->
                                 if (call.isOutgoing) {
@@ -1227,7 +1236,7 @@ class InMeetingViewModel @Inject constructor(
                                 }
                             }
 
-                            chatIdResult.value = chatId.toLong()
+                            chatIdResult.value = chatId
                         }
                     }
                 }
@@ -1237,7 +1246,7 @@ class InMeetingViewModel @Inject constructor(
 
         Timber.d("The chat doesn't exists")
         inMeetingRepository.createMeeting(
-            _chatTitle.value!!,
+            _state.value.chatTitle,
             CreateGroupChatWithPublicLink()
         )
 
@@ -1250,18 +1259,18 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return the privileges
      */
-    fun getOwnPrivileges(): Int = inMeetingRepository.getOwnPrivileges(currentChatId)
+    fun getOwnPrivileges(): Int = inMeetingRepository.getOwnPrivileges(_state.value.currentChatId)
 
     /**
      * Method to know if the participant is a moderator.
      *
      * @param peerId User handle of a participant
      */
-    fun isParticipantModerator(peerId: Long): Boolean =
+    private fun isParticipantModerator(peerId: Long): Boolean =
         if (isMe(peerId))
             getOwnPrivileges() == PRIV_MODERATOR
         else
-            inMeetingRepository.getChatRoom(currentChatId)
+            inMeetingRepository.getChatRoom(_state.value.currentChatId)
                 ?.let { it.getPeerPrivilegeByHandle(peerId) == PRIV_MODERATOR }
                 ?: false
 
@@ -1282,7 +1291,7 @@ class InMeetingViewModel @Inject constructor(
      * @param peerId User handle
      */
     fun updateParticipantsVisibility(peerId: Long) {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             participants.value?.let { listParticipants ->
                 val iterator = listParticipants.iterator()
                 iterator.forEach {
@@ -1383,7 +1392,7 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method to control when the number of participants changes
      */
-    fun updateParticipantsList(context: Context) {
+    private fun updateParticipantsList(context: Context) {
         participants.value = participants.value
         Timber.d("Num of participants in the call: ${participants.value?.size}")
         updateMeetingInfoBottomPanel(context)
@@ -1424,7 +1433,7 @@ class InMeetingViewModel @Inject constructor(
      * @return the position of the participant
      */
     private fun createParticipant(session: MegaChatSession): Participant? {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             participants.value?.let { listParticipants ->
                 val peer = listParticipants.filter { participant ->
                     participant.peerId == session.peerid && participant.clientId == session.clientid
@@ -1482,7 +1491,7 @@ class InMeetingViewModel @Inject constructor(
      * Method for removing the listener from participants who still have
      */
     fun removeListeners() {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             val iterator = participants.value?.iterator()
             iterator?.let { list ->
                 list.forEach { participant ->
@@ -1502,7 +1511,7 @@ class InMeetingViewModel @Inject constructor(
      * @return the position of the participant
      */
     fun removeParticipant(session: MegaChatSession, context: Context): Int {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             val iterator = participants.value?.iterator()
             iterator?.let { list ->
                 list.forEach { participant ->
@@ -1550,11 +1559,11 @@ class InMeetingViewModel @Inject constructor(
         getSession(participant.clientId)?.let {
             if (participant.hasHiRes && it.canRecvVideoHiRes()) {
                 Timber.d("Stop HiResolution and remove listener, clientId = ${participant.clientId}")
-                stopHiResVideo(it, currentChatId)
+                stopHiResVideo(it, _state.value.currentChatId)
 
             } else if (!participant.hasHiRes && it.canRecvVideoLowRes()) {
                 Timber.d("Stop LowResolution and remove listener, clientId = ${participant.clientId}")
-                stopLowResVideo(it, currentChatId)
+                stopLowResVideo(it, _state.value.currentChatId)
             }
         }
     }
@@ -1572,7 +1581,7 @@ class InMeetingViewModel @Inject constructor(
         removeChatRemoteVideoListener(
             listener,
             participant.clientId,
-            currentChatId,
+            _state.value.currentChatId,
             participant.hasHiRes
         )
     }
@@ -1626,7 +1635,8 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if should be high. False, otherwise
      */
     private fun needHiRes(): Boolean =
-        participants.value?.let { state.value.callUIStatus != CallUIStatusType.SpeakerView } ?: false
+        participants.value?.let { state.value.callUIStatus != CallUIStatusType.SpeakerView }
+            ?: false
 
     /**
      * Method to know if the session has video on and is not on hold
@@ -1674,17 +1684,17 @@ class InMeetingViewModel @Inject constructor(
      * @return the avatar of a participant
      */
     fun getAvatarBitmap(peerId: Long): Bitmap? =
-        inMeetingRepository.getChatRoom(currentChatId)
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)
             ?.let { inMeetingRepository.getAvatarBitmap(peerId) }
 
     /**
      * Method to get the first participant in the list, who will be the new speaker
      */
     fun getFirstParticipant(peerId: Long, clientId: Long): Participant? {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            if (participants.value != null && participants.value!!.size > 0) {
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
+            if (participants.value != null && (participants.value ?: return@let).size > 0) {
                 if (peerId == MEGACHAT_INVALID_HANDLE && clientId == MEGACHAT_INVALID_HANDLE) {
-                    return participants.value!![0]
+                    return (participants.value ?: return@let)[0]
                 }
 
                 val iterator = participants.value?.iterator()
@@ -1845,27 +1855,20 @@ class InMeetingViewModel @Inject constructor(
      * @param newTitle the chat title
      */
     fun setTitleChat(newTitle: String) {
-        if (currentChatId == MEGACHAT_INVALID_HANDLE) {
-            _chatTitle.value = newTitle
+        if (_state.value.currentChatId == MEGACHAT_INVALID_HANDLE) {
+            _state.update { state ->
+                state.copy(
+                    chatTitle = newTitle,
+                )
+            }
         } else {
-            inMeetingRepository.getChatRoom(currentChatId)?.let {
+            inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
                 inMeetingRepository.setTitleChatRoom(
                     it.chatId,
                     newTitle,
                     EditChatRoomNameListener(MegaApplication.getInstance(), this)
                 )
             }
-        }
-    }
-
-    /**
-     * Update the title when the meeting name is be changed
-     *
-     * @param newName the new meeting name
-     */
-    fun updateMeetingName(newName: String) {
-        if (currentChatId != MEGACHAT_INVALID_HANDLE) {
-            _chatTitle.value = newName
         }
     }
 
@@ -2127,7 +2130,7 @@ class InMeetingViewModel @Inject constructor(
      * @param list new list of visible participants
      */
     fun updateVisibleParticipants(list: List<Participant>?) {
-        if (list != null && list.isNotEmpty()) {
+        if (!list.isNullOrEmpty()) {
             val iteratorParticipants = list.iterator()
             iteratorParticipants.forEach { participant ->
                 addParticipantVisible(participant)
@@ -2142,22 +2145,20 @@ class InMeetingViewModel @Inject constructor(
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .removeObserver(updateCallObserver)
 
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .removeObserver(updateCallStatusObserver)
-
         LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
             .removeObserver(noOutgoingCallObserver)
 
         LiveEventBus.get<Pair<Long, Boolean>>(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
             .removeObserver(waitingForOthersBannerObserver)
-
-        LiveEventBus.get(EventConstants.EVENT_CHAT_OPEN_INVITE, MegaChatRoom::class.java)
-            .removeObserver(openInviteChangeObserver)
     }
 
     override fun onEditedChatRoomName(chatId: Long, name: String) {
-        if (currentChatId == chatId) {
-            _chatTitle.value = name
+        if (_state.value.currentChatId == chatId) {
+            _state.update { state ->
+                state.copy(
+                    chatTitle = name,
+                )
+            }
         }
     }
 
@@ -2166,7 +2167,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return True, if you can be assigned as a moderator. False, otherwise.
      */
-    fun shouldAssignModerator(): Boolean {
+    private fun shouldAssignModerator(): Boolean {
         if (!isModerator() || numParticipants() == 0) {
             return false
         }
@@ -2268,27 +2269,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Determine if should hide or show the share link and invite button
-     *
-     * @return True, if the link is visible. False, if not.
-     */
-    fun isLinkVisible(): Boolean {
-        getCall()?.let {
-            return isChatRoomPublic() && it.status == CALL_STATUS_IN_PROGRESS && (getOwnPrivileges() == PRIV_MODERATOR || (isOpenInvite() && !amIAGuest()))
-        }
-
-        return false
-    }
-
-    /**
-     * Method to check if I am a chat moderator
-     *
-     * @return True, if I'm moderator. False, if not.
-     */
-    fun isModeratorOfPrivateRoom(): Boolean =
-        !isChatRoomPublic() && getOwnPrivileges() == PRIV_MODERATOR
-
-    /**
      * Determine if I am a guest
      *
      * @return True, if I am a guest. False if not
@@ -2308,7 +2288,7 @@ class InMeetingViewModel @Inject constructor(
      * @param peerId User handle of a participant
      */
     fun isStandardUser(peerId: Long): Boolean =
-        inMeetingRepository.getChatRoom(currentChatId)
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)
             ?.let { it.getPeerPrivilegeByHandle(peerId) == MegaChatRoom.PRIV_STANDARD } ?: false
 
     /**
@@ -2318,16 +2298,6 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isModerator(): Boolean =
         getOwnPrivileges() == PRIV_MODERATOR
-
-    /**
-     * Method for obtaining the bitmap of a participant's avatar
-     *
-     * @param peerId User handle of a participant
-     * @return The bitmap of a participant's avatar
-     */
-    fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
-        return inMeetingRepository.getAvatarBitmapByPeerId(peerId)
-    }
 
     /**
      * Method to check if tips should be displayed
@@ -2354,7 +2324,7 @@ class InMeetingViewModel @Inject constructor(
         if (email == null)
             return
 
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
+        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             participants.value = participants.value?.map { participant ->
                 return@map when (participant.peerId) {
                     handler -> {
@@ -2368,21 +2338,16 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Determine if this call is creating and have network connection
-     *
-     * @return if creating and no connection, return true, else false
-     */
-    fun showShouldNoConnectionBanner(): Boolean =
-        previousState == CALL_STATUS_INITIAL && !haveConnection
-
-    /**
      * Update the connection status
      *
      * @param status new status
      */
-    fun updateNetworkStatus(status: Boolean) {
-        this.haveConnection = status
-    }
+    fun updateNetworkStatus(status: Boolean) =
+        _state.update {
+            it.copy(
+                haveConnection = status,
+            )
+        }
 
     /**
      * Method for updating meeting info panel information
@@ -2403,14 +2368,17 @@ class InMeetingViewModel @Inject constructor(
                 }
         }
 
-        _updateNumParticipants.value = numParticipants
-
-        _updateModeratorsName.value = if (numParticipantsModerator == 0) "" else
-            context.resources.getQuantityString(
-                R.plurals.meeting_call_screen_meeting_info_bottom_panel_name_of_moderators,
-                numParticipantsModerator,
-                nameList
+        _state.update { state ->
+            state.copy(
+                updateNumParticipants = numParticipants,
+                updateModeratorsName = if (numParticipantsModerator == 0) "" else
+                    context.resources.getQuantityString(
+                        R.plurals.meeting_call_screen_meeting_info_bottom_panel_name_of_moderators,
+                        numParticipantsModerator,
+                        nameList
+                    )
             )
+        }
     }
 
     /**
@@ -2476,7 +2444,9 @@ class InMeetingViewModel @Inject constructor(
                 val iterator = listFound.iterator()
                 iterator.forEach { participant ->
                     if (participant.videoListener != null) {
-                        removeResolutionAndListener(participant, participant.videoListener!!)
+                        removeResolutionAndListener(
+                            participant, participant.videoListener ?: return@forEach
+                        )
                         participant.videoListener = null
                     }
                     val position = listSpeakerParticipants.indexOf(participant)
@@ -2503,7 +2473,10 @@ class InMeetingViewModel @Inject constructor(
                 val iterator = listFound.iterator()
                 iterator.forEach { participant ->
                     if (participant.videoListener != null) {
-                        removeResolutionAndListener(participant, participant.videoListener!!)
+                        removeResolutionAndListener(
+                            participant,
+                            participant.videoListener ?: return@forEach
+                        )
                         participant.videoListener = null
                     }
                     val position = listSpeakerParticipants.indexOf(participant)
@@ -2571,7 +2544,7 @@ class InMeetingViewModel @Inject constructor(
             return null
         }
 
-        val checkParticipant = speakerParticipants.value!!.filter {
+        val checkParticipant = (speakerParticipants.value ?: return null).filter {
             it.peerId != peerId || it.clientId != clientId
         }
 
@@ -2670,11 +2643,11 @@ class InMeetingViewModel @Inject constructor(
      * Control when the hang up button is clicked
      */
     fun checkClickEndButton() {
-        if (isOneToOneCall()) {
+        if (_state.value.isOneToOneCall) {
             hangCall()
             return
-
         }
+
         if (amIAGuest()) {
             _callLiveData.value?.let {
                 LiveEventBus.get(
@@ -2733,5 +2706,19 @@ class InMeetingViewModel @Inject constructor(
      */
     fun setStatus(newStatus: CallUIStatusType) {
         _state.update { it.copy(callUIStatus = newStatus) }
+    }
+
+    /**
+     * On reject button tapped
+     *
+     * @param chatId Chat id of the incoming call
+     */
+    fun onRejectBottomTap(chatId: Long) {
+        removeIncomingCallNotification(chatId)
+        if (_state.value.isOneToOneCall) {
+            checkClickEndButton()
+        } else {
+            ignoreCall()
+        }
     }
 }

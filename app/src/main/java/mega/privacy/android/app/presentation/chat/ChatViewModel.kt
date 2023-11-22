@@ -63,7 +63,7 @@ import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
 import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -93,7 +93,7 @@ import javax.inject.Inject
  * @property startChatCallNoRingingUseCase                  [StartChatCallNoRingingUseCase]
  * @property startMeetingInWaitingRoomChatUseCase           [StartMeetingInWaitingRoomChatUseCase]
  * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
- * @property getChatCall                                    [GetChatCall]
+ * @property getChatCallUseCase                                    [GetChatCallUseCase]
  * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
  * @property endCallUseCase                                 [EndCallUseCase]
  * @property sendStatisticsMeetingsUseCase                  [SendStatisticsMeetingsUseCase]
@@ -124,7 +124,7 @@ class ChatViewModel @Inject constructor(
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     private val openOrStartCallUseCase: OpenOrStartCallUseCase,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
-    private val getChatCall: GetChatCall,
+    private val getChatCallUseCase: GetChatCallUseCase,
     private val getChatRoom: GetChatRoom,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val endCallUseCase: EndCallUseCase,
@@ -444,7 +444,7 @@ class ChatViewModel @Inject constructor(
                                 ScheduledMeetingStatus.NotStarted
                             if (!scheduledMeetReceived.isPast()) {
                                 Timber.d("Has scheduled meeting")
-                                getChatCall(scheduledMeetReceived.chatId)?.let { call ->
+                                getChatCallUseCase(scheduledMeetReceived.chatId)?.let { call ->
                                     scheduledMeetingStatus = when (call.status) {
                                         ChatCallStatus.UserNoPresent ->
                                             ScheduledMeetingStatus.NotJoined(call.duration)
@@ -729,7 +729,7 @@ class ChatViewModel @Inject constructor(
         MegaApplication.getChatManagement().stopCounterToFinishCall()
         viewModelScope.launch {
             runCatching {
-                getChatCall(state.value.chatId)
+                getChatCallUseCase(state.value.chatId)
             }.onFailure { exception ->
                 Timber.e("Call does not exist $exception")
             }.onSuccess { call ->
@@ -903,7 +903,7 @@ class ChatViewModel @Inject constructor(
     fun startOrAnswerMeetingOfOtherChatRoomWithWaitingRoomAsHost(chatId: Long) {
         viewModelScope.launch {
             runCatching {
-                val call = getChatCall(chatId)
+                val call = getChatCallUseCase(chatId)
                 val scheduledMeetingStatus = when (call?.status) {
                     ChatCallStatus.UserNoPresent -> ScheduledMeetingStatus.NotJoined(call.duration)
 

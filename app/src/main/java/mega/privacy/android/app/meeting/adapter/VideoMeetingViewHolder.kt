@@ -225,10 +225,10 @@ class VideoMeetingViewHolder(
             inMeetingViewModel.getSession(participant.clientId)?.let {
                 if (participant.hasHiRes && !it.canRecvVideoHiRes() && it.isHiResVideo) {
                     Timber.d("Asking for HiRes video, clientId ${participant.clientId}")
-                    inMeetingViewModel.requestHiResVideo(it, inMeetingViewModel.currentChatId)
+                    inMeetingViewModel.requestHiResVideo(it, inMeetingViewModel.getChatId())
                 } else if (!participant.hasHiRes && !it.canRecvVideoLowRes() && it.isLowResVideo) {
                     Timber.d("Asking for LowRes video, clientId ${participant.clientId}")
-                    inMeetingViewModel.requestLowResVideo(it, inMeetingViewModel.currentChatId)
+                    inMeetingViewModel.requestLowResVideo(it, inMeetingViewModel.getChatId())
                 } else {
                     Timber.d("Already have LowRes/HiRes video, clientId ${participant.clientId}")
                     updateListener(participant, true, participant.hasHiRes)
@@ -547,7 +547,7 @@ class VideoMeetingViewHolder(
             Timber.d("Participant is speaker")
             setRoundedCorners(binding.selectedForeground)
             setRoundedCorners(binding.speakingForeground)
-            binding.selectedForeground.isVisible = !inMeetingViewModel.isSpeakerSelectionAutomatic
+            binding.selectedForeground.isVisible = !inMeetingViewModel.state.value.isSpeakerSelectionAutomatic
         } else {
             Timber.d("Participant is not selected")
             binding.selectedForeground.isVisible = false

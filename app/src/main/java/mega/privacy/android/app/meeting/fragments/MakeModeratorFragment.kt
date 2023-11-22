@@ -75,7 +75,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         Observer<Pair<MegaChatCall?, MegaChatSession>> { callAndSession ->
             val call = callAndSession.first ?: return@Observer
 
-            if (inMeetingViewModel.isSameCall(call.callId) && !inMeetingViewModel.isOneToOneCall()) {
+            if (inMeetingViewModel.isSameCall(call.callId) && !inMeetingViewModel.state.value.isOneToOneCall) {
                 when (callAndSession.second.status) {
                     MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
                         Timber.d("Session in progress, clientID = ${callAndSession.second.clientid}")

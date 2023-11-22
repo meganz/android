@@ -26,7 +26,7 @@ import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import timber.log.Timber
@@ -39,7 +39,7 @@ internal class OpenLinkViewModel @Inject constructor(
     private val getHandleFromContactLinkUseCase: GetHandleFromContactLinkUseCase,
     private val getChatLinkContentUseCase: GetChatLinkContentUseCase,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
-    private val getChatCallUseCase: GetChatCall,
+    private val getChatCallUseCase: GetChatCallUseCase,
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,

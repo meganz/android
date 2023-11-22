@@ -31,7 +31,7 @@ import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
 import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -70,7 +70,7 @@ class ChatViewModelTest {
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase = mock()
     private val openOrStartCallUseCase: OpenOrStartCallUseCase = mock()
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
-    private val getChatCall: GetChatCall = mock()
+    private val getChatCallUseCase: GetChatCallUseCase = mock()
     private val getChatRoom: GetChatRoom = mock()
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val endCallUseCase: EndCallUseCase = mock()
@@ -123,7 +123,7 @@ class ChatViewModelTest {
             startChatCallNoRingingUseCase = startChatCallNoRingingUseCase,
             openOrStartCallUseCase = openOrStartCallUseCase,
             getScheduledMeetingByChat = getScheduledMeetingByChat,
-            getChatCall = getChatCall,
+            getChatCallUseCase = getChatCallUseCase,
             getChatRoom = getChatRoom,
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             endCallUseCase = endCallUseCase,

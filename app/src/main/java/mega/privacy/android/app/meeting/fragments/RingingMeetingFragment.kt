@@ -5,16 +5,19 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
@@ -23,16 +26,21 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
+import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor
 import mega.privacy.android.app.utils.CallUtil.getDefaultAvatarCall
 import mega.privacy.android.app.utils.CallUtil.getImageAvatarCall
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR
 import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.android.domain.entity.meeting.AnotherCallType
+import mega.privacy.android.domain.entity.meeting.CallUIStatusType
+import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import timber.log.Timber
@@ -88,23 +96,17 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         toolbarSubtitle.text = getString(R.string.outgoing_call_starting)
 
         binding.answerVideoFab.setOnClickListener {
-            inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
+            inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.getChatId())
             answerCall(enableVideo = true)
         }
 
         binding.answerAudioFab.setOnClickListener {
-            inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
+            inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.getChatId())
             answerCall(enableVideo = false)
         }
 
         binding.rejectFab.setOnClickListener {
-            inMeetingViewModel.removeIncomingCallNotification(chatId)
-
-            if (inMeetingViewModel.isOneToOneCall()) {
-                inMeetingViewModel.checkClickEndButton()
-            } else {
-                inMeetingViewModel.ignoreCall()
-            }
+            inMeetingViewModel.onRejectBottomTap(chatId)
             requireActivity().finish()
         }
     }
@@ -154,15 +156,17 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             inMeetingViewModel.setChatId(chatId, requireContext())
         }
 
-        inMeetingViewModel.chatTitle.observe(viewLifecycleOwner) { title ->
-            toolbarTitle.text = title
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
+            if (state.chatTitle.isNotEmpty()) {
+                toolbarTitle.text = state.chatTitle
+            }
         }
 
         var bitmap: Bitmap?
 
         // Set caller's name and avatar
         inMeetingViewModel.getChat()?.let {
-            if (inMeetingViewModel.isOneToOneCall()) {
+            if (inMeetingViewModel.state.value.isOneToOneCall) {
                 val callerId = it.getPeerHandle(0)
 
                 bitmap = getImageAvatarCall(callerId)

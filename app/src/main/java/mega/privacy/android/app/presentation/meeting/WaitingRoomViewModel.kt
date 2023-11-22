@@ -40,7 +40,7 @@ import mega.privacy.android.domain.usecase.chat.JoinGuestChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -66,7 +66,7 @@ import javax.inject.Inject
  * @property isValidWaitingRoomUseCase                  [IsValidWaitingRoomUseCase]
  * @property monitorChatCallUpdatesUseCase              [MonitorChatCallUpdatesUseCase]
  * @property monitorScheduledMeetingUpdatesUseCase      [MonitorScheduledMeetingUpdatesUseCase]
- * @property getChatCall                                [GetChatCall]
+ * @property getChatCallUseCase                         [GetChatCallUseCase]
  * @property getChatLocalVideoUpdatesUseCase            [GetChatLocalVideoUpdatesUseCase]
  * @property setChatVideoInDeviceUseCase                [SetChatVideoInDeviceUseCase]
  * @property startVideoDeviceUseCase                    [StartVideoDeviceUseCase]
@@ -92,7 +92,7 @@ class WaitingRoomViewModel @Inject constructor(
     private val isValidWaitingRoomUseCase: IsValidWaitingRoomUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
-    private val getChatCall: GetChatCall,
+    private val getChatCallUseCase: GetChatCallUseCase,
     private val getChatLocalVideoUpdatesUseCase: GetChatLocalVideoUpdatesUseCase,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val startVideoDeviceUseCase: StartVideoDeviceUseCase,
@@ -231,7 +231,7 @@ class WaitingRoomViewModel @Inject constructor(
     private fun retrieveCallDetails() {
         viewModelScope.launch {
             runCatching {
-                getChatCall(chatId = _state.value.chatId)
+                getChatCallUseCase(chatId = _state.value.chatId)
             }.onSuccess { call ->
                 call?.updateUiState()
             }.onFailure { exception ->

@@ -27,7 +27,6 @@ import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -55,13 +54,6 @@ abstract class ChatModule {
         @Provides
         fun provideGetChatRoom(chatRepository: ChatRepository): GetChatRoom =
             GetChatRoom(chatRepository::getChatRoom)
-
-        /**
-         * Provides the Use Case [GetChatCall]
-         */
-        @Provides
-        fun provideGetChatCall(callRepository: CallRepository): GetChatCall =
-            GetChatCall(callRepository::getChatCall)
 
         /**
          * Provides the Use Case [GetScheduledMeetingByChat]

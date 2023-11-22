@@ -38,7 +38,7 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.ChatRoomItemStatusMapper
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdatesUseCase
@@ -57,7 +57,7 @@ class GetChatsUseCase @Inject constructor(
     private val chatRoomItemMapper: ChatRoomItemMapper,
     private val chatRoomItemStatusMapper: ChatRoomItemStatusMapper,
     private val contactsRepository: ContactsRepository,
-    private val getChatCall: GetChatCall,
+    private val getChatCallUseCase: GetChatCallUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val getUserEmail: GetContactEmail,
@@ -446,7 +446,7 @@ class GetChatsUseCase @Inject constructor(
         runCatching { !notificationsRepository.isChatEnabled(chatId) }.getOrNull() ?: false
 
     private suspend fun getCurrentCall(chatId: Long): ChatRoomItemStatus =
-        runCatching { getChatCall(chatId)?.let(chatRoomItemStatusMapper::invoke) }.getOrNull()
+        runCatching { getChatCallUseCase(chatId)?.let(chatRoomItemStatusMapper::invoke) }.getOrNull()
             ?: ChatRoomItemStatus.NotStarted
 
     private suspend fun getMeetingScheduleData(

@@ -29,6 +29,7 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.FragmentMeetingInfoBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.listenAction
+import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
@@ -75,22 +76,20 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
      * Init views
      */
     private fun initView() {
-        inMeetingViewModel.chatTitle.observe(this) {
-            chatTitle = it
-            binding.meetingName.text = it
-        }
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
+            if (state.chatTitle.isNotEmpty()) {
+                chatTitle = state.chatTitle
+                binding.meetingName.text = state.chatTitle
+            }
 
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.updateModeratorsName) { moderatorsName ->
-            binding.moderatorName.text = moderatorsName
-            binding.moderatorName.isVisible = moderatorsName.isNotEmpty()
-        }
+            binding.moderatorName.text = state.updateModeratorsName
+            binding.moderatorName.isVisible = state.updateModeratorsName.isNotEmpty()
 
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.updateNumParticipants) { numParticipants ->
             binding.participantSize.text =
                 resources.getQuantityString(
                     R.plurals.meeting_call_screen_meeting_info_bottom_panel_num_of_participants,
-                    numParticipants,
-                    numParticipants
+                    state.updateNumParticipants,
+                    state.updateNumParticipants
                 )
         }
 

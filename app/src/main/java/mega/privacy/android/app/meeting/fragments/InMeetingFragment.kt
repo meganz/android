@@ -89,7 +89,7 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
-import mega.privacy.android.app.presentation.meeting.model.InMeetingState
+import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.utils.CallUtil
@@ -121,8 +121,10 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.meeting.AnotherCallType
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -363,7 +365,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 Timber.d("Back from reconnecting")
             } else {
                 Timber.d("Change in call composition, review the UI")
-                if (inMeetingViewModel.isOneToOneCall()) {
+                if (inMeetingViewModel.state.value.isOneToOneCall) {
                     if (it.numParticipants == 1 || it.numParticipants == 2) {
                         checkChildFragments()
                     }
@@ -389,7 +391,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 val call = inMeetingViewModel.getCall()
                 call?.let {
                     Timber.d("Change in session on hold status")
-                    if (!inMeetingViewModel.isOneToOneCall()) {
+                    if (!inMeetingViewModel.state.value.isOneToOneCall) {
                         updateOnHoldRemote(callAndSession.second)
                     } else if (it.hasLocalVideo() && callAndSession.second.isOnHold) {
                         sharedModel.clickCamera(false)
@@ -400,7 +402,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private val sessionStatusObserver =
         Observer<Pair<MegaChatCall, MegaChatSession>> { callAndSession ->
-            if (!inMeetingViewModel.isOneToOneCall()) {
+            if (!inMeetingViewModel.state.value.isOneToOneCall) {
                 when (callAndSession.second.status) {
                     MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
                         Timber.d("Session in progress, clientID = ${callAndSession.second.clientid}")
@@ -443,7 +445,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             //As the session has been established, I am no longer in the Request sent state
             if (inMeetingViewModel.isSameCall(callAndSession.first)) {
                 showMuteBanner()
-                if (!inMeetingViewModel.isOneToOneCall()) {
+                if (!inMeetingViewModel.state.value.isOneToOneCall) {
                     val isAudioChange =
                         inMeetingViewModel.changesInRemoteAudioFlag(callAndSession.second)
                     val isVideoChange =
@@ -463,7 +465,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private val sessionLowResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.isOneToOneCall()) {
+            if (inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.state.value.isOneToOneCall) {
                 inMeetingViewModel.getParticipant(
                     callAndSession.second.peerid,
                     callAndSession.second.clientid
@@ -513,7 +515,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private val sessionHiResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.isOneToOneCall()) {
+            if (inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.state.value.isOneToOneCall) {
                 inMeetingViewModel.getParticipant(
                     callAndSession.second.peerid,
                     callAndSession.second.clientid
@@ -729,7 +731,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             MEETING_ACTION_START -> {
                 Timber.d("Action need answer call")
                 updateMicAndCam()
-                controlWhenJoinedAChat(inMeetingViewModel.currentChatId)
+                controlWhenJoinedAChat(inMeetingViewModel.getChatId())
             }
 
             MEETING_ACTION_IN -> {
@@ -907,6 +909,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bannerAnotherCallLayout.setOnClickListener {
             sharedModel.clickSwitchCall()
         }
+        meetingActivity.binding.toolbar.setOnClickListener {
+            inMeetingViewModel.onToolbarTap(true)
+        }
     }
 
     private fun showMeetingInfoFragment() {
@@ -920,9 +925,89 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun collectFlows() {
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingState ->
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
             if (state.error != null) {
                 sharedModel.showSnackBar(getString(state.error))
+            }
+
+            if (state.chatTitle.isNotEmpty()) {
+                toolbarTitle?.apply {
+                    text = state.chatTitle
+                }
+            }
+
+            meetingChrono?.apply {
+                if (state.showCallDuration) {
+                    if (!isVisible) {
+                        inMeetingViewModel.getCallDuration().let { duration ->
+                            if (duration != INVALID_VALUE.toLong()) {
+                                base =
+                                    SystemClock.elapsedRealtime() - duration * MILLISECONDS_IN_ONE_SECOND
+                                start()
+                                isVisible = true
+                            }
+                        }
+                    }
+                } else {
+                    stop()
+                    isVisible = false
+                }
+            }
+
+            toolbarSubtitle?.apply {
+                text = when (state.updateCallSubtitle) {
+                    SubtitleCallType.Connecting -> getString(R.string.chat_connecting)
+                    SubtitleCallType.Calling -> getString(R.string.outgoing_call_starting)
+                    SubtitleCallType.Established -> ""
+                }
+            }
+
+            if (state.showMeetingInfoFragment) {
+                inMeetingViewModel.onToolbarTap(false)
+                showMeetingInfoFragment()
+            }
+
+            bannerAnotherCallTitle?.apply {
+                if (state.anotherChatTitle.isNotEmpty()) {
+                    text = state.anotherChatTitle
+                }
+            }
+
+            when (state.updateAnotherCallBannerType) {
+                AnotherCallType.NotCall -> {
+                    if (bannerAnotherCallLayout.isVisible) {
+                        Timber.d("No other calls in progress or on hold")
+                        bannerAnotherCallLayout.isVisible = false
+                        bottomFloatingPanelViewHolder?.changeOnHoldIconDrawable(false)
+                    }
+                }
+
+                AnotherCallType.CallInProgress -> {
+                    if (!bannerAnotherCallLayout.isVisible) {
+                        bannerAnotherCallLayout.let {
+                            it.alpha = 1f
+                            it.isVisible = true
+                        }
+                        bannerAnotherCallSubtitle?.text =
+                            getString(R.string.call_in_progress_layout)
+
+                        bottomFloatingPanelViewHolder?.changeOnHoldIconDrawable(false)
+                    }
+                }
+
+                AnotherCallType.CallOnHold -> {
+                    if (!bannerAnotherCallLayout.isVisible) {
+                        bannerAnotherCallLayout.let {
+                            it.alpha = 0.9f
+                            it.isVisible = true
+                        }
+
+                        bannerAnotherCallSubtitle?.text =
+                            getString(R.string.call_on_hold)
+
+                        bottomFloatingPanelViewHolder?.changeOnHoldIconDrawable(true)
+                    }
+                }
             }
 
             sharedModel.setSpeakerView(isSpeakerMode = state.callUIStatus == CallUIStatusType.SpeakerView)
@@ -992,23 +1077,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        sharedModel.meetingNameLiveData.observe(viewLifecycleOwner) {
-            if (!TextUtil.isTextEmpty(it)) {
-                Timber.d("Meeting name has changed")
-                inMeetingViewModel.updateMeetingName(it)
-            }
-        }
-
         inMeetingViewModel.callLiveData.observe(viewLifecycleOwner) {
             if (it != null && isWaitingForAnswerCall) {
                 answerCallAfterJoin()
-            }
-        }
-
-        inMeetingViewModel.chatTitle.observe(viewLifecycleOwner) {
-            if (toolbarTitle != null) {
-                Timber.d("Chat title has changed")
-                toolbarTitle?.text = it
             }
         }
 
@@ -1113,62 +1184,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.showCallDuration) { isVisible ->
-            if (isVisible) {
-                meetingChrono?.let { chrono ->
-                    chrono.stop()
-                    inMeetingViewModel.getCallDuration().let {
-                        if (it != INVALID_VALUE.toLong()) {
-                            chrono.base =
-                                SystemClock.elapsedRealtime() - it * MILLISECONDS_IN_ONE_SECOND
-                            chrono.start()
-                            chrono.isVisible = true
-                        }
-                    }
-                }
-            } else {
-                meetingChrono?.let {
-                    it.stop()
-                    it.isVisible = false
-                }
-            }
-        }
-
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.updateCallSubtitle) { type ->
-            toolbarSubtitle?.let {
-                when (type) {
-                    InMeetingViewModel.SubtitleCallType.TYPE_CONNECTING -> {
-                        it.text = getString(R.string.chat_connecting)
-                    }
-
-                    InMeetingViewModel.SubtitleCallType.TYPE_CALLING -> {
-                        it.text =
-                            getString(R.string.outgoing_call_starting)
-                    }
-
-                    InMeetingViewModel.SubtitleCallType.TYPE_ESTABLISHED -> {
-                        it.text = ""
-                    }
-                }
-            }
-        }
-
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.allowClickingOnToolbar) { allowed ->
-            if (allowed) {
-                meetingActivity.binding.toolbar.setOnClickListener {
-                    showMeetingInfoFragment()
-                }
-            } else {
-                meetingActivity.binding.toolbar.setOnClickListener(null)
-            }
-        }
-
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.anotherChatTitle) { title ->
-            if (title.isNotEmpty()) {
-                bannerAnotherCallTitle?.text = title
-            }
-        }
-
         viewLifecycleOwner.collectFlow(inMeetingViewModel.getParticipantsChanges) { (type, getTitle) ->
             if (getTitle != null) {
                 participantsChangesBanner?.apply {
@@ -1214,41 +1229,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 showWaitingForOthersBanner()
             } else {
                 hideCallWillEndInBanner()
-            }
-        }
-
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.updateAnotherCallBannerType) { type ->
-            when (type) {
-                InMeetingViewModel.AnotherCallType.TYPE_NO_CALL -> {
-                    Timber.d("No other calls in progress or on hold")
-                    bannerAnotherCallLayout.isVisible = false
-                    bottomFloatingPanelViewHolder?.changeOnHoldIconDrawable(false)
-
-                }
-
-                InMeetingViewModel.AnotherCallType.TYPE_IN_PROGRESS -> {
-                    bannerAnotherCallLayout.let {
-                        it.alpha = 1f
-                        it.isVisible = true
-                    }
-                    bannerAnotherCallSubtitle?.text =
-                        getString(R.string.call_in_progress_layout)
-
-                    bottomFloatingPanelViewHolder?.changeOnHoldIconDrawable(false)
-
-                }
-
-                InMeetingViewModel.AnotherCallType.TYPE_ON_HOLD -> {
-                    bannerAnotherCallLayout.let {
-                        it.alpha = 0.9f
-                        it.isVisible = true
-                    }
-
-                    bannerAnotherCallSubtitle?.text =
-                        getString(R.string.call_on_hold)
-
-                    bottomFloatingPanelViewHolder?.changeOnHoldIconDrawable(true)
-                }
             }
         }
 
@@ -1328,6 +1308,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
     }
+
 
     /**
      * user denies the RECORD_AUDIO or CAMERA permission
@@ -1673,7 +1654,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         binding.reconnecting.isVisible = false
 
         if (call.status >= MegaChatCall.CALL_STATUS_JOINING) {
-            if (inMeetingViewModel.isOneToOneCall()) {
+            if (inMeetingViewModel.state.value.isOneToOneCall) {
                 Timber.d("One to one call")
                 updateOneToOneUI()
             } else {
@@ -2214,7 +2195,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         )
 
         showMuteBanner()
-        if (!inMeetingViewModel.isOneToOneCall()) {
+        if (!inMeetingViewModel.state.value.isOneToOneCall) {
             gridViewCallFragment?.let {
                 if (it.isAdded) {
                     it.updateCallOnHold(isHold)
@@ -2582,7 +2563,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
                     putExtra(INTENT_EXTRA_KEY_CHAT, true)
                     putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
-                    putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.currentChatId)
+                    putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.getChatId())
                     putExtra(
                         INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
                         getString(R.string.invite_participants)

@@ -72,7 +72,7 @@ import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -203,7 +203,7 @@ class ManagerViewModel @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getChatLinkContentUseCase: GetChatLinkContentUseCase,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
-    private val getChatCallUseCase: GetChatCall,
+    private val getChatCallUseCase: GetChatCallUseCase,
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,

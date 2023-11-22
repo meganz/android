@@ -64,7 +64,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         val callId = it.first
         val session = it.second
 
-        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId) && isAdded) {
+        if (inMeetingViewModel.state.value.isOneToOneCall && inMeetingViewModel.isSameCall(callId) && isAdded) {
             Timber.d("Check changes in remote AVFlags")
             when {
                 isFloatingWindow -> checkItIsOnlyAudio()
@@ -86,7 +86,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     private val sessionHiResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (inMeetingViewModel.isSameCall(callAndSession.first) && !isFloatingWindow && inMeetingViewModel.isOneToOneCall() && isAdded) {
+            if (inMeetingViewModel.isSameCall(callAndSession.first) && !isFloatingWindow && inMeetingViewModel.state.value.isOneToOneCall && isAdded) {
                 if (callAndSession.second.canRecvVideoHiRes() && callAndSession.second.isHiResVideo) {
                     Timber.d("Can receive high-resolution video")
 
@@ -128,7 +128,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         val callId = it.first
         val session = it.second
 
-        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId) && isAdded) {
+        if (inMeetingViewModel.state.value.isOneToOneCall && inMeetingViewModel.isSameCall(callId) && isAdded) {
             Timber.d("Check changes in session on hold")
             checkChangesInOnHold(
                 session.isOnHold
@@ -341,7 +341,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Check if is an audio call
      */
     private fun checkItIsOnlyAudio() {
-        if (!isFloatingWindow || !inMeetingViewModel.isOneToOneCall()) return
+        if (!isFloatingWindow || !inMeetingViewModel.state.value.isOneToOneCall) return
 
         if (inMeetingViewModel.isAudioCall()) {
             Timber.d("Is only audio call, hide avatar")
@@ -392,8 +392,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Method to control the Call on hold icon visibility
      */
     private fun showCallOnHoldIcon() {
-        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall() && !isFloatingWindow ||
-            !inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold()
+        if (inMeetingViewModel.state.value.isOneToOneCall && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall() && !isFloatingWindow ||
+            !inMeetingViewModel.state.value.isOneToOneCall && inMeetingViewModel.isCallOnHold()
         ) {
             Timber.d("Show on hold icon")
             onHoldImageView.isVisible = true
@@ -435,8 +435,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
         if ((currentCall != null && currentCall.status != MegaChatCall.CALL_STATUS_JOINING && currentCall.status != CALL_STATUS_IN_PROGRESS) ||
             (!inMeetingViewModel.isMe(peerId) && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
             (inMeetingViewModel.isMe(peerId) &&
-                    ((inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
-                            (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold())))
+                    ((inMeetingViewModel.state.value.isOneToOneCall && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
+                            (!inMeetingViewModel.state.value.isOneToOneCall && inMeetingViewModel.isCallOnHold())))
         ) {
             Timber.d("The video should be turned off")
             videoOffUI(peerId, clientId)
@@ -537,7 +537,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         if (isOnHold) {
             Timber.d("Call or session on hold")
             //It's on hold
-            if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isMe(this.peerId) && isFloatingWindow) {
+            if (inMeetingViewModel.state.value.isOneToOneCall && inMeetingViewModel.isMe(this.peerId) && isFloatingWindow) {
                 closeVideo(peerId, this.clientId)
                 checkItIsOnlyAudio()
                 return

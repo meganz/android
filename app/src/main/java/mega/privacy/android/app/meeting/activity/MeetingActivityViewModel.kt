@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -87,7 +86,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -119,7 +118,7 @@ import javax.inject.Inject
  * @property monitorFinishActivityUseCase   [MonitorFinishActivityUseCase]
  * @property monitorChatCallUpdatesUseCase  [MonitorChatCallUpdatesUseCase]
  * @property getChatRoomByChatIdUseCase     [GetChatRoom]
- * @property getChatCall                    [GetChatCall]
+ * @property getCallUseCase                 [GetChatCallUseCase]
  * @property getFeatureFlagValue            [GetFeatureFlagValueUseCase]
  * @property setOpenInvite                  [SetOpenInvite]
  * @property chatParticipantMapper          [ChatParticipantMapper]
@@ -140,7 +139,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val meetingActivityRepository: MeetingActivityRepository,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val getCallUseCase: GetCallUseCase,
-    private val getChatCall: GetChatCall,
+    private val getChatCallUseCase: GetChatCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
@@ -372,7 +371,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun getChatCall() = viewModelScope.launch {
         runCatching {
-            getChatCall(_state.value.chatId)
+            getChatCallUseCase(_state.value.chatId)
         }.onSuccess { call ->
             call?.let {
                 checkEphemeralAccountAndWaitingRoom(it)

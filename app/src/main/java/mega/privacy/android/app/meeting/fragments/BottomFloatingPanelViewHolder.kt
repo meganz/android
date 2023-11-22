@@ -145,7 +145,7 @@ class BottomFloatingPanelViewHolder(
      * @param anchor the anchor view, the tips widow should show base on it's location
      */
     private fun initPopWindow(anchor: View) {
-        if (inMeetingViewModel.isOneToOneCall()) {
+        if (inMeetingViewModel.state.value.isOneToOneCall) {
             return
         }
 
@@ -195,7 +195,7 @@ class BottomFloatingPanelViewHolder(
             collapse()
         }
 
-        floatingPanelView.indicator.isVisible = !inMeetingViewModel.isOneToOneCall()
+        floatingPanelView.indicator.isVisible = !inMeetingViewModel.state.value.isOneToOneCall
     }
 
 
@@ -266,7 +266,7 @@ class BottomFloatingPanelViewHolder(
     private fun setupBottomSheet() {
         if (bottomSheetBehavior is LockableBottomSheetBehavior<*>) {
             (bottomSheetBehavior as LockableBottomSheetBehavior<*>).setLocked(
-                inMeetingViewModel.isOneToOneCall()
+                inMeetingViewModel.state.value.isOneToOneCall
             )
         }
 
@@ -276,7 +276,7 @@ class BottomFloatingPanelViewHolder(
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
                 meetingViewModel.setBottomPanelExpanded(bottomFloatingPanelExpanded)
 
-                if (newState == BottomSheetBehavior.STATE_DRAGGING && inMeetingViewModel.isOneToOneCall()) {
+                if (newState == BottomSheetBehavior.STATE_DRAGGING && inMeetingViewModel.state.value.isOneToOneCall) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
 
@@ -292,7 +292,7 @@ class BottomFloatingPanelViewHolder(
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                if (!inMeetingViewModel.isOneToOneCall()) {
+                if (!inMeetingViewModel.state.value.isOneToOneCall) {
                     onBottomFloatingPanelSlide(slideOffset)
                     if (slideOffset > 0.1f) {
                         dismissPopWindow()
