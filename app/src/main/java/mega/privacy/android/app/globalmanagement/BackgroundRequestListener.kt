@@ -109,7 +109,7 @@ class BackgroundRequestListener @Inject constructor(
     private fun handleSetAttrUserRequest(request: MegaRequest, e: MegaError) {
         if (request.paramType == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
             if (e.errorCode == MegaError.API_OK) {
-                pushNotificationSettingManagement.sendPushNotificationSettings(request.megaPushNotificationSettings)
+                pushNotificationSettingManagement.setPushNotificationSettings(request.megaPushNotificationSettings)
                 applicationScope.launch { broadcastPushNotificationSettingsUseCase() }
             } else {
                 Timber.e("Chat notification settings cannot be updated")
@@ -120,7 +120,7 @@ class BackgroundRequestListener @Inject constructor(
     private fun handleGetAttrUserRequest(request: MegaRequest, e: MegaError) {
         if (request.paramType == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
             if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_ENOENT) {
-                pushNotificationSettingManagement.sendPushNotificationSettings(request.megaPushNotificationSettings)
+                pushNotificationSettingManagement.setPushNotificationSettings(request.megaPushNotificationSettings)
                 applicationScope.launch { broadcastPushNotificationSettingsUseCase() }
             }
         } else if (e.errorCode == MegaError.API_OK) {
