@@ -97,11 +97,4 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     override fun getIpAddress() = applicationIpAddressWrapper.getIpAddress().also {
         Timber.d("Current Ip Address $it")
     }
-
-    override suspend fun setIsFirstLaunch(isFirstLaunch: Boolean) {
-        withContext(ioDispatcher) {
-            megaLocalStorageGateway.setFirstTime(isFirstLaunch)
-            Timber.d("Setting first launch value to $isFirstLaunch")
-        }
-    }
 }

@@ -43,7 +43,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.BaseActivity.Companion.showSimpleSnackbar
@@ -77,9 +76,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.user.UserCredentials
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.environment.AfterFirstLaunchUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -138,13 +135,6 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
 
     @Inject
     lateinit var dbH: DatabaseHandler
-
-    @Inject
-    lateinit var afterFirstLaunchUseCase: AfterFirstLaunchUseCase
-
-    @Inject
-    @ApplicationScope
-    lateinit var appScope: CoroutineScope
 
     private val viewModel by viewModels<FileProviderViewModel>()
 
@@ -1348,9 +1338,7 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
                 }
                 if (dbH.preferences != null) {
                     dbH.clearPreferences()
-                    appScope.launch {
-                        afterFirstLaunchUseCase()
-                    }
+                    dbH.setFirstTime(false)
                     viewModel.stopCameraUploads()
                 }
             } else {
