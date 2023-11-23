@@ -185,6 +185,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
+import mega.privacy.android.app.presentation.meeting.view.CallRecordingConsentDialog
 import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
@@ -521,6 +522,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var searchType: SearchType = SearchType.OTHER
     private lateinit var fragmentLayout: LinearLayout
     private lateinit var waitingRoomComposeView: ComposeView
+    private lateinit var callRecordingConsentDialogComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
     private lateinit var adsComposeView: ComposeView
@@ -1036,6 +1038,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             setDisplayHomeAsUpEnabled(true)
         }
         waitingRoomComposeView = findViewById(R.id.waiting_room_dialog_compose_view)
+        callRecordingConsentDialogComposeView =
+            findViewById(R.id.call_recording_consent_dialog_compose_view)
         adsComposeView = findViewById(R.id.ads_web_compose_view)
         fragmentLayout = findViewById(R.id.fragment_layout)
         bottomNavigationView =
@@ -1113,6 +1117,32 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed()
                         },
                     )
+                }
+            }
+        }
+
+        callRecordingConsentDialogComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                val state by viewModel.state.collectAsStateWithLifecycle()
+                if (state.callInProgressChatId != -1L && state.isSessionOnRecording && state.showRecordingConsentDialog) {
+                    AndroidTheme(isDark = isDark) {
+                        CallRecordingConsentDialog(
+                            onConfirm = { viewModel.setShowRecordingConsentDialogConsumed() },
+                            onDismiss = {
+                                viewModel.setShowRecordingConsentDialogConsumed()
+                                viewModel.endChatCall(state.callInProgressChatId)
+                            },
+                            onLearnMore = {
+                                val viewIntent = Intent(Intent.ACTION_VIEW)
+                                viewIntent.data = Uri.parse("https://mega.io/privacy")
+                                startActivity(viewIntent)
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -2005,6 +2035,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             action = MeetingActivity.MEETING_ACTION_IN
             putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
             putExtra(MeetingActivity.MEETING_BOTTOM_PANEL_EXPANDED, true)
+            putExtra(
+                MeetingActivity.MEETING_CALL_RECORDING,
+                viewModel.state().isSessionOnRecording
+            )
         }
         startActivity(intent)
     }
@@ -2712,6 +2746,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
         nodeSaver.destroy()
+        viewModel.stopMonitorChatSessionUpdates()
         super.onDestroy()
     }
 
@@ -4770,7 +4805,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Method to return to an ongoing call
      */
     fun returnCall() {
-        CallUtil.returnActiveCall(this, passcodeManagement)
+        CallUtil.returnActiveCall(this, passcodeManagement, viewModel.state().isSessionOnRecording)
     }
 
     private fun checkBeforeOpeningQR(openScanQR: Boolean) {
@@ -7699,6 +7734,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * and it is in Cloud Drive section, Recent section, Incoming section, Outgoing section or in the chats list.
      */
     private fun setCallWidget() {
+        if (CallUtil.participatingInACall()) {
+            viewModel.stopMonitorChatSessionUpdates()
+            CallUtil.getCallInProgress()?.chatid?.let { chatId ->
+                viewModel.startMonitorChatSessionUpdates(chatId)
+            }
+        } else {
+            viewModel.stopMonitorChatSessionUpdates()
+        }
         setCallBadge()
         if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.TRANSFERS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.HOMEPAGE || !Util.isScreenInPortrait(
                 this

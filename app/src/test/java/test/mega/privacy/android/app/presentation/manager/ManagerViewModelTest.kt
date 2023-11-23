@@ -83,6 +83,8 @@ import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -277,6 +279,8 @@ class ManagerViewModelTest {
     private val chatManagement: ChatManagement = mock()
     private val passcodeManagement: PasscodeManagement = mock()
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
+    private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
+    private val hangChatCallUseCase: HangChatCallUseCase = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -354,7 +358,9 @@ class ManagerViewModelTest {
             chatManagement = chatManagement,
             passcodeManagement = passcodeManagement,
             monitorSyncStalledIssuesUseCase = monitorSyncStalledIssuesUseCase,
-            monitorSyncsUseCase = monitorSyncsUseCase
+            monitorSyncsUseCase = monitorSyncsUseCase,
+            monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
+            hangChatCallUseCase = hangChatCallUseCase
         )
     }
 

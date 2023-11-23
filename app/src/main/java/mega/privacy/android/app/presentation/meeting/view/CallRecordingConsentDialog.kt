@@ -64,7 +64,9 @@ fun CallRecordingConsentDialog(
         cancelButtonText = stringResource(id = R.string.meetings_call_recording_consent_dialog_negative_button),
         onConfirm = onConfirm,
         onDismiss = onDismiss,
-        modifier = Modifier.testTag(TEST_TAG_CALL_RECORDING_CONSENT_DIALOG)
+        modifier = Modifier.testTag(TEST_TAG_CALL_RECORDING_CONSENT_DIALOG),
+        dismissOnClickOutside = false,
+        dismissOnBackPress = false
     )
 }
 

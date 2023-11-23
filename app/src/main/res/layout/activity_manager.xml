@@ -181,6 +181,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/call_recording_consent_dialog_compose_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
     </FrameLayout>
 
     <com.google.android.material.navigation.NavigationView

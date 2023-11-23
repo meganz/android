@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.activity
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -44,6 +45,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
+import mega.privacy.android.app.presentation.meeting.view.CallRecordingConsentDialog
 import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsFullListView
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
@@ -88,6 +90,7 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_GUEST_LAST_NAME = "guest_last_name"
         const val CALL_ACTION = "call_action"
         const val MEETING_BOTTOM_PANEL_EXPANDED = "meeting_bottom_panel_expanded"
+        const val MEETING_CALL_RECORDING = "meeting_call_recording"
 
         fun getIntentOngoingCall(context: Context, chatId: Long): Intent {
             return Intent(context, MeetingActivity::class.java).apply {
@@ -324,6 +327,30 @@ class MeetingActivity : PasscodeActivity() {
             }
         }
 
+        binding.callRecordingConsentDialogComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val state by meetingViewModel.state.collectAsStateWithLifecycle()
+                if (state.isSessionOnRecording && state.showRecordingConsentDialog) {
+                    AndroidTheme(isDark = true) {
+                        CallRecordingConsentDialog(
+                            onConfirm = { meetingViewModel.setShowRecordingConsentDialogConsumed() },
+                            onDismiss = {
+                                meetingViewModel.setShowRecordingConsentDialogConsumed()
+                                meetingViewModel.endChatCall()
+                            },
+                            onLearnMore = {
+                                val viewIntent = Intent(Intent.ACTION_VIEW)
+                                viewIntent.data = Uri.parse("https://mega.io/privacy")
+                                startActivity(viewIntent)
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
         collectFlows()
 
         collectFlow(meetingViewModel.finishMeetingActivity) { shouldFinish ->
@@ -439,6 +466,12 @@ class MeetingActivity : PasscodeActivity() {
             }
             val chatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
             meetingViewModel.updateChatRoomId(chatId)
+            meetingViewModel.setIsSessionOnRecording(
+                it.getBooleanExtra(
+                    MEETING_CALL_RECORDING,
+                    false
+                )
+            )
 
             // Cancel current notification if needed
             notificationManager.cancel(chatId.toInt())
@@ -568,6 +601,12 @@ class MeetingActivity : PasscodeActivity() {
             bundle.putBoolean(
                 MEETING_SPEAKER_ENABLE, intent.getBooleanExtra(
                     MEETING_SPEAKER_ENABLE,
+                    false
+                )
+            )
+            bundle.putBoolean(
+                MEETING_CALL_RECORDING, intent.getBooleanExtra(
+                    MEETING_CALL_RECORDING,
                     false
                 )
             )

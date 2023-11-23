@@ -377,6 +377,7 @@ import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
+import mega.privacy.android.app.presentation.meeting.CallRecordingConsentDialogFragment;
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity;
 import mega.privacy.android.app.presentation.meeting.UsersInWaitingRoomDialogFragment;
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
@@ -599,6 +600,7 @@ public class ChatActivity extends PasscodeActivity
     AlertDialog dialog;
     AlertDialog statusDialog;
     private UsersInWaitingRoomDialogFragment usersInWaitingRoomDialogFragment;
+    private CallRecordingConsentDialogFragment callRecordingConsentDialogFragment;
 
     boolean retryHistory = false;
     boolean isStartAndRecordVoiceClip = false;
@@ -2008,6 +2010,30 @@ public class ChatActivity extends PasscodeActivity
         usersInWaitingRoomDialogFragment.show(getSupportFragmentManager(), usersInWaitingRoomDialogFragment.getTag());
     }
 
+    /**
+     * Show call recording consent dialog
+     */
+    private void showCallRecordingConsentDialog() {
+        if (callRecordingConsentDialogFragment == null) {
+            callRecordingConsentDialogFragment = CallRecordingConsentDialogFragment.Companion.newInstance(() -> {
+                viewModel.setShowRecordingConsentDialogConsumed();
+                callRecordingConsentDialogFragment.dismissAllowingStateLoss();
+                return null;
+            }, () -> {
+                viewModel.setShowRecordingConsentDialogConsumed();
+                viewModel.endChatCall(viewModel.getState().getValue().getChatId());
+                callRecordingConsentDialogFragment.dismissAllowingStateLoss();
+                return null;
+            }, () -> {
+                Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                viewIntent.setData(Uri.parse("https://mega.io/privacy"));
+                startActivity(viewIntent);
+                return null;
+            });
+        }
+        callRecordingConsentDialogFragment.show(getSupportFragmentManager().beginTransaction().remove(callRecordingConsentDialogFragment), callRecordingConsentDialogFragment.getTag());
+    }
+
     private boolean isAllowedToRecord() {
         Timber.d("isAllowedToRecord ");
         if (participatingInACall()) return false;
@@ -2084,6 +2110,7 @@ public class ChatActivity extends PasscodeActivity
                 intentMeeting.putExtra(MEETING_CHAT_ID, callChatId);
                 intentMeeting.putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, chatState.getCurrentCallAudioStatus());
                 intentMeeting.putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, chatState.getCurrentCallVideoStatus());
+                intentMeeting.putExtra(MeetingActivity.MEETING_CALL_RECORDING, chatState.isSessionOnRecording());
                 startActivity(intentMeeting);
             }
 
@@ -2112,6 +2139,12 @@ public class ChatActivity extends PasscodeActivity
                     showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, contactInvitation.getEmail());
                 }
                 viewModel.onContactInvitationConsumed();
+            }
+
+            if (chatState.getShowRecordingConsentDialog()) {
+                showCallRecordingConsentDialog();
+            } else if (callRecordingConsentDialogFragment != null) {
+                callRecordingConsentDialogFragment.dismissAllowingStateLoss();
             }
 
             return Unit.INSTANCE;
@@ -4493,7 +4526,7 @@ public class ChatActivity extends PasscodeActivity
                     startVideo = false;
                     checkCallInThisChat();
                 } else {
-                    returnCall(this, chatIdBanner, passcodeManagement);
+                    returnCall(this, chatIdBanner, passcodeManagement, viewModel.getState().getValue().isSessionOnRecording());
                 }
             }
         } else if (id == R.id.expand_input_text_rl || id == R.id.expand_input_text_icon) {

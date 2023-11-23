@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -74,6 +76,8 @@ import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -135,13 +139,15 @@ import javax.inject.Inject
  * @param getNumUnreadChatsUseCase  monitor number of unread chats
  * @property monitorBackupFolder
  * @property getScheduledMeetingByChat  [GetScheduledMeetingByChat]
- * @property getChatCallUseCase [GetChatCall]
+ * @property getChatCallUseCase [GetChatCallUseCase]
  * @property startMeetingInWaitingRoomChatUseCase [StartMeetingInWaitingRoomChatUseCase]
  * @property answerChatCallUseCase [AnswerChatCallUseCase]
  * @property setChatVideoInDeviceUseCase [SetChatVideoInDeviceUseCase]
  * @property rtcAudioManagerGateway [RTCAudioManagerGateway]
  * @property chatManagement [ChatManagement]
  * @property passcodeManagement [PasscodeManagement]
+ * @property monitorChatSessionUpdatesUseCase [MonitorChatSessionUpdatesUseCase]
+ * @property hangChatCallUseCase [HangChatCallUseCase]
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -212,6 +218,8 @@ class ManagerViewModel @Inject constructor(
     private val passcodeManagement: PasscodeManagement,
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
+    private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
+    private val hangChatCallUseCase: HangChatCallUseCase,
 ) : ViewModel() {
 
     /**
@@ -278,6 +286,8 @@ class ManagerViewModel @Inject constructor(
         key = isFirstLoginKey,
         initialValue = false
     )
+
+    private var monitorChatSessionUpdatesJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -1097,8 +1107,76 @@ class ManagerViewModel @Inject constructor(
             MegaApplication.getInstance().applicationContext,
             call.chatId,
             true,
-            passcodeManagement
+            passcodeManagement,
+            state().isSessionOnRecording
         )
+    }
+
+    /**
+     * Sets showRecordingConsentDialog as consumed.
+     */
+    fun setShowRecordingConsentDialogConsumed() =
+        _state.update { state -> state.copy(showRecordingConsentDialog = false) }
+
+    /**
+     * End chat call
+     */
+    fun endChatCall(chatId: Long) = viewModelScope.launch {
+        runCatching {
+            getChatCallUseCase(chatId)?.let { chatCall ->
+                hangChatCallUseCase(chatCall.callId)
+            }
+        }.onSuccess {
+            _state.update { state ->
+                state.copy(
+                    isSessionOnRecording = false,
+                    showRecordingConsentDialog = false
+                )
+            }
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
+
+    /**
+     * Monitor chat session updates
+     *
+     * @param chatId    Chat ID to monitor
+     */
+    fun startMonitorChatSessionUpdates(chatId: Long) {
+        _state.update { it.copy(callInProgressChatId = chatId) }
+        monitorChatSessionUpdatesJob = viewModelScope.launch {
+            monitorChatSessionUpdatesUseCase()
+                .filter { it.chatId == chatId }
+                .collectLatest { result ->
+                    result.session?.let { session ->
+                        session.changes?.apply {
+                            if (contains(ChatSessionChanges.SessionOnRecording)) {
+                                _state.update {
+                                    it.copy(
+                                        isSessionOnRecording = session.isRecording,
+                                        showRecordingConsentDialog = session.isRecording
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
+    /**
+     * Stop monitor chat session updates
+     */
+    fun stopMonitorChatSessionUpdates() {
+        monitorChatSessionUpdatesJob?.cancel()
+        _state.update {
+            it.copy(
+                callInProgressChatId = -1L,
+                isSessionOnRecording = false,
+                showRecordingConsentDialog = false
+            )
+        }
     }
 
     internal companion object {

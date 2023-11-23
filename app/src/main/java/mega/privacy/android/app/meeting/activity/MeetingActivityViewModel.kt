@@ -87,6 +87,7 @@ import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -106,33 +107,34 @@ import javax.inject.Inject
  * These fragments can share a ViewModel using their activity scope to handle this communication.
  * MeetingActivityViewModel shares state of Mic, Camera and Speaker for all Fragments
  *
- * @property meetingActivityRepository      [MeetingActivityRepository]
- * @property answerChatCallUseCase          [AnswerChatCallUseCase]
- * @property getCallUseCase                 [GetCallUseCase]
- * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
- * @property getChatParticipants            [GetChatParticipants]
- * @property chatManagement                 [ChatManagement]
- * @property setChatVideoInDeviceUseCase    [SetChatVideoInDeviceUseCase]
- * @property checkChatLink                  [CheckChatLinkUseCase]
- * @property logoutUseCase                  [LogoutUseCase]
- * @property monitorFinishActivityUseCase   [MonitorFinishActivityUseCase]
- * @property monitorChatCallUpdatesUseCase  [MonitorChatCallUpdatesUseCase]
- * @property getChatRoomByChatIdUseCase     [GetChatRoom]
- * @property getCallUseCase                 [GetChatCallUseCase]
- * @property getFeatureFlagValue            [GetFeatureFlagValueUseCase]
- * @property setOpenInvite                  [SetOpenInvite]
- * @property chatParticipantMapper          [ChatParticipantMapper]
- * @property monitorChatRoomUpdates         [MonitorChatRoomUpdates]
- * @property queryChatLink                  [QueryChatLink]
- * @property isEphemeralPlusPlusUseCase     [IsEphemeralPlusPlusUseCase]
- * @property createChatLink                 [CreateChatLink]
- * @property inviteContactUseCase           [InviteContactUseCase]
- * @property updateChatPermissionsUseCase   [UpdateChatPermissions]
- * @property removeFromChaUseCase           [RemoveFromChat]
- * @property startConversationUseCase       [StartConversationUseCase]
- * @property isConnectedToInternetUseCase   [IsConnectedToInternetUseCase]
- * @property monitorStorageStateEventUseCase [MonitorStorageStateEventUseCase]
- * @property state                      Current view state as [MeetingState]
+ * @property meetingActivityRepository          [MeetingActivityRepository]
+ * @property answerChatCallUseCase              [AnswerChatCallUseCase]
+ * @property getCallUseCase                     [GetCallUseCase]
+ * @property rtcAudioManagerGateway             [RTCAudioManagerGateway]
+ * @property getChatParticipants                [GetChatParticipants]
+ * @property chatManagement                     [ChatManagement]
+ * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
+ * @property checkChatLink                      [CheckChatLinkUseCase]
+ * @property logoutUseCase                      [LogoutUseCase]
+ * @property monitorFinishActivityUseCase       [MonitorFinishActivityUseCase]
+ * @property monitorChatCallUpdatesUseCase      [MonitorChatCallUpdatesUseCase]
+ * @property getChatRoomByChatIdUseCase         [GetChatRoom]
+ * @property getChatCallUseCase                 [GetChatCallUseCase]
+ * @property getFeatureFlagValue                [GetFeatureFlagValueUseCase]
+ * @property setOpenInvite                      [SetOpenInvite]
+ * @property chatParticipantMapper              [ChatParticipantMapper]
+ * @property monitorChatRoomUpdates             [MonitorChatRoomUpdates]
+ * @property queryChatLink                      [QueryChatLink]
+ * @property isEphemeralPlusPlusUseCase         [IsEphemeralPlusPlusUseCase]
+ * @property createChatLink                     [CreateChatLink]
+ * @property inviteContactUseCase               [InviteContactUseCase]
+ * @property updateChatPermissionsUseCase       [UpdateChatPermissions]
+ * @property removeFromChaUseCase               [RemoveFromChat]
+ * @property startConversationUseCase           [StartConversationUseCase]
+ * @property isConnectedToInternetUseCase       [IsConnectedToInternetUseCase]
+ * @property monitorStorageStateEventUseCase    [MonitorStorageStateEventUseCase]
+ * @property hangChatCallUseCase                [HangChatCallUseCase]
+ * @property state                              Current view state as [MeetingState]
  */
 @HiltViewModel
 class MeetingActivityViewModel @Inject constructor(
@@ -164,6 +166,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val startConversationUseCase: StartConversationUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val hangChatCallUseCase: HangChatCallUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -478,12 +481,17 @@ class MeetingActivityViewModel @Inject constructor(
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { result ->
                     result.session?.let { session ->
-
                         session.changes?.apply {
                             if (contains(ChatSessionChanges.RemoteAvFlags)) {
-                                val isScreenSharing = session.hasScreenShare
-
-                                _state.update { it.copy(isParticipantSharingScreen = isScreenSharing) }
+                                _state.update { it.copy(isParticipantSharingScreen = session.hasScreenShare) }
+                            }
+                            if (contains(ChatSessionChanges.SessionOnRecording)) {
+                                _state.update {
+                                    it.copy(
+                                        isSessionOnRecording = session.isRecording,
+                                        showRecordingConsentDialog = session.isRecording
+                                    )
+                                }
                             }
                         }
                     }
@@ -1248,9 +1256,39 @@ class MeetingActivityViewModel @Inject constructor(
                     }
 
                     checkParticipantLists()
+                    if (!state.value.isSessionOnRecording) {
+                        checkIfCallIsBeingRecorded(chatId = chatId)
+                    }
                 }
         }.onFailure { exception ->
             Timber.e(exception)
+        }
+    }
+
+    /**
+     * Check if the call is being recorded
+     *
+     * @param chatId Chat ID
+     */
+    private fun checkIfCallIsBeingRecorded(chatId: Long) {
+        getCallUseCase.getMegaChatCall(chatId).blockingGet().let { call ->
+            call.sessionsClientid?.let { listParticipants ->
+                if (listParticipants.size() > 0) {
+                    for (i in 0 until listParticipants.size()) {
+                        call.getMegaChatSession(listParticipants[i])?.let { session ->
+                            if (session.isRecording) {
+                                _state.update { state ->
+                                    state.copy(
+                                        isSessionOnRecording = true,
+                                        showRecordingConsentDialog = true
+                                    )
+                                }
+                                return
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1446,6 +1484,40 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun onConsumeNavigateToChatEvent() =
         _state.update { it.copy(chatIdToOpen = INVALID_CHAT_HANDLE) }
+
+    /**
+     * Sets isSessionOnRecording value.
+     *
+     * @param value Value to set.
+     */
+    fun setIsSessionOnRecording(value: Boolean) =
+        _state.update { state -> state.copy(isSessionOnRecording = value) }
+
+    /**
+     * Sets showRecordingConsentDialog as consumed.
+     */
+    fun setShowRecordingConsentDialogConsumed() =
+        _state.update { state -> state.copy(showRecordingConsentDialog = false) }
+
+    /**
+     * End chat call
+     */
+    fun endChatCall() = viewModelScope.launch {
+        runCatching {
+            getChatCallUseCase(_state.value.chatId)?.let { chatCall ->
+                hangChatCallUseCase(chatCall.callId)
+            }
+        }.onSuccess {
+            _state.update { state ->
+                state.copy(
+                    isSessionOnRecording = false,
+                    showRecordingConsentDialog = false
+                )
+            }
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
 
     companion object {
         private const val INVALID_CHAT_HANDLE = -1L

@@ -33,7 +33,9 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
@@ -106,6 +108,8 @@ class ChatViewModelTest {
         onBlocking { invoke(any()) }.thenReturn(flowOf())
     }
     private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
+    private val monitorChatSessionUpdatesUseCase = mock<MonitorChatSessionUpdatesUseCase>()
+    private val hangChatCallUseCase = mock<HangChatCallUseCase>()
 
     @Before
     fun setUp() {
@@ -143,6 +147,8 @@ class ChatViewModelTest {
             startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
+            monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
+            hangChatCallUseCase = hangChatCallUseCase,
         )
     }
 

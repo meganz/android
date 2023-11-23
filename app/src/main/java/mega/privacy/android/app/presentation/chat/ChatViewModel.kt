@@ -45,6 +45,7 @@ import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
@@ -65,7 +66,9 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
@@ -93,7 +96,7 @@ import javax.inject.Inject
  * @property startChatCallNoRingingUseCase                  [StartChatCallNoRingingUseCase]
  * @property startMeetingInWaitingRoomChatUseCase           [StartMeetingInWaitingRoomChatUseCase]
  * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
- * @property getChatCallUseCase                                    [GetChatCallUseCase]
+ * @property getChatCallUseCase                             [GetChatCallUseCase]
  * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
  * @property endCallUseCase                                 [EndCallUseCase]
  * @property sendStatisticsMeetingsUseCase                  [SendStatisticsMeetingsUseCase]
@@ -109,6 +112,8 @@ import javax.inject.Inject
  * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdatesUseCase]
  * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
  * @property leaveChatUseCase                               [LeaveChatUseCase]
+ * @property monitorChatSessionUpdatesUseCase               [MonitorChatSessionUpdatesUseCase]
+ * @property hangChatCallUseCase                            [HangChatCallUseCase]
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -143,6 +148,8 @@ class ChatViewModel @Inject constructor(
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdatesUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
+    private val hangChatCallUseCase: HangChatCallUseCase,
     monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
 ) : ViewModel() {
 
@@ -224,6 +231,8 @@ class ChatViewModel @Inject constructor(
                 }
             }
         }
+
+        startMonitorChatSessionUpdates()
     }
 
     override fun onCleared() {
@@ -1001,7 +1010,58 @@ class ChatViewModel @Inject constructor(
             getInstance().applicationContext,
             call.chatId,
             true,
-            passcodeManagement
+            passcodeManagement,
+            state.value.isSessionOnRecording
         )
+    }
+
+    /**
+     * Sets showRecordingConsentDialog as consumed.
+     */
+    fun setShowRecordingConsentDialogConsumed() =
+        _state.update { state -> state.copy(showRecordingConsentDialog = false) }
+
+    /**
+     * End chat call
+     */
+    fun endChatCall(chatId: Long) = viewModelScope.launch {
+        runCatching {
+            getChatCallUseCase(chatId)?.let { chatCall ->
+                hangChatCallUseCase(chatCall.callId)
+            }
+        }.onSuccess {
+            _state.update { state ->
+                state.copy(
+                    isSessionOnRecording = false,
+                    showRecordingConsentDialog = false
+                )
+            }
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
+
+    /**
+     * Monitor chat session updates
+     */
+    fun startMonitorChatSessionUpdates() {
+        viewModelScope.launch {
+            monitorChatSessionUpdatesUseCase()
+                .filter { it.chatId == state.value.chatId }
+                .collectLatest { result ->
+                    result.session?.let { session ->
+                        session.changes?.apply {
+                            if (contains(ChatSessionChanges.SessionOnRecording)) {
+                                _state.update {
+                                    it.copy(
+                                        isSessionOnRecording = session.isRecording,
+                                        showRecordingConsentDialog = session.isRecording
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+        }
     }
 }
