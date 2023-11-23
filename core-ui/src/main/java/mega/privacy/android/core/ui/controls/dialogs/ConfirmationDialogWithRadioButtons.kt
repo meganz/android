@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.core.ui.controls.dialogs.internal.AlertDialogFlowRow
 import mega.privacy.android.core.ui.controls.lists.SettingsItemWithRadioButton
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews

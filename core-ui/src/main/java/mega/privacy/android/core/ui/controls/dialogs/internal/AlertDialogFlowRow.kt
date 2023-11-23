@@ -1,9 +1,10 @@
-package mega.privacy.android.core.ui.controls.dialogs
+package mega.privacy.android.core.ui.controls.dialogs.internal
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
@@ -92,11 +93,7 @@ internal fun AlertDialogFlowRow(
             }
             val crossAxisLayoutSize = max(crossAxisSpace, constraints.minHeight)
 
-            val layoutWidth = mainAxisLayoutSize
-
-            val layoutHeight = crossAxisLayoutSize
-
-            layout(layoutWidth, layoutHeight) {
+            layout(mainAxisLayoutSize, crossAxisLayoutSize) {
                 sequences.forEachIndexed { i, placeables ->
                     val childrenMainAxisSizes = IntArray(placeables.size) { j ->
                         placeables[j].width +

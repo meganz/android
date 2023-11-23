@@ -4,6 +4,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.core.ui.controls.dialogs.internal.BaseMegaAlertDialog
+import mega.privacy.android.core.ui.controls.dialogs.internal.CANCEL_TAG
+import mega.privacy.android.core.ui.controls.dialogs.internal.CONFIRM_TAG
+import mega.privacy.android.core.ui.controls.dialogs.internal.TITLE_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
