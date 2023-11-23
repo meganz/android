@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -89,7 +90,7 @@ fun BottomSheet(
 @Composable
 fun BottomSheet(
     modalSheetState: ModalBottomSheetState,
-    sheetBody: @Composable () -> Unit,
+    sheetBody: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     scrimColor: Color = Color.Black.copy(alpha = 0.5f),
     content: (@Composable () -> Unit)? = null,
@@ -132,7 +133,7 @@ fun BottomSheet(
         ),
         sheetState = modalSheetState,
         scrimColor = scrimColor,
-        sheetContent = { sheetBody() },
+        sheetContent = sheetBody,
     ) {
         content?.invoke()
     }

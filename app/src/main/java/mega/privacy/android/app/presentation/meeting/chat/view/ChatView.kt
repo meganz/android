@@ -3,16 +3,15 @@ package mega.privacy.android.app.presentation.meeting.chat.view
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
@@ -32,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
@@ -58,6 +56,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.MutePushNo
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactToAddDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
@@ -121,6 +120,14 @@ internal fun ChatView(
     var showClearChat by rememberSaveable { mutableStateOf(false) }
     var showEndCallForAllDialog by rememberSaveable { mutableStateOf(false) }
     var showMutePushNotificationDialog by rememberSaveable { mutableStateOf(false) }
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+    )
+    BackHandler(enabled = modalSheetState.isVisible) {
+        coroutineScope.launch {
+            modalSheetState.hide()
+        }
+    }
 
     with(uiState) {
         val addContactLauncher =
@@ -138,18 +145,12 @@ internal fun ChatView(
                 }
             }
 
-        val modalSheetState = rememberModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Hidden,
-        )
-
         BottomSheet(
             modalSheetState = modalSheetState,
             sheetBody = {
-                // place holder sheet
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
+                ChatToolbarBottomSheet(
+                    modifier = Modifier.fillMaxWidth(),
+                    sheetState = modalSheetState
                 )
             },
         ) {
