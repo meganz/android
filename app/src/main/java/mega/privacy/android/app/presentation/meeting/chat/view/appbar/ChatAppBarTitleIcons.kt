@@ -1,9 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.appbar
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -11,8 +9,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.isValid
-import mega.privacy.android.app.presentation.extensions.vectorRes
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.core.ui.controls.chat.ChatStatusIcon
+import mega.privacy.android.core.ui.controls.chat.UiChatStatus
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
 @Composable
@@ -25,11 +24,27 @@ internal fun TitleIcons(uiState: ChatUiState) {
 @Composable
 private fun UserChatStateIcon(userChatStatus: UserChatStatus?) {
     if (userChatStatus?.isValid() == true) {
-        Image(
-            painter = painterResource(id = userChatStatus.vectorRes(MaterialTheme.colors.isLight)),
-            modifier = Modifier.testTag(TEST_TAG_USER_CHAT_STATE),
-            contentDescription = "Status icon"
-        )
+        when (userChatStatus) {
+            UserChatStatus.Online -> ChatStatusIcon(
+                modifier = Modifier.testTag(TEST_TAG_USER_CHAT_STATE),
+                status = UiChatStatus.Online
+            )
+
+            UserChatStatus.Away -> ChatStatusIcon(
+                modifier = Modifier.testTag(TEST_TAG_USER_CHAT_STATE),
+                status = UiChatStatus.Away
+            )
+
+            UserChatStatus.Busy -> ChatStatusIcon(
+                modifier = Modifier.testTag(TEST_TAG_USER_CHAT_STATE),
+                status = UiChatStatus.Busy
+            )
+
+            else -> ChatStatusIcon(
+                modifier = Modifier.testTag(TEST_TAG_USER_CHAT_STATE),
+                status = UiChatStatus.Offline
+            )
+        }
     }
 }
 
