@@ -549,6 +549,11 @@ private String firebaseUploadFailureMessage(String lineBreak) {
     } else if (env.gitlabActionType == "NOTE") {
         message += "${lineBreak}Trigger Reason: MR comment (${gitlabTriggerPhrase})"
     }
+
+    if (env.gitlabTargetBranch == "develop" && env.gitlabSourceBranch == "develop") {
+        message += "${lineBreak}Hi <!subteam^S02B2PB5SG7>,  latest `develop` has build failure, please check."  //notify all Android devs
+    }
+
     return message
 }
 
