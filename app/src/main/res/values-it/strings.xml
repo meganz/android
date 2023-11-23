@@ -2558,7 +2558,7 @@
     <!-- Text of the dialog shown when a pdf required password -->
     <string name="text_pdf_password">%s è un documento PDF protetto da password. Per favore, inserisci la password per aprire il PDF.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
-    <string name="error_max_pdf_password">La password che hai inserito non è valida.</string>
+    <string name="error_max_pdf_password">La password che hai inserito non è valida</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">Non è possibile mettere play ai media mentre c’è una chiamata in corso.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
@@ -4679,19 +4679,13 @@
         <item quantity="many">Impossibile copiare %1$d di oggetti</item>
         <item quantity="other">Impossibile copiare %1$d oggetti</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">%1$d oggetto copiato,&#160;</item>
         <item quantity="many">%1$d di oggetti copiati,&#160;</item>
         <item quantity="other">%1$d oggetti copiati,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">impossibile copiare %1$d oggetto</item>
         <item quantity="many">impossibile copiare %1$d oggetti</item>
@@ -4860,11 +4854,11 @@
     <!-- Label for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations">Inviti per il meeting</string>
     <!-- Text for the meeting invitations option on calls settings -->
-    <string name="settings_calls_preferences_meeting_invitations_text"></string>
+    <string name="settings_calls_preferences_meeting_invitations_text">Notify me when someone invites me to a meeting</string>
     <!-- Label for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders"></string>
+    <string name="settings_calls_preferences_meeting_reminders">Meeting reminders</string>
     <!-- Text for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders_text"></string>
+    <string name="settings_calls_preferences_meeting_reminders_text">Notify me 15 minutes before the meetings starts and on the time the meeting is schedule to start</string>
     <!-- Notification description for scheduled meetings that starts in 15 minutes -->
     <string name="notification_sched_meeting_starts_15_minutes">Il meeting inizierà tra 15 minuti</string>
     <!-- Notification description for scheduled meetings that starts now -->
@@ -4938,9 +4932,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Impossibile aprire il file</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description"></string>
+    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description"></string>
+    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Solo Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -5468,5 +5462,5 @@
     <!-- Label for the negative or cancel button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_negative_button">Lascia la chiamata</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option"></string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Learn more[/A]</string>
 </resources>

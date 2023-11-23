@@ -2495,7 +2495,7 @@
     <!-- Text of the dialog shown when a pdf required password -->
     <string name="text_pdf_password">%s is a password protected PDF document. Please enter the password to open the PDF.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
-    <string name="error_max_pdf_password">The password you have entered is not valid.</string>
+    <string name="error_max_pdf_password">The password you have entered is not valid</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">It is not possible to play media files while there is a call in progress.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->

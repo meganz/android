@@ -2432,7 +2432,7 @@
     <!-- Text of the dialog shown when a pdf required password -->
     <string name="text_pdf_password">%s là tệp tin PDF được bảo vệ với mật khẩu. Xin nhập mật khẩu để mở PDF này.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
-    <string name="error_max_pdf_password">Mật&#160;khẩu vừa nhập không hợp lệ.</string>
+    <string name="error_max_pdf_password">Mật&#160;khẩu vừa nhập không hợp lệ</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">Việc phát nội dung phương tiện số không thực hiện được khi có cuộc gọi đang diễn ra.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
@@ -2464,13 +2464,13 @@
     <!-- Subtitle of the call screen when the call is on hold -->
     <string name="call_on_hold">Cuộc gọi hiện tạm dừng</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
-    <string name="hold_and_answer_call_incoming">Trả lời &amp; Tạm dừng cuộc hiện tại</string>
+    <string name="hold_and_answer_call_incoming">Trả lời &amp;amp; Tạm dừng cuộc hiện tại</string>
     <!-- The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other. -->
-    <string name="hold_and_join_call_incoming">Tham gia &amp; Tạm dừng cuộc hiện tại</string>
+    <string name="hold_and_join_call_incoming">Tham gia &amp;amp; Tạm dừng cuộc hiện tại</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other. -->
-    <string name="end_and_answer_call_incoming">Trả lời &amp; Kết thúc cuộc hiện tại</string>
+    <string name="end_and_answer_call_incoming">Trả lời &amp;amp; Kết thúc cuộc hiện tại</string>
     <!-- The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other. -->
-    <string name="end_and_join_call_incoming">Tham gia &amp; Kết thúc cuộc hiện tại</string>
+    <string name="end_and_join_call_incoming">Tham gia &amp;amp; Kết thúc cuộc hiện tại</string>
     <!-- when trying to download a file that is already downloaded in the device and has to copy in another path -->
     <string name="copy_already_downloaded">Tệp tin đã được tải xuống từ trước. Bản sao đã được tạo ra ở vị trí đã chọn.</string>
     <!-- Title of the dialog shown when you want to join a group call -->
@@ -4303,17 +4303,11 @@
     <plurals name="general_copy_snackbar_fail">
         <item quantity="other">Đã không sao&#160;chép được %1$d mục</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="other">Đã sao&#160;chép %1$d mục,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="other">không sao&#160;chép được %1$d mục</item>
     </plurals>
@@ -4446,11 +4440,11 @@
     <!-- Label for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations">Mời vào cuộc họp</string>
     <!-- Text for the meeting invitations option on calls settings -->
-    <string name="settings_calls_preferences_meeting_invitations_text"></string>
+    <string name="settings_calls_preferences_meeting_invitations_text">Notify me when someone invites me to a meeting</string>
     <!-- Label for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders"></string>
+    <string name="settings_calls_preferences_meeting_reminders">Meeting reminders</string>
     <!-- Text for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders_text"></string>
+    <string name="settings_calls_preferences_meeting_reminders_text">Notify me 15 minutes before the meetings starts and on the time the meeting is schedule to start</string>
     <!-- Notification description for scheduled meetings that starts in 15 minutes -->
     <string name="notification_sched_meeting_starts_15_minutes">Cuộc họp bắt&#160;đầu trong 15 phút</string>
     <!-- Notification description for scheduled meetings that starts now -->
@@ -4512,9 +4506,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Không thể mở được tệp</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description"></string>
+    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description"></string>
+    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Chỉ cho hạng Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -4990,7 +4984,7 @@
     <!-- Warning indicating that a participant is sharing the screen-->
     <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Người này đang chiếu chia&#160;sẻ màn&#160;hình</string>
     <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">This call is being recorded</string>
+    <string name="meetings_call_recording_consent_dialog_title">Cuộc gọi này đang được ghi lại</string>
     <!-- Message of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_message">By staying in the call you give permission to be recorded. The recording is only stored on the device of the person who records it.</string>
     <!-- Label for the positive or confirm button of the call recording consent dialog -->
@@ -4998,5 +4992,5 @@
     <!-- Label for the negative or cancel button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_negative_button">Rời khỏi cuộc gọi</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option"></string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Learn more[/A]</string>
 </resources>

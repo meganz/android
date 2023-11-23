@@ -57,11 +57,11 @@
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Weergeven in Cloud Schijf</string>
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="device_center_list_view_item_sub_state_no_sync_error"></string>
+    <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="device_center_list_view_item_sub_state_unsupported_file_system"></string>
+    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA can’t sync or backup this folder because the filesystem on your device is not supported.</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
-    <string name="device_center_list_view_item_sub_state_invalid_remote_type"></string>
+    <string name="device_center_list_view_item_sub_state_invalid_remote_type">The folder you chose can’t be synced</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">Een bestand kan niet individueel gesynchroniseerd worden. U moet de synchronisatie vanuit de map instellen.</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
@@ -69,11 +69,11 @@
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">De map in MEGA kan niet worden gevonden omdat deze is verplaatst of verwijderd, of u heeft mogelijk geen toegang.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
-    <string name="device_center_list_view_item_sub_state_storage_overquota"></string>
+    <string name="device_center_list_view_item_sub_state_storage_overquota">Storage quota has reached the limit.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
-    <string name="device_center_list_view_item_sub_state_account_expired"></string>
+    <string name="device_center_list_view_item_sub_state_account_expired">Your plan has expired.</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="device_center_list_view_item_sub_state_foreign_target_overshare"></string>
+    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Folder can’t be synced as user who shared this folder has reached their storage quota.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
     <string name="device_center_list_view_item_sub_state_remote_path_has_changed">Map in MEGA kan niet gevonden worden omdat het was verwijderd.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
@@ -83,57 +83,57 @@
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_below_path">Map kan niet worden gesynchroniseerd omdat deze al gesynchroniseerde mappen bevat.</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported"></string>
+    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA can’t sync or backup VirtualBox folders.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="device_center_list_view_item_sub_state_account_blocked"></string>
+    <string name="device_center_list_view_item_sub_state_account_blocked">Account has been blocked</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
-    <string name="device_center_list_view_item_sub_state_unknown_temporary_error"></string>
+    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problem syncing or backing up this folder. Check again later. If issue continues, contact Support.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="device_center_list_view_item_sub_state_too_many_action_packets">Account opnieuw geladen. Eventuele gemiste updates voor uw back-ups of synchronisaties zijn niet toegepast.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="device_center_list_view_item_sub_state_logged_out">Synchronisatie of back-up is gestopt omdat het lijkt alsof u bent afgemeld bij de Desktop-applicatie. Meld u opnieuw aan via de Desktop-applicatie en hervat de synchronisatie of back-up.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="device_center_list_view_item_sub_state_missing_parent_node"></string>
+    <string name="device_center_list_view_item_sub_state_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">Map in lokale schijf kan niet gevonden worden.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_same_path"></string>
+    <string name="device_center_list_view_item_sub_state_active_sync_same_path">There’s already a synced folder at the same path</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Hernoemen is mislukt.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file"></string>
+    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Couldn’t create a sync. File has been ignored.</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="device_center_list_view_item_sub_state_sync_config_read_failure"></string>
+    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Couldn’t read sync configs from drive.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="device_center_list_view_item_sub_state_unknown_drive_path"></string>
+    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Sync’s drive path is unknown</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
-    <string name="device_center_list_view_item_sub_state_invalid_scan_interval"></string>
+    <string name="device_center_list_view_item_sub_state_invalid_scan_interval">Invalid scan interval</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="device_center_list_view_item_sub_state_notification_system_unavailable"></string>
+    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">Filesystem notification subsystem has encountered an unrecoverable error.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
-    <string name="device_center_list_view_item_sub_state_unable_to_add_watch"></string>
+    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Unable to add a filesystem watch.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
-    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid"></string>
+    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Unable to retrieve a sync root’s FSID.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="device_center_list_view_item_sub_state_unable_to_open_database"></string>
+    <string name="device_center_list_view_item_sub_state_unable_to_open_database">Unable to open state cache database</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Onvoldoende ruimte om te downloaden.</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage"></string>
+    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage">No access to persistent storage</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Onbekende fout.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="device_center_list_view_item_sub_state_message_something_went_wrong"></string>
+    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Map kan niet gesynchroniseerd worden of opgeslagen omdat de MEGA map in de Prullenbak is.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">De map op uw apparaat kan nu niet worden gevonden. Probeer het later opnieuw.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive"></string>
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Folder in your device can’t be located</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes"></string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the backup and try setting it up again in the desktop app, or contact Support.</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue"></string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">Problem syncing or backing up this folder. Stop the sync or backup and try setting it up again in the desktop app, or contact Support.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Map kan niet gesynchroniseert worden omdat het al binnen een gesynchroniseerde map is.</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
