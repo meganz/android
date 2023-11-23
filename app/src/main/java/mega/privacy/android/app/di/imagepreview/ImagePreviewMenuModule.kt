@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.multibindings.IntoMap
 import mega.privacy.android.app.presentation.imagepreview.menu.AlbumContentImagePreviewMenuOptions
+import mega.privacy.android.app.presentation.imagepreview.menu.CloudDriveImagePreviewMenuOptions
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenuOptions
 import mega.privacy.android.app.presentation.imagepreview.menu.MediaDiscoveryImagePreviewMenuOptions
 import mega.privacy.android.app.presentation.imagepreview.menu.TimelineImagePreviewMenuOptions
@@ -29,4 +30,10 @@ interface ImagePreviewMenuModule {
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.MEDIA_DISCOVERY)
     fun MediaDiscoveryImagePreviewMenuOptions.bindMediaDiscoveryMenuOptions(): ImagePreviewMenuOptions
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.CLOUD_DRIVE)
+    fun CloudDriveImagePreviewMenuOptions.bindCloudDriveMenuOptions(): ImagePreviewMenuOptions
+
 }

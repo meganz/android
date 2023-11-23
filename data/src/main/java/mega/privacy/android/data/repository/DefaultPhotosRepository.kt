@@ -38,6 +38,7 @@ import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPrefer
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
@@ -47,6 +48,7 @@ import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.RawFileTypeInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -101,6 +103,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val imageNodeMapper: ImageNodeMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : PhotosRepository {
     private val photosCache: MutableMap<NodeId, Photo> = mutableMapOf()
 
@@ -719,7 +722,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     ): List<ImageNode> {
         return withContext(ioDispatcher) {
             val parent = megaApiFacade.getMegaNodeByHandle(parentID)
-            val searchString = ""
+            val searchString = "*"
             parent?.let { parentNode ->
                 val token = MegaCancelToken.createInstance()
                 val images = async {
@@ -756,4 +759,60 @@ internal class DefaultPhotosRepository @Inject constructor(
             } ?: emptyList()
         }
     }
+
+    override suspend fun getCloudDriveImageNodes(
+        parentId: NodeId,
+        order: SortOrder?,
+    ): List<ImageNode> = withContext(ioDispatcher) {
+        val parentNode =
+            megaApiFacade.getMegaNodeByHandle(parentId.longValue) ?: return@withContext emptyList()
+        val megaNodes = megaApiFacade.getChildrenByNode(
+            parentNode = parentNode,
+            order = order?.let { sortOrderIntMapper(it) },
+        ).filter { isImageNodeValid(it) || isVideoNodeValid(it) }
+
+        val offlineMap = megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
+        megaNodes.map { megaNode ->
+            imageNodeMapper(
+                megaNode = megaNode,
+                hasVersion = megaApiFacade::hasVersion,
+                requireSerializedData = true,
+                offline = offlineMap?.get(megaNode.handle.toString()),
+            )
+        }
+    }
+
+    private suspend fun isImageNodeValid(node: MegaNode, filterSvg: Boolean = true): Boolean {
+        val fileType = fileTypeInfoMapper(node)
+        return node.isFile
+                && fileType is ImageFileTypeInfo
+                && node.isValidPhotoNode()
+                && (fileType !is SvgFileTypeInfo || !filterSvg)
+    }
+
+    private suspend fun isVideoNodeValid(node: MegaNode): Boolean {
+        val fileType = fileTypeInfoMapper(node)
+        return node.isFile && fileType is VideoFileTypeInfo && node.isValidPhotoNode()
+    }
+
+    override suspend fun fetchImageNode(nodeId: NodeId): ImageNode? = withContext(ioDispatcher) {
+        val offlineMap = megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
+        getMegaNode(nodeId)?.let { megaNode ->
+            if (isImageNodeValid(megaNode) || isVideoNodeValid(megaNode)) {
+                imageNodeMapper(
+                    megaNode = megaNode,
+                    hasVersion = megaApiFacade::hasVersion,
+                    requireSerializedData = true,
+                    offline = offlineMap?.get(megaNode.handle.toString()),
+                )
+            } else {
+                null
+            }
+        }
+    }
+
+    private suspend fun getMegaNode(nodeId: NodeId): MegaNode? {
+        return megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
+    }
+
 }

@@ -5,4 +5,5 @@ enum class ImagePreviewMenuSource {
     ALBUM_CONTENT,
     ALBUM_SHARING,
     MEDIA_DISCOVERY,
+    CLOUD_DRIVE,
 }

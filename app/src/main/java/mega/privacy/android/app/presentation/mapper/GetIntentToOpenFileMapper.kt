@@ -9,9 +9,14 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
@@ -33,6 +38,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFileForNode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
@@ -62,7 +68,8 @@ class GetIntentToOpenFileMapper @Inject constructor(
     private val httpServerSetMaxBufferSize: MegaApiHttpServerSetMaxBufferSizeUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     private val getCloudSortOrder: GetCloudSortOrder,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     /**
@@ -229,13 +236,22 @@ class GetIntentToOpenFileMapper @Inject constructor(
             intentInternalIntentPair.first
 
         } else if (MimeTypeList.typeForName(fileNode.name).isImage) {
-            ImageViewerActivity.getIntentForParentNode(
-                activity,
-                fileNode.parentId.longValue,
-                getCloudSortOrder(),
-                fileNode.id.longValue
-            )
-
+            if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                ImagePreviewActivity.createIntent(
+                    context = activity,
+                    imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
+                    menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
+                    anchorImageNodeId = fileNode.id,
+                    params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to fileNode.parentId.longValue),
+                )
+            } else {
+                ImageViewerActivity.getIntentForParentNode(
+                    activity,
+                    fileNode.parentId.longValue,
+                    getCloudSortOrder(),
+                    fileNode.id.longValue
+                )
+            }
         } else {
             getNodeByHandle(fileNode.id.longValue)?.let { node ->
                 if (viewType == Constants.FOLDER_LINK_ADAPTER) {

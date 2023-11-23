@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
@@ -130,4 +131,14 @@ interface PhotosRepository {
      * Monitor media discovery nodes
      */
     suspend fun getMediaDiscoveryNodes(parentID: Long, recursive: Boolean): List<ImageNode>
+
+    /**
+     * Monitor imageNodes in a cloud drive folder
+     */
+    suspend fun getCloudDriveImageNodes(parentId: NodeId, order: SortOrder?): List<ImageNode>
+
+    /**
+     * Map ImageNode by NodeId
+     */
+    suspend fun fetchImageNode(nodeId: NodeId): ImageNode?
 }

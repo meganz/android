@@ -24,7 +24,7 @@ class MediaDiscoveryImageNodeFetcher @Inject constructor(
     }
 
     internal companion object {
-        const val PARENT_ID = "parentID"
+        const val PARENT_ID = "parentId"
 
         const val IS_RECURSIVE = "recursive"
     }

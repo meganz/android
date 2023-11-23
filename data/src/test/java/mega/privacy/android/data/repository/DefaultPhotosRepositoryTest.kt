@@ -254,7 +254,8 @@ class DefaultPhotosRepositoryTest {
         contentConsumptionMegaStringMapMapper = contentConsumptionMegaStringMapMapper,
         imageNodeMapper = mock(),
         megaLocalRoomGateway = mock(),
-        cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway
+        cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
+        sortOrderIntMapper = mock(),
     )
 
     private fun createMegaNode(
