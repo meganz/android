@@ -45,6 +45,7 @@ import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.HttpConnectionRepositoryImpl
 import mega.privacy.android.data.repository.ImageRepositoryImpl
 import mega.privacy.android.data.repository.InAppUpdateRepositoryImpl
+import mega.privacy.android.data.repository.LegacyNotificationRepository
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
@@ -162,7 +163,12 @@ internal abstract class RepositoryModule {
     abstract fun bindSupportRepository(implementation: DefaultSupportRepository): SupportRepository
 
     @Binds
+    @Singleton
     abstract fun bindNotificationsRepository(repository: DefaultNotificationsRepository): NotificationsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLegacyNotificationsRepository(repository: DefaultNotificationsRepository): LegacyNotificationRepository
 
     /**
      * Bind sort order repository

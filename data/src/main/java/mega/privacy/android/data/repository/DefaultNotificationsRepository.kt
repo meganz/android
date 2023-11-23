@@ -51,10 +51,13 @@ internal class DefaultNotificationsRepository @Inject constructor(
     private val callsPreferencesGateway: CallsPreferencesGateway,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
-) : NotificationsRepository {
+) : NotificationsRepository, LegacyNotificationRepository {
 
     private val _pushNotificationSettings =
         MutableStateFlow(megaApiGateway.createInstanceMegaPushNotificationSettings())
+
+    override val pushNotificationSettings: MegaPushNotificationSettings
+        get() = _pushNotificationSettings.value
 
     override fun monitorUserAlerts() = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
