@@ -80,11 +80,19 @@ sealed interface ChatRoomMenuAction : MenuAction {
     }
 
     /**
-     * Clear
+     * Archive
+     *
      */
     object Archive : MenuActionWithoutIcon(
         descriptionRes = R.string.general_archive,
         testTag = TEST_TAG_ARCHIVE_ACTION,
+    ), ChatRoomMenuAction {
+        override val orderInCategory: Int = 135
+    }
+
+    object Unarchive : MenuActionWithoutIcon(
+        descriptionRes = R.string.general_unarchive,
+        testTag = TEST_TAG_UNARCHIVE_ACTION,
     ), ChatRoomMenuAction {
         override val orderInCategory: Int = 135
     }
@@ -147,6 +155,11 @@ sealed interface ChatRoomMenuAction : MenuAction {
          * Test Tag Archive Action
          */
         const val TEST_TAG_ARCHIVE_ACTION = "chat_view:action_chat_archive"
+
+        /**
+         * Test Tag Unarchive Action
+         */
+        const val TEST_TAG_UNARCHIVE_ACTION = "chat_view:action_chat_unarchive"
 
         /**
          * Test Tag End Call For All Action

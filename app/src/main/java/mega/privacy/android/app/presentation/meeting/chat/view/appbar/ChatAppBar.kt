@@ -59,6 +59,7 @@ internal fun ChatAppBar(
     showClearChatConfirmationDialog: () -> Unit = {},
     showMutePushNotificationDialog: () -> Unit = {},
     archiveChat: () -> Unit = {},
+    unarchiveChat: () -> Unit = {},
     showEndCallForAllDialog: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -131,6 +132,8 @@ internal fun ChatAppBar(
 
                 ChatRoomMenuAction.Archive -> archiveChat()
 
+                ChatRoomMenuAction.Unarchive -> unarchiveChat()
+
                 ChatRoomMenuAction.EndCallForAll -> showEndCallForAllDialog()
 
                 else -> (it as ChatRoomMenuAction).let(onMenuActionPressed)
@@ -170,8 +173,12 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
             add(ChatRoomMenuAction.Clear)
         }
 
-        if (!isPreviewMode && isConnected && !isArchived) {
-            add(ChatRoomMenuAction.Archive)
+        if (!isPreviewMode && isConnected) {
+            if (isArchived) {
+                add(ChatRoomMenuAction.Unarchive)
+            } else {
+                add(ChatRoomMenuAction.Archive)
+            }
         }
 
         if (hasModeratorPermission && (uiState.isGroup || uiState.isMeeting) && uiState.hasACallInThisChat()) {

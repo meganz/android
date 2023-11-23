@@ -84,6 +84,7 @@ internal fun ChatView(
         onClearChatHistory = viewModel::clearChatHistory,
         onInfoToShowConsumed = viewModel::onInfoToShowEventConsumed,
         archiveChat = viewModel::archiveChat,
+        unarchiveChat = viewModel::unarchiveChat,
         endCallForAll = viewModel::endCall,
         startCall = viewModel::startCall,
         onCallStarted = viewModel::onCallStarted
@@ -107,6 +108,7 @@ internal fun ChatView(
     onInfoToShowConsumed: () -> Unit = {},
     enablePasscodeCheck: () -> Unit = {},
     archiveChat: () -> Unit = {},
+    unarchiveChat: () -> Unit = {},
     endCallForAll: () -> Unit = {},
     startCall: (Boolean) -> Unit = {},
     onCallStarted: () -> Unit = {},
@@ -190,6 +192,7 @@ internal fun ChatView(
                         showEndCallForAllDialog = {
                             showEndCallForAllDialog = true
                         },
+                        unarchiveChat = unarchiveChat,
                     )
                 },
                 snackbarHost = {

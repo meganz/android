@@ -1203,6 +1203,19 @@ class ChatAppBarTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun `test that Unarchive menu action is available if it is archived`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                isArchived = true,
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNARCHIVE_ACTION)
+            .assertIsDisplayed()
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatAppBar(

@@ -596,11 +596,6 @@ internal class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             chatId?.let {
                 runCatching { archiveChatUseCase(it, true) }
-                    .onSuccess {
-                        _state.update { state ->
-                            state.copy(infoToShowEvent = triggered(null))
-                        }
-                    }
                     .onFailure {
                         Timber.e("Error archiving chat $it")
                         _state.update { state ->
@@ -608,8 +603,28 @@ internal class ChatViewModel @Inject constructor(
                                 infoToShowEvent = triggered(
                                     InfoToShow(
                                         stringId = R.string.error_archive_chat,
-                                        args = state.title?.let { title -> listOf(title) }
-                                            ?: emptyList()
+                                        args = state.title?.let { title -> listOf(title) }.orEmpty()
+                                    )
+                                )
+                            )
+                        }
+                    }
+            }
+        }
+    }
+
+    fun unarchiveChat() {
+        viewModelScope.launch {
+            chatId?.let {
+                runCatching { archiveChatUseCase(it, false) }
+                    .onFailure {
+                        Timber.e("Error unarchiving chat $it")
+                        _state.update { state ->
+                            state.copy(
+                                infoToShowEvent = triggered(
+                                    InfoToShow(
+                                        stringId = R.string.error_unarchive_chat,
+                                        args = state.title?.let { title -> listOf(title) }.orEmpty()
                                     )
                                 )
                             )
