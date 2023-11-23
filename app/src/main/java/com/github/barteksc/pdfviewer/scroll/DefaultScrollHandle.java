@@ -53,6 +53,7 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
     @Override
     public void setupLayout(PDFView pdfView) {
         Timber.d("setupLayout");
+        if (getParent() != null) return;
 
         ConstraintLayout.LayoutParams textViewHandleLp = new ConstraintLayout.LayoutParams(dp2px(45), dp2px(45));
         textViewHandleLp.endToEnd = LayoutParams.PARENT_ID;
