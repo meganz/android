@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.videosection.model
 
 import mega.privacy.android.domain.entity.node.NodeId
+import java.io.File
 
 /**
  * The entity for the video is displayed in videos section
@@ -10,11 +11,15 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property size the video's size
  * @property duration the video's duration
  * @property thumbnail the video's thumbnail
+ * @property isFavourite the video if is Favourite
+ * @property nodeAvailableOffline the video if is available for offline
  */
 data class UIVideo(
     val id: NodeId,
     val name: String,
     val size: Long,
-    val duration: Int? = 0,
-    val thumbnail: String? = null,
+    val duration: String?,
+    val thumbnail: File? = null,
+    val isFavourite: Boolean = false,
+    val nodeAvailableOffline: Boolean = false,
 )

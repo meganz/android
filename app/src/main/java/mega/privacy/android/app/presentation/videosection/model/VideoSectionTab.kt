@@ -10,7 +10,7 @@ enum class VideoSectionTab {
     All,
 
     /**
-     * Playlist tab
+     * Playlists tab
      */
-    Playlist
+    Playlists
 }
