@@ -850,7 +850,7 @@
         <item quantity="other">Le dossier est partagé avec %1$d contacts. Supprimer tous les partages ?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">L’adresse courriel ou le mot de passe est invalide. Veuillez réessayer.</string>
+    <string name="error_incorrect_email_or_password">L’adresse courriel ou le mot de passe est erroné. Veuillez réessayer.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">Votre compte a été désactivé en raison du non-respect de nos Conditions générales d’utilisation. Veuillez contacter support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
@@ -1635,7 +1635,7 @@
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
     <string name="invalid_link">Le lien est invalide, veuillez demander un nouveau lien valide</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
-    <string name="invalid_link_password">Le mot de passe du lien est invalide</string>
+    <string name="invalid_link_password">Le mot de passe du lien est erroné</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
     <string name="open_link_not_valid_link">Le lien que vous tentez d’ouvrir n’est pas un lien&#160;MEGA valide.</string>
     <!-- Message shown when a link is being processing -->
@@ -2558,7 +2558,7 @@
     <!-- Text of the dialog shown when a pdf required password -->
     <string name="text_pdf_password">%s est un document PDF protégé par mot de passe. Veuillez saisir le mot de passe pour ouvrir le PDF.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
-    <string name="error_max_pdf_password">Le mot de passe que vous avez saisi est invalide.</string>
+    <string name="error_max_pdf_password">Le mot de passe que vous avez saisi est erroné.</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">Il est impossible de lire des fichiers multimédias alors qu’un appel est en cours.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
@@ -4679,19 +4679,13 @@
         <item quantity="many">Impossible de copier %1$d d’éléments</item>
         <item quantity="other">Impossible de copier %1$d&#160;éléments</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">%1$d&#160;élément a été copié,&#160;</item>
         <item quantity="many">%1$d d’éléments ont été copiés,&#160;</item>
         <item quantity="other">%1$d&#160;éléments ont été copiés,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">impossible de copier %1$d&#160;élément</item>
         <item quantity="many">impossible de copier %1$d d’éléments</item>
@@ -4860,11 +4854,11 @@
     <!-- Label for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations">Invitations à la réunion</string>
     <!-- Text for the meeting invitations option on calls settings -->
-    <string name="settings_calls_preferences_meeting_invitations_text"></string>
+    <string name="settings_calls_preferences_meeting_invitations_text">Notify me when someone invites me to a meeting</string>
     <!-- Label for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders"></string>
+    <string name="settings_calls_preferences_meeting_reminders">Meeting reminders</string>
     <!-- Text for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders_text"></string>
+    <string name="settings_calls_preferences_meeting_reminders_text">Notify me 15 minutes before the meetings starts and on the time the meeting is schedule to start</string>
     <!-- Notification description for scheduled meetings that starts in 15 minutes -->
     <string name="notification_sched_meeting_starts_15_minutes">La réunion commence dans 15&#160;minutes</string>
     <!-- Notification description for scheduled meetings that starts now -->
@@ -4938,9 +4932,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Impossible d’ouvrir le fichier</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description"></string>
+    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description"></string>
+    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Pro seulement</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -5468,5 +5462,5 @@
     <!-- Label for the negative or cancel button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_negative_button">Quitter l’appel</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option"></string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]En apprendre davantage[/A]</string>
 </resources>

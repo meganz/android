@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Screen title for cropping current scan (Document scanner) -->
     <string name="scan_title_crop">قص</string>

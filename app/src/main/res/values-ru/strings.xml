@@ -2621,7 +2621,7 @@
     <!-- Text of the dialog shown when a pdf required password -->
     <string name="text_pdf_password">%s — защищённый паролем PDF-документ. Пожалуйста, введите пароль, чтобы открыть PDF.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
-    <string name="error_max_pdf_password">Введённый пароль неверен.</string>
+    <string name="error_max_pdf_password">Введённый пароль неверен</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">Невозможно воспроизвести мультимедийные файлы во время разговора.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
@@ -4867,20 +4867,14 @@
         <item quantity="many">%1$d элементов не удалось скопировать</item>
         <item quantity="other">%1$d элемента не удалось скопировать</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Скопирован %1$d элемент,&#160;</item>
         <item quantity="few">Скопированы %1$d элемента,&#160;</item>
         <item quantity="many">Скопировано %1$d элементов,&#160;</item>
         <item quantity="other">Скопировано %1$d элемента,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">%1$d не удалось скопировать</item>
         <item quantity="few">%1$d не удалось скопировать</item>
@@ -5067,11 +5061,11 @@
     <!-- Label for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations">Приглашения на встречу</string>
     <!-- Text for the meeting invitations option on calls settings -->
-    <string name="settings_calls_preferences_meeting_invitations_text"></string>
+    <string name="settings_calls_preferences_meeting_invitations_text">Notify me when someone invites me to a meeting</string>
     <!-- Label for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders"></string>
+    <string name="settings_calls_preferences_meeting_reminders">Meeting reminders</string>
     <!-- Text for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders_text"></string>
+    <string name="settings_calls_preferences_meeting_reminders_text">Notify me 15 minutes before the meetings starts and on the time the meeting is schedule to start</string>
     <!-- Notification description for scheduled meetings that starts in 15 minutes -->
     <string name="notification_sched_meeting_starts_15_minutes">Встреча начнётся через 15 минут</string>
     <!-- Notification description for scheduled meetings that starts now -->
@@ -5703,5 +5697,5 @@
     <!-- Label for the negative or cancel button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_negative_button">Покинуть звонок</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option"></string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Подробнее[/A]</string>
 </resources>
