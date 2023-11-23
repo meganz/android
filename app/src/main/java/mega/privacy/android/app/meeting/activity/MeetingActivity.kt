@@ -403,6 +403,9 @@ class MeetingActivity : PasscodeActivity() {
                 )
                 meetingViewModel.onConsumeNavigateToChatEvent()
             }
+
+            binding.recIndicator.visibility =
+                if (state.isSessionOnRecording && !state.showRecordingConsentDialog) View.VISIBLE else View.GONE
         }
 
         collectFlow(waitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->

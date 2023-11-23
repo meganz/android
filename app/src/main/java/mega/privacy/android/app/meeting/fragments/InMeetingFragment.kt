@@ -1046,6 +1046,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 isManualModeView = true
                 initSpeakerViewMode()
             }
+
+            binding.recIndicator.visibility =
+                if (state.isSessionOnRecording && !state.showRecordingConsentDialog) View.VISIBLE else View.GONE
         }
 
         viewLifecycleOwner.collectFlow(sharedWaitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->
