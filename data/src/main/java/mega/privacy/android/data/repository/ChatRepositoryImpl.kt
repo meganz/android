@@ -7,12 +7,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
@@ -46,7 +51,6 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatInitState
 import mega.privacy.android.domain.entity.chat.ChatListItem
-import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -67,6 +71,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -91,6 +96,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property ioDispatcher                           [CoroutineDispatcher]
  * @property appEventGateway                        [AppEventGateway]
  */
+@Singleton
 internal class ChatRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val megaApiGateway: MegaApiGateway,
@@ -114,6 +120,9 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val databaseHandler: DatabaseHandler,
 ) : ChatRepository {
+
+    private var chatRoomUpdates: HashMap<Long, Flow<ChatRoomUpdate>> = hashMapOf()
+    private val chatRoomUpdatesMutex = Mutex()
 
     override suspend fun getChatInitState(): ChatInitState = withContext(ioDispatcher) {
         chatInitStateMapper(megaChatApiGateway.initState)
@@ -586,23 +595,28 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom> =
-        megaChatApiGateway.getChatRoomUpdates(chatId)
-            .filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
-            .mapNotNull { it.chat }
-            .map { chatRoomMapper(it) }
-            .flowOn(ioDispatcher)
+    override fun monitorChatRoomUpdates(chatId: Long) = flow {
+        getChatRoomUpdates(chatId)?.let { updates ->
+            emitAll(updates.filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
+                .mapNotNull { it.chat }
+                .map { chatRoomMapper(it) }
+                .flowOn(ioDispatcher))
+        }
+    }
 
     override suspend fun loadMessages(chatId: Long, count: Int): ChatHistoryLoadStatus =
         withContext(ioDispatcher) {
             chatHistoryLoadStatusMapper(megaChatApiGateway.loadMessages(chatId, count))
         }
 
-    override fun monitorOnMessageLoaded(chatId: Long): Flow<ChatMessage?> =
-        megaChatApiGateway.getChatRoomUpdates(chatId)
-            .filterIsInstance<ChatRoomUpdate.OnMessageLoaded>()
-            .map { it.msg?.let { message -> chatMessageMapper(message) } }
-            .flowOn(ioDispatcher)
+    override fun monitorOnMessageLoaded(chatId: Long) = flow {
+        getChatRoomUpdates(chatId)?.let { updates ->
+            emitAll(updates.filterIsInstance<ChatRoomUpdate.OnMessageLoaded>()
+                .mapNotNull { it.msg }
+                .map { message -> chatMessageMapper(message) }
+                .flowOn(ioDispatcher))
+        }
+    }
 
     override fun monitorChatListItemUpdates(): Flow<ChatListItem> =
         megaChatApiGateway.chatUpdates
@@ -982,5 +996,15 @@ internal class ChatRepositoryImpl @Inject constructor(
                 megaChatApiGateway.removeRequestListener(listener)
             }
         }
+    }
+
+    private suspend fun getChatRoomUpdates(chatId: Long) = chatRoomUpdatesMutex.withLock {
+        if (!chatRoomUpdates.containsKey(chatId)) {
+            chatRoomUpdates[chatId] = megaChatApiGateway.openChatRoom(chatId).onCompletion {
+                chatRoomUpdates.remove(chatId)
+            }
+        }
+
+        chatRoomUpdates[chatId]
     }
 }

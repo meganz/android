@@ -34,6 +34,7 @@ import nz.mega.sdk.MegaChatScheduledRules
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaChatVideoListenerInterface
 import nz.mega.sdk.MegaHandleList
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -152,7 +153,7 @@ internal class MegaChatApiFacade @Inject constructor(
             awaitClose { chatApi.removeChatCallListener(listener) }
         }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
-    override fun getChatRoomUpdates(chatId: Long): Flow<ChatRoomUpdate> = callbackFlow {
+    override fun openChatRoom(chatId: Long): Flow<ChatRoomUpdate> = callbackFlow {
         val listener = object : MegaChatRoomListenerInterface {
             override fun onChatRoomUpdate(api: MegaChatApiJava?, chat: MegaChatRoom?) {
                 trySend(ChatRoomUpdate.OnChatRoomUpdate(chat))
@@ -191,10 +192,11 @@ internal class MegaChatApiFacade @Inject constructor(
             }
         }
 
-        chatApi.closeChatRoom(chatId, listener)
-        chatApi.openChatRoom(chatId, listener)
+        val opened = chatApi.openChatRoom(chatId, listener)
+        Timber.d("Open chat room $chatId: $opened")
 
         awaitClose {
+            Timber.d("Close chat room $chatId")
             chatApi.closeChatRoom(chatId, listener)
         }
     }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
@@ -690,7 +692,7 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun requestHiResVideo(
         chatId: Long,
         clientId: Long,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
         chatApi.requestHiResVideo(chatId, clientId, listener)
     }
@@ -698,7 +700,7 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun stopHiResVideo(
         chatId: Long,
         clientIds: MegaHandleList?,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
         chatApi.stopHiResVideo(chatId, clientIds, listener)
     }

@@ -325,9 +325,9 @@ interface MegaChatApiGateway {
     fun getUserOnlineStatus(userHandle: Long): Int
 
     /**
-     * Gets chat Room updates.
+     * Opens a chat room and starts getting updates.
      */
-    fun getChatRoomUpdates(chatId: Long): Flow<ChatRoomUpdate>
+    fun openChatRoom(chatId: Long): Flow<ChatRoomUpdate>
 
     /**
      * Gets a chat conversation if exists.
