@@ -95,8 +95,24 @@ fun ConfirmationDialog(
     dismissOnClickOutside = dismissOnClickOutside,
 )
 
+/**
+ * Confirmation dialog with a title, a message body and 3 buttons.
+ * The 3 buttons have short text and are in a vertical column.
+ *
+ * @param title title
+ * @param text message body
+ * @param cancelButtonText cancel button text
+ * @param buttonOption1Text option 1 button text
+ * @param buttonOption2Text option 2 button text
+ * @param onDismiss to be triggered when dialog is hidden, whether with cancel button, confirm button, back or outside press.
+ * @param onOption1 to be triggered when option 1 button is pressed
+ * @param onOption2 to be triggered when option 2 button is pressed
+ * @param onCancel  to be triggered when cancel button is clicked
+ * @param dismissOnBackPress if true, the dialog will be dismiss when the user does back action, default to true.
+ * @param dismissOnClickOutside if true, the dialog will be dismiss when the user taps outside of the dialog, default to true.
+ */
 @Composable
-internal fun ConfirmationDialog(
+fun ConfirmationDialog(
     title: String,
     text: String,
     buttonOption1Text: String,
