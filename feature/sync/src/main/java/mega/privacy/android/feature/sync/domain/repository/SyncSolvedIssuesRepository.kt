@@ -5,11 +5,9 @@ import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 
 internal interface SyncSolvedIssuesRepository {
 
-    suspend fun getAll(): List<SolvedIssue>
+    fun monitorSolvedIssues(): Flow<List<SolvedIssue>>
 
-    suspend fun set(solvedIssues: SolvedIssue)
+    suspend fun insertSolvedIssues(solvedIssues: SolvedIssue)
 
     suspend fun clear()
-
-    fun monitorSolvedIssuesCountChanged(): Flow<Unit>
 }

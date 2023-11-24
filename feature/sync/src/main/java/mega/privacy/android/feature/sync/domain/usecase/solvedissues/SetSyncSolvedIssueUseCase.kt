@@ -9,6 +9,6 @@ internal class SetSyncSolvedIssueUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(solvedIssue: SolvedIssue) {
-        syncSolvedIssuesRepository.set(solvedIssue)
+        syncSolvedIssuesRepository.insertSolvedIssues(solvedIssue)
     }
 }
