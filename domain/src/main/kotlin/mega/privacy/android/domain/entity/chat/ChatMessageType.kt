@@ -87,11 +87,6 @@ enum class ChatMessageType {
     SCHED_MEETING,
 
     /**
-     * Highest management type.
-     */
-    HIGHEST_MANAGEMENT,
-
-    /**
      * Node attachment type.
      * User message including info about a shared node.
      */

@@ -9,7 +9,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
@@ -31,10 +33,12 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
@@ -52,6 +56,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCas
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
+import mega.privacy.android.domain.usecase.chat.message.MonitorMessageLoadedUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
@@ -61,6 +66,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUs
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
+import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -167,6 +173,10 @@ internal class ChatViewModelTest {
     private val archiveChatUseCase = mock<ArchiveChatUseCase>()
     private val startCallUseCase = mock<StartCallUseCase>()
     private val chatManagement = mock<ChatManagement>()
+    private val loadMessagesUseCase = mock<LoadMessagesUseCase>()
+    private val monitorMessageLoadedUseCase = mock<MonitorMessageLoadedUseCase> {
+        onBlocking { invoke(chatId) } doReturn emptyFlow()
+    }
 
     @BeforeAll
     fun setup() {
@@ -202,6 +212,7 @@ internal class ChatViewModelTest {
             archiveChatUseCase,
             startCallUseCase,
             chatManagement,
+            loadMessagesUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -224,6 +235,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorCallInChatUseCase(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorParticipatingInACallUseCase() } doReturn emptyFlow()
         whenever(monitorAllContactParticipantsInChatUseCase(any())) doReturn emptyFlow()
+        wheneverBlocking { (monitorMessageLoadedUseCase(chatId)) } doReturn emptyFlow()
     }
 
     private fun initTestClass() {
@@ -259,6 +271,8 @@ internal class ChatViewModelTest {
             archiveChatUseCase = archiveChatUseCase,
             startCallUseCase = startCallUseCase,
             chatManagement = chatManagement,
+            loadMessagesUseCase = loadMessagesUseCase,
+            monitorMessageLoadedUseCase = monitorMessageLoadedUseCase,
         )
     }
 
@@ -1618,6 +1632,72 @@ internal class ChatViewModelTest {
         underTest.onCallStarted()
         underTest.state.test {
             assertThat(awaitItem().isStartingCall).isFalse()
+        }
+    }
+
+    @ParameterizedTest(name = " when history status is {0}")
+    @EnumSource(ChatHistoryLoadStatus::class)
+    fun `test that request messages behaves correctly`(
+        historyStatus: ChatHistoryLoadStatus,
+    ) = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+        }
+        val updatedHistoryStatus =
+            when (historyStatus) {
+                ChatHistoryLoadStatus.ERROR -> ChatHistoryLoadStatus.LOCAL
+                ChatHistoryLoadStatus.NONE -> ChatHistoryLoadStatus.NONE
+                ChatHistoryLoadStatus.LOCAL -> ChatHistoryLoadStatus.REMOTE
+                ChatHistoryLoadStatus.REMOTE -> ChatHistoryLoadStatus.NONE
+            }
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(loadMessagesUseCase(chatId)).thenReturn(historyStatus, updatedHistoryStatus)
+        initTestClass()
+        testScheduler.advanceUntilIdle()
+        underTest.state.map { it.chatHistoryLoadStatus }.distinctUntilChanged().test {
+            verify(loadMessagesUseCase).invoke(chatId)
+            assertThat(awaitItem()).isEqualTo(historyStatus)
+            underTest.requestMessages()
+            testScheduler.advanceUntilIdle()
+            if (historyStatus == ChatHistoryLoadStatus.NONE || historyStatus == ChatHistoryLoadStatus.REMOTE) {
+                verifyNoMoreInteractions(loadMessagesUseCase)
+            } else {
+                assertThat(awaitItem()).isEqualTo(updatedHistoryStatus)
+            }
+        }
+    }
+
+    @Test
+    fun `test that monitor message loaded behaves correctly`() = runTest {
+        val flow = MutableSharedFlow<TypedMessage>()
+        val pendingMessagesToLoad = LoadMessagesUseCase.NUMBER_MESSAGES_TO_LOAD
+        val message1 = mock<TypedMessage>()
+        val message2 = mock<TypedMessage>()
+        val message3 = mock<TypedMessage>()
+        val message4 = mock<TypedMessage>()
+        whenever(monitorMessageLoadedUseCase(chatId)).thenReturn(flow)
+        initTestClass()
+        testScheduler.advanceUntilIdle()
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad)
+            assertThat(actual.messages).isEqualTo(emptyList<TypedMessage>())
+            flow.emit(message1)
+            val actual1 = awaitItem()
+            assertThat(actual1.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 1)
+            assertThat(actual1.messages).isEqualTo(listOf(message1))
+            flow.emit(message2)
+            val actual2 = awaitItem()
+            assertThat(actual2.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 2)
+            assertThat(actual2.messages).isEqualTo(listOf(message2, message1))
+            flow.emit(message3)
+            val actual3 = awaitItem()
+            assertThat(actual3.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 3)
+            assertThat(actual3.messages).isEqualTo(listOf(message3, message2, message1))
+            flow.emit(message4)
+            val actual4 = awaitItem()
+            assertThat(actual4.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 4)
+            assertThat(actual4.messages).isEqualTo(listOf(message4, message3, message2, message1))
         }
     }
 

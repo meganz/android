@@ -9,14 +9,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.model.CallEndedMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.CallMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.CallStartedMessage
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.core.ui.controls.chat.ChatManagementMessage
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
+import mega.privacy.android.domain.entity.chat.messages.management.CallEndedMessage
+import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
+import mega.privacy.android.domain.entity.chat.messages.management.CallStartedMessage
 import java.util.concurrent.TimeUnit
 
 /**
@@ -52,6 +52,8 @@ private fun CallMessage.getIconPainterResId(): Int {
                 ChatMessageTermCode.CANCELLED -> R.drawable.ic_new_call_cancelled
             }
         }
+
+        else -> R.drawable.ic_new_call_started
     }
 }
 
@@ -68,17 +70,19 @@ private fun CallMessage.getText(isOneToOneChat: Boolean): String {
 
                 ChatMessageTermCode.REJECTED -> TextUtil.removeFormatPlaceholder(stringResource(R.string.call_rejected_messages))
                 ChatMessageTermCode.NO_ANSWER -> TextUtil.removeFormatPlaceholder(
-                    if (isMe) stringResource(R.string.call_not_answered_messages)
+                    if (isMine) stringResource(R.string.call_not_answered_messages)
                     else stringResource(R.string.call_missed_messages)
                 )
 
                 ChatMessageTermCode.FAILED -> TextUtil.removeFormatPlaceholder(stringResource(R.string.call_failed_messages))
                 ChatMessageTermCode.CANCELLED -> TextUtil.removeFormatPlaceholder(
-                    if (isMe) stringResource(R.string.call_cancelled_messages)
+                    if (isMine) stringResource(R.string.call_cancelled_messages)
                     else stringResource(R.string.call_missed_messages)
                 )
             }
         }
+
+        else -> ""
     }
 }
 
@@ -160,15 +164,17 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
         get() = sequenceOf(
             PreviewParameters(
                 message = CallStartedMessage(
+                    msgId = 123L,
                     time = System.currentTimeMillis(),
-                    isMe = true
+                    isMine = true
                 ),
                 isOneToOneChat = true
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    msgId = 123L,
                     time = System.currentTimeMillis(),
-                    isMe = true,
+                    isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 0
                 ),
@@ -176,8 +182,9 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    msgId = 123L,
                     time = System.currentTimeMillis(),
-                    isMe = true,
+                    isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 0
                 ),
@@ -185,8 +192,9 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    msgId = 123L,
                     time = System.currentTimeMillis(),
-                    isMe = true,
+                    isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 100
                 ),
@@ -194,8 +202,9 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    msgId = 123L,
                     time = System.currentTimeMillis(),
-                    isMe = true,
+                    isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 100
                 ),
@@ -203,8 +212,9 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    msgId = 123L,
                     time = System.currentTimeMillis(),
-                    isMe = true,
+                    isMine = true,
                     termCode = ChatMessageTermCode.FAILED,
                     duration = 0
                 ),
@@ -212,8 +222,9 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    msgId = 123L,
                     time = System.currentTimeMillis(),
-                    isMe = true,
+                    isMine = true,
                     termCode = ChatMessageTermCode.CANCELLED,
                     duration = 0
                 ),
@@ -221,8 +232,9 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    msgId = 123L,
                     time = System.currentTimeMillis(),
-                    isMe = true,
+                    isMine = true,
                     termCode = ChatMessageTermCode.REJECTED,
                     duration = 0
                 ),
@@ -230,8 +242,9 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    msgId = 123L,
                     time = System.currentTimeMillis(),
-                    isMe = true,
+                    isMine = true,
                     termCode = ChatMessageTermCode.NO_ANSWER,
                     duration = 0
                 ),

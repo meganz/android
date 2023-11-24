@@ -6,13 +6,13 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.model.CallEndedMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.CallMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.CallStartedMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatCallMessageView
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.core.ui.controls.chat.TEST_TAG_MANAGEMENT_MESSAGE_ICON
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
+import mega.privacy.android.domain.entity.chat.messages.management.CallEndedMessage
+import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
+import mega.privacy.android.domain.entity.chat.messages.management.CallStartedMessage
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,12 +22,15 @@ class ChatCallMessageViewTest {
     @get:Rule
     var composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
+    private val msgId = 123L
+
     @Test
     fun `test that text and icon show correctly when call started`() {
         initComposeRuleContent(
             message = CallStartedMessage(
+                msgId = msgId,
                 time = System.currentTimeMillis(),
-                isMe = true
+                isMine = true
             ),
             isOneToOneChat = true
         )
@@ -40,8 +43,9 @@ class ChatCallMessageViewTest {
     fun `test that text and icon show correctly when call end with ended term code and chat is one to one`() {
         initComposeRuleContent(
             message = CallEndedMessage(
+                msgId = msgId,
                 time = System.currentTimeMillis(),
-                isMe = true,
+                isMine = true,
                 termCode = ChatMessageTermCode.ENDED,
                 duration = 0
             ),
@@ -56,8 +60,9 @@ class ChatCallMessageViewTest {
     fun `test that text and icon show correctly when call end with ended term code and chat is group`() {
         initComposeRuleContent(
             message = CallEndedMessage(
+                msgId = msgId,
                 time = System.currentTimeMillis(),
-                isMe = true,
+                isMine = true,
                 termCode = ChatMessageTermCode.ENDED,
                 duration = 0
             ),
@@ -76,8 +81,9 @@ class ChatCallMessageViewTest {
     fun `test that text and icon show correctly when call end with rejected term code`() {
         initComposeRuleContent(
             message = CallEndedMessage(
+                msgId = msgId,
                 time = System.currentTimeMillis(),
-                isMe = true,
+                isMine = true,
                 termCode = ChatMessageTermCode.REJECTED,
                 duration = 0
             ),
@@ -96,8 +102,9 @@ class ChatCallMessageViewTest {
     fun `test that text and icon show correctly when call end with no answer term code and it is my message`() {
         initComposeRuleContent(
             message = CallEndedMessage(
+                msgId = msgId,
                 time = System.currentTimeMillis(),
-                isMe = true,
+                isMine = true,
                 termCode = ChatMessageTermCode.NO_ANSWER,
                 duration = 0
             ),
@@ -116,8 +123,9 @@ class ChatCallMessageViewTest {
     fun `test that text and icon show correctly when call end with no answer term code and it is not my message`() {
         initComposeRuleContent(
             message = CallEndedMessage(
+                msgId = msgId,
                 time = System.currentTimeMillis(),
-                isMe = false,
+                isMine = false,
                 termCode = ChatMessageTermCode.NO_ANSWER,
                 duration = 0
             ),
@@ -136,8 +144,9 @@ class ChatCallMessageViewTest {
     fun `test that text and icon show correctly when call end with cancelled term code and it is my message`() {
         initComposeRuleContent(
             message = CallEndedMessage(
+                msgId = msgId,
                 time = System.currentTimeMillis(),
-                isMe = true,
+                isMine = true,
                 termCode = ChatMessageTermCode.CANCELLED,
                 duration = 0
             ),
@@ -156,8 +165,9 @@ class ChatCallMessageViewTest {
     fun `test that text and icon show correctly when call end with failed term code`() {
         initComposeRuleContent(
             message = CallEndedMessage(
+                msgId = msgId,
                 time = System.currentTimeMillis(),
-                isMe = false,
+                isMine = false,
                 termCode = ChatMessageTermCode.CANCELLED,
                 duration = 0
             ),
@@ -176,8 +186,9 @@ class ChatCallMessageViewTest {
     fun `test that text and icon show correctly when call end with cancelled term code and it is not my message`() {
         initComposeRuleContent(
             message = CallEndedMessage(
+                msgId = msgId,
                 time = System.currentTimeMillis(),
-                isMe = false,
+                isMine = false,
                 termCode = ChatMessageTermCode.FAILED,
                 duration = 0
             ),

@@ -55,6 +55,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EndCallFor
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.MutePushNotificationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactToAddDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
+import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatCallMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
 import mega.privacy.android.app.presentation.qrcode.findActivity
@@ -65,6 +66,7 @@ import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import timber.log.Timber
 
@@ -87,7 +89,8 @@ internal fun ChatView(
         unarchiveChat = viewModel::unarchiveChat,
         endCallForAll = viewModel::endCall,
         startCall = viewModel::startCall,
-        onCallStarted = viewModel::onCallStarted
+        onCallStarted = viewModel::onCallStarted,
+        onRequestMoreMessages = viewModel::requestMessages
     )
 }
 
@@ -112,6 +115,7 @@ internal fun ChatView(
     endCallForAll: () -> Unit = {},
     startCall: (Boolean) -> Unit = {},
     onCallStarted: () -> Unit = {},
+    onRequestMoreMessages: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -222,6 +226,17 @@ internal fun ChatView(
                         .padding(paddingValues)
                 ) {
                     item("first_message_header") { FirstMessageHeader(uiState) }
+
+                    messages.forEach { message ->
+                        if (message is CallMessage) {
+                            item(message.msgId) {
+                                ChatCallMessageView(
+                                    message = (message),
+                                    isOneToOneChat = !isGroup
+                                )
+                            }
+                        }
+                    }
                 }
 
                 if (showParticipatingInACallDialog) {

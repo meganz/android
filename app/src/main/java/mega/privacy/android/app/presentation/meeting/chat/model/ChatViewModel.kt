@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipa
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCas
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
+import mega.privacy.android.domain.usecase.chat.message.MonitorMessageLoadedUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
@@ -51,6 +53,8 @@ import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUs
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
+import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
+import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion.NUMBER_MESSAGES_TO_LOAD
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -104,6 +108,8 @@ internal class ChatViewModel @Inject constructor(
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val startCallUseCase: StartCallUseCase,
     private val chatManagement: ChatManagement,
+    private val loadMessagesUseCase: LoadMessagesUseCase,
+    private val monitorMessageLoadedUseCase: MonitorMessageLoadedUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -136,6 +142,54 @@ internal class ChatViewModel @Inject constructor(
             monitorNotificationMute(it)
             monitorChatConnectionState(it)
             monitorNetworkConnectivity(it)
+            monitorMessageLoaded(it)
+        }
+    }
+
+    private fun checkIfMoreMessagesShouldBeRequested() = with(state.value) {
+        when {
+            chatHistoryLoadStatus == ChatHistoryLoadStatus.NONE -> {
+                Timber.d("Whole history already loaded. No more messages to request.")
+                false
+            }
+
+            pendingMessagesToLoad > 0 && chatHistoryLoadStatus == ChatHistoryLoadStatus.REMOTE -> {
+                Timber.d("Waiting for messages to load. No more can be requested. Previous history status $chatHistoryLoadStatus")
+                false
+            }
+
+            else -> {
+                Timber.d("Requesting more messages. Previous history status $chatHistoryLoadStatus")
+                _state.update { state -> state.copy(pendingMessagesToLoad = NUMBER_MESSAGES_TO_LOAD) }
+                true
+            }
+        }
+    }
+
+    /**
+     * Request messages.
+     * Must be called only if the first messages in the history are shown in the screen.
+     */
+    fun requestMessages() {
+        if (checkIfMoreMessagesShouldBeRequested() && chatId != null) {
+            viewModelScope.launch {
+                val newHistoryLoadStatus = loadMessagesUseCase(chatId)
+                Timber.d("New history status $newHistoryLoadStatus")
+                _state.update { state -> state.copy(chatHistoryLoadStatus = newHistoryLoadStatus) }
+            }
+        }
+    }
+
+    private fun monitorMessageLoaded(chatId: Long) {
+        viewModelScope.launch {
+            monitorMessageLoadedUseCase(chatId).collect { loadedMessage ->
+                Timber.d("New message: ${loadedMessage.msgId}")
+                _state.update { state ->
+                    val pendingMessagesToLoad = state.pendingMessagesToLoad - 1
+                    val messages = state.messages.toMutableList().apply { add(0, loadedMessage) }
+                    state.copy(messages = messages, pendingMessagesToLoad = pendingMessagesToLoad)
+                }
+            }
         }
     }
 
@@ -238,6 +292,7 @@ internal class ChatViewModel @Inject constructor(
             runCatching {
                 getChatRoomUseCase(chatId)
             }.onSuccess { chatRoom ->
+                requestMessages()
                 chatRoom?.let {
                     with(chatRoom) {
                         checkCustomTitle()

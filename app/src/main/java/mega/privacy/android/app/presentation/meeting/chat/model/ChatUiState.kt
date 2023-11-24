@@ -5,8 +5,11 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion.NUMBER_MESSAGES_TO_LOAD
 
 /**
  * Chat ui state
@@ -40,6 +43,9 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property infoToShowEvent Event to show some info. Set it to null in case the activity needs to be closed.
  * @property sendingText Text that is being sent.
  * @property isStartingCall True if it is starting a call, false otherwise.
+ * @property messages List of [TypedMessage] containing the chat history.
+ * @property pendingMessagesToLoad Number of messages already requested, but pending to load.
+ * @property chatHistoryLoadStatus [ChatHistoryLoadStatus]. Until this is not [ChatHistoryLoadStatus.NONE], we can request for more messages.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -71,6 +77,9 @@ data class ChatUiState(
     val infoToShowEvent: StateEventWithContent<InfoToShow?> = consumed(),
     val sendingText: String = "",
     val isStartingCall: Boolean = false,
+    val messages: List<TypedMessage> = emptyList(),
+    val pendingMessagesToLoad: Int = NUMBER_MESSAGES_TO_LOAD,
+    val chatHistoryLoadStatus: ChatHistoryLoadStatus? = null,
 ) {
 
     /**
