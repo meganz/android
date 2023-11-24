@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -21,10 +22,17 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 
@@ -33,6 +41,7 @@ import kotlin.contracts.ExperimentalContracts
  */
 @OptIn(ExperimentalContracts::class)
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class DefaultSettingsRepositoryTest {
     private lateinit var underTest: DefaultSettingsRepository
 
@@ -52,7 +61,7 @@ internal class DefaultSettingsRepositoryTest {
     private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway = mock()
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway = mock()
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = DefaultSettingsRepository(
             databaseHandler = databaseHandler,
@@ -68,6 +77,24 @@ internal class DefaultSettingsRepositoryTest {
             startScreenMapper = startScreenMapper,
             cameraTimestampsPreferenceGateway = cameraTimestampsPreferenceGateway,
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
+        )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            databaseHandler,
+            context,
+            apiFacade,
+            megaLocalStorageGateway,
+            chatPreferencesGateway,
+            callsPreferencesGateway,
+            appPreferencesGateway,
+            fileGateway,
+            uiPreferencesGateway,
+            startScreenMapper,
+            cameraTimestampsPreferenceGateway,
+            fileManagementPreferencesGateway
         )
     }
 
@@ -90,7 +117,7 @@ internal class DefaultSettingsRepositoryTest {
         underTest.enableFileVersionsOption(true)
     }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that calling setFileVersionsOption thrown an exception if the api does not return successfully`() =
         runTest {
             val api = mock<MegaApiJava>()
@@ -106,7 +133,24 @@ internal class DefaultSettingsRepositoryTest {
                     error
                 )
             }
+            assertThrows<MegaException> {
+                underTest.enableFileVersionsOption(true)
+            }
+        }
 
-            underTest.enableFileVersionsOption(true)
+    @ParameterizedTest(name = "set to: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that set ask before large downloads sets the value to the storage gateway`(ask: Boolean) =
+        runTest {
+            underTest.setAskBeforeLargeDownloads(ask)
+            verify(megaLocalStorageGateway).setAskBeforeLargeDownloads(ask)
+        }
+
+    @ParameterizedTest(name = "expected: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is ask before large downloads gets the value from the storage gateway`(expected: Boolean) =
+        runTest {
+            whenever(megaLocalStorageGateway.isAskBeforeLargeDownloads()).thenReturn(expected)
+            assertThat(underTest.isAskBeforeLargeDownloads()).isEqualTo(expected)
         }
 }

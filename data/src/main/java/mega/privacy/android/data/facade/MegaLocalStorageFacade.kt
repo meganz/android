@@ -107,6 +107,13 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.setStorageDownloadLocation(storageDownloadLocation)
     }
 
+    override suspend fun isAskBeforeLargeDownloads() =
+        dbHandler.attributes?.askSizeDownload?.equals(true.toString()) ?: true
+
+    override suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean) {
+        dbHandler.setAttrAskSizeDownload(askForConfirmation.toString())
+    }
+
     override fun setPasscodeLockEnabled(isPasscodeLockEnabled: Boolean) {
         dbHandler.isPasscodeLockEnabled = isPasscodeLockEnabled
     }

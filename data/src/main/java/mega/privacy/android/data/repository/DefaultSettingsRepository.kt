@@ -221,6 +221,12 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) =
         megaLocalStorageGateway.setStorageDownloadLocation(storageDownloadLocation)
 
+    override suspend fun isAskBeforeLargeDownloads() =
+        megaLocalStorageGateway.isAskBeforeLargeDownloads()
+
+    override suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean) =
+        megaLocalStorageGateway.setAskBeforeLargeDownloads(askForConfirmation)
+
     override suspend fun setShowCopyright() {
         if (megaApiGateway.getPublicLinks().isEmpty()) {
             Timber.d("No public links: showCopyright set true")

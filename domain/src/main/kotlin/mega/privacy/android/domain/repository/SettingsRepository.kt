@@ -125,6 +125,16 @@ interface SettingsRepository {
     suspend fun setStorageDownloadLocation(storageDownloadLocation: String)
 
     /**
+     * @return ask for confirmation before large downloads preference
+     */
+    suspend fun isAskBeforeLargeDownloads(): Boolean
+
+    /**
+     * Set ask for confirmation before large downloads preference
+     */
+    suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean)
+
+    /**
      * Set if we want to show copyright notice
      */
     suspend fun setShowCopyright()
