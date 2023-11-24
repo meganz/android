@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
@@ -33,15 +34,19 @@ import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUserAlert
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefaultNotificationsRepositoryTest {
     private lateinit var underTest: NotificationsRepository
 
@@ -66,8 +71,9 @@ class DefaultNotificationsRepositoryTest {
         mock<FetchNumberOfScheduledMeetingOccurrencesByChat>()
     private val getScheduledMeetingUseCase = mock<GetScheduledMeeting>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
+    private val appEventGateway = mock<AppEventGateway>()
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = DefaultNotificationsRepository(
             megaApiGateway = megaApiGateway,
@@ -78,11 +84,26 @@ class DefaultNotificationsRepositoryTest {
             getScheduledMeetingUseCase = getScheduledMeetingUseCase,
             callsPreferencesGateway = callsPreferencesGateway,
             dispatcher = UnconfinedTestDispatcher(),
-            appEventGateway = mock()
+            appEventGateway = appEventGateway,
+        )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            megaApiGateway,
+            eventMapper,
+            megaLocalStorageGateway,
+            fetchSchedOccurrencesByChatUseCase,
+            getScheduledMeetingUseCase,
+            callsPreferencesGateway,
+            appEventGateway,
         )
 
         whenever(callsPreferencesGateway.getCallsMeetingInvitationsPreference())
             .thenReturn(flowOf(CallsMeetingInvitations.Enabled))
+        whenever(megaApiGateway.createInstanceMegaPushNotificationSettings())
+            .thenReturn(mock())
     }
 
     @Test
@@ -310,4 +331,22 @@ class DefaultNotificationsRepositoryTest {
         verify(megaApiGateway).getPushNotificationSettings(any())
         verify(megaApiGateway).setPushNotificationSettings(any(), any())
     }
+
+    @Test
+    fun `test that updatePushNotificationSettings broadcasts a PushNotificationSettings event`() =
+        runTest {
+            val settings = mock<MegaPushNotificationSettings>()
+            whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock { on { megaPushNotificationSettings }.thenReturn(settings) },
+                    mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                )
+            }
+            whenever(megaApiGateway.copyMegaPushNotificationsSettings(settings)).thenReturn(settings)
+
+            underTest.updatePushNotificationSettings()
+
+            verify(appEventGateway).broadcastPushNotificationSettings()
+        }
 }

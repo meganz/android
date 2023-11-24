@@ -30,6 +30,7 @@ import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaPushNotificationSettings
+import nz.mega.sdk.MegaPushNotificationSettingsAndroid
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -1443,4 +1444,10 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun changeApiUrl(apiURL: String, disablePkp: Boolean) =
         megaApi.changeApiUrl(apiURL, disablePkp)
+
+    override fun copyMegaPushNotificationsSettings(pushNotificationSettings: MegaPushNotificationSettings): MegaPushNotificationSettings? =
+        MegaPushNotificationSettingsAndroid.copy(pushNotificationSettings)
+
+    override fun createInstanceMegaPushNotificationSettings(): MegaPushNotificationSettings =
+        MegaPushNotificationSettings.createInstance()
 }

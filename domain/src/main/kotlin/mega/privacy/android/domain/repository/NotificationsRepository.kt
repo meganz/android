@@ -78,4 +78,8 @@ interface NotificationsRepository {
      */
     suspend fun isChatDoNotDisturbEnabled(chatId: Long): Boolean
 
+    /**
+     *  Retrieve the push notification settings from the server and update the data in memory
+     */
+    suspend fun updatePushNotificationSettings()
 }

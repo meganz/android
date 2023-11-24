@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
@@ -51,6 +52,9 @@ internal class DefaultNotificationsRepository @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
 ) : NotificationsRepository {
+
+    private val _pushNotificationSettings =
+        MutableStateFlow(megaApiGateway.createInstanceMegaPushNotificationSettings())
 
     override fun monitorUserAlerts() = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
@@ -185,8 +189,27 @@ internal class DefaultNotificationsRepository @Inject constructor(
         setPushNotificationSettings(updatedSettings)
     }
 
-    override suspend fun isChatDoNotDisturbEnabled(chatId: Long): Boolean = withContext(dispatcher) {
-        getPushNotificationSettings().isChatDndEnabled(chatId)
+    override suspend fun isChatDoNotDisturbEnabled(chatId: Long): Boolean =
+        withContext(dispatcher) {
+            getPushNotificationSettings().isChatDndEnabled(chatId)
+        }
+
+    override suspend fun updatePushNotificationSettings() = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("getPushNotificationSettings") {
+                _pushNotificationSettings.value =
+                    megaApiGateway.copyMegaPushNotificationsSettings(it.megaPushNotificationSettings)
+                        ?: megaApiGateway.createInstanceMegaPushNotificationSettings()
+            }
+
+            megaApiGateway.getPushNotificationSettings(listener)
+
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+
+        appEventGateway.broadcastPushNotificationSettings()
     }
 
     private suspend fun getPushNotificationSettings(): MegaPushNotificationSettings =

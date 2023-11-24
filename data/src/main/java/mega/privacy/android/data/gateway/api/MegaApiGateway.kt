@@ -3119,4 +3119,19 @@ interface MegaApiGateway {
      * @param disablePkp True to disable public key pinning for this URL
      */
     suspend fun changeApiUrl(apiURL: String, disablePkp: Boolean)
+
+    /**
+     * Copy a mega push notifications settings
+     *
+     * @param pushNotificationSettings the mega push notification to copy
+     * @return the copied push notification settings
+     */
+    fun copyMegaPushNotificationsSettings(pushNotificationSettings: MegaPushNotificationSettings): MegaPushNotificationSettings?
+
+    /**
+     * Create mega push notifications settings
+     *
+     * @return the created push notification settings
+     */
+    fun createInstanceMegaPushNotificationSettings(): MegaPushNotificationSettings
 }
