@@ -70,9 +70,8 @@ import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
-import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -87,7 +86,7 @@ import javax.inject.Inject
  * View Model for [ChatActivity]
  *
  * @property monitorStorageStateEventUseCase                [MonitorStorageStateEventUseCase]
- * @property startChatCall                                  [StartChatCall]
+ * @property startCallUseCase                               [startCallUseCase]
  * @property answerChatCallUseCase                          [AnswerChatCallUseCase]
  * @property passcodeManagement                             [PasscodeManagement]
  * @property setChatVideoInDeviceUseCase                    [SetChatVideoInDeviceUseCase]
@@ -118,7 +117,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val startChatCall: StartChatCall,
+    private val startCallUseCase: StartCallUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val passcodeManagement: PasscodeManagement,
@@ -127,7 +126,6 @@ class ChatViewModel @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
-    private val openOrStartCallUseCase: OpenOrStartCallUseCase,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getChatCallUseCase: GetChatCallUseCase,
     private val getChatRoom: GetChatRoom,
@@ -315,10 +313,6 @@ class ChatViewModel @Inject constructor(
 
             }
 
-            !hasSchedMeeting -> startCall(
-                video = video
-            )
-
             _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted ->
                 if (shouldCallRing)
                     startCall(video = video)
@@ -331,6 +325,18 @@ class ChatViewModel @Inject constructor(
                     video = false,
                     audio = true
                 )
+
+            !hasSchedMeeting ->
+                viewModelScope.launch {
+                    runCatching {
+                        getChatCallUseCase(state.value.chatId)
+                    }.onSuccess { call ->
+                        when (call) {
+                            null -> startCall(video = false)
+                            else -> answerCall(state.value.chatId, video = false, audio = true)
+                        }
+                    }
+                }
         }
     }
 
@@ -541,6 +547,7 @@ class ChatViewModel @Inject constructor(
 
                                 else -> ScheduledMeetingStatus.NotStarted
                             }
+
                             _state.update {
                                 it.copy(
                                     scheduledMeetingStatus = scheduledMeetingStatus
@@ -559,13 +566,15 @@ class ChatViewModel @Inject constructor(
     private fun startCall(video: Boolean) = viewModelScope.launch {
         Timber.d("Start call")
         runCatching {
-            openOrStartCallUseCase(chatId = _state.value.chatId, video = video)
+            startCallUseCase(chatId = _state.value.chatId, video = video)
         }.onSuccess { call ->
             call?.let {
                 Timber.d("Call started")
                 openCurrentCall(call = it)
             }
-        }.onFailure { Timber.e("Exception opening or starting call: $it") }
+        }.onFailure {
+            Timber.e("Exception opening or starting call: $it")
+        }
     }
 
     /**

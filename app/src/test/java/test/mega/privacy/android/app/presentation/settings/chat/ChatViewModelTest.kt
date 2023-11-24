@@ -37,9 +37,8 @@ import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
-import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -61,7 +60,6 @@ class ChatViewModelTest {
 
     //Mocks
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
-    private val startChatCall: StartChatCall = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
@@ -70,7 +68,7 @@ class ChatViewModelTest {
     private val chatManagement: ChatManagement = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase = mock()
-    private val openOrStartCallUseCase: OpenOrStartCallUseCase = mock()
+    private val startCallUseCase: StartCallUseCase = mock()
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
     private val getChatCallUseCase: GetChatCallUseCase = mock()
     private val getChatRoom: GetChatRoom = mock()
@@ -116,7 +114,7 @@ class ChatViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = ChatViewModel(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
-            startChatCall = startChatCall,
+            startCallUseCase = startCallUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             answerChatCallUseCase = answerChatCallUseCase,
             passcodeManagement = passcodeManagement,
@@ -125,7 +123,6 @@ class ChatViewModelTest {
             chatManagement = chatManagement,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             startChatCallNoRingingUseCase = startChatCallNoRingingUseCase,
-            openOrStartCallUseCase = openOrStartCallUseCase,
             getScheduledMeetingByChat = getScheduledMeetingByChat,
             getChatCallUseCase = getChatCallUseCase,
             getChatRoom = getChatRoom,
