@@ -34,6 +34,7 @@ import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -41,6 +42,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @property megaApiGateway
  */
+@Singleton
 internal class DefaultNotificationsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val userAlertsMapper: UserAlertMapper,
