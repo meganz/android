@@ -253,13 +253,14 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-        intent ?: return
-        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
-            return
-        }
-        if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
-            return
+        when {
+            nodeSaver.handleActivityResult(this, requestCode, resultCode, intent) ->
+                return
+
+            nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this) ->
+                return
+
+            else -> super.onActivityResult(requestCode, resultCode, intent)
         }
     }
 
