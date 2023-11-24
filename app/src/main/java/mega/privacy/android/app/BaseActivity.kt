@@ -766,8 +766,16 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         anchor: View?,
         s: String?,
         idChat: Long = MEGACHAT_INVALID_HANDLE,
+        forceDarkMode: Boolean = false,
     ) {
-        showSnackbar(type = type, view = view, anchor = anchor, s = s, idChat = idChat)
+        showSnackbar(
+            type = type,
+            view = view,
+            anchor = anchor,
+            s = s,
+            idChat = idChat,
+            forceDarkMode = forceDarkMode
+        )
     }
 
     /**
@@ -793,6 +801,35 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         s: String?,
         idChat: Long = MEGACHAT_INVALID_HANDLE,
         userEmail: String? = null,
+    ) {
+        showSnackbar(type, view, anchor, s, idChat, userEmail, false)
+    }
+
+    /**
+     * Method to display a simple or action Snackbar.
+     *
+     * @param type          There are three possible values to this param:
+     *                      - SNACKBAR_TYPE: creates a simple snackbar
+     *                      - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
+     *                      - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     *                      - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
+     *                      - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
+     * @param view          Layout where the snackbar is going to show.
+     * @param anchor        Sets the view the Snackbar should be anchored above, null as default
+     * @param s             Text to shown in the snackbar
+     * @param idChat        Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
+     *                      If the value is -1 (MEGACHAT_INVALID_HANDLE) the function ends in chats list view.
+     * @param userEmail     Email of the user to be invited.
+     * @param forceDarkMode True if want to force to display the snackbar like in dark mode or False otherwise
+     */
+    fun showSnackbar(
+        type: Int,
+        view: View,
+        anchor: View? = null,
+        s: String?,
+        idChat: Long = MEGACHAT_INVALID_HANDLE,
+        userEmail: String? = null,
+        forceDarkMode: Boolean = false,
     ) {
         Timber.d("Show snackbar: %s", s)
         snackbar = try {
@@ -837,7 +874,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
         snackbar?.apply {
             val snackbarLayout = this.view as SnackbarLayout
-            snackbarLayout.setBackgroundResource(R.drawable.background_snackbar)
+            if (forceDarkMode) {
+                setTextColor(resources.getColor(R.color.grey_alpha_087, theme))
+                snackbarLayout.setBackgroundColor(resources.getColor(R.color.white, theme))
+            } else {
+                snackbarLayout.setBackgroundResource(R.drawable.background_snackbar)
+            }
 
             if (anchor != null) {
                 anchorView = anchor

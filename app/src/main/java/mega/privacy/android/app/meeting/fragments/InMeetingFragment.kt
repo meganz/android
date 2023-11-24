@@ -1049,6 +1049,29 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             binding.recIndicator.visibility =
                 if (state.isSessionOnRecording && !state.showRecordingConsentDialog) View.VISIBLE else View.GONE
+
+            if (state.recordingParticipant != null && !state.showRecordingConsentDialog) {
+                if (state.isSessionOnRecording) {
+                    showSnackbar(
+                        SNACKBAR_TYPE,
+                        getString(
+                            R.string.meetings_call_recording_started_snackbar_message,
+                            state.recordingParticipant.name
+                        ),
+                        MEGACHAT_INVALID_HANDLE
+                    )
+                } else {
+                    showSnackbar(
+                        SNACKBAR_TYPE,
+                        getString(
+                            R.string.meetings_call_recording_stopped_snackbar_message,
+                            state.recordingParticipant.name
+                        ),
+                        MEGACHAT_INVALID_HANDLE
+                    )
+                    sharedModel.setRecordingParticipantConsumed()
+                }
+            }
         }
 
         viewLifecycleOwner.collectFlow(sharedWaitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->
@@ -2042,7 +2065,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             binding.root,
             anchor,
             content,
-            chatId
+            chatId,
+            true
         )
     }
 

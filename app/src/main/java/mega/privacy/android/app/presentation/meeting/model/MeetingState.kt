@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property isParticipantSharingScreen                 True, if a participant is sharing the screen. False, if not.
  * @property isSessionOnRecording                       True if a host is recording or False otherwise.
  * @property showRecordingConsentDialog                 True if should show the recording consent dialog or False otherwise.
+ * @property recordingParticipant                       [Participant] who is recording
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -77,6 +78,7 @@ data class MeetingState(
     val isParticipantSharingScreen: Boolean = false,
     val isSessionOnRecording: Boolean = false,
     val showRecordingConsentDialog: Boolean = false,
+    val recordingParticipant: Participant? = null,
 ) {
     /**
      * Check if waiting room is opened

@@ -489,7 +489,8 @@ class MeetingActivityViewModel @Inject constructor(
                                 _state.update {
                                     it.copy(
                                         isSessionOnRecording = session.isRecording,
-                                        showRecordingConsentDialog = session.isRecording
+                                        showRecordingConsentDialog = session.isRecording,
+                                        recordingParticipant = state.value.usersInCall.find { participant -> participant.peerId == session.peerId }
                                     )
                                 }
                             }
@@ -1518,6 +1519,12 @@ class MeetingActivityViewModel @Inject constructor(
             Timber.e(exception)
         }
     }
+
+    /**
+     * Set recordingParticipant as consumed.
+     */
+    fun setRecordingParticipantConsumed() =
+        _state.update { state -> state.copy(recordingParticipant = null) }
 
     companion object {
         private const val INVALID_CHAT_HANDLE = -1L
