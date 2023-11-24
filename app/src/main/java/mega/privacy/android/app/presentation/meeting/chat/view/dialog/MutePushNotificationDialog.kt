@@ -13,18 +13,29 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  */
 @Composable
 fun MutePushNotificationDialog(
+    isMeeting: Boolean = false,
     onCancel: () -> Unit = {},
     onConfirm: () -> Unit = {},
 ) =
     ConfirmationDialogWithRadioButtons(
-        titleText = "mute chat",
+        titleText = getTitle(isMeeting),
         confirmButtonText = stringResource(id = R.string.general_ok),
         cancelButtonText = stringResource(id = R.string.general_cancel),
         radioOptions = listOf("1", "2", "3", "4", "5"),
+        initialSelectedOption = null,
         onDismissRequest = onCancel,
-        onConfirmRequest = onConfirm,
+        onConfirmRequest = { println("selection = $it") },
         onOptionSelected = {},
     )
+
+@Composable
+private fun getTitle(isMeeting: Boolean) =
+    if (isMeeting)
+        stringResource(id = R.string.meetings_mute_notifications_dialog_title)
+    else
+        stringResource(
+            id = R.string.title_dialog_mute_chatroom_notifications
+        )
 
 @CombinedThemePreviews
 @Composable

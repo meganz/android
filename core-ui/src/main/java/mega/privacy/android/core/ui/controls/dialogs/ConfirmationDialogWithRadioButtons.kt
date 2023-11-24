@@ -17,6 +17,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -46,13 +47,14 @@ fun <T> ConfirmationDialogWithRadioButtons(
     modifier: Modifier = Modifier,
     cancelButtonText: String? = null,
     confirmButtonText: String? = null,
-    onConfirmRequest: () -> Unit = {},
+    onConfirmRequest: (T) -> Unit = {},
     titleText: String = "",
     subTitleText: String = "",
     initialSelectedOption: T? = null,
     optionDescriptionMapper: @Composable (T) -> String = { it.toString() },
     properties: DialogProperties = DialogProperties(),
 ) {
+    var selectedOption by rememberSaveable { mutableStateOf(initialSelectedOption) }
 
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -109,8 +111,12 @@ fun <T> ConfirmationDialogWithRadioButtons(
                         SettingsItemWithRadioButton(
                             modifier = Modifier.fillMaxWidth(),
                             title = optionDescriptionMapper(item),
-                            selected = item == initialSelectedOption,
-                            onClick = { onOptionSelected(item) })
+                            selected = item == selectedOption,
+                            onClick = {
+                                selectedOption = item
+                                onOptionSelected(item)
+                            }
+                        )
                     }
                 }
                 if (showScrollSeparatorBottom) {
@@ -128,8 +134,9 @@ fun <T> ConfirmationDialogWithRadioButtons(
                         }
                         if (!confirmButtonText.isNullOrEmpty()) {
                             TextMegaButton(
+                                enabled = selectedOption != null,
                                 text = confirmButtonText,
-                                onClick = onConfirmRequest,
+                                onClick = { selectedOption?.let(onConfirmRequest) },
                             )
                         }
                     }

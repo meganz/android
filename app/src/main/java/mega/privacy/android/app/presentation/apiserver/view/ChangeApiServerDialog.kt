@@ -45,7 +45,7 @@ internal fun ChangeApiServerDialog(
     uiState: ApiServerUIState,
     onOptionSelected: (ApiServer) -> Unit,
     onDismissRequest: () -> Unit,
-    onConfirmRequest: () -> Unit = {},
+    onConfirmRequest: (ApiServer) -> Unit = {},
 ) = ConfirmationDialogWithRadioButtons(
     radioOptions = ApiServer.values().toList(),
     onOptionSelected = onOptionSelected,
