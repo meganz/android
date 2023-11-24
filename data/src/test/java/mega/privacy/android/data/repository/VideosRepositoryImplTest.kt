@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
@@ -39,6 +40,7 @@ class VideoSectionRepositoryImplTest {
     private val videoNodeMapper = mock<VideoNodeMapper>()
     private val cancelTokenProvider = mock<CancelTokenProvider>()
     private val megaCancelToken = mock<MegaCancelToken>()
+    private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
 
     @BeforeAll
     fun setUp() {
@@ -49,6 +51,7 @@ class VideoSectionRepositoryImplTest {
             cacheGateway = cacheGateway,
             videoNodeMapper = videoNodeMapper,
             cancelTokenProvider = cancelTokenProvider,
+            megaLocalRoomGateway = megaLocalRoomGateway,
             ioDispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -60,7 +63,8 @@ class VideoSectionRepositoryImplTest {
             sortOrderIntMapper,
             fileNodeMapper,
             cacheGateway,
-            videoNodeMapper
+            videoNodeMapper,
+            megaLocalRoomGateway
         )
     }
 
@@ -81,6 +85,8 @@ class VideoSectionRepositoryImplTest {
 
         whenever(cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER))
             .thenReturn(mock())
+
+        whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
 
         whenever(videoNodeMapper(any(), any())).thenReturn(mock())
 

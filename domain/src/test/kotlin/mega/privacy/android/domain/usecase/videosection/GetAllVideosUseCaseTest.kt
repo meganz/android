@@ -1,18 +1,14 @@
 package mega.privacy.android.domain.usecase.videosection
 
-import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.VideoNode
-import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.VideoSectionRepository
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -27,7 +23,7 @@ import org.mockito.kotlin.whenever
 class GetAllVideosUseCaseTest {
     private lateinit var underTest: GetAllVideosUseCase
     private val videoSectionRepository = mock<VideoSectionRepository>()
-    private val nodeRepository = mock<NodeRepository>()
+    private val getCloudSortOrder = mock<GetCloudSortOrder>()
 
     val order = SortOrder.ORDER_MODIFICATION_DESC
 
@@ -35,7 +31,7 @@ class GetAllVideosUseCaseTest {
     fun setUp() {
         underTest = GetAllVideosUseCase(
             videoSectionRepository = videoSectionRepository,
-            nodeRepository = nodeRepository
+            getCloudSortOrder = getCloudSortOrder
         )
     }
 
@@ -43,7 +39,7 @@ class GetAllVideosUseCaseTest {
     fun resetMock() {
         reset(
             videoSectionRepository,
-            nodeRepository
+            getCloudSortOrder
         )
     }
 
@@ -56,30 +52,16 @@ class GetAllVideosUseCaseTest {
     fun `test that videos is not empty`() = runTest {
         val list = listOf(mock<VideoNode>())
         whenever(videoSectionRepository.getAllVideos(order)).thenReturn(list)
-        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(emptyMap())))
-        underTest(order).test {
-            assertThat(awaitItem()).isNotEmpty()
-            cancelAndIgnoreRemainingEvents()
-        }
+        whenever(getCloudSortOrder()).thenReturn(order)
+        assertThat(underTest()).isNotEmpty()
     }
 
     @Test
     fun `test that video is empty`() {
         runTest {
             whenever(videoSectionRepository.getAllVideos(order)).thenReturn(emptyList())
-            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(emptyMap())))
-            underTest(order).test {
-                assertThat(awaitItem()).isEmpty()
-                cancelAndIgnoreRemainingEvents()
-            }
+            whenever(getCloudSortOrder()).thenReturn(order)
+            assertThat(underTest()).isEmpty()
         }
     }
-
-    @Test
-    fun `test that video returns result of getAllVideos when a node update occur`() =
-        runTest {
-            whenever(videoSectionRepository.getAllVideos(order)).thenReturn(emptyList())
-            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(emptyMap())))
-            assertThat(underTest(order).count()).isEqualTo(2)
-        }
 }

@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 internal fun VideoSectionComposeView(
     videoSectionViewModel: VideoSectionViewModel,
     onSortOrderClick: () -> Unit = {},
-    onClick: () -> Unit = {},
+    onClick: (item: UIVideo, index: Int) -> Unit,
     onMenuClick: (UIVideo) -> Unit = {},
     onLongClick: (() -> Unit)? = null,
 ) {
