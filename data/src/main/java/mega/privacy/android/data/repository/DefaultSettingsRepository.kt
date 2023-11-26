@@ -502,4 +502,8 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun resetSetting() {
         setSubfolderMediaDiscoveryEnabled(true)
     }
+
+    override suspend fun getIsFirstLaunch() = withContext(ioDispatcher) {
+        megaLocalStorageGateway.getFirstTime()
+    }
 }

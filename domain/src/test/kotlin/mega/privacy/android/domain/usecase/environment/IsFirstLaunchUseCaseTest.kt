@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.environment
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.EnvironmentRepository
+import mega.privacy.android.domain.repository.SettingsRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -11,16 +11,16 @@ import org.mockito.kotlin.stub
 class IsFirstLaunchUseCaseTest {
     private lateinit var underTest: IsFirstLaunchUseCase
 
-    private val environmentRepository = mock<EnvironmentRepository>()
+    private val settingsRepository = mock<SettingsRepository>()
 
     @Before
     fun setUp() {
-        underTest = IsFirstLaunchUseCase(environmentRepository = environmentRepository)
+        underTest = IsFirstLaunchUseCase(settingsRepository = settingsRepository)
     }
 
     @Test
     fun `test that true is returned if repository returns true`() = runTest {
-        environmentRepository.stub {
+        settingsRepository.stub {
             onBlocking { getIsFirstLaunch() }.thenReturn(true)
         }
 
@@ -29,7 +29,7 @@ class IsFirstLaunchUseCaseTest {
 
     @Test
     fun `test that false is returned if repository returns false`() = runTest {
-        environmentRepository.stub {
+        settingsRepository.stub {
             onBlocking { getIsFirstLaunch() }.thenReturn(false)
         }
 
@@ -38,7 +38,7 @@ class IsFirstLaunchUseCaseTest {
 
     @Test
     fun `test that true is returned if repository returns null`() = runTest {
-        environmentRepository.stub {
+        settingsRepository.stub {
             onBlocking { getIsFirstLaunch() }.thenReturn(null)
         }
 

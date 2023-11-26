@@ -43,7 +43,6 @@ class EnvironmentRepositoryImplTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             appInfoGateway = appInfoGateway,
             appInfoPreferencesGateway = appInfoPreferencesGateway,
-            megaLocalStorageGateway = megaLocalStorageGateway,
             applicationIpAddressWrapper = applicationIpAddressWrapper,
         )
     }

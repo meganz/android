@@ -61,13 +61,6 @@ interface EnvironmentRepository {
     suspend fun getDeviceMemorySizeInBytes(): Long?
 
     /**
-     * Get is first launch
-     *
-     * @return first launch value, or null if not set
-     */
-    suspend fun getIsFirstLaunch(): Boolean?
-
-    /**
      * get current time
      */
     val now: Long

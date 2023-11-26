@@ -481,4 +481,11 @@ interface SettingsRepository {
      * Handle reset setting when user logout
      */
     suspend fun resetSetting()
+
+    /**
+     * Get is first launch
+     *
+     * @return first launch value, or null if not set
+     */
+    suspend fun getIsFirstLaunch(): Boolean?
 }

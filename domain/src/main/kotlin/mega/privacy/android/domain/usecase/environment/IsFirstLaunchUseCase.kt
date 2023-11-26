@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.environment
 
-import mega.privacy.android.domain.repository.EnvironmentRepository
+import mega.privacy.android.domain.repository.SettingsRepository
 import javax.inject.Inject
 
 /**
@@ -8,11 +8,11 @@ import javax.inject.Inject
  *
  * @property environmentRepository
  */
-class IsFirstLaunchUseCase @Inject constructor(private val environmentRepository: EnvironmentRepository) {
+class IsFirstLaunchUseCase @Inject constructor(private val settingsRepository: SettingsRepository) {
     /**
      * Invoke
      *
      * @return true if this is the first launch
      */
-    suspend operator fun invoke(): Boolean = environmentRepository.getIsFirstLaunch() ?: true
+    suspend operator fun invoke(): Boolean = settingsRepository.getIsFirstLaunch() ?: true
 }
