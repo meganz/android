@@ -52,8 +52,10 @@ class SyncFoldersScreenTest {
         whenever(viewModel.state).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
-                viewModel = viewModel
-            ) {}
+                viewModel = viewModel,
+                addFolderClicked = {},
+                issuesInfoClicked = {},
+            )
         }
 
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW)
@@ -66,8 +68,10 @@ class SyncFoldersScreenTest {
         whenever(viewModel.state).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
-                viewModel = viewModel
-            ) {}
+                viewModel = viewModel,
+                addFolderClicked = {},
+                issuesInfoClicked = {},
+            )
         }
 
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW)

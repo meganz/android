@@ -12,6 +12,7 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.C
 internal fun SyncFoldersRoute(
     viewModel: SyncFoldersViewModel = hiltViewModel(),
     addFolderClicked: () -> Unit,
+    issuesInfoClicked: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -25,5 +26,6 @@ internal fun SyncFoldersRoute(
             viewModel.handleAction(RemoveFolderClicked(it))
         },
         addFolderClicked = addFolderClicked,
+        issuesInfoClicked = issuesInfoClicked,
     )
 }

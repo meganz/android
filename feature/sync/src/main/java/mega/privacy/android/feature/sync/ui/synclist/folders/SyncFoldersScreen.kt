@@ -13,7 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.CardExpanded
@@ -26,6 +28,7 @@ internal fun SyncFoldersScreen(
     pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (folderPairId: Long) -> Unit,
     addFolderClicked: () -> Unit,
+    issuesInfoClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(state = LazyListState(), modifier = modifier) {
@@ -51,7 +54,8 @@ internal fun SyncFoldersScreen(
                         cardExpanded(CardExpanded(syncUiItem, expanded))
                     },
                     pauseRunClicked,
-                    removeFolderClicked
+                    removeFolderClicked,
+                    issuesInfoClicked
                 )
             }
         }
@@ -66,4 +70,52 @@ internal fun SyncFoldersScreen(
             Icon(Icons.Filled.Add, contentDescription = "Add folder pair")
         }
     }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun SyncFoldersScreenSyncingPreview() {
+    SyncFoldersScreen(
+        listOf(
+            SyncUiItem(
+                1,
+                "Folder pair name",
+                SyncStatus.SYNCING,
+                false,
+                "/path/to/local/folder",
+                "/path/to/mega/folder",
+                "Two way sync",
+                false
+            )
+        ),
+        cardExpanded = {},
+        pauseRunClicked = {},
+        removeFolderClicked = {},
+        addFolderClicked = {},
+        issuesInfoClicked = {}
+    )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun SyncFoldersScreenSyncingWithStalledIssuesPreview() {
+    SyncFoldersScreen(
+        listOf(
+            SyncUiItem(
+                1,
+                "Folder pair name",
+                SyncStatus.SYNCING,
+                true,
+                "/path/to/local/folder",
+                "/path/to/mega/folder",
+                "Two way sync",
+                false
+            )
+        ),
+        cardExpanded = {},
+        pauseRunClicked = {},
+        removeFolderClicked = {},
+        addFolderClicked = {},
+        issuesInfoClicked = {}
+    )
 }

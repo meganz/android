@@ -48,6 +48,7 @@ internal fun SyncCard(
     expandClicked: () -> Unit,
     pauseRunClicked: () -> Unit,
     removeFolderClicked: () -> Unit,
+    issuesInfoClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -86,7 +87,8 @@ internal fun SyncCard(
             ),
             isError = hasStalledIssues,
             pauseRunClicked,
-            removeFolderClicked
+            removeFolderClicked,
+            issuesInfoClicked,
         )
     }
 }
@@ -234,6 +236,7 @@ private fun SyncCardFooter(
     isError: Boolean,
     pauseRunClicked: () -> Unit,
     removeFolderClicked: () -> Unit,
+    issuesInfoClicked: () -> Unit,
 ) {
     Box(Modifier.fillMaxWidth()) {
         Row(
@@ -244,7 +247,7 @@ private fun SyncCardFooter(
             if (isError) {
                 IconButtonWithText(
                     modifier = Modifier.padding(end = 8.dp),
-                    onClick = removeFolderClicked,
+                    onClick = issuesInfoClicked,
                     icon = R.drawable.ic_info,
                     color = MaterialTheme.colors.error,
                     text = "Issues info"
@@ -317,6 +320,7 @@ private fun SyncCardExpandedPreview() {
             expanded = true,
             expandClicked = {},
             removeFolderClicked = {},
+            issuesInfoClicked = {}
         )
     }
 }
@@ -336,6 +340,7 @@ private fun SyncCardCollapsedPreview() {
             expanded = false,
             expandClicked = {},
             removeFolderClicked = {},
+            issuesInfoClicked = {}
         )
     }
 }

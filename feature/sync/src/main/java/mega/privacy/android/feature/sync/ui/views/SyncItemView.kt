@@ -13,6 +13,7 @@ internal fun SyncItemView(
     cardExpanded: (SyncUiItem, Boolean) -> Unit,
     pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (folderPairId: Long) -> Unit,
+    issuesInfoClicked: () -> Unit
 ) {
     val sync = syncUiItems[itemIndex]
     SyncCard(
@@ -32,7 +33,9 @@ internal fun SyncItemView(
         },
         removeFolderClicked = {
             removeFolderClicked(sync.id)
-        })
+        },
+        issuesInfoClicked = issuesInfoClicked
+    )
 }
 
 internal const val TEST_TAG_SYNC_ITEM_VIEW = "sync_item_view:root"

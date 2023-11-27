@@ -171,6 +171,9 @@ private fun SyncListScreenContent(
             addFolderClicked = addFolderClicked,
             stalledIssueDetailsClicked = stalledIssuesDetailsClicked,
             moreClicked = moreClicked,
+            issuesInfoClicked = {
+                checkedChip = STALLED_ISSUES
+            },
             checkedChip = checkedChip
         )
     }
@@ -212,11 +215,15 @@ private fun SelectedChipScreen(
     addFolderClicked: () -> Unit,
     stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
+    issuesInfoClicked: () -> Unit,
     checkedChip: SyncChip,
 ) {
     when (checkedChip) {
         SYNC_FOLDERS -> {
-            SyncFoldersRoute(addFolderClicked = addFolderClicked)
+            SyncFoldersRoute(
+                addFolderClicked = addFolderClicked,
+                issuesInfoClicked = issuesInfoClicked
+            )
         }
 
         STALLED_ISSUES -> {
