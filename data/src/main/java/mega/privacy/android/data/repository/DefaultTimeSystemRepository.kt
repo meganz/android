@@ -9,7 +9,11 @@ import javax.inject.Inject
  *
  */
 internal class DefaultTimeSystemRepository @Inject constructor(
-    private val deviceGateway: DeviceGateway
+    private val deviceGateway: DeviceGateway,
 ) : TimeSystemRepository {
     override fun getCurrentTimeInMillis() = deviceGateway.getCurrentTimeInMillis()
+
+    override fun getCurrentHourOfDay(): Int = deviceGateway.getCurrentHourOfDay()
+
+    override fun getCurrentMinute(): Int = deviceGateway.getCurrentMinute()
 }

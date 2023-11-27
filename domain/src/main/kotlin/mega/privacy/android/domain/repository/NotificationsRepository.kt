@@ -71,6 +71,22 @@ interface NotificationsRepository {
     suspend fun setChatEnabled(chatId: Long, enabled: Boolean)
 
     /**
+     * Enable or disable notifications for a list of chats
+     *
+     * @param chatIdList list of chat IDs
+     * @param enabled tru to enable, false to disable
+     */
+    suspend fun setChatEnabled(chatIdList: List<Long>, enabled: Boolean)
+
+    /**
+     * Set the DND mode for a list of chats for a period of time
+     *
+     * @param chatIdList list of chat IDs
+     * @param timestamp Timestamp until DND mode is enabled (in seconds since the Epoch)
+     */
+    suspend fun setChatDoNotDisturb(chatIdList: List<Long>, timestamp: Long)
+
+    /**
      * Returns whether Do-Not-Disturb mode for a chat is enabled or not
      *
      * @param chatId - handle of the node that identifies the chat room

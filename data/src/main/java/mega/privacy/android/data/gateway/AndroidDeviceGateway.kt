@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
 import java.net.NetworkInterface
+import java.time.LocalTime
 import java.util.Locale
 import javax.inject.Inject
 
@@ -112,6 +113,10 @@ internal class AndroidDeviceGateway @Inject constructor(
         }
         return null
     }
+
+    override fun getCurrentHourOfDay(): Int = LocalTime.now().hour
+
+    override fun getCurrentMinute(): Int = LocalTime.now().minute
 
     override val monitorBatteryInfo =
         context.registerReceiverAsFlow(

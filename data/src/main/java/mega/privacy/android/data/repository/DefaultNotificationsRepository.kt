@@ -194,6 +194,24 @@ internal class DefaultNotificationsRepository @Inject constructor(
         setPushNotificationSettings(updatedSettings)
     }
 
+    override suspend fun setChatEnabled(chatIdList: List<Long>, enabled: Boolean) =
+        withContext(dispatcher) {
+            val updatedSettings = _pushNotificationSettings.value.apply {
+                chatIdList.forEach { enableChat(it, enabled) }
+            }
+
+            setPushNotificationSettings(updatedSettings)
+        }
+
+    override suspend fun setChatDoNotDisturb(chatIdList: List<Long>, timestamp: Long) =
+        withContext(dispatcher) {
+            val updatedSettings = _pushNotificationSettings.value.apply {
+                chatIdList.forEach { setChatDnd(it, timestamp) }
+            }
+
+            setPushNotificationSettings(updatedSettings)
+        }
+
     override suspend fun isChatDoNotDisturbEnabled(chatId: Long): Boolean =
         withContext(dispatcher) {
             _pushNotificationSettings.value.isChatDndEnabled(chatId)

@@ -10,4 +10,20 @@ interface TimeSystemRepository {
      *
      */
     fun getCurrentTimeInMillis(): Long
+
+
+    /**
+     * Get current hour of day
+     *
+     * @return hour of day
+     */
+    fun getCurrentHourOfDay(): Int
+
+
+    /**
+     * Get current minute
+     *
+     * @return minute
+     */
+    fun getCurrentMinute(): Int
 }
