@@ -236,7 +236,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                 }
 
                                 is TransferEvent.TransferFinishEvent -> {
-                                    processTransferFinishEvent(record, transferEvent, path)
+                                    processTransferFinishEvent(record, transferEvent)
                                         .collect {
                                             trySend(CameraUploadsTransferProgress.Error(record, it))
                                         }
@@ -446,14 +446,12 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
      *
      * @param record
      * @param transferEvent
-     * @param path
      *
      * @return a [Flow] of [Throwable] to inform about the failure of one of the operations
      */
     private suspend fun processTransferFinishEvent(
         record: CameraUploadsRecord,
         transferEvent: TransferEvent.TransferFinishEvent,
-        path: String,
     ) = channelFlow {
         val nodeId = NodeId(transferEvent.transfer.nodeHandle)
             .takeIf { getNodeByIdUseCase(it) != null }
@@ -485,7 +483,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
             },
             launch {
                 createThumbnailAndPreview(
-                    path = path,
+                    path = record.filePath,
                     nodeId = nodeId,
                 ).onFailure { trySend(it) }
             },
