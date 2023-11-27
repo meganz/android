@@ -67,6 +67,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbar
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
+import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.ChatMeetingButton
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
@@ -143,7 +144,7 @@ internal fun ChatView(
     var showEndCallForAllDialog by rememberSaveable { mutableStateOf(false) }
     var showMutePushNotificationDialog by rememberSaveable { mutableStateOf(false) }
     var muteNotificationDialogOptions by rememberSaveable { mutableStateOf(emptyList<ChatPushNotificationMuteOption>()) }
-
+    var isSelectMode by rememberSaveable { mutableStateOf(false) }
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
@@ -180,43 +181,54 @@ internal fun ChatView(
         ) {
             Scaffold(
                 topBar = {
-                    ChatAppBar(
-                        uiState = uiState,
-                        snackBarHostState = snackBarHostState,
-                        onBackPressed = onBackPressed,
-                        onMenuActionPressed = onMenuActionPressed,
-                        showParticipatingInACallDialog = {
-                            showParticipatingInACallDialog = true
-                        },
-                        showAllContactsParticipateInChat = {
-                            showAllContactsParticipateInChat = true
-                        },
-                        showGroupOrContactInfoActivity = {
-                            showGroupOrContactInfoActivity(context, uiState)
-                        },
-                        showNoContactToAddDialog = {
-                            showNoContactToAddDialog = true
-                        },
-                        onStartCall = { isVideoCall ->
-                            startCall(isVideoCall)
-                        },
-                        openAddContactActivity = {
-                            openAddContactActivity(
-                                context = context,
-                                chatId = chatId,
-                                addContactLauncher = addContactLauncher
-                            )
-                        },
-                        showClearChatConfirmationDialog = {
-                            showClearChat = true
-                        },
-                        archiveChat = archiveChat,
-                        unarchiveChat = unarchiveChat,
-                        showEndCallForAllDialog = {
-                            showEndCallForAllDialog = true
-                        },
-                        showMutePushNotificationDialog = { showMutePushNotificationDialog() },
-                    )
+                    if (isSelectMode) {
+                        SelectModeAppBar(
+                            title = "",
+                            onNavigationPressed = {
+                                isSelectMode = false
+                            },
+                        )
+                    } else {
+                        ChatAppBar(
+                            uiState = uiState,
+                            snackBarHostState = snackBarHostState,
+                            onBackPressed = onBackPressed,
+                            onMenuActionPressed = onMenuActionPressed,
+                            showParticipatingInACallDialog = {
+                                showParticipatingInACallDialog = true
+                            },
+                            showAllContactsParticipateInChat = {
+                                showAllContactsParticipateInChat = true
+                            },
+                            showGroupOrContactInfoActivity = {
+                                showGroupOrContactInfoActivity(context, uiState)
+                            },
+                            showNoContactToAddDialog = {
+                                showNoContactToAddDialog = true
+                            },
+                            onStartCall = { isVideoCall ->
+                                startCall(isVideoCall)
+                            },
+                            openAddContactActivity = {
+                                openAddContactActivity(
+                                    context = context,
+                                    chatId = chatId,
+                                    addContactLauncher = addContactLauncher
+                                )
+                            },
+                            showClearChatConfirmationDialog = {
+                                showClearChat = true
+                            },
+                            archiveChat = archiveChat,
+                            unarchiveChat = unarchiveChat,showEndCallForAllDialog = {
+                                showEndCallForAllDialog = true
+                            },
+                            showMutePushNotificationDialog = { showMutePushNotificationDialog() },
+                            enableSelectMode = {
+                                isSelectMode = true
+                            },
+                        )
+                    }
                 },
                 snackbarHost = {
                     SnackbarHost(hostState = snackBarHostState) { data ->

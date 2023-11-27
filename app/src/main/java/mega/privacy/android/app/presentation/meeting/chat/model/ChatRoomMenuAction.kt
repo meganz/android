@@ -90,6 +90,10 @@ sealed interface ChatRoomMenuAction : MenuAction {
         override val orderInCategory: Int = 135
     }
 
+    /**
+     * Unarchive
+     *
+     */
     object Unarchive : MenuActionWithoutIcon(
         descriptionRes = R.string.general_unarchive,
         testTag = TEST_TAG_UNARCHIVE_ACTION,
@@ -105,6 +109,17 @@ sealed interface ChatRoomMenuAction : MenuAction {
         testTag = TEST_TAG_END_CALL_FOR_ALL_ACTION,
     ), ChatRoomMenuAction {
         override val orderInCategory = 145
+    }
+
+    /**
+     * Select
+     *
+     */
+    object Select : MenuActionWithoutIcon(
+        descriptionRes = R.string.general_select,
+        testTag = TEST_TAG_SELECT_ACTION,
+    ), ChatRoomMenuAction {
+        override val orderInCategory = 110
     }
 
     /**
@@ -165,5 +180,10 @@ sealed interface ChatRoomMenuAction : MenuAction {
          * Test Tag End Call For All Action
          */
         const val TEST_TAG_END_CALL_FOR_ALL_ACTION = "chat_view:action_end_call_for_all"
+
+        /**
+         * Test Tag Select Action
+         */
+        const val TEST_TAG_SELECT_ACTION = "chat_view:action_select"
     }
 }

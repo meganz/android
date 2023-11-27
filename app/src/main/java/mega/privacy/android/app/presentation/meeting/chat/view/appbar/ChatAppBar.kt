@@ -28,6 +28,7 @@ import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
+import mega.privacy.android.app.presentation.meeting.chat.extension.isSelectable
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -61,6 +62,7 @@ internal fun ChatAppBar(
     archiveChat: () -> Unit = {},
     unarchiveChat: () -> Unit = {},
     showEndCallForAllDialog: () -> Unit = {},
+    enableSelectMode: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -136,6 +138,8 @@ internal fun ChatAppBar(
 
                 ChatRoomMenuAction.EndCallForAll -> showEndCallForAllDialog()
 
+                ChatRoomMenuAction.Select -> enableSelectMode()
+
                 else -> (it as ChatRoomMenuAction).let(onMenuActionPressed)
             }
         },
@@ -193,6 +197,10 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
             } else {
                 add(ChatRoomMenuAction.Mute)
             }
+        }
+
+        if (!isPreviewMode && uiState.messages.any { it.isSelectable }) {
+            add(ChatRoomMenuAction.Select)
         }
     }
 }

@@ -21,6 +21,8 @@ import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_U
 import mega.privacy.android.core.ui.controls.appbar.TEST_TAG_APP_BAR
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.messages.InvalidMessage
+import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import org.junit.Rule
 import org.junit.Test
@@ -1201,6 +1203,36 @@ class ChatAppBarTest {
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ARCHIVE_ACTION)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that select menu action is available if messages contains text message`() {
+        val textMessage = mock<TextMessage>()
+        initComposeRuleContent(
+            ChatUiState(
+                isPreviewMode = false,
+                messages = listOf(textMessage),
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_SELECT_ACTION)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that select menu action is not available if messages contains chat invalid message`() {
+        val invalidMessage = mock<InvalidMessage>()
+        initComposeRuleContent(
+            ChatUiState(
+                isPreviewMode = false,
+                isConnected = true,
+                isArchived = false,
+                messages = listOf(invalidMessage),
+            )
+        )
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
+        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_SELECT_ACTION)
+            .assertDoesNotExist()
     }
 
     @Test
