@@ -12,11 +12,11 @@ internal class StalledIssueResolutionActionMapper @Inject constructor() {
 
     operator fun invoke(
         issueType: StallIssueType,
-        isFolder: Boolean,
+        areAllNodesFolders: Boolean,
     ): List<StalledIssueResolutionAction> =
         when (issueType) {
             NamesWouldClashWhenSynced -> {
-                if (isFolder) {
+                if (areAllNodesFolders) {
                     listOf(
                         StalledIssueResolutionAction(
                             "Rename all items",
@@ -32,14 +32,6 @@ internal class StalledIssueResolutionActionMapper @Inject constructor() {
                         StalledIssueResolutionAction(
                             "Rename all items",
                             StalledIssueResolutionActionType.RENAME_ALL_ITEMS
-                        ),
-                        StalledIssueResolutionAction(
-                            "Remove duplicates",
-                            StalledIssueResolutionActionType.REMOVE_DUPLICATES
-                        ),
-                        StalledIssueResolutionAction(
-                            "Remove duplicates and rename the rest",
-                            StalledIssueResolutionActionType.REMOVE_DUPLICATES_AND_REMOVE_THE_REST
                         ),
                     )
                 }

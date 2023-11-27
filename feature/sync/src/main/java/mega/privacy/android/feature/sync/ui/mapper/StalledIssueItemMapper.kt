@@ -11,20 +11,20 @@ internal class StalledIssueItemMapper @Inject constructor(
     private val stalledIssueResolutionActionMapper: StalledIssueResolutionActionMapper,
 ) {
 
-    operator fun invoke(stalledIssueEntity: StalledIssue, isFolder: Boolean) =
+    operator fun invoke(stalledIssueEntity: StalledIssue, areAllNodesFolders: Boolean) =
         StalledIssueUiItem(
             nodeIds = stalledIssueEntity.nodeIds,
             localPaths = stalledIssueEntity.localPaths,
             issueType = stalledIssueEntity.issueType,
             conflictName = stalledIssueEntity.conflictName,
             nodeNames = stalledIssueEntity.nodeNames,
-            icon = if (isFolder) {
+            icon = if (areAllNodesFolders) {
                 R.drawable.ic_folder_list
             } else {
                 iconPackR.drawable.ic_generic_list
             },
             detailedInfo = getMockStalledIssueResolveInfo(),
-            actions = stalledIssueResolutionActionMapper(stalledIssueEntity.issueType, isFolder)
+            actions = stalledIssueResolutionActionMapper(stalledIssueEntity.issueType, areAllNodesFolders)
         )
 
     operator fun invoke(stalledIssueUiItem: StalledIssueUiItem): StalledIssue =

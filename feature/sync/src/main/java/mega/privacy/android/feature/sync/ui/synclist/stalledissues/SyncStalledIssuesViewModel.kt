@@ -36,10 +36,19 @@ internal class SyncStalledIssuesViewModel @Inject constructor(
                 }
                 .map { stalledIssuesList ->
                     stalledIssuesList.map { stalledIssue ->
-                        val node = getNodeByHandleUseCase(stalledIssue.nodeIds.first().longValue)
+                        val areAllNodesFolders =
+                            stalledIssue
+                                .nodeIds
+                                .map {
+                                    getNodeByHandleUseCase(it.longValue)
+                                }
+                                .all { node ->
+                                    node is FolderNode
+                                }
+
                         stalledIssueItemMapper(
                             stalledIssueEntity = stalledIssue,
-                            isFolder = node is FolderNode
+                            areAllNodesFolders = areAllNodesFolders
                         )
                     }
                 }

@@ -1,16 +1,21 @@
 package mega.privacy.android.feature.sync.domain
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.usecase.camerauploads.GetNodeByFingerprintAndParentNodeUseCase
 import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
-import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
@@ -19,6 +24,7 @@ import mega.privacy.android.feature.sync.domain.mapper.StalledIssueToSolvedIssue
 import mega.privacy.android.feature.sync.domain.usecase.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissues.SetSyncSolvedIssueUseCase
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito
@@ -41,7 +47,10 @@ class ResolveStalledIssueUseCaseTest {
     private val setSyncSolvedIssueUseCase: SetSyncSolvedIssueUseCase = mock()
     private val stalledIssueToSolvedIssueMapper: StalledIssueToSolvedIssueMapper = mock()
     private val renameNodeUseCase: RenameNodeUseCase = mock()
-    private val getFingerprintUseCase: GetFingerprintUseCase = mock()
+    private val getNodeByFingerprintAndParentNodeUseCase: GetNodeByFingerprintAndParentNodeUseCase =
+        mock()
+    private val moveNodeUseCase: MoveNodeUseCase = mock()
+
 
     private val underTest = ResolveStalledIssueUseCase(
         deleteFileUseCase,
@@ -50,8 +59,8 @@ class ResolveStalledIssueUseCaseTest {
         getFileByPathUseCase,
         setSyncSolvedIssueUseCase,
         renameNodeUseCase,
-        getFingerprintUseCase,
-        stalledIssueToSolvedIssueMapper
+        moveNodeUseCase,
+        stalledIssueToSolvedIssueMapper,
     )
 
     @AfterEach
@@ -60,8 +69,14 @@ class ResolveStalledIssueUseCaseTest {
             deleteFileUseCase,
             moveNodesToRubbishUseCase,
             getNodeByHandleUseCase,
-            getFileByPathUseCase
+            getFileByPathUseCase,
+            setSyncSolvedIssueUseCase,
+            renameNodeUseCase,
+            getNodeByFingerprintAndParentNodeUseCase,
+            moveNodeUseCase,
+            stalledIssueToSolvedIssueMapper
         )
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -217,6 +232,109 @@ class ResolveStalledIssueUseCaseTest {
         }
 
     @Test
+    fun `test that merge folders action results into folders merged to the biggest folder`() =
+        runTest {
+            val mainFolderId = NodeId(999L)
+            val secondaryFolderId = NodeId(888L)
+            val mainFolder: FolderNode = mock {
+                on { it.childFileCount } doReturn 5
+                on { id } doReturn mainFolderId
+            }
+            val secondaryFolder: FolderNode = mock {
+                on { it.childFileCount } doReturn 3
+                on { id } doReturn secondaryFolderId
+            }
+            val childOne: FolderNode = mock {
+                on { id } doReturn NodeId(1L)
+                on { name } doReturn "childOne"
+            }
+            val childTwo: FileNode = mock {
+                on { id } doReturn NodeId(2L)
+                on { name } doReturn "childTwo.png"
+                on { fingerprint } doReturn "123"
+            }
+            val childThree: FolderNode = mock {
+                on { id } doReturn NodeId(3L)
+                on { name } doReturn "childThree"
+            }
+            val childThreeWithDifferentFiles: FolderNode = mock {
+                on { id } doReturn NodeId(4L)
+                on { name } doReturn "childThree"
+            }
+            val subChildFour: FileNode = mock {
+                on { id } doReturn NodeId(4L)
+                on { name } doReturn "subChildFour.txt"
+                on { fingerprint } doReturn "456"
+            }
+            val subChildFive: FileNode = mock {
+                on { id } doReturn NodeId(5L)
+                on { name } doReturn "subChildFive.jpeg"
+                on { fingerprint } doReturn "789"
+            }
+            val childSix: FileNode = mock {
+                on { id } doReturn NodeId(6L)
+                on { name } doReturn "childSix.jpeg"
+                on { fingerprint } doReturn "101112"
+            }
+            val childSeven: FileNode = mock {
+                on { id } doReturn NodeId(7L)
+                on { name } doReturn "childSeven.jpeg"
+                on { fingerprint } doReturn "131415"
+            }
+            val childEight: FileNode = mock {
+                on { id } doReturn NodeId(8L)
+                on { name } doReturn "subChildFive.jpeg"
+                on { fingerprint } doReturn "161718"
+            }
+            val mainFolderChildren = listOf(
+                childOne,
+                childTwo,
+                childThree,
+                childSeven
+            )
+            val secondaryFolderChildren = listOf(
+                childOne,
+                childSix,
+                childThreeWithDifferentFiles,
+            )
+            val childOneChildren = listOf<UnTypedNode>()
+            val childThreeChildren = listOf<UnTypedNode>(
+                subChildFour,
+                subChildFive,
+            )
+            val childThreeDifferentChildren = listOf<UnTypedNode>(
+                childEight
+            )
+            whenever(mainFolder.fetchChildren).thenReturn { mainFolderChildren }
+            whenever(secondaryFolder.fetchChildren).thenReturn { secondaryFolderChildren }
+            whenever(childOne.fetchChildren).thenReturn { childOneChildren }
+            whenever(childThree.fetchChildren).thenReturn { childThreeChildren }
+            whenever(childThreeWithDifferentFiles.fetchChildren).thenReturn { childThreeDifferentChildren }
+            whenever(getNodeByHandleUseCase(mainFolderId.longValue)).thenReturn(mainFolder)
+            whenever(getNodeByHandleUseCase(secondaryFolderId.longValue)).thenReturn(secondaryFolder)
+            val resolutionAction = StalledIssueResolutionAction(
+                actionName = "Merge folders",
+                resolutionActionType = StalledIssueResolutionActionType.MERGE_FOLDERS
+            )
+            val stalledIssue = StalledIssue(
+                nodeIds = listOf(mainFolderId, secondaryFolderId),
+                nodeNames = listOf("/folder12/aa", "/folder12/AA"),
+                localPaths = emptyList(),
+                issueType = StallIssueType.NamesWouldClashWhenSynced,
+                conflictName = "Names would clash when synced"
+            )
+
+            underTest(
+                resolutionAction, stalledIssue
+            )
+
+            verify(moveNodeUseCase).invoke(childSix.id, mainFolderId)
+            verify(renameNodeUseCase).invoke(childEight.id.longValue, "subChildFive (1).jpeg")
+            verify(moveNodeUseCase).invoke(childEight.id, childThree.id)
+            verify(moveNodesToRubbishUseCase).invoke(listOf(secondaryFolderId.longValue))
+        }
+
+    @Test
     fun `test that after resolving stalled issue it is saved as solved issue`() = runTest {
         val stalledIssueResolutionAction = StalledIssueResolutionAction(
             actionName = "Choose file with the latest modified date",
@@ -249,8 +367,7 @@ class ResolveStalledIssueUseCaseTest {
         whenever(getFileByPathUseCase(localPath)).thenReturn(localFile)
         whenever(
             stalledIssueToSolvedIssueMapper(
-                stalledIssue,
-                stalledIssueResolutionAction.actionName
+                stalledIssue, stalledIssueResolutionAction.actionName
             )
         ).thenReturn(solvedIssue)
 

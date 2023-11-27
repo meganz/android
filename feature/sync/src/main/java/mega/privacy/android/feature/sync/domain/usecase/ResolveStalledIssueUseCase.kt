@@ -1,10 +1,17 @@
 package mega.privacy.android.feature.sync.domain.usecase
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
-import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
@@ -22,7 +29,7 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
     private val getFileByPathUseCase: GetFileByPathUseCase,
     private val setSyncSolvedIssueUseCase: SetSyncSolvedIssueUseCase,
     private val renameNodeUseCase: RenameNodeUseCase,
-    private val getFingerprintUseCase: GetFingerprintUseCase,
+    private val moveNodeUseCase: MoveNodeUseCase,
     private val stalledIssueToSolvedIssueMapper: StalledIssueToSolvedIssueMapper,
 ) {
 
@@ -50,18 +57,7 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
                     }
                     val nodeNameWithFullPath = stalledIssue.nodeNames[index]
                     val nodeName = nodeNameWithFullPath.substringAfterLast(File.separator)
-                    val nodeNameWithoutExtension = nodeName.substringBeforeLast(".")
-                    val nodeExtension =
-                        nodeName.substringAfterLast(".", missingDelimiterValue = "")
-                    val fullNodeExtension = if (nodeExtension.isNotEmpty()) {
-                        ".$nodeExtension"
-                    } else {
-                        ""
-                    }
-                    renameNodeUseCase(
-                        nodeId.longValue,
-                        "$nodeNameWithoutExtension ($counter)$fullNodeExtension"
-                    )
+                    addCounterToNodeName(nodeName, nodeId, counter)
                     counter++
                 }
             }
@@ -71,7 +67,19 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
             }
 
             StalledIssueResolutionActionType.MERGE_FOLDERS -> {
-                // will be implemented in a separate MR
+                val allFolderNodes = stalledIssue.nodeIds.map {
+                    getNodeByHandleUseCase(it.longValue)
+                }.map {
+                    it as FolderNode
+                }
+
+                val mainFolder = allFolderNodes.maxBy {
+                    it.childFileCount
+                }
+
+                val secondaryFolders = allFolderNodes.filter { it.id != mainFolder.id }
+
+                mergeFolders(mainFolder, secondaryFolders)
             }
 
             StalledIssueResolutionActionType.REMOVE_DUPLICATES_AND_REMOVE_THE_REST -> {
@@ -87,8 +95,7 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
             }
 
             StalledIssueResolutionActionType.CHOOSE_LATEST_MODIFIED_TIME -> {
-                val localFile =
-                    getFileByPathUseCase(stalledIssue.localPaths.first())
+                val localFile = getFileByPathUseCase(stalledIssue.localPaths.first())
                 val remoteNode = getNodeByHandleUseCase(stalledIssue.nodeIds.first().longValue)
                 if (remoteNode is FileNode && localFile != null) {
                     val remoteModifiedDateInSeconds = remoteNode.modificationTime
@@ -103,13 +110,98 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
         }
     }
 
+    private suspend fun mergeFolders(mainFolder: FolderNode, secondaryFolders: List<FolderNode>) {
+        for (secondaryFolderRoot in secondaryFolders) {
+            mergeFoldersIterative(mainFolder, secondaryFolderRoot)
+        }
+        moveNodesToRubbishUseCase(secondaryFolders.map { it.id.longValue })
+    }
+
+    private suspend fun mergeFoldersIterative(mainFolder: FolderNode, secondaryFolder: FolderNode) =
+        coroutineScope {
+            val stack = ArrayDeque<Pair<FolderNode, FolderNode>>()
+            stack.add(Pair(mainFolder, secondaryFolder))
+
+            while (stack.isNotEmpty()) {
+                val (currentMainFolder, currentSecondaryFolder) = stack.removeLast()
+
+                val (mainFolderChildren, secondaryFolderChildren) = awaitAll(
+                    async { currentMainFolder.fetchChildren(SortOrder.ORDER_ALPHABETICAL_ASC) },
+                    async { currentSecondaryFolder.fetchChildren(SortOrder.ORDER_ALPHABETICAL_ASC) },
+                )
+
+                for (secondaryNode in secondaryFolderChildren) {
+                    when (secondaryNode) {
+                        is FileNode -> {
+                            mergeFiles(currentMainFolder, secondaryNode, mainFolderChildren)
+                        }
+
+                        is FolderNode -> {
+                            val sameNameFolderInMainFolder = mainFolderChildren.find {
+                                it is FolderNode && it.name == secondaryNode.name
+                            }
+
+                            if (sameNameFolderInMainFolder == null) {
+                                moveNodeUseCase(secondaryNode.id, currentMainFolder.id)
+                            } else {
+                                stack.add(
+                                    Pair(
+                                        sameNameFolderInMainFolder as FolderNode,
+                                        secondaryNode
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+    private suspend fun mergeFiles(
+        mainFolder: FolderNode,
+        secondaryFile: FileNode,
+        mainFolderChildren: List<UnTypedNode>,
+    ) {
+        val sameNameFileInMainFolder = mainFolderChildren.find {
+            it is FileNode && it.name == secondaryFile.name
+        }
+
+        if (sameNameFileInMainFolder != null) {
+            if (sameNameFileInMainFolder is FileNode && sameNameFileInMainFolder.fingerprint != secondaryFile.fingerprint) {
+                addCounterToNodeName(secondaryFile.name, secondaryFile.id, 1)
+                moveNodeUseCase(secondaryFile.id, mainFolder.id)
+            }
+        } else {
+            moveNodeUseCase(secondaryFile.id, mainFolder.id)
+        }
+    }
+
+    private suspend fun addCounterToNodeName(
+        nodeName: String,
+        nodeId: NodeId,
+        counter: Int,
+    ) {
+        val nodeNameWithoutExtension = nodeName.substringBeforeLast(".")
+        val nodeExtension =
+            nodeName.substringAfterLast(".", missingDelimiterValue = "")
+        val fullNodeExtension = if (nodeExtension.isNotEmpty()) {
+            ".$nodeExtension"
+        } else {
+            ""
+        }
+        renameNodeUseCase(
+            nodeId.longValue,
+            "$nodeNameWithoutExtension ($counter)$fullNodeExtension"
+        )
+    }
+
     private suspend fun saveSolvedIssue(
         stalledIssue: StalledIssue,
         stalledIssueResolutionAction: StalledIssueResolutionAction,
     ) {
         val solvedIssue = stalledIssueToSolvedIssueMapper(
-            stalledIssue,
-            stalledIssueResolutionAction.actionName
+            stalledIssue, stalledIssueResolutionAction.actionName
         )
         setSyncSolvedIssueUseCase(solvedIssue = solvedIssue)
     }
