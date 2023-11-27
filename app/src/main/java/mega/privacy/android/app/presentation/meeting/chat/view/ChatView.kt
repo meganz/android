@@ -102,6 +102,7 @@ internal fun ChatView(
         onMutePushNotificationSelected = viewModel::mutePushNotification,
         showMutePushNotificationDialog = viewModel::showMutePushNotificationDialog,
         onShowMutePushNotificationDialogConsumed = viewModel::onShowMutePushNotificationDialogConsumed,
+        onStartMeeting = viewModel::onStartMeeting,
     )
 }
 
@@ -130,6 +131,7 @@ internal fun ChatView(
     onMutePushNotificationSelected: (ChatPushNotificationMuteOption) -> Unit = {},
     showMutePushNotificationDialog: () -> Unit = {},
     onShowMutePushNotificationDialogConsumed: () -> Unit = {},
+    onStartMeeting: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -258,7 +260,7 @@ internal fun ChatView(
                         }
                     }
                     if (isMeeting && isActive && !isArchived) {
-                        StartOrJoinMeeting(this@with)
+                        StartOrJoinMeeting(this@with, onStartMeeting)
                     }
                 }
 
@@ -359,13 +361,15 @@ internal fun ChatView(
 }
 
 @Composable
-private fun BoxScope.StartOrJoinMeeting(uiState: ChatUiState) {
-    val modifier = Modifier.padding(top = 16.dp).align(Alignment.TopCenter)
+private fun BoxScope.StartOrJoinMeeting(uiState: ChatUiState, onStartMeeting: () -> Unit = {}) {
+    val modifier = Modifier
+        .padding(top = 16.dp)
+        .align(Alignment.TopCenter)
     if (uiState.callInThisChat?.status?.isStarted != true) {
         ChatMeetingButton(
             modifier = modifier,
             text = stringResource(id = R.string.meetings_chat_room_start_scheduled_meeting_option),
-            onClick = { },
+            onClick = onStartMeeting,
         )
     } else if (uiState.callInThisChat.status?.isJoined != true) {
         ChatMeetingButton(

@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
@@ -59,6 +60,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion.NUMBER_MESSAGES_TO_LOAD
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
+import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
@@ -114,6 +116,7 @@ internal class ChatViewModel @Inject constructor(
     private val monitorMessageLoadedUseCase: MonitorMessageLoadedUseCase,
     private val getChatMuteOptionListUseCase: GetChatMuteOptionListUseCase,
     private val muteChatNotificationForChatRoomsUseCase: MuteChatNotificationForChatRoomsUseCase,
+    private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -741,15 +744,19 @@ internal class ChatViewModel @Inject constructor(
             chatId?.let {
                 runCatching { startCallUseCase(it, video) }
                     .onSuccess { call ->
-                        call?.let {
-                            chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
-                            chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
-                            passcodeManagement.showPasscodeScreen = true
-                        }
-                        _state.update { state ->
-                            state.copy(callInThisChat = call, isStartingCall = true)
-                        }
+                        setCallReady(call)
                     }.onFailure { Timber.e("Exception starting call $it") }
+            }
+        }
+    }
+
+    private fun setCallReady(call: ChatCall?) {
+        call?.let {
+            chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
+            chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
+            passcodeManagement.showPasscodeScreen = true
+            _state.update { state ->
+                state.copy(callInThisChat = call, isStartingCall = true)
             }
         }
     }
@@ -759,6 +766,23 @@ internal class ChatViewModel @Inject constructor(
      */
     fun onCallStarted() {
         _state.update { state -> state.copy(isStartingCall = false) }
+    }
+
+    fun onStartMeeting() {
+        viewModelScope.launch {
+            runCatching {
+                val chatId = requireNotNull(chatId)
+                val scheduledMeeting = requireNotNull(state.value.scheduledMeeting)
+                startChatCallNoRingingUseCase(
+                    chatId = chatId,
+                    schedId = scheduledMeeting.schedId,
+                    enabledVideo = false,
+                    enabledAudio = true
+                )
+            }.onSuccess { chatCall ->
+                setCallReady(chatCall)
+            }.onFailure { Timber.e(it) }
+        }
     }
 
     companion object {

@@ -71,6 +71,7 @@ import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallU
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
+import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaChatError
@@ -182,6 +183,7 @@ internal class ChatViewModelTest {
     private val muteChatNotificationForChatRoomsUseCase =
         mock<MuteChatNotificationForChatRoomsUseCase>()
     private val getChatMuteOptionListUseCase = mock<GetChatMuteOptionListUseCase>()
+    private val startChatCallNoRingingUseCase = mock<StartChatCallNoRingingUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -220,6 +222,7 @@ internal class ChatViewModelTest {
             loadMessagesUseCase,
             muteChatNotificationForChatRoomsUseCase,
             getChatMuteOptionListUseCase,
+            startChatCallNoRingingUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -277,6 +280,7 @@ internal class ChatViewModelTest {
             sendStatisticsMeetingsUseCase = sendStatisticsMeetingsUseCase,
             archiveChatUseCase = archiveChatUseCase,
             startCallUseCase = startCallUseCase,
+            startChatCallNoRingingUseCase = startChatCallNoRingingUseCase,
             chatManagement = chatManagement,
             loadMessagesUseCase = loadMessagesUseCase,
             monitorMessageLoadedUseCase = monitorMessageLoadedUseCase,
@@ -1642,6 +1646,72 @@ internal class ChatViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().isStartingCall).isFalse()
         }
+    }
+
+    @Test
+    fun `test that start schedule meeting failed`() = runTest {
+        val invalidHandle = -1L
+        val schedId = 123L
+        val expectedScheduledMeeting =
+            ChatScheduledMeeting(parentSchedId = invalidHandle, schedId = schedId)
+        whenever(getScheduledMeetingByChat(chatId)).thenReturn(listOf(expectedScheduledMeeting))
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().scheduledMeeting).isEqualTo(expectedScheduledMeeting)
+        }
+        whenever(
+            startChatCallNoRingingUseCase(
+                chatId = chatId,
+                schedId = schedId,
+                enabledVideo = false,
+                enabledAudio = true
+            )
+        ).thenThrow(RuntimeException())
+        underTest.onStartMeeting()
+        underTest.state.test {
+            assertThat(awaitItem().isStartingCall).isFalse()
+        }
+        verifyNoInteractions(chatManagement)
+        verifyNoInteractions(passcodeManagement)
+    }
+
+    @Test
+    fun `test that start schedule meeting successfully`() = runTest {
+        val invalidHandle = -1L
+        val schedId = 123L
+        val expectedScheduledMeeting =
+            ChatScheduledMeeting(parentSchedId = invalidHandle, schedId = schedId)
+        whenever(getScheduledMeetingByChat(chatId)).thenReturn(listOf(expectedScheduledMeeting))
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().scheduledMeeting).isEqualTo(expectedScheduledMeeting)
+        }
+        val callId = 321L
+        val call = mock<ChatCall> {
+            on { this.chatId } doReturn chatId
+            on { this.callId } doReturn callId
+            on { isOutgoing } doReturn true
+            on { hasLocalVideo } doReturn false
+        }
+        whenever(
+            startChatCallNoRingingUseCase(
+                chatId = chatId,
+                schedId = schedId,
+                enabledVideo = false,
+                enabledAudio = true
+            )
+        ).thenReturn(call)
+        underTest.onStartMeeting()
+        underTest.state.test {
+            assertThat(awaitItem().isStartingCall).isTrue()
+        }
+        verify(chatManagement).setSpeakerStatus(chatId, call.hasLocalVideo)
+        verify(chatManagement).setRequestSentCall(callId, true)
+        verifyNoMoreInteractions(chatManagement)
+        verify(passcodeManagement).showPasscodeScreen = true
+        verifyNoMoreInteractions(passcodeManagement)
     }
 
     @ParameterizedTest(name = " when history status is {0}")
