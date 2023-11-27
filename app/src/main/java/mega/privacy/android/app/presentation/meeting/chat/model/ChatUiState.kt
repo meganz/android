@@ -88,5 +88,5 @@ data class ChatUiState(
     /**
      * Has a call in this chat.
      */
-    fun hasACallInThisChat() = callInThisChat != null
+    val hasACallInThisChat = callInThisChat != null
 }

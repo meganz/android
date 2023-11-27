@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
@@ -54,6 +55,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipants
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
@@ -117,6 +119,8 @@ internal class ChatViewModel @Inject constructor(
     private val getChatMuteOptionListUseCase: GetChatMuteOptionListUseCase,
     private val muteChatNotificationForChatRoomsUseCase: MuteChatNotificationForChatRoomsUseCase,
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
+    private val answerChatCallUseCase: AnswerChatCallUseCase,
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -782,6 +786,26 @@ internal class ChatViewModel @Inject constructor(
             }.onSuccess { chatCall ->
                 setCallReady(chatCall)
             }.onFailure { Timber.e(it) }
+        }
+    }
+
+    fun onAnswerCall() {
+        viewModelScope.launch {
+            chatId?.let {
+                chatManagement.addJoiningCallChatId(chatId)
+                runCatching {
+                    answerChatCallUseCase(chatId = chatId, video = false, audio = true)
+                }.onSuccess { call ->
+                    call?.apply {
+                        chatManagement.removeJoiningCallChatId(chatId)
+                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                        _state.update { state -> state.copy(isStartingCall = true) }
+                    }
+                }.onFailure {
+                    Timber.w("Exception answering call: $it")
+                    chatManagement.removeJoiningCallChatId(chatId)
+                }
+            }
         }
     }
 

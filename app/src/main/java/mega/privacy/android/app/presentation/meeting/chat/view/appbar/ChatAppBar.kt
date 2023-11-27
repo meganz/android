@@ -155,10 +155,10 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
         val hasModeratorPermission = myPermission == ChatRoomPermission.Moderator
 
         if ((hasModeratorPermission || myPermission == ChatRoomPermission.Standard) && !isPreviewMode) {
-            add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat() && (!isWaitingRoom || hasModeratorPermission)))
+            add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat && (!isWaitingRoom || hasModeratorPermission)))
 
             if (!isGroup) {
-                add(ChatRoomMenuAction.VideoCall(!hasACallInThisChat()))
+                add(ChatRoomMenuAction.VideoCall(!hasACallInThisChat))
             }
         }
 
@@ -185,7 +185,7 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
             }
         }
 
-        if (hasModeratorPermission && (uiState.isGroup || uiState.isMeeting) && uiState.hasACallInThisChat()) {
+        if (hasModeratorPermission && (uiState.isGroup || uiState.isMeeting) && uiState.hasACallInThisChat) {
             add(ChatRoomMenuAction.EndCallForAll)
         }
 

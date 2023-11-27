@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -37,6 +38,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -65,11 +69,13 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatCallM
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
 import mega.privacy.android.app.presentation.qrcode.findActivity
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.ChatMeetingButton
+import mega.privacy.android.core.ui.controls.chat.ReturnToCallBanner
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -77,6 +83,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import timber.log.Timber
 
 @Composable
@@ -104,6 +111,7 @@ internal fun ChatView(
         showMutePushNotificationDialog = viewModel::showMutePushNotificationDialog,
         onShowMutePushNotificationDialogConsumed = viewModel::onShowMutePushNotificationDialogConsumed,
         onStartMeeting = viewModel::onStartMeeting,
+        onAnswerCall = viewModel::onAnswerCall,
     )
 }
 
@@ -113,7 +121,7 @@ internal fun ChatView(
  * @param uiState [ChatUiState]
  * @param onBackPressed Action to perform for back button.
  */
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
 @Composable
 internal fun ChatView(
     uiState: ChatUiState,
@@ -133,6 +141,7 @@ internal fun ChatView(
     showMutePushNotificationDialog: () -> Unit = {},
     onShowMutePushNotificationDialogConsumed: () -> Unit = {},
     onStartMeeting: () -> Unit = {},
+    onAnswerCall: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -145,6 +154,8 @@ internal fun ChatView(
     var showMutePushNotificationDialog by rememberSaveable { mutableStateOf(false) }
     var muteNotificationDialogOptions by rememberSaveable { mutableStateOf(emptyList<ChatPushNotificationMuteOption>()) }
     var isSelectMode by rememberSaveable { mutableStateOf(false) }
+    val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
+
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
@@ -220,7 +231,8 @@ internal fun ChatView(
                                 showClearChat = true
                             },
                             archiveChat = archiveChat,
-                            unarchiveChat = unarchiveChat,showEndCallForAllDialog = {
+                            unarchiveChat = unarchiveChat,
+                            showEndCallForAllDialog = {
                                 showEndCallForAllDialog = true
                             },
                             showMutePushNotificationDialog = { showMutePushNotificationDialog() },
@@ -274,6 +286,17 @@ internal fun ChatView(
                     if (isMeeting && isActive && !isArchived) {
                         StartOrJoinMeeting(this@with, onStartMeeting)
                     }
+                    getReturnToCallBannerText(uiState = uiState)?.let {
+                        ReturnToCallBanner(
+                            text = it,
+                            onBannerClicked = {
+                                if (audioPermissionState.status.isGranted) {
+                                    onAnswerCall()
+                                } else {
+                                    startMeetingActivity(context, chatId, enableAudio = false)
+                                }
+                            })
+                    }
                 }
 
                 if (showParticipatingInACallDialog) {
@@ -284,7 +307,6 @@ internal fun ChatView(
                             // return to active call
                             currentCall?.let {
                                 enablePasscodeCheck()
-                                MegaApplication.getInstance().openCallService(it)
                                 startMeetingActivity(context, it)
                             }
                         }
@@ -362,6 +384,8 @@ internal fun ChatView(
 
         if (isStartingCall && callInThisChat != null) {
             onCallStarted()
+            MegaApplication.getInstance().openCallService(chatId)
+            CallUtil.clearIncomingCallNotification(callInThisChat.callId)
             startMeetingActivity(
                 context,
                 chatId,
@@ -447,7 +471,10 @@ private fun startMeetingActivity(
     enableVideo: Boolean? = null,
 ) {
     context.startActivity(Intent(context, MeetingActivity::class.java).apply {
-        action = MeetingActivity.MEETING_ACTION_IN
+        action =
+            if (enableAudio == true) MeetingActivity.MEETING_ACTION_IN
+            else MeetingActivity.MEETING_ACTION_RINGING
+
         putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
         enableAudio?.let { putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, it) }
         enableVideo?.let { putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, it) }
@@ -463,6 +490,23 @@ private fun getInfoToShow(infoToShow: InfoToShow, context: Context): String? = w
         } else {
             stringId?.let { context.getString(it) }
         }
+}
+
+@Composable
+private fun getReturnToCallBannerText(uiState: ChatUiState): String? = with(uiState) {
+    if (!isConnected) return@with null
+
+    val callInThisChatNotAnswered =
+        callInThisChat?.status == ChatCallStatus.TerminatingUserParticipation
+                || callInThisChat?.status == ChatCallStatus.UserNoPresent
+
+    when {
+        !isGroup && hasACallInThisChat && callInThisChatNotAnswered -> {
+            stringResource(id = R.string.join_call_layout)
+        }
+
+        else -> null
+    }
 }
 
 @Preview

@@ -19,6 +19,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
@@ -66,6 +67,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipants
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
@@ -103,9 +105,13 @@ import java.util.stream.Stream
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ChatViewModelTest {
+
     private val chatId = 123L
     private val userHandle = 321L
+    private val callId = 456L
+
     private lateinit var underTest: ChatViewModel
+
     private val getChatRoomUseCase: GetChatRoom = mock()
     private val savedStateHandle: SavedStateHandle = mock {
         on { get<Long>(Constants.CHAT_ID) } doReturn chatId
@@ -184,6 +190,8 @@ internal class ChatViewModelTest {
         mock<MuteChatNotificationForChatRoomsUseCase>()
     private val getChatMuteOptionListUseCase = mock<GetChatMuteOptionListUseCase>()
     private val startChatCallNoRingingUseCase = mock<StartChatCallNoRingingUseCase>()
+    private val answerChatCallUseCase = mock<AnswerChatCallUseCase>()
+    private val rtcAudioManagerGateway = mock<RTCAudioManagerGateway>()
 
     @BeforeAll
     fun setup() {
@@ -223,6 +231,8 @@ internal class ChatViewModelTest {
             muteChatNotificationForChatRoomsUseCase,
             getChatMuteOptionListUseCase,
             startChatCallNoRingingUseCase,
+            answerChatCallUseCase,
+            rtcAudioManagerGateway,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -286,6 +296,8 @@ internal class ChatViewModelTest {
             monitorMessageLoadedUseCase = monitorMessageLoadedUseCase,
             getChatMuteOptionListUseCase = getChatMuteOptionListUseCase,
             muteChatNotificationForChatRoomsUseCase = muteChatNotificationForChatRoomsUseCase,
+            answerChatCallUseCase = answerChatCallUseCase,
+            rtcAudioManagerGateway = rtcAudioManagerGateway,
         )
     }
 
@@ -1598,7 +1610,6 @@ internal class ChatViewModelTest {
         success: Boolean,
         video: Boolean,
     ) = runTest {
-        val callId = 321L
         val call = mock<ChatCall> {
             on { this.chatId } doReturn chatId
             on { this.callId } doReturn callId
@@ -1622,15 +1633,14 @@ internal class ChatViewModelTest {
             verifyNoMoreInteractions(chatManagement)
             verify(passcodeManagement).showPasscodeScreen = true
             verifyNoMoreInteractions(passcodeManagement)
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual.callInThisChat).isEqualTo(call)
+                assertThat(actual.isStartingCall).isTrue()
+            }
         } else {
             verifyNoInteractions(chatManagement)
             verifyNoInteractions(passcodeManagement)
-        }
-
-        underTest.state.test {
-            val actual = awaitItem()
-            assertThat(actual.callInThisChat).isEqualTo(if (success) call else null)
-            assertThat(actual.isStartingCall).isEqualTo(success)
         }
     }
 
@@ -1688,7 +1698,6 @@ internal class ChatViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().scheduledMeeting).isEqualTo(expectedScheduledMeeting)
         }
-        val callId = 321L
         val call = mock<ChatCall> {
             on { this.chatId } doReturn chatId
             on { this.callId } doReturn callId
@@ -1814,6 +1823,38 @@ internal class ChatViewModelTest {
             val item =
                 (awaitItem().infoToShowEvent as StateEventWithContentTriggered).content?.chatPushNotificationMuteOption
             assertThat(item).isEqualTo(muteOption)
+        }
+    }
+
+    @ParameterizedTest(name = " with success {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that answer call invokes chat call use case and finishes`(
+        success: Boolean,
+    ) = runTest {
+        if (success) {
+            val call = mock<ChatCall> {
+                on { this.chatId } doReturn chatId
+                on { this.callId } doReturn callId
+            }
+            whenever(answerChatCallUseCase(chatId, video = false, audio = true)).thenReturn(call)
+        } else {
+            whenever(answerChatCallUseCase(chatId, video = false, audio = true))
+                .thenThrow(RuntimeException())
+        }
+
+        underTest.onAnswerCall()
+        verify(chatManagement).addJoiningCallChatId(chatId)
+        verify(chatManagement).removeJoiningCallChatId(chatId)
+        verifyNoMoreInteractions(chatManagement)
+
+        if (success) {
+            verify(rtcAudioManagerGateway).removeRTCAudioManagerRingIn()
+            verifyNoMoreInteractions(rtcAudioManagerGateway)
+            underTest.state.test {
+                assertThat(awaitItem().isStartingCall).isTrue()
+            }
+        } else {
+            verifyNoInteractions(rtcAudioManagerGateway)
         }
     }
 

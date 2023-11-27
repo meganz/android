@@ -203,6 +203,24 @@ class ChatViewTest {
         ).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that join current call banner is shown in 1on1 chat, in which there is a call I am not participating yet`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                callInThisChat = ChatCall(
+                    chatId = 1L,
+                    callId = 1L,
+                    status = ChatCallStatus.UserNoPresent
+                ),
+                isGroup = false,
+            )
+        )
+        composeTestRule.onNodeWithText(
+            composeTestRule.activity.getString(R.string.join_call_layout)
+        ).assertIsDisplayed()
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatView(
