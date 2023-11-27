@@ -10,6 +10,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,10 +29,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
@@ -43,6 +47,8 @@ import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
+import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
+import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
 import mega.privacy.android.app.presentation.meeting.chat.extension.toString
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
@@ -62,6 +68,7 @@ import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
+import mega.privacy.android.core.ui.controls.chat.ChatMeetingButton
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -220,22 +227,28 @@ internal fun ChatView(
                 }
             )
             { paddingValues ->
-                LazyColumn(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    item("first_message_header") { FirstMessageHeader(uiState) }
-
-                    messages.forEach { message ->
-                        if (message is CallMessage) {
-                            item(message.msgId) {
-                                ChatCallMessageView(
-                                    message = (message),
-                                    isOneToOneChat = !isGroup
-                                )
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        item("first_message_header") { FirstMessageHeader(uiState) }
+                        messages.forEach { message ->
+                            if (message is CallMessage) {
+                                item(message.msgId) {
+                                    ChatCallMessageView(
+                                        message = (message),
+                                        isOneToOneChat = !isGroup
+                                    )
+                                }
                             }
                         }
+                    }
+                    if (isMeeting && isActive && !isArchived) {
+                        StartOrJoinMeeting(this@with)
                     }
                 }
 
@@ -319,6 +332,24 @@ internal fun ChatView(
                 enableVideo = callInThisChat.hasLocalVideo
             )
         }
+    }
+}
+
+@Composable
+private fun BoxScope.StartOrJoinMeeting(uiState: ChatUiState) {
+    val modifier = Modifier.padding(top = 16.dp).align(Alignment.TopCenter)
+    if (uiState.callInThisChat?.status?.isStarted != true) {
+        ChatMeetingButton(
+            modifier = modifier,
+            text = stringResource(id = R.string.meetings_chat_room_start_scheduled_meeting_option),
+            onClick = { },
+        )
+    } else if (uiState.callInThisChat.status?.isJoined != true) {
+        ChatMeetingButton(
+            modifier = modifier,
+            text = stringResource(id = R.string.meetings_chat_room_join_scheduled_meeting_option),
+            onClick = { },
+        )
     }
 }
 

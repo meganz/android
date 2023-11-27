@@ -19,6 +19,8 @@ import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -158,6 +160,47 @@ class ChatViewTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.meetings_chat_screen_dialog_description_end_call_for_all))
             .assertIsDisplayed()
+    }
+
+
+    @Test
+    fun `test that start meeting view shows correctly when chat room is meeting and available and user doesn't join`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isMeeting = true,
+                isActive = true,
+                callInThisChat = ChatCall(
+                    chatId = 1L,
+                    callId = 1L,
+                    status = ChatCallStatus.Unknown
+                ),
+            )
+        )
+        composeTestRule.onNodeWithText(
+            composeTestRule.activity.getString(
+                R.string.meetings_chat_room_start_scheduled_meeting_option
+            )
+        ).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that join meeting view shows correctly when chat room is meeting and available and user doesn't join`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isMeeting = true,
+                isActive = true,
+                callInThisChat = ChatCall(
+                    chatId = 1L,
+                    callId = 1L,
+                    status = ChatCallStatus.UserNoPresent
+                ),
+            )
+        )
+        composeTestRule.onNodeWithText(
+            composeTestRule.activity.getString(
+                R.string.meetings_chat_room_join_scheduled_meeting_option
+            )
+        ).assertIsDisplayed()
     }
 
     private fun initComposeRuleContent(state: ChatUiState) {
