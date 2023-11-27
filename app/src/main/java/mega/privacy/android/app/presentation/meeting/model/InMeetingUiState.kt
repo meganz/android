@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.AnotherCallType
@@ -20,13 +22,16 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property isSpeakerSelectionAutomatic            True, if is speaker selection automatic. False, if it's manual.
  * @property haveConnection                         True, have connection. False, if not.
  * @property showCallDuration                       True, should show call duration. False, if not.
- * @property showPoorConnectionBanner               True, should show poor connection banner. False, if not.
- * @property showReconnectingBanner                 True, should show reconnecting banner. False, if not.
- * @property showOnlyMeBanner                       True, should show only me banner. False, if not.
- * @property showWaitingForOthersBanner             True, should show waiting for others banner. False, if not.
- * @property showEndMeetingAsModeratorBottomPanel   True, should show end meeting as moderator bottom panel. False, if not.
- * @property showAssignModeratorBottomPanel         True, should show assign moderator bottom panel. False, if not.
-
+ * @property isPublicChat                           True if it's public chat. False, if not
+ * @property chatTitle                              Chat title
+ * @property updateCallSubtitle                     If should update the call subtitle
+ * @property updateAnotherCallBannerType            Update the banner of another call.
+ * @property anotherChatTitle                       Chat title of another call.
+ * @property updateModeratorsName                   Update moderator's name
+ * @property updateNumParticipants                  Update the num of participants
+ * @property isOneToOneCall                         True, if it's one to one call. False, if it's a group call or a meeting.
+ * @property showMeetingInfoFragment                True to show meeting info fragment or False otherwise
+ * @property snackbarMessage                        Message to show in Snackbar.
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -39,13 +44,14 @@ data class InMeetingUiState(
     val isSpeakerSelectionAutomatic: Boolean = true,
     val haveConnection: Boolean = false,
     val showCallDuration: Boolean = false,
-    val chatTitle:String = " ",
-    val isPublicChat:Boolean = false,
+    val chatTitle: String = " ",
+    val isPublicChat: Boolean = false,
     val updateCallSubtitle: SubtitleCallType = SubtitleCallType.Connecting,
     val updateAnotherCallBannerType: AnotherCallType = AnotherCallType.NotCall,
     val anotherChatTitle: String = " ",
     val updateModeratorsName: String = " ",
     val updateNumParticipants: Int = 1,
-    val isOneToOneCall: Boolean = false,
+    val isOneToOneCall: Boolean = true,
     val showMeetingInfoFragment: Boolean = false,
+    val snackbarMessage: StateEventWithContent<Int> = consumed(),
 )

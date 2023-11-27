@@ -5,10 +5,14 @@ import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatSession
+import mega.privacy.android.domain.entity.meeting.ChatWaitingRoom
 import mega.privacy.android.domain.entity.meeting.EndCallReason
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
 import mega.privacy.android.domain.entity.meeting.TermCodeType
+import mega.privacy.android.domain.entity.meeting.WaitingRoomStatus
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaHandleList
 import org.junit.Before
 import org.junit.Test
@@ -27,15 +31,23 @@ class ChatRequestMapperTest {
     fun setUp() {
         underTest =
             ChatCallMapper(
-                HandleListMapper(),
-                ChatCallChangesMapper(),
-                ChatCallStatusMapper(),
-                EndCallReasonMapper(),
-                CallTermCodeMapper(),
-                CallCompositionChangesMapper(),
-                NetworkQualityMapper(),
-                ChatWaitingRoomMapper(WaitingRoomStatusMapper(), HandleListMapper()),
-                WaitingRoomStatusMapper()
+                handleListMapper = HandleListMapper(),
+                chatCallChangesMapper = ChatCallChangesMapper(),
+                chatCallStatusMapper = ChatCallStatusMapper(),
+                endCallReasonMapper = EndCallReasonMapper(),
+                callTermCodeMapper = CallTermCodeMapper(),
+                callCompositionChangesMapper = CallCompositionChangesMapper(),
+                networkQualityMapper = NetworkQualityMapper(),
+                chatWaitingRoomMapper = ChatWaitingRoomMapper(
+                    WaitingRoomStatusMapper(),
+                    HandleListMapper()
+                ),
+                waitingRoomStatusMapper = WaitingRoomStatusMapper(),
+                chatSessionMapper = ChatSessionMapper(
+                    ChatSessionChangesMapper(),
+                    ChatSessionStatusMapper(),
+                    ChatSessionTermCodeMapper()
+                ),
             )
     }
 
@@ -46,7 +58,7 @@ class ChatRequestMapperTest {
         Truth.assertThat(actual.callId).isEqualTo(expectedCallId)
         Truth.assertThat(actual.chatId).isEqualTo(expectedChatId)
         Truth.assertThat(actual.caller).isEqualTo(expectedPeerId1)
-        Truth.assertThat(actual.peeridCallCompositionChange)
+        Truth.assertThat(actual.peerIdCallCompositionChange)
             .isEqualTo(expectedPeerId1)
     }
 
@@ -85,7 +97,7 @@ class ChatRequestMapperTest {
         whenever(peerIdParticipantsListTest[0]).thenReturn(expectedPeerId1)
         whenever(peerIdParticipantsListTest[1]).thenReturn(expectedPeerId2)
 
-        val chatCall = getMockChatCall(peeridParticipants = peerIdParticipantsListTest)
+        val chatCall = getMockChatCall(peerIdParticipants = peerIdParticipantsListTest)
         val actual = underTest(chatCall)
         Truth.assertThat(actual.peerIdParticipants).isNotNull()
         Truth.assertThat(actual.peerIdParticipants?.get(0)).isEqualTo(expectedPeerId1)
@@ -113,11 +125,11 @@ class ChatRequestMapperTest {
         whenever(sessionsClientIdListTest[0]).thenReturn(expectedPeerId1)
         whenever(sessionsClientIdListTest[1]).thenReturn(expectedPeerId2)
 
-        val chatCall = getMockChatCall(sessionsClientid = sessionsClientIdListTest)
+        val chatCall = getMockChatCall(sessionsClientId = sessionsClientIdListTest)
         val actual = underTest(chatCall)
-        Truth.assertThat(actual.sessionsClientid).isNotNull()
-        Truth.assertThat(actual.sessionsClientid?.get(0)).isEqualTo(expectedPeerId1)
-        Truth.assertThat(actual.sessionsClientid?.get(1)).isEqualTo(expectedPeerId2)
+        Truth.assertThat(actual.sessionsClientId).isNotNull()
+        Truth.assertThat(actual.sessionsClientId?.get(0)).isEqualTo(expectedPeerId1)
+        Truth.assertThat(actual.sessionsClientId?.get(1)).isEqualTo(expectedPeerId2)
     }
 
     @Test
@@ -218,53 +230,87 @@ class ChatRequestMapperTest {
         Truth.assertThat(actual.hasPendingSpeakRequest).isEqualTo(false)
     }
 
+    private fun getMockChatSession(peerId:Long, clientId:Long): MegaChatSession{
+        val session = mock<MegaChatSession> {
+            on { peerid }.thenReturn(peerId)
+            on { clientid }.thenReturn(clientId)
+            on { status }.thenReturn(MegaChatSession.SESSION_STATUS_IN_PROGRESS)
+            on { isSpeakAllowed }.thenReturn(true)
+            on { hasAudio() }.thenReturn(true)
+            on { hasVideo() }.thenReturn(true)
+            on { isHiResVideo }.thenReturn(true)
+            on { isLowResVideo }.thenReturn(false)
+            on { hasCamera() }.thenReturn(true)
+            on { isLowResCamera }.thenReturn(false)
+            on { isHiResCamera }.thenReturn(true)
+            on { hasScreenShare() }.thenReturn(false)
+            on { isHiResScreenShare }.thenReturn(false)
+            on { isLowResScreenShare }.thenReturn(false)
+            on { isOnHold }.thenReturn(false)
+            on { termCode }.thenReturn(MegaChatSession.SESS_TERM_CODE_RECOVERABLE)
+            on { hasPendingSpeakRequest() }.thenReturn(false)
+            on { isAudioDetected }.thenReturn(true)
+            on { canRecvVideoHiRes() }.thenReturn(true)
+            on { canRecvVideoLowRes() }.thenReturn(false)
+            on { isModerator }.thenReturn(true)
+            on { isRecording }.thenReturn(true)
+            on { hasSpeakPermission() }.thenReturn(false)
+        }
+
+        return session
+    }
+
     private fun getMockChatCall(
-        callId: Long = expectedCallId,
-        chatId: Long = expectedChatId,
         status: Int = -1,
-        caller: Long = expectedPeerId1,
-        duration: Long = 100L,
-        numParticipants: Int = 2,
-        changes: Int = -1,
-        endCallReason: Int = -1,
-        callCompositionChange: Int = -1,
-        peeridCallCompositionChange: Long = expectedPeerId1,
-        peeridParticipants: MegaHandleList = mock(),
-        moderators: MegaHandleList = mock(),
-        sessionsClientid: MegaHandleList = mock(),
-        networkQuality: Int = -1,
-        termCode: Int = -1,
-        initialTimeStamp: Long = 1L,
-        finalTimeStamp: Long = 1L,
-        isAudioDetected: Boolean = false,
-        isIgnored: Boolean = false,
-        isIncoming: Boolean = false,
-        isOnHold: Boolean = false,
-        isOutgoing: Boolean = false,
-        isOwnClientCaller: Boolean = false,
-        isOwnModerator: Boolean = false,
-        isRinging: Boolean = false,
-        isSpeakAllowed: Boolean = false,
+        chatId: Long = expectedChatId,
+        callId: Long = expectedCallId,
         hasLocalAudio: Boolean = false,
         hasLocalVideo: Boolean = false,
+        changes: Int = -1,
+        hasSpeakerPermission: Boolean = false,
+        isAudioDetected: Boolean = false,
+        duration: Long = 100L,
+        initialTimeStamp: Long = 1L,
+        finalTimeStamp: Long = 1L,
+        termCode: Int = -1,
+        endCallReason: Int = -1,
+        isSpeakRequestEnabled: Boolean = false,
+        isRinging: Boolean = false,
+        isOwnModerator: Boolean = false,
+        sessionsClientId: MegaHandleList = mock(),
+        peerIdCallCompositionChange: Long = expectedPeerId1,
+        callCompositionChange: Int = -1,
+        peerIdParticipants: MegaHandleList = mock(),
+        moderators: MegaHandleList = mock(),
+        numParticipants: Int = 2,
+        isIgnored: Boolean = false,
+        isIncoming: Boolean = false,
+        isOutgoing: Boolean = false,
+        isOwnClientCaller: Boolean = false,
+        caller: Long = expectedPeerId1,
+        isOnHold: Boolean = false,
+        isSpeakAllowed: Boolean = false,
+        networkQuality: Int = -1,
         hasPendingSpeakRequest: Boolean = false,
-        waitingRoomStatus: Int = 0,
-
-        ): MegaChatCall {
+        waitingRoomStatus: Int? = 0,
+        sessionByClientId: Map<Long, ChatSession> = emptyMap()
+    ): MegaChatCall {
         val call = mock<MegaChatCall> {
             on { this.callId }.thenReturn(callId)
             on { this.chatid }.thenReturn(chatId)
             on { this.status }.thenReturn(status)
             on { this.caller }.thenReturn(caller)
+            on { this.isSpeakRequestEnabled }.thenReturn(isSpeakRequestEnabled)
+            on { this.hasSpeakPermission() }.thenReturn(hasSpeakerPermission)
             on { this.duration }.thenReturn(duration)
             on { this.numParticipants }.thenReturn(numParticipants)
             on { this.changes }.thenReturn(changes)
             on { this.endCallReason }.thenReturn(endCallReason)
             on { this.callCompositionChange }.thenReturn(callCompositionChange)
-            on { this.peeridCallCompositionChange }.thenReturn(peeridCallCompositionChange)
-            on { this.peeridParticipants }.thenReturn(peeridParticipants)
+            on { this.peeridCallCompositionChange }.thenReturn(peerIdCallCompositionChange)
+            on { this.peeridParticipants }.thenReturn(peerIdParticipants)
             on { this.moderators }.thenReturn(moderators)
-            on { this.sessionsClientid }.thenReturn(sessionsClientid)
+            on { this.sessionsClientid }.thenReturn(sessionsClientId)
             on { this.networkQuality }.thenReturn(networkQuality)
             on { this.termCode }.thenReturn(termCode)
             on { this.initialTimeStamp }.thenReturn(initialTimeStamp)

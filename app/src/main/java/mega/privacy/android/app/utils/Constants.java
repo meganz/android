@@ -406,9 +406,6 @@ public class Constants {
 
     public static int TYPE_LEFT = -1;
     public static int TYPE_JOIN = 1;
-    public static int TYPE_AUDIO = 3;
-    public static int TYPE_VIDEO = 4;
-
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
 

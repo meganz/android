@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
 import timber.log.Timber
 
 class VideoListViewAdapter(
@@ -115,17 +115,19 @@ class VideoListViewAdapter(
     /**
      * Update participant audio or video flags
      *
+     * @param typeChange    [TypeRemoteAVFlagChange]
      * @param participant Participant to update
      */
-    fun updateParticipantAudioVideo(typeChange: Int, participant: Participant) {
+    fun updateParticipantAudioVideo(typeChange: TypeRemoteAVFlagChange, participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         if (position == INVALID_POSITION)
             return
 
         getHolder(position)?.let {
             when (typeChange) {
-                Constants.TYPE_VIDEO -> it.checkVideoOn(participant)
-                Constants.TYPE_AUDIO -> it.updateAudioIcon(participant)
+                TypeRemoteAVFlagChange.Video -> it.checkVideoOn(participant)
+                TypeRemoteAVFlagChange.Audio -> it.updateAudioIcon(participant)
+                TypeRemoteAVFlagChange.ScreenSharing -> {}
             }
             return
         }

@@ -166,7 +166,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
 
         // Set caller's name and avatar
         inMeetingViewModel.getChat()?.let {
-            if (inMeetingViewModel.state.value.isOneToOneCall) {
+            if (inMeetingViewModel.isOneToOneCall()) {
                 val callerId = it.getPeerHandle(0)
 
                 bitmap = getImageAvatarCall(callerId)

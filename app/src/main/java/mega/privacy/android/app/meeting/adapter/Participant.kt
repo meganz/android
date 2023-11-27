@@ -10,6 +10,11 @@ import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import timber.log.Timber
 import java.io.Serializable
 
+/**
+ * Participant in a call
+ *
+ * @param isPresenting  If the user is presenting.
+ */
 data class Participant(
     val peerId: Long,
     val clientId: Long,
@@ -28,8 +33,8 @@ data class Participant(
     var isChosenForAssign: Boolean = false,
     var isGuest: Boolean = false,
     var hasOptionsAllowed: Boolean = true,
-
-    ) : Serializable {
+    var isPresenting: Boolean = false,
+) : Serializable {
 
     /**
      * Get the display name for participant list

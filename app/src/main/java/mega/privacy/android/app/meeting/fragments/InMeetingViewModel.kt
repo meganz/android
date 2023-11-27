@@ -13,6 +13,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -60,7 +62,6 @@ import mega.privacy.android.domain.entity.meeting.AnotherCallType
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
@@ -169,13 +170,26 @@ class InMeetingViewModel @Inject constructor(
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
 
+
     /**
-     * Participant in carousel clicked
+     * Participant selected
      *
-     * @param participant Participant clicked
+     * @param peerId Peer Id
+     * @param clientId  Client Id
      */
-    fun onItemClick(participant: Participant) {
-        _pinItemEvent.value = Event(participant)
+    fun onItemClick(peerId: Long, clientId: Long) {
+        getParticipant(peerId, clientId)?.let { participant ->
+            if (participant.isPresenting && _state.value.callUIStatus == CallUIStatusType.SpeakerView) {
+                _state.update {
+                    it.copy(
+                        snackbarMessage = triggered(R.string.meetings_meeting_screen_main_view_participant_is_sharing_screen_warning),
+                    )
+                }
+            }
+
+            _pinItemEvent.value = Event(participant)
+        }
+
     }
 
     /**
@@ -185,7 +199,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun onItemClick(chatParticipant: ChatParticipant) =
         participants.value?.find { it.peerId == chatParticipant.handle }?.let {
-            onItemClick(participant = it)
+            onItemClick(peerId = it.peerId, clientId = it.clientId)
         }
 
     // Meeting
@@ -262,6 +276,11 @@ class InMeetingViewModel @Inject constructor(
         }
 
     init {
+
+        startMonitorChatRoomUpdates()
+        startMonitorChatCallUpdates()
+        startMonitorChatSessionUpdates()
+
         getParticipantsChangesUseCase.getChangesFromParticipants()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -311,9 +330,6 @@ class InMeetingViewModel @Inject constructor(
             )
             .addTo(composite)
 
-        startMonitorChatSessionUpdates()
-        startMonitorChatCallUpdates()
-
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .observeForever(updateCallObserver)
 
@@ -342,7 +358,6 @@ class InMeetingViewModel @Inject constructor(
                         )
                     }
                 }
-                startMonitorChatRoomUpdates()
             }.onFailure { exception ->
                 Timber.e(exception)
             }
@@ -400,6 +415,20 @@ class InMeetingViewModel @Inject constructor(
         }
 
     /**
+     * Get chat session updates
+     */
+    private fun startMonitorChatSessionUpdates() =
+        viewModelScope.launch {
+            monitorChatSessionUpdatesUseCase()
+                .filter { it.chatId == _state.value.currentChatId }
+                .collectLatest { result ->
+                    getChatCallUseCase(result.chatId)?.let { call ->
+                        _state.update { it.copy(call = call) }
+                    }
+                }
+        }
+
+    /**
      * Get chat call updates
      */
     private fun startMonitorChatCallUpdates() =
@@ -425,28 +454,6 @@ class InMeetingViewModel @Inject constructor(
         }
 
     /**
-     * Get chat session updates
-     */
-    private fun startMonitorChatSessionUpdates() =
-        viewModelScope.launch {
-            monitorChatSessionUpdatesUseCase()
-                .filter { it.chatId == _state.value.currentChatId }
-                .collectLatest { result ->
-                    result.session?.let { session ->
-                        session.changes?.apply {
-                            if (contains(ChatSessionChanges.RemoteAvFlags)) {
-                                val isScreenSharing = session.hasScreenShare
-                                //val isAudioChange =
-                                //  inMeetingViewModel.changesInRemoteAudioFlag(callAndSession.second)
-                                // val isVideoChange =
-                                // inMeetingViewModel.changesInRemoteVideoFlag(callAndSession.second)
-                            }
-                        }
-                    }
-                }
-        }
-
-    /**
      * Show meeting info dialog
      *
      * @param shouldShowDialog True,show dialog.
@@ -460,7 +467,7 @@ class InMeetingViewModel @Inject constructor(
      * Method to check if only me dialog and the call will end banner should be displayed.
      */
     fun checkShowOnlyMeBanner() {
-        if (_state.value.isOneToOneCall)
+        if (isOneToOneCall())
             return
 
         _callLiveData.value?.let { call ->
@@ -476,7 +483,6 @@ class InMeetingViewModel @Inject constructor(
             }
         }
     }
-
 
     /**
      * Method to get right text to display on the banner
@@ -538,20 +544,13 @@ class InMeetingViewModel @Inject constructor(
                 }
             }
 
-            ChatCallStatus.InProgress, ChatCallStatus.Joining -> {
+            ChatCallStatus.InProgress -> {
                 getChat()?.let { chat ->
                     if (!chat.isMeeting && isRequestSent() && isOutgoingCall) {
                         _state.update { state ->
                             state.copy(
                                 showCallDuration = false,
                                 updateCallSubtitle = SubtitleCallType.Calling
-                            )
-                        }
-                    } else if (callStatus == ChatCallStatus.Joining) {
-                        _state.update { state ->
-                            state.copy(
-                                showCallDuration = false,
-                                updateCallSubtitle = SubtitleCallType.Connecting
                             )
                         }
                     } else {
@@ -816,7 +815,7 @@ class InMeetingViewModel @Inject constructor(
                 currentChatId = newChatId,
             )
         }
-
+        chatManagement.openChatRoom(newChatId)
         getChatRoom()
         getChatCall(context)
         enableAudioLevelMonitor(_state.value.currentChatId)
@@ -841,6 +840,14 @@ class InMeetingViewModel @Inject constructor(
      * @return chat ID
      */
     fun getChatId(): Long = _state.value.currentChatId
+
+    /**
+     *  Method to know if it is a one-to-one chat call
+     *
+     *  @return True, if it is a one-to-one chat call. False, otherwise
+     */
+    fun isOneToOneCall(): Boolean = inMeetingRepository.getChatRoom(_state.value.currentChatId)
+        ?.let { (!it.isGroup && !it.isMeeting) } ?: false
 
     /**
      * Set speaker selection automatic or manual
@@ -936,7 +943,7 @@ class InMeetingViewModel @Inject constructor(
      */
     private fun isSessionOnHoldOfOneToOneCall(): Boolean {
         _callLiveData.value?.let { call ->
-            if (_state.value.isOneToOneCall) {
+            if (isOneToOneCall()) {
                 val session = inMeetingRepository.getSessionOneToOneCall(call)
                 session?.let {
                     return it.isOnHold
@@ -1129,7 +1136,7 @@ class InMeetingViewModel @Inject constructor(
 
         //Check mute call or session
         _callLiveData.value?.let { call ->
-            if (_state.value.isOneToOneCall) {
+            if (isOneToOneCall()) {
                 inMeetingRepository.getSessionOneToOneCall(call)?.let { session ->
                     if (!session.hasAudio() && session.peerid != MEGACHAT_INVALID_HANDLE) {
                         bannerIcon?.let {
@@ -1354,7 +1361,8 @@ class InMeetingViewModel @Inject constructor(
             hasHiRes = true,
             videoListener = null,
             participant.isChosenForAssign,
-            participant.isGuest
+            participant.isGuest,
+            isPresenting = participant.isPresenting
         )
 
     /**
@@ -1480,7 +1488,8 @@ class InMeetingViewModel @Inject constructor(
                 null,
                 false,
                 isGuest,
-                hasOptionsAllowed = shouldParticipantsOptionBeVisible(false, isGuest)
+                hasOptionsAllowed = shouldParticipantsOptionBeVisible(false, isGuest),
+                isPresenting = session.hasScreenShare()
             )
         }
 
@@ -1765,6 +1774,39 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
+     * Method for updating participant screen sharing
+     *
+     * @param session of a participant
+     * @return True, if there have been changes. False, otherwise
+     */
+    fun changesInScreenSharing(session: MegaChatSession): Boolean {
+        var hasChanged = false
+        participants.value = participants.value?.map { participant ->
+            return@map when {
+                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isPresenting != session.hasScreenShare() -> {
+
+                    hasChanged = true
+                    participant.copy(isPresenting = session.hasScreenShare())
+                }
+
+                else -> participant
+            }
+        }?.toMutableList()
+
+        speakerParticipants.value = speakerParticipants.value?.map { participant ->
+            return@map when {
+                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isPresenting != session.hasScreenShare() -> {
+                    hasChanged = true
+                    participant.copy(isPresenting = session.hasScreenShare())
+                }
+
+                else -> participant
+            }
+        }?.toMutableList()
+        return hasChanged
+    }
+
+    /**
      * Method for updating participant audio
      *
      * @param session of a participant
@@ -1856,11 +1898,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun setTitleChat(newTitle: String) {
         if (_state.value.currentChatId == MEGACHAT_INVALID_HANDLE) {
-            _state.update { state ->
-                state.copy(
-                    chatTitle = newTitle,
-                )
-            }
+            _state.update { it.copy(chatTitle = newTitle) }
         } else {
             inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
                 inMeetingRepository.setTitleChatRoom(
@@ -2496,6 +2534,7 @@ class InMeetingViewModel @Inject constructor(
      * @param participant The participant who is chosen as speaker
      */
     private fun addSpeaker(participant: Participant) {
+
         if (speakerParticipants.value.isNullOrEmpty()) {
             createSpeaker(participant)
         } else {
@@ -2643,7 +2682,7 @@ class InMeetingViewModel @Inject constructor(
      * Control when the hang up button is clicked
      */
     fun checkClickEndButton() {
-        if (_state.value.isOneToOneCall) {
+        if (isOneToOneCall()) {
             hangCall()
             return
         }
@@ -2715,10 +2754,16 @@ class InMeetingViewModel @Inject constructor(
      */
     fun onRejectBottomTap(chatId: Long) {
         removeIncomingCallNotification(chatId)
-        if (_state.value.isOneToOneCall) {
+        if (isOneToOneCall()) {
             checkClickEndButton()
         } else {
             ignoreCall()
         }
     }
+
+    /**
+     * Sets snackbarMessage in state as consumed.
+     */
+    fun onSnackbarMessageConsumed() =
+        _state.update { state -> state.copy(snackbarMessage = consumed()) }
 }

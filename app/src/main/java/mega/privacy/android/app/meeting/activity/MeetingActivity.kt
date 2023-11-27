@@ -364,7 +364,7 @@ class MeetingActivity : PasscodeActivity() {
         }
 
         collectFlow(meetingViewModel.switchCall) { chatId ->
-            if (chatId != MEGACHAT_INVALID_HANDLE && meetingViewModel.currentChatId.value != chatId) {
+            if (chatId != MEGACHAT_INVALID_HANDLE && meetingViewModel.state.value.chatId != chatId) {
                 Timber.d("Switch call")
                 passcodeManagement.showPasscodeScreen = true
                 MegaApplication.getInstance().openCallService(chatId)
@@ -485,7 +485,7 @@ class MeetingActivity : PasscodeActivity() {
             )
 
             if ((!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere()) {
-                meetingViewModel.currentChatId.value?.let { currentChatId ->
+                meetingViewModel.state.value.chatId.let { currentChatId ->
                     if (currentChatId != MEGACHAT_INVALID_HANDLE) {
                         //Notification of this call should be displayed again
                         MegaApplication.getChatManagement().removeNotificationShown(currentChatId)
@@ -551,12 +551,13 @@ class MeetingActivity : PasscodeActivity() {
 
         // The args to be passed to startDestination
         val bundle = Bundle()
-
-        meetingViewModel.currentChatId.value?.let { currentChatId ->
-            bundle.putLong(
-                MEETING_CHAT_ID,
-                currentChatId
-            )
+        meetingViewModel.state.value.chatId.let { chatId ->
+            if (chatId != -1L) {
+                bundle.putLong(
+                    MEETING_CHAT_ID,
+                    meetingViewModel.state.value.chatId
+                )
+            }
         }
 
         bundle.putLong(

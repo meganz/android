@@ -75,12 +75,13 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         Observer<Pair<MegaChatCall?, MegaChatSession>> { callAndSession ->
             val call = callAndSession.first ?: return@Observer
 
-            if (inMeetingViewModel.isSameCall(call.callId) && !inMeetingViewModel.state.value.isOneToOneCall) {
+            if (inMeetingViewModel.isSameCall(call.callId) && !inMeetingViewModel.isOneToOneCall()) {
                 when (callAndSession.second.status) {
                     MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
                         Timber.d("Session in progress, clientID = ${callAndSession.second.clientid}")
                         inMeetingViewModel.addParticipant(callAndSession.second, requireContext())
                     }
+
                     MegaChatSession.SESSION_STATUS_DESTROYED -> {
                         Timber.d("Session destroyed, clientID = ${callAndSession.second.clientid}")
                         inMeetingViewModel.removeParticipant(
@@ -105,7 +106,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         Timber.d("In make moderator fragment")
         chatId = arguments?.getLong(MeetingActivity.MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
         if (chatId == MEGACHAT_INVALID_HANDLE) {
-            sharedModel.currentChatId.value?.let {
+            sharedModel.state.value.chatId.let {
                 chatId = it
             }
         }

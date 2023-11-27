@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper.meeting
 
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.meeting.ChatSession
 import nz.mega.sdk.MegaChatCall
 import javax.inject.Inject
 
@@ -18,6 +19,7 @@ internal class ChatCallMapper @Inject constructor(
     private val networkQualityMapper: NetworkQualityMapper,
     private val chatWaitingRoomMapper: ChatWaitingRoomMapper,
     private val waitingRoomStatusMapper: WaitingRoomStatusMapper,
+    private val chatSessionMapper: ChatSessionMapper
 ) {
     operator fun invoke(megaChatCall: MegaChatCall): ChatCall = ChatCall(
         callId = megaChatCall.callId,
@@ -29,15 +31,16 @@ internal class ChatCallMapper @Inject constructor(
         changes = chatCallChangesMapper(megaChatCall.changes),
         endCallReason = endCallReasonMapper(megaChatCall.endCallReason),
         callCompositionChange = callCompositionChangesMapper(megaChatCall.callCompositionChange),
-        peeridCallCompositionChange = megaChatCall.peeridCallCompositionChange,
+        peerIdCallCompositionChange = megaChatCall.peeridCallCompositionChange,
         peerIdParticipants = handleListMapper(megaChatCall.peeridParticipants),
         moderators = handleListMapper(megaChatCall.moderators),
-        sessionsClientid = handleListMapper(megaChatCall.sessionsClientid),
+        sessionsClientId = handleListMapper(megaChatCall.sessionsClientid),
         networkQuality = networkQualityMapper(megaChatCall.networkQuality),
         termCode = callTermCodeMapper(megaChatCall.termCode),
         initialTimestamp = megaChatCall.initialTimeStamp,
         finalTimestamp = megaChatCall.finalTimeStamp,
         isAudioDetected = megaChatCall.isAudioDetected,
+        hasSpeakPermission = megaChatCall.hasSpeakPermission(),
         isIgnored = megaChatCall.isIgnored,
         isIncoming = megaChatCall.isIncoming,
         isOnHold = megaChatCall.isOnHold,
@@ -50,6 +53,20 @@ internal class ChatCallMapper @Inject constructor(
         hasLocalVideo = megaChatCall.hasLocalVideo(),
         hasPendingSpeakRequest = megaChatCall.hasPendingSpeakRequest(),
         waitingRoom = chatWaitingRoomMapper(megaChatCall.waitingRoom),
-        waitingRoomStatus = waitingRoomStatusMapper(megaChatCall.wrJoiningState)
+        waitingRoomStatus = waitingRoomStatusMapper(megaChatCall.wrJoiningState),
+        isSpeakRequestEnabled = megaChatCall.isSpeakRequestEnabled,
+        sessionByClientId = megaChatCall.toChatSessionByClientId()
     )
+
+    private fun MegaChatCall.toChatSessionByClientId(): Map<Long, ChatSession> {
+        val sessionsMap: MutableMap<Long, ChatSession> = mutableMapOf()
+        val listOfClientId = handleListMapper(sessionsClientid)
+        for (i in listOfClientId.indices) {
+            val clientId = listOfClientId[i]
+            getMegaChatSession(clientId)?.let { megaChatSession ->
+                sessionsMap[clientId] = chatSessionMapper(megaChatSession)
+            }
+        }
+        return sessionsMap
+    }
 }

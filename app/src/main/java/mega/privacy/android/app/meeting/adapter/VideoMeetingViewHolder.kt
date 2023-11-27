@@ -87,7 +87,7 @@ class VideoMeetingViewHolder(
             layoutParams.width = dp2px(ITEM_WIDTH)
             layoutParams.height = dp2px(ITEM_HEIGHT)
             binding.root.setOnClickListener {
-                inMeetingViewModel.onItemClick(participant)
+                inMeetingViewModel.onItemClick(participant.peerId, participant.clientId)
             }
 
             binding.root.background = ContextCompat.getDrawable(
@@ -291,7 +291,6 @@ class VideoMeetingViewHolder(
      */
     private fun videoOffUI(participant: Participant) {
         if (isInvalid(participant)) return
-
         Timber.d("UI video off")
         showAvatar(participant)
         closeVideo(participant)
@@ -547,7 +546,8 @@ class VideoMeetingViewHolder(
             Timber.d("Participant is speaker")
             setRoundedCorners(binding.selectedForeground)
             setRoundedCorners(binding.speakingForeground)
-            binding.selectedForeground.isVisible = !inMeetingViewModel.state.value.isSpeakerSelectionAutomatic
+            binding.selectedForeground.isVisible =
+                !inMeetingViewModel.state.value.isSpeakerSelectionAutomatic
         } else {
             Timber.d("Participant is not selected")
             binding.selectedForeground.isVisible = false

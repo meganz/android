@@ -122,7 +122,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
 
         listenAction(binding.pingToSpeaker) {
             // Pin to speaker view
-            inMeetingViewModel.onItemClick(participantItem)
+            inMeetingViewModel.onItemClick(participantItem.peerId, participantItem.clientId)
         }
 
         listenAction(binding.makeModerator) {
@@ -141,9 +141,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
 
         listenAction(binding.removeParticipant) {
             // Remove participant
-            sharedViewModel.currentChatId.value?.let {
-                onRemoveParticipant(it)
-            }
+            onRemoveParticipant(sharedViewModel.state.value.chatId)
         }
     }
 

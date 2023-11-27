@@ -224,10 +224,6 @@ class MeetingActivityViewModel @Inject constructor(
     val monitorConnectivityEvent =
         monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.Eagerly)
 
-    private val _currentChatId: MutableLiveData<Long> =
-        MutableLiveData<Long>(MEGACHAT_INVALID_HANDLE)
-    val currentChatId: LiveData<Long> = _currentChatId
-
     // Name of meeting
     private val _meetingNameLiveData: MutableLiveData<String> = MutableLiveData<String>()
     val meetingNameLiveData: LiveData<String> = _meetingNameLiveData
@@ -266,7 +262,7 @@ class MeetingActivityViewModel @Inject constructor(
 
     private val titleMeetingChangeObserver =
         Observer<MegaChatRoom> { chatRoom ->
-            meetingActivityRepository.getChatRoom(_currentChatId.value!!)?.let {
+            meetingActivityRepository.getChatRoom(_state.value.chatId)?.let {
                 if (it.chatId == chatRoom.chatId) {
                     _meetingNameLiveData.value = getTitleChat(it)
                 }
@@ -301,10 +297,8 @@ class MeetingActivityViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { chatIdOfCallEnded ->
-                    currentChatId.value.let { currentChatId ->
-                        if (chatIdOfCallEnded == currentChatId) {
-                            _finishMeetingActivity.value = true
-                        }
+                    if (chatIdOfCallEnded == _state.value.chatId) {
+                        _finishMeetingActivity.value = true
                     }
                 },
                 onError = Timber::e
@@ -377,12 +371,32 @@ class MeetingActivityViewModel @Inject constructor(
             getChatCallUseCase(_state.value.chatId)
         }.onSuccess { call ->
             call?.let {
+                checkIfPresenting(it)
                 checkEphemeralAccountAndWaitingRoom(it)
+
+
             }
         }.onFailure { exception ->
             Timber.e(exception)
         }
     }
+
+    /**
+     * Check if some participant is presenting
+     *
+     * @param call  [ChatCall]
+     */
+    private fun checkIfPresenting(call: ChatCall) =
+        call.sessionByClientId.forEach { (_, value) ->
+            if (value.hasScreenShare) {
+                _state.update { state ->
+                    state.copy(
+                        isParticipantSharingScreen = true
+                    )
+                }
+                return@forEach
+            }
+        }
 
     /**
      * Check ephemeral account and waiting room
@@ -431,6 +445,8 @@ class MeetingActivityViewModel @Inject constructor(
             monitorChatCallUpdatesUseCase()
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
+                    checkIfPresenting(call)
+
                     call.changes?.apply {
                         if (contains(ChatCallChanges.Status)) {
                             if (call.status == ChatCallStatus.InProgress) {
@@ -527,14 +543,12 @@ class MeetingActivityViewModel @Inject constructor(
      * @param shouldEndCurrentCall if the current call should be finish
      */
     private fun checkAnotherCalls(shouldEndCurrentCall: Boolean) {
-        currentChatId.value?.let { currentChatId ->
-            val chatId =
-                getCallUseCase.getChatIdOfAnotherCallInProgress(currentChatId).blockingGet()
-            if (chatId != MEGACHAT_INVALID_HANDLE && chatId != currentChatId && _switchCall.value != chatId) {
-                _switchCall.value = chatId
-            } else if (shouldEndCurrentCall) {
-                _finishMeetingActivity.value = true
-            }
+        val chatId =
+            getCallUseCase.getChatIdOfAnotherCallInProgress(_state.value.chatId).blockingGet()
+        if (chatId != MEGACHAT_INVALID_HANDLE && chatId != _state.value.chatId && _switchCall.value != chatId) {
+            _switchCall.value = chatId
+        } else if (shouldEndCurrentCall) {
+            _finishMeetingActivity.value = true
         }
     }
 
@@ -590,8 +604,7 @@ class MeetingActivityViewModel @Inject constructor(
      * @param chatId chat ID
      */
     fun updateChatRoomId(chatId: Long) {
-        if (_currentChatId.value != chatId) {
-            _currentChatId.value = chatId
+        if (_state.value.chatId != chatId) {
             _state.update {
                 it.copy(
                     chatId = chatId
@@ -610,9 +623,9 @@ class MeetingActivityViewModel @Inject constructor(
      * @return True, if it exists. False, otherwise
      */
     fun isChatCreatedAndIParticipating(): Boolean =
-        (_currentChatId.value != MEGACHAT_INVALID_HANDLE &&
-                amIParticipatingInAChat(_currentChatId.value!!) &&
-                CallUtil.amIParticipatingInThisMeeting(_currentChatId.value!!))
+        (_state.value.chatId != MEGACHAT_INVALID_HANDLE &&
+                amIParticipatingInAChat(_state.value.chatId) &&
+                CallUtil.amIParticipatingInThisMeeting(_state.value.chatId))
 
     /**
      * Method to initiate the call with the microphone on
@@ -662,7 +675,7 @@ class MeetingActivityViewModel @Inject constructor(
 
         if (isChatCreatedAndIParticipating()) {
             meetingActivityRepository.switchMic(
-                _currentChatId.value!!,
+                _state.value.chatId,
                 shouldAudioBeEnabled,
                 DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
             )
@@ -693,7 +706,7 @@ class MeetingActivityViewModel @Inject constructor(
         if (isChatCreatedAndIParticipating()) {
             Timber.d("Clicked cam with chat")
             meetingActivityRepository.switchCamera(
-                _currentChatId.value!!,
+                _state.value.chatId,
                 shouldVideoBeEnabled,
                 DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
             )
@@ -865,10 +878,8 @@ class MeetingActivityViewModel @Inject constructor(
             val contactsData: List<String>? =
                 intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
             if (contactsData != null) {
-                currentChatId.value?.let {
-                    InviteToChatRoomListener(context).inviteToChat(it, contactsData)
-                    _snackBarLiveData.value = context.getString(R.string.invite_sent)
-                }
+                InviteToChatRoomListener(context).inviteToChat(_state.value.chatId, contactsData)
+                _snackBarLiveData.value = context.getString(R.string.invite_sent)
             }
         } else {
             Timber.e("Error adding participants")
@@ -913,14 +924,12 @@ class MeetingActivityViewModel @Inject constructor(
         permission: Int,
         listener: MegaChatRequestListenerInterface? = null,
     ) {
-        currentChatId.value?.let {
-            meetingActivityRepository.changeParticipantPermissions(
-                it,
-                userHandle,
-                permission,
-                listener
-            )
-        }
+        meetingActivityRepository.changeParticipantPermissions(
+            _state.value.chatId,
+            userHandle,
+            permission,
+            listener
+        )
     }
 
     /**
@@ -937,7 +946,7 @@ class MeetingActivityViewModel @Inject constructor(
         speakerAudio: Boolean,
     ): LiveData<AnswerCallResult> {
         val result = MutableLiveData<AnswerCallResult>()
-        _currentChatId.value?.let { chatId ->
+        _state.value.chatId.let { chatId ->
             if (CallUtil.amIParticipatingInThisMeeting(chatId)) {
                 Timber.d("Already participating in this call")
                 return result

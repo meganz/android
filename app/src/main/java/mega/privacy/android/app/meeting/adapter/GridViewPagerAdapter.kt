@@ -13,6 +13,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.Util.getCurrentOrientation
+import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
 import timber.log.Timber
 
 class GridViewPagerAdapter(
@@ -491,13 +492,13 @@ class GridViewPagerAdapter(
     /**
      * Update participant audio or video flags
      *
-     * @param typeChange TYPE_VIDEO or TYPE_AUDIO
+     * @param typeChange [TypeRemoteAVFlagChange]
      * @param participant
      * @param currentPage the current page number
      * @param pager the ViewPager2
      */
     fun updateParticipantAudioVideo(
-        typeChange: Int,
+        typeChange: TypeRemoteAVFlagChange,
         participant: Participant,
         currentPage: Int,
         pager: ViewPager2,
