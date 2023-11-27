@@ -1094,7 +1094,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
 
             binding.recIndicator.visibility =
-                if (state.isSessionOnRecording && !state.showRecordingConsentDialog) View.VISIBLE else View.GONE
+                if (state.isSessionOnRecording && !state.showRecordingConsentDialog && !toolbar.isVisible) View.VISIBLE else View.GONE
 
             if (state.startOrStopRecordingParticipantName != null && !state.showRecordingConsentDialog) {
                 showSnackbar(
@@ -1492,6 +1492,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         floatingWindowContainer.post {
             adjustPositionOfFloatingWindow(bTop = true, bBottom = true)
         }
+
+        binding.recIndicator.visibility =
+            if (sharedModel.state.value.isSessionOnRecording && !sharedModel.state.value.showRecordingConsentDialog && !toolbar.isVisible) View.VISIBLE else View.GONE
 
         lastTouch = System.currentTimeMillis()
     }
