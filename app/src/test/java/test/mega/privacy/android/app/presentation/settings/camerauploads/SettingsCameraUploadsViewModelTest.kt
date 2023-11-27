@@ -662,14 +662,14 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that media uploads are disabled when calling onEnableOrDisableMediaUpload`() =
+    fun `test that media uploads are disabled when calling toggleMediaUploads`() =
         runTest {
             setupUnderTest()
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
             // enable media upload
-            underTest.onEnableOrDisableMediaUpload()
+            underTest.toggleMediaUploads()
             // disable media upload
-            underTest.onEnableOrDisableMediaUpload()
+            underTest.toggleMediaUploads()
             verify(resetMediaUploadTimeStamps).invoke()
             verify(disableMediaUploadSettings).invoke()
         }
@@ -719,9 +719,9 @@ class SettingsCameraUploadsViewModelTest {
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
             whenever(setupDefaultSecondaryFolderUseCase()).thenThrow(RuntimeException())
             //disable it
-            underTest.onEnableOrDisableMediaUpload()
+            underTest.toggleMediaUploads()
             // enable it
-            underTest.onEnableOrDisableMediaUpload()
+            underTest.toggleMediaUploads()
             underTest.state.map { it.shouldShowError }.test {
                 assertThat(awaitItem()).isTrue()
             }
@@ -741,14 +741,14 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that media uploads is enabled when onEnableOrDisableMediaUpload is invoked`() =
+    fun `test that media uploads is enabled when toggleMediaUploads is invoked`() =
         runTest {
             setupUnderTest()
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
             //disable
-            underTest.onEnableOrDisableMediaUpload()
+            underTest.toggleMediaUploads()
             // enable
-            underTest.onEnableOrDisableMediaUpload()
+            underTest.toggleMediaUploads()
             verify(setupDefaultSecondaryFolderUseCase).invoke()
             verify(restoreSecondaryTimestamps).invoke()
             verify(setupMediaUploadsSettingUseCase).invoke(true)

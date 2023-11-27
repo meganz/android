@@ -3,8 +3,8 @@ package mega.privacy.android.domain.usecase.camerauploads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -27,22 +27,25 @@ class IsPrimaryFolderPathValidUseCaseTest {
 
     private lateinit var underTest: IsPrimaryFolderPathValidUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
-    private val fileSystemRepository = mock<FileSystemRepository>()
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase = mock()
+    private val fileSystemRepository: FileSystemRepository = mock()
+    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled = mock()
 
     @BeforeAll
     fun setUp() {
         underTest = IsPrimaryFolderPathValidUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
             fileSystemRepository = fileSystemRepository,
+            isSecondaryFolderEnabled = isSecondaryFolderEnabled,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            cameraUploadRepository,
+            getSecondaryFolderPathUseCase,
             fileSystemRepository,
+            isSecondaryFolderEnabled,
         )
     }
 
@@ -60,9 +63,8 @@ class IsPrimaryFolderPathValidUseCaseTest {
             val testPrimaryFolderPath = "test/primary/folder/path"
             val testSecondaryFolderPath = "test/secondary/folder/path"
 
-            whenever(cameraUploadRepository.getSecondaryFolderLocalPath()).thenReturn(
-                testSecondaryFolderPath
-            )
+            whenever(getSecondaryFolderPathUseCase()).thenReturn(testSecondaryFolderPath)
+            whenever(isSecondaryFolderEnabled()).thenReturn(doesFolderExists)
             whenever(fileSystemRepository.doesFolderExists(any())).thenReturn(doesFolderExists)
 
             val expectedAnswer = underTest(testPrimaryFolderPath)
@@ -80,9 +82,8 @@ class IsPrimaryFolderPathValidUseCaseTest {
         secondaryFolderPath: String,
         isPrimaryFolderValid: Boolean,
     ) = runTest {
-        whenever(cameraUploadRepository.getSecondaryFolderLocalPath()).thenReturn(
-            secondaryFolderPath
-        )
+        whenever(getSecondaryFolderPathUseCase()).thenReturn(secondaryFolderPath)
+        whenever(isSecondaryFolderEnabled()).thenReturn(true)
         whenever(fileSystemRepository.doesFolderExists(any())).thenReturn(true)
 
         val expectedAnswer = underTest(primaryFolderPath)

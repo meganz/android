@@ -268,12 +268,27 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     private suspend fun enableMediaUploads() {
         runCatching {
+            val isValid = isNewSettingValid(
+                isSecondaryEnabled = true,
+                secondaryPath = _state.value.secondaryFolderPath.takeIf { it.isNotBlank() }
+                    ?: "-1"
+            )
+            if (isValid.not()) {
+                setSecondaryFolderLocalPathUseCase("")
+            }
             // Sets up a Secondary Folder with a Media Uploads folder name
             setupDefaultSecondaryFolderUseCase()
             //If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
             //if not clean the sync record from previous primary folder
             restoreSecondaryTimestamps()
             setupMediaUploadsSettingUseCase(isEnabled = true)
+            stopCameraUploadsUseCase(shouldReschedule = true)
+            _state.update {
+                it.copy(
+                    isMediaUploadsEnabled = !it.isMediaUploadsEnabled,
+                    secondaryFolderPath = if (isValid.not()) "" else it.secondaryFolderPath
+                )
+            }
         }.onFailure {
             Timber.e(it)
             setErrorState(shouldShow = true)
@@ -283,6 +298,10 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private suspend fun disableMediaUploads() {
         runCatching {
             resetAndDisableMediaUploads()
+            stopCameraUploadsUseCase(shouldReschedule = true)
+            _state.update {
+                it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
+            }
         }.onFailure {
             Timber.e(it)
             setErrorState(shouldShow = true)
@@ -772,35 +791,17 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
+     * toggle MediaUploads
      * on Enable or Disable MediaUpload
      */
-    fun onEnableOrDisableMediaUpload() {
+    fun toggleMediaUploads() {
         viewModelScope.launch {
             if (isConnected.not()) return@launch
             if (_state.value.isMediaUploadsEnabled) {
                 // we need to disable media upload
                 disableMediaUploads()
-                runCatching { stopCameraUploadsUseCase(shouldReschedule = true) }
-                    .onFailure { Timber.e(it) }
-                _state.update {
-                    it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
-                }
             } else {
-                if (isNewSettingValid(
-                        isSecondaryEnabled = true,
-                        secondaryPath = _state.value.secondaryFolderPath.takeIf { it.isNotBlank() }
-                            ?: "-1"
-                    )
-                ) {
-                    enableMediaUploads()
-                    runCatching { stopCameraUploadsUseCase(shouldReschedule = true) }
-                        .onFailure { Timber.e(it) }
-                    _state.update {
-                        it.copy(isMediaUploadsEnabled = !it.isMediaUploadsEnabled)
-                    }
-                } else {
-                    setInvalidFolderSelectedPromptShown(true)
-                }
+                enableMediaUploads()
             }
         }
     }

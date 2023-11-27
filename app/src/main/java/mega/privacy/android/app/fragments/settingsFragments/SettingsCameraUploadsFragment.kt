@@ -353,7 +353,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             }
 
             KEY_SECONDARY_MEDIA_FOLDER_ON -> {
-                viewModel.onEnableOrDisableMediaUpload()
+                viewModel.toggleMediaUploads()
             }
 
             KEY_LOCAL_SECONDARY_MEDIA_FOLDER -> {
@@ -565,7 +565,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             }
             collectFlow(viewModel.monitorCameraUploadsSettingsActions) {
                 when (it) {
-                    CameraUploadsSettingsAction.DisableMediaUploads -> viewModel.onEnableOrDisableMediaUpload()
+                    CameraUploadsSettingsAction.DisableMediaUploads -> viewModel.toggleMediaUploads()
                     CameraUploadsSettingsAction.RefreshSettings -> viewModel.toggleCameraUploadsSettings()
                 }
             }
