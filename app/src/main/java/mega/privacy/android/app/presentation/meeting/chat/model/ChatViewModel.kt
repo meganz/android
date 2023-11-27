@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorMessageLoadedUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -110,6 +112,8 @@ internal class ChatViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val loadMessagesUseCase: LoadMessagesUseCase,
     private val monitorMessageLoadedUseCase: MonitorMessageLoadedUseCase,
+    private val getChatMuteOptionListUseCase: GetChatMuteOptionListUseCase,
+    private val muteChatNotificationForChatRoomsUseCase: MuteChatNotificationForChatRoomsUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -579,6 +583,49 @@ internal class ChatViewModel @Inject constructor(
                             infoToShowEvent = triggered(
                                 InfoToShow(
                                     chatPushNotificationMuteOption = ChatPushNotificationMuteOption.Unmute
+                                )
+                            )
+                        )
+                    }
+                }.onFailure { Timber.e(it) }
+            }
+        }
+    }
+
+    /**
+     * Show the dialog of selecting chat mute options
+     */
+    fun showMutePushNotificationDialog() {
+        chatId?.let {
+            viewModelScope.launch {
+                val muteOptionList = getChatMuteOptionListUseCase(listOf(chatId))
+                _state.update {
+                    it.copy(mutePushNotificationDialogEvent = triggered(muteOptionList))
+                }
+            }
+        }
+    }
+
+    fun onShowMutePushNotificationDialogConsumed() {
+        _state.update { state -> state.copy(mutePushNotificationDialogEvent = consumed()) }
+    }
+
+    /**
+     * Mute chat push notification based on user selection. And once mute operation succeeds,
+     * send [InfoToShow] to show a message to indicate the result in UI.
+     *
+     * @param option [ChatPushNotificationMuteOption]
+     */
+    fun mutePushNotification(option: ChatPushNotificationMuteOption) {
+        chatId?.let { chatId ->
+            viewModelScope.launch {
+                runCatching {
+                    muteChatNotificationForChatRoomsUseCase(listOf(chatId), option)
+                    _state.update {
+                        it.copy(
+                            infoToShowEvent = triggered(
+                                InfoToShow(
+                                    chatPushNotificationMuteOption = option
                                 )
                             )
                         )

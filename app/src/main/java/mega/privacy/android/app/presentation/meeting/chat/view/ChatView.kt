@@ -49,7 +49,7 @@ import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
-import mega.privacy.android.app.presentation.meeting.chat.extension.toString
+import mega.privacy.android.app.presentation.meeting.chat.extension.toInfoText
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
@@ -73,6 +73,7 @@ import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import timber.log.Timber
@@ -97,7 +98,10 @@ internal fun ChatView(
         endCallForAll = viewModel::endCall,
         startCall = viewModel::startCall,
         onCallStarted = viewModel::onCallStarted,
-        onRequestMoreMessages = viewModel::requestMessages
+        onRequestMoreMessages = viewModel::requestMessages,
+        onMutePushNotificationSelected = viewModel::mutePushNotification,
+        showMutePushNotificationDialog = viewModel::showMutePushNotificationDialog,
+        onShowMutePushNotificationDialogConsumed = viewModel::onShowMutePushNotificationDialogConsumed,
     )
 }
 
@@ -123,6 +127,9 @@ internal fun ChatView(
     startCall: (Boolean) -> Unit = {},
     onCallStarted: () -> Unit = {},
     onRequestMoreMessages: () -> Unit = {},
+    onMutePushNotificationSelected: (ChatPushNotificationMuteOption) -> Unit = {},
+    showMutePushNotificationDialog: () -> Unit = {},
+    onShowMutePushNotificationDialogConsumed: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -133,6 +140,8 @@ internal fun ChatView(
     var showClearChat by rememberSaveable { mutableStateOf(false) }
     var showEndCallForAllDialog by rememberSaveable { mutableStateOf(false) }
     var showMutePushNotificationDialog by rememberSaveable { mutableStateOf(false) }
+    var muteNotificationDialogOptions by rememberSaveable { mutableStateOf(emptyList<ChatPushNotificationMuteOption>()) }
+
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
@@ -200,10 +209,11 @@ internal fun ChatView(
                             showClearChat = true
                         },
                         archiveChat = archiveChat,
+                        unarchiveChat = unarchiveChat,
                         showEndCallForAllDialog = {
                             showEndCallForAllDialog = true
                         },
-                        unarchiveChat = unarchiveChat,
+                        showMutePushNotificationDialog = { showMutePushNotificationDialog() },
                     )
                 },
                 snackbarHost = {
@@ -269,8 +279,13 @@ internal fun ChatView(
 
                 if (showMutePushNotificationDialog) {
                     MutePushNotificationDialog(
+                        options = muteNotificationDialogOptions,
+                        isMeeting = uiState.isMeeting,
                         onCancel = { showMutePushNotificationDialog = false },
-                        onConfirm = { /* TODO */ }
+                        onConfirm = { muteOption ->
+                            showMutePushNotificationDialog = false
+                            onMutePushNotificationSelected(muteOption)
+                        }
                     )
                 }
 
@@ -320,6 +335,14 @@ internal fun ChatView(
                 info?.let {
                     getInfoToShow(info, context)?.let { snackBarHostState.showSnackbar(it) }
                 } ?: context.findActivity()?.finish()
+            }
+
+            EventEffect(
+                event = mutePushNotificationDialogEvent,
+                onConsumed = { onShowMutePushNotificationDialogConsumed }
+            ) { options ->
+                muteNotificationDialogOptions = options
+                showMutePushNotificationDialog = true
             }
         }
 
@@ -417,8 +440,8 @@ private fun startMeetingActivity(
 }
 
 private fun getInfoToShow(infoToShow: InfoToShow, context: Context): String? = with(infoToShow) {
-    inviteContactToChatResult?.toString(context)
-        ?: chatPushNotificationMuteOption?.toString(context)
+    inviteContactToChatResult?.toInfoText(context)
+        ?: chatPushNotificationMuteOption?.toInfoText(context)
         ?: if (args.isNotEmpty()) {
             stringId?.let { context.getString(it, *args.toTypedArray()) }
         } else {

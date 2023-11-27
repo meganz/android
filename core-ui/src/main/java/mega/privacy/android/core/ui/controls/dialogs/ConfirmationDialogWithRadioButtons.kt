@@ -54,7 +54,11 @@ fun <T> ConfirmationDialogWithRadioButtons(
     optionDescriptionMapper: @Composable (T) -> String = { it.toString() },
     properties: DialogProperties = DialogProperties(),
 ) {
-    var selectedOption by rememberSaveable { mutableStateOf(initialSelectedOption) }
+    var selectedOption by rememberSaveable(initialSelectedOption) {
+        mutableStateOf(
+            initialSelectedOption
+        )
+    }
 
     Dialog(
         onDismissRequest = onDismissRequest,

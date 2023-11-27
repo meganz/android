@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
@@ -55,6 +56,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorMessageLoadedUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -177,6 +179,9 @@ internal class ChatViewModelTest {
     private val monitorMessageLoadedUseCase = mock<MonitorMessageLoadedUseCase> {
         onBlocking { invoke(chatId) } doReturn emptyFlow()
     }
+    private val muteChatNotificationForChatRoomsUseCase =
+        mock<MuteChatNotificationForChatRoomsUseCase>()
+    private val getChatMuteOptionListUseCase = mock<GetChatMuteOptionListUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -213,6 +218,8 @@ internal class ChatViewModelTest {
             startCallUseCase,
             chatManagement,
             loadMessagesUseCase,
+            muteChatNotificationForChatRoomsUseCase,
+            getChatMuteOptionListUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -273,6 +280,8 @@ internal class ChatViewModelTest {
             chatManagement = chatManagement,
             loadMessagesUseCase = loadMessagesUseCase,
             monitorMessageLoadedUseCase = monitorMessageLoadedUseCase,
+            getChatMuteOptionListUseCase = getChatMuteOptionListUseCase,
+            muteChatNotificationForChatRoomsUseCase = muteChatNotificationForChatRoomsUseCase,
         )
     }
 
@@ -1698,6 +1707,43 @@ internal class ChatViewModelTest {
             val actual4 = awaitItem()
             assertThat(actual4.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 4)
             assertThat(actual4.messages).isEqualTo(listOf(message4, message3, message2, message1))
+        }
+    }
+
+    @Test
+    fun `test that mute push notification dialog is shown correctly`() = runTest {
+        val expectedList = listOf(
+            ChatPushNotificationMuteOption.Mute30Minutes,
+            ChatPushNotificationMuteOption.Mute1Hour,
+            ChatPushNotificationMuteOption.Mute6Hours,
+            ChatPushNotificationMuteOption.Mute24Hours,
+            ChatPushNotificationMuteOption.MuteUntilThisMorning,
+        )
+        whenever(getChatMuteOptionListUseCase(listOf(chatId))).thenReturn(expectedList)
+
+        initTestClass()
+        underTest.showMutePushNotificationDialog()
+
+        underTest.state.test {
+            val item =
+                (awaitItem().mutePushNotificationDialogEvent as StateEventWithContentTriggered).content
+            assertThat(item).isEqualTo(expectedList)
+        }
+    }
+
+    @ParameterizedTest(name = " {0} is selected")
+    @EnumSource(ChatPushNotificationMuteOption::class)
+    fun `test that info to show is passed to UI when mute chat push notification option`(
+        muteOption: ChatPushNotificationMuteOption,
+    ) = runTest {
+
+        initTestClass()
+        underTest.mutePushNotification(muteOption)
+
+        underTest.state.test {
+            val item =
+                (awaitItem().infoToShowEvent as StateEventWithContentTriggered).content?.chatPushNotificationMuteOption
+            assertThat(item).isEqualTo(muteOption)
         }
     }
 

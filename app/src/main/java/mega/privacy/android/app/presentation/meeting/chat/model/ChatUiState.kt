@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
+import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -46,6 +47,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property messages List of [TypedMessage] containing the chat history.
  * @property pendingMessagesToLoad Number of messages already requested, but pending to load.
  * @property chatHistoryLoadStatus [ChatHistoryLoadStatus]. Until this is not [ChatHistoryLoadStatus.NONE], we can request for more messages.
+ * @property mutePushNotificationDialogEvent Event to show the dialog to mute push notifications.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -80,6 +82,7 @@ data class ChatUiState(
     val messages: List<TypedMessage> = emptyList(),
     val pendingMessagesToLoad: Int = NUMBER_MESSAGES_TO_LOAD,
     val chatHistoryLoadStatus: ChatHistoryLoadStatus? = null,
+    val mutePushNotificationDialogEvent: StateEventWithContent<List<ChatPushNotificationMuteOption>> = consumed(),
 ) {
 
     /**

@@ -11,7 +11,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToC
  * @param context Context to access resources.
  * @return String with the result of adding contacts to a chat.
  */
-fun InviteContactToChatResult.toString(context: Context) = when (this) {
+fun InviteContactToChatResult.toInfoText(context: Context) = when (this) {
 
     is InviteContactToChatResult.OnlyOneContactAdded -> context.getString(R.string.add_participant_success)
     is InviteContactToChatResult.AlreadyExistsError -> context.getString(R.string.add_participant_error_already_exists)
