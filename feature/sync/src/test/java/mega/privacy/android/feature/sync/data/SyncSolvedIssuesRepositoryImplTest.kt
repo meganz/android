@@ -5,7 +5,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.data.gateway.SyncSolvedIssuesGateway
-import mega.privacy.android.feature.sync.data.mapper.SyncSolvedIssueMapper
+import mega.privacy.android.feature.sync.data.mapper.solvedissue.SolvedIssueEntityToSolvedIssueMapper
+import mega.privacy.android.feature.sync.data.mapper.solvedissue.SolvedIssueToSolvedIssueEntityMapper
 import mega.privacy.android.feature.sync.data.repository.SyncSolvedIssuesRepositoryImpl
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import org.junit.jupiter.api.Test
@@ -16,11 +17,13 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 class SyncSolvedIssuesRepositoryImplTest {
     private val syncSolvedIssuesGateway: SyncSolvedIssuesGateway = mock()
-    private val syncSolvedIssuesMapper: SyncSolvedIssueMapper = mock()
+    private val solvedIssueToSolvedIssueEntityMapper: SolvedIssueToSolvedIssueEntityMapper = mock()
+    private val solvedIssueEntityToSolvedIssueMapper: SolvedIssueEntityToSolvedIssueMapper = mock()
 
     private val underTest = SyncSolvedIssuesRepositoryImpl(
         syncSolvedIssuesGateway = syncSolvedIssuesGateway,
-        syncSolvedIssuesMapper = syncSolvedIssuesMapper
+        solvedIssueToSolvedIssueEntityMapper = solvedIssueToSolvedIssueEntityMapper,
+        solvedIssueEntityToSolvedIssueMapper = solvedIssueEntityToSolvedIssueMapper
     )
 
     private val solvedIssue = SolvedIssue(
@@ -38,14 +41,14 @@ class SyncSolvedIssuesRepositoryImplTest {
 
     @Test
     fun `test that clear invokes gateway clear method`() = runTest {
-        whenever(syncSolvedIssuesMapper(solvedIssue)).thenReturn(syncSolvedIssueEntity)
+        whenever(solvedIssueToSolvedIssueEntityMapper(solvedIssue)).thenReturn(syncSolvedIssueEntity)
         underTest.clear()
         verify(syncSolvedIssuesGateway).clear()
     }
 
     @Test
     fun `test that setting solved issue invokes gateway set method`() = runTest {
-        whenever(syncSolvedIssuesMapper(solvedIssue)).thenReturn(syncSolvedIssueEntity)
+        whenever(solvedIssueToSolvedIssueEntityMapper(solvedIssue)).thenReturn(syncSolvedIssueEntity)
         underTest.insertSolvedIssues(solvedIssue)
         verify(syncSolvedIssuesGateway).set(syncSolvedIssueEntity)
     }
