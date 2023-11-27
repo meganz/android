@@ -1,5 +1,5 @@
 /**
- * This script is to automatically clean up the remote gradle caches
+ * This script is to automatically clean up the remote gradle caches on Artifactory servers.
  */
 
 
