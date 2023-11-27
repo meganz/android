@@ -19,6 +19,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -72,6 +75,7 @@ import javax.inject.Inject
 /**
  * Application's Global Listener
  */
+@OptIn(FlowPreview::class)
 class GlobalListener @Inject constructor(
     private val dbH: DatabaseHandler,
     private val megaChatNotificationHandler: MegaChatNotificationHandler,
@@ -94,6 +98,19 @@ class GlobalListener @Inject constructor(
     private val getIncomingContactRequestsNotificationListUseCase: GetIncomingContactRequestsNotificationListUseCase,
     private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
 ) : MegaGlobalListenerInterface {
+
+    private val globalSyncUpdates = MutableSharedFlow<Unit>()
+
+    init {
+        applicationScope.launch {
+            globalSyncUpdates.debounce(1000).collect {
+                runCatching {
+                    val notifications = getNotificationCountUseCase(false)
+                    broadcastHomeBadgeCountUseCase(notifications)
+                }.getOrElse { Timber.e(it) }
+            }
+        }
+    }
 
     /**
      * onUsersUpdate
@@ -299,12 +316,16 @@ class GlobalListener @Inject constructor(
 
     override fun onGlobalSyncStateChanged(api: MegaApiJava) {
         Timber.d("Global sync state changed")
+        applicationScope.launch {
+            globalSyncUpdates.emit(Unit)
+        }
     }
 
     private fun sendBroadcastUpdateAccountDetails() {
         appContext.sendBroadcast(
             Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-                .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS).setPackage(appContext.packageName)
+                .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS)
+                .setPackage(appContext.packageName)
         )
 
         sendMyAccountUpdateBroadcast(Action.UPDATE_ACCOUNT_DETAILS, null)

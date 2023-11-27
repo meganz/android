@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 
@@ -46,11 +47,25 @@ interface SyncRepository {
      *
      * @return [Flow<Unit>]Returns the folder pair with the given id.
      */
-    fun monitorSyncChanges(): Flow<Unit>
+    val syncChanges: Flow<MegaSyncListenerEvent>
 
     /**
      * Gets the list of stalled issues.
      * @return [List<StalledIssue>] Returns the stalled issues.
      */
     suspend fun getSyncStalledIssues(): List<StalledIssue>
+
+    /**
+     * Monitors the list of stalled issues.
+     * @return [Flow<List<StalledIssue>>] Returns the stalled issues.
+     */
+    fun monitorStalledIssues(): Flow<List<StalledIssue>>
+
+    /**
+     * Monitors the list of folder pairs.
+     *
+     * @return [Flow<List<FolderPair>>] Returns the folder pairs.
+     */
+    fun monitorFolderPairChanges(): Flow<List<FolderPair>>
+
 }

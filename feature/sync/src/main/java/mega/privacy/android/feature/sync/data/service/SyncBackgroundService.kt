@@ -1,9 +1,12 @@
 package mega.privacy.android.feature.sync.data.service
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
@@ -16,16 +19,10 @@ import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
-import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
-import mega.privacy.android.icon.pack.R as iconPackR
-import android.app.Notification
-import android.graphics.Color
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,15 +54,6 @@ internal class SyncBackgroundService : LifecycleService() {
 
     @Inject
     internal lateinit var monitorSyncsUseCase: MonitorSyncsUseCase
-
-    @Inject
-    lateinit var getNotificationCountUseCase: GetNotificationCountUseCase
-
-    @Inject
-    internal lateinit var broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase
-
-    @Inject
-    internal lateinit var monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase
 
     override fun onCreate() {
         super.onCreate()
@@ -118,12 +106,6 @@ internal class SyncBackgroundService : LifecycleService() {
         if (!loginMutex.isLocked) {
             lifecycleScope.launch {
                 runCatching { backgroundFastLoginUseCase() }.getOrElse(Timber::e)
-            }
-        }
-        lifecycleScope.launch {
-            monitorSyncStalledIssuesUseCase().collect {
-                val notificationCount = getNotificationCountUseCase(false)
-                broadcastHomeBadgeCountUseCase(notificationCount)
             }
         }
         lifecycleScope.launch {

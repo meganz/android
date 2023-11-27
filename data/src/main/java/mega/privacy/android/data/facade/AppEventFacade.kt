@@ -27,7 +27,8 @@ internal class AppEventFacade @Inject constructor(
 ) : AppEventGateway {
 
     private val _monitorCameraUploadProgress = MutableSharedFlow<Pair<Int, Int>>()
-    private val cameraUploadsFolderDestinationUpdate = MutableSharedFlow<CameraUploadsFolderDestinationUpdate>()
+    private val cameraUploadsFolderDestinationUpdate =
+        MutableSharedFlow<CameraUploadsFolderDestinationUpdate>()
     private val _transferOverQuota = MutableSharedFlow<Boolean>()
     private val _storageOverQuota = MutableSharedFlow<Boolean>()
     private val _fileAvailableOffline = MutableSharedFlow<Long>()
@@ -149,7 +150,8 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastChatArchived(chatTitle: String) = chatArchived.emit(chatTitle)
 
-    override fun monitorHomeBadgeCount() = homeBadgeCount.toSharedFlow(appScope)
+    override fun monitorHomeBadgeCount() =
+        homeBadgeCount.shareIn(appScope, started = SharingStarted.WhileSubscribed(), replay = 1)
 
     override suspend fun broadcastHomeBadgeCount(badgeCount: Int) =
         homeBadgeCount.emit(badgeCount)

@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.domain
 
 import app.cash.turbine.test
+import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -13,7 +14,6 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
-import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -21,19 +21,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MonitorSyncsUseCaseTest {
 
-    private val getFolderPairsUseCase: GetFolderPairsUseCase = mock()
     private val syncRepository: SyncRepository = mock()
 
     private val underTest = MonitorSyncsUseCase(
-        getFolderPairsUseCase,
         syncRepository
     )
 
@@ -56,23 +52,24 @@ class MonitorSyncsUseCaseTest {
     fun resetAndTearDown() {
         Dispatchers.resetMain()
         reset(
-            getFolderPairsUseCase,
             syncRepository,
         )
     }
 
     @Test
-    fun `test that syncs are refetched every time syncs change`() = runTest {
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
-        whenever(syncRepository.monitorSyncChanges()).thenReturn(
+    fun `test that monitor folder pair changes emits flow of folder pairs`() = runTest {
+        whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
             flow {
-                emit(Unit)
-                emit(Unit)
+                emit(folderPairs)
                 awaitCancellation()
-            })
+            },
+        )
 
-        underTest().test { cancelAndIgnoreRemainingEvents() }
+        underTest().test {
+            val result = awaitItem()
+            Truth.assertThat(result.size).isEqualTo(1)
+            cancelAndIgnoreRemainingEvents()
+        }
 
-        verify(getFolderPairsUseCase, times(3)).invoke()
     }
 }

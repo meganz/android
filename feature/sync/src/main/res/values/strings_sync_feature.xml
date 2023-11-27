@@ -8,6 +8,8 @@
     <string name="sync">Sync</string>
     <string name="section_sync_with_notification">Sync [A](%1$d)[/A]</string>
     <string name="general_select_to_download" />
+    <string name="sync_storage_permission_banner">"We need to access your device storage in order to sync your local folder. Tap to grant access"</string>
+    <string name="sync_battery_optimisation_banner">"To continuously sync your files and folders, allow MEGA to run in the background."</string>
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d file</item>
         <item quantity="other">%d files</item>

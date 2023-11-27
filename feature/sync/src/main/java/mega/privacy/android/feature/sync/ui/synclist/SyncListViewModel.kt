@@ -43,10 +43,9 @@ internal class SyncListViewModel @Inject constructor(
 
     private fun monitorStalledIssue() {
         viewModelScope.launch {
-            monitorSyncStalledIssuesUseCase()
-                .collectLatest { stalledIssues ->
-                    _state.update { SyncListState(stalledIssues.size) }
-                }
+            monitorSyncStalledIssuesUseCase().collectLatest { stalledIssues ->
+                _state.update { SyncListState(stalledIssues.size) }
+            }
         }
     }
 

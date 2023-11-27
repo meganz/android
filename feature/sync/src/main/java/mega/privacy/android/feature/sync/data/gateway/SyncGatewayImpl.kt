@@ -38,7 +38,7 @@ internal class SyncGatewayImpl @Inject constructor(
     @ApplicationScope private val appScope: CoroutineScope,
 ) : SyncGateway {
 
-    private val syncMegaListenerFlow = callbackFlow {
+    override val syncUpdate = callbackFlow {
         val listener = OptionalMegaListenerInterface(
             onSyncDeleted = {
                 trySend(MegaSyncListenerEvent.OnSyncDeleted(it))
@@ -68,7 +68,7 @@ internal class SyncGatewayImpl @Inject constructor(
     ): Boolean =
         suspendCancellableCoroutine { continuation ->
             val requestListener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request: MegaRequest, error: MegaError ->
+                onRequestFinish = { _: MegaRequest, error: MegaError ->
                     if (error.errorCode == MegaError.API_OK) {
                         continuation.resumeWith(Result.success(true))
                     } else {
@@ -97,17 +97,17 @@ internal class SyncGatewayImpl @Inject constructor(
     }
 
     override fun monitorOnSyncDeleted(): Flow<MegaSync> =
-        syncMegaListenerFlow
+        syncUpdate
             .filterIsInstance<MegaSyncListenerEvent.OnSyncDeleted>()
             .map { it.sync }
 
     override fun monitorOnSyncStatsUpdated(): Flow<MegaSyncStats> =
-        syncMegaListenerFlow
+        syncUpdate
             .filterIsInstance<MegaSyncListenerEvent.OnSyncStatsUpdated>()
             .map { it.syncStats }
 
     override fun monitorOnSyncStateChanged(): Flow<MegaSync> =
-        syncMegaListenerFlow
+        syncUpdate
             .filterIsInstance<MegaSyncListenerEvent.OnSyncStateChanged>()
             .map { it.sync }
 

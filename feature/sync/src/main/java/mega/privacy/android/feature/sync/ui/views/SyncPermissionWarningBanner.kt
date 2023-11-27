@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -16,6 +17,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import mega.privacy.android.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.core.ui.utils.rememberPermissionState
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 
 /**
@@ -44,7 +46,7 @@ internal fun SyncPermissionWarningBanner(
     }
     if (allFileAccess.not()) {
         WarningBanner(
-            textString = "We need to access your device storage in order to sync your local folder. Click here to grant access.",
+            textString = stringResource(id = R.string.sync_storage_permission_banner),
             onCloseClick = null,
             modifier = Modifier.clickable {
                 if (syncPermissionsManager.isSDKAboveOrEqualToR()) {
@@ -61,7 +63,7 @@ internal fun SyncPermissionWarningBanner(
     }
     if (allFileAccess && hasUnrestrictedBatteryUsage.not()) {
         WarningBanner(
-            textString = "To continuously sync your files and folders, allow MEGA to run in the background. ",
+            textString = stringResource(id = R.string.sync_battery_optimisation_banner),
             onCloseClick = null,
             modifier = Modifier.clickable {
                 syncPermissionsManager.launchAppSettingBatteryOptimisation()

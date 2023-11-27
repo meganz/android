@@ -115,7 +115,7 @@ private fun SyncNewFolderScreenContent(
 
         AnimatedVisibility(showSyncPermissionBanner) {
             WarningBanner(
-                textString = "We need to access your device storage in order to sync your local folder. Click here to grant access.",
+                textString = stringResource(id = R.string.sync_storage_permission_banner),
                 onCloseClick = null,
                 modifier = Modifier.clickable {
                     syncPermissionsManager.launchAppSettingFileStorageAccess()
