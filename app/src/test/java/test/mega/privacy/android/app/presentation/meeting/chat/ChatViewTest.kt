@@ -40,7 +40,7 @@ class ChatViewTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Standard,
-                currentCall = 123L
+                currentCall = mock()
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION, true).apply {
@@ -218,6 +218,19 @@ class ChatViewTest {
         )
         composeTestRule.onNodeWithText(
             composeTestRule.activity.getString(R.string.join_call_layout)
+        ).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that return to call banner is shown when I am already participating in a call`() {
+        initComposeRuleContent(
+            ChatUiState(
+                isConnected = true,
+                currentCall = mock(),
+            )
+        )
+        composeTestRule.onNodeWithText(
+            composeTestRule.activity.getString(R.string.call_in_progress_layout)
         ).assertIsDisplayed()
     }
 

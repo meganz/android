@@ -538,12 +538,17 @@ internal class ChatViewModelTest {
     fun `test that is participating in a call has correct state if use case`(
         isParticipatingInChatCall: Long?,
     ) = runTest {
-        val flow = MutableSharedFlow<Long?>()
+        val flow = MutableSharedFlow<ChatCall?>()
         whenever(monitorParticipatingInACallUseCase()).thenReturn(flow)
         initTestClass()
-        flow.emit(isParticipatingInChatCall)
+        val expected = isParticipatingInChatCall?.let {
+            mock<ChatCall> {
+                on { chatId } doReturn isParticipatingInChatCall
+            }
+        }
+        flow.emit(expected)
         underTest.state.test {
-            assertThat(awaitItem().currentCall).isEqualTo(isParticipatingInChatCall)
+            assertThat(awaitItem().currentCall).isEqualTo(expected)
         }
     }
 

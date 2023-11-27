@@ -286,17 +286,12 @@ internal fun ChatView(
                     if (isMeeting && isActive && !isArchived) {
                         StartOrJoinMeeting(this@with, onStartMeeting)
                     }
-                    getReturnToCallBannerText(uiState = uiState)?.let {
-                        ReturnToCallBanner(
-                            text = it,
-                            onBannerClicked = {
-                                if (audioPermissionState.status.isGranted) {
-                                    onAnswerCall()
-                                } else {
-                                    startMeetingActivity(context, chatId, enableAudio = false)
-                                }
-                            })
-                    }
+                    ReturnToCallBanner(
+                        uiState = uiState,
+                        context = context,
+                        isAudioPermissionGranted = audioPermissionState.status.isGranted,
+                        onAnswerCall = onAnswerCall
+                    )
                 }
 
                 if (showParticipatingInACallDialog) {
@@ -307,7 +302,7 @@ internal fun ChatView(
                             // return to active call
                             currentCall?.let {
                                 enablePasscodeCheck()
-                                startMeetingActivity(context, it)
+                                startMeetingActivity(context, it.chatId)
                             }
                         }
                     )
@@ -472,8 +467,8 @@ private fun startMeetingActivity(
 ) {
     context.startActivity(Intent(context, MeetingActivity::class.java).apply {
         action =
-            if (enableAudio == true) MeetingActivity.MEETING_ACTION_IN
-            else MeetingActivity.MEETING_ACTION_RINGING
+            if (enableAudio != null && !enableAudio) MeetingActivity.MEETING_ACTION_RINGING
+            else MeetingActivity.MEETING_ACTION_IN
 
         putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
         enableAudio?.let { putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, it) }
@@ -493,7 +488,12 @@ private fun getInfoToShow(infoToShow: InfoToShow, context: Context): String? = w
 }
 
 @Composable
-private fun getReturnToCallBannerText(uiState: ChatUiState): String? = with(uiState) {
+private fun ReturnToCallBanner(
+    uiState: ChatUiState,
+    context: Context,
+    isAudioPermissionGranted: Boolean,
+    onAnswerCall: () -> Unit,
+) = with(uiState) {
     if (!isConnected) return@with null
 
     val callInThisChatNotAnswered =
@@ -501,9 +501,23 @@ private fun getReturnToCallBannerText(uiState: ChatUiState): String? = with(uiSt
                 || callInThisChat?.status == ChatCallStatus.UserNoPresent
 
     when {
-        !isGroup && hasACallInThisChat && callInThisChatNotAnswered -> {
-            stringResource(id = R.string.join_call_layout)
-        }
+        !isGroup && hasACallInThisChat && callInThisChatNotAnswered ->
+            ReturnToCallBanner(
+                text = stringResource(id = R.string.join_call_layout),
+                onBannerClicked = {
+                    if (isAudioPermissionGranted) {
+                        onAnswerCall()
+                    } else {
+                        startMeetingActivity(context, chatId, enableAudio = false)
+                    }
+                })
+
+        !isMeeting && currentCall != null ->
+            ReturnToCallBanner(
+                text = stringResource(id = R.string.call_in_progress_layout),
+                onBannerClicked = { startMeetingActivity(context, currentCall.chatId) },
+                duration = currentCall.duration
+            )
 
         else -> null
     }
