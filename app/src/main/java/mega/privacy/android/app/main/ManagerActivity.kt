@@ -1000,10 +1000,26 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
         checkForInAppUpdate()
-        if (this.isPortrait()) {
-            setupAdsView()
-        } else {
-            hideAdsView()
+        checkForInAppAdvertisement()
+    }
+
+    private fun checkForInAppAdvertisement() {
+        lifecycleScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement).let {
+                    if (it) {
+                        if (this@ManagerActivity.isPortrait()) {
+                            setupAdsView()
+                        } else {
+                            hideAdsView()
+                        }
+                        adsViewModel.enableAdsFeature()
+                        adsViewModel.getDefaultStartScreen()
+                    }
+                }
+            }.onFailure {
+                Timber.e("Failed to fetch feature flag with error: ${it.message}")
+            }
         }
     }
 
@@ -2282,7 +2298,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Checks for the screen orientation and handle showing the Ads view
      */
     fun handleShowingAds(slotId: String) {
-        if (this.isPortrait()) {
+        if (this.isPortrait() && adsViewModel.canConsumeAdSlot(slotId)) {
             adsViewModel.fetchNewAd(slotId)
         } else {
             hideAdsView()
@@ -8316,21 +8332,26 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 val intent = Intent(Intent.ACTION_VIEW, it)
                                 if (intent.resolveActivity(packageManager) != null) {
                                     startActivity(intent)
+                                    onAdConsumed()
                                 } else {
                                     Timber.d("No Application found to can handle Ads intent")
                                     adsViewModel.fetchNewAd()
                                 }
                             }
                         }, onAdDismissed = {
-                            hideAdsView()
-                            showBNVImmediate()
-                            showHideBottomNavigationView(hide = false)
-                            adsViewModel.onAdDismissed()
+                            onAdConsumed()
                         }
                     )
                 }
             }
         }
+    }
+
+    private fun onAdConsumed() {
+        hideAdsView()
+        showBNVImmediate()
+        showHideBottomNavigationView(hide = false)
+        adsViewModel.onAdConsumed()
     }
 
     private fun showAdsView() {

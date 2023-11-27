@@ -13,14 +13,17 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.extensions.isPortrait
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -42,8 +45,10 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * FileLinkActivity with compose view
@@ -51,6 +56,9 @@ import timber.log.Timber
 @AndroidEntryPoint
 class FileLinkComposeActivity : TransfersManagementActivity(),
     DecryptAlertDialog.DecryptDialogListener {
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val viewModel: FileLinkViewModel by viewModels()
     private val adsViewModel: AdsViewModel by viewModels()
@@ -124,19 +132,36 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                             val intent = Intent(Intent.ACTION_VIEW, it)
                             if (intent.resolveActivity(packageManager) != null) {
                                 startActivity(intent)
+                                adsViewModel.onAdConsumed()
                             } else {
                                 Timber.d("No Application found to can handle Ads intent")
+                                adsViewModel.fetchNewAd()
                             }
                         }
                         adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
                     },
-                    onAdDismissed = adsViewModel::onAdDismissed
+                    onAdDismissed = adsViewModel::onAdConsumed
                 )
             }
         }
         setupObserver()
-        if (isPortrait()) {
-            adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
+        checkForInAppAdvertisement()
+    }
+
+    private fun checkForInAppAdvertisement() {
+        lifecycleScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement).let {
+                    if (it) {
+                        if (this@FileLinkComposeActivity.isPortrait()) {
+                            adsViewModel.enableAdsFeature()
+                            adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
+                        }
+                    }
+                }
+            }.onFailure {
+                Timber.e("Failed to fetch feature flag with error: ${it.message}")
+            }
         }
     }
 

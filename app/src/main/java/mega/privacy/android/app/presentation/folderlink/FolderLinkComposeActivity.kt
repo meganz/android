@@ -32,6 +32,7 @@ import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.extensions.isPortrait
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -63,8 +64,10 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * FolderLinkActivity with compose view
@@ -72,6 +75,9 @@ import timber.log.Timber
 @AndroidEntryPoint
 class FolderLinkComposeActivity : TransfersManagementActivity(),
     DecryptAlertDialog.DecryptDialogListener {
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private lateinit var binding: ActivityFolderLinkComposeBinding
 
@@ -155,8 +161,23 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         intent?.let { viewModel.handleIntent(it) }
         setupObservers()
         viewModel.checkLoginRequired()
-        if (isPortrait()) {
-            adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
+        checkForInAppAdvertisement()
+    }
+
+    private fun checkForInAppAdvertisement() {
+        lifecycleScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement).let {
+                    if (it) {
+                        if (this@FolderLinkComposeActivity.isPortrait()) {
+                            adsViewModel.enableAdsFeature()
+                            adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
+                        }
+                    }
+                }
+            }.onFailure {
+                Timber.e("Failed to fetch feature flag with error: ${it.message}")
+            }
         }
     }
 
@@ -207,13 +228,15 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                         val intent = Intent(Intent.ACTION_VIEW, it)
                         if (intent.resolveActivity(packageManager) != null) {
                             startActivity(intent)
+                            adsViewModel.onAdConsumed()
                         } else {
                             Timber.d("No Application found to can handle Ads intent")
+                            adsViewModel.fetchNewAd()
                         }
                     }
                     adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
                 },
-                onAdDismissed = adsViewModel::onAdDismissed
+                onAdDismissed = adsViewModel::onAdConsumed
             )
         }
     }

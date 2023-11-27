@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
 import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
 import mega.privacy.android.domain.entity.advertisements.FetchAdDetailRequest
@@ -17,7 +16,6 @@ import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.advertisements.FetchAdDetailUseCase
 import mega.privacy.android.domain.usecase.advertisements.IsAccountNewUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,7 +26,6 @@ import javax.inject.Inject
 class AdsViewModel @Inject constructor(
     private val fetchAdDetailUseCase: FetchAdDetailUseCase,
     private val isAccountNewUseCase: IsAccountNewUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorStartScreenPreference: MonitorStartScreenPreference,
 ) : ViewModel() {
 
@@ -47,20 +44,39 @@ class AdsViewModel @Inject constructor(
     private var isAccountNew: Boolean = false
     private var fetchAdUrlJob: Job? = null
 
-    init {
-        checkForInApAdvertisementFeature()
+
+    /**
+     * Enable the ads feature
+     */
+    fun enableAdsFeature() {
+        isAdsFeatureEnabled = true
+        checkIsNewAccount()
     }
 
     /**
-     * Checks before fetching new Ad if account is not new
+     * Mark the ad slot as consumed
      */
-    fun onAdDismissed() {
+    fun onAdConsumed() {
+        val consumedSlots = _uiState.value.consumedAdSlots
+        consumedSlots.add(_uiState.value.slotId)
         _uiState.update { state ->
-            state.copy(showAdsView = false)
+            state.copy(consumedAdSlots = consumedSlots, showAdsView = false)
         }
-        if (isAccountNew) return
-        val currentSlotId = _uiState.value.slotId
-        fetchNewAd(currentSlotId)
+        if (canConsumeAdSlot(_uiState.value.slotId))
+            fetchNewAd()
+    }
+
+    /**
+     * Checks if the ad slot can be consumed
+     * @param adSlot  The ad slot id to check
+     * @return true if the ad slot can be consumed, false otherwise
+     */
+    fun canConsumeAdSlot(adSlot: String): Boolean {
+        return if (isAccountNew.not()) {
+            true
+        } else {
+            _uiState.value.consumedAdSlots.contains(adSlot).not()
+        }
     }
 
     /**
@@ -71,7 +87,11 @@ class AdsViewModel @Inject constructor(
         if (isPortrait.not())
             cancelFetchingAds()
         _uiState.update { state ->
-            state.copy(showAdsView = isPortrait && isAdsFeatureEnabled)
+            state.copy(
+                showAdsView = isPortrait
+                        && canConsumeAdSlot(_uiState.value.slotId)
+                        && isAdsFeatureEnabled
+            )
         }
     }
 
@@ -79,24 +99,12 @@ class AdsViewModel @Inject constructor(
     /**
      * Check for the status of the account if new or not
      */
-    private suspend fun checkIsNewAccount() {
-        runCatching {
-            isAccountNew = isAccountNewUseCase()
-        }.onFailure {
-            Timber.e("Failed to fetch isNewAccount with error: ${it.message}")
-        }
-    }
-
-    private fun checkForInApAdvertisementFeature() {
+    private fun checkIsNewAccount() {
         viewModelScope.launch {
             runCatching {
-                isAdsFeatureEnabled = getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement)
-                if (isAdsFeatureEnabled) {
-                    getDefaultStartScreen()
-                    checkIsNewAccount()
-                }
+                isAccountNew = isAccountNewUseCase()
             }.onFailure {
-                Timber.e("Failed to fetch feature flag with error: ${it.message}")
+                Timber.e("Failed to fetch isNewAccount with error: ${it.message}")
             }
         }
     }
@@ -104,21 +112,23 @@ class AdsViewModel @Inject constructor(
     /**
      * gets the default start screen and fetch the Ad based on the assigned slot
      */
-    private suspend fun getDefaultStartScreen() {
-        when (monitorStartScreenPreference().firstOrNull()) {
-            StartScreen.CloudDrive -> {
-                fetchNewAd(AdsSlotIDs.TAB_CLOUD_SLOT_ID)
-            }
+    fun getDefaultStartScreen() {
+        viewModelScope.launch {
+            when (monitorStartScreenPreference().firstOrNull()) {
+                StartScreen.CloudDrive -> {
+                    fetchNewAd(AdsSlotIDs.TAB_CLOUD_SLOT_ID)
+                }
 
-            StartScreen.Photos -> {
-                fetchNewAd(AdsSlotIDs.TAB_PHOTOS_SLOT_ID)
-            }
+                StartScreen.Photos -> {
+                    fetchNewAd(AdsSlotIDs.TAB_PHOTOS_SLOT_ID)
+                }
 
-            StartScreen.Home -> {
-                fetchNewAd(AdsSlotIDs.TAB_HOME_SLOT_ID)
-            }
+                StartScreen.Home -> {
+                    fetchNewAd(AdsSlotIDs.TAB_HOME_SLOT_ID)
+                }
 
-            else -> {}
+                else -> {}
+            }
         }
     }
 
@@ -138,7 +148,7 @@ class AdsViewModel @Inject constructor(
         slotId: String = uiState.value.slotId,
         linkHandle: Long? = null,
     ) {
-        if (isAdsFeatureEnabled) {
+        if (isAdsFeatureEnabled && canConsumeAdSlot(slotId)) {
             val fetchAdDetailRequest = FetchAdDetailRequest(slotId, linkHandle)
             fetchAdUrlJob?.cancel()
             fetchAdUrlJob = viewModelScope.launch {
