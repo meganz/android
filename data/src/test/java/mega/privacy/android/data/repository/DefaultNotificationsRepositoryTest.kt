@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
@@ -36,12 +37,15 @@ import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUserAlert
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -283,59 +287,32 @@ class DefaultNotificationsRepositoryTest {
         }
     }
 
-    @Test
-    fun `test that isChatEnabled returns correct value`() = runTest {
-        val chatId = 123L
-        val enabled = true
-        val settings = mock<MegaPushNotificationSettings> {
-            on { isChatEnabled(chatId) }.thenReturn(enabled)
-        }
-        whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
-            (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                mock { on { megaPushNotificationSettings }.thenReturn(settings) },
-                mock { on { errorCode }.thenReturn(MegaError.API_OK) }
-            )
-        }
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @Nested
+    inner class PushNotificationSettings {
 
-        val result = underTest.isChatEnabled(chatId)
+        private val settings = mock<MegaPushNotificationSettings>()
 
-        assertThat(result).isEqualTo(enabled)
-    }
-
-    @Test
-    fun `test that setChatEnabled updates settings correctly`() = runTest {
-        val chatId = 123L
-        val enabled = true
-        val settings = mock<MegaPushNotificationSettings> {
-            on { isChatEnabled(chatId) }.thenReturn(enabled)
-        }
-        whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
-            (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                mock { on { megaPushNotificationSettings }.thenReturn(settings) },
-                mock { on { errorCode }.thenReturn(MegaError.API_OK) }
-            )
+        @BeforeEach
+        fun setupMocks(): Unit = runBlocking {
+            whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock { on { megaPushNotificationSettings }.thenReturn(settings) },
+                    mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                )
+            }
+            whenever(megaApiGateway.copyMegaPushNotificationsSettings(settings)).thenReturn(settings)
         }
 
-        whenever(megaApiGateway.setPushNotificationSettings(any(), any())).thenAnswer {
-            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                mock(),
-                mock { on { errorCode }.thenReturn(MegaError.API_OK) }
-            )
-        }
+        @Test
+        fun `test that isChatEnabled returns correct value`() = runTest {
+            val chatId = 123L
+            val enabled = true
+            val settings = mock<MegaPushNotificationSettings> {
+                on { isChatEnabled(chatId) }.thenReturn(enabled)
+            }
 
-        underTest.setChatEnabled(chatId, enabled)
-
-        verify(megaApiGateway).getPushNotificationSettings(any())
-        verify(megaApiGateway).setPushNotificationSettings(any(), any())
-    }
-
-    @Test
-    fun `test that updatePushNotificationSettings broadcasts a PushNotificationSettings event`() =
-        runTest {
-            val settings = mock<MegaPushNotificationSettings>()
             whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
                 (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
                     mock(),
@@ -347,6 +324,252 @@ class DefaultNotificationsRepositoryTest {
 
             underTest.updatePushNotificationSettings()
 
-            verify(appEventGateway).broadcastPushNotificationSettings()
+            val result = underTest.isChatEnabled(chatId)
+
+            assertThat(result).isEqualTo(enabled)
         }
+
+        @Test
+        fun `test that isChatDoNotDisturbEnabled returns correct value`() = runTest {
+            val chatId = 123L
+            val enabled = true
+            val settings = mock<MegaPushNotificationSettings> {
+                on { isChatDndEnabled(chatId) }.thenReturn(enabled)
+            }
+
+            whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock { on { megaPushNotificationSettings }.thenReturn(settings) },
+                    mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                )
+            }
+            whenever(megaApiGateway.copyMegaPushNotificationsSettings(settings)).thenReturn(settings)
+
+            underTest.updatePushNotificationSettings()
+
+            val result = underTest.isChatDoNotDisturbEnabled(chatId)
+
+            assertThat(result).isEqualTo(enabled)
+        }
+
+        @Test
+        fun `test that setChatEnabled updates settings correctly`() = runTest {
+            val chatId = 123L
+            val enabled = true
+            val expectedSettings = settings.apply {
+                enableChat(chatId, enabled)
+            }
+
+            whenever(megaApiGateway.setPushNotificationSettings(eq(expectedSettings), any()))
+                .thenAnswer {
+                    (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        mock { on { megaPushNotificationSettings }.thenReturn(expectedSettings) },
+                        mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                    )
+                }
+            whenever(megaApiGateway.copyMegaPushNotificationsSettings(expectedSettings))
+                .thenReturn(expectedSettings)
+
+            underTest.updatePushNotificationSettings()
+
+            underTest.setChatEnabled(chatId, enabled)
+
+            verify(megaApiGateway).setPushNotificationSettings(eq(expectedSettings), any())
+        }
+
+        @Test
+        fun `test that setChatEnabled broadcasts a PushNotificationSettings event`() = runTest {
+            val chatId = 123L
+            val enabled = true
+            val expectedSettings = settings.apply {
+                enableChat(chatId, enabled)
+            }
+
+            whenever(megaApiGateway.setPushNotificationSettings(eq(expectedSettings), any()))
+                .thenAnswer {
+                    (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        mock { on { megaPushNotificationSettings }.thenReturn(expectedSettings) },
+                        mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                    )
+                }
+
+            underTest.updatePushNotificationSettings()
+
+            underTest.setChatEnabled(chatId, enabled)
+
+            verify(appEventGateway, times(2)).broadcastPushNotificationSettings()
+        }
+
+        @Test
+        fun `test that setChatDoNotDisturb updates settings correctly`() = runTest {
+            val chatId = 123L
+            val timestamp = 111111L
+            val expectedSettings = settings.apply {
+                setChatDnd(chatId, timestamp)
+            }
+
+            whenever(megaApiGateway.setPushNotificationSettings(eq(expectedSettings), any()))
+                .thenAnswer {
+                    (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        mock { on { megaPushNotificationSettings }.thenReturn(expectedSettings) },
+                        mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                    )
+                }
+            whenever(megaApiGateway.copyMegaPushNotificationsSettings(expectedSettings))
+                .thenReturn(expectedSettings)
+
+            underTest.updatePushNotificationSettings()
+
+            underTest.setChatDoNotDisturb(chatId, timestamp)
+
+            verify(megaApiGateway).setPushNotificationSettings(eq(expectedSettings), any())
+        }
+
+        @Test
+        fun `test that setChatDoNotDisturb broadcasts a PushNotificationSettings event`() =
+            runTest {
+                val chatId = 123L
+                val timestamp = 111111L
+                val expectedSettings = settings.apply {
+                    setChatDnd(chatId, timestamp)
+                }
+
+                whenever(megaApiGateway.setPushNotificationSettings(eq(expectedSettings), any()))
+                    .thenAnswer {
+                        (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                            mock(),
+                            mock { on { megaPushNotificationSettings }.thenReturn(expectedSettings) },
+                            mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                        )
+                    }
+                whenever(megaApiGateway.copyMegaPushNotificationsSettings(expectedSettings))
+                    .thenReturn(expectedSettings)
+
+                underTest.updatePushNotificationSettings()
+
+                underTest.setChatDoNotDisturb(chatId, timestamp)
+
+                verify(appEventGateway, times(2)).broadcastPushNotificationSettings()
+            }
+
+        @Test
+        fun `test that setChatsEnabled updates settings correctly`() = runTest {
+            val enabled = true
+            val expectedSettings = settings.apply {
+                enableChats(enabled)
+            }
+
+            whenever(megaApiGateway.setPushNotificationSettings(eq(expectedSettings), any()))
+                .thenAnswer {
+                    (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        mock { on { megaPushNotificationSettings }.thenReturn(expectedSettings) },
+                        mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                    )
+                }
+            whenever(megaApiGateway.copyMegaPushNotificationsSettings(expectedSettings))
+                .thenReturn(expectedSettings)
+
+            underTest.updatePushNotificationSettings()
+
+            underTest.setChatsEnabled(enabled)
+
+            verify(megaApiGateway).setPushNotificationSettings(eq(expectedSettings), any())
+        }
+
+        @Test
+        fun `test that setChatsEnabled broadcasts a PushNotificationSettings event`() = runTest {
+            val enabled = true
+            val expectedSettings = settings.apply {
+                enableChats(enabled)
+            }
+
+            whenever(megaApiGateway.setPushNotificationSettings(eq(expectedSettings), any()))
+                .thenAnswer {
+                    (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        mock { on { megaPushNotificationSettings }.thenReturn(expectedSettings) },
+                        mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                    )
+                }
+            whenever(megaApiGateway.copyMegaPushNotificationsSettings(expectedSettings))
+                .thenReturn(expectedSettings)
+
+            underTest.updatePushNotificationSettings()
+
+            underTest.setChatsEnabled(enabled)
+
+            verify(appEventGateway, times(2)).broadcastPushNotificationSettings()
+        }
+
+        @Test
+        fun `test that setChatsDoNotDisturb updates settings correctly`() = runTest {
+            val timestamp = 111111L
+            val expectedSettings = settings.apply {
+                globalChatsDnd = timestamp
+            }
+
+            whenever(megaApiGateway.setPushNotificationSettings(eq(expectedSettings), any()))
+                .thenAnswer {
+                    (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        mock { on { megaPushNotificationSettings }.thenReturn(expectedSettings) },
+                        mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                    )
+                }
+            whenever(megaApiGateway.copyMegaPushNotificationsSettings(expectedSettings))
+                .thenReturn(expectedSettings)
+
+            underTest.updatePushNotificationSettings()
+
+            underTest.setChatsDoNotDisturb(timestamp)
+
+            verify(megaApiGateway).setPushNotificationSettings(eq(expectedSettings), any())
+        }
+
+        @Test
+        fun `test that setChatsDoNotDisturb broadcasts a PushNotificationSettings event`() =
+            runTest {
+                val timestamp = 111111L
+                val expectedSettings = settings.apply {
+                    globalChatsDnd = timestamp
+                }
+
+                whenever(megaApiGateway.setPushNotificationSettings(eq(expectedSettings), any()))
+                    .thenAnswer {
+                        (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                            mock(),
+                            mock { on { megaPushNotificationSettings }.thenReturn(expectedSettings) },
+                            mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                        )
+                    }
+                whenever(megaApiGateway.copyMegaPushNotificationsSettings(expectedSettings))
+                    .thenReturn(expectedSettings)
+
+                underTest.updatePushNotificationSettings()
+
+                underTest.setChatsDoNotDisturb(timestamp)
+
+                verify(appEventGateway, times(2)).broadcastPushNotificationSettings()
+            }
+
+        @Test
+        fun `test that updatePushNotificationsSettings will fetch the MegaPushNotificationSettings from the server`() =
+            runTest {
+                underTest.updatePushNotificationSettings()
+                verify(megaApiGateway).getPushNotificationSettings(any())
+            }
+
+        @Test
+        fun `test that updatePushNotificationSettings broadcasts a PushNotificationSettings event`() =
+            runTest {
+                underTest.updatePushNotificationSettings()
+                verify(appEventGateway).broadcastPushNotificationSettings()
+            }
+    }
+
 }

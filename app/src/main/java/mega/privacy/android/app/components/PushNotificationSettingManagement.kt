@@ -1,15 +1,15 @@
 package mega.privacy.android.app.components
 
 import android.content.Context
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.data.qualifier.MegaApi
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatListItem
+import mega.privacy.android.data.repository.LegacyNotificationRepository
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaPushNotificationSettings
-import nz.mega.sdk.MegaPushNotificationSettingsAndroid
 import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,44 +22,17 @@ import javax.inject.Singleton
  */
 @Singleton
 class PushNotificationSettingManagement @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid,
+    private val notificationsRepository: NotificationsRepository,
+    private val legacyNotificationRepository: LegacyNotificationRepository,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
-    private var push: MegaPushNotificationSettings? = null
-
     /**
      * Method for getting the PushNotificationSetting instance.
      *
      * @return MegaPushNotificationSettings.
      */
-    val pushNotificationSetting: MegaPushNotificationSettings?
-        get() = push
-
-    init {
-        updateMegaPushNotificationSetting()
-    }
-
-
-    /**
-     * Method for getting MegaPushNotificationSettings from megaApi.
-     *
-     * The result will be received in [mega.privacy.android.app.globalmanagement.BackgroundRequestListener]
-     * and then set in function [setPushNotificationSettings]
-     */
-    fun updateMegaPushNotificationSetting() {
-        megaApi.getPushNotificationSettings(null)
-    }
-
-    /**
-     * Set the push notification settings
-     *
-     * @param receivedPush The MegaPushNotificationSettings obtained from the request.
-     */
-    fun setPushNotificationSettings(receivedPush: MegaPushNotificationSettings?) {
-        push = receivedPush?.let {
-            MegaPushNotificationSettingsAndroid.copy(it)
-        } ?: MegaPushNotificationSettings.createInstance()
-    }
+    val pushNotificationSetting: MegaPushNotificationSettings
+        get() = legacyNotificationRepository.pushNotificationSettings
 
     /**
      * Method that controls the change in the notifications of a specific chat.
@@ -69,9 +42,7 @@ class PushNotificationSettingManagement @Inject constructor(
      * @param chatId  Chat ID.
      */
     fun controlMuteNotificationsOfAChat(context: Context?, option: String?, chatId: Long) {
-        megaChatApi.getChatListItem(chatId)?.let { chat ->
-            controlMuteNotifications(context, option, listOf(chat))
-        }
+        controlMuteNotifications(context, option, listOf(chatId))
     }
 
     /**
@@ -79,57 +50,58 @@ class PushNotificationSettingManagement @Inject constructor(
      *
      * @param context Context of Activity.
      * @param option  Muting option selected
-     * @param chats   List of Chats.
+     * @param chatIds   List of Chat ids.
      */
     fun controlMuteNotifications(
         context: Context?,
         option: String?,
-        chats: List<MegaChatListItem>?
+        chatIds: List<Long>?
     ) {
-        when (option) {
-            Constants.NOTIFICATIONS_DISABLED -> {
-                chats?.forEach { chat ->
-                    push?.enableChat(chat.chatId, false)
-                } ?: run {
-                    push?.enableChats(false)
-                }
-            }
-
-            Constants.NOTIFICATIONS_ENABLED ->
-                chats?.forEach { chat ->
-                    push?.enableChat(chat.chatId, true)
-                } ?: run {
-                    push?.enableChats(true)
-                }
-
-            Constants.NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING, Constants.NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING -> {
-                val timestamp = TimeUtils.getCalendarSpecificTime(option).timeInMillis / 1000
-                chats?.forEach { chat ->
-                    push?.setChatDnd(chat.chatId, timestamp)
-                } ?: run {
-                    push?.globalChatsDnd = timestamp
-                }
-            }
-
-            else -> {
-                val time = Calendar.getInstance().apply {
-                    timeInMillis = System.currentTimeMillis()
-                    when (option) {
-                        Constants.NOTIFICATIONS_30_MINUTES -> add(Calendar.MINUTE, 30)
-                        Constants.NOTIFICATIONS_1_HOUR -> add(Calendar.HOUR, 1)
-                        Constants.NOTIFICATIONS_6_HOURS -> add(Calendar.HOUR, 6)
-                        Constants.NOTIFICATIONS_24_HOURS -> add(Calendar.HOUR, 24)
+        applicationScope.launch {
+            when (option) {
+                Constants.NOTIFICATIONS_DISABLED -> {
+                    chatIds?.forEach { chatId ->
+                        notificationsRepository.setChatEnabled(chatId, false)
+                    } ?: run {
+                        notificationsRepository.setChatsEnabled(false)
                     }
-                }.timeInMillis / 1000
+                }
 
-                chats?.forEach { chat ->
-                    push?.setChatDnd(chat.chatId, time)
-                } ?: run {
-                    push?.globalChatsDnd = time
+                Constants.NOTIFICATIONS_ENABLED ->
+                    chatIds?.forEach { chatId ->
+                        notificationsRepository.setChatEnabled(chatId, true)
+                    } ?: run {
+                        notificationsRepository.setChatsEnabled(true)
+                    }
+
+                Constants.NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING, Constants.NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING -> {
+                    val timestamp = TimeUtils.getCalendarSpecificTime(option).timeInMillis / 1000
+                    chatIds?.forEach { chatId ->
+                        notificationsRepository.setChatDoNotDisturb(chatId, timestamp)
+                    } ?: run {
+                        notificationsRepository.setChatsDoNotDisturb(timestamp)
+                    }
+                }
+
+                else -> {
+                    val time = Calendar.getInstance().apply {
+                        timeInMillis = System.currentTimeMillis()
+                        when (option) {
+                            Constants.NOTIFICATIONS_30_MINUTES -> add(Calendar.MINUTE, 30)
+                            Constants.NOTIFICATIONS_1_HOUR -> add(Calendar.HOUR, 1)
+                            Constants.NOTIFICATIONS_6_HOURS -> add(Calendar.HOUR, 6)
+                            Constants.NOTIFICATIONS_24_HOURS -> add(Calendar.HOUR, 24)
+                        }
+                    }.timeInMillis / 1000
+
+                    chatIds?.forEach { chatId ->
+                        notificationsRepository.setChatDoNotDisturb(chatId, time)
+                    } ?: run {
+                        notificationsRepository.setChatsDoNotDisturb(time)
+                    }
                 }
             }
+            ChatUtil.muteChat(context, option)
         }
-        megaApi.setPushNotificationSettings(push, null)
-        ChatUtil.muteChat(context, option)
     }
 }

@@ -3126,7 +3126,7 @@ interface MegaApiGateway {
      * @param pushNotificationSettings the mega push notification to copy
      * @return the copied push notification settings
      */
-    fun copyMegaPushNotificationsSettings(pushNotificationSettings: MegaPushNotificationSettings): MegaPushNotificationSettings?
+    suspend fun copyMegaPushNotificationsSettings(pushNotificationSettings: MegaPushNotificationSettings): MegaPushNotificationSettings?
 
     /**
      * Create mega push notifications settings

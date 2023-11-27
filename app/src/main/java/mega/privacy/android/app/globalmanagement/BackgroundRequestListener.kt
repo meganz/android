@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
@@ -17,9 +16,9 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.backup.SetupDeviceNameUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
+import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
-import mega.privacy.android.domain.usecase.setting.BroadcastPushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -41,7 +40,6 @@ import javax.inject.Inject
  * @property dbH [DatabaseHandler]
  * @property megaApi [MegaApiAndroid]
  * @property transfersManagement [TransfersManagement]
- * @property pushNotificationSettingManagement [PushNotificationSettingManagement]
  * @property applicationScope [CoroutineScope]
  * @property getFullAccountInfoUseCase [GetFullAccountInfoUseCase]
  * @property broadcastFetchNodesFinishUseCase [BroadcastFetchNodesFinishUseCase]
@@ -54,16 +52,15 @@ class BackgroundRequestListener @Inject constructor(
     private val dbH: DatabaseHandler,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val transfersManagement: TransfersManagement,
-    private val pushNotificationSettingManagement: PushNotificationSettingManagement,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
     private val broadcastFetchNodesFinishUseCase: BroadcastFetchNodesFinishUseCase,
-    private val broadcastPushNotificationSettingsUseCase: BroadcastPushNotificationSettingsUseCase,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
     private val setupDeviceNameUseCase: SetupDeviceNameUseCase,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
     @LoginMutex private val loginMutex: Mutex,
+    private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -102,28 +99,11 @@ class BackgroundRequestListener @Inject constructor(
             MegaRequest.TYPE_LOGOUT -> handleLogoutRequest(e, request, api)
             MegaRequest.TYPE_FETCH_NODES -> handleFetchNodeRequest(e)
             MegaRequest.TYPE_GET_ATTR_USER -> handleGetAttrUserRequest(request, e)
-            MegaRequest.TYPE_SET_ATTR_USER -> handleSetAttrUserRequest(request, e)
-        }
-    }
-
-    private fun handleSetAttrUserRequest(request: MegaRequest, e: MegaError) {
-        if (request.paramType == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
-            if (e.errorCode == MegaError.API_OK) {
-                pushNotificationSettingManagement.setPushNotificationSettings(request.megaPushNotificationSettings)
-                applicationScope.launch { broadcastPushNotificationSettingsUseCase() }
-            } else {
-                Timber.e("Chat notification settings cannot be updated")
-            }
         }
     }
 
     private fun handleGetAttrUserRequest(request: MegaRequest, e: MegaError) {
-        if (request.paramType == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
-            if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_ENOENT) {
-                pushNotificationSettingManagement.setPushNotificationSettings(request.megaPushNotificationSettings)
-                applicationScope.launch { broadcastPushNotificationSettingsUseCase() }
-            }
-        } else if (e.errorCode == MegaError.API_OK) {
+        if (e.errorCode == MegaError.API_OK) {
             if (request.paramType == MegaApiJava.USER_ATTR_FIRSTNAME || request.paramType == MegaApiJava.USER_ATTR_LASTNAME) {
                 request.email?.let { email ->
                     megaApi.getContact(email)?.let { user ->
@@ -191,6 +171,12 @@ class BackgroundRequestListener @Inject constructor(
                     Timber.e(it)
                 }
                 scheduleCameraUploadUseCase()
+
+                runCatching {
+                    updatePushNotificationSettingsUseCase()
+                }.onFailure {
+                    Timber.e(it)
+                }
             }
         }
     }

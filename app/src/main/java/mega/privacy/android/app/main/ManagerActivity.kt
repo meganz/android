@@ -927,7 +927,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         checkChatChanges()
         Timber.d("retryChatPendingConnections()")
         megaChatApi.retryPendingConnections(false, null)
-        MegaApplication.getPushNotificationSettingManagement().pushNotificationSetting
 
         val display: Display = windowManager.defaultDisplay
         display.getMetrics(outMetrics)

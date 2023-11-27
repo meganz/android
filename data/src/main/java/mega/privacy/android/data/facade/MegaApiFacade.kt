@@ -1445,7 +1445,7 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun changeApiUrl(apiURL: String, disablePkp: Boolean) =
         megaApi.changeApiUrl(apiURL, disablePkp)
 
-    override fun copyMegaPushNotificationsSettings(pushNotificationSettings: MegaPushNotificationSettings): MegaPushNotificationSettings? =
+    override suspend fun copyMegaPushNotificationsSettings(pushNotificationSettings: MegaPushNotificationSettings): MegaPushNotificationSettings? =
         MegaPushNotificationSettingsAndroid.copy(pushNotificationSettings)
 
     override fun createInstanceMegaPushNotificationSettings(): MegaPushNotificationSettings =

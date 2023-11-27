@@ -79,6 +79,28 @@ interface NotificationsRepository {
     suspend fun isChatDoNotDisturbEnabled(chatId: Long): Boolean
 
     /**
+     * Set Do-Not-Disturb mode for a chat
+     *
+     * @param chatId handle of the node that identifies the chat room
+     * @param timestamp timestamp until DND mode is enabled (in seconds since the Epoch)
+     */
+    suspend fun setChatDoNotDisturb(chatId: Long, timestamp: Long)
+
+    /**
+     * Enable or disable notifications for all chats
+     *
+     * @param enabled   true to enable, false to disable
+     */
+    suspend fun setChatsEnabled(enabled: Boolean)
+
+    /**
+     * Set Do-Not-Disturb mode for all chats
+     *
+     * @param timestamp timestamp until DND mode is enabled (in seconds since the Epoch)
+     */
+    suspend fun setChatsDoNotDisturb(timestamp: Long)
+
+    /**
      *  Retrieve the push notification settings from the server and update the data in memory
      */
     suspend fun updatePushNotificationSettings()

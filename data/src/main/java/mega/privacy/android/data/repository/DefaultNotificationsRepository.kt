@@ -183,11 +183,11 @@ internal class DefaultNotificationsRepository @Inject constructor(
                 CallsMeetingInvitations.Enabled
 
     override suspend fun isChatEnabled(chatId: Long): Boolean = withContext(dispatcher) {
-        getPushNotificationSettings().isChatEnabled(chatId)
+        _pushNotificationSettings.value.isChatEnabled(chatId)
     }
 
     override suspend fun setChatEnabled(chatId: Long, enabled: Boolean) = withContext(dispatcher) {
-        val updatedSettings = getPushNotificationSettings().apply {
+        val updatedSettings = _pushNotificationSettings.value.apply {
             enableChat(chatId, enabled)
         }
 
@@ -196,15 +196,38 @@ internal class DefaultNotificationsRepository @Inject constructor(
 
     override suspend fun isChatDoNotDisturbEnabled(chatId: Long): Boolean =
         withContext(dispatcher) {
-            getPushNotificationSettings().isChatDndEnabled(chatId)
+            _pushNotificationSettings.value.isChatDndEnabled(chatId)
         }
 
+    override suspend fun setChatDoNotDisturb(chatId: Long, timestamp: Long) =
+        withContext(dispatcher) {
+            val updatedSettings = _pushNotificationSettings.value.apply {
+                setChatDnd(chatId, timestamp)
+            }
+
+            setPushNotificationSettings(updatedSettings)
+        }
+
+    override suspend fun setChatsEnabled(enabled: Boolean) = withContext(dispatcher) {
+        val updatedSettings = _pushNotificationSettings.value.apply {
+            enableChats(enabled)
+        }
+
+        setPushNotificationSettings(updatedSettings)
+    }
+
+    override suspend fun setChatsDoNotDisturb(timestamp: Long) = withContext(dispatcher) {
+        val updatedSettings = _pushNotificationSettings.value.apply {
+            globalChatsDnd = timestamp
+        }
+
+        setPushNotificationSettings(updatedSettings)
+    }
+
     override suspend fun updatePushNotificationSettings() = withContext(dispatcher) {
-        suspendCancellableCoroutine { continuation ->
+        val pushNotificationSettings = suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("getPushNotificationSettings") {
-                _pushNotificationSettings.value =
-                    megaApiGateway.copyMegaPushNotificationsSettings(it.megaPushNotificationSettings)
-                        ?: megaApiGateway.createInstanceMegaPushNotificationSettings()
+                it.megaPushNotificationSettings
             }
 
             megaApiGateway.getPushNotificationSettings(listener)
@@ -214,28 +237,20 @@ internal class DefaultNotificationsRepository @Inject constructor(
             }
         }
 
+        _pushNotificationSettings.value =
+            megaApiGateway.copyMegaPushNotificationsSettings(pushNotificationSettings)
+                ?: megaApiGateway.createInstanceMegaPushNotificationSettings()
+
+
         appEventGateway.broadcastPushNotificationSettings()
     }
 
-    private suspend fun getPushNotificationSettings(): MegaPushNotificationSettings =
-        withContext(dispatcher) {
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("getPushNotificationSettings") {
-                    it.megaPushNotificationSettings ?: MegaPushNotificationSettings.createInstance()
-                }
-
-                megaApiGateway.getPushNotificationSettings(listener)
-
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
-            }
-        }
-
     private suspend fun setPushNotificationSettings(settings: MegaPushNotificationSettings) =
         withContext(dispatcher) {
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("setPushNotificationSettings") {}
+            val pushNotificationSettings = suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("setPushNotificationSettings") {
+                    it.megaPushNotificationSettings
+                }
 
                 megaApiGateway.setPushNotificationSettings(settings, listener)
 
@@ -243,5 +258,11 @@ internal class DefaultNotificationsRepository @Inject constructor(
                     megaApiGateway.removeRequestListener(listener)
                 }
             }
+
+            _pushNotificationSettings.value =
+                megaApiGateway.copyMegaPushNotificationsSettings(pushNotificationSettings)
+                    ?: megaApiGateway.createInstanceMegaPushNotificationSettings()
+
+            appEventGateway.broadcastPushNotificationSettings()
         }
 }

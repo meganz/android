@@ -1,6 +1,7 @@
 package mega.privacy.android.app.listeners
 
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -20,7 +21,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
@@ -52,10 +52,10 @@ import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCa
 import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
+import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.contact.GetIncomingContactRequestsNotificationListUseCase
 import mega.privacy.android.domain.usecase.monitoring.EnablePerformanceReporterUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
-import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -75,7 +75,6 @@ import javax.inject.Inject
 class GlobalListener @Inject constructor(
     private val dbH: DatabaseHandler,
     private val megaChatNotificationHandler: MegaChatNotificationHandler,
-    private val pushNotificationSettingManagement: PushNotificationSettingManagement,
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val crashReporter: CrashReporter,
     private val enablePerformanceReporterUseCase: EnablePerformanceReporterUseCase,
@@ -93,6 +92,7 @@ class GlobalListener @Inject constructor(
     private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
     private val broadcastAccountBlockedUseCase: BroadcastAccountBlockedUseCase,
     private val getIncomingContactRequestsNotificationListUseCase: GetIncomingContactRequestsNotificationListUseCase,
+    private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
 ) : MegaGlobalListenerInterface {
 
     /**
@@ -108,7 +108,13 @@ class GlobalListener @Inject constructor(
                     .post(user.handle)
             }
             if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS.toLong()) && user.isOwnChange == 0) {
-                pushNotificationSettingManagement.updateMegaPushNotificationSetting()
+                applicationScope.launch {
+                    runCatching {
+                        updatePushNotificationSettingsUseCase()
+                    }.onFailure {
+                        Timber.e(it)
+                    }
+                }
             }
             if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER.toLong()) && isMyChange) {
                 api.getMyChatFilesFolder(GetAttrUserListener(appContext, true))

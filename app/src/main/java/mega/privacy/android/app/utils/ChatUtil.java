@@ -1051,7 +1051,11 @@ public class ChatUtil {
 
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
-                    MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeMute(itemClicked.get(), optionSelected), chats);
+                    MegaApplication.getPushNotificationSettingManagement()
+                            .controlMuteNotifications(
+                                    context,
+                                    getTypeMute(itemClicked.get(), optionSelected),
+                                    chats != null ? chats.stream().map(MegaChatListItem::getChatId).toList() : null);
                     dialog.dismiss();
                 });
         dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
