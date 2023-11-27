@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
@@ -18,6 +19,8 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAct
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
+import mega.privacy.android.feature.sync.domain.usecase.solvedissues.ClearSyncSolvedIssuesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.solvedissues.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.ui.mapper.StalledIssueItemMapper
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
@@ -41,6 +44,8 @@ class SyncListViewModelTest {
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
     private val resolveStalledIssueUseCase: ResolveStalledIssueUseCase = mock()
     private val stalledIssueItemMapper: StalledIssueItemMapper = mock()
+    private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase = mock()
+    private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase = mock()
 
     private val stalledIssues = listOf(
         StalledIssue(
@@ -49,6 +54,14 @@ class SyncListViewModelTest {
             issueType = StallIssueType.DownloadIssue,
             conflictName = "conflicting folder",
             nodeNames = listOf("Camera"),
+        )
+    )
+
+    private val solvedIssues = listOf(
+        SolvedIssue(
+            nodeIds = listOf(),
+            localPaths = listOf(),
+            resolutionExplanation = ""
         )
     )
 
@@ -64,7 +77,8 @@ class SyncListViewModelTest {
             setOnboardingShownUseCase,
             monitorSyncStalledIssuesUseCase,
             resolveStalledIssueUseCase,
-            stalledIssueItemMapper
+            stalledIssueItemMapper,
+            monitorSyncSolvedIssuesUseCase
         )
     }
 
@@ -81,6 +95,12 @@ class SyncListViewModelTest {
             whenever(monitorSyncStalledIssuesUseCase()).thenReturn(
                 flow {
                     emit(stalledIssues)
+                    awaitCancellation()
+                }
+            )
+            whenever(monitorSyncSolvedIssuesUseCase()).thenReturn(
+                flow {
+                    emit(solvedIssues)
                     awaitCancellation()
                 }
             )
@@ -131,12 +151,29 @@ class SyncListViewModelTest {
                 }
         }
 
+    @Test
+    fun `test that when monitorSyncSolvedIssuesUseCase emit list then it updates shouldShowCleanSolvedIssueMenuItem to true`() =
+        runTest {
+            whenever(monitorSyncSolvedIssuesUseCase()).thenReturn(
+                flow {
+                    emit(solvedIssues)
+                    awaitCancellation()
+                }
+            )
+            initViewModel()
+            underTest.state.test {
+                assertThat(awaitItem().shouldShowCleanSolvedIssueMenuItem).isTrue()
+            }
+        }
+
     private fun initViewModel() {
         underTest = SyncListViewModel(
-            setOnboardingShownUseCase,
-            monitorSyncStalledIssuesUseCase,
-            resolveStalledIssueUseCase,
-            stalledIssueItemMapper
+            setOnboardingShownUseCase = setOnboardingShownUseCase,
+            monitorSyncStalledIssuesUseCase = monitorSyncStalledIssuesUseCase,
+            resolveStalledIssueUseCase = resolveStalledIssueUseCase,
+            stalledIssueItemMapper = stalledIssueItemMapper,
+            monitorSyncSolvedIssuesUseCase = monitorSyncSolvedIssuesUseCase,
+            clearSyncSolvedIssuesUseCase = clearSyncSolvedIssuesUseCase
         )
     }
 }

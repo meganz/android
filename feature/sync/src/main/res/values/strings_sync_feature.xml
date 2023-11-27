@@ -24,4 +24,6 @@
         <item quantity="one">%1$d file</item>
         <item quantity="other">%1$d files</item>
     </plurals>
+    <string name="sync_menu_sync_options">Sync options</string>
+    <string name="sync_menu_clear_issues">Clean solved issues</string>
 </resources>

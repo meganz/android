@@ -28,6 +28,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.sync.R
@@ -54,6 +56,8 @@ internal fun SyncListScreen(
     actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction) -> Unit,
     snackBarHostState: SnackbarHostState,
     syncPermissionsManager: SyncPermissionsManager,
+    actions: List<MenuAction>,
+    onActionPressed: (MenuAction) -> Unit
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -109,7 +113,9 @@ internal fun SyncListScreen(
                     elevation = 0.dp,
                     onNavigationPressed = {
                         onBackPressedDispatcher?.onBackPressed()
-                    }
+                    },
+                    actions = actions,
+                    onActionPressed = onActionPressed
                 )
             }, content = { paddingValues ->
                 SyncListScreenContent(
@@ -245,7 +251,10 @@ private fun SyncListScreenPreview() {
             addFolderClicked = {},
             actionSelected = { _, _ -> },
             snackBarHostState = SnackbarHostState(),
-            syncPermissionsManager = SyncPermissionsManager(LocalContext.current)
+            syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
+            actions = listOf(),
+            onActionPressed = {
+            }
         )
     }
 }

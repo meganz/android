@@ -6,6 +6,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.core.ui.model.MenuActionWithoutIcon
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 
 @Composable
@@ -27,7 +30,19 @@ internal fun SyncListRoute(
             )
         },
         snackBarHostState = snackBarHostState,
-        syncPermissionsManager = syncPermissionsManager
+        syncPermissionsManager = syncPermissionsManager,
+        actions = prepareMenuActions(state),
+        onActionPressed = {
+            when (it) {
+                is SyncListMenuAction.ClearSyncOptions -> {
+                    viewModel.onClearSyncOptionsPressed()
+                }
+
+                is SyncListMenuAction.SyncOptions -> {
+
+                }
+            }
+        }
     )
 
     LaunchedEffect(key1 = state.snackbarMessage) {
@@ -36,4 +51,21 @@ internal fun SyncListRoute(
             viewModel.handleAction(SyncListAction.SnackBarShown)
         }
     }
+
+}
+
+internal const val SYNC_OPTIONS_TEST_TAG =
+    "sync_options_test_tag"
+internal const val CLEAN_SOLVED_ISSUES_TEST_TAG =
+    "clean_solved_issues_test_tag"
+
+private fun prepareMenuActions(state: SyncListState): List<MenuAction> {
+    val menuActionList = mutableListOf<MenuAction>()
+    if (state.shouldShowSyncOptionsMenuItem) {
+        menuActionList.add(SyncListMenuAction.SyncOptions)
+    }
+    if (state.shouldShowCleanSolvedIssueMenuItem) {
+        menuActionList.add(SyncListMenuAction.ClearSyncOptions)
+    }
+    return menuActionList
 }

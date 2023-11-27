@@ -26,6 +26,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacyTopAppBar
 import mega.privacy.android.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -53,14 +55,13 @@ internal fun SyncNewFolderScreen(
 
     Scaffold(
         topBar = {
-            LegacyTopAppBar(
+            MegaAppBar(
                 modifier = Modifier.testTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR),
+                appBarType = AppBarType.BACK_NAVIGATION,
                 title = stringResource(R.string.sync_toolbar_title),
                 subtitle = "Choose folders",
-                elevation = false,
-                onBackPressed = {
-                    onBackPressedDispatcher?.onBackPressed()
-                }
+                onNavigationPressed = { onBackPressedDispatcher?.onBackPressed() },
+                elevation = 0.dp
             )
         }, content = { paddingValues ->
             SyncNewFolderScreenContent(
