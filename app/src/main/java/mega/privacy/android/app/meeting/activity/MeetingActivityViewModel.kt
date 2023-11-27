@@ -506,7 +506,7 @@ class MeetingActivityViewModel @Inject constructor(
                                     it.copy(
                                         isSessionOnRecording = session.isRecording,
                                         showRecordingConsentDialog = session.isRecording,
-                                        recordingParticipant = state.value.usersInCall.find { participant -> participant.peerId == session.peerId }
+                                        startOrStopRecordingParticipantName = state.value.usersInCall.find { participant -> participant.peerId == session.peerId }?.name
                                     )
                                 }
                             }
@@ -1530,10 +1530,10 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
-     * Set recordingParticipant as consumed.
+     * Set startOrStopRecordingParticipantName as consumed.
      */
-    fun setRecordingParticipantConsumed() =
-        _state.update { state -> state.copy(recordingParticipant = null) }
+    fun setStartOrStopRecordingParticipantNameConsumed() =
+        _state.update { state -> state.copy(startOrStopRecordingParticipantName = null) }
 
     companion object {
         private const val INVALID_CHAT_HANDLE = -1L

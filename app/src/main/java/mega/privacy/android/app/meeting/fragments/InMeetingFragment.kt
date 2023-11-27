@@ -1096,27 +1096,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             binding.recIndicator.visibility =
                 if (state.isSessionOnRecording && !state.showRecordingConsentDialog) View.VISIBLE else View.GONE
 
-            if (state.recordingParticipant != null && !state.showRecordingConsentDialog) {
-                if (state.isSessionOnRecording) {
-                    showSnackbar(
-                        SNACKBAR_TYPE,
-                        getString(
-                            R.string.meetings_call_recording_started_snackbar_message,
-                            state.recordingParticipant.name
-                        ),
-                        MEGACHAT_INVALID_HANDLE
-                    )
-                } else {
-                    showSnackbar(
-                        SNACKBAR_TYPE,
-                        getString(
-                            R.string.meetings_call_recording_stopped_snackbar_message,
-                            state.recordingParticipant.name
-                        ),
-                        MEGACHAT_INVALID_HANDLE
-                    )
-                    sharedModel.setRecordingParticipantConsumed()
-                }
+            if (state.startOrStopRecordingParticipantName != null && !state.showRecordingConsentDialog) {
+                showSnackbar(
+                    SNACKBAR_TYPE, getString(
+                        if (state.isSessionOnRecording) R.string.meetings_call_recording_started_snackbar_message else R.string.meetings_call_recording_stopped_snackbar_message,
+                        state.startOrStopRecordingParticipantName
+                    ),
+                    MEGACHAT_INVALID_HANDLE
+                )
+                sharedModel.setStartOrStopRecordingParticipantNameConsumed()
             }
         }
 
