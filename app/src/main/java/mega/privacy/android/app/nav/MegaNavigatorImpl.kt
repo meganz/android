@@ -1,12 +1,17 @@
 package mega.privacy.android.app.nav
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.result.contract.ActivityResultContracts
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
+import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -24,6 +29,30 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : MegaNavigator,
     AppNavigatorImpl {
+    override fun openBackupsInformation(
+        activity: Activity,
+        backupsHandle: Long,
+        backupsName: String,
+    ) {
+        (activity as? ManagerActivity)?.let { managerActivity ->
+            val fileInfoLauncher =
+                managerActivity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                    managerActivity.handleFileInfoSuccessResult(
+                        intent = result.data,
+                        resultCode = result.resultCode,
+                    )
+                }
+            val intent = Intent(managerActivity, FileInfoActivity::class.java).apply {
+                putExtra(Constants.NAME, backupsName)
+                putExtra(Constants.HANDLE, backupsHandle)
+                if (managerActivity.tabItemShares === SharesTab.INCOMING_TAB) {
+                    putExtra(Constants.INTENT_EXTRA_KEY_FROM, Constants.FROM_BACKUPS)
+                }
+            }
+            fileInfoLauncher.launch(intent)
+        }
+    }
+
     override fun openChat(
         context: Context,
         chatId: Long?,
@@ -32,7 +61,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         text: String?,
         messageId: Long?,
         isOverQuota: Int?,
-        flags: Int
+        flags: Int,
     ) {
         applicationScope.launch {
             val intent = if (getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {

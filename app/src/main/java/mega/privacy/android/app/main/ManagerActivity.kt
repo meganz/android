@@ -6231,12 +6231,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            requestCode == Constants.REQUEST_CODE_FILE_INFO && resultCode == Activity.RESULT_OK -> {
-                if (isCloudAdded) {
-                    val handle = intent?.getLongExtra(FileInfoActivity.NODE_HANDLE, -1) ?: -1
-                    fileBrowserViewModel.setBrowserParentHandle(handle)
-                }
-                onNodesSharedUpdate()
+            requestCode == Constants.REQUEST_CODE_FILE_INFO -> {
+                handleFileInfoSuccessResult(
+                    intent = intent,
+                    resultCode = resultCode,
+                )
             }
 
             requestCode == Constants.REQUEST_WRITE_STORAGE || requestCode == Constants.REQUEST_READ_WRITE_STORAGE -> {
@@ -6300,6 +6299,22 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Timber.w("No request code processed")
                 super.onActivityResult(requestCode, resultCode, intent)
             }
+        }
+    }
+
+    /**
+     * Handles the successful result from [FileInfoActivity]
+     *
+     * @param intent A potentially nullable [Intent] that returns some data
+     * @param resultCode The Activity Result Code
+     */
+    fun handleFileInfoSuccessResult(intent: Intent?, resultCode: Int) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (isCloudAdded) {
+                val handle = intent?.getLongExtra(FileInfoActivity.NODE_HANDLE, -1) ?: -1
+                fileBrowserViewModel.setBrowserParentHandle(handle)
+            }
+            onNodesSharedUpdate()
         }
     }
 
