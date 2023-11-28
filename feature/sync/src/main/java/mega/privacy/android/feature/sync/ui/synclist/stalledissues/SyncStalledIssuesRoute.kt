@@ -18,9 +18,9 @@ internal fun SyncStalledIssuesRoute(
     val stalledIssues = state.stalledIssues
 
     StalledIssuesScreen(
-        modifier,
-        stalledIssues,
+        stalledIssues = stalledIssues,
         issueDetailsClicked = stalledIssueDetailsClicked,
-        moreClicked = moreClicked
+        moreClicked = moreClicked,
+        modifier = modifier
     )
 }

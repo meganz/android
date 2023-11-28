@@ -39,8 +39,8 @@ internal fun MegaFolderPickerView(
     showChangeViewType: Boolean,
     listState: LazyListState,
     onFolderClick: (TypedNode) -> Unit,
-    modifier: Modifier = Modifier,
     fileTypeIconMapper: FileTypeIconMapper,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(state = listState, modifier = modifier) {
         item(

@@ -14,10 +14,10 @@ import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 
 @Composable
 internal fun StalledIssuesScreen(
-    modifier: Modifier = Modifier,
     stalledIssues: List<StalledIssueUiItem>,
     issueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     StalledIssuesScreenContent(stalledIssues, modifier, issueDetailsClicked, moreClicked)
 }

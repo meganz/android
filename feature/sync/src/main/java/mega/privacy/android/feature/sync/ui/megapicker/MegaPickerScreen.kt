@@ -60,8 +60,8 @@ internal fun MegaPickerScreen(
                 nodes,
                 folderClicked,
                 currentFolderSelected,
-                Modifier.padding(paddingValues),
-                fileTypeIconMapper
+                fileTypeIconMapper,
+                Modifier.padding(paddingValues)
             )
         }
     )
@@ -72,8 +72,8 @@ private fun MegaPickerScreenContent(
     nodes: List<TypedNode>,
     folderClicked: (TypedNode) -> Unit,
     currentFolderSelected: () -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
-    fileTypeIconMapper: FileTypeIconMapper
 ) {
     Column(modifier) {
         MegaFolderPickerView(

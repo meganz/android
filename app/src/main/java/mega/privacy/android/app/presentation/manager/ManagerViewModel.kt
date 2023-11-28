@@ -395,7 +395,7 @@ class ManagerViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            monitorSyncStalledIssuesUseCase().collect {
+            monitorSyncStalledIssuesUseCase().catch { Timber.e(it) }.collect {
                 _stalledIssuesCount.value = it.size
             }
         }
@@ -405,7 +405,7 @@ class ManagerViewModel @Inject constructor(
                 getFeatureFlagValueUseCase(AppFeatures.AndroidSync)
 
             if (androidSyncEnabled) {
-                monitorSyncsUseCase().collect { syncFolders ->
+                monitorSyncsUseCase().catch { Timber.e(it) }.collect { syncFolders ->
                     val isServiceEnabled = syncFolders.isNotEmpty()
                     _state.update { it.copy(androidSyncServiceEnabled = isServiceEnabled) }
                 }

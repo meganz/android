@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -43,15 +44,16 @@ internal class SyncListViewModel @Inject constructor(
 
     private fun monitorStalledIssue() {
         viewModelScope.launch {
-            monitorSyncStalledIssuesUseCase().collectLatest { stalledIssues ->
-                _state.update { SyncListState(stalledIssues.size) }
-            }
+            monitorSyncStalledIssuesUseCase().catch { Timber.e(it) }
+                .collectLatest { stalledIssues ->
+                    _state.update { SyncListState(stalledIssues.size) }
+                }
         }
     }
 
     private fun monitorSolvedIssue() {
         viewModelScope.launch {
-            monitorSyncSolvedIssuesUseCase().collect {
+            monitorSyncSolvedIssuesUseCase().catch { Timber.e(it) }.collect {
                 _state.update { state ->
                     state.copy(
                         shouldShowCleanSolvedIssueMenuItem = it.isNotEmpty()

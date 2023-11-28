@@ -21,6 +21,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -103,12 +104,14 @@ class GlobalListener @Inject constructor(
 
     init {
         applicationScope.launch {
-            globalSyncUpdates.debounce(1000).collect {
-                runCatching {
-                    val notifications = getNotificationCountUseCase(false)
-                    broadcastHomeBadgeCountUseCase(notifications)
-                }.getOrElse { Timber.e(it) }
-            }
+            globalSyncUpdates.debounce(1000)
+                .catch { Timber.e(it) }
+                .collect {
+                    runCatching {
+                        val notifications = getNotificationCountUseCase(false)
+                        broadcastHomeBadgeCountUseCase(notifications)
+                    }.getOrElse { Timber.e(it) }
+                }
         }
     }
 
