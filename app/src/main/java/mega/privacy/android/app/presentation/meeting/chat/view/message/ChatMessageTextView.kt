@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.controls.chat.ChatBubble
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -20,9 +22,9 @@ fun ChatMessageTextView(
     isMe: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    ChatBubble(isMe = isMe) {
+    ChatBubble(modifier = modifier, isMe = isMe) {
         Text(
-            modifier = modifier,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
             text = text,
         )
     }
