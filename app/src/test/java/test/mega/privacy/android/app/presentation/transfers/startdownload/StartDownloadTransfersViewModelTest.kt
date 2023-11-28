@@ -12,19 +12,24 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
+import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadTransfersViewModel
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferEvent
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
+import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetDownloadLocationForNodeUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadUseCase
@@ -41,8 +46,8 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -59,7 +64,13 @@ class StartDownloadTransfersViewModelTest {
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val clearActiveTransfersIfFinishedUseCase =
         mock<ClearActiveTransfersIfFinishedUseCase>()
-    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val totalFileSizeOfNodesUseCase = mock<TotalFileSizeOfNodesUseCase>()
+    private val fileSizeStringMapper = mock<FileSizeStringMapper>()
+    private val isAskBeforeLargeDownloadsSettingUseCase =
+        mock<IsAskBeforeLargeDownloadsSettingUseCase>()
+    private val setAskBeforeLargeDownloadsSettingUseCase =
+        mock<SetAskBeforeLargeDownloadsSettingUseCase>()
+
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -76,7 +87,10 @@ class StartDownloadTransfersViewModelTest {
             broadcastOfflineFileAvailabilityUseCase,
             clearActiveTransfersIfFinishedUseCase,
             isConnectedToInternetUseCase,
-            getNodeByIdUseCase,
+            totalFileSizeOfNodesUseCase,
+            fileSizeStringMapper,
+            isAskBeforeLargeDownloadsSettingUseCase,
+            setAskBeforeLargeDownloadsSettingUseCase,
         )
 
     }
@@ -92,7 +106,10 @@ class StartDownloadTransfersViewModelTest {
             node,
             parentNode,
             clearActiveTransfersIfFinishedUseCase,
-            getNodeByIdUseCase,
+            totalFileSizeOfNodesUseCase,
+            fileSizeStringMapper,
+            isAskBeforeLargeDownloadsSettingUseCase,
+            setAskBeforeLargeDownloadsSettingUseCase,
         )
     }
 
@@ -101,111 +118,75 @@ class StartDownloadTransfersViewModelTest {
         Dispatchers.resetMain()
     }
 
-    @Test
-    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startDownloadNode is invoked`() =
-        runTest {
-            stubNodeForDownload()
-            underTest.startDownloadNodes(nodes)
-            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
-        }
+    @ParameterizedTest
+    @MethodSource("provideStartEvents")
+    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startDownloadNode is invoked`(
+        startEvent: TransferTriggerEvent,
+    ) = runTest {
+        commonStub()
+        underTest.startDownload(startEvent)
+        verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
+    }
 
-    @Test
-    fun `test that getNodeByIdUseCase is invoked when startDownloadNode with id is invoked`() =
-        runTest {
-            stubNodeForDownload()
-            underTest.startDownloadNodesWithId(listOf(nodeId))
-            verify(getNodeByIdUseCase).invoke(nodeId)
-        }
-
-    @Test
-    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startDownloadNode with id is invoked`() =
-        runTest {
-            stubNodeForDownload()
-            underTest.startDownloadNodesWithId(listOf(nodeId))
-            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
-        }
-
-    @Test
-    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startDownloadForOffline is invoked`() =
-        runTest {
-            stubNodeForDownload()
-            underTest.startDownloadForOffline(node)
-            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
-        }
-
-    @Test
-    fun `test that getNodeByIdUseCase is invoked when startDownloadForOffline with id is invoked`() =
-        runTest {
-            stubNodeForDownload()
-            underTest.startDownloadForOffline(nodeId)
-            verify(getNodeByIdUseCase).invoke(nodeId)
-        }
-
-    @Test
-    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startDownloadForOffline with id is invoked`() =
-        runTest {
-            stubNodeForDownload()
-            underTest.startDownloadForOffline(nodeId)
-            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
-        }
-
-    @Test
-    fun `test that start download use case is invoked with correct parameters when startDownloadNode is invoked`() =
-        runTest {
-            stubNodeForDownload()
-            underTest.startDownloadNodes(nodes)
-            verify(startDownloadUseCase).invoke(nodes, destination, null, false)
-        }
-
-    @Test
-    fun `test that start download use case is invoked with correct parameters when startDownloadNode with id is invoked`() =
-        runTest {
-            stubNodeForDownload()
-            underTest.startDownloadNodesWithId(listOf(nodeId))
-            verify(startDownloadUseCase).invoke(nodes, destination, null, false)
-        }
-
-    @Test
-    fun `test that start download use case is invoked with correct parameters when startDownloadForOffline is invoked`() =
-        runTest {
-            stubNodeForDownload()
+    @ParameterizedTest
+    @MethodSource("provideStartEvents")
+    fun `test that start download use case is invoked with correct parameters when startDownloadNod is invoked`(
+        startEvent: TransferTriggerEvent,
+    ) = runTest {
+        commonStub()
+        if (startEvent is TransferTriggerEvent.StartDownloadForOffline) {
             whenever(getOfflinePathForNodeUseCase(any())).thenReturn(destination)
-            underTest.startDownloadForOffline(node)
-            verify(startDownloadUseCase).invoke(listOf(node), destination, null, false)
         }
-
-    @Test
-    fun `test that start download use case is invoked with correct parameters when startDownloadForOffline with Id is invoked`() =
-        runTest {
-            stubNodeForDownload()
-            whenever(getOfflinePathForNodeUseCase(any())).thenReturn(destination)
-            underTest.startDownloadForOffline(nodeId)
-            verify(startDownloadUseCase).invoke(listOf(node), destination, null, false)
-        }
+        underTest.startDownload(startEvent)
+        verify(startDownloadUseCase).invoke(nodes, destination, null, false)
+    }
 
     @Test
     fun `test that no connection event is emitted when monitorConnectivityUseCase is false`() =
         runTest {
-            stubNodeForDownload(false)
-            underTest.startDownloadNodes(nodes)
+            commonStub()
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
             assertCurrentEventIsEqualTo(StartDownloadTransferEvent.NotConnected)
         }
 
     @Test
     fun `test that cancel event is emitted when start download nodes is invoked with no sibling nodes`() =
         runTest {
-            stubNodeForDownload()
+            commonStub()
             whenever(parentNode.parentId).thenReturn(NodeId(55L))
-            underTest.startDownloadNodes(listOf(node, parentNode))
+            underTest.startDownload(
+                TransferTriggerEvent.StartDownloadNode(listOf(node, parentNode))
+            )
+            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.TransferCancelled)
+        }
+
+    @Test
+    fun `test that cancel event is emitted when start download nodes is invoked with empty list`() =
+        runTest {
+            commonStub()
+            underTest.startDownload(
+                TransferTriggerEvent.StartDownloadNode(listOf())
+            )
+            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.TransferCancelled)
+        }
+
+    @Test
+    fun `test that cancel event is emitted when start download nodes is invoked with null node`() =
+        runTest {
+            commonStub()
+            underTest.startDownload(
+                TransferTriggerEvent.StartDownloadForOffline(null)
+            )
             assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.TransferCancelled)
         }
 
     @Test
     fun `test that job in progress is set to ProcessingFiles when start download use case starts`() =
         runTest {
-            stubNodeForDownload()
+            commonStub()
             stubStartDownload(flow { delay(500) })
-            underTest.startDownloadNodes(nodes)
+            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
             Truth.assertThat(underTest.uiState.value.jobInProgressState)
                 .isEqualTo(StartDownloadTransferJobInProgress.ProcessingFiles)
         }
@@ -213,18 +194,18 @@ class StartDownloadTransfersViewModelTest {
     @Test
     fun `test that FinishProcessing event is emitted if start download use case finishes correctly`() =
         runTest {
-            stubNodeForDownload()
+            commonStub()
             stubStartDownload(flowOf(DownloadNodesEvent.FinishProcessingTransfers))
-            underTest.startDownloadNodes(nodes)
+            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
             assertCurrentEventIsEqualTo(StartDownloadTransferEvent.FinishProcessing(null, 1))
         }
 
     @Test
     fun `test that NotSufficientSpace event is emitted if start download use case returns NotSufficientSpace`() =
         runTest {
-            stubNodeForDownload()
+            commonStub()
             stubStartDownload(flowOf(DownloadNodesEvent.NotSufficientSpace))
-            underTest.startDownloadNodes(nodes)
+            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
             assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.NotSufficientSpace)
         }
 
@@ -234,13 +215,49 @@ class StartDownloadTransfersViewModelTest {
         downloadNodesEvent: DownloadNodesEvent,
         startDownloadTransferEvent: StartDownloadTransferEvent,
     ) = runTest {
-        stubNodeForDownload()
+        commonStub()
         stubStartDownload(flowOf(downloadNodesEvent))
-        underTest.startDownloadNodes(nodes)
+        underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
         assertCurrentEventIsEqualTo(startDownloadTransferEvent)
     }
 
-    private fun provideDownloadNodeParameters() = Stream.of(
+    @ParameterizedTest
+    @MethodSource("provideStartEvents")
+    fun `test that ConfirmLargeDownload is emitted when a large download is started`(
+        startEvent: TransferTriggerEvent,
+    ) = runTest {
+        commonStub()
+        whenever(isAskBeforeLargeDownloadsSettingUseCase()).thenReturn(true)
+        whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(TransfersConstants.CONFIRM_SIZE_MIN_BYTES + 1)
+        val size = "x MB"
+        whenever(fileSizeStringMapper(any())).thenReturn(size)
+        underTest.startDownload(startEvent)
+        assertCurrentEventIsEqualTo(
+            StartDownloadTransferEvent.ConfirmLargeDownload(size, startEvent)
+        )
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideStartEvents")
+    fun `test that setAskBeforeLargeDownloadsSettingUseCase is invoked when specified in start download`(
+        startEvent: TransferTriggerEvent,
+    ) = runTest {
+        commonStub()
+        underTest.startDownloadWithoutConfirmation(startEvent, true)
+        verify(setAskBeforeLargeDownloadsSettingUseCase).invoke(false)
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideStartEvents")
+    fun `test that setAskBeforeLargeDownloadsSettingUseCase is not invoked when not specified in start download`(
+        startEvent: TransferTriggerEvent,
+    ) = runTest {
+        commonStub()
+        underTest.startDownloadWithoutConfirmation(startEvent, false)
+        verifyNoInteractions(setAskBeforeLargeDownloadsSettingUseCase)
+    }
+
+    private fun provideDownloadNodeParameters() = listOf(
         Arguments.of(
             DownloadNodesEvent.FinishProcessingTransfers,
             StartDownloadTransferEvent.FinishProcessing(null, 1),
@@ -251,6 +268,11 @@ class StartDownloadTransfersViewModelTest {
         ),
     )
 
+    private fun provideStartEvents() = listOf(
+        TransferTriggerEvent.StartDownloadNode(nodes),
+        TransferTriggerEvent.StartDownloadForOffline(node),
+    )
+
     private fun assertCurrentEventIsEqualTo(event: StartDownloadTransferEvent) {
         Truth.assertThat(underTest.uiState.value.oneOffViewEvent)
             .isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -258,15 +280,16 @@ class StartDownloadTransfersViewModelTest {
             .isEqualTo(event)
     }
 
-    private suspend fun stubNodeForDownload(internetConnection: Boolean = true) {
+    private suspend fun commonStub() {
+        whenever(isAskBeforeLargeDownloadsSettingUseCase()).thenReturn(false)
         whenever(node.id).thenReturn(nodeId)
         whenever(node.parentId).thenReturn(parentId)
         whenever(parentNode.id).thenReturn(parentId)
 
         whenever(getDownloadLocationForNodeUseCase(node)).thenReturn(destination)
 
-        whenever(isConnectedToInternetUseCase()).thenReturn(internetConnection)
-        whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
+        whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(1)
     }
 
     private fun stubStartDownload(flow: Flow<DownloadNodesEvent>) {

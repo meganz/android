@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.bottomsheet
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
@@ -8,10 +9,12 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
@@ -22,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NodeOptionsDownloadViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<StateEventWithContent<TransferTriggerEvent>>(consumed())
@@ -43,8 +47,11 @@ class NodeOptionsDownloadViewModel @Inject constructor(
      * @param nodeId
      */
     fun onDownloadClicked(nodeId: NodeId) {
-        _state.update {
-            triggered(TransferTriggerEvent.StartDownloadNodeWithId(listOf(nodeId)))
+        viewModelScope.launch {
+            val nodes = listOf(getNodeByIdUseCase(nodeId)).filterNotNull()
+            _state.update {
+                triggered(TransferTriggerEvent.StartDownloadNode(nodes))
+            }
         }
     }
 
@@ -63,8 +70,11 @@ class NodeOptionsDownloadViewModel @Inject constructor(
      * @param nodeId
      */
     fun onSaveOfflineClicked(nodeId: NodeId) {
-        _state.update {
-            triggered(TransferTriggerEvent.StartDownloadForOfflineWithId(nodeId))
+        viewModelScope.launch {
+            val node = getNodeByIdUseCase(nodeId)
+            _state.update {
+                triggered(TransferTriggerEvent.StartDownloadForOffline(node))
+            }
         }
     }
 

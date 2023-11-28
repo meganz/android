@@ -13,6 +13,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -29,8 +30,10 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeOptionsDownloadViewModelTest {
 
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private lateinit var underTest: NodeOptionsDownloadViewModel
+
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -45,12 +48,13 @@ class NodeOptionsDownloadViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(getFeatureFlagValueUseCase)
+        reset(getFeatureFlagValueUseCase, getNodeByIdUseCase)
     }
 
     private fun initViewModel() {
         underTest = NodeOptionsDownloadViewModel(
             getFeatureFlagValueUseCase,
+            getNodeByIdUseCase
         )
     }
 
@@ -94,28 +98,32 @@ class NodeOptionsDownloadViewModelTest {
     @Test
     fun `test that onDownloadClicked with id launches the correct event`() = runTest {
         val nodeId = NodeId(1L)
+        val node = mock<TypedFileNode>()
+        whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
         underTest.onDownloadClicked(nodeId)
         underTest.state.test {
             val event = awaitItem()
             assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
             val content = (event as StateEventWithContentTriggered).content
-            assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadNodeWithId::class.java)
-            assertThat((content as TransferTriggerEvent.StartDownloadNodeWithId).nodeIds)
-                .containsExactly(nodeId)
+            assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
+            assertThat((content as TransferTriggerEvent.StartDownloadNode).nodes)
+                .containsExactly(node)
         }
     }
 
     @Test
     fun `test that onSaveOfflineClicked with id launches the correct event`() = runTest {
         val nodeId = NodeId(1L)
+        val node = mock<TypedFileNode>()
+        whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
         underTest.onSaveOfflineClicked(nodeId)
         underTest.state.test {
             val event = awaitItem()
             assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
             val content = (event as StateEventWithContentTriggered).content
-            assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadForOfflineWithId::class.java)
-            assertThat((content as TransferTriggerEvent.StartDownloadForOfflineWithId).nodeId)
-                .isEqualTo(nodeId)
+            assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
+            assertThat((content as TransferTriggerEvent.StartDownloadForOffline).node)
+                .isEqualTo(node)
         }
     }
 }

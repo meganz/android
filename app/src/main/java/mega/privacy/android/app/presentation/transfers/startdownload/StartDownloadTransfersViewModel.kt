@@ -14,18 +14,22 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
+import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferEvent
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
+import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetDownloadLocationForNodeUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadUseCase
@@ -44,7 +48,10 @@ class StartDownloadTransfersViewModel @Inject constructor(
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
-    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val totalFileSizeOfNodesUseCase: TotalFileSizeOfNodesUseCase,
+    private val fileSizeStringMapper: FileSizeStringMapper,
+    private val isAskBeforeLargeDownloadsSettingUseCase: IsAskBeforeLargeDownloadsSettingUseCase,
+    private val setAskBeforeLargeDownloadsSettingUseCase: SetAskBeforeLargeDownloadsSettingUseCase,
 ) : ViewModel() {
 
     private var currentInProgressJob: Job? = null
@@ -57,10 +64,61 @@ class StartDownloadTransfersViewModel @Inject constructor(
     internal val uiState = _uiState.asStateFlow()
 
     /**
-     * It starts downloading the node with the appropriate use case
+     * It starts downloading the related nodes, asking for confirmation in case of large transfers if corresponds
+     * @param transferTriggerEvent the event that triggered this download
+     */
+    fun startDownload(
+        transferTriggerEvent: TransferTriggerEvent,
+    ) {
+        if (checkAndHandleDeviceIsNotConnected()) {
+            return
+        }
+        viewModelScope.launch {
+            if (transferTriggerEvent.nodes.isEmpty()) {
+                Timber.e("Node in $transferTriggerEvent must exist")
+                _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
+            } else if (!checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent)) {
+                startDownloadWithoutConfirmation(transferTriggerEvent)
+            }
+        }
+    }
+
+    /**
+     * It starts downloading the related nodes, without asking confirmation for large transfers (because it's already asked)
+     * @param transferTriggerEvent the event that triggered this download
+     * @param saveDoNotAskAgainForLargeTransfers if true, it will save in settings to don't ask again for confirmation on large files
+     */
+    fun startDownloadWithoutConfirmation(
+        transferTriggerEvent: TransferTriggerEvent,
+        saveDoNotAskAgainForLargeTransfers: Boolean = false,
+    ) {
+        if (saveDoNotAskAgainForLargeTransfers) {
+            viewModelScope.launch {
+                setAskBeforeLargeDownloadsSettingUseCase(askForConfirmation = false)
+            }
+        }
+        val node = transferTriggerEvent.nodes.firstOrNull()
+        if (node == null) {
+            Timber.e("Node in $transferTriggerEvent must exist")
+            _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
+        } else {
+            when (transferTriggerEvent) {
+                is TransferTriggerEvent.StartDownloadForOffline -> {
+                    startDownloadForOffline(node)
+                }
+
+                is TransferTriggerEvent.StartDownloadNode -> {
+                    startDownloadNodes(transferTriggerEvent.nodes)
+                }
+            }
+        }
+    }
+
+    /**
+     * It starts downloading the nodes with the appropriate use case
      * @param siblingNodes the [Node]s to be download, they must belong to same parent folder
      */
-    fun startDownloadNodes(siblingNodes: List<Node>) {
+    private fun startDownloadNodes(siblingNodes: List<Node>) {
         if (siblingNodes.isEmpty()) return
         val firstSibling = siblingNodes.first()
         val parentId = firstSibling.parentId
@@ -80,20 +138,10 @@ class StartDownloadTransfersViewModel @Inject constructor(
     }
 
     /**
-     * It starts downloading the node with the appropriate use case
-     * @param siblingNodeIds the [NodeId]s of the nodes to be download, they must belong to same parent folder
-     */
-    fun startDownloadNodesWithId(siblingNodeIds: List<NodeId>) {
-        viewModelScope.launch {
-            startDownloadNodes(siblingNodeIds.mapNotNull { getNodeByIdUseCase(it) })
-        }
-    }
-
-    /**
      * It starts downloading the node for offline with the appropriate use case
      * @param node the [Node] to be saved offline
      */
-    fun startDownloadForOffline(node: Node) {
+    private fun startDownloadForOffline(node: Node) {
         currentInProgressJob = viewModelScope.launch {
             startDownloadNodes(
                 nodes = listOf(node),
@@ -109,22 +157,6 @@ class StartDownloadTransfersViewModel @Inject constructor(
     }
 
     /**
-     * It starts downloading the node for offline with the appropriate use case
-     * @param nodeId the [NodeId] of the node to be saved offline
-     */
-    fun startDownloadForOffline(nodeId: NodeId) {
-        viewModelScope.launch {
-            val node = getNodeByIdUseCase(nodeId)
-            if (node == null) {
-                Timber.e("Node with $nodeId must exist")
-                _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
-            } else {
-                startDownloadForOffline(node)
-            }
-        }
-    }
-
-    /**
      * common logic to start downloading nodes, either for offline or ordinary download
      */
     private suspend fun startDownloadNodes(
@@ -132,9 +164,6 @@ class StartDownloadTransfersViewModel @Inject constructor(
         toDoAfterProcessing: (suspend () -> Unit)? = null,
         getPath: suspend () -> String?,
     ) {
-        if (!checkAndHandleIsDeviceConnected()) {
-            return
-        }
         clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD)
         _uiState.update {
             it.copy(jobInProgressState = StartDownloadTransferJobInProgress.ProcessingFiles)
@@ -192,13 +221,33 @@ class StartDownloadTransfersViewModel @Inject constructor(
         currentInProgressJob?.cancel()
     }
 
-    private fun checkAndHandleIsDeviceConnected() =
+    private fun checkAndHandleDeviceIsNotConnected() =
         if (!isConnectedToInternetUseCase()) {
             _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.NotConnected)
-            false
-        } else {
             true
+        } else {
+            false
         }
+
+    /**
+     * Checks if confirmation dialog for large download should be shown and updates uiState if so
+     *
+     * @return true if the state has been handled to ask for confirmation, so no extra action should be done
+     */
+    private suspend fun checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent: TransferTriggerEvent): Boolean {
+        if (isAskBeforeLargeDownloadsSettingUseCase()) {
+            val size = totalFileSizeOfNodesUseCase(transferTriggerEvent.nodes)
+            if (size > TransfersConstants.CONFIRM_SIZE_MIN_BYTES) {
+                _uiState.updateEventAndClearProgress(
+                    StartDownloadTransferEvent.ConfirmLargeDownload(
+                        fileSizeStringMapper(size), transferTriggerEvent
+                    )
+                )
+                return true
+            }
+        }
+        return false
+    }
 
     private fun MutableStateFlow<StartDownloadTransferViewState>.updateEventAndClearProgress(
         event: StartDownloadTransferEvent?,
