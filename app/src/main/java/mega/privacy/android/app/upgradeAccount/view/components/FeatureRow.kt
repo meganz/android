@@ -1,6 +1,5 @@
-package mega.privacy.android.app.upgradeAccount.view
+package mega.privacy.android.app.upgradeAccount.view.components
 
-import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,13 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.app.upgradeAccount.view.STORAGE_DESCRIPTION_ROW
+import mega.privacy.android.core.theme.tokens.MegaAppTheme
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -33,7 +33,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
  * Composable UI for feature description to reuse on Onboarding dialog for both Variants (A and B)
  */
 @Composable
-fun FeatureRow(
+internal fun FeatureRow(
     drawableID: Painter,
     title: String,
     description: String,
@@ -92,11 +92,10 @@ fun FeatureRow(
     Spacer(modifier = Modifier.height(16.dp))
 }
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DescriptionRowPreviewDark")
+@CombinedThemePreviews
 @Composable
-fun PreviewDescriptionRow() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+fun FeatureRowPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         FeatureRow(
             drawableID = painterResource(id = R.drawable.ic_security_onboarding_dialog),
             title = "Additional security when sharing",

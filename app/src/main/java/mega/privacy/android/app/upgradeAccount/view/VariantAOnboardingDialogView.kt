@@ -28,13 +28,14 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.app.upgradeAccount.view.components.FeatureRow
+import mega.privacy.android.core.theme.tokens.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -228,7 +229,7 @@ fun ButtonsRow(
 private fun PreviewVariantAOnboardingDialogView(
     @PreviewParameter(VariantAOnboardingDialogPreviewProvider::class) state: ChooseAccountState,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         VariantAOnboardingDialogView(
             onSkipPressed = {},
             onViewPlansPressed = {},

@@ -21,15 +21,18 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurren
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.view.BILLING_WARNING_CLOSE_BUTTON_TAG
 import mega.privacy.android.app.upgradeAccount.view.BILLING_WARNING_TAG
-import mega.privacy.android.app.upgradeAccount.view.CURRENT_PLAN_TAG
+import mega.privacy.android.app.upgradeAccount.view.BUY_BUTTON_TAG
 import mega.privacy.android.app.upgradeAccount.view.EMPTY_CARD_TAG
-import mega.privacy.android.app.upgradeAccount.view.MONTHLY_CHECK_ICON_TAG
-import mega.privacy.android.app.upgradeAccount.view.MONTHLY_TAB_TAG
 import mega.privacy.android.app.upgradeAccount.view.PRICING_PAGE_LINK_TAG
-import mega.privacy.android.app.upgradeAccount.view.RECOMMENDED_PLAN_TAG
+import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_CARD_TAG
+import mega.privacy.android.app.upgradeAccount.view.UPGRADE_ACCOUNT_SCREEN_TAG
 import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
-import mega.privacy.android.app.upgradeAccount.view.YEARLY_CHECK_ICON_TAG
-import mega.privacy.android.app.upgradeAccount.view.YEARLY_TAB_TAG
+import mega.privacy.android.app.upgradeAccount.view.components.CURRENT_PLAN_TAG
+import mega.privacy.android.app.upgradeAccount.view.components.MONTHLY_CHECK_ICON_TAG
+import mega.privacy.android.app.upgradeAccount.view.components.MONTHLY_TAB_TAG
+import mega.privacy.android.app.upgradeAccount.view.components.RECOMMENDED_PLAN_TAG
+import mega.privacy.android.app.upgradeAccount.view.components.YEARLY_CHECK_ICON_TAG
+import mega.privacy.android.app.upgradeAccount.view.components.YEARLY_TAB_TAG
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
@@ -126,11 +129,17 @@ class UpgradeAccountViewTest {
                 ),
             )
         }
-        composeRule.onNodeWithTag(MONTHLY_TAB_TAG).performClick()
+        composeRule.onNodeWithTag("$UPGRADE_ACCOUNT_SCREEN_TAG$MONTHLY_TAB_TAG").performClick()
 
-        composeRule.onNodeWithTag(MONTHLY_CHECK_ICON_TAG, useUnmergedTree = true)
+        composeRule.onNodeWithTag(
+            "$UPGRADE_ACCOUNT_SCREEN_TAG$MONTHLY_CHECK_ICON_TAG",
+            useUnmergedTree = true
+        )
             .assertExists()
-        composeRule.onNodeWithTag(YEARLY_CHECK_ICON_TAG, useUnmergedTree = true)
+        composeRule.onNodeWithTag(
+            "$UPGRADE_ACCOUNT_SCREEN_TAG$YEARLY_CHECK_ICON_TAG",
+            useUnmergedTree = true
+        )
             .assertDoesNotExist()
     }
 
@@ -145,11 +154,17 @@ class UpgradeAccountViewTest {
                 ),
             )
         }
-        composeRule.onNodeWithTag(YEARLY_TAB_TAG).performClick()
+        composeRule.onNodeWithTag("$UPGRADE_ACCOUNT_SCREEN_TAG$YEARLY_TAB_TAG").performClick()
 
-        composeRule.onNodeWithTag(MONTHLY_CHECK_ICON_TAG, useUnmergedTree = true)
+        composeRule.onNodeWithTag(
+            "$UPGRADE_ACCOUNT_SCREEN_TAG$MONTHLY_CHECK_ICON_TAG",
+            useUnmergedTree = true
+        )
             .assertDoesNotExist()
-        composeRule.onNodeWithTag(YEARLY_CHECK_ICON_TAG, useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag(
+            "$UPGRADE_ACCOUNT_SCREEN_TAG$YEARLY_CHECK_ICON_TAG",
+            useUnmergedTree = true
+        ).assertExists()
     }
 
     @Test
@@ -164,10 +179,10 @@ class UpgradeAccountViewTest {
             )
         }
         composeRule.onNodeWithTag(
-            "upgrade_account_screen:card_pro_plan_${UIAccountType.PRO_I.ordinal}",
+            "$PRO_PLAN_CARD_TAG${UIAccountType.PRO_I.ordinal}",
             useUnmergedTree = true
         )
-            .assert(hasAnyChild(hasTestTag(CURRENT_PLAN_TAG)))
+            .assert(hasAnyChild(hasTestTag("$PRO_PLAN_CARD_TAG$CURRENT_PLAN_TAG")))
     }
 
     @Test
@@ -185,7 +200,7 @@ class UpgradeAccountViewTest {
             "upgrade_account_screen:card_pro_plan_${UIAccountType.PRO_II.ordinal}",
             useUnmergedTree = true
         )
-            .assert(hasAnyChild(hasTestTag(RECOMMENDED_PLAN_TAG)))
+            .assert(hasAnyChild(hasTestTag("$PRO_PLAN_CARD_TAG$RECOMMENDED_PLAN_TAG")))
     }
 
     @Test
@@ -199,7 +214,7 @@ class UpgradeAccountViewTest {
                 ),
             )
         }
-        composeRule.onNodeWithTag("upgrade_account_screen:button_buy_pro_plan_${UIAccountType.PRO_II.ordinal}")
+        composeRule.onNodeWithTag("$BUY_BUTTON_TAG${UIAccountType.PRO_II.ordinal}")
             .assertExists()
     }
 
@@ -214,10 +229,10 @@ class UpgradeAccountViewTest {
                 ),
             )
         }
-        composeRule.onNodeWithTag("upgrade_account_screen:card_pro_plan_${UIAccountType.PRO_LITE.ordinal}")
+        composeRule.onNodeWithTag("$PRO_PLAN_CARD_TAG${UIAccountType.PRO_LITE.ordinal}")
             .performClick()
 
-        composeRule.onNodeWithTag("upgrade_account_screen:button_buy_pro_plan_${UIAccountType.PRO_LITE.ordinal}")
+        composeRule.onNodeWithTag("$BUY_BUTTON_TAG${UIAccountType.PRO_LITE.ordinal}")
             .assertExists()
     }
 
@@ -234,10 +249,10 @@ class UpgradeAccountViewTest {
                 onBuyClicked = onBuyClicked,
             )
         }
-        composeRule.onNodeWithTag("upgrade_account_screen:card_pro_plan_${UIAccountType.PRO_LITE.ordinal}")
+        composeRule.onNodeWithTag("$PRO_PLAN_CARD_TAG${UIAccountType.PRO_LITE.ordinal}")
             .performClick()
 
-        composeRule.onNodeWithTag("upgrade_account_screen:button_buy_pro_plan_${UIAccountType.PRO_LITE.ordinal}")
+        composeRule.onNodeWithTag("$BUY_BUTTON_TAG${UIAccountType.PRO_LITE.ordinal}")
             .performClick()
 
         verify(onBuyClicked).invoke()
@@ -329,13 +344,13 @@ class UpgradeAccountViewTest {
                 ),
             )
         }
-        composeRule.onNodeWithTag(YEARLY_TAB_TAG).performClick()
+        composeRule.onNodeWithTag("$UPGRADE_ACCOUNT_SCREEN_TAG$YEARLY_TAB_TAG").performClick()
         composeRule.onNodeWithTag(
-            "upgrade_account_screen:card_pro_plan_${UIAccountType.PRO_LITE.ordinal}",
+            "$PRO_PLAN_CARD_TAG${UIAccountType.PRO_LITE.ordinal}",
             useUnmergedTree = true
         ).performClick()
-        composeRule.onNodeWithTag(MONTHLY_TAB_TAG).performClick()
-        composeRule.onNodeWithTag("upgrade_account_screen:button_buy_pro_plan_${UIAccountType.PRO_LITE.ordinal}")
+        composeRule.onNodeWithTag("$UPGRADE_ACCOUNT_SCREEN_TAG$MONTHLY_TAB_TAG").performClick()
+        composeRule.onNodeWithTag("$BUY_BUTTON_TAG${UIAccountType.PRO_LITE.ordinal}")
             .assertDoesNotExist()
     }
 
@@ -351,15 +366,18 @@ class UpgradeAccountViewTest {
                 ),
             )
         }
-        composeRule.onNodeWithTag(MONTHLY_CHECK_ICON_TAG, useUnmergedTree = true)
-            .assertExists()
         composeRule.onNodeWithTag(
-            "upgrade_account_screen:card_pro_plan_${UIAccountType.PRO_I.ordinal}",
+            "$UPGRADE_ACCOUNT_SCREEN_TAG$MONTHLY_CHECK_ICON_TAG",
             useUnmergedTree = true
         )
-            .assert(hasAnyChild(hasTestTag(CURRENT_PLAN_TAG)))
-        composeRule.onNodeWithTag(YEARLY_TAB_TAG).performClick()
-        composeRule.onNodeWithTag(CURRENT_PLAN_TAG).assertDoesNotExist()
+            .assertExists()
+        composeRule.onNodeWithTag(
+            "$PRO_PLAN_CARD_TAG${UIAccountType.PRO_I.ordinal}",
+            useUnmergedTree = true
+        )
+            .assert(hasAnyChild(hasTestTag("$PRO_PLAN_CARD_TAG$CURRENT_PLAN_TAG")))
+        composeRule.onNodeWithTag("$UPGRADE_ACCOUNT_SCREEN_TAG$YEARLY_TAB_TAG").performClick()
+        composeRule.onNodeWithTag("$PRO_PLAN_CARD_TAG$CURRENT_PLAN_TAG").assertDoesNotExist()
     }
 
     private fun getUpgradeAccountState(
