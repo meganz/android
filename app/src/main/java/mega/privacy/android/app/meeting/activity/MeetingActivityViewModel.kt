@@ -502,11 +502,11 @@ class MeetingActivityViewModel @Inject constructor(
                                 _state.update { it.copy(isParticipantSharingScreen = session.hasScreenShare) }
                             }
                             if (contains(ChatSessionChanges.SessionOnRecording)) {
-                                _state.update {
-                                    it.copy(
+                                _state.update { state ->
+                                    state.copy(
                                         isSessionOnRecording = session.isRecording,
                                         showRecordingConsentDialog = session.isRecording,
-                                        startOrStopRecordingParticipantName = state.value.usersInCall.find { participant -> participant.peerId == session.peerId }?.name.orEmpty()
+                                        startOrStopRecordingParticipantName = state.usersInCall.find { participant -> participant.peerId == session.peerId }?.name.orEmpty()
                                     )
                                 }
                             }
@@ -1266,9 +1266,6 @@ class MeetingActivityViewModel @Inject constructor(
                     }
 
                     checkParticipantLists()
-                    if (!state.value.isSessionOnRecording) {
-                        checkIfCallIsBeingRecorded(chatId = chatId)
-                    }
                 }
         }.onFailure { exception ->
             Timber.e(exception)
@@ -1277,24 +1274,26 @@ class MeetingActivityViewModel @Inject constructor(
 
     /**
      * Check if the call is being recorded
-     *
-     * @param chatId Chat ID
      */
-    private fun checkIfCallIsBeingRecorded(chatId: Long) {
-        getCallUseCase.getMegaChatCall(chatId).blockingGet().let { call ->
+    private fun checkIfCallIsBeingRecorded() {
+        getCallUseCase.getMegaChatCall(_state.value.chatId).blockingGet().let { call ->
             call.sessionsClientid?.let { listParticipants ->
                 if (listParticipants.size() > 0) {
                     for (i in 0 until listParticipants.size()) {
                         call.getMegaChatSession(listParticipants[i])?.let { session ->
-                            if (session.isRecording) {
-                                _state.update { state ->
-                                    state.copy(
-                                        isSessionOnRecording = true,
-                                        showRecordingConsentDialog = true
-                                    )
+                            _state.value.usersInCall.find { participant -> participant.peerId == session.peerid }
+                                ?.let { participant ->
+                                    if (session.isRecording) {
+                                        _state.update { state ->
+                                            state.copy(
+                                                isSessionOnRecording = true,
+                                                showRecordingConsentDialog = true,
+                                                startOrStopRecordingParticipantName = participant.name
+                                            )
+                                        }
+                                        return
+                                    }
                                 }
-                                return
-                            }
                         }
                     }
                 }
@@ -1312,6 +1311,9 @@ class MeetingActivityViewModel @Inject constructor(
             )
         }
         checkParticipantLists()
+        if (!_state.value.isSessionOnRecording) {
+            checkIfCallIsBeingRecorded()
+        }
     }
 
     /**
