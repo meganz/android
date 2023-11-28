@@ -506,7 +506,7 @@ class MeetingActivityViewModel @Inject constructor(
                                     it.copy(
                                         isSessionOnRecording = session.isRecording,
                                         showRecordingConsentDialog = session.isRecording,
-                                        startOrStopRecordingParticipantName = state.value.usersInCall.find { participant -> participant.peerId == session.peerId }?.name
+                                        startOrStopRecordingParticipantName = state.value.usersInCall.find { participant -> participant.peerId == session.peerId }?.name.orEmpty()
                                     )
                                 }
                             }
