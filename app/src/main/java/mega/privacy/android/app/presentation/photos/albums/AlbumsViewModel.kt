@@ -245,15 +245,13 @@ class AlbumsViewModel @Inject constructor(
                 legacyUIAlbumMapper(uiAlbum?.photos.orEmpty(), userAlbum, isLoadingDone = true)
             } else {
                 val cover = userAlbum.cover
-                val defaultCover = uiAlbum?.photos?.maxByOrNull { it.modificationTime }
-                val imageVideoCount = getImageAndVideoCount(uiAlbum?.photos ?: emptyList())
                 uiAlbumMapper(
                     count = uiAlbum?.count ?: 0,
-                    imageCount = imageVideoCount.first,
-                    videoCount = imageVideoCount.second,
+                    imageCount = uiAlbum?.imageCount ?: 0,
+                    videoCount = uiAlbum?.videoCount ?: 0,
                     cover = cover,
-                    defaultCover = defaultCover,
-                    album = userAlbum
+                    defaultCover = uiAlbum?.defaultCover,
+                    album = userAlbum,
                 )
             }
         }.sortedByDescending { (it.id as? Album.UserAlbum)?.creationTime }

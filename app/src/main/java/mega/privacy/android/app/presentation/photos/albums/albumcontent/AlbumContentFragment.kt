@@ -24,8 +24,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -41,7 +42,6 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperAct
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumType
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
-import mega.privacy.android.app.presentation.photos.compose.albumcontent.isFilterable
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -52,6 +52,7 @@ import mega.privacy.android.domain.entity.photos.Album.GifAlbum
 import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
@@ -82,6 +83,12 @@ class AlbumContentFragment : Fragment() {
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    @DefaultDispatcher
+    lateinit var defaultDispatcher: CoroutineDispatcher
+
+    private var isContextMenuInitialized: Boolean = false
 
     private val albumPhotosSelectionLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
@@ -171,6 +178,11 @@ class AlbumContentFragment : Fragment() {
                     if (!state.showRenameDialog) {
                         managerActivity.setToolbarTitle(getCurrentAlbumTitle())
                     }
+
+                    if (state.uiAlbum != null && !isContextMenuInitialized) {
+                        managerActivity.invalidateOptionsMenu()
+                        isContextMenuInitialized = true
+                    }
                 }
             }
         }
@@ -254,32 +266,37 @@ class AlbumContentFragment : Fragment() {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        albumContentViewModel.state.value.uiAlbum?.id?.let { album ->
-            val photos = albumContentViewModel.state.value.photos
+        val album = albumContentViewModel.state.value.uiAlbum?.id ?: return
+        val photos = albumContentViewModel.state.value.photos
+
+        viewLifecycleOwner.lifecycleScope.launch {
             menu.findItem(R.id.action_menu_sort_by)?.isVisible = photos.isNotEmpty()
-            photos.setFilterMenuItemVisibility()
+            menu.findItem(R.id.action_menu_filter)?.isVisible = withContext(defaultDispatcher) {
+                val imageCount = photos.count { it is Photo.Image }
+                val videoCount = photos.size - imageCount
 
-            if (album is UserAlbum) {
-                val isAlbumSharingEnabled = runBlocking {
-                    getFeatureFlagValueUseCase(AppFeatures.AlbumSharing)
-                }
-                menu.findItem(R.id.action_menu_get_link)?.let { menu ->
-                    menu.title =
-                        context?.resources?.getQuantityString(R.plurals.album_share_get_links, 1)
-                    menu.isVisible = isAlbumSharingEnabled && album.isExported == false
-                }
-                menu.findItem(R.id.action_menu_manage_link)?.let { menu ->
-                    menu.isVisible = isAlbumSharingEnabled && album.isExported == true
-                }
-                menu.findItem(R.id.action_menu_remove_link)?.let { menu ->
-                    menu.isVisible = isAlbumSharingEnabled && album.isExported == true
-                }
-
-                menu.findItem(R.id.action_menu_rename)?.isVisible = true
-                menu.findItem(R.id.action_menu_delete)?.isVisible = true
-
-                photos.setSelectAlbumCoverMenuItemVisibility()
+                imageCount > 0 && videoCount > 0
             }
+
+            if (album !is UserAlbum) return@launch
+            val isAlbumSharingEnabled = getFeatureFlagValueUseCase(AppFeatures.AlbumSharing)
+
+            menu.findItem(R.id.action_menu_get_link)?.let { menu ->
+                menu.title =
+                    context?.resources?.getQuantityString(R.plurals.album_share_get_links, 1)
+                menu.isVisible = isAlbumSharingEnabled && album.isExported == false
+            }
+            menu.findItem(R.id.action_menu_manage_link)?.let { menu ->
+                menu.isVisible = isAlbumSharingEnabled && album.isExported == true
+            }
+            menu.findItem(R.id.action_menu_remove_link)?.let { menu ->
+                menu.isVisible = isAlbumSharingEnabled && album.isExported == true
+            }
+
+            menu.findItem(R.id.action_menu_rename)?.isVisible = true
+            menu.findItem(R.id.action_menu_delete)?.isVisible = true
+
+            photos.setSelectAlbumCoverMenuItemVisibility()
         }
     }
 
@@ -321,10 +338,6 @@ class AlbumContentFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun List<Photo>.setFilterMenuItemVisibility() {
-        menu?.findItem(R.id.action_menu_filter)?.isVisible = isFilterable()
     }
 
     private fun List<Photo>.setSelectAlbumCoverMenuItemVisibility() {
