@@ -5232,4 +5232,6 @@
     <string name="meetings_call_recording_started_snackbar_message">%1$s started recording</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s stopped recording</string>
+    <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
+    <string name="chat_attach_panel_gallery">Gallery</string>
 </resources>
