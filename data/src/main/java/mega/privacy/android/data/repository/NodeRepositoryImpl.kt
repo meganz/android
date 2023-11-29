@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineInformationMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
@@ -89,6 +90,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val megaExceptionMapper: MegaExceptionMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val nodeMapper: NodeMapper,
+    private val fileNodeMapper: FileNodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
     private val offlineInformationMapper: OfflineInformationMapper,
@@ -641,6 +643,29 @@ internal class NodeRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             getMegaNodeByHandle(NodeId(handle), attemptFromFolderApi)
                 ?.let { nodeMapper(megaNode = it, offline = getOfflineNode(it.handle)) }
+        }
+
+    override suspend fun getNodeFromChatMessage(chatId: Long, messageId: Long, messageIndex: Int) =
+        withContext(ioDispatcher) {
+            (megaChatApiGateway.getMessage(chatId, messageId)
+                ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId))
+                ?.let { messageChat ->
+                    val node = messageChat.megaNodeList.get(messageIndex)
+                    val chat = megaChatApiGateway.getChatRoom(chatId)
+
+                    if (chat?.isPreview == true) {
+                        megaApiGateway.authorizeChatNode(node, chat.authorizationToken)
+                    } else {
+                        node
+                    }
+                }
+                ?.let {
+                    fileNodeMapper(
+                        megaNode = it,
+                        requireSerializedData = false,
+                        offline = null,
+                    )
+                }
         }
 
     override suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode> {

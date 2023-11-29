@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
+import mega.privacy.android.domain.entity.node.DefaultTypedImageNode
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.TypedImageNode
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -24,7 +25,7 @@ class AddImageTypeUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(node: ImageNode): TypedImageNode {
-        return TypedImageNode(
+        return DefaultTypedImageNode(
             imageNode = node,
             thumbnailPath = getThumbnailPath(node.base64Id),
             previewPath = getPreviewPath(node.base64Id),

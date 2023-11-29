@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -426,6 +427,19 @@ interface NodeRepository {
      * @param handle
      */
     suspend fun getNodeByHandle(handle: Long, attemptFromFolderApi: Boolean = false): UnTypedNode?
+
+    /**
+     * Get file attached to a chat message by its chat and message id
+     *
+     * @param chatId
+     * @param messageId
+     * @param messageIndex: The index of the file in message attachments, usually 0 since there's usually only one file. Keeping this because the SDK, in theory, allows for multiple files per message.
+     */
+    suspend fun getNodeFromChatMessage(
+        chatId: Long,
+        messageId: Long,
+        messageIndex: Int = 0,
+    ): FileNode?
 
     /**
      * Get nodes by handles

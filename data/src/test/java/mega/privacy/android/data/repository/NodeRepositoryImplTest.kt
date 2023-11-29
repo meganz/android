@@ -42,9 +42,12 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.repository.NodeRepository
+import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFolderInfo
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
@@ -99,14 +102,15 @@ class NodeRepositoryImplTest {
     private val fetChildrenMapper = mock<FetchChildrenMapper>()
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper = mock()
+    private val fileNodeMapper = FileNodeMapper(
+        cacheGateway = cacheGateway,
+        megaApiGateway = megaApiGateway,
+        fileTypeInfoMapper = fileTypeInfoMapper,
+        offlineAvailabilityMapper = offlineAvailabilityMapper,
+    )
 
     private val nodeMapper: NodeMapper = NodeMapper(
-        fileNodeMapper = FileNodeMapper(
-            cacheGateway = cacheGateway,
-            megaApiGateway = megaApiGateway,
-            fileTypeInfoMapper = fileTypeInfoMapper,
-            offlineAvailabilityMapper = offlineAvailabilityMapper,
-        ),
+        fileNodeMapper = fileNodeMapper,
         folderNodeMapper = FolderNodeMapper(
             megaApiGateway = megaApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
@@ -129,6 +133,7 @@ class NodeRepositoryImplTest {
             megaExceptionMapper = megaExceptionMapper,
             sortOrderIntMapper = sortOrderIntMapper,
             nodeMapper = nodeMapper,
+            fileNodeMapper = fileNodeMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             offlineNodeInformationMapper = offlineNodeInformationMapper,
             offlineInformationMapper = offlineInformationMapper,
@@ -139,13 +144,32 @@ class NodeRepositoryImplTest {
             accessPermissionMapper = accessPermissionMapper,
             nodeShareKeyResultMapper = nodeShareKeyResultMapper,
             accessPermissionIntMapper = accessPermissionIntMapper,
-            megaLocalRoomGateway = megaLocalRoomGateway
+            megaLocalRoomGateway = megaLocalRoomGateway,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(megaApiGateway)
+        reset(
+            megaApiGateway,
+            megaApiFolderGateway,
+            megaChatApiGateway,
+            megaLocalStorageGateway,
+            shareDataMapper,
+            megaExceptionMapper,
+            sortOrderIntMapper,
+            fileTypeInfoMapper,
+            offlineNodeInformationMapper,
+            offlineInformationMapper,
+            fileGateway,
+            chatFilesFolderUserAttributeMapper,
+            streamingGateway,
+            nodeUpdateMapper,
+            accessPermissionMapper,
+            nodeShareKeyResultMapper,
+            accessPermissionMapper,
+            megaLocalStorageGateway
+        )
     }
 
     @Test
@@ -744,6 +768,62 @@ class NodeRepositoryImplTest {
         assertDoesNotThrow {
             underTest.moveNodeToRubbishBinByHandle(node)
         }
+    }
+
+    @Test
+    fun `test that getNodeFromChatMessage returns correct node from gateway`() = runTest {
+        val chatId = 11L
+        val messageId = 22L
+        val megaNode = mockMegaNodeForConversion()
+        val megaChatMessage = mock<MegaChatMessage>()
+        val megaNodeList = mock<MegaNodeList>()
+        whenever(megaNodeList.get(0)).thenReturn(megaNode)
+        whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
+        whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(megaChatMessage)
+        assertThat(
+            underTest.getNodeFromChatMessage(chatId, messageId)?.id?.longValue
+        ).isEqualTo(megaNode.handle)
+    }
+
+    @Test
+    fun `test that chat node history is used as a fallback when node is not found`() = runTest {
+        val chatId = 11L
+        val messageId = 22L
+        val megaNode = mockMegaNodeForConversion()
+        val megaChatMessage = mock<MegaChatMessage>()
+        val megaNodeList = mock<MegaNodeList>()
+        whenever(megaNodeList.get(0)).thenReturn(megaNode)
+        whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
+        whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(null)
+        whenever(megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId))
+            .thenReturn(megaChatMessage)
+        assertThat(
+            underTest.getNodeFromChatMessage(chatId, messageId)?.id?.longValue
+        ).isEqualTo(megaNode.handle)
+    }
+
+    @Test
+    fun `test that chat node is authorized if is in chat preview`() = runTest {
+        val chatId = 11L
+        val messageId = 22L
+        val authorizationToken = "authorizationToken"
+        val megaNode = mockMegaNodeForConversion()
+        val megaNode2 = mock<MegaNode>()
+        val megaChatMessage = mock<MegaChatMessage>()
+        val megaNodeList = mock<MegaNodeList>()
+        val chat = mock<MegaChatRoom>()
+        whenever(megaNodeList.get(0)).thenReturn(megaNode2)
+        whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
+        whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(megaChatMessage)
+        whenever(megaChatApiGateway.getChatRoom(chatId)).thenReturn(chat)
+        whenever(chat.isPreview).thenReturn(true)
+        whenever(chat.authorizationToken).thenReturn(authorizationToken)
+        whenever(megaApiGateway.authorizeChatNode(megaNode2, chat.authorizationToken))
+            .thenReturn(megaNode)
+        assertThat(
+            underTest.getNodeFromChatMessage(chatId, messageId)?.id?.longValue
+        ).isEqualTo(megaNode.handle)
+        verify(megaApiGateway).authorizeChatNode(megaNode2, chat.authorizationToken)
     }
 
     companion object {
