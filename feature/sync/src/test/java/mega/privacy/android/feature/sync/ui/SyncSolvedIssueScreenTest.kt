@@ -33,7 +33,35 @@ class SyncSolvedIssueScreenTest {
 
 
     @Test
-    fun `test that solved issues list is displayed when there are solved issues`() {
+    fun `test that solved issues list is displayed with local folder name`() {
+        val folderName = "Folder name"
+        val resolutionExplanation = "Folders were merged"
+        whenever(state.value).thenReturn(
+            SyncSolvedIssuesState(
+                listOf(
+                    SolvedIssueUiItem(
+                        nodeIds = listOf(),
+                        nodeNames = listOf(),
+                        localPaths = listOf(folderName),
+                        resolutionExplanation = resolutionExplanation,
+                        icon = R.drawable.ic_folder_list,
+                    )
+                )
+            )
+        )
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            SyncSolvedIssuesRoute(
+                viewModel,
+            )
+        }
+
+        composeTestRule.onNodeWithTag(SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that solved issues list is displayed with MEGA folder name`() {
         val folderName = "Folder name"
         val resolutionExplanation = "Folders were merged"
         whenever(state.value).thenReturn(
@@ -41,7 +69,8 @@ class SyncSolvedIssueScreenTest {
                 listOf(
                     SolvedIssueUiItem(
                         nodeIds = listOf(NodeId(1L)),
-                        localPaths = listOf(folderName),
+                        nodeNames = listOf(folderName),
+                        localPaths = listOf(),
                         resolutionExplanation = resolutionExplanation,
                         icon = R.drawable.ic_folder_list,
                     )

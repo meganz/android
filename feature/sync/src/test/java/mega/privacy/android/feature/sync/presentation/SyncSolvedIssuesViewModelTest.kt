@@ -48,6 +48,7 @@ class SyncSolvedIssuesViewModelTest {
     private val stalledIssuesUiItems = listOf(
         SolvedIssueUiItem(
             nodeIds = listOf(NodeId(3L)),
+            nodeNames = listOf("DCIM"),
             localPaths = listOf("/storage/emulated/0/DCIM"),
             resolutionExplanation = "folders merged",
             icon = 0,
@@ -77,12 +78,12 @@ class SyncSolvedIssuesViewModelTest {
                 emit(solvedIssues)
                 awaitCancellation()
             })
-            whenever(solvedIssueItemMapper(solvedIssues.first(), isFolder = true)).thenReturn(
-                stalledIssuesUiItems.first()
-            )
             val node: FolderNode = mock()
             whenever(getNodeByHandleUseCase(solvedIssues.first().nodeIds.first().longValue)).thenReturn(
                 node
+            )
+            whenever(solvedIssueItemMapper(solvedIssues.first(), listOf(node))).thenReturn(
+                stalledIssuesUiItems.first()
             )
             initViewModel()
 

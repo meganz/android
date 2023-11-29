@@ -30,10 +30,11 @@ internal class SyncSolvedIssuesViewModel @Inject constructor(
             monitorSyncSolvedIssuesUseCase()
                 .map { solvedIssuesList ->
                     solvedIssuesList.map { solvedIssue ->
-                        val node = getNodeByHandleUseCase(solvedIssue.nodeIds.first().longValue)
                         solvedIssueItemMapper(
                             solvedIssue = solvedIssue,
-                            isFolder = node is FolderNode
+                            nodes = solvedIssue.nodeIds.mapNotNull { nodeId ->
+                                getNodeByHandleUseCase(nodeId.longValue)
+                            },
                         )
                     }
                 }

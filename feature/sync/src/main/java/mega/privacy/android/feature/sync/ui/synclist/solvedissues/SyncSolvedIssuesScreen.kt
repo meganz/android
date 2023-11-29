@@ -36,14 +36,15 @@ internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
         } else {
             items(solvedIssues) { solvedIssue ->
                 MenuActionNodeHeaderWithBody(
-                    title = solvedIssue.localPaths.first(),
+                    title = solvedIssue.localPaths.firstOrNull() ?: solvedIssue.nodeNames.first(),
                     body = solvedIssue.resolutionExplanation,
                     nodeIcon = solvedIssue.icon,
                     bodyIcon = CoreUiR.drawable.ic_check_circle,
                     bodyIconColor = MaterialTheme.colors.secondary
                 )
                 Divider(
-                    Modifier.padding(start = 72.dp)
+                    Modifier
+                        .padding(start = 72.dp)
                         .testTag(SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY)
                 )
             }
@@ -59,36 +60,42 @@ internal fun SyncSolvedIssuesScreenPreview() {
             listOf(
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(1L)),
+                    nodeNames = listOf("Folder name"),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "Folders were merged",
                     icon = CoreUiR.drawable.ic_folder_list,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(2L)),
+                    nodeNames = listOf("Folder name"),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "Folders were merged",
                     icon = CoreUiR.drawable.ic_folder_list,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(3L)),
+                    nodeNames = listOf("Folder name"),
                     localPaths = listOf("File name"),
                     resolutionExplanation = "All duplicates were removed",
                     icon = iconPackR.drawable.ic_generic_list
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(4L)),
+                    nodeNames = listOf("Folder name"),
                     localPaths = listOf("File name"),
                     resolutionExplanation = "All items were renamed",
                     icon = iconPackR.drawable.ic_generic_list,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(6L)),
+                    nodeNames = listOf("Folder name"),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "All items were renamed",
                     icon = iconPackR.drawable.ic_generic_list,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(7L)),
+                    nodeNames = listOf("Folder name"),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "All items were renamed",
                     icon = iconPackR.drawable.ic_generic_list,
@@ -98,4 +105,5 @@ internal fun SyncSolvedIssuesScreenPreview() {
     }
 }
 
-internal const val SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY = "solve_issues_menu_action_node_header_with_body"
+internal const val SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY =
+    "solve_issues_menu_action_node_header_with_body"

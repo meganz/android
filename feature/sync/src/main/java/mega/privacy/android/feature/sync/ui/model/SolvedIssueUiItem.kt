@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 
 internal data class SolvedIssueUiItem(
     val nodeIds: List<NodeId>,
+    val nodeNames: List<String>,
     val localPaths: List<String>,
     val resolutionExplanation: String,
     @DrawableRes val icon: Int,
