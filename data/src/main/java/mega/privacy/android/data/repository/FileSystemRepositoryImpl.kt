@@ -166,7 +166,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     private suspend fun getMegaNodeFromFolderLink(folderLinkNode: ViewerNode.FolderLinkNode) =
         withContext(ioDispatcher) {
-            megaApiGateway.getMegaNodeByHandle(folderLinkNode.id)?.let {
+            megaApiFolderGateway.getMegaNodeByHandle(folderLinkNode.id)?.let {
                 megaApiFolderGateway.authorizeNode(it)
             }
         }

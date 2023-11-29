@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.startdownload.model
 
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
  * Event to trigger the start of a transfer
@@ -10,14 +10,14 @@ sealed interface TransferTriggerEvent {
     /**
      * nodes to be transferred
      */
-    val nodes: List<Node>
+    val nodes: List<TypedNode>
 
 
     /**
      * Event to start downloading a node for offline use
      * @param node the node to be saved offline
      */
-    data class StartDownloadForOffline(val node: Node?) : TransferTriggerEvent {
+    data class StartDownloadForOffline(val node: TypedNode?) : TransferTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
     }
 
@@ -26,6 +26,6 @@ sealed interface TransferTriggerEvent {
      * Event to start downloading a list of nodes to download folder
      * @param nodes list of nodes to be downloaded, they should belong to the same parent folder
      */
-    data class StartDownloadNode(override val nodes: List<Node>) : TransferTriggerEvent
+    data class StartDownloadNode(override val nodes: List<TypedNode>) : TransferTriggerEvent
 
 }

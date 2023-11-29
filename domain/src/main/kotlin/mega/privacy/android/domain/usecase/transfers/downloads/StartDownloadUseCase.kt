@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.withContext
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -45,7 +45,7 @@ class StartDownloadUseCase @Inject constructor(
      * @return a flow of [DownloadNodesEvent]s to monitor the download state and progress
      */
     operator fun invoke(
-        nodes: List<Node>,
+        nodes: List<TypedNode>,
         destinationPath: String,
         appData: TransferAppData?,
         isHighPriority: Boolean,
@@ -59,7 +59,7 @@ class StartDownloadUseCase @Inject constructor(
             val startDownloadFlow =
                 if (doesPathHaveSufficientSpaceForNodesUseCase(destinationPath, nodes)) {
                     downloadNodesUseCase(
-                        nodes.map { it.id },
+                        nodes,
                         destinationPath,
                         appData = appData,
                         isHighPriority = isHighPriority

@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -71,7 +71,7 @@ class StartDownloadUseCaseTest {
     @Test
     fun `test that file system create destination folder is launched`() = runTest {
         whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(false)
-        val nodes = nodeIds.map { mock<Node>() }
+        val nodes = nodeIds.map { mock<TypedFileNode>() }
         underTest(nodes, DESTINATION_PATH_FOLDER, null, false).test {
             cancelAndIgnoreRemainingEvents()
         }
@@ -170,7 +170,7 @@ class StartDownloadUseCaseTest {
         verify(cancelCancelTokenUseCase).invoke()
     }
 
-    private fun mockNodes() = nodeIds.map { mock<Node>() }
+    private fun mockNodes() = nodeIds.map { mock<TypedFileNode>() }
 
     private suspend fun mockFlow(events: Flow<DownloadNodesEvent>) {
         whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)

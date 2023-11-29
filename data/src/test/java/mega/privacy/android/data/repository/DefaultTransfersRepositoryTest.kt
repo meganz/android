@@ -14,7 +14,9 @@ import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
@@ -29,6 +31,9 @@ import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.RequestEvent
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -36,12 +41,17 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
+import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -69,6 +79,8 @@ class DefaultTransfersRepositoryTest {
     private lateinit var underTest: DefaultTransfersRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaChatApiGateway = mock<MegaChatApiGateway>()
+    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val transferEventMapper = mock<TransferEventMapper>()
     private val appEventGateway: AppEventGateway = mock()
     private val transferMapper: TransferMapper = mock()
@@ -95,6 +107,8 @@ class DefaultTransfersRepositoryTest {
         stubPauseTransfers(paused)
         return DefaultTransfersRepository(
             megaApiGateway = megaApiGateway,
+            megaChatApiGateway = megaChatApiGateway,
+            megaApiFolderGateway = megaApiFolderGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             transferEventMapper = transferEventMapper,
             appEventGateway = appEventGateway,
@@ -116,6 +130,8 @@ class DefaultTransfersRepositoryTest {
     fun resetMocks() {
         reset(
             megaApiGateway,
+            megaChatApiGateway,
+            megaApiFolderGateway,
             transferEventMapper,
             appEventGateway,
             transferMapper,
@@ -170,7 +186,7 @@ class DefaultTransfersRepositoryTest {
 
         private fun startDownloadFlow() =
             underTest.startDownload(
-                nodeId = NodeId(1L),
+                node = mock<TypedFileNode>(),
                 localPath = "test local path",
                 appData = null,
                 shouldStartFirst = false,
@@ -307,6 +323,116 @@ class DefaultTransfersRepositoryTest {
         }
     }
 
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @DisplayName("Test start download with chat files")
+    inner class StartDownloadWithChatFile {
+
+        private val chatId = 11L
+        private val messageId = 22L
+        private val path = "path"
+
+        private val megaNode = mock<MegaNode>()
+        private val megaChatMessage = mock<MegaChatMessage>()
+        private val megaNodeList = mock<MegaNodeList>()
+        private val chatFile = mock<ChatDefaultFile>()
+        fun resetMocks() = reset(megaNode, megaChatMessage, megaNodeList, chatFile)
+
+        private fun commonSetup() {
+            whenever(chatFile.chatId).thenReturn(chatId)
+            whenever(chatFile.messageId).thenReturn(messageId)
+            whenever(chatFile.messageIndex).thenReturn(0)
+            whenever(megaNodeList.get(0)).thenReturn(megaNode)
+            whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
+        }
+
+        @Test
+        fun `test that start download is started with the correct chat node from gateway when start download with ChatFile`() =
+            runTest {
+                commonSetup()
+                whenever(megaChatApiGateway.getMessage(chatId, messageId))
+                    .thenReturn(megaChatMessage)
+                verifyStartChatFile()
+            }
+
+        @Test
+        fun `test that chat node history is used as a fallback when node is not found`() = runTest {
+            commonSetup()
+            whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(null)
+            whenever(megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId))
+                .thenReturn(megaChatMessage)
+            verifyStartChatFile()
+        }
+
+        @Test
+        fun `test that chat node is authorized if is in chat preview`() = runTest {
+            commonSetup()
+            whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(megaChatMessage)
+            val megaNodeAuthorized = mock<MegaNode>()
+            val authorizationToken = "token"
+            val chat = mock<MegaChatRoom> {
+                on { isPreview }.thenReturn(true)
+                on { this.authorizationToken }.thenReturn(authorizationToken)
+            }
+            whenever(megaChatApiGateway.getChatRoom(chatId)).thenReturn(chat)
+            whenever(megaApiGateway.authorizeChatNode(megaNode, authorizationToken))
+                .thenReturn(megaNodeAuthorized)
+            verifyStartChatFile(megaNodeAuthorized)
+            verify(megaApiGateway).authorizeChatNode(megaNode, authorizationToken)
+        }
+
+        private suspend fun verifyStartChatFile(node: MegaNode = megaNode) {
+            underTest.startDownload(chatFile, path, null, false).test {
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(megaApiGateway).startDownload(
+                node = eq(node),
+                localPath = eq(path),
+                fileName = anyOrNull(),
+                appData = anyOrNull(),
+                startFirst = any(),
+                cancelToken = anyOrNull(),
+                collisionCheck = any(),
+                collisionResolution = any(),
+                listener = anyOrNull()
+            )
+        }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @DisplayName("Test start download with public links")
+    inner class StartDownloadWithPublicLinks {
+
+        @Test
+        fun `test that start download is started with the correct node from gateway when start download with PublicLinkFolder`() =
+            runTest {
+                val handle = 23L
+                val nodeId = NodeId(handle)
+                val publicLinkFolder = mock<PublicLinkFolder> {
+                    on { this.id }.thenReturn(nodeId)
+                }
+                val megaNode = mock<MegaNode>()
+                val authorizedNode = mock<MegaNode>()
+
+                whenever(megaApiFolderGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
+                whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(authorizedNode)
+                underTest.startDownload(publicLinkFolder, "path", null, false).test {
+                    cancelAndIgnoreRemainingEvents()
+                }
+                verify(megaApiGateway).startDownload(
+                    node = eq(authorizedNode),
+                    localPath = anyOrNull(),
+                    fileName = anyOrNull(),
+                    appData = anyOrNull(),
+                    startFirst = any(),
+                    cancelToken = anyOrNull(),
+                    collisionCheck = any(),
+                    collisionResolution = any(),
+                    listener = anyOrNull()
+                )
+            }
+    }
 
     @Test
     fun `test that cancelTransferByTag returns success when MegaApi returns API_OK`() =

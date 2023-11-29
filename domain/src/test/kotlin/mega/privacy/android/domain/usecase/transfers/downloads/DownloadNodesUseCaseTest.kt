@@ -12,9 +12,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -90,8 +92,8 @@ class DownloadNodesUseCaseTest {
     @ParameterizedTest(name = "priority: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that repository is called with the proper priority`(priority: Boolean) = runTest {
-        underTest(nodeIds, DESTINATION_PATH_FOLDER, null, priority).test {
-            nodeIds.forEach { nodeId ->
+        underTest(fileNodes, DESTINATION_PATH_FOLDER, null, priority).test {
+            fileNodes.forEach { nodeId ->
                 verify(transferRepository).startDownload(
                     nodeId,
                     DESTINATION_PATH_FOLDER,
@@ -108,9 +110,9 @@ class DownloadNodesUseCaseTest {
     fun `test that repository is called with the proper appData`(
         appData: TransferAppData?,
     ) = runTest {
-        underTest(listOf(nodeId), DESTINATION_PATH_FOLDER, appData, false).test {
+        underTest(listOf(node), DESTINATION_PATH_FOLDER, appData, false).test {
             verify(transferRepository).startDownload(
-                nodeId,
+                node,
                 DESTINATION_PATH_FOLDER,
                 appData,
                 false
@@ -133,8 +135,8 @@ class DownloadNodesUseCaseTest {
     @Test
     fun `test that repository start download is invoked for each nodeId when start download is invoked`() =
         runTest {
-            underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
-                nodeIds.forEach { nodeId ->
+            underTest(fileNodes, DESTINATION_PATH_FOLDER, null, false).test {
+                fileNodes.forEach { nodeId ->
                     verify(transferRepository).startDownload(
                         nodeId, DESTINATION_PATH_FOLDER, null, false,
                     )
@@ -146,7 +148,7 @@ class DownloadNodesUseCaseTest {
     @Test
     fun `test that cancel token is canceled when start download flow is canceled`() =
         runTest {
-            nodeIds.forEach {
+            fileNodes.forEach {
                 whenever(
                     transferRepository.startDownload(
                         it, DESTINATION_PATH_FOLDER, null, false,
@@ -155,7 +157,7 @@ class DownloadNodesUseCaseTest {
                     flow { delay(100) }
                 )
             }
-            underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
+            underTest(fileNodes, DESTINATION_PATH_FOLDER, null, false).test {
                 cancel()
                 verify(cancelCancelTokenUseCase).invoke()
                 cancelAndIgnoreRemainingEvents()
@@ -163,9 +165,9 @@ class DownloadNodesUseCaseTest {
         }
 
     @Test
-    fun `test that cancel token is not invalidated when start download flow is canceled before completation`() =
+    fun `test that cancel token is not invalidated when start download flow is canceled before completion`() =
         runTest {
-            nodeIds.forEach {
+            fileNodes.forEach {
                 whenever(
                     transferRepository.startDownload(
                         it, DESTINATION_PATH_FOLDER, null, false,
@@ -174,7 +176,7 @@ class DownloadNodesUseCaseTest {
                     flow { delay(100) }
                 )
             }
-            underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
+            underTest(fileNodes, DESTINATION_PATH_FOLDER, null, false).test {
                 cancel()
                 verify(invalidateCancelTokenUseCase, never()).invoke()
                 cancelAndIgnoreRemainingEvents()
@@ -184,7 +186,7 @@ class DownloadNodesUseCaseTest {
     @Test
     fun `test that cancel token is not canceled if start download flow is not completed`() =
         runTest {
-            nodeIds.forEach {
+            fileNodes.forEach {
                 whenever(
                     transferRepository.startDownload(
                         it, DESTINATION_PATH_FOLDER, null, false,
@@ -193,7 +195,7 @@ class DownloadNodesUseCaseTest {
                     flow { delay(100) }
                 )
             }
-            underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
+            underTest(fileNodes, DESTINATION_PATH_FOLDER, null, false).test {
                 verify(cancelCancelTokenUseCase, never()).invoke()
                 cancelAndIgnoreRemainingEvents()
             }
@@ -208,7 +210,7 @@ class DownloadNodesUseCaseTest {
                 mock<TransferEvent.TransferUpdateEvent> { on { it.transfer }.thenReturn(transfer) },
                 mock<TransferEvent.TransferFinishEvent> { on { it.transfer }.thenReturn(transfer) },
             )
-            nodeIds.forEach {
+            fileNodes.forEach {
                 whenever(
                     transferRepository.startDownload(
                         it, DESTINATION_PATH_FOLDER, null, false,
@@ -216,7 +218,7 @@ class DownloadNodesUseCaseTest {
                 ).thenReturn(flow)
             }
             underTest(
-                nodeIds,
+                fileNodes,
                 DESTINATION_PATH_FOLDER,
                 null,
                 false
@@ -242,7 +244,7 @@ class DownloadNodesUseCaseTest {
                 mock<TransferEvent.TransferUpdateEvent> { on { it.transfer }.thenReturn(transfer) },
                 mock<TransferEvent.TransferFinishEvent> { on { it.transfer }.thenReturn(transfer) },
             )
-            nodeIds.forEach {
+            fileNodes.forEach {
                 whenever(
                     transferRepository.startDownload(
                         it, DESTINATION_PATH_FOLDER, null, false,
@@ -250,7 +252,7 @@ class DownloadNodesUseCaseTest {
                 ).thenReturn(flow)
             }
             underTest(
-                nodeIds,
+                fileNodes,
                 DESTINATION_PATH_FOLDER,
                 null,
                 false
@@ -266,20 +268,21 @@ class DownloadNodesUseCaseTest {
     @Test
     fun `test that finished processing event is emitted when each node finishes its processing`() =
         runTest {
-            val transfers = nodeIds.associateWith { nodeId ->
+            val transfers = folderNodes.associateWith { node ->
+                val handle = node.id.longValue
                 mock<Transfer> {
                     on { isFolderTransfer }.thenReturn(true)
-                    on { nodeHandle }.thenReturn(nodeId.longValue)
+                    on { nodeHandle }.thenReturn(handle)
                 }
             }
-            val flows = nodeIds.associateWith { nodeId ->
+            val flows = folderNodes.associateWith { nodeId ->
                 flowOf(
                     mock<TransferEvent.TransferFinishEvent> {
                         on { it.transfer }.thenReturn(transfers[nodeId])
                     }
                 )
             }
-            nodeIds.forEach {
+            transfers.keys.forEach {
                 whenever(
                     transferRepository.startDownload(
                         it, DESTINATION_PATH_FOLDER, null, false,
@@ -287,7 +290,7 @@ class DownloadNodesUseCaseTest {
                 ).thenReturn(flows[it])
             }
             underTest(
-                nodeIds,
+                folderNodes,
                 DESTINATION_PATH_FOLDER,
                 null,
                 false
@@ -304,11 +307,11 @@ class DownloadNodesUseCaseTest {
     @Test
     fun `test that finish processing is emitted when all transfers are processed`() = runTest {
 
-        nodeIds.forEachIndexed { index, nodeId ->
-            stubFinishProcessingEvent(index.mod(2) == 0, nodeId)
+        fileAndFolderNodes.forEach { node ->
+            stubFinishProcessingEvent(node)
         }
 
-        underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
+        underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
             Truth.assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
                 (event as? Event.Item)?.value?.takeIf { it is DownloadNodesEvent.FinishProcessingTransfers }
             }).hasSize(1)
@@ -318,21 +321,21 @@ class DownloadNodesUseCaseTest {
     @Test
     fun `test that finish processing is emitted when all transfers are processed including not found nodes`() =
         runTest {
-            nodeIds.forEachIndexed { index, nodeId ->
+            fileAndFolderNodes.forEachIndexed { index, node ->
                 if (index == 5) {
                     whenever(
                         transferRepository.startDownload(
-                            nodeId, DESTINATION_PATH_FOLDER, null, false,
+                            node, DESTINATION_PATH_FOLDER, null, false,
                         )
                     ).thenAnswer {
                         throw NodeDoesNotExistsException()
                     }
                 } else {
-                    stubFinishProcessingEvent(index.mod(2) == 0, nodeId)
+                    stubFinishProcessingEvent(node)
                 }
             }
 
-            underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
+            underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
                 Truth.assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
                     (event as? Event.Item)?.value?.takeIf { it is DownloadNodesEvent.FinishProcessingTransfers }
                 }).hasSize(1)
@@ -341,7 +344,7 @@ class DownloadNodesUseCaseTest {
 
     @Test
     fun `test that destination folder is created`() = runTest {
-        underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
+        underTest(fileNodes, DESTINATION_PATH_FOLDER, null, false).test {
             cancelAndIgnoreRemainingEvents()
         }
         verify(fileSystemRepository).createDirectory(DESTINATION_PATH_FOLDER)
@@ -350,11 +353,11 @@ class DownloadNodesUseCaseTest {
     @Test
     fun `test that cancel token is invalidated when all transfers are processed`() = runTest {
 
-        nodeIds.forEachIndexed { index, nodeId ->
-            stubFinishProcessingEvent(index.mod(2) == 0, nodeId)
+        fileAndFolderNodes.forEach { node ->
+            stubFinishProcessingEvent(node)
         }
 
-        underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
+        underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
             cancelAndIgnoreRemainingEvents()
         }
         verify(invalidateCancelTokenUseCase).invoke()
@@ -364,35 +367,35 @@ class DownloadNodesUseCaseTest {
     fun `test that finish processing is not emitted if not all transfers are processed`() =
         runTest {
 
-            nodeIds.dropLast(1).forEachIndexed { index, nodeId ->
-                stubFinishProcessingEvent(index.mod(2) == 0, nodeId)
+            fileAndFolderNodes.dropLast(1).forEachIndexed { index, node ->
+                stubFinishProcessingEvent(node)
             }
 
-            underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
+            underTest(fileNodes, DESTINATION_PATH_FOLDER, null, false).test {
                 Truth.assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
                     (event as? Event.Item)?.value?.takeIf { it is DownloadNodesEvent.FinishProcessingTransfers }
                 }).isEmpty()
             }
         }
 
-    private fun stubFinishProcessingEvent(folder: Boolean, nodeId: NodeId) {
+    private fun stubFinishProcessingEvent(node: TypedNode) {
+        val handle = node.id.longValue
         whenever(
             transferRepository.startDownload(
-                nodeId, DESTINATION_PATH_FOLDER, null, false,
+                node, DESTINATION_PATH_FOLDER, null, false,
             )
         ).thenAnswer {
             flowOf(
-                //even -> files, odd -> folders
-                if (folder) {
+                if (node is FolderNode) {
                     TransferEvent.TransferUpdateEvent(mock {
                         on { isFolderTransfer }.thenReturn(true)
                         on { stage }.thenReturn(TransferStage.STAGE_TRANSFERRING_FILES)
-                        on { nodeHandle }.thenReturn(nodeId.longValue)
+                        on { nodeHandle }.thenReturn(handle)
                     })
                 } else {
                     TransferEvent.TransferStartEvent(mock {
                         on { isFolderTransfer }.thenReturn(false)
-                        on { nodeHandle }.thenReturn(nodeId.longValue)
+                        on { nodeHandle }.thenReturn(handle)
                     })
                 }
             )
@@ -401,8 +404,25 @@ class DownloadNodesUseCaseTest {
 
 
     companion object {
-        private val nodeId = NodeId(1L)
         private val nodeIds = (0L..10L).map { NodeId(it) }
+        private val fileNodes = nodeIds.map { nodeId ->
+            mock<TypedFileNode> {
+                on { id }.thenReturn(nodeId)
+            }
+        }
+        private val folderNodes = nodeIds.map { nodeId ->
+            mock<TypedFolderNode> {
+                on { id }.thenReturn(nodeId)
+            }
+        }
+        private val fileAndFolderNodes: List<TypedNode> = nodeIds.mapIndexed { index, nodeId ->
+            //even -> files, odd -> folders
+            (if (index.mod(2) == 0) mock<TypedFolderNode>() else mock<TypedFileNode>())
+                .also {
+                    whenever(it.id).thenReturn(nodeId)
+                }
+        }
+        private val node = fileNodes.first()
         private const val DESTINATION_PATH_FOLDER = "root/parent/destination"
     }
 }

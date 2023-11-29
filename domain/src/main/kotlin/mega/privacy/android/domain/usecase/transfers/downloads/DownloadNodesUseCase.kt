@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transform
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
@@ -31,7 +32,7 @@ class DownloadNodesUseCase @Inject constructor(
 ) {
     /**
      * Invoke
-     * @param nodeIds The desired nodes to download
+     * @param nodes The desired nodes to download
      * @param destinationPath Full destination path of the node, including file name if it's a file node. If this path does not exist it will try to create it
      * @param appData Custom app data to save in the MegaTransfer object.
      * @param isHighPriority Puts the transfer on top of the download queue.
@@ -39,23 +40,24 @@ class DownloadNodesUseCase @Inject constructor(
      * @return a flow of [DownloadNodesEvent]s to monitor the download state and progress
      */
     operator fun invoke(
-        nodeIds: List<NodeId>,
+        nodes: List<TypedNode>,
         destinationPath: String,
         appData: TransferAppData?,
         isHighPriority: Boolean,
     ): Flow<DownloadNodesEvent> {
         if (destinationPath.isEmpty()) {
-            return nodeIds.asFlow().map { DownloadNodesEvent.TransferNotStarted(it, null) }
+            return nodes.asFlow().map { DownloadNodesEvent.TransferNotStarted(it.id, null) }
         }
-        val alreadyProcessed = mutableSetOf<NodeId>()
+        val alreadyProcessed = mutableSetOf<Long>()
+        val allIds = nodes.map { it.id.longValue }
         var finishProcessingSend = false
         return flow {
             fileSystemRepository.createDirectory(destinationPath)
-            nodeIds.forEach { nodeId ->
+            nodes.forEach { node ->
                 runCatching {
                     emitAll(
                         transferRepository.startDownload(
-                            nodeId = nodeId,
+                            node = node,
                             localPath = destinationPath,
                             appData = appData,
                             shouldStartFirst = isHighPriority,
@@ -63,8 +65,8 @@ class DownloadNodesUseCase @Inject constructor(
                     )
                 }.onFailure { cause ->
                     if (cause is NodeDoesNotExistsException) {
-                        alreadyProcessed.add(nodeId)
-                        emit(DownloadNodesEvent.TransferNotStarted(nodeId, cause))
+                        alreadyProcessed.add(node.id.longValue)
+                        emit(DownloadNodesEvent.TransferNotStarted(node.id, cause))
                     }
                 }
             }
@@ -78,13 +80,13 @@ class DownloadNodesUseCase @Inject constructor(
                 //check if single node processing is finished
                 if (event.isFinishProcessingEvent()) {
                     val nodeId = NodeId(event.transferEvent.transfer.nodeHandle)
-                    if (!alreadyProcessed.contains(nodeId)) {
+                    if (!alreadyProcessed.contains(nodeId.longValue)) {
                         //this node is already processed: save it and emit the event
-                        alreadyProcessed.add(nodeId)
+                        alreadyProcessed.add(nodeId.longValue)
                         emit(DownloadNodesEvent.TransferFinishedProcessing(nodeId))
 
                         //check if all nodes have finished processing
-                        if (!finishProcessingSend && alreadyProcessed.containsAll(nodeIds)) {
+                        if (!finishProcessingSend && alreadyProcessed.containsAll(allIds)) {
                             finishProcessingSend = true
                             invalidateCancelTokenUseCase() //we need to avoid a future cancellation from now on
                             emit(DownloadNodesEvent.FinishProcessingTransfers)

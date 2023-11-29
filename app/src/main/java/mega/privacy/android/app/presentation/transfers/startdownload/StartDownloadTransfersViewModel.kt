@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.transfers.startdownload.model.Start
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
@@ -118,7 +119,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
      * It starts downloading the nodes with the appropriate use case
      * @param siblingNodes the [Node]s to be download, they must belong to same parent folder
      */
-    private fun startDownloadNodes(siblingNodes: List<Node>) {
+    private fun startDownloadNodes(siblingNodes: List<TypedNode>) {
         if (siblingNodes.isEmpty()) return
         val firstSibling = siblingNodes.first()
         val parentId = firstSibling.parentId
@@ -141,7 +142,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
      * It starts downloading the node for offline with the appropriate use case
      * @param node the [Node] to be saved offline
      */
-    private fun startDownloadForOffline(node: Node) {
+    private fun startDownloadForOffline(node: TypedNode) {
         currentInProgressJob = viewModelScope.launch {
             startDownloadNodes(
                 nodes = listOf(node),
@@ -160,7 +161,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
      * common logic to start downloading nodes, either for offline or ordinary download
      */
     private suspend fun startDownloadNodes(
-        nodes: List<Node>,
+        nodes: List<TypedNode>,
         toDoAfterProcessing: (suspend () -> Unit)? = null,
         getPath: suspend () -> String?,
     ) {

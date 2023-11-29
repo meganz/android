@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
@@ -59,7 +59,7 @@ class NodeOptionsDownloadViewModel @Inject constructor(
      * Triggers the event related to download a node
      * @param node
      */
-    fun onDownloadClicked(node: Node) {
+    fun onDownloadClicked(node: TypedNode) {
         _state.update {
             triggered(TransferTriggerEvent.StartDownloadNode(listOf(node)))
         }
@@ -82,7 +82,7 @@ class NodeOptionsDownloadViewModel @Inject constructor(
      * Triggers the event related to save offline a node
      * @param node
      */
-    fun onSaveOfflineClicked(node: Node) {
+    fun onSaveOfflineClicked(node: TypedNode) {
         _state.update {
             triggered(TransferTriggerEvent.StartDownloadForOffline(node))
         }
