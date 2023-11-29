@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.chat
+package mega.privacy.android.core.ui.controls.chat.messages
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.isSystemInDarkTheme

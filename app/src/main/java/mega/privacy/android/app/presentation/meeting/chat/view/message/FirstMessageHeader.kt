@@ -13,9 +13,9 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.view.getRecurringMeetingDateTime
-import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderParagraph
-import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderSubtitleWithIcon
-import mega.privacy.android.core.ui.controls.chat.FirstMessageHeaderTitle
+import mega.privacy.android.core.ui.controls.chat.messages.FirstMessageHeaderParagraph
+import mega.privacy.android.core.ui.controls.chat.messages.FirstMessageHeaderSubtitleWithIcon
+import mega.privacy.android.core.ui.controls.chat.messages.FirstMessageHeaderTitle
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission

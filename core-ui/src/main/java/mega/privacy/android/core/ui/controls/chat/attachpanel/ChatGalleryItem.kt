@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls.chat
+package mega.privacy.android.core.ui.controls.chat.attachpanel
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
