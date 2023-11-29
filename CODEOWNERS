@@ -2,7 +2,7 @@
 [Photos Owners]
 /app/src/main/java/mega/privacy/android/app/presentation/photos/ @es @jj @jta @ks @lh @kh @do @yenel @rsh
 
-[Chat Owners] @jg @raquelgc @yenel @rsh @kh @do @lh
+[Chat Owners] @jg @raquelgc @yenel @rsh @kh @do @lh @pau
 app/src/main/java/mega/privacy/android/app/di/chat/
 app/src/main/java/mega/privacy/android/app/main/megachat/
 app/src/main/java/mega/privacy/android/app/modalbottomsheet/chatmodalbottomsheet/
@@ -14,7 +14,7 @@ domain/src/main/kotlin/mega/privacy/android/data/mapper/chat/
 domain/src/main/kotlin/mega/privacy/android/domain/entity/chat/
 domain/src/main/kotlin/mega/privacy/android/domain/usecase/chat/
 
-[Meetings Owners] @jg @raquelgc @yenel @rsh @kh @do @lh
+[Meetings Owners] @jg @raquelgc @yenel @rsh @kh @do @lh @pau
 app/src/main/java/mega/privacy/android/app/meeting/
 app/src/main/java/mega/privacy/android/app/presentation/meeting/
 app/src/main/java/mega/privacy/android/app/usecase/call/
