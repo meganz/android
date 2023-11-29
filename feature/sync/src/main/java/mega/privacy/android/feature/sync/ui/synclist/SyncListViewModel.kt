@@ -79,6 +79,14 @@ internal class SyncListViewModel @Inject constructor(
             SyncListAction.SnackBarShown -> {
                 _state.update { SyncListState(snackbarMessage = null) }
             }
+
+            is SyncListAction.SyncOptionsSelected -> {
+                _state.update { state ->
+                    state.copy(
+                        selectedSyncOption = action.selectedOption
+                    )
+                }
+            }
         }
     }
 

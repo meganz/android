@@ -14,7 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.theme.tokens.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.navigation.syncNavGraph
@@ -67,7 +67,7 @@ class SyncFragment : Fragment() {
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
                 state.showOnboarding?.let { showOnboarding ->
-                    AndroidTheme(isDark = themeMode.isDarkMode()) {
+                    MegaAppTheme(isDark = themeMode.isDarkMode()) {
                         NavHost(
                             navController = animatedNavController,
                             startDestination = syncRoute,

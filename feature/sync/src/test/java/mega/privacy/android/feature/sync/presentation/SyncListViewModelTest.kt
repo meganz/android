@@ -23,6 +23,7 @@ import mega.privacy.android.feature.sync.domain.usecase.solvedissues.ClearSyncSo
 import mega.privacy.android.feature.sync.domain.usecase.solvedissues.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.ui.mapper.StalledIssueItemMapper
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
+import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
 import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
 import org.junit.jupiter.api.AfterEach
@@ -59,9 +60,7 @@ class SyncListViewModelTest {
 
     private val solvedIssues = listOf(
         SolvedIssue(
-            nodeIds = listOf(),
-            localPaths = listOf(),
-            resolutionExplanation = ""
+            nodeIds = listOf(), localPaths = listOf(), resolutionExplanation = ""
         )
     )
 
@@ -90,81 +89,78 @@ class SyncListViewModelTest {
     }
 
     @Test
-    fun `test that stalled issues count is updated when stalled issues are fetched`() =
-        runTest {
-            whenever(monitorSyncStalledIssuesUseCase()).thenReturn(
-                flow {
-                    emit(stalledIssues)
-                    awaitCancellation()
-                }
-            )
-            whenever(monitorSyncSolvedIssuesUseCase()).thenReturn(
-                flow {
-                    emit(solvedIssues)
-                    awaitCancellation()
-                }
-            )
-            initViewModel()
+    fun `test that stalled issues count is updated when stalled issues are fetched`() = runTest {
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flow {
+            emit(stalledIssues)
+            awaitCancellation()
+        })
+        whenever(monitorSyncSolvedIssuesUseCase()).thenReturn(flow {
+            emit(solvedIssues)
+            awaitCancellation()
+        })
+        initViewModel()
 
-            underTest
-                .state
-                .test {
-                    assertThat(awaitItem().stalledIssuesCount).isEqualTo(1)
-                    cancelAndIgnoreRemainingEvents()
-                }
+        underTest.state.test {
+            assertThat(awaitItem().stalledIssuesCount).isEqualTo(1)
+            cancelAndIgnoreRemainingEvents()
         }
+    }
 
     @Test
-    fun `test that snackbar is shown when issues are resolved`() =
-        runTest {
-            whenever(monitorSyncStalledIssuesUseCase()).thenReturn(
-                flow {
-                    emit(stalledIssues)
-                    awaitCancellation()
-                }
-            )
-            val selectedResolution = StalledIssueResolutionAction(
-                resolutionActionType = StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE,
-                actionName = "Choose remote file",
-            )
-            val stalledIssueUiItem: StalledIssueUiItem = mock()
-            val stalledIssue: StalledIssue = mock()
-            whenever(stalledIssueItemMapper(stalledIssueUiItem)).thenReturn(stalledIssue)
-            initViewModel()
+    fun `test that snackbar is shown when issues are resolved`() = runTest {
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flow {
+            emit(stalledIssues)
+            awaitCancellation()
+        })
+        val selectedResolution = StalledIssueResolutionAction(
+            resolutionActionType = StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE,
+            actionName = "Choose remote file",
+        )
+        val stalledIssueUiItem: StalledIssueUiItem = mock()
+        val stalledIssue: StalledIssue = mock()
+        whenever(stalledIssueItemMapper(stalledIssueUiItem)).thenReturn(stalledIssue)
+        initViewModel()
 
-            underTest.handleAction(
-                SyncListAction.ResolveStalledIssue(
-                    stalledIssueUiItem,
-                    selectedResolution
-                )
+        underTest.handleAction(
+            SyncListAction.ResolveStalledIssue(
+                stalledIssueUiItem, selectedResolution
             )
+        )
 
-            verify(resolveStalledIssueUseCase).invoke(
-                selectedResolution,
-                stalledIssue
-            )
-            underTest
-                .state
-                .test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo("Conflict resolved")
-                    cancelAndIgnoreRemainingEvents()
-                }
+        verify(resolveStalledIssueUseCase).invoke(
+            selectedResolution, stalledIssue
+        )
+        underTest.state.test {
+            assertThat(awaitItem().snackbarMessage).isEqualTo("Conflict resolved")
+            cancelAndIgnoreRemainingEvents()
         }
+    }
 
     @Test
     fun `test that when monitorSyncSolvedIssuesUseCase emit list then it updates shouldShowCleanSolvedIssueMenuItem to true`() =
         runTest {
-            whenever(monitorSyncSolvedIssuesUseCase()).thenReturn(
-                flow {
-                    emit(solvedIssues)
-                    awaitCancellation()
-                }
-            )
+            whenever(monitorSyncSolvedIssuesUseCase()).thenReturn(flow {
+                emit(solvedIssues)
+                awaitCancellation()
+            })
             initViewModel()
             underTest.state.test {
                 assertThat(awaitItem().shouldShowCleanSolvedIssueMenuItem).isTrue()
+                cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that state changes when sync option is selected`() = runTest {
+        initViewModel()
+
+        underTest.handleAction(SyncListAction.SyncOptionsSelected(SyncOption.WI_FI_ONLY))
+
+        underTest.state.test {
+            assertThat(awaitItem().selectedSyncOption).isEqualTo(SyncOption.WI_FI_ONLY)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     private fun initViewModel() {
         underTest = SyncListViewModel(

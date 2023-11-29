@@ -4,12 +4,13 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.core.ui.model.MenuAction
-import mega.privacy.android.core.ui.model.MenuActionWithoutIcon
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.feature.sync.ui.views.SyncOptionsDialog
 
 @Composable
 internal fun SyncListRoute(
@@ -20,6 +21,8 @@ internal fun SyncListRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
+
+    var showSyncOptionsDialog by remember { mutableStateOf(false) }
 
     SyncListScreen(
         stalledIssuesCount = state.stalledIssuesCount,
@@ -39,11 +42,24 @@ internal fun SyncListRoute(
                 }
 
                 is SyncListMenuAction.SyncOptions -> {
-
+                    showSyncOptionsDialog = true
                 }
             }
         }
     )
+
+    if (showSyncOptionsDialog) {
+        SyncOptionsDialog(
+            onDismiss = {
+                showSyncOptionsDialog = false
+            },
+            selectedOption = state.selectedSyncOption,
+            onSyncOptionsClicked = {
+                viewModel.handleAction(SyncListAction.SyncOptionsSelected(it))
+                showSyncOptionsDialog = false
+            },
+        )
+    }
 
     LaunchedEffect(key1 = state.snackbarMessage) {
         state.snackbarMessage?.let {

@@ -82,6 +82,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":core:formatter"))
     implementation(project(":core-ui"))
+    implementation(project(":core:theme"))
     implementation(project(":legacy-core-ui"))
     implementation(project(":icon-pack"))
 
