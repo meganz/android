@@ -9,7 +9,6 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 
@@ -421,4 +420,16 @@ interface CallRepository {
         chatId: Long,
         clientIds: List<Long>,
     ): ChatRequest
+
+    /**
+     * Monitor call recording consent accepted.
+     *
+     * @return Flow of Boolean.
+     */
+    fun monitorCallRecordingConsentAccepted(): Flow<Boolean>
+
+    /**
+     * Broadcast call recording consent accepted.
+     */
+    suspend fun broadcastCallRecordingConsentAccepted()
 }

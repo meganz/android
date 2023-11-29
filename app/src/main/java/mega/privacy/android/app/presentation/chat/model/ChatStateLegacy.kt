@@ -30,6 +30,7 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
  * @property openWaitingRoomScreen                      Should open waiting Room screen.
  * @property isSessionOnRecording                       True if a host is recording or False otherwise.
  * @property showRecordingConsentDialog                 True if should show the recording consent dialog or False otherwise.
+ * @property isRecordingConsentAccepted                 True if recording consent dialog has been already accepted or False otherwise.
  * @property enabledFeatureFlags                        Set of enabled feature flags
  */
 data class ChatStateLegacy(
@@ -54,5 +55,6 @@ data class ChatStateLegacy(
     val openWaitingRoomScreen: Boolean = false,
     val isSessionOnRecording: Boolean = false,
     val showRecordingConsentDialog: Boolean = false,
+    val isRecordingConsentAccepted: Boolean = false,
     val enabledFeatureFlags: Set<Feature> = emptySet(),
 )

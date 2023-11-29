@@ -2036,6 +2036,7 @@ public class ChatActivity extends PasscodeActivity
     private void showCallRecordingConsentDialog() {
         if (callRecordingConsentDialogFragment == null) {
             callRecordingConsentDialogFragment = CallRecordingConsentDialogFragment.Companion.newInstance(() -> {
+                viewModel.setIsRecordingConsentAccepted();
                 viewModel.setShowRecordingConsentDialogConsumed();
                 callRecordingConsentDialogFragment.dismissAllowingStateLoss();
                 return null;
@@ -2161,7 +2162,7 @@ public class ChatActivity extends PasscodeActivity
                 viewModel.onContactInvitationConsumed();
             }
 
-            if (chatState.getShowRecordingConsentDialog()) {
+            if (chatState.getShowRecordingConsentDialog() && !chatState.isRecordingConsentAccepted()) {
                 showCallRecordingConsentDialog();
             } else if (callRecordingConsentDialogFragment != null) {
                 callRecordingConsentDialogFragment.dismissAllowingStateLoss();
@@ -9175,6 +9176,7 @@ public class ChatActivity extends PasscodeActivity
     private void hideCallBar(MegaChatCall call) {
         invalidateOptionsMenu();
         stopChronometers(call);
+        viewModel.resetCallRecordingState();
 
         if (callInProgressLayout != null) {
             callInProgressLayout.setVisibility(View.GONE);

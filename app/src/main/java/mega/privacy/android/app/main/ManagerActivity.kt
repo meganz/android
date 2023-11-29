@@ -1143,10 +1143,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
                 val state by viewModel.state.collectAsStateWithLifecycle()
-                if (state.callInProgressChatId != -1L && state.isSessionOnRecording && state.showRecordingConsentDialog) {
+                if (state.callInProgressChatId != -1L && state.isSessionOnRecording && state.showRecordingConsentDialog && !state.isRecordingConsentAccepted) {
                     AndroidTheme(isDark = isDark) {
                         CallRecordingConsentDialog(
-                            onConfirm = { viewModel.setShowRecordingConsentDialogConsumed() },
+                            onConfirm = {
+                                viewModel.setIsRecordingConsentAccepted()
+                                viewModel.setShowRecordingConsentDialogConsumed()
+                            },
                             onDismiss = {
                                 viewModel.setShowRecordingConsentDialogConsumed()
                                 viewModel.endChatCall(state.callInProgressChatId)
@@ -7771,6 +7774,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         } else {
             viewModel.stopMonitorChatSessionUpdates()
+            viewModel.resetCallRecordingState()
         }
         setCallBadge()
         if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.TRANSFERS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.HOMEPAGE || !Util.isScreenInPortrait(

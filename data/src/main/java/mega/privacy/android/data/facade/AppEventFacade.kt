@@ -65,6 +65,8 @@ internal class AppEventFacade @Inject constructor(
     override val monitorCompletedTransfer =
         _monitorCompletedTransfer.toSharedFlow(appScope)
 
+    private val callRecordingConsentAccepted = MutableSharedFlow<Boolean>()
+
     override suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int) {
         _monitorCameraUploadProgress.emit(Pair(progress, pending))
     }
@@ -206,6 +208,12 @@ internal class AppEventFacade @Inject constructor(
     }
 
     override fun monitorBusinessAccountExpired() = _businessAccountExpired.asSharedFlow()
+
+    override fun monitorCallRecordingConsentAccepted() =
+        callRecordingConsentAccepted.asSharedFlow()
+
+    override suspend fun broadcastCallRecordingConsentAccepted() =
+        callRecordingConsentAccepted.emit(true)
 }
 
 private fun <T> Flow<T>.toSharedFlow(

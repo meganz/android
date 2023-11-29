@@ -77,6 +77,7 @@ import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentAcceptedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -148,6 +149,7 @@ import javax.inject.Inject
  * @property passcodeManagement [PasscodeManagement]
  * @property monitorChatSessionUpdatesUseCase [MonitorChatSessionUpdatesUseCase]
  * @property hangChatCallUseCase [HangChatCallUseCase]
+ * @property monitorCallRecordingConsentAcceptedUseCase [MonitorCallRecordingConsentAcceptedUseCase]
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -220,6 +222,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
+    private val monitorCallRecordingConsentAcceptedUseCase: MonitorCallRecordingConsentAcceptedUseCase,
 ) : ViewModel() {
 
     /**
@@ -409,6 +412,12 @@ class ManagerViewModel @Inject constructor(
                     val isServiceEnabled = syncFolders.isNotEmpty()
                     _state.update { it.copy(androidSyncServiceEnabled = isServiceEnabled) }
                 }
+            }
+        }
+
+        viewModelScope.launch {
+            monitorCallRecordingConsentAcceptedUseCase().conflate().collect {
+                _state.update { it.copy(showRecordingConsentDialog = false) }
             }
         }
     }
@@ -1119,6 +1128,12 @@ class ManagerViewModel @Inject constructor(
         _state.update { state -> state.copy(showRecordingConsentDialog = false) }
 
     /**
+     * Sets isRecordingConsentAccepted.
+     */
+    fun setIsRecordingConsentAccepted() =
+        _state.update { state -> state.copy(isRecordingConsentAccepted = true) }
+
+    /**
      * End chat call
      */
     fun endChatCall(chatId: Long) = viewModelScope.launch {
@@ -1130,7 +1145,8 @@ class ManagerViewModel @Inject constructor(
             _state.update { state ->
                 state.copy(
                     isSessionOnRecording = false,
-                    showRecordingConsentDialog = false
+                    showRecordingConsentDialog = false,
+                    isRecordingConsentAccepted = false
                 )
             }
         }.onFailure { exception ->
@@ -1152,10 +1168,10 @@ class ManagerViewModel @Inject constructor(
                     result.session?.let { session ->
                         session.changes?.apply {
                             if (contains(ChatSessionChanges.SessionOnRecording)) {
-                                _state.update {
-                                    it.copy(
+                                _state.update { state ->
+                                    state.copy(
                                         isSessionOnRecording = session.isRecording,
-                                        showRecordingConsentDialog = session.isRecording
+                                        showRecordingConsentDialog = if (!state.isRecordingConsentAccepted) session.isRecording else false
                                     )
                                 }
                             }
@@ -1170,11 +1186,18 @@ class ManagerViewModel @Inject constructor(
      */
     fun stopMonitorChatSessionUpdates() {
         monitorChatSessionUpdatesJob?.cancel()
+    }
+
+    /**
+     * Reset call recording status properties
+     */
+    fun resetCallRecordingState() {
         _state.update {
             it.copy(
                 callInProgressChatId = -1L,
                 isSessionOnRecording = false,
-                showRecordingConsentDialog = false
+                showRecordingConsentDialog = false,
+                isRecordingConsentAccepted = false
             )
         }
     }

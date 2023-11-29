@@ -346,4 +346,14 @@ internal interface AppEventGateway {
      * @return a flow that emits each time a new business account expired error is received
      */
     fun monitorBusinessAccountExpired(): Flow<Unit>
+
+    /**
+     * Broadcast call recording consent accepted
+     */
+    suspend fun broadcastCallRecordingConsentAccepted()
+
+    /**
+     * Monitor call recording consent accepted
+     */
+    fun monitorCallRecordingConsentAccepted(): Flow<Boolean>
 }

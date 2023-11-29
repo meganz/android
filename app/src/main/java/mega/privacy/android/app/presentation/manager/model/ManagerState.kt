@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property userRootBackupsFolderHandle            The User's Root Backups Folder Handle
  * @property isSessionOnRecording                   True if a host is recording or False otherwise.
  * @property showRecordingConsentDialog             True if should show the recording consent dialog or False otherwise.
+ * @property isRecordingConsentAccepted             True if recording consent dialog has been already accepted or False otherwise.
  * @property callInProgressChatId                   Chat ID of the current call in progress.
  */
 data class ManagerState(
@@ -54,5 +55,6 @@ data class ManagerState(
     val userRootBackupsFolderHandle: NodeId = NodeId(-1L),
     val isSessionOnRecording: Boolean = false,
     val showRecordingConsentDialog: Boolean = false,
+    val isRecordingConsentAccepted: Boolean = false,
     val callInProgressChatId: Long = -1L,
 )

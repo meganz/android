@@ -86,6 +86,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentAcceptedUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -107,34 +108,35 @@ import javax.inject.Inject
  * These fragments can share a ViewModel using their activity scope to handle this communication.
  * MeetingActivityViewModel shares state of Mic, Camera and Speaker for all Fragments
  *
- * @property meetingActivityRepository          [MeetingActivityRepository]
- * @property answerChatCallUseCase              [AnswerChatCallUseCase]
- * @property getCallUseCase                     [GetCallUseCase]
- * @property rtcAudioManagerGateway             [RTCAudioManagerGateway]
- * @property getChatParticipants                [GetChatParticipants]
- * @property chatManagement                     [ChatManagement]
- * @property setChatVideoInDeviceUseCase        [SetChatVideoInDeviceUseCase]
- * @property checkChatLink                      [CheckChatLinkUseCase]
- * @property logoutUseCase                      [LogoutUseCase]
- * @property monitorFinishActivityUseCase       [MonitorFinishActivityUseCase]
- * @property monitorChatCallUpdatesUseCase      [MonitorChatCallUpdatesUseCase]
- * @property getChatRoomByChatIdUseCase         [GetChatRoom]
- * @property getChatCallUseCase                 [GetChatCallUseCase]
- * @property getFeatureFlagValue                [GetFeatureFlagValueUseCase]
- * @property setOpenInvite                      [SetOpenInvite]
- * @property chatParticipantMapper              [ChatParticipantMapper]
- * @property monitorChatRoomUpdates             [MonitorChatRoomUpdates]
- * @property queryChatLink                      [QueryChatLink]
- * @property isEphemeralPlusPlusUseCase         [IsEphemeralPlusPlusUseCase]
- * @property createChatLink                     [CreateChatLink]
- * @property inviteContactUseCase               [InviteContactUseCase]
- * @property updateChatPermissionsUseCase       [UpdateChatPermissions]
- * @property removeFromChaUseCase               [RemoveFromChat]
- * @property startConversationUseCase           [StartConversationUseCase]
- * @property isConnectedToInternetUseCase       [IsConnectedToInternetUseCase]
- * @property monitorStorageStateEventUseCase    [MonitorStorageStateEventUseCase]
- * @property hangChatCallUseCase                [HangChatCallUseCase]
- * @property state                              Current view state as [MeetingState]
+ * @property meetingActivityRepository                      [MeetingActivityRepository]
+ * @property answerChatCallUseCase                          [AnswerChatCallUseCase]
+ * @property getCallUseCase                                 [GetCallUseCase]
+ * @property rtcAudioManagerGateway                         [RTCAudioManagerGateway]
+ * @property getChatParticipants                            [GetChatParticipants]
+ * @property chatManagement                                 [ChatManagement]
+ * @property setChatVideoInDeviceUseCase                    [SetChatVideoInDeviceUseCase]
+ * @property checkChatLink                                  [CheckChatLinkUseCase]
+ * @property logoutUseCase                                  [LogoutUseCase]
+ * @property monitorFinishActivityUseCase                   [MonitorFinishActivityUseCase]
+ * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
+ * @property getChatRoomByChatIdUseCase                     [GetChatRoom]
+ * @property getChatCallUseCase                             [GetChatCallUseCase]
+ * @property getFeatureFlagValue                            [GetFeatureFlagValueUseCase]
+ * @property setOpenInvite                                  [SetOpenInvite]
+ * @property chatParticipantMapper                          [ChatParticipantMapper]
+ * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
+ * @property queryChatLink                                  [QueryChatLink]
+ * @property isEphemeralPlusPlusUseCase                     [IsEphemeralPlusPlusUseCase]
+ * @property createChatLink                                 [CreateChatLink]
+ * @property inviteContactUseCase                           [InviteContactUseCase]
+ * @property updateChatPermissionsUseCase                   [UpdateChatPermissions]
+ * @property removeFromChaUseCase                           [RemoveFromChat]
+ * @property startConversationUseCase                       [StartConversationUseCase]
+ * @property isConnectedToInternetUseCase                   [IsConnectedToInternetUseCase]
+ * @property monitorStorageStateEventUseCase                [MonitorStorageStateEventUseCase]
+ * @property hangChatCallUseCase                            [HangChatCallUseCase]
+ * @property broadcastCallRecordingConsentAcceptedUseCase   [BroadcastCallRecordingConsentAcceptedUseCase]
+ * @property state                                          Current view state as [MeetingState]
  */
 @HiltViewModel
 class MeetingActivityViewModel @Inject constructor(
@@ -167,6 +169,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
+    private val broadcastCallRecordingConsentAcceptedUseCase: BroadcastCallRecordingConsentAcceptedUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -505,7 +508,7 @@ class MeetingActivityViewModel @Inject constructor(
                                 _state.update { state ->
                                     state.copy(
                                         isSessionOnRecording = session.isRecording,
-                                        showRecordingConsentDialog = session.isRecording,
+                                        showRecordingConsentDialog = if (!state.isRecordingConsentAccepted) session.isRecording else false,
                                         startOrStopRecordingParticipantName = state.usersInCall.find { participant -> participant.peerId == session.peerId }?.name.orEmpty()
                                     )
                                 }
@@ -1286,8 +1289,8 @@ class MeetingActivityViewModel @Inject constructor(
                                     if (session.isRecording) {
                                         _state.update { state ->
                                             state.copy(
-                                                isSessionOnRecording = true,
-                                                showRecordingConsentDialog = true,
+                                                isSessionOnRecording = session.isRecording,
+                                                showRecordingConsentDialog = if (!state.isRecordingConsentAccepted) session.isRecording else false,
                                                 startOrStopRecordingParticipantName = participant.name
                                             )
                                         }
@@ -1508,8 +1511,16 @@ class MeetingActivityViewModel @Inject constructor(
     /**
      * Sets showRecordingConsentDialog as consumed.
      */
-    fun setShowRecordingConsentDialogConsumed() =
+    fun setShowRecordingConsentDialogConsumed() {
         _state.update { state -> state.copy(showRecordingConsentDialog = false) }
+        launchBroadcastCallRecordingConsentAccepted()
+    }
+
+    /**
+     * Sets isRecordingConsentAccepted.
+     */
+    fun setIsRecordingConsentAccepted() =
+        _state.update { state -> state.copy(isRecordingConsentAccepted = true) }
 
     /**
      * End chat call
@@ -1523,7 +1534,8 @@ class MeetingActivityViewModel @Inject constructor(
             _state.update { state ->
                 state.copy(
                     isSessionOnRecording = false,
-                    showRecordingConsentDialog = false
+                    showRecordingConsentDialog = false,
+                    isRecordingConsentAccepted = false
                 )
             }
         }.onFailure { exception ->
@@ -1536,6 +1548,13 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun setStartOrStopRecordingParticipantNameConsumed() =
         _state.update { state -> state.copy(startOrStopRecordingParticipantName = null) }
+
+    /**
+     * Launch broadcast for recording consent has been accepted event
+     */
+    private fun launchBroadcastCallRecordingConsentAccepted() = viewModelScope.launch {
+        broadcastCallRecordingConsentAcceptedUseCase()
+    }
 
     companion object {
         private const val INVALID_CHAT_HANDLE = -1L

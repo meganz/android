@@ -1094,9 +1094,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
 
             binding.recIndicator.visibility =
-                if (state.isSessionOnRecording && !state.showRecordingConsentDialog && !toolbar.isVisible) View.VISIBLE else View.GONE
+                if (state.isSessionOnRecording && !state.showRecordingConsentDialog && state.isRecordingConsentAccepted && !toolbar.isVisible) View.VISIBLE else View.GONE
 
-            if (state.startOrStopRecordingParticipantName != null && !state.showRecordingConsentDialog) {
+            if (state.startOrStopRecordingParticipantName != null && !state.showRecordingConsentDialog && state.isRecordingConsentAccepted) {
                 showSnackbar(
                     SNACKBAR_TYPE, getString(
                         if (state.isSessionOnRecording) R.string.meetings_call_recording_started_snackbar_message else R.string.meetings_call_recording_stopped_snackbar_message,
@@ -1494,7 +1494,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         binding.recIndicator.visibility =
-            if (sharedModel.state.value.isSessionOnRecording && !sharedModel.state.value.showRecordingConsentDialog && !toolbar.isVisible) View.VISIBLE else View.GONE
+            if (sharedModel.state.value.isSessionOnRecording && !sharedModel.state.value.showRecordingConsentDialog && sharedModel.state.value.isRecordingConsentAccepted && !toolbar.isVisible) View.VISIBLE else View.GONE
 
         lastTouch = System.currentTimeMillis()
     }

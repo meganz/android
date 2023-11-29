@@ -64,9 +64,11 @@ import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
 import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentAcceptedUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentAcceptedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -113,6 +115,8 @@ import javax.inject.Inject
  * @property leaveChatUseCase                               [LeaveChatUseCase]
  * @property monitorChatSessionUpdatesUseCase               [MonitorChatSessionUpdatesUseCase]
  * @property hangChatCallUseCase                            [HangChatCallUseCase]
+ * @property broadcastCallRecordingConsentAcceptedUseCase   [BroadcastCallRecordingConsentAcceptedUseCase]
+ * @property monitorCallRecordingConsentAcceptedUseCase     [MonitorCallRecordingConsentAcceptedUseCase]
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -148,6 +152,8 @@ class ChatViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
+    private val broadcastCallRecordingConsentAcceptedUseCase: BroadcastCallRecordingConsentAcceptedUseCase,
+    private val monitorCallRecordingConsentAcceptedUseCase: MonitorCallRecordingConsentAcceptedUseCase,
     monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
 ) : ViewModel() {
 
@@ -227,6 +233,12 @@ class ChatViewModel @Inject constructor(
                     }
                     performLeaveChat(chatId)
                 }
+            }
+        }
+
+        viewModelScope.launch {
+            monitorCallRecordingConsentAcceptedUseCase().conflate().collect {
+                _state.update { it.copy(showRecordingConsentDialog = false) }
             }
         }
 
@@ -1027,8 +1039,16 @@ class ChatViewModel @Inject constructor(
     /**
      * Sets showRecordingConsentDialog as consumed.
      */
-    fun setShowRecordingConsentDialogConsumed() =
+    fun setShowRecordingConsentDialogConsumed() {
         _state.update { state -> state.copy(showRecordingConsentDialog = false) }
+        launchBroadcastCallRecordingConsentAccepted()
+    }
+
+    /**
+     * Sets isRecordingConsentAccepted.
+     */
+    fun setIsRecordingConsentAccepted() =
+        _state.update { state -> state.copy(isRecordingConsentAccepted = true) }
 
     /**
      * End chat call
@@ -1042,7 +1062,8 @@ class ChatViewModel @Inject constructor(
             _state.update { state ->
                 state.copy(
                     isSessionOnRecording = false,
-                    showRecordingConsentDialog = false
+                    showRecordingConsentDialog = false,
+                    isRecordingConsentAccepted = false
                 )
             }
         }.onFailure { exception ->
@@ -1061,16 +1082,36 @@ class ChatViewModel @Inject constructor(
                     result.session?.let { session ->
                         session.changes?.apply {
                             if (contains(ChatSessionChanges.SessionOnRecording)) {
-                                _state.update {
-                                    it.copy(
+                                _state.update { state ->
+                                    state.copy(
                                         isSessionOnRecording = session.isRecording,
-                                        showRecordingConsentDialog = session.isRecording
+                                        showRecordingConsentDialog = if (!state.isRecordingConsentAccepted) session.isRecording else false
                                     )
                                 }
                             }
                         }
                     }
                 }
+        }
+    }
+
+    /**
+     * Launch broadcast for recording consent dialog has been accepted event
+     */
+    private fun launchBroadcastCallRecordingConsentAccepted() = viewModelScope.launch {
+        broadcastCallRecordingConsentAcceptedUseCase()
+    }
+
+    /**
+     * Reset call recording status properties
+     */
+    fun resetCallRecordingState() {
+        _state.update {
+            it.copy(
+                isSessionOnRecording = false,
+                showRecordingConsentDialog = false,
+                isRecordingConsentAccepted = false
+            )
         }
     }
 }

@@ -332,10 +332,13 @@ class MeetingActivity : PasscodeActivity() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val state by meetingViewModel.state.collectAsStateWithLifecycle()
-                if (state.isSessionOnRecording && state.showRecordingConsentDialog) {
+                if (state.isSessionOnRecording && state.showRecordingConsentDialog && !state.isRecordingConsentAccepted) {
                     AndroidTheme(isDark = true) {
                         CallRecordingConsentDialog(
-                            onConfirm = { meetingViewModel.setShowRecordingConsentDialogConsumed() },
+                            onConfirm = {
+                                meetingViewModel.setIsRecordingConsentAccepted()
+                                meetingViewModel.setShowRecordingConsentDialogConsumed()
+                            },
                             onDismiss = {
                                 meetingViewModel.setShowRecordingConsentDialogConsumed()
                                 meetingViewModel.endChatCall()
@@ -405,7 +408,7 @@ class MeetingActivity : PasscodeActivity() {
             }
 
             binding.recIndicator.visibility =
-                if (state.isSessionOnRecording && !state.showRecordingConsentDialog) View.VISIBLE else View.GONE
+                if (state.isSessionOnRecording && !state.showRecordingConsentDialog && state.isRecordingConsentAccepted) View.VISIBLE else View.GONE
         }
 
         collectFlow(waitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->
@@ -469,12 +472,12 @@ class MeetingActivity : PasscodeActivity() {
             }
             val chatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
             meetingViewModel.updateChatRoomId(chatId)
-            meetingViewModel.setIsSessionOnRecording(
-                it.getBooleanExtra(
-                    MEETING_CALL_RECORDING,
-                    false
-                )
-            )
+
+            val isSessionOnRecording = it.getBooleanExtra(MEETING_CALL_RECORDING, false)
+            meetingViewModel.setIsSessionOnRecording(isSessionOnRecording)
+            if (isSessionOnRecording) {
+                meetingViewModel.setIsRecordingConsentAccepted()
+            }
 
             // Cancel current notification if needed
             notificationManager.cancel(chatId.toInt())

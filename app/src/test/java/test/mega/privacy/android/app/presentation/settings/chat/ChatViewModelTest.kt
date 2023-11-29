@@ -31,9 +31,11 @@ import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
 import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentAcceptedUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentAcceptedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -108,6 +110,10 @@ class ChatViewModelTest {
     private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
     private val monitorChatSessionUpdatesUseCase = mock<MonitorChatSessionUpdatesUseCase>()
     private val hangChatCallUseCase = mock<HangChatCallUseCase>()
+    private val broadcastCallRecordingConsentAcceptedUseCase =
+        mock<BroadcastCallRecordingConsentAcceptedUseCase>()
+    private val monitorCallRecordingConsentAcceptedUseCase =
+        mock<MonitorCallRecordingConsentAcceptedUseCase>()
 
     @Before
     fun setUp() {
@@ -146,6 +152,8 @@ class ChatViewModelTest {
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
+            broadcastCallRecordingConsentAcceptedUseCase = broadcastCallRecordingConsentAcceptedUseCase,
+            monitorCallRecordingConsentAcceptedUseCase = monitorCallRecordingConsentAcceptedUseCase,
         )
     }
 
