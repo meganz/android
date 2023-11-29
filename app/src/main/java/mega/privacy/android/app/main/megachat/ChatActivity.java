@@ -35,6 +35,7 @@ import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
+import static mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadTransferComponentKt.createStartDownloadTransferView;
 import static mega.privacy.android.app.providers.FileProviderActivity.FROM_MEGA_APP;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -367,6 +368,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsDownloadViewModel;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
 import mega.privacy.android.app.presentation.chat.ContactInvitation;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
@@ -573,6 +575,7 @@ public class ChatActivity extends PasscodeActivity
     HasMediaPermissionUseCase hasMediaPermissionUseCase;
 
     private ChatViewModel viewModel;
+    private NodeOptionsDownloadViewModel nodeOptionsDownloadViewModel;
 
     private WaitingRoomManagementViewModel waitingRoomManagementViewModel;
 
@@ -1457,6 +1460,7 @@ public class ChatActivity extends PasscodeActivity
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+        nodeOptionsDownloadViewModel = new ViewModelProvider(this).get(NodeOptionsDownloadViewModel.class);
         waitingRoomManagementViewModel = new ViewModelProvider(this).get(WaitingRoomManagementViewModel.class);
 
         if (shouldRefreshSessionDueToKarere()) {
@@ -1615,6 +1619,8 @@ public class ChatActivity extends PasscodeActivity
                 });
 
         setContentView(R.layout.activity_chat);
+
+        addStartDownloadTransferView();
         //Set toolbar
         tB = findViewById(R.id.toolbar_chat);
 
@@ -1996,6 +2002,20 @@ public class ChatActivity extends PasscodeActivity
         initAfterIntent(getIntent(), savedInstanceState);
 
         Timber.d("FINISH on Create");
+    }
+
+    private void addStartDownloadTransferView() {
+        ViewGroup root = findViewById(R.id.fragment_container_chat);
+        root.addView(
+                createStartDownloadTransferView(
+                        this,
+                        nodeOptionsDownloadViewModel.getState(),
+                        () -> {
+                            nodeOptionsDownloadViewModel.consumeDownloadEvent();
+                            return Unit.INSTANCE;
+                        }
+                )
+        );
     }
 
     /**

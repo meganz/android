@@ -13,8 +13,11 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -33,6 +36,7 @@ class NodeOptionsDownloadViewModelTest {
     private lateinit var underTest: NodeOptionsDownloadViewModel
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getChatFileUseCase = mock<GetChatFileUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
 
     @BeforeAll
@@ -48,13 +52,14 @@ class NodeOptionsDownloadViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(getFeatureFlagValueUseCase, getNodeByIdUseCase)
+        reset(getFeatureFlagValueUseCase, getChatFileUseCase, getNodeByIdUseCase)
     }
 
     private fun initViewModel() {
         underTest = NodeOptionsDownloadViewModel(
             getFeatureFlagValueUseCase,
-            getNodeByIdUseCase
+            getChatFileUseCase,
+            getNodeByIdUseCase,
         )
     }
 
@@ -71,28 +76,14 @@ class NodeOptionsDownloadViewModelTest {
     fun `test that onDownloadClicked launches the correct event`() = runTest {
         val node = mock<TypedFileNode>()
         underTest.onDownloadClicked(node)
-        underTest.state.test {
-            val event = awaitItem()
-            assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
-            val content = (event as StateEventWithContentTriggered).content
-            assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
-            assertThat((content as TransferTriggerEvent.StartDownloadNode).nodes)
-                .containsExactly(node)
-        }
+        assertStartDownloadNode(node)
     }
 
     @Test
     fun `test that onSaveOfflineClicked launches the correct event`() = runTest {
         val node = mock<TypedFileNode>()
         underTest.onSaveOfflineClicked(node)
-        underTest.state.test {
-            val event = awaitItem()
-            assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
-            val content = (event as StateEventWithContentTriggered).content
-            assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
-            assertThat((content as TransferTriggerEvent.StartDownloadForOffline).node)
-                .isEqualTo(node)
-        }
+        assertStartDownloadForOffline(node)
     }
 
     @Test
@@ -101,6 +92,39 @@ class NodeOptionsDownloadViewModelTest {
         val node = mock<TypedFileNode>()
         whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
         underTest.onDownloadClicked(nodeId)
+        assertStartDownloadNode(node)
+    }
+
+    @Test
+    fun `test that onSaveOfflineClicked with id launches the correct event`() = runTest {
+        val nodeId = NodeId(1L)
+        val node = mock<TypedFileNode>()
+        whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
+        underTest.onSaveOfflineClicked(nodeId)
+        assertStartDownloadForOffline(node)
+    }
+
+    @Test
+    fun `test that onDownloadClicked for chat file launches the correct event`() = runTest {
+        val chatId = 11L
+        val messageId = 22L
+        val chatFile = mock<ChatDefaultFile>()
+        whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
+        underTest.onDownloadClicked(chatId, messageId)
+        assertStartDownloadNode(chatFile)
+    }
+
+    @Test
+    fun `test that onSaveOfflineClicked for chat file launches the correct event`() = runTest {
+        val chatId = 11L
+        val messageId = 22L
+        val chatFile = mock<ChatDefaultFile>()
+        whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
+        underTest.onSaveOfflineClicked(chatId, messageId)
+        assertStartDownloadForOffline(chatFile)
+    }
+
+    private suspend fun assertStartDownloadNode(node: TypedNode) {
         underTest.state.test {
             val event = awaitItem()
             assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -111,12 +135,7 @@ class NodeOptionsDownloadViewModelTest {
         }
     }
 
-    @Test
-    fun `test that onSaveOfflineClicked with id launches the correct event`() = runTest {
-        val nodeId = NodeId(1L)
-        val node = mock<TypedFileNode>()
-        whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
-        underTest.onSaveOfflineClicked(nodeId)
+    private suspend fun assertStartDownloadForOffline(node: TypedNode) {
         underTest.state.test {
             val event = awaitItem()
             assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)

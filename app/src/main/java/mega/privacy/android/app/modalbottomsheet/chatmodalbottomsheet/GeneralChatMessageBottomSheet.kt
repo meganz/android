@@ -9,11 +9,14 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.switchmaterial.SwitchMaterial
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.ContactController
@@ -22,6 +25,7 @@ import mega.privacy.android.app.main.megachat.ChatReactionsView
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsDownloadViewModel
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -86,6 +90,8 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
     private lateinit var deleteSeparator: LinearLayout
     private var cannotOpenFileDialog: AlertDialog? = null
     private val rxSubscriptions = CompositeDisposable()
+
+    private val nodeOptionsDownloadViewModel: NodeOptionsDownloadViewModel by activityViewModels()
 
     @Inject
     lateinit var getNodeUseCase: GetNodeUseCase
@@ -441,9 +447,15 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 Timber.w("The selected node is NULL")
                 return
             }
-            val nodeList = message.message?.megaNodeList
-            if (nodeList != null && nodeList.size() > 0) {
-                (requireActivity() as ChatActivity).downloadNodeList(nodeList)
+            lifecycleScope.launch {
+                if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                    nodeOptionsDownloadViewModel.onDownloadClicked(chatId, messageId)
+                } else {
+                    val nodeList = message.message?.megaNodeList
+                    if (nodeList != null && nodeList.size() > 0) {
+                        (requireActivity() as ChatActivity).downloadNodeList(nodeList)
+                    }
+                }
             }
         } else if (id == R.id.option_import_layout) {
             if (node == null) {
@@ -462,13 +474,20 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                     activity, resources.getString(R.string.file_removed_offline)
                 )
             } else {
-                checkNotificationsPermission(requireActivity())
-                val messages = ArrayList<AndroidMegaChatMessage>()
-                messages.add(message)
-                chatC.saveForOfflineWithAndroidMessages(
-                    messages,
-                    megaChatApi.getChatRoom(chatId), requireActivity() as ChatActivity
-                )
+                lifecycleScope.launch {
+                    if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                        nodeOptionsDownloadViewModel
+                            .onSaveOfflineClicked(chatId, messageId)
+                    } else {
+                        checkNotificationsPermission(requireActivity())
+                        val messages = ArrayList<AndroidMegaChatMessage>()
+                        messages.add(message)
+                        chatC.saveForOfflineWithAndroidMessages(
+                            messages,
+                            megaChatApi.getChatRoom(chatId), requireActivity() as ChatActivity
+                        )
+                    }
+                }
             }
         } else if (id == R.id.delete_layout) {
             (requireActivity() as ChatActivity).showConfirmationDeleteMessages(

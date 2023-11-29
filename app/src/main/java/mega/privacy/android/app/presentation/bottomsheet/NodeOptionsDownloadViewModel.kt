@@ -16,15 +16,18 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import javax.inject.Inject
 
 /**
- * View model to be shared by [NodeOptionsBottomSheetDialogFragment] and its caller to receive download events through a state flow instead of of directly calling legacy download methods
- * Once [NodeOptionsBottomSheetDialogFragment] is migrated to compose this view model should be removed and the state added to the corresponding view model (the same state that will trigger the event to show the bottom sheet).
+ * View model to be shared by legacy screens where there isn't a view model to handle download state following our architecture (like [NodeOptionsBottomSheetDialogFragment] and its callers)
+ * It can receive download events through a state flow instead of of directly calling legacy download methods
+ * Once these screens are migrated to compose this view model should be removed and the state added to the corresponding view model (the same state that will trigger the event to show the bottom sheet).
  */
 @HiltViewModel
 class NodeOptionsDownloadViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getChatFileUseCase: GetChatFileUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
 
@@ -56,6 +59,21 @@ class NodeOptionsDownloadViewModel @Inject constructor(
     }
 
     /**
+     * Triggers the event related to download a chat node
+     * @param chatId
+     * @param messageId
+     */
+    fun onDownloadClicked(chatId: Long, messageId: Long) {
+        viewModelScope.launch {
+            getChatFileUseCase(chatId, messageId)?.let { chatFile ->
+                _state.update {
+                    triggered(TransferTriggerEvent.StartDownloadNode(listOf(chatFile)))
+                }
+            }
+        }
+    }
+
+    /**
      * Triggers the event related to download a node
      * @param node
      */
@@ -74,6 +92,21 @@ class NodeOptionsDownloadViewModel @Inject constructor(
             val node = getNodeByIdUseCase(nodeId)
             _state.update {
                 triggered(TransferTriggerEvent.StartDownloadForOffline(node))
+            }
+        }
+    }
+
+    /**
+     * Triggers the event related to save offline a chat node
+     * @param chatId
+     * @param messageId
+     */
+    fun onSaveOfflineClicked(chatId: Long, messageId: Long) {
+        viewModelScope.launch {
+            getChatFileUseCase(chatId, messageId)?.let { chatFile ->
+                _state.update {
+                    triggered(TransferTriggerEvent.StartDownloadForOffline(chatFile))
+                }
             }
         }
     }
