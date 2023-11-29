@@ -36,7 +36,7 @@ internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
         } else {
             items(solvedIssues) { solvedIssue ->
                 MenuActionNodeHeaderWithBody(
-                    title = solvedIssue.localPaths.firstOrNull() ?: solvedIssue.nodeNames.first(),
+                    title = solvedIssue.nodeNames.firstOrNull() ?: solvedIssue.localPaths.first(),
                     body = solvedIssue.resolutionExplanation,
                     nodeIcon = solvedIssue.icon,
                     bodyIcon = CoreUiR.drawable.ic_check_circle,

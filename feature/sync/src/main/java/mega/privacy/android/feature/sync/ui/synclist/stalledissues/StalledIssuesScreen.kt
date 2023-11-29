@@ -41,12 +41,10 @@ private fun StalledIssuesScreenContent(
                 )
             }
         } else {
-            items(count = stalledIssues.size, key = {
-                stalledIssues[it].nodeIds.first().longValue
-            }) { itemIndex ->
+            items(count = stalledIssues.size) { itemIndex ->
                 val issue = stalledIssues[itemIndex]
                 StalledIssueCard(
-                    nodeName = issue.nodeNames.first(),
+                    nodeName = issue.nodeNames.firstOrNull() ?: issue.localPaths.first(),
                     conflictName = issue.conflictName,
                     icon = issue.icon,
                     issueDetailsClicked = { issueDetailsClicked(stalledIssues[itemIndex]) },
