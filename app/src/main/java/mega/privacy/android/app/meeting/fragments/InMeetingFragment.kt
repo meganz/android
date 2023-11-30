@@ -116,6 +116,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
+import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import mega.privacy.android.data.qualifier.MegaApi
@@ -1093,8 +1094,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
 
-            binding.recIndicator.visibility =
-                if (state.isSessionOnRecording && !state.showRecordingConsentDialog && state.isRecordingConsentAccepted && !toolbar.isVisible) View.VISIBLE else View.GONE
+            setRecIndicatorVisibility()
 
             if (state.startOrStopRecordingParticipantName != null && !state.showRecordingConsentDialog && state.isRecordingConsentAccepted) {
                 showSnackbar(
@@ -1120,6 +1120,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     bottomFloatingPanelViewHolder?.expand()
                 }
             }
+        }
+    }
+
+    /**
+     * Set the rec indicator visibility according to the call recording status values
+     * and the visibility of the toolbar and the floating bottom sheet
+     */
+    private fun setRecIndicatorVisibility() {
+        with(sharedModel.state.value) {
+            binding.recIndicator.visibility =
+                if (isSessionOnRecording && !showRecordingConsentDialog && isRecordingConsentAccepted &&
+                    !toolbar.isVisible && !floatingBottomSheet.isVisible
+                ) View.VISIBLE else View.GONE
         }
     }
 
@@ -1493,8 +1506,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             adjustPositionOfFloatingWindow(bTop = true, bBottom = true)
         }
 
-        binding.recIndicator.visibility =
-            if (sharedModel.state.value.isSessionOnRecording && !sharedModel.state.value.showRecordingConsentDialog && sharedModel.state.value.isRecordingConsentAccepted && !toolbar.isVisible) View.VISIBLE else View.GONE
+        setRecIndicatorVisibility()
 
         lastTouch = System.currentTimeMillis()
     }
