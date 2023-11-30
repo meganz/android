@@ -21,6 +21,7 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatCall
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.GetChatRoom
@@ -121,6 +123,7 @@ internal class ChatViewModel @Inject constructor(
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
+    private val uiChatMessageMapper: UiChatMessageMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -138,6 +141,7 @@ internal class ChatViewModel @Inject constructor(
                 && ownPrivilege != ChatRoomPermission.Removed
 
     private var monitorAllContactParticipantsInChatJob: Job? = null
+    private val messages = mutableListOf<TypedMessage>()
 
     init {
         monitorParticipatingInACall()
@@ -197,8 +201,10 @@ internal class ChatViewModel @Inject constructor(
                 Timber.d("New message: ${loadedMessage.msgId}")
                 _state.update { state ->
                     val pendingMessagesToLoad = state.pendingMessagesToLoad - 1
-                    val messages = state.messages.toMutableList().apply { add(0, loadedMessage) }
-                    state.copy(messages = messages, pendingMessagesToLoad = pendingMessagesToLoad)
+                    messages.add(0, loadedMessage)
+                    val uiMessages =
+                        messages.map { uiChatMessageMapper(it, !state.isGroup && !state.isMeeting) }
+                    state.copy(messages = uiMessages, pendingMessagesToLoad = pendingMessagesToLoad)
                 }
             }
         }

@@ -9,6 +9,7 @@ internal class CreateNormalChatMessageUseCase @Inject constructor() : CreateType
     override fun invoke(message: ChatMessage, isMine: Boolean) = TextMessage(
         message.msgId,
         message.timestamp,
-        isMine = isMine
+        isMine = isMine,
+        content = message.content
     )
 }

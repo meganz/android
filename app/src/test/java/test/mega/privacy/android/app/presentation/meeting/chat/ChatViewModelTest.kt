@@ -22,9 +22,11 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
+import mega.privacy.android.app.presentation.meeting.chat.model.ui.UiChatMessage
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -93,6 +95,7 @@ import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -192,6 +195,7 @@ internal class ChatViewModelTest {
     private val startChatCallNoRingingUseCase = mock<StartChatCallNoRingingUseCase>()
     private val answerChatCallUseCase = mock<AnswerChatCallUseCase>()
     private val rtcAudioManagerGateway = mock<RTCAudioManagerGateway>()
+    private val uiChatMessageMapper = mock<UiChatMessageMapper>()
 
     @BeforeAll
     fun setup() {
@@ -233,6 +237,7 @@ internal class ChatViewModelTest {
             startChatCallNoRingingUseCase,
             answerChatCallUseCase,
             rtcAudioManagerGateway,
+            uiChatMessageMapper
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -298,6 +303,7 @@ internal class ChatViewModelTest {
             muteChatNotificationForChatRoomsUseCase = muteChatNotificationForChatRoomsUseCase,
             answerChatCallUseCase = answerChatCallUseCase,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
+            uiChatMessageMapper = uiChatMessageMapper
         )
     }
 
@@ -1768,7 +1774,15 @@ internal class ChatViewModelTest {
         val message2 = mock<TypedMessage>()
         val message3 = mock<TypedMessage>()
         val message4 = mock<TypedMessage>()
+        val uiMessage1 = mock<UiChatMessage>()
+        val uiMessage2 = mock<UiChatMessage>()
+        val uiMessage3 = mock<UiChatMessage>()
+        val uiMessage4 = mock<UiChatMessage>()
         whenever(monitorMessageLoadedUseCase(chatId)).thenReturn(flow)
+        whenever(uiChatMessageMapper(eq(message1), any())).thenReturn(uiMessage1)
+        whenever(uiChatMessageMapper(eq(message2), any())).thenReturn(uiMessage2)
+        whenever(uiChatMessageMapper(eq(message3), any())).thenReturn(uiMessage3)
+        whenever(uiChatMessageMapper(eq(message4), any())).thenReturn(uiMessage4)
         initTestClass()
         testScheduler.advanceUntilIdle()
         underTest.state.test {
@@ -1778,19 +1792,19 @@ internal class ChatViewModelTest {
             flow.emit(message1)
             val actual1 = awaitItem()
             assertThat(actual1.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 1)
-            assertThat(actual1.messages).isEqualTo(listOf(message1))
+            assertThat(actual1.messages).isEqualTo(listOf(uiMessage1))
             flow.emit(message2)
             val actual2 = awaitItem()
             assertThat(actual2.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 2)
-            assertThat(actual2.messages).isEqualTo(listOf(message2, message1))
+            assertThat(actual2.messages).isEqualTo(listOf(uiMessage2, uiMessage1))
             flow.emit(message3)
             val actual3 = awaitItem()
             assertThat(actual3.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 3)
-            assertThat(actual3.messages).isEqualTo(listOf(message3, message2, message1))
+            assertThat(actual3.messages).isEqualTo(listOf(uiMessage3, uiMessage2, uiMessage1))
             flow.emit(message4)
             val actual4 = awaitItem()
             assertThat(actual4.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 4)
-            assertThat(actual4.messages).isEqualTo(listOf(message4, message3, message2, message1))
+            assertThat(actual4.messages).isEqualTo(listOf(uiMessage4,uiMessage3, uiMessage2, uiMessage1))
         }
     }
 

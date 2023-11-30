@@ -7,4 +7,5 @@ data class TextMessage(
     override val msgId: Long,
     override val time: Long,
     override val isMine: Boolean,
+    val content: String?
 ) : NormalMessage

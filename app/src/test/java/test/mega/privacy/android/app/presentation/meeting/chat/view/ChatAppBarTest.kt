@@ -13,6 +13,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.app.presentation.meeting.chat.model.ui.TextUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.ui.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_NOTIFICATION_MUTE
@@ -22,7 +24,6 @@ import mega.privacy.android.core.ui.controls.appbar.TEST_TAG_APP_BAR
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.messages.InvalidMessage
-import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import org.junit.Rule
 import org.junit.Test
@@ -1207,7 +1208,9 @@ class ChatAppBarTest {
 
     @Test
     fun `test that select menu action is available if messages contains text message`() {
-        val textMessage = mock<TextMessage>()
+        val textMessage = mock<TextUiMessage> {
+            on { message }.thenReturn(mock())
+        }
         initComposeRuleContent(
             ChatUiState(
                 isPreviewMode = false,
@@ -1221,7 +1224,9 @@ class ChatAppBarTest {
 
     @Test
     fun `test that select menu action is not available if messages contains chat invalid message`() {
-        val invalidMessage = mock<InvalidMessage>()
+        val invalidMessage = mock<UiChatMessage> {
+            on { message }.thenReturn(mock<InvalidMessage>())
+        }
         initComposeRuleContent(
             ChatUiState(
                 isPreviewMode = false,

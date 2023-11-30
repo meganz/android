@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.meeting.chat.model.ui.UiChatMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
@@ -79,7 +80,7 @@ data class ChatUiState(
     val infoToShowEvent: StateEventWithContent<InfoToShow?> = consumed(),
     val sendingText: String = "",
     val isStartingCall: Boolean = false,
-    val messages: List<TypedMessage> = emptyList(),
+    val messages: List<UiChatMessage> = emptyList(),
     val pendingMessagesToLoad: Int = NUMBER_MESSAGES_TO_LOAD,
     val chatHistoryLoadStatus: ChatHistoryLoadStatus? = null,
     val mutePushNotificationDialogEvent: StateEventWithContent<List<ChatPushNotificationMuteOption>> = consumed(),

@@ -199,7 +199,7 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
             }
         }
 
-        if (!isPreviewMode && uiState.messages.any { it.isSelectable }) {
+        if (!isPreviewMode && uiState.messages.any { it.message.isSelectable }) {
             add(ChatRoomMenuAction.Select)
         }
     }
