@@ -69,6 +69,10 @@ fun AttachItem(
     )
 }
 
+@Composable
+fun AttachItemPlaceHolder(modifier: Modifier = Modifier) =
+    Box(modifier = modifier.size(width = 64.dp, height = 66.dp))
+
 @CombinedThemePreviews
 @Composable
 private fun AttachItemPreview() {
