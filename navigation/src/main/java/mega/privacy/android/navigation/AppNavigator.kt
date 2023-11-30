@@ -33,15 +33,6 @@ interface AppNavigator {
     fun openNodeInCloudDrive(activity: Activity, nodeHandle: Long = -1L)
 
     /**
-     * Opens the Info page to view more information of a Backups item
-     *
-     * @param activity the Activity
-     * @param backupsHandle the Backups handle
-     * @param backupsName the Backups name
-     */
-    fun openBackupsInformation(activity: Activity, backupsHandle: Long, backupsName: String)
-
-    /**
      * Open chat
      *
      * @param context

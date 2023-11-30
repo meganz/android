@@ -22,6 +22,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -150,6 +151,7 @@ import javax.inject.Inject
  * @property monitorChatSessionUpdatesUseCase [MonitorChatSessionUpdatesUseCase]
  * @property hangChatCallUseCase [HangChatCallUseCase]
  * @property monitorCallRecordingConsentAcceptedUseCase [MonitorCallRecordingConsentAcceptedUseCase]
+ * @property getNodeByHandle [GetNodeByHandle]
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -223,6 +225,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val monitorCallRecordingConsentAcceptedUseCase: MonitorCallRecordingConsentAcceptedUseCase,
+    private val getNodeByHandle: GetNodeByHandle,
 ) : ViewModel() {
 
     /**
@@ -1201,6 +1204,14 @@ class ManagerViewModel @Inject constructor(
             )
         }
     }
+
+    /**
+     * Retrieves the corresponding [MegaNode] from the given handle
+     *
+     * @param nodeHandle The Node Handle
+     * @return A potentially nullable [MegaNode]
+     */
+    suspend fun retrieveMegaNode(nodeHandle: Long): MegaNode? = getNodeByHandle(nodeHandle)
 
     internal companion object {
         internal const val isFirstLoginKey = "EXTRA_FIRST_LOGIN"

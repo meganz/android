@@ -234,10 +234,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLabel.setOnClickListener { onLabelClicked(node) }
                 optionFavourite.setOnClickListener { onFavouriteClicked(node) }
                 optionDownload.setOnClickListener {
-                    if (drawerItem == DrawerItem.SEARCH) {
-                        Analytics.tracker.trackEvent(SearchResultSaveToDeviceMenuItemEvent)
-                    }
-                    onDownloadClicked(node)
+                    (requireActivity() as? ManagerActivity)?.downloadNodeToDevice(node)
+                    setStateBottomSheetBehaviorHidden()
                 }
                 optionOffline.setOnClickListener { onOfflineClicked(node) }
                 optionInfo.setOnClickListener { onPropertiesClicked(node) }
@@ -854,23 +852,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         contentView.findViewById<View>(R.id.rubbish_bin_option).visibility = View.GONE
         contentView.findViewById<View>(R.id.share_option).visibility = View.GONE
         contentView.findViewById<View>(R.id.clear_share_option).visibility = View.GONE
-    }
-
-    private fun onDownloadClicked(node: MegaNode) {
-        lifecycleScope.launch {
-            if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                nodeOptionsDownloadViewModel.onDownloadClicked(NodeId(node.handle))
-            } else {
-                (requireActivity() as ManagerActivity).saveNodesToDevice(
-                    nodes = listOf(node),
-                    highPriority = false,
-                    isFolderLink = false,
-                    fromMediaViewer = false,
-                    fromChat = false
-                )
-            }
-        }
-        setStateBottomSheetBehaviorHidden()
     }
 
     private fun onFavouriteClicked(node: MegaNode) {

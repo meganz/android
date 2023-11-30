@@ -312,6 +312,7 @@ import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
+import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceCenterBottomSheetActionListener
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import mega.privacy.android.navigation.MegaNavigator
@@ -320,6 +321,7 @@ import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
 import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
 import mega.privacy.mobile.analytics.event.OutgoingSharesTabEvent
 import mega.privacy.mobile.analytics.event.SearchResultOverflowMenuItemEvent
+import mega.privacy.mobile.analytics.event.SearchResultSaveToDeviceMenuItemEvent
 import mega.privacy.mobile.analytics.event.SharedItemsScreenEvent
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -354,7 +356,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
     ChatManagementCallback, ActionNodeCallback, SnackbarShower,
     MeetingBottomSheetDialogActionListener, NotificationNavigationHandler,
-    ParentNodeManager, CameraPermissionManager, NavigationDrawerManager {
+    ParentNodeManager, CameraPermissionManager, NavigationDrawerManager,
+    DeviceCenterBottomSheetActionListener {
     /**
      * The cause bitmap of elevating the app bar
      */
@@ -391,6 +394,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         ?: INVALID_HANDLE
                 openSearchFolder(handle)
             }
+        }
+
+    private val fileInfoLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            handleFileInfoSuccessResult(
+                intent = result.data,
+                resultCode = result.resultCode,
+            )
         }
 
     @Inject
@@ -1001,6 +1012,69 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         checkForInAppUpdate()
         checkForInAppAdvertisement()
+    }
+
+    override fun onDeviceCenterBackupsInfoClicked(backupsHandle: Long, backupsName: String) {
+        val intent = Intent(this, FileInfoActivity::class.java).apply {
+            putExtra(Constants.NAME, backupsName)
+            putExtra(Constants.HANDLE, backupsHandle)
+            if (tabItemShares === SharesTab.INCOMING_TAB) {
+                putExtra(Constants.INTENT_EXTRA_KEY_FROM, Constants.FROM_BACKUPS)
+            }
+        }
+        fileInfoLauncher.launch(intent)
+    }
+
+    override fun onDeviceCenterSaveToDeviceClicked(nodeHandle: Long) {
+        lifecycleScope.launch {
+            runCatching {
+                viewModel.retrieveMegaNode(nodeHandle)
+            }.onSuccess { megaNode ->
+                megaNode?.let { downloadNodeToDevice(it) }
+            }.onFailure {
+                Timber.e("Error saving the Node to the Device")
+            }
+        }
+    }
+
+    /**
+     * Handles the successful result from [FileInfoActivity]
+     *
+     * @param intent A potentially nullable [Intent] that returns some data
+     * @param resultCode The Activity Result Code
+     */
+    fun handleFileInfoSuccessResult(intent: Intent?, resultCode: Int) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (isCloudAdded) {
+                val handle = intent?.getLongExtra(FileInfoActivity.NODE_HANDLE, -1) ?: -1
+                fileBrowserViewModel.setBrowserParentHandle(handle)
+            }
+            onNodesSharedUpdate()
+        }
+    }
+
+    /**
+     * Downloads a specific [MegaNode] to the User's Device
+     *
+     * @param node The [MegaNode] to be downloaded to the User's Device
+     */
+    fun downloadNodeToDevice(node: MegaNode) {
+        if (drawerItem == DrawerItem.SEARCH) {
+            Analytics.tracker.trackEvent(SearchResultSaveToDeviceMenuItemEvent)
+        }
+        lifecycleScope.launch {
+            if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                nodeOptionsDownloadViewModel.onDownloadClicked(NodeId(node.handle))
+            } else {
+                saveNodesToDevice(
+                    nodes = listOf(node),
+                    highPriority = false,
+                    isFolderLink = false,
+                    fromMediaViewer = false,
+                    fromChat = false,
+                )
+            }
+        }
     }
 
     private fun checkForInAppAdvertisement() {
@@ -6302,22 +6376,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Timber.w("No request code processed")
                 super.onActivityResult(requestCode, resultCode, intent)
             }
-        }
-    }
-
-    /**
-     * Handles the successful result from [FileInfoActivity]
-     *
-     * @param intent A potentially nullable [Intent] that returns some data
-     * @param resultCode The Activity Result Code
-     */
-    fun handleFileInfoSuccessResult(intent: Intent?, resultCode: Int) {
-        if (resultCode == Activity.RESULT_OK) {
-            if (isCloudAdded) {
-                val handle = intent?.getLongExtra(FileInfoActivity.NODE_HANDLE, -1) ?: -1
-                fileBrowserViewModel.setBrowserParentHandle(handle)
-            }
-            onNodesSharedUpdate()
         }
     }
 
