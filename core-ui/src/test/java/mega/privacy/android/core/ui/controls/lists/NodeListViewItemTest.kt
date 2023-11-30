@@ -43,8 +43,6 @@ class NodeListViewItemTest {
                     subtitle = "Subtitle",
                     icon = R.drawable.ic_info,
                     accessPermissionIcon = R.drawable.ic_favorite,
-                    enableMiddleEllipsisTitle = false,
-                    enableMiddleEllipsisSubTitle = false,
                     showOffline = true,
                     showVersion = true,
                     labelColor = Color.Blue,

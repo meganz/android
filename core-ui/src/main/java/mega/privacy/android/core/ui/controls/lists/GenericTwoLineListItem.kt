@@ -110,11 +110,12 @@ internal fun GenericTwoLineListItem(
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         icon?.invoke()
         Column(
             modifier = Modifier
-                .padding(start = 12.dp, end = 8.dp)
+                .padding(horizontal = 4.dp)
                 .weight(1f),
             verticalArrangement = Arrangement.Center,
         ) {

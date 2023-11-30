@@ -2,23 +2,22 @@ package mega.privacy.android.core.ui.controls.lists
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
-import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
+import mega.privacy.android.core.ui.controls.text.MegaText
+import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -35,10 +34,11 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
  * @param modifier Modifier
  * @param thumbnailData Thumbnail data
  * @param accessPermissionIcon Access permission icon
- * @param enableMiddleEllipsisTitle Enable middle ellipsis for title
- * @param enableMiddleEllipsisSubTitle Enable middle ellipsis for subtitle
+ * @param titleOverflow Title overflow
+ * @param subTitleOverflow Subtitle overflow
  * @param showOffline Show offline
  * @param showVersion Show version
+ * @param showChecked Show checked
  * @param labelColor Label color
  * @param showLink Show link
  * @param showFavourite Show favourite
@@ -50,16 +50,18 @@ fun NodeLisViewItem(
     subtitle: String,
     @DrawableRes icon: Int,
     modifier: Modifier = Modifier,
-    thumbnailData: String? = null,
+    thumbnailData: Any? = null,
     @DrawableRes accessPermissionIcon: Int? = null,
-    enableMiddleEllipsisTitle: Boolean = false,
-    enableMiddleEllipsisSubTitle: Boolean = false,
+    titleOverflow: LongTextBehaviour = LongTextBehaviour.Clip(),
+    subTitleOverflow: LongTextBehaviour = LongTextBehaviour.Clip(),
     showOffline: Boolean = false,
     showVersion: Boolean = false,
+    showChecked: Boolean = false,
     labelColor: Color? = null,
     showLink: Boolean = false,
     showFavourite: Boolean = false,
     onMoreClicked: (() -> Unit)? = null,
+    onInfoClicked: (() -> Unit)? = null,
 ) {
     GenericTwoLineListItem(
         modifier = modifier,
@@ -75,20 +77,12 @@ fun NodeLisViewItem(
             )
         },
         title = {
-            if (enableMiddleEllipsisTitle) {
-                MiddleEllipsisText(
-                    text = title,
-                    modifier = Modifier.testTag(TITLE_TAG),
-                    color = TextColor.Primary
-                )
-            } else {
-                Text(
-                    text = title,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.testTag(TITLE_TAG),
-                )
-            }
+            MegaText(
+                text = title,
+                overflow = titleOverflow,
+                textColor = TextColor.Primary,
+                modifier = Modifier.testTag(TITLE_TAG),
+            )
         },
         titleIcons = {
             if (labelColor != null) {
@@ -114,25 +108,29 @@ fun NodeLisViewItem(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_version_small),
                     contentDescription = "Version",
-                    modifier = Modifier.testTag(VERSION_ICON_TAG)
+                    modifier = Modifier
+                        .size(16.dp)
+                        .testTag(VERSION_ICON_TAG)
+                )
+            }
+            if (showChecked) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_check_circle),
+                    contentDescription = "Checked",
+                    tint = MegaTheme.colors.icon.accent,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .testTag(VERSION_ICON_TAG)
                 )
             }
         },
         subtitle = {
-            if (enableMiddleEllipsisSubTitle) {
-                MiddleEllipsisText(
-                    modifier = Modifier.testTag(SUBTITLE_TAG),
-                    text = subtitle,
-                    color = TextColor.Secondary
-                )
-            } else {
-                Text(
-                    modifier = Modifier.testTag(SUBTITLE_TAG),
-                    text = subtitle,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+            MegaText(
+                text = subtitle,
+                textColor = TextColor.Secondary,
+                overflow = subTitleOverflow,
+                modifier = Modifier.testTag(SUBTITLE_TAG),
+            )
         },
         subTitleSuffixIcons = {
             if (showOffline) {
@@ -149,20 +147,31 @@ fun NodeLisViewItem(
             if (accessPermissionIcon != null) {
                 Icon(
                     modifier = Modifier
-                        .size(16.dp)
+                        .size(24.dp)
                         .testTag(PERMISSION_ICON_TAG),
                     painter = painterResource(id = accessPermissionIcon),
                     contentDescription = "Access permission",
                 )
             }
+            if (onInfoClicked != null) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_info),
+                    contentDescription = "Info",
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { onInfoClicked() }
+                        .testTag(MORE_ICON_TAG)
+                )
+            }
             if (onMoreClicked != null) {
-                IconButton(onClick = { onMoreClicked() }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_more),
-                        contentDescription = "More",
-                        modifier = Modifier.testTag(MORE_ICON_TAG)
-                    )
-                }
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_more),
+                    contentDescription = "More",
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { onMoreClicked() }
+                        .testTag(MORE_ICON_TAG)
+                )
             }
         }
     )
@@ -198,7 +207,6 @@ private fun PreviewGenericTwoLineListItemWithLongTitle() {
             title = "Title very big for testing the middle ellipsis",
             subtitle = "Subtitle very big for testing the middle ellipsis",
             icon = R.drawable.ic_folder_incoming,
-            enableMiddleEllipsisTitle = true,
             onMoreClicked = { },
             showOffline = true,
             showVersion = true,
@@ -218,7 +226,6 @@ private fun PreviewGenericTwoLineListItem() {
             title = "Title",
             subtitle = "Subtitle",
             icon = R.drawable.ic_folder_outgoing,
-            enableMiddleEllipsisTitle = true,
             onMoreClicked = { },
             accessPermissionIcon = R.drawable.ic_sync,
             showOffline = true,
@@ -239,10 +246,12 @@ private fun PreviewGenericTwoLineListItemWithoutMoreOption() {
             title = "Title",
             subtitle = "Subtitle",
             icon = R.drawable.ic_folder_outgoing,
-            enableMiddleEllipsisTitle = true,
-            showVersion = true,
             showFavourite = true,
             showLink = true,
+            showChecked = true,
+            onInfoClicked = { },
+            onMoreClicked = { },
+            accessPermissionIcon = R.drawable.ic_sync,
             labelColor = MegaTheme.colors.indicator.pink,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg"
         )

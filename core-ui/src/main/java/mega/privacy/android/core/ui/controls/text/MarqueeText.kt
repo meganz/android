@@ -3,11 +3,9 @@ package mega.privacy.android.core.ui.controls.text
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -52,15 +50,13 @@ internal fun MarqueeText(
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
     style: TextStyle = LocalTextStyle.current,
-) = Box(modifier = modifier, contentAlignment = Alignment.Center) {
-    Text(
-        text,
-        modifier = Modifier.basicMarquee(),
-        color = color,
-        maxLines = 1,
-        style = style,
-    )
-}
+) = Text(
+    text = text,
+    modifier = modifier.basicMarquee(),
+    color = color,
+    maxLines = 1,
+    style = style,
+)
 
 @CombinedThemePreviews
 @Composable
