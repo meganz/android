@@ -70,12 +70,12 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactT
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
 import mega.privacy.android.app.presentation.meeting.chat.view.message.MessageRow
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatAttachFileBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.ChatMeetingButton
@@ -86,6 +86,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 
 @Composable
@@ -157,13 +158,20 @@ internal fun ChatView(
     var muteNotificationDialogOptions by rememberSaveable { mutableStateOf(emptyList<ChatPushNotificationMuteOption>()) }
     var isSelectMode by rememberSaveable { mutableStateOf(false) }
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
-
-    val modalSheetState = rememberModalBottomSheetState(
+    val toolbarModalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
-    BackHandler(enabled = modalSheetState.isVisible) {
+    val fileModalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+    )
+    BackHandler(enabled = toolbarModalSheetState.isVisible) {
         coroutineScope.launch {
-            modalSheetState.hide()
+            toolbarModalSheetState.hide()
+        }
+    }
+    BackHandler(enabled = fileModalSheetState.isVisible) {
+        coroutineScope.launch {
+            fileModalSheetState.hide()
         }
     }
 
@@ -183,13 +191,26 @@ internal fun ChatView(
                 }
             }
 
+        val isFileModalShown = fileModalSheetState.currentValue != ModalBottomSheetValue.Hidden
+
         BottomSheet(
-            modalSheetState = modalSheetState,
+            modalSheetState = if (isFileModalShown) fileModalSheetState else toolbarModalSheetState,
             sheetBody = {
-                ChatToolbarBottomSheet(
-                    modifier = Modifier.fillMaxWidth(),
-                    sheetState = modalSheetState
-                )
+                if (isFileModalShown) {
+                    ChatAttachFileBottomSheet(
+                        sheetState = fileModalSheetState
+                    )
+                } else {
+                    ChatToolbarBottomSheet(
+                        onAttachFileClicked = {
+                            onBackPressed()
+                            coroutineScope.launch {
+                                fileModalSheetState.show()
+                            }
+                        },
+                        sheetState = toolbarModalSheetState
+                    )
+                }
             },
         ) {
             Scaffold(
@@ -253,7 +274,7 @@ internal fun ChatView(
                     ChatInputTextToolbar(
                         onAttachmentClick = {
                             coroutineScope.launch {
-                                modalSheetState.show()
+                                toolbarModalSheetState.show()
                             }
                         },
                         text = uiState.sendingText,

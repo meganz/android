@@ -67,11 +67,10 @@ class ChatToolbarBottomSheetTest {
         composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_CONTACT).assertIsDisplayed()
     }
 
-
-
     private fun initComposeRuleContent() {
         composeTestRule.setContent {
             ChatToolbarBottomSheet(
+                onAttachFileClicked = {},
                 sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
             )
         }

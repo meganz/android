@@ -20,18 +20,20 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItem
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Chat toolbar bottom sheet
@@ -41,15 +43,19 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatToolbarBottomSheet(
+    onAttachFileClicked: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
     val galleryPicker =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.PickMultipleVisualMedia()
         ) {
             //Manage gallery picked files here
+            coroutineScope.launch { sheetState.hide() }
         }
 
     val gifPickerLauncher =
@@ -57,9 +63,10 @@ fun ChatToolbarBottomSheet(
             contract = ActivityResultContracts.StartActivityForResult()
         ) {
             // Manage gif picked files here
+            coroutineScope.launch { sheetState.hide() }
         }
 
-    Column(modifier = modifier) {
+    Column(modifier = modifier.fillMaxWidth()) {
         ChatGallery(
             modifier = Modifier
                 .fillMaxWidth()
@@ -83,7 +90,7 @@ fun ChatToolbarBottomSheet(
             AttachItem(
                 iconId = R.drawable.ic_attach_from_file,
                 itemName = pluralStringResource(id = R.plurals.general_num_files, count = 1),
-                onItemClick = { },
+                onItemClick = onAttachFileClicked,
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_FILE)
             )
             AttachItem(
@@ -102,7 +109,7 @@ fun ChatToolbarBottomSheet(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(start = 24.dp, end = 24.dp, bottom = 40.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             AttachItem(
@@ -157,6 +164,7 @@ fun ChatGallery(
 private fun ChatToolbarBottomSheetPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatToolbarBottomSheet(
+            onAttachFileClicked = {},
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
         )
     }
