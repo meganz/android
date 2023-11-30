@@ -34,6 +34,7 @@ import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItem
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
+import nz.mega.documentscanner.DocumentScannerActivity
 
 /**
  * Chat toolbar bottom sheet
@@ -63,6 +64,14 @@ fun ChatToolbarBottomSheet(
             contract = ActivityResultContracts.StartActivityForResult()
         ) {
             // Manage gif picked files here
+            coroutineScope.launch { sheetState.hide() }
+        }
+
+    val scanDocumentLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) {
+            // Manage scanned files here
             coroutineScope.launch { sheetState.hide() }
         }
 
@@ -102,7 +111,7 @@ fun ChatToolbarBottomSheet(
             AttachItem(
                 iconId = R.drawable.ic_attach_from_scan,
                 itemName = stringResource(id = R.string.chat_room_toolbar_scan_option),
-                onItemClick = { },
+                onItemClick = { openDocumentScanner(context, scanDocumentLauncher) },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_SCAN)
             )
         }
@@ -137,6 +146,16 @@ private fun openGifPicker(
     Intent(context, GiphyPickerActivity::class.java).also {
         pickGifLauncher.launch(it)
     }
+}
+
+private fun openDocumentScanner(
+    context: Context,
+    scanDocumentLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+) {
+    DocumentScannerActivity.getIntent(context, arrayOf(context.getString(R.string.section_chat)))
+        .also {
+            scanDocumentLauncher.launch(it)
+        }
 }
 
 /**
