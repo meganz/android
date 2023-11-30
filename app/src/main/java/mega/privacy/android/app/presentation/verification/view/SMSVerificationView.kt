@@ -52,14 +52,14 @@ import androidx.compose.ui.unit.em
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.blue_400_blue_200
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.extensions.white_alpha_087_grey_alpha_087
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
 
 /**
  * Test tag not now button
@@ -435,7 +435,7 @@ private fun SMSVerificationViewPreview() {
         countryCodeText = "(NZ+64)New Zealand",
         isUserLocked = true,
     )
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SMSVerificationView(
             state = uiState,
             {}, {}, {}, {}, {}, {}, {}

@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.views
 
+import mega.privacy.android.core.R as CoreUiR
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -25,14 +26,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.textfields.GenericTextField
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 
 @Composable
 internal fun InputSyncInformationView(
@@ -162,7 +162,7 @@ private fun TwoLinesItem(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun SyncEmptyScreenPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         InputSyncInformationView(
             Modifier.padding(top = 24.dp, start = 16.dp, end = 16.dp),
             {},

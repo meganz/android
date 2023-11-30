@@ -26,7 +26,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.settings.chat.imagequality.model.SettingsChatImageQualityState
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.Typography
 import mega.privacy.android.domain.entity.ChatImageQuality
 
@@ -84,7 +84,7 @@ fun ChatImageQualityItem(
 @Composable
 fun PreviewChatImageQualityView() {
     var selected by remember { mutableStateOf(ChatImageQuality.Original) }
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatImageQualityView(
             settingsChatImageQualityState = SettingsChatImageQualityState(
                 selectedQuality = selected,

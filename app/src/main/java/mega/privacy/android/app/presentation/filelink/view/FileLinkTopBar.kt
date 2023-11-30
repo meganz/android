@@ -7,11 +7,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 
 internal const val SHARE_BUTTON_TAG = "file_link_top_bar:icon_share"
 
@@ -48,7 +48,7 @@ private class ShareMenuAction : MenuActionWithIcon {
 @CombinedTextAndThemePreviews
 @Composable
 private fun FileInfoTopBarPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         FileLinkTopBar(
             title = "Title",
             onBackPressed = {},

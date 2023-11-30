@@ -19,9 +19,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 
 
@@ -77,7 +77,7 @@ private fun PreviewInfoOptionsLight() {
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = false,
     )
-    AndroidTheme(isDark = false) {
+    MegaAppTheme(isDark = false) {
         Surface {
             InfoOptionsView(
                 primaryDisplayName = "Nick Name",
@@ -102,7 +102,7 @@ private fun PreviewInfoOptionsDark() {
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = false,
     )
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         Surface {
             InfoOptionsView(
                 primaryDisplayName = "Nick Name",

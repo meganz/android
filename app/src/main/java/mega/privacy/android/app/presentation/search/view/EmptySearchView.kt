@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.search.view
 
-import androidx.compose.foundation.Image
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.grey_300
 import mega.privacy.android.core.ui.theme.grey_600
 
@@ -56,7 +56,7 @@ fun EmptySearchView() {
 @Preview
 @Composable
 fun PreviewEmptySearchView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         EmptySearchView()
     }
 }

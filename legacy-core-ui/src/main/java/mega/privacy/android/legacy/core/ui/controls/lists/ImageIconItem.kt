@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.core.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
@@ -158,7 +158,7 @@ internal const val IMAGE_ICON_ITEM_DIVIDER_TAG = "image_icon_item:divider"
 @CombinedThemePreviews
 @Composable
 private fun ImageItemPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ImageIconItem(
             icon = R.drawable.ic_recovery_key_circle,
             title = R.string.back_up_recovery_key,
@@ -173,7 +173,7 @@ private fun ImageItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun IconItemPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ImageIconItem(
             icon = R.drawable.ic_contacts_connection,
             title = R.string.back_up_recovery_key,
@@ -188,7 +188,7 @@ private fun IconItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun IconItemWithDividerPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ImageIconItem(
             icon = R.drawable.ic_contacts_connection,
             title = R.string.back_up_recovery_key,

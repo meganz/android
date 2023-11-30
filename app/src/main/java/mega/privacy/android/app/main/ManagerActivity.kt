@@ -281,7 +281,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -1178,7 +1178,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
                 val waitingRoomState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
-                AndroidTheme(isDark = isDark) {
+                MegaAppTheme(isDark = isDark) {
                     UsersInWaitingRoomDialog(
                         state = waitingRoomState,
                         onAdmitClick = {
@@ -1218,7 +1218,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val isDark = themeMode.isDarkMode()
                 val state by viewModel.state.collectAsStateWithLifecycle()
                 if (state.callInProgressChatId != -1L && state.isSessionOnRecording && state.showRecordingConsentDialog && !state.isRecordingConsentAccepted) {
-                    AndroidTheme(isDark = isDark) {
+                    MegaAppTheme(isDark = isDark) {
                         CallRecordingConsentDialog(
                             onConfirm = {
                                 viewModel.setIsRecordingConsentAccepted(value = true)
@@ -8402,7 +8402,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
                 val uiState by adsViewModel.uiState.collectAsStateWithLifecycle()
-                AndroidTheme(isDark = isDark) {
+                MegaAppTheme(isDark = isDark) {
                     AdsBannerView(uiState = uiState,
                         onAdsWebpageLoaded = ::onAdsWebpageLoaded,
                         onAdClicked = { uri ->

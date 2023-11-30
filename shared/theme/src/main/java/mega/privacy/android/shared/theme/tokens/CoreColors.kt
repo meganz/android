@@ -2,7 +2,7 @@
 // Generated automatically by KotlinTokensGenerator.
 // Do not modify this file manually.
 //
-package mega.privacy.android.core.theme.tokens
+package mega.privacy.android.shared.theme.tokens
 
 import androidx.compose.ui.graphics.Color
 

@@ -35,7 +35,7 @@ import androidx.constraintlayout.compose.Visibility
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
-import mega.privacy.android.core.theme.tokens.MegaAppTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 

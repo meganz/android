@@ -28,8 +28,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 
@@ -228,7 +228,7 @@ private fun FileInfoContentPreview(
 ) {
     val scrollState = rememberScrollState()
     var state by mutableStateOf(viewState) //not remembered to allow multiple states in device, don't do that in real code, just in previews
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         FileInfoContent(
             viewState = state,
             onTakeDownLinkClick = {},

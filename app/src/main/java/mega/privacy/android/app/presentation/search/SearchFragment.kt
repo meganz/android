@@ -77,13 +77,13 @@ import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDow
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import mega.privacy.android.app.utils.displayMetrics
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
@@ -264,7 +264,7 @@ class SearchFragment : RotatableFragment() {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by searchViewModel.state.collectAsStateWithLifecycle()
-                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     if (uiState.showChips) {
                         SearchFilterChipsView(
                             filters = uiState.filters,
@@ -287,7 +287,7 @@ class SearchFragment : RotatableFragment() {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by searchViewModel.state.collectAsStateWithLifecycle()
-                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     if (uiState.isInProgress) {
                         isVisible = true
                         recyclerView?.isVisible = false

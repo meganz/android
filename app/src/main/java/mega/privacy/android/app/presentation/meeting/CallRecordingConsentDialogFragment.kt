@@ -16,7 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.chat.ChatViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.view.CallRecordingConsentDialog
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -48,7 +48,7 @@ class CallRecordingConsentDialogFragment : DialogFragment() {
             setContent {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
-                AndroidTheme(isDark = isDark) {
+                MegaAppTheme(isDark = isDark) {
                     CallRecordingConsentDialog(
                         onConfirm = {
                             viewModel.setIsRecordingConsentAccepted(value = true)

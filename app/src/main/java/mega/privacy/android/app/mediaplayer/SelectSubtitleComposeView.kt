@@ -58,8 +58,8 @@ import mega.privacy.android.app.mediaplayer.Constants.SELECTED_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.mediaplayer.Constants.SUBTITLE_FILES_TEST_TAG
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -458,7 +458,7 @@ internal fun EmptyTopBar(
 @Preview
 @Composable
 private fun PreviewSelectSubtitleFileViewWithEmptyList() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SelectSubtitleComposeView({}, {})
     }
 }
@@ -466,7 +466,7 @@ private fun PreviewSelectSubtitleFileViewWithEmptyList() {
 @Preview
 @Composable
 private fun PreviewSelectSubtitleFileView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SelectSubtitleComposeView({}, {})
     }
 }
@@ -474,7 +474,7 @@ private fun PreviewSelectSubtitleFileView() {
 @Preview
 @Composable
 private fun PreviewSubtitleEmptyView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SubtitleEmptyView(
             Modifier.fillMaxSize(),
             false
@@ -485,7 +485,7 @@ private fun PreviewSubtitleEmptyView() {
 @Preview
 @Composable
 private fun PreviewSubtitleEmptyViewWhenSearchMode() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SubtitleEmptyView(
             Modifier.fillMaxSize(),
             true
@@ -496,7 +496,7 @@ private fun PreviewSubtitleEmptyViewWhenSearchMode() {
 @Preview
 @Composable
 private fun PreviewSubtitleFileInfoListItem() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SubtitleFileInfoListItem(
             subtitleFileInfoItem = SubtitleFileInfoItem(
                 false,
@@ -515,7 +515,7 @@ private fun PreviewSubtitleFileInfoListItem() {
 @Preview
 @Composable
 private fun PreviewSubtitleFileInfoListView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SubtitleFileInfoListView(
             getTestSubtitleFileInfoList(),
         ) { }

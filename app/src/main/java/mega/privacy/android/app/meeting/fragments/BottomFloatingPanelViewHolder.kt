@@ -34,7 +34,7 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import timber.log.Timber
 
@@ -443,7 +443,7 @@ class BottomFloatingPanelViewHolder(
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val meetingState by meetingViewModel.state.collectAsStateWithLifecycle()
-                AndroidTheme(isDark = Util.isDarkMode(context)) {
+                MegaAppTheme(isDark = Util.isDarkMode(context)) {
                     ParticipantsBottomPanelView(
                         state = meetingState,
                         onWaitingRoomClick = {

@@ -24,11 +24,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -145,7 +145,7 @@ internal const val MENU_ITEM_SWITCH_TAG = "menu_action:button_switch"
 private fun PreviewPreviewMegaMenuAction(
     @PreviewParameter(BooleanProvider::class) isDestructive: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = R.drawable.ic_folder_list),
@@ -159,7 +159,7 @@ private fun PreviewPreviewMegaMenuAction(
 private fun PreviewMegaMenuActionWithSwitch(
     @PreviewParameter(BooleanProvider::class) hasSwitch: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = R.drawable.ic_folder_list),
@@ -176,7 +176,7 @@ private fun PreviewMegaMenuActionWithSwitch(
 @CombinedThemePreviews
 @Composable
 private fun PreviewMegaMenuActionWithoutIcon() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
         )
@@ -186,7 +186,7 @@ private fun PreviewMegaMenuActionWithoutIcon() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewMegaMenuActionWithTextButton() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = R.drawable.ic_folder_list),

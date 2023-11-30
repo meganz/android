@@ -38,7 +38,7 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -83,7 +83,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         checkLoginStatus()
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            AndroidTheme(isDark = themeMode.isDarkMode()) {
+            MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 MediaDiscoveryScreen(
                     mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,
                     viewModel = mediaDiscoveryViewModel,

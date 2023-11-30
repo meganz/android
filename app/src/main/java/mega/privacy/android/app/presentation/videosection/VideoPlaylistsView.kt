@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
 @Composable
@@ -23,7 +23,7 @@ internal fun VideoPlaylistsView(
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistsViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistsView(Modifier)
     }
 }

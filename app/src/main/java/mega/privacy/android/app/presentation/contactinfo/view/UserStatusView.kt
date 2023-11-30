@@ -14,8 +14,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.text
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.white_alpha_087
@@ -64,7 +64,7 @@ internal fun UserStatusView(
 @CombinedThemePreviews
 @Composable
 private fun PreviewUserStatusLight() {
-    AndroidTheme(isDark = false) {
+    MegaAppTheme(isDark = false) {
         Surface {
             UserStatusView(
                 modifier = Modifier,
@@ -79,7 +79,7 @@ private fun PreviewUserStatusLight() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewUserStatusDark() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         Surface {
             UserStatusView(
                 modifier = Modifier,

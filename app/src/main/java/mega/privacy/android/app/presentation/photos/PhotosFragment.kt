@@ -86,7 +86,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermiss
 import mega.privacy.android.app.utils.permission.PermissionUtils.getNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getPartialMediaPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -163,7 +163,7 @@ class PhotosFragment : Fragment() {
             setContent {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                AndroidTheme(isDark = mode.isDarkMode()) {
+                MegaAppTheme(isDark = mode.isDarkMode()) {
                     PhotosScreen(
                         viewComposeCoordinator = viewComposeCoordinator,
                         getFeatureFlagUseCase = getFeatureFlagUseCase,

@@ -40,9 +40,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.dialog.view.CallParticipantBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -343,7 +343,7 @@ private fun ParticipantsFullListAppBar(
 @Preview
 @Composable
 fun PreviewUsersListViewWaitingRoom() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         ParticipantsFullListView(state = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getParticipants(),
@@ -377,7 +377,7 @@ fun PreviewUsersListViewWaitingRoom() {
 @Preview
 @Composable
 fun PreviewUsersListViewInCall() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         ParticipantsFullListView(state = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getParticipants(),
@@ -411,7 +411,7 @@ fun PreviewUsersListViewInCall() {
 @Preview
 @Composable
 fun PreviewUsersListViewNotInCall() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         ParticipantsFullListView(state = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getParticipants(),

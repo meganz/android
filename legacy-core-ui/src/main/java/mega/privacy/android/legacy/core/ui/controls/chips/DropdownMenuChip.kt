@@ -36,10 +36,10 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.preview.TextFieldProvider
 import mega.privacy.android.core.ui.preview.TextFieldState
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
@@ -166,7 +166,7 @@ fun <T> DropdownMenuChip(
 private fun PreviewDropdownMenuChip(
     @PreviewParameter(TextFieldProvider::class) state: TextFieldState,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DropdownMenuChip(
             options = listOf("day", "week", "month"),
             initialSelectedOption = "day",

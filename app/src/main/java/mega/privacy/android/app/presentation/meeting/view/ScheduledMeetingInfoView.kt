@@ -74,8 +74,8 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoS
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_038
@@ -1282,7 +1282,7 @@ internal const val ACTION_BUTTON_OPTION_TAG = "scheduled_meeting_info:action_but
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewActionButton")
 @Composable
 fun PreviewActionButton() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ActionButton(state = ScheduledMeetingInfoState(
             scheduledMeeting = ChatScheduledMeeting(
                 chatId = -1,
@@ -1315,7 +1315,7 @@ fun PreviewActionButton() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkAddParticipantsButton")
 @Composable
 fun PreviewAddParticipantsButton() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         AddParticipantsButton(state = ScheduledMeetingInfoState(
             scheduledMeeting = ChatScheduledMeeting(
                 chatId = -1,
@@ -1344,7 +1344,7 @@ fun PreviewAddParticipantsButton() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewScheduledMeetingInfoView")
 @Composable
 fun PreviewScheduledMeetingInfoView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ScheduledMeetingInfoView(
             state = ScheduledMeetingInfoState(
                 scheduledMeeting = ChatScheduledMeeting(

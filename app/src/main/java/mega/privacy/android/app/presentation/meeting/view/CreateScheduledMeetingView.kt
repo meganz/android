@@ -65,11 +65,11 @@ import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetin
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.core.ui.controls.textfields.GenericTitleTextField
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -736,7 +736,7 @@ internal const val ACTION_BUTTON_TAG = "create_scheduled_meeting:action_button"
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewDiscardMeetingAlertDialog")
 @Composable
 fun PreviewDiscardMeetingAlertDialog() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DiscardMeetingAlertDialog(state = CreateScheduledMeetingState(
             meetingTitle = "Title meeting",
             rulesSelected = ChatScheduledRules(),
@@ -757,7 +757,7 @@ fun PreviewDiscardMeetingAlertDialog() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewRecurringMeetingDialog")
 @Composable
 fun PreviewRecurringMeetingDialog() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         RecurringMeetingDialog(state = CreateScheduledMeetingState(
             meetingTitle = "Title meeting",
             rulesSelected = ChatScheduledRules(),
@@ -778,7 +778,7 @@ fun PreviewRecurringMeetingDialog() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewCreateScheduledMeetingView")
 @Composable
 private fun PreviewCreateScheduledMeetingView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CreateScheduledMeetingView(
             state = CreateScheduledMeetingState(
                 meetingTitle = "Title meeting",

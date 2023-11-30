@@ -11,7 +11,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -45,7 +45,7 @@ class SecurityUpgradeDialogFragment : DialogFragment() {
                 setContent {
                     val mode by getThemeMode()
                         .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                    AndroidTheme(isDark = mode.isDarkMode()) {
+                    MegaAppTheme(isDark = mode.isDarkMode()) {
                         SecurityUpgradeDialogView(
                             onCloseClick = {
                                 dismiss()

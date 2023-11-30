@@ -12,8 +12,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
@@ -137,7 +137,7 @@ private fun getStatusColor(uiNodeStatus: DeviceCenterUINodeStatus) =
 @CombinedThemePreviews
 @Composable
 private fun PreviewDeviceCenterListViewItem() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(
                 id = "1234-5678",
@@ -159,7 +159,7 @@ private fun PreviewDeviceCenterListViewItem() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewDeviceCenterListViewItemWithEmptyTitle() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(
                 id = "1234-5678",

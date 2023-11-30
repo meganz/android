@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * An [AlertDialog] that is shown when Business Account users attempt to enable Camera Uploads, and
@@ -79,7 +79,7 @@ fun CameraUploadsBusinessAlertDialog(
 @Preview
 @Composable
 fun PreviewCameraUploadsBusinessAlertDialog() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CameraUploadsBusinessAlertDialog(
             show = true,
             onConfirm = {},

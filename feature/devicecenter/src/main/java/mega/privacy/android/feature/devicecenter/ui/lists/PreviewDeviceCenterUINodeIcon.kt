@@ -4,8 +4,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
@@ -22,7 +22,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUIN
 private fun PreviewDeviceCenterUINodeIcon(
     @PreviewParameter(DeviceCenterUINodeIconProvider::class) icon: DeviceCenterUINodeIcon,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(
                 id = "1234-5678",

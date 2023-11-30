@@ -41,11 +41,9 @@ import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.body2
 import mega.privacy.android.core.ui.theme.caption
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -58,6 +56,8 @@ import mega.privacy.android.core.ui.theme.subtitle2
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import java.util.Locale
 
 /**
@@ -389,7 +389,7 @@ private fun createPriceText(
 private fun PreviewChooseAccountView(
     @PreviewParameter(ChooseAccountPreviewProvider::class) state: ChooseAccountState,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChooseAccountView(state = state)
     }
 }

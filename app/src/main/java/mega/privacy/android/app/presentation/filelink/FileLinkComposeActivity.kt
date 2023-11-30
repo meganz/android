@@ -43,7 +43,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaNode
@@ -112,7 +112,7 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                 action = ::downloadFile
             )
 
-            AndroidTheme(isDark = themeMode.isDarkMode()) {
+            MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 FileLinkView(
                     viewState = uiState,
                     transferState = transferState,

@@ -106,10 +106,9 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRAN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_SECTION
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.amber_700_amber_300
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -130,6 +129,7 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import org.jetbrains.anko.displayMetrics
 import java.io.File
 
@@ -940,7 +940,7 @@ private fun shouldShowPaymentInfo(uiState: MyAccountHomeUIState): Boolean {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "MyAccountHomePreviewDark")
 @Composable
 internal fun MyAccountHomePreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MyAccountHomeView(
             uiState = MyAccountHomeUIState(
                 name = "QWERTY UIOP",

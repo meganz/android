@@ -11,7 +11,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.upgradeAccount.payment.component.PaymentScreen
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.PurchaseType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -33,7 +33,7 @@ internal class PaymentActivity : PasscodeActivity() {
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
 
-            AndroidTheme(isDark = themeMode.isDarkMode()) {
+            MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 PaymentScreen(billingViewModel = billingViewModel, paymentViewModel = viewModel)
             }
         }

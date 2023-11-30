@@ -51,7 +51,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 fun PhotosFilterView(
@@ -269,7 +269,7 @@ fun MediaSourceView(
 fun PreviewPhotosFilterView() {
     var selectedType by remember { mutableStateOf(FilterMediaType.ALL_MEDIA) }
     var selectedSource by remember { mutableStateOf(TimelinePhotosSource.ALL_PHOTOS) }
-    AndroidTheme(isSystemInDarkTheme()) {
+    MegaAppTheme(isSystemInDarkTheme()) {
         PhotosFilterView(
             timelineViewState = TimelineViewState(
                 currentFilterMediaType = selectedType,

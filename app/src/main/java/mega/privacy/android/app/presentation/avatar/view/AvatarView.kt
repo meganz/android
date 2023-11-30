@@ -36,7 +36,7 @@ import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.model.EmojiAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.dark_grey
 import mega.privacy.android.core.ui.theme.white
 
@@ -200,7 +200,7 @@ private fun borderColor() = white.takeIf { MaterialTheme.colors.isLight } ?: dar
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "PreviewEmojiAvatar")
 @Composable
 fun PreviewEmojiAvatar() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         EmojiAvatar(
             modifier = Modifier.size(66.dp),
             avatarBgColor = Color.Blue.toArgb(),
@@ -218,7 +218,7 @@ fun PreviewEmojiAvatar() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "PreviewTextAvatar")
 @Composable
 fun PreviewTextAvatar() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         TextAvatar(
             modifier = Modifier.size(66.dp),
             avatarBgColor = Color.Magenta.toArgb(),

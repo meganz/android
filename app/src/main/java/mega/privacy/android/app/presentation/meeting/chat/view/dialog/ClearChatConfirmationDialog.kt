@@ -7,10 +7,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * The dialog to show when it is trying to clear the chat history.
@@ -41,7 +41,7 @@ fun ClearChatConfirmationDialog(
 private fun ClearChatConfirmationDialogPreview(
     @PreviewParameter(BooleanProvider::class) isMeeting: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ClearChatConfirmationDialog(
             isMeeting = isMeeting,
             onDismiss = {},

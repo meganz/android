@@ -65,9 +65,9 @@ import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.isScrolledToEnd
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_038
@@ -557,7 +557,7 @@ fun CameraUploadsLimitedAccess(
 @CombinedThemePreviews()
 @Composable
 fun PreviewProgressBar() {
-    AndroidTheme(isSystemInDarkTheme()) {
+    MegaAppTheme(isSystemInDarkTheme()) {
         CameraUploadProgressBar(
             timelineViewState = TimelineViewState(
                 progressBarShowing = true,

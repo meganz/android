@@ -10,6 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.core.ui.controls.text.MegaText
@@ -17,7 +18,6 @@ import mega.privacy.android.core.ui.model.MegaSpanStyle
 import mega.privacy.android.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 /**
@@ -76,7 +76,7 @@ fun CallRecordingConsentDialog(
 @CombinedThemePreviews
 @Composable
 fun CallRecordingConsentDialogPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CallRecordingConsentDialog(
             onConfirm = {},
             onDismiss = {},

@@ -28,7 +28,7 @@ import mega.privacy.android.app.presentation.photos.albums.photosselection.Album
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -70,7 +70,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
-            AndroidTheme(isDark = themeMode.isDarkMode()) {
+            MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 when (albumScreen) {
                     AlbumScreen.AlbumPhotosSelectionScreen -> {
                         AlbumPhotosSelectionScreen(

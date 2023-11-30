@@ -16,10 +16,10 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.layouts.CollapsibleHeaderWithTitle
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
 @Composable
@@ -73,7 +73,7 @@ internal fun FileInfoHeader(
 private fun FileInfoHeaderPreview(
     @PreviewParameter(FileInfoViewStatePreviewsProvider::class) viewState: FileInfoViewState,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         FileInfoHeader(
             title = viewState.title,
             iconResource = viewState.iconResource,

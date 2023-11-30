@@ -30,11 +30,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toStorageString
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.AchievementsOverviewViewModel
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_020_dark_grey
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 
 internal object AchievementViewTestTags {
     private const val ACHIEVEMENTS_VIEW = "achievements_info_view"
@@ -269,7 +269,7 @@ internal fun AchievementView(
 @Preview(showBackground = true)
 @Composable
 fun AchievementPreview() {
-    AndroidTheme(false) {
+    MegaAppTheme(false) {
         AchievementView(
             currentStorage = 1337000000000,
             hasReferrals = true,
@@ -295,7 +295,7 @@ fun AchievementPreview() {
 @Preview(showBackground = true)
 @Composable
 fun AchievementPreviewDark() {
-    AndroidTheme(true) {
+    MegaAppTheme(true) {
         AchievementView(
             currentStorage = 13376969,
             hasReferrals = false,

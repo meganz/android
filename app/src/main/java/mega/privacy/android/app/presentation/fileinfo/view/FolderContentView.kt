@@ -7,8 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * Shows a titled text with the total amount of files and folders for a folder
@@ -54,7 +54,7 @@ internal fun FolderContentView(
 @CombinedTextAndThemePreviews
 @Composable
 private fun FolderContentPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         FolderContentView(numberOfFolders = 3, numberOfFiles = 24)
     }
 }

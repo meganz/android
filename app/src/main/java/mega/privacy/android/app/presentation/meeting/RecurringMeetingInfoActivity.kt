@@ -5,12 +5,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -19,12 +19,12 @@ import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingInfoView
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
@@ -98,7 +98,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
-        AndroidTheme(isDark = isDark) {
+        MegaAppTheme(isDark = isDark) {
             RecurringMeetingInfoView(
                 state = uiState,
                 managementState = managementState,

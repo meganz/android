@@ -55,7 +55,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_CREATED
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
@@ -477,7 +477,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
         val waitingRoomManagementState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
 
-        AndroidTheme(isDark = isDark) {
+        MegaAppTheme(isDark = isDark) {
             ScheduledMeetingInfoView(
                 state = uiState,
                 managementState = managementState,

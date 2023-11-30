@@ -295,7 +295,7 @@ dependencies {
     implementation(project(":core:formatter"))
     implementation(project(":domain"))
     implementation(project(":core-ui"))
-    implementation(project(":core:theme"))
+    implementation(project(":shared:theme"))
     implementation(project(":legacy-core-ui"))
     implementation(project(":data"))
     implementation(project(":navigation"))

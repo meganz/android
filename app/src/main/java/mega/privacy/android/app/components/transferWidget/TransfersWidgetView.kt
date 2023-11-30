@@ -22,8 +22,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.amber_700_amber_300
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.TransfersInfo
@@ -125,7 +125,7 @@ const val TAG_UPLOADING_DOWNLOADING_ICON = "uploadingDownloading"
 private fun TransfersWidgetPreview(
     @PreviewParameter(TransfersWidgetPreviewProvider::class) parameter: TransfersInfo,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         TransfersWidgetView(parameter, onClick = {})
     }
 }

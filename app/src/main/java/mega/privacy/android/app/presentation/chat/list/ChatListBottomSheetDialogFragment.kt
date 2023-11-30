@@ -32,7 +32,7 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkMandatoryCallPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestCallPermissions
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
@@ -81,7 +81,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val item: ChatRoomItem? by viewModel.getChatRoom(chatId)
                 .collectAsStateWithLifecycle(null, viewLifecycleOwner, Lifecycle.State.STARTED)
-            AndroidTheme(isDark = mode.isDarkMode()) {
+            MegaAppTheme(isDark = mode.isDarkMode()) {
                 ChatRoomItemBottomSheetView(
                     item = item,
                     onStartMeetingClick = ::onStartMeetingClick,

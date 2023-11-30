@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * View to show the file or folder total size
@@ -28,7 +28,7 @@ internal fun NodeSizeView(
 @CombinedTextAndThemePreviews
 @Composable
 private fun NodeSizePreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         NodeSizeView(forFolder = true, sizeString = "1024 Bytes")
     }
 }

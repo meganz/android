@@ -35,7 +35,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDis
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -105,7 +105,7 @@ class MediaDiscoveryFragment : Fragment() {
                 val isNewMediaDiscoveryFabEnabled by produceState(initialValue = false) {
                     value = getFeatureFlagUseCase(AppFeatures.NewMediaDiscoveryFab)
                 }
-                AndroidTheme(isDark = mode.isDarkMode()) {
+                MegaAppTheme(isDark = mode.isDarkMode()) {
                     MediaDiscoveryView(
                         mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,
                         mediaDiscoveryViewModel = mediaDiscoveryViewModel,

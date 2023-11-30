@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist.solvedissues
 
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
@@ -11,11 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.feature.sync.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
 import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWithBody
@@ -55,7 +55,7 @@ internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
 @CombinedThemePreviews
 @Composable
 internal fun SyncSolvedIssuesScreenPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SyncSolvedIssuesScreen(
             listOf(
                 SolvedIssueUiItem(

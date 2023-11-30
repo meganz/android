@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava
@@ -54,7 +54,7 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
                 val state by viewModel.state.collectAsStateWithLifecycle()
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
-                AndroidTheme(isDark = isDark) {
+                MegaAppTheme(isDark = isDark) {
                     UsersInWaitingRoomDialog(
                         state = state,
                         onAdmitClick = {

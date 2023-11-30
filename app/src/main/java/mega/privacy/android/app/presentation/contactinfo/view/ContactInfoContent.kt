@@ -18,8 +18,8 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -112,7 +112,7 @@ private fun PreviewContactInfoContent() {
         avatarUri = "https://avatar.uri.com",
         fullName = "Tony Stark",
     )
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ContactInfoContent(
             uiState = ContactInfoState(
                 contactItem = ContactItem(
@@ -174,7 +174,7 @@ private fun PreviewContactInfoContentWithChatRoom() {
         isSpeakRequest = true,
         peerPrivilegesList = emptyList()
     )
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ContactInfoContent(
             uiState = ContactInfoState(
                 contactItem = ContactItem(

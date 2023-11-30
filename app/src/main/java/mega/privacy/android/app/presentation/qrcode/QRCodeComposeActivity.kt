@@ -25,7 +25,7 @@ import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
@@ -83,7 +83,7 @@ class QRCodeComposeActivity : PasscodeActivity() {
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val viewState by viewModel.uiState.collectAsStateWithLifecycle()
-            AndroidTheme(isDark = mode.isDarkMode()) {
+            MegaAppTheme(isDark = mode.isDarkMode()) {
                 QRCodeView(
                     viewState = viewState,
                     onBackPressed = onBackPressedDispatcher::onBackPressed,

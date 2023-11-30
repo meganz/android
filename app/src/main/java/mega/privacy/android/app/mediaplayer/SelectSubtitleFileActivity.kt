@@ -12,7 +12,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerFragment.Companion.INTENT_KEY_SUBTITLE_FILE_INFO
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -55,7 +55,7 @@ class SelectSubtitleFileActivity : PasscodeActivity() {
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
-            AndroidTheme(isDark = themeMode.isDarkMode()) {
+            MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 SelectSubtitleComposeView(
                     onAddSubtitle = { info ->
                         viewModel.sendAddSubtitleClickedEvent()

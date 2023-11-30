@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
-import mega.privacy.android.core.theme.tokens.MegaAppTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItem
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews

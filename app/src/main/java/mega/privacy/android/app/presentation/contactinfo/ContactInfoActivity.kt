@@ -98,7 +98,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -549,7 +549,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
                 val waitingRoomState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
-                AndroidTheme(isDark = isDark) {
+                MegaAppTheme(isDark = isDark) {
                     UsersInWaitingRoomDialog(
                         state = waitingRoomState,
                         onAdmitClick = {

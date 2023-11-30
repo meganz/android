@@ -13,11 +13,11 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.view.getRecurringMeetingDateTime
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.chat.messages.FirstMessageHeaderParagraph
 import mega.privacy.android.core.ui.controls.chat.messages.FirstMessageHeaderSubtitleWithIcon
 import mega.privacy.android.core.ui.controls.chat.messages.FirstMessageHeaderTitle
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
@@ -67,7 +67,7 @@ internal fun FirstMessageHeader(uiState: ChatUiState) {
 @CombinedThemePreviews
 @Composable
 private fun FirstMessageHeaderPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         FirstMessageHeader(
             uiState = ChatUiState(
                 title = "My Name",

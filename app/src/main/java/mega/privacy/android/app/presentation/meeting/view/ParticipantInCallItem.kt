@@ -33,7 +33,7 @@ import mega.privacy.android.app.presentation.contact.view.ContactStatusView
 import mega.privacy.android.app.presentation.contact.view.DefaultAvatarView
 import mega.privacy.android.app.presentation.contact.view.UriAvatarView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
@@ -251,7 +251,7 @@ private fun ParticipantAvatar(
 @Preview
 @Composable
 fun PreviewParticipantInWaitingRoomItem() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.WaitingRoomSection,
             hasHostPermission = true,
@@ -278,7 +278,7 @@ fun PreviewParticipantInWaitingRoomItem() {
 @Preview
 @Composable
 fun PreviewMeParticipantInCallItem() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.InCallSection,
             hasHostPermission = true,
@@ -307,7 +307,7 @@ fun PreviewMeParticipantInCallItem() {
 @Preview
 @Composable
 fun PreviewParticipantInCallItem() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.InCallSection,
             hasHostPermission = true,
@@ -333,7 +333,7 @@ fun PreviewParticipantInCallItem() {
 @Preview
 @Composable
 fun PreviewGuestParticipantInCallItem() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.InCallSection,
             hasHostPermission = true,
@@ -359,7 +359,7 @@ fun PreviewGuestParticipantInCallItem() {
 @Preview
 @Composable
 fun PreviewParticipantNotInCallItem() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.NotInCallSection,
             hasHostPermission = true,
@@ -386,7 +386,7 @@ fun PreviewParticipantNotInCallItem() {
 @Preview
 @Composable
 fun PreviewParticipantNotInCallItemNonHost() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.NotInCallSection,
             hasHostPermission = false,
@@ -414,7 +414,7 @@ fun PreviewParticipantNotInCallItemNonHost() {
 @Preview
 @Composable
 fun PreviewGuestParticipantNotInCallItem() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.NotInCallSection,
             hasHostPermission = true,

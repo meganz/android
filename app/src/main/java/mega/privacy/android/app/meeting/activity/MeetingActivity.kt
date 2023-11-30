@@ -51,7 +51,7 @@ import mega.privacy.android.app.presentation.meeting.view.ParticipantsFullListVi
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
@@ -209,7 +209,7 @@ class MeetingActivity : PasscodeActivity() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val waitingRoomState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
-                AndroidTheme(isDark = true) {
+                MegaAppTheme(isDark = true) {
                     UsersInWaitingRoomDialog(
                         state = waitingRoomState,
                         onAdmitClick = {
@@ -248,7 +248,7 @@ class MeetingActivity : PasscodeActivity() {
                 val state by meetingViewModel.state.collectAsStateWithLifecycle()
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
-                AndroidTheme(isDark = isDark) {
+                MegaAppTheme(isDark = isDark) {
                     ParticipantsFullListView(
                         state = state,
                         onScrollChange = { scrolled ->
@@ -333,7 +333,7 @@ class MeetingActivity : PasscodeActivity() {
             setContent {
                 val state by meetingViewModel.state.collectAsStateWithLifecycle()
                 if (state.isSessionOnRecording && state.showRecordingConsentDialog && !state.isRecordingConsentAccepted) {
-                    AndroidTheme(isDark = true) {
+                    MegaAppTheme(isDark = true) {
                         CallRecordingConsentDialog(
                             onConfirm = {
                                 meetingViewModel.setIsRecordingConsentAccepted(value = true)

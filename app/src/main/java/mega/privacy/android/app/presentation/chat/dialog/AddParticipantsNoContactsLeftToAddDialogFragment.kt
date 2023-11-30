@@ -12,7 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContactsAddedDialog
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -38,7 +38,7 @@ class AddParticipantsNoContactsLeftToAddDialogFragment : DialogFragment() {
             setContent {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     AllContactsAddedDialog(
                         onDismiss = { dismissAllowingStateLoss() },
                     )

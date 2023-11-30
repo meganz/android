@@ -17,8 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * A [Composable] that displays a Top App Bar with a Title and Back Button
@@ -99,7 +99,7 @@ fun SimpleTopAppBar(
 @CombinedThemePreviews
 @Composable
 private fun PreviewSimpleTopAppBar() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SimpleTopAppBar(titleId = 0,
             elevation = false,
             onBackPressed = {}
@@ -113,7 +113,7 @@ private fun PreviewSimpleTopAppBar() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewSimpleTopAppBarWithOverflowText() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SimpleTopAppBar(
             title = "This is a very long toolbar title that can overflow",
             elevation = false,

@@ -19,7 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.extensions.body4
 
@@ -76,7 +76,7 @@ fun AttachItemPlaceHolder(modifier: Modifier = Modifier) =
 @CombinedThemePreviews
 @Composable
 private fun AttachItemPreview() {
-    AndroidThemeForPreviews {
+    AndroidTheme {
         AttachItem(
             iconId = R.drawable.ic_menu,
             itemName = "Item",

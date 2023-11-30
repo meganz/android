@@ -40,7 +40,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -246,7 +246,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
             val uiState by transfersManagementViewModel.state.collectAsStateWithLifecycle(
                 TransferManagementUiState()
             )
-            AndroidTheme(isDark = themeMode.isDarkMode()) {
+            MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 @OptIn(ExperimentalAnimationApi::class)
                 AnimatedVisibility(
                     visible = uiState.widgetVisible,

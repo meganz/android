@@ -3,7 +3,7 @@ package mega.privacy.android.feature.sync.ui.views
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import mega.privacy.android.core.theme.tokens.MegaAppTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.sync.ui.model.SyncOption

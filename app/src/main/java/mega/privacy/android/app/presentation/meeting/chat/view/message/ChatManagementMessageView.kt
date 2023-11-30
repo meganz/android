@@ -6,10 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 
 /**
  * Chat management message view
@@ -35,7 +35,7 @@ fun ChatManagementMessageView(
 @CombinedThemePreviews
 @Composable
 private fun ChatManagementMessageViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatManagementMessageView(
             text = "[A]Hello[/A] World",
             styles = mapOf(

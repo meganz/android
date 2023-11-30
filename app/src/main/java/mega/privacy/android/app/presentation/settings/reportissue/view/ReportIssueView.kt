@@ -24,13 +24,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueState
-import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
-import mega.privacy.android.legacy.core.ui.controls.dialogs.ProgressDialog
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
+import mega.privacy.android.legacy.core.ui.controls.dialogs.ProgressDialog
 
 @Composable
 fun ReportIssueView(
@@ -125,7 +125,7 @@ private fun ProgressHandler(
 @Composable
 fun PreviewReportIssueView() {
     var checkedState by remember { mutableStateOf(false) }
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         Scaffold {
             ReportIssueView(
                 state = ReportIssueState(

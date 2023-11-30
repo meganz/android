@@ -24,10 +24,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.preview.TextFieldProvider
 import mega.privacy.android.core.ui.preview.TextFieldState
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
 /**
@@ -125,7 +125,7 @@ private fun colorsUnChecked() = ButtonDefaults.buttonColors(
 private fun PreviewTextButtonWithIconChip(
     @PreviewParameter(TextFieldProvider::class) state: TextFieldState,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         TextButtonWithIconChip(
             onClick = { },
             text = "weekdays",

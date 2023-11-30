@@ -2,7 +2,7 @@
 // Generated automatically by KotlinTokensGenerator.
 // Do not modify this file manually.
 //
-package mega.privacy.android.core.theme.tokens
+package mega.privacy.android.shared.theme.tokens
 
 import mega.privacy.android.core.ui.theme.tokens.Background
 import mega.privacy.android.core.ui.theme.tokens.Border

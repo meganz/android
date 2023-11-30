@@ -59,7 +59,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -192,7 +192,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val adsUiState by adsViewModel.uiState.collectAsStateWithLifecycle()
 
-        AndroidTheme(isDark = themeMode.isDarkMode()) {
+        MegaAppTheme(isDark = themeMode.isDarkMode()) {
             FolderLinkView(
                 state = uiState,
                 onBackPressed = viewModel::handleBackPress,

@@ -22,8 +22,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlag
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.textfields.GenericTextField
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -53,7 +53,7 @@ class FeatureFlagActivity : BaseActivity() {
                     val mode by getThemeMode()
                         .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                     val uiState by featureFlagMenuViewModel.state.collectAsStateWithLifecycle()
-                    AndroidTheme(isDark = mode.isDarkMode()) {
+                    MegaAppTheme(isDark = mode.isDarkMode()) {
                         FeatureFlagBody(
                             featureFlags = uiState.filteredFeatureFlags,
                             onFeatureFlagChecked = featureFlagMenuViewModel::setFeatureEnabled,

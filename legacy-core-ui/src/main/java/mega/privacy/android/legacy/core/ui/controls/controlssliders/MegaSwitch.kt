@@ -12,9 +12,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.grey_010
 import mega.privacy.android.core.ui.theme.grey_100
 import mega.privacy.android.core.ui.theme.grey_400
@@ -70,7 +70,7 @@ private fun MegaSwitchPreview(
     @PreviewParameter(BooleanProvider::class) initialValue: Boolean,
 ) {
     var checked by remember { mutableStateOf(initialValue) }
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MegaSwitch(
             checked = checked,
             onCheckedChange = { checked = !checked })

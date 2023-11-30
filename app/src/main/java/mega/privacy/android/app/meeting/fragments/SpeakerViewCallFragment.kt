@@ -27,7 +27,7 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.VideoListViewAdapter
 import mega.privacy.android.app.presentation.meeting.view.SpeakerCallView
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatSession
@@ -139,7 +139,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val state by inMeetingViewModel.state.collectAsStateWithLifecycle()
-                AndroidTheme(isDark = true) {
+                MegaAppTheme(isDark = true) {
                     SpeakerCallView(
                         state = state,
                         onSnackbarMessageConsumed = {

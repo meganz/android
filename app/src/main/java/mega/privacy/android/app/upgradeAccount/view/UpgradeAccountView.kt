@@ -70,11 +70,8 @@ import mega.privacy.android.app.upgradeAccount.view.components.MonthlyYearlyTabs
 import mega.privacy.android.app.upgradeAccount.view.components.ProPlanInfoCard
 import mega.privacy.android.app.upgradeAccount.view.components.SaveUpToLabel
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.theme.tokens.MegaAppTheme
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleNoTitleTopAppBar
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedClickableText
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.legacy.core.ui.model.SpanStyleWithAnnotation
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.Typography
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -88,6 +85,9 @@ import mega.privacy.android.core.ui.theme.subtitle1
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleNoTitleTopAppBar
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedClickableText
+import mega.privacy.android.legacy.core.ui.model.SpanStyleWithAnnotation
 
 internal const val UPGRADE_ACCOUNT_SCREEN_TAG = "upgrade_account_screen:"
 internal const val TOS_TAG = "upgrade_account_screen:link_terms_of_service"

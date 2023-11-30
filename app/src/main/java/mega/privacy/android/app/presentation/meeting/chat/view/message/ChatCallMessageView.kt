@@ -10,9 +10,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.chat.messages.ChatManagementMessage
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.messages.management.CallEndedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
@@ -146,7 +146,7 @@ private fun getAppropriateStringForCallEnded(
 private fun ChatCallMessageViewPreview(
     @PreviewParameter(ChatCallMessageViewParameterProvider::class) parameters: PreviewParameters,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatCallMessageView(
             message = parameters.message,
             isOneToOneChat = parameters.isOneToOneChat,

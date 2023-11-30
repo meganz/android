@@ -11,7 +11,7 @@ import mega.privacy.android.core.ui.controls.dialogs.internal.BaseMegaAlertDialo
 import mega.privacy.android.core.ui.controls.preview.PreviewAlertDialogParametersProvider
 import mega.privacy.android.core.ui.controls.preview.PreviewStringParameters
 import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
-import mega.privacy.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
 
 
 /**
@@ -90,7 +90,7 @@ fun MegaAlertDialog(
 private fun MegaAlertDialogPreview(
     @PreviewParameter(PreviewAlertDialogParametersProvider::class) texts: PreviewStringParameters,
 ) {
-    AndroidThemeForPreviews {
+    AndroidTheme {
         PreviewBox {
             MegaAlertDialog(
                 text = texts.text.getText(),

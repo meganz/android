@@ -1,4 +1,4 @@
-package mega.privacy.android.core.theme.buildscripts
+package mega.privacy.android.shared.theme.buildscripts
 
 import mega.privacy.android.core.ui.buildscripts.GenerateTokens
 
@@ -8,8 +8,8 @@ import mega.privacy.android.core.ui.buildscripts.GenerateTokens
 fun main(args: Array<String>) {
     GenerateTokens().generate(
         appPrefix = "MegaApp",
-        packageName = "mega.privacy.android.core.theme.tokens",
-        destinationPath = "core/theme/src/main/java",
+        packageName = "mega.privacy.android.shared.theme.tokens",
+        destinationPath = "shared/theme/src/main/java",
         assetsFolder = "designSystemAssets"
     )
 }

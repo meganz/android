@@ -37,9 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.slideshow.SlideshowSettingViewModel
-import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
-import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.button
 import mega.privacy.android.core.ui.theme.grey_alpha_012
@@ -53,6 +51,8 @@ import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
+import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
+import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.mobile.analytics.event.SlideshowSettingOrderNewestButtonEvent
 import mega.privacy.mobile.analytics.event.SlideshowSettingOrderOldestButtonEvent
 import mega.privacy.mobile.analytics.event.SlideshowSettingOrderShuffleButtonEvent
@@ -318,7 +318,7 @@ fun PreviewSlideshowSettingsView() {
     var selectedSpeed by remember { mutableStateOf("Normal (4s)") }
     var selectedOrder by remember { mutableStateOf("Shuffle") }
     var repeat by remember { mutableStateOf(false) }
-    AndroidTheme(isSystemInDarkTheme()) {
+    MegaAppTheme(isSystemInDarkTheme()) {
         Scaffold {
             SlideshowSettingsView(viewModel())
         }

@@ -62,7 +62,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -148,7 +148,7 @@ class FileBrowserComposeFragment : Fragment() {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by fileBrowserViewModel.state.collectAsStateWithLifecycle()
-                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     FileBrowserComposeView(
                         uiState = uiState,
                         emptyState = getEmptyFolderDrawable(uiState.isFileBrowserEmpty),

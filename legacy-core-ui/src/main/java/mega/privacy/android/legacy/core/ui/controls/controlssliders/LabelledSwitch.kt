@@ -18,9 +18,9 @@ import androidx.compose.ui.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.white_alpha_087
 
@@ -62,7 +62,7 @@ private fun LabelledSwitchPreview(
     @PreviewParameter(BooleanProvider::class) initialValue: Boolean,
 ) {
     var checked by remember { mutableStateOf(initialValue) }
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         LabelledSwitch(label = stringResource(if (checked) R.string.on else R.string.off),
             checked = checked,
             onCheckChanged = { checked = !checked })

@@ -58,13 +58,8 @@ import mega.privacy.android.app.presentation.extensions.meeting.StringId
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.CustomRecurrenceState
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
-import mega.privacy.android.legacy.core.ui.controls.chips.DropdownMenuChip
-import mega.privacy.android.legacy.core.ui.controls.chips.TextButtonChip
-import mega.privacy.android.legacy.core.ui.controls.chips.TextButtonWithIconChip
-import mega.privacy.android.legacy.core.ui.controls.chips.TextFieldChip
-import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
@@ -73,6 +68,11 @@ import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.MonthlyRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
+import mega.privacy.android.legacy.core.ui.controls.chips.DropdownMenuChip
+import mega.privacy.android.legacy.core.ui.controls.chips.TextButtonChip
+import mega.privacy.android.legacy.core.ui.controls.chips.TextButtonWithIconChip
+import mega.privacy.android.legacy.core.ui.controls.chips.TextFieldChip
+import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import java.time.ZonedDateTime
 
 /**
@@ -761,7 +761,7 @@ private fun EndsSection(
 @CombinedThemePreviews
 @Composable
 private fun PreviewCustomRecurrenceView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CustomRecurrenceView(
             state = CreateScheduledMeetingState(
                 meetingTitle = "Title meeting",

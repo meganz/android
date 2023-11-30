@@ -68,8 +68,8 @@ import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BU
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SNACKBAR_TAG
 import mega.privacy.android.app.presentation.view.NodesView
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
@@ -476,7 +476,7 @@ internal fun EmptyFolderLinkView(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSimpleAppBarPreview")
 @Composable
 private fun PreviewFolderLinkTopAppBar() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         FolderLinkTopAppBar(
             title = "Folder Name",
             elevation = false,
@@ -491,7 +491,7 @@ private fun PreviewFolderLinkTopAppBar() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSimpleAppBarPreview")
 @Composable
 private fun PreviewEmptyFolderLinkView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         EmptyFolderLinkView(
             modifier = Modifier
                 .fillMaxWidth()
@@ -507,7 +507,7 @@ private fun PreviewEmptyFolderLinkView() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSimpleAppBarPreview")
 @Composable
 private fun PreviewFolderLinkSelectedTopAppBar() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         FolderLinkSelectedTopAppBar(
             title = "Folder Name",
             elevation = false,
@@ -523,7 +523,7 @@ private fun PreviewFolderLinkSelectedTopAppBar() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSimpleAppBarPreview")
 @Composable
 private fun PreviewImportDownloadView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ImportDownloadView(
             modifier = Modifier
                 .fillMaxWidth()

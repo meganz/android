@@ -35,9 +35,8 @@ import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.dark_blue_500_dark_blue_200
 import mega.privacy.android.core.ui.theme.extensions.green_500_green_300
@@ -49,6 +48,7 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 
 internal object TestTags {
     private const val REFERRAL_BONUS_VIEW = "referral_bonus_view"
@@ -238,7 +238,7 @@ internal fun ReferralListItem(
 @CombinedThemePreviews
 @Composable
 private fun ReferralBonusViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ReferralBonusView(
             modifier = Modifier,
             uiState = ReferralBonusesUIState(

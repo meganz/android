@@ -22,8 +22,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.red_500
@@ -123,7 +123,7 @@ fun MenuActionNodeHeaderWithBody(
 @CombinedThemePreviews
 @Composable
 private fun HeaderPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Node Title",
             body = "Node Body",
@@ -135,7 +135,7 @@ private fun HeaderPreview() {
 @CombinedThemePreviews
 @Composable
 private fun HeaderWithVeryLongTitlePreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "This is a very long Title that exceeds the maximum number of two lines. An ellipsis is added for additional text",
             body = "Node Body",
@@ -150,7 +150,7 @@ private fun HeaderWithVeryLongTitlePreview() {
 @CombinedThemePreviews
 @Composable
 private fun HeaderWithBodyIconPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Node Title",
             body = "Node Body",
@@ -169,7 +169,7 @@ private fun HeaderWithBodyIconPreview() {
 @CombinedThemePreviews
 @Composable
 private fun HeaderWithVeryLongBodyPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Backup Folder",
             body = "Sync or backup has been stopped as you’ve logged out or closed the session. To re-enable, go to Settings in the desktop app, select the Sync or Backup tab, and check the relevant folder.",
@@ -188,7 +188,7 @@ private fun HeaderWithVeryLongBodyPreview() {
 @CombinedThemePreviews
 @Composable
 private fun HeaderWithBodyIconAndVeryLongBodyPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Backup Folder",
             body = "Sync or backup has been stopped as you’ve logged out or closed the session. To re-enable, go to Settings in the desktop app, select the Sync or Backup tab, and check the relevant folder.",

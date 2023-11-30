@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
 /**
@@ -51,7 +51,7 @@ internal const val MENU_HEADER_TEXT_TAG = "menu_list_view_header_item:text_title
 @CombinedThemePreviews
 @Composable
 private fun PreviewMenuActionHeader() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MenuActionHeader(
             text = "Menu item label test very big item check ellipsis on text",
         )

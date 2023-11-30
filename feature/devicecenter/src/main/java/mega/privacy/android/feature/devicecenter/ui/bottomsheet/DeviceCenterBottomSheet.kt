@@ -14,10 +14,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWithBody
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.BackupFolderBottomSheetBody
@@ -33,6 +32,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
+import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWithBody
 
 /**
  * Test Tags for the Device Center Bottom Sheet
@@ -201,7 +201,7 @@ private fun getNodeIconColor(uiNodeIcon: DeviceCenterUINodeIcon) =
 @CombinedThemePreviews
 @Composable
 private fun PreviewDeviceCenterBottomSheet() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         val ownDeviceUINode = OwnDeviceUINode(
             id = "1234-5678",
             name = "Test Device",

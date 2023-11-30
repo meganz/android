@@ -33,9 +33,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.h6
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
@@ -336,7 +336,7 @@ private fun getDetail(state: StorageStatusDialogState): DialogViewDetail {
 private fun PreviewHorizontalButtonDialog(
     @PreviewParameter(StorageStatusDialogPreviewProvider::class) storageState: StorageStatusDialogState,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         StorageStatusDialogView(
             state = storageState,
             dismissClickListener = {},

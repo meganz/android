@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.theme
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -29,28 +30,18 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 
 /**
- * Android theme
+ * Android theme to be used only for internal previews
  *
  * @param isDark
  * @param content
  */
+@SuppressLint("IsSystemInDarkTheme")
 @Composable
-@Deprecated(message = "Usage of AndroidTheme without setting the color tokens is deprecated, please use app specific theme with colours defined")
-fun AndroidTheme(
-    isDark: Boolean,
+internal fun AndroidTheme(
+    isDark: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) = AndroidTheme(
     isDark = isDark,
-    darkColorTokens = DefaultSemanticTokensDark,
-    lightColorTokens = DefaultSemanticTokensLight,
-    content = content,
-)
-
-@Composable
-internal fun AndroidThemeForPreviews(
-    content: @Composable () -> Unit,
-) = AndroidTheme(
-    isDark = isSystemInDarkTheme(),
     darkColorTokens = DefaultSemanticTokensDark,
     lightColorTokens = DefaultSemanticTokensLight,
     content = content,

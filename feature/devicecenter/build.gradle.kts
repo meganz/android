@@ -78,6 +78,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":data"))
     implementation(project(":core-ui"))
+    implementation(project(":shared:theme"))
     implementation(project(":legacy-core-ui"))
 
     testImplementation(project(":core-ui-test"))

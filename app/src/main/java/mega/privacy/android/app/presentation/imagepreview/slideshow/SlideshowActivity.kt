@@ -13,7 +13,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SlideshowScreen
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SlideshowSettingScreen
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -32,7 +32,7 @@ class SlideshowActivity : BaseActivity() {
 
             val mode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            AndroidTheme(isDark = mode.isDarkMode()) {
+            MegaAppTheme(isDark = mode.isDarkMode()) {
                 NavHost(navController, startDestination = "slideshow") {
                     composable("slideshow") {
                         SlideshowScreen(

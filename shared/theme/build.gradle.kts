@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "mega.privacy.android.core.ui.theme"
+    namespace = "mega.privacy.android.shared.theme"
     val compileSdkVersion: Int by rootProject.extra
     compileSdk = compileSdkVersion
     val buildTools: String by rootProject.extra

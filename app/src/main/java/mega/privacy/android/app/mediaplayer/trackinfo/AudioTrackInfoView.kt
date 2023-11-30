@@ -45,7 +45,7 @@ import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_SIZE_TEST_
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_TITLE_TEST_TAG
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.OFFLINE_OPTION_TEST_TAG
 import mega.privacy.android.app.utils.LocationInfo
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import java.io.File
 
 internal object Constants {
@@ -367,7 +367,7 @@ fun AudioNodeInfoView(
 @Preview
 @Composable
 private fun PreviewAudioInfoView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         AudioInfoView(
             thumbnail = null,
             titleString = "Vengeance Rhythm",
@@ -381,7 +381,7 @@ private fun PreviewAudioInfoView() {
 @Preview
 @Composable
 private fun PreviewAudioNodeInfoView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         AudioNodeInfoView(
             onCheckedChange = {},
             isEnabled = false,

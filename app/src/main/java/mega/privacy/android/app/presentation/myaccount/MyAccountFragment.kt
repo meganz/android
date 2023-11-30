@@ -26,7 +26,7 @@ import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -72,7 +72,7 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     MyAccountHomeView(
                         uiState = uiState,
                         uiActions = this@MyAccountFragment,

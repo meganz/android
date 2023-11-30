@@ -8,9 +8,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.logout.model.LogoutState
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 
 @Composable
 internal fun LogoutConfirmationDialog(
@@ -77,7 +77,7 @@ private fun ShowDialog(
 @CombinedThemePreviews
 @Composable
 private fun LogoutConfirmationDialogPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ConfirmationDialog(
             logoutState = LogoutState.Data(hasOfflineFiles = true, hasPendingTransfers = true),
             logout = {},

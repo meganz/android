@@ -67,7 +67,7 @@ import mega.privacy.android.app.presentation.slideshow.model.SlideshowItem
 import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
 import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_070
 import mega.privacy.android.core.ui.theme.white
@@ -100,7 +100,7 @@ class SlideshowFragment : Fragment() {
             setContent {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                AndroidTheme(isDark = mode.isDarkMode()) {
+                MegaAppTheme(isDark = mode.isDarkMode()) {
                     SlideshowBody()
                 }
             }

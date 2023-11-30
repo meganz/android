@@ -18,17 +18,17 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
-import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_NEW_PASSWORD
-import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_VERIFY_TYPE
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
+import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
+import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_NEW_PASSWORD
+import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_VERIFY_TYPE
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHANGE_PASSWORD_2FA
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaError
@@ -106,7 +106,7 @@ class ChangePasswordActivity : PasscodeActivity() {
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        AndroidTheme(isDark = themeMode.isDarkMode()) {
+        MegaAppTheme(isDark = themeMode.isDarkMode()) {
             LaunchedEffect(Unit) {
                 viewModel.determineIfScreenIsResetPasswordMode()
             }

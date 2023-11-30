@@ -25,7 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.grey_700
 
 /**
@@ -100,7 +100,7 @@ fun FeatureFlagRowPreview() {
     val description by derivedStateOf {
         if (enabled) "This is the subtitle, it goes away when you toggle this switch" else null
     }
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         FeatureFlagRow(
             name = "Test Flag",
             description = description,

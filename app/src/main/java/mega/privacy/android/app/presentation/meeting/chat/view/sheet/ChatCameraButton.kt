@@ -41,7 +41,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import mega.privacy.android.app.R
-import mega.privacy.android.core.theme.tokens.MegaAppTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.chat.attachpanel.ChatGalleryItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import timber.log.Timber

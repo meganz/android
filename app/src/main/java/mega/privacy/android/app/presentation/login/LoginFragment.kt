@@ -58,7 +58,7 @@ import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.qualifier.LoginMutex
@@ -128,7 +128,7 @@ class LoginFragment : Fragment() {
             if (ongoingTransfersExist == true) showCancelTransfersDialog()
         }
 
-        AndroidTheme(isDark = themeMode.isDarkMode()) {
+        MegaAppTheme(isDark = themeMode.isDarkMode()) {
             LoginView(
                 state = uiState,
                 onEmailChanged = viewModel::onEmailChanged,

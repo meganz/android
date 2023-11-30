@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * Show confirmation dialog to cancel unique scheduled meeting occurrence
@@ -43,7 +43,7 @@ fun CancelOccurrenceAndMeetingDialog(
 @Preview
 @Composable
 fun PreviewEmptyHistoryCancelOccurrenceAndMeetingDialog() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CancelOccurrenceAndMeetingDialog(
             isChatHistoryEmpty = true,
             onConfirm = {},
@@ -58,7 +58,7 @@ fun PreviewEmptyHistoryCancelOccurrenceAndMeetingDialog() {
 @Preview
 @Composable
 fun PreviewNoEmptyHistoryCancelOccurrenceAndMeetingDialog() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CancelOccurrenceAndMeetingDialog(
             isChatHistoryEmpty = false,
             onConfirm = {},

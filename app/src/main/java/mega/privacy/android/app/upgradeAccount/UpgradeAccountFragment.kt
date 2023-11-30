@@ -20,7 +20,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.billing.BillingViewModel
@@ -32,7 +31,7 @@ import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.billing.PaymentUtils
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
@@ -93,7 +92,7 @@ class UpgradeAccountFragment : Fragment() {
         val uiState by upgradeAccountViewModel.state.collectAsStateWithLifecycle()
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-        AndroidTheme(isDark = mode.isDarkMode()) {
+        MegaAppTheme(isDark = mode.isDarkMode()) {
             val useNewPlansPageUI by produceState(initialValue = false) {
                 value = getFeatureFlagUseCase(ABTestFeatures.sus2023)
             }

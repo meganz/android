@@ -13,12 +13,12 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
+import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 
 /**
  * QR code save bottom sheet
@@ -78,7 +78,7 @@ private fun BottomSheetContent(
 @CombinedThemePreviews
 @Composable
 private fun PreviewBottomSheetContent() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         BottomSheetContent(
             onCloudDriveClicked = { },
             onFileSystemClicked = { }

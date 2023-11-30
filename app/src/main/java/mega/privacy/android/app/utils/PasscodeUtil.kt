@@ -30,7 +30,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
 import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -385,7 +385,7 @@ class PasscodeUtil @Inject constructor(
                                 initialValue = true
                             )
                             if (locked) {
-                                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                                MegaAppTheme(isDark = themeMode.isDarkMode()) {
                                     PasscodeView(cryptObjectFactory = passcodeCryptObjectFactory)
                                 }
                             }

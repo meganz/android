@@ -27,13 +27,13 @@ import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.utils.LocationInfo
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -151,7 +151,7 @@ private fun FileInfoScreenPreview(
     @PreviewParameter(FileInfoViewStatePreviewsProvider::class) viewState: FileInfoViewState,
 ) {
     var state by mutableStateOf(viewState) //not remembered to allow multiple states in device, don't do that in real code, just in previews
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         FileInfoScreen(
             modifier = Modifier.background(color = MaterialTheme.colors.background),
             viewState = state,

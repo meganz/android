@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -84,7 +84,7 @@ fun BottomSheetMenuItemView(
 @Preview
 @Composable
 fun PreviewBottomSheetMenuItemView() {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         BottomSheetMenuItemView(
             modifier = Modifier,
             res = R.drawable.ic_scheduled_meeting_edit,

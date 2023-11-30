@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.notification.view.NotificationView
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -49,7 +49,7 @@ class NotificationsFragment : Fragment() {
             setContent {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                AndroidTheme(isDark = mode.isDarkMode()) {
+                MegaAppTheme(isDark = mode.isDarkMode()) {
                     NotificationView(viewModel)
                 }
             }

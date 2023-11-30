@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 
 /**
@@ -90,7 +90,7 @@ private fun CallChronometer(duration: Long, textStyle: TextStyle) {
 @CombinedThemePreviews
 @Composable
 private fun ReturnToCallBannerPreview() {
-    AndroidThemeForPreviews {
+    AndroidTheme {
         ReturnToCallBanner(
             text = "Return to call",
             onBannerClicked = {},

@@ -21,12 +21,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceCenterBottomSheet
 import mega.privacy.android.feature.devicecenter.ui.lists.DeviceCenterListViewItem
@@ -43,6 +42,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.feature.devicecenter.ui.renamedevice.RenameDeviceDialog
+import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 
 /**
  * Test tags for the Device Center Screen
@@ -275,7 +275,7 @@ private fun DeviceCenterContent(
 @CombinedThemePreviews
 @Composable
 private fun PreviewDeviceCenterInInitialLoading() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = DeviceCenterState(),
             snackbarHostState = SnackbarHostState(),
@@ -309,7 +309,7 @@ private fun PreviewDeviceCenterInDeviceView() {
         ),
         isInitialLoadingFinished = true,
     )
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = uiState,
             snackbarHostState = SnackbarHostState(),
@@ -339,7 +339,7 @@ private fun PreviewDeviceCenterInFolderView() {
         isInitialLoadingFinished = true,
         selectedDevice = ownDeviceUINodeTwo,
     )
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = uiState,
             snackbarHostState = SnackbarHostState(),
@@ -364,7 +364,7 @@ private fun PreviewDeviceCenterInFolderView() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewDeviceCenterContentWithOwnDeviceSectionOnly() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(ownDeviceUINode),
             onDeviceClicked = {},
@@ -380,7 +380,7 @@ private fun PreviewDeviceCenterContentWithOwnDeviceSectionOnly() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewDeviceCenterContentWithOtherDevicesSectionOnly() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(otherDeviceUINodeOne),
             onDeviceClicked = {},
@@ -396,7 +396,7 @@ private fun PreviewDeviceCenterContentWithOtherDevicesSectionOnly() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewDeviceCenterContentWithBothDeviceSections() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(
                 ownDeviceUINode,

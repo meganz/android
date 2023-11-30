@@ -6,9 +6,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * Text view for chat message
@@ -33,7 +33,7 @@ fun ChatMessageTextView(
 @CombinedThemePreviews
 @Composable
 private fun MeChatMessageTextPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatMessageTextView(isMe = true, text = "Hello World")
     }
 }
@@ -41,7 +41,7 @@ private fun MeChatMessageTextPreview() {
 @CombinedThemePreviews
 @Composable
 private fun OtherChatMessageTextPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatMessageTextView(isMe = false, text = "Hello World")
     }
 }

@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
-import mega.privacy.android.core.ui.theme.AndroidTheme
 
 @Composable
 internal fun DescriptionTextField(
@@ -31,7 +31,7 @@ internal fun DescriptionTextField(
 )
 @Composable
 private fun PreviewTextField() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DescriptionTextField(description = "This is my text",
             onDescriptionChanged = {})
     }

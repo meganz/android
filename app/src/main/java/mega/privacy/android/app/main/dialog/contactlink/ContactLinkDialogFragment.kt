@@ -19,8 +19,8 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava
@@ -64,7 +64,7 @@ internal class ContactLinkDialogFragment : DialogFragment() {
                             } else {
                                 email
                             }
-                            AndroidTheme(isDark = themeMode.isDarkMode()) {
+                            MegaAppTheme(isDark = themeMode.isDarkMode()) {
                                 ConfirmationDialog(
                                     title = contactLink.fullName.orEmpty(),
                                     text = message,

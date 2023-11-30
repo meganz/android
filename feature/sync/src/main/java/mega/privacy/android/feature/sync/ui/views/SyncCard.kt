@@ -29,8 +29,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -308,7 +308,7 @@ private fun IconButtonWithText(
 @CombinedThemePreviews
 @Composable
 private fun SyncCardExpandedPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
             folderPairName = "Competitors documentation",
             status = SyncStatus.SYNCING,
@@ -328,7 +328,7 @@ private fun SyncCardExpandedPreview() {
 @CombinedThemePreviews
 @Composable
 private fun SyncCardCollapsedPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
             folderPairName = "Competitors documentation",
             status = SyncStatus.SYNCING,
@@ -348,7 +348,7 @@ private fun SyncCardCollapsedPreview() {
 @CombinedThemePreviews
 @Composable
 private fun IconButtonPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         IconButtonWithText(
             onClick = {}, icon = R.drawable.ic_info, text = "Info"
         )

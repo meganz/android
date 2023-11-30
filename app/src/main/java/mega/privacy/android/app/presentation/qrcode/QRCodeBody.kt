@@ -51,7 +51,7 @@ import mega.privacy.android.app.presentation.qrcode.model.MyQRTab
 import mega.privacy.android.app.presentation.qrcode.mycode.MyCodeFragment
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyQRCodeUIState
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.SNACKBAR_TEST_TAG
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -322,7 +322,7 @@ fun MyQRCodeHeader(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "PreviewMyQRCodeHeader")
 @Composable
 fun PreviewMyQRCodeHeader() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         val pagerState = rememberPagerState(
             initialPage = MyQRTab.MyQRCode.ordinal
         )

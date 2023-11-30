@@ -9,8 +9,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import java.time.Instant.now
 import kotlin.time.Duration.Companion.days
 
@@ -47,7 +47,7 @@ internal fun CreationModificationTimesView(
 @CombinedTextAndThemePreviews
 @Composable
 private fun CreationModificationTimesPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CreationModificationTimesView(
             creationTimeInSeconds = now().epochSecond - 10.days.inWholeSeconds,
             modificationTimeInSeconds = now().epochSecond,

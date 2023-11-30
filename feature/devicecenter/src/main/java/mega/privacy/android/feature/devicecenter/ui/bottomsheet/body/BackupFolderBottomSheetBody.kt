@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.InfoBottomSheetTile
 
 /**
@@ -35,7 +35,7 @@ internal fun BackupFolderBottomSheetBody(
 @CombinedThemePreviews
 @Composable
 private fun PreviewBackupFolderBottomSheet() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         BackupFolderBottomSheetBody(
             onInfoClicked = {},
         )

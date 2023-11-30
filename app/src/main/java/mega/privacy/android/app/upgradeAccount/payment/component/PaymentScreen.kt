@@ -34,10 +34,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.upgradeAccount.model.UserSubscription
 import mega.privacy.android.app.upgradeAccount.payment.PaymentViewModel
+import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.core.ui.theme.AndroidTheme
 
 @Composable
 internal fun PaymentScreen(
@@ -150,7 +150,7 @@ internal fun PaymentView(
 @Preview(showBackground = true)
 @Composable
 fun PaymentViewPreview() {
-    AndroidTheme(false) {
+    MegaAppTheme(false) {
         PaymentView(
             titleId = R.string.prolite_account,
             titleColorId = R.color.orange_400_orange_300,
@@ -165,7 +165,7 @@ fun PaymentViewPreview() {
 @Preview(showBackground = true)
 @Composable
 fun PaymentViewDisablePreview() {
-    AndroidTheme(true) {
+    MegaAppTheme(true) {
         PaymentView(
             isPaymentMethodAvailable = false,
             titleId = R.string.prolite_account,

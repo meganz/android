@@ -28,7 +28,7 @@ import mega.privacy.android.core.ui.controls.dialogs.internal.AlertDialogFlowRow
 import mega.privacy.android.core.ui.controls.lists.SettingsItemWithRadioButton
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 
@@ -166,7 +166,7 @@ private fun ScrollSeparator() = Spacer(
 private fun ConfirmationDialogWithRadioButtonsPreview() {
     val options = listOf("Light", "Dark", "Busy", "System default")
     var selected by remember { mutableStateOf(options[0]) }
-    AndroidThemeForPreviews {
+    AndroidTheme {
         ConfirmationDialogWithRadioButtons(
             titleText = "Dialog title",
             cancelButtonText = "Cancel",
@@ -190,7 +190,7 @@ private fun ConfirmationDialogWithRadioButtonsWithCancelPreview() {
         "System default",
     )
     var selected by remember { mutableStateOf(options[0]) }
-    AndroidThemeForPreviews {
+    AndroidTheme {
         ConfirmationDialogWithRadioButtons(
             titleText = "Dialog title",
             subTitleText = "Subtitle",
@@ -216,7 +216,7 @@ private fun ConfirmationDialogWithRadioButtonsWithScrollPreview() {
         "Yet another one",
     )
     var selected by remember { mutableStateOf(options[0]) }
-    AndroidThemeForPreviews {
+    AndroidTheme {
         ConfirmationDialogWithRadioButtons(
             modifier = Modifier.height(350.dp),
             titleText = "Dialog title",

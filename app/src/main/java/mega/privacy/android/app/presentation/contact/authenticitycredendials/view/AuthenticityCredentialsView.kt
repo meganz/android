@@ -45,10 +45,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.model.AuthenticityCredentialsState
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -57,6 +56,7 @@ import mega.privacy.android.core.ui.theme.grey_800
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.yellow_100
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 
 /**
  * Authenticity credentials view.
@@ -327,7 +327,7 @@ fun CredentialsItem(modifier: Modifier, text: String, myCredentials: Boolean) {
 fun PreviewAuthenticityCredentialsView(
     @PreviewParameter(BooleanProvider::class) showContactVerificationBanner: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         AuthenticityCredentialsView(state = AuthenticityCredentialsState(
             contactCredentials = AccountCredentials.ContactCredentials(
                 credentials = listOf(

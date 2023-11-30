@@ -17,8 +17,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
@@ -92,7 +92,7 @@ fun LoadingDialog(
 )
 @Composable
 fun PreviewLoadingDialog() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         LoadingDialog(text = "Loading..")
     }
 }
@@ -107,7 +107,7 @@ fun PreviewLoadingDialog() {
 )
 @Composable
 fun PreviewLoadingDialogWithTitle() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         LoadingDialog(title = "Title", text = "Loading..")
     }
 }

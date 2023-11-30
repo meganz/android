@@ -16,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.preview.TextFieldProvider
 import mega.privacy.android.core.ui.preview.TextFieldState
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white
@@ -102,7 +102,7 @@ private fun colorsUnChecked() = ButtonDefaults.buttonColors(
 private fun PreviewCallTextButtonChipChecked(
     @PreviewParameter(TextFieldProvider::class) state: TextFieldState,
 ) {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         CallTextButtonChip(
             onClick = { },
             text = "Waiting room",
@@ -117,7 +117,7 @@ private fun PreviewCallTextButtonChipChecked(
 private fun PreviewCallTextButtonChipUnChecked(
     @PreviewParameter(TextFieldProvider::class) state: TextFieldState,
 ) {
-    AndroidTheme(isDark = true) {
+    MegaAppTheme(isDark = true) {
         CallTextButtonChip(
             onClick = { },
             text = "In call",

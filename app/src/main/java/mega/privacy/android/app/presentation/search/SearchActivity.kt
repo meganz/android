@@ -36,7 +36,7 @@ import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -131,7 +131,7 @@ class SearchActivity : AppCompatActivity() {
             BackHandler(enabled = modalSheetState.isVisible) {
                 selectedNode = null
             }
-            AndroidTheme(isDark = themeMode.isDarkMode()) {
+            MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 SearchComposeView(
                     state = uiState,
                     sortOrder = getString(

@@ -5,10 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTileWithBody
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTileWithBody
 
 /**
  * Test Tag for the Camera Uploads Bottom Sheet Tile
@@ -48,7 +48,7 @@ internal fun CameraUploadsBottomSheetTile(
 @CombinedThemePreviews
 @Composable
 private fun PreviewEnabledCameraUploadsTile() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CameraUploadsBottomSheetTile(
             isCameraUploadsEnabled = true,
             onActionClicked = {},
@@ -62,7 +62,7 @@ private fun PreviewEnabledCameraUploadsTile() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewDisabledCameraUploadsTile() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CameraUploadsBottomSheetTile(
             isCameraUploadsEnabled = false,
             onActionClicked = {},

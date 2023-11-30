@@ -83,12 +83,12 @@ import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.view.QRCode
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
@@ -679,7 +679,7 @@ private fun finishActivity(activity: Activity?) {
 @CombinedThemePreviews
 @Composable
 private fun PreviewQRCodeView() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         val avatarContent = TextAvatarContent(
             avatarText = "A",
             backgroundColor = colorResource(id = R.color.red_300_red_200).toArgb(),
@@ -724,7 +724,7 @@ private fun PreviewQRCodeView() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewInviteContactDialog() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         val result = ScannedContactLinkResult(
             contactName = "Abc",
             email = "abc@gmail.com",
@@ -751,7 +751,7 @@ private fun PreviewInviteContactDialog() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewInviteResultDialog() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         InviteResultDialog(
             title = "Title",
             text = "Message content text",
