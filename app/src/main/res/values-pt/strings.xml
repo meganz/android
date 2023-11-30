@@ -5463,4 +5463,10 @@
     <string name="meetings_call_recording_consent_dialog_negative_button">Deixar chamada</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Mais informações[/A]</string>
+    <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
+    <string name="meetings_call_recording_started_snackbar_message">%1$s começou a gravar</string>
+    <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
+    <string name="meetings_call_recording_stopped_snackbar_message">%1$s deixou de gravar</string>
+    <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
+    <string name="chat_attach_panel_gallery">Galeria</string>
 </resources>

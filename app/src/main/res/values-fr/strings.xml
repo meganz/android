@@ -2236,7 +2236,7 @@
     <!-- Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown -->
     <string name="section_notification_user_with_nickname">[A]%1$s (%2$s)[/A]</string>
     <!-- Title of the historic notification for an account deleted -->
-    <string name="title_account_notification_deleted">Un compte a été supprimé</string>
+    <string name="title_account_notification_deleted">Le compte a été supprimé</string>
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]Le compte [/B][A]%s[/A][B] a été supprimé.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
@@ -3328,7 +3328,7 @@
     <!-- General label for camera disable -->
     <string name="general_camera_disable">Votre caméra est désactivée.</string>
     <!-- Label for hold meeting -->
-    <string name="meeting_hold">Attente</string>
+    <string name="meeting_hold">Pause</string>
     <!-- General label for speaker -->
     <string name="general_speaker">Haut-parleur</string>
     <!-- General label for headphone-->
@@ -3576,7 +3576,7 @@
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">Vous avez saisi votre mot de passe actuel</string>
     <!-- Title of pop-up error message for taken down file -->
-    <string name="error_file_not_available">Le fichier n’est plus proposé</string>
+    <string name="error_file_not_available">Le fichier n’est plus accessible</string>
     <!-- Body of pop-up error message for taken down file. -->
     <string name="error_takendown_file">Le fichier a été supprimé pour non-respect des Conditions générales d’utilisation.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
@@ -5463,4 +5463,10 @@
     <string name="meetings_call_recording_consent_dialog_negative_button">Quitter l’appel</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]En apprendre davantage[/A]</string>
+    <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
+    <string name="meetings_call_recording_started_snackbar_message">%1$s a commencé l’enregistrement</string>
+    <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
+    <string name="meetings_call_recording_stopped_snackbar_message">%1$s a mis fin à l’enregistrement</string>
+    <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
+    <string name="chat_attach_panel_gallery">Galerie</string>
 </resources>

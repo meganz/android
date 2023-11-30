@@ -577,7 +577,7 @@
     </string-array>
     <!-- choose the way the new user’s email is inserted, import from phone option -->
     <string-array name="add_contact_array">
-        <item></item>
+        <item>Write the user’s email</item>
         <item>장치에서 들여오기</item>
     </string-array>
     <!-- settings option -->
@@ -1601,13 +1601,13 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%sB</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
+    <string name="label_file_size_kilo_byte">%sKB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s&#160;MB</string>
+    <string name="label_file_size_mega_byte">%sMB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s&#160;GB</string>
+    <string name="label_file_size_giga_byte">%sGB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s&#160;TB</string>
+    <string name="label_file_size_tera_byte">%sTB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -2170,7 +2170,7 @@
     <!-- Subtitle of the historic notification for contact request denied -->
     <string name="subtitle_outgoing_contact_request_denied">[A]%s 님이[/A][B]연락처 요청을 거절했습니다.[/B]</string>
     <!-- Subtitle of the historic notification for contact request accepted -->
-    <string name="subtitle_outgoing_contact_request_accepted">[A]%s님이 [/A][B]연락처 요청을 수락하였습니다.[/B]</string>
+    <string name="subtitle_outgoing_contact_request_accepted">[A]%s [/A][B]accepted your contact request.[/B]</string>
     <!-- Subtitle of the historic notification for deleted shared folders (one or many) -->
     <string name="notification_deleted_shared_folder">[A]%s님이 [/A][B]공유한 폴더에 대한 접근이[/B][B] 삭제되었습니다.[/B]</string>
     <!-- Subtitle of the historic notification when a contact leaves a shared folder -->
@@ -2702,9 +2702,9 @@
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d초</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">인증되지 않음</string>
+    <string name="label_not_verified">Not verified</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">확인됨</string>
+    <string name="label_verified">Verified</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">진위 증명</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3064,9 +3064,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$sPB&#160;</string>
+    <string name="label_file_size_peta_byte">%1$sPB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$sEB&#160;</string>
+    <string name="label_file_size_exa_byte">%1$sEB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">전화 번호 추가</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -4438,7 +4438,7 @@
     <!-- The select time dialog in schedule meeting -->
     <string name="meetings_schedule_meeting_enter_time_title_dialog">시간 입력</string>
     <!-- Label for the meeting invitations option on calls settings -->
-    <string name="settings_calls_preferences_meeting_invitations">회의 초대</string>
+    <string name="settings_calls_preferences_meeting_invitations">Meeting invitations</string>
     <!-- Text for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations_text">Notify me when someone invites me to a meeting</string>
     <!-- Label for the meeting reminders option on calls settings -->
@@ -4830,9 +4830,9 @@
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">오디오 파일에 접근 허용</string>
     <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">인증됨</string>
+    <string name="contact_approve_credentials_approved_text">Verified</string>
     <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">인증되지 않음</string>
+    <string name="contact_approve_credentials_not_approved_text">Not verified</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">확대</string>
     <!-- Photos action menu zoom out -->
@@ -4992,5 +4992,11 @@
     <!-- Label for the negative or cancel button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_negative_button">통화 떠나기</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Learn more[/A]</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]더 알아보기[/A]</string>
+    <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
+    <string name="meetings_call_recording_started_snackbar_message">%1$s 님이 녹화를 시작하였습니다</string>
+    <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
+    <string name="meetings_call_recording_stopped_snackbar_message">%1$s 님이 녹화를 멈췄습니다</string>
+    <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
+    <string name="chat_attach_panel_gallery">갤러리</string>
 </resources>
