@@ -85,7 +85,11 @@ import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.mobile.analytics.event.AlbumImportInputDecryptionKeyDialogEvent
+import mega.privacy.mobile.analytics.event.AlbumImportSaveToCloudDriveButtonEvent
+import mega.privacy.mobile.analytics.event.AlbumImportSaveToDeviceButtonEvent
 import mega.privacy.mobile.analytics.event.AlbumImportScreenEvent
+import mega.privacy.mobile.analytics.event.AlbumImportStorageOverQuotaDialogEvent
+import mega.privacy.mobile.analytics.event.AlbumsStorageOverQuotaUpgradeAccountButtonEvent
 import mega.privacy.mobile.analytics.event.ImportAlbumContentLoadedEvent
 import nz.mega.sdk.MegaNode
 
@@ -174,6 +178,9 @@ internal fun AlbumImportScreen(
     }
 
     if (state.showStorageExceededDialog) {
+        LaunchedEffect(Unit) {
+            Analytics.tracker.trackEvent(AlbumImportStorageOverQuotaDialogEvent)
+        }
         StorageExceededDialog(
             onDismiss = albumImportViewModel::closeStorageExceededDialog,
             onUpgradeAccount = {
@@ -462,7 +469,10 @@ private fun AlbumImportBottomBar(
                 content = {
                     if (isLogin) {
                         TextButton(
-                            onClick = onImport,
+                            onClick = {
+                                Analytics.tracker.trackEvent(AlbumImportSaveToCloudDriveButtonEvent)
+                                onImport()
+                            },
                             content = {
                                 Text(
                                     text = stringResource(id = R.string.general_save_to_cloud_drive),
@@ -478,7 +488,10 @@ private fun AlbumImportBottomBar(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     TextButton(
-                        onClick = onSaveToDevice,
+                        onClick = {
+                            Analytics.tracker.trackEvent(AlbumImportSaveToDeviceButtonEvent)
+                            onSaveToDevice()
+                        },
                         content = {
                             Text(
                                 text = stringResource(id = R.string.general_save_to_device),
@@ -871,7 +884,10 @@ private fun StorageExceededDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = onUpgradeAccount,
+                onClick = {
+                    Analytics.tracker.trackEvent(AlbumsStorageOverQuotaUpgradeAccountButtonEvent)
+                    onUpgradeAccount()
+                },
                 content = {
                     Text(
                         text = stringResource(id = R.string.my_account_upgrade_pro),

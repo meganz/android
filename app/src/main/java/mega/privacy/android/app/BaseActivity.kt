@@ -38,6 +38,7 @@ import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -121,6 +122,8 @@ import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
+import mega.privacy.mobile.analytics.event.TransferOverQuotaDialogEvent
+import mega.privacy.mobile.analytics.event.TransferOverQuotaUpgradeAccountButtonEvent
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -1196,6 +1199,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             setOnClickListener {
                 transferGeneralOverQuotaWarning?.dismiss()
                 if (isLoggedIn) {
+                    Analytics.tracker.trackEvent(TransferOverQuotaUpgradeAccountButtonEvent)
                     navigateToUpgradeAccount()
                 } else {
                     navigateToLogin()
@@ -1210,6 +1214,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             transferGeneralOverQuotaWarning,
             binding.textTransferOverquota
         )
+        Analytics.tracker.trackEvent(TransferOverQuotaDialogEvent)
         transferGeneralOverQuotaWarning?.show()
         isGeneralTransferOverQuotaWarningShown = true
     }
