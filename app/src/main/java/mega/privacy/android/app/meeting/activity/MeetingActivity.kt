@@ -336,10 +336,11 @@ class MeetingActivity : PasscodeActivity() {
                     AndroidTheme(isDark = true) {
                         CallRecordingConsentDialog(
                             onConfirm = {
-                                meetingViewModel.setIsRecordingConsentAccepted()
+                                meetingViewModel.setIsRecordingConsentAccepted(value = true)
                                 meetingViewModel.setShowRecordingConsentDialogConsumed()
                             },
                             onDismiss = {
+                                meetingViewModel.setIsRecordingConsentAccepted(value = false)
                                 meetingViewModel.setShowRecordingConsentDialogConsumed()
                                 meetingViewModel.endChatCall()
                             },
@@ -476,7 +477,7 @@ class MeetingActivity : PasscodeActivity() {
             val isSessionOnRecording = it.getBooleanExtra(MEETING_CALL_RECORDING, false)
             meetingViewModel.setIsSessionOnRecording(isSessionOnRecording)
             if (isSessionOnRecording) {
-                meetingViewModel.setIsRecordingConsentAccepted()
+                meetingViewModel.setIsRecordingConsentAccepted(value = true)
             }
 
             // Cancel current notification if needed

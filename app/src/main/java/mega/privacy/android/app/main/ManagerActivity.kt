@@ -1221,10 +1221,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     AndroidTheme(isDark = isDark) {
                         CallRecordingConsentDialog(
                             onConfirm = {
-                                viewModel.setIsRecordingConsentAccepted()
+                                viewModel.setIsRecordingConsentAccepted(value = true)
                                 viewModel.setShowRecordingConsentDialogConsumed()
                             },
                             onDismiss = {
+                                viewModel.setIsRecordingConsentAccepted(value = false)
                                 viewModel.setShowRecordingConsentDialogConsumed()
                                 viewModel.endChatCall(state.callInProgressChatId)
                             },

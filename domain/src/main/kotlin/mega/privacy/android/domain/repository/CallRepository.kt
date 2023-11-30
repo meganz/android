@@ -422,14 +422,16 @@ interface CallRepository {
     ): ChatRequest
 
     /**
-     * Monitor call recording consent accepted.
+     * Monitor call recording consent event (accepted/rejected).
      *
-     * @return Flow of Boolean.
+     * @return Flow of Boolean. True if consent has been accepted or False otherwise.
      */
-    fun monitorCallRecordingConsentAccepted(): Flow<Boolean>
+    fun monitorCallRecordingConsentEvent(): Flow<Boolean>
 
     /**
-     * Broadcast call recording consent accepted.
+     * Broadcast call recording consent event (accepted/rejected).
+     *
+     * @param isRecordingConsentAccepted True if recording consent has been accepted or False otherwise.
      */
-    suspend fun broadcastCallRecordingConsentAccepted()
+    suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean)
 }

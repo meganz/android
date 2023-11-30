@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.meeting
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,8 +10,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.presentation.chat.ChatViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.view.CallRecordingConsentDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -22,11 +26,8 @@ import javax.inject.Inject
  * Necessary to display the compose dialog in ChatActivity.java
  */
 @AndroidEntryPoint
-class CallRecordingConsentDialogFragment(
-    private val onConfirm: () -> Unit,
-    private val onDismiss: () -> Unit,
-    private val onLearnMore: () -> Unit,
-) : DialogFragment() {
+class CallRecordingConsentDialogFragment : DialogFragment() {
+    private val viewModel: ChatViewModel by viewModels()
 
     /**
      * GetThemeMode
@@ -49,9 +50,21 @@ class CallRecordingConsentDialogFragment(
                 val isDark = themeMode.isDarkMode()
                 AndroidTheme(isDark = isDark) {
                     CallRecordingConsentDialog(
-                        onConfirm = onConfirm,
-                        onDismiss = onDismiss,
-                        onLearnMore = onLearnMore
+                        onConfirm = {
+                            viewModel.setIsRecordingConsentAccepted(value = true)
+                            viewModel.setShowRecordingConsentDialogConsumed()
+                            dismissAllowingStateLoss()
+                        },
+                        onDismiss = {
+                            viewModel.setIsRecordingConsentAccepted(value = false)
+                            viewModel.setShowRecordingConsentDialogConsumed()
+                            dismissAllowingStateLoss()
+                        },
+                        onLearnMore = {
+                            val viewIntent = Intent(Intent.ACTION_VIEW)
+                            viewIntent.data = Uri.parse("https://mega.io/privacy")
+                            startActivity(viewIntent)
+                        }
                     )
                 }
             }
@@ -62,11 +75,6 @@ class CallRecordingConsentDialogFragment(
         /**
          * New instance
          */
-        fun newInstance(onConfirm: () -> Unit, onDismiss: () -> Unit, onLearnMore: () -> Unit) =
-            CallRecordingConsentDialogFragment(
-                onConfirm = onConfirm,
-                onDismiss = onDismiss,
-                onLearnMore = onLearnMore
-            )
+        fun newInstance(): CallRecordingConsentDialogFragment = CallRecordingConsentDialogFragment()
     }
 }

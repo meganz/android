@@ -85,7 +85,7 @@ import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentAcceptedUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -283,7 +283,7 @@ class ManagerViewModelTest {
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
-    private val monitorCallRecordingConsentAcceptedUseCase: MonitorCallRecordingConsentAcceptedUseCase =
+    private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase =
         mock()
     private val getNodeByHandle: GetNodeByHandle = mock()
 
@@ -366,7 +366,7 @@ class ManagerViewModelTest {
             monitorSyncsUseCase = monitorSyncsUseCase,
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
-            monitorCallRecordingConsentAcceptedUseCase = monitorCallRecordingConsentAcceptedUseCase,
+            monitorCallRecordingConsentEventUseCase = monitorCallRecordingConsentEventUseCase,
             getNodeByHandle = getNodeByHandle,
         )
     }

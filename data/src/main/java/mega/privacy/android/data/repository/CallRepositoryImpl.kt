@@ -672,9 +672,9 @@ internal class CallRepositoryImpl @Inject constructor(
             }
         }
 
-    override fun monitorCallRecordingConsentAccepted(): Flow<Boolean> =
-        appEventGateway.monitorCallRecordingConsentAccepted()
+    override fun monitorCallRecordingConsentEvent(): Flow<Boolean> =
+        appEventGateway.monitorCallRecordingConsentEvent()
 
-    override suspend fun broadcastCallRecordingConsentAccepted() =
-        appEventGateway.broadcastCallRecordingConsentAccepted()
+    override suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean) =
+        appEventGateway.broadcastCallRecordingConsentEvent(isRecordingConsentAccepted)
 }

@@ -86,7 +86,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentAcceptedUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -135,7 +135,7 @@ import javax.inject.Inject
  * @property isConnectedToInternetUseCase                   [IsConnectedToInternetUseCase]
  * @property monitorStorageStateEventUseCase                [MonitorStorageStateEventUseCase]
  * @property hangChatCallUseCase                            [HangChatCallUseCase]
- * @property broadcastCallRecordingConsentAcceptedUseCase   [BroadcastCallRecordingConsentAcceptedUseCase]
+ * @property broadcastCallRecordingConsentEventUseCase      [BroadcastCallRecordingConsentEventUseCase]
  * @property state                                          Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -169,7 +169,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
-    private val broadcastCallRecordingConsentAcceptedUseCase: BroadcastCallRecordingConsentAcceptedUseCase,
+    private val broadcastCallRecordingConsentEventUseCase: BroadcastCallRecordingConsentEventUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -1511,16 +1511,16 @@ class MeetingActivityViewModel @Inject constructor(
     /**
      * Sets showRecordingConsentDialog as consumed.
      */
-    fun setShowRecordingConsentDialogConsumed() {
+    fun setShowRecordingConsentDialogConsumed() =
         _state.update { state -> state.copy(showRecordingConsentDialog = false) }
-        launchBroadcastCallRecordingConsentAccepted()
-    }
 
     /**
      * Sets isRecordingConsentAccepted.
      */
-    fun setIsRecordingConsentAccepted() =
-        _state.update { state -> state.copy(isRecordingConsentAccepted = true) }
+    fun setIsRecordingConsentAccepted(value: Boolean) {
+        _state.update { state -> state.copy(isRecordingConsentAccepted = value) }
+        launchBroadcastCallRecordingConsentEvent(isRecordingConsentAccepted = value)
+    }
 
     /**
      * End chat call
@@ -1550,11 +1550,14 @@ class MeetingActivityViewModel @Inject constructor(
         _state.update { state -> state.copy(startOrStopRecordingParticipantName = null) }
 
     /**
-     * Launch broadcast for recording consent has been accepted event
+     * Launch broadcast for recording consent event (accepted/rejected)
+     *
+     * @param isRecordingConsentAccepted True if recording consent has been accepted or False otherwise.
      */
-    private fun launchBroadcastCallRecordingConsentAccepted() = viewModelScope.launch {
-        broadcastCallRecordingConsentAcceptedUseCase()
-    }
+    private fun launchBroadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean) =
+        viewModelScope.launch {
+            broadcastCallRecordingConsentEventUseCase(isRecordingConsentAccepted)
+        }
 
     companion object {
         private const val INVALID_CHAT_HANDLE = -1L

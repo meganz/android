@@ -78,7 +78,7 @@ import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentAcceptedUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -150,7 +150,7 @@ import javax.inject.Inject
  * @property passcodeManagement [PasscodeManagement]
  * @property monitorChatSessionUpdatesUseCase [MonitorChatSessionUpdatesUseCase]
  * @property hangChatCallUseCase [HangChatCallUseCase]
- * @property monitorCallRecordingConsentAcceptedUseCase [MonitorCallRecordingConsentAcceptedUseCase]
+ * @property monitorCallRecordingConsentEventUseCase [MonitorCallRecordingConsentEventUseCase]
  * @property getNodeByHandle [GetNodeByHandle]
  */
 @HiltViewModel
@@ -224,7 +224,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
-    private val monitorCallRecordingConsentAcceptedUseCase: MonitorCallRecordingConsentAcceptedUseCase,
+    private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase,
     private val getNodeByHandle: GetNodeByHandle,
 ) : ViewModel() {
 
@@ -419,9 +419,15 @@ class ManagerViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            monitorCallRecordingConsentAcceptedUseCase().conflate().collect {
-                _state.update { it.copy(showRecordingConsentDialog = false) }
-            }
+            monitorCallRecordingConsentEventUseCase().conflate()
+                .collect { isRecordingConsentAccepted ->
+                    _state.update {
+                        it.copy(
+                            showRecordingConsentDialog = false,
+                            isRecordingConsentAccepted = isRecordingConsentAccepted
+                        )
+                    }
+                }
         }
     }
 
@@ -1133,8 +1139,8 @@ class ManagerViewModel @Inject constructor(
     /**
      * Sets isRecordingConsentAccepted.
      */
-    fun setIsRecordingConsentAccepted() =
-        _state.update { state -> state.copy(isRecordingConsentAccepted = true) }
+    fun setIsRecordingConsentAccepted(value: Boolean) =
+        _state.update { state -> state.copy(isRecordingConsentAccepted = value) }
 
     /**
      * End chat call

@@ -2035,22 +2035,7 @@ public class ChatActivity extends PasscodeActivity
      */
     private void showCallRecordingConsentDialog() {
         if (callRecordingConsentDialogFragment == null) {
-            callRecordingConsentDialogFragment = CallRecordingConsentDialogFragment.Companion.newInstance(() -> {
-                viewModel.setIsRecordingConsentAccepted();
-                viewModel.setShowRecordingConsentDialogConsumed();
-                callRecordingConsentDialogFragment.dismissAllowingStateLoss();
-                return null;
-            }, () -> {
-                viewModel.setShowRecordingConsentDialogConsumed();
-                viewModel.endChatCall(viewModel.getState().getValue().getChatId());
-                callRecordingConsentDialogFragment.dismissAllowingStateLoss();
-                return null;
-            }, () -> {
-                Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                viewIntent.setData(Uri.parse("https://mega.io/privacy"));
-                startActivity(viewIntent);
-                return null;
-            });
+            callRecordingConsentDialogFragment = CallRecordingConsentDialogFragment.Companion.newInstance();
         }
         callRecordingConsentDialogFragment.show(getSupportFragmentManager().beginTransaction().remove(callRecordingConsentDialogFragment), callRecordingConsentDialogFragment.getTag());
     }
