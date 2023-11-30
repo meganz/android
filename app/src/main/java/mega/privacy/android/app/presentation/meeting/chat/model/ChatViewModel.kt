@@ -30,7 +30,6 @@ import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.GetChatRoom
@@ -141,7 +140,6 @@ internal class ChatViewModel @Inject constructor(
                 && ownPrivilege != ChatRoomPermission.Removed
 
     private var monitorAllContactParticipantsInChatJob: Job? = null
-    private val messages = mutableListOf<TypedMessage>()
 
     init {
         monitorParticipatingInACall()
@@ -199,12 +197,18 @@ internal class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             monitorMessageLoadedUseCase(chatId).collect { loadedMessage ->
                 Timber.d("New message: ${loadedMessage.msgId}")
+                val state = state.value
+                val newMessage =
+                    uiChatMessageMapper(loadedMessage, !state.isGroup && !state.isMeeting)
+                val newMessages = state.messages.toMutableList().apply {
+                    add(0, newMessage)
+                }
+                val pendingMessagesToLoad = state.pendingMessagesToLoad - 1
                 _state.update { state ->
-                    val pendingMessagesToLoad = state.pendingMessagesToLoad - 1
-                    messages.add(0, loadedMessage)
-                    val uiMessages =
-                        messages.map { uiChatMessageMapper(it, !state.isGroup && !state.isMeeting) }
-                    state.copy(messages = uiMessages, pendingMessagesToLoad = pendingMessagesToLoad)
+                    state.copy(
+                        messages = newMessages,
+                        pendingMessagesToLoad = pendingMessagesToLoad
+                    )
                 }
             }
         }

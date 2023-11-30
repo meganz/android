@@ -26,6 +26,13 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  */
 const val TEST_TAG_MANAGEMENT_MESSAGE_ICON = "chat_management_message:icon"
 
+/**
+ * Chat Management Message
+ *
+ * @param iconResId Icon resource id
+ * @param text Text
+ * @param modifier Modifier
+ */
 @Composable
 fun ChatManagementMessage(
     @DrawableRes iconResId: Int,
@@ -34,7 +41,7 @@ fun ChatManagementMessage(
 ) {
     Row(
         modifier = modifier
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 4.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {

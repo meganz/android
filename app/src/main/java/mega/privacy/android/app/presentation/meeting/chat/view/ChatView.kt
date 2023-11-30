@@ -11,12 +11,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
@@ -51,6 +53,7 @@ import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
+import mega.privacy.android.app.presentation.meeting.chat.extension.hasAvatar
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
 import mega.privacy.android.app.presentation.meeting.chat.extension.toInfoText
@@ -65,8 +68,8 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EndCallFor
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.MutePushNotificationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactToAddDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
-import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatCallMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
+import mega.privacy.android.app.presentation.meeting.chat.view.message.MessageRow
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
@@ -81,7 +84,6 @@ import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
-import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import timber.log.Timber
@@ -269,18 +271,16 @@ internal fun ChatView(
                         .padding(paddingValues)
                 ) {
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         item("first_message_header") { FirstMessageHeader(uiState) }
-                        messages.forEach { message ->
-                            if (message is CallMessage) {
-                                item(message.msgId) {
-                                    ChatCallMessageView(
-                                        message = (message),
-                                        isOneToOneChat = !isGroup
-                                    )
-                                }
-                            }
+                        items(messages) { uiChatMessage ->
+                            MessageRow(
+                                uiChatMessage = uiChatMessage,
+                                modifier = Modifier.fillMaxWidth(),
+                                hasAvatar = uiChatMessage.message.hasAvatar
+                            )
                         }
                     }
                     if (isMeeting && isActive && !isArchived) {
