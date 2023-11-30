@@ -101,7 +101,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         viewLifecycleOwner.collectFlow(
             videoSectionViewModel.state.map { it.allVideos }.distinctUntilChanged()
         ) { list ->
-            if (list.isNotEmpty()) {
+            if (!videoSectionViewModel.state.value.searchMode && list.isNotEmpty()) {
                 callManager {
                     it.invalidateOptionsMenu()
                 }
@@ -227,4 +227,27 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
      * @return true if should show search menu, false otherwise
      */
     override fun shouldShowSearchMenu(): Boolean = videoSectionViewModel.shouldShowSearchMenu()
+
+    /**
+     * Search ready
+     */
+    override fun searchReady() {
+        videoSectionViewModel.searchReady()
+    }
+
+    /**
+     * Search query
+     *
+     * @param query query string
+     */
+    override fun searchQuery(query: String) {
+        videoSectionViewModel.searchQuery(query)
+    }
+
+    /**
+     * Exit search
+     */
+    override fun exitSearch() {
+        videoSectionViewModel.exitSearch()
+    }
 }

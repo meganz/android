@@ -16,12 +16,12 @@ class UIVideoMapper @Inject constructor() {
     operator fun invoke(
         videoNode: VideoNode,
     ) = UIVideo(
-        id = videoNode.fileNode.id,
-        name = videoNode.fileNode.name,
-        size = videoNode.fileNode.size,
+        id = videoNode.id,
+        name = videoNode.name,
+        size = videoNode.size,
         duration = TimeUtils.getVideoDuration(videoNode.duration),
         thumbnail = videoNode.thumbnailFilePath?.let { File(it) },
-        isFavourite = videoNode.fileNode.isFavourite,
-        nodeAvailableOffline = videoNode.fileNode.isAvailableOffline
+        isFavourite = videoNode.isFavourite,
+        nodeAvailableOffline = videoNode.isAvailableOffline
     )
 }

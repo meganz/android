@@ -17,6 +17,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
+import mega.privacy.android.app.presentation.videosection.model.UIVideo
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionState
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTabState
@@ -63,6 +64,9 @@ class VideoSectionViewModel @Inject constructor(
      */
     val tabState = _tabState.asStateFlow()
 
+    private var searchQuery = ""
+    private val originalData = mutableListOf<UIVideo>()
+
     init {
         viewModelScope.launch {
             merge(
@@ -74,16 +78,30 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
+    private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
+
     internal fun refreshNodes() = viewModelScope.launch {
         _state.update {
             it.copy(
-                allVideos = getUIVideoList(),
-                sortOrder = getCloudSortOrder()
+                allVideos = getUIVideoList().updateOriginalData().filterVideosBySearchQuery(),
+                sortOrder = getCloudSortOrder(),
+                progressBarShowing = false,
+                scrollToTop = false
             )
         }
     }
 
-    private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
+    private fun List<UIVideo>.filterVideosBySearchQuery() =
+        filter { video ->
+            video.name.contains(searchQuery, true)
+        }
+
+    private fun List<UIVideo>.updateOriginalData() = also { data ->
+        if (originalData.isNotEmpty()) {
+            originalData.clear()
+        }
+        originalData.addAll(data)
+    }
 
     private suspend fun getUIVideoList() = getAllVideosUseCase().map { uiVideoMapper(it) }
 
@@ -97,13 +115,47 @@ class VideoSectionViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update {
                 it.copy(
-                    sortOrder = getCloudSortOrder()
+                    sortOrder = getCloudSortOrder(),
+                    progressBarShowing = true
                 )
             }
             setPendingRefreshNodes()
         }
 
     internal fun shouldShowSearchMenu() = state.value.allVideos.isNotEmpty()
+
+    internal fun searchReady() {
+        if (state.value.searchMode)
+            return
+
+        _state.update { it.copy(searchMode = true) }
+        searchQuery = ""
+    }
+
+    internal fun searchQuery(query: String) {
+        if (searchQuery == query)
+            return
+
+        searchQuery = query
+        searchNodeByQueryString()
+    }
+
+    internal fun exitSearch() {
+        _state.update { it.copy(searchMode = false) }
+        searchQuery = ""
+        refreshNodes()
+    }
+
+    private fun searchNodeByQueryString() {
+        _state.update {
+            it.copy(
+                allVideos = originalData.filter { video ->
+                    video.name.contains(searchQuery, true)
+                },
+                scrollToTop = true
+            )
+        }
+    }
 
     /**
      * Detect the node whether is local file

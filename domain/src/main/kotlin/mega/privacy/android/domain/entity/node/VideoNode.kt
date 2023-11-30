@@ -8,7 +8,7 @@ package mega.privacy.android.domain.entity.node
  * @property thumbnailFilePath the thumbnail file path for loading thumbnail
  */
 data class VideoNode(
-    val fileNode: FileNode,
+    private val fileNode: FileNode,
     val duration: Int,
     val thumbnailFilePath: String?,
-)
+) : TypedFileNode, FileNode by fileNode

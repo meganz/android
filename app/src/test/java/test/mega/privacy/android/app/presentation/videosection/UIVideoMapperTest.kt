@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.VideoNode
 import org.junit.jupiter.api.BeforeAll
@@ -31,16 +30,12 @@ class UIVideoMapperTest {
         val expectedThumbnail = "video file thumbnail"
         val expectedAvailableOffline = true
 
-        val expectedFileNode = mock<FileNode> {
+        val expectedVideoNode = mock<VideoNode> {
             on { id }.thenReturn(expectedId)
             on { name }.thenReturn(expectedName)
             on { size }.thenReturn(expectedSize)
             on { isFavourite }.thenReturn(false)
             on { isAvailableOffline }.thenReturn(expectedAvailableOffline)
-        }
-
-        val expectedVideoNode = mock<VideoNode> {
-            on { fileNode }.thenReturn(expectedFileNode)
             on { duration }.thenReturn(100)
             on { thumbnailFilePath }.thenReturn(expectedThumbnail)
         }

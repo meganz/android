@@ -13,10 +13,8 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
+import mega.privacy.android.app.presentation.videosection.model.UIVideo
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.VideoNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
@@ -30,6 +28,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -99,31 +98,37 @@ class VideoSectionViewModelTest {
             assertThat(initial.allVideos).isEmpty()
             assertThat(initial.isPendingRefresh).isFalse()
             assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
+            assertThat(initial.progressBarShowing).isEqualTo(true)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `test that the videos are retrieved when the nodes are refreshed`() = runTest {
-        val firstExpectedHandle: Long = 1234567
-        val secondExpectedHandle: Long = 7654321
-        val thirdExpectedHandle: Long = 13571234
-        val firstExpectedVideo = getVideoNode(firstExpectedHandle)
-        val secondExpectedVideo = getVideoNode(secondExpectedHandle)
-        val thirdExpectedVideo = getVideoNode(thirdExpectedHandle)
+        val expectedVideo: UIVideo = mock {
+            on { name }.thenReturn("video name")
+        }
 
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
 
         whenever(getAllVideosUseCase()).thenReturn(
-            listOf(firstExpectedVideo, secondExpectedVideo, thirdExpectedVideo)
+            listOf(mock(), mock())
         )
-        underTest.refreshNodes()
+        whenever(uiVideoMapper(any())).thenReturn(expectedVideo)
+
         underTest.state.test(200) {
-            assertThat(awaitItem().allVideos).isEmpty()
+            val initial = awaitItem()
+            assertThat(initial.allVideos).isEmpty()
+            assertThat(initial.progressBarShowing).isEqualTo(true)
+            assertThat(initial.scrollToTop).isEqualTo(false)
+
+            underTest.refreshNodes()
+
             val actual = awaitItem()
             assertThat(actual.allVideos).isNotEmpty()
             assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
-            assertThat(actual.allVideos.size).isEqualTo(3)
+            assertThat(actual.allVideos.size).isEqualTo(2)
+            assertThat(actual.progressBarShowing).isEqualTo(false)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -138,19 +143,6 @@ class VideoSectionViewModelTest {
             assertThat(awaitItem().sortOrder).isEqualTo(SortOrder.ORDER_NONE)
             assertThat(awaitItem().sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
             cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    private fun getVideoNode(handle: Long): VideoNode {
-        val expectedFileNode = mock<FileNode> {
-            on { id }.thenReturn(NodeId(handle))
-            on { name }.thenReturn("video file name")
-            on { size }.thenReturn(100)
-        }
-        return mock {
-            on { fileNode }.thenReturn(expectedFileNode)
-            on { duration }.thenReturn(100)
-            on { thumbnailFilePath }.thenReturn("video file thumbnail")
         }
     }
 }

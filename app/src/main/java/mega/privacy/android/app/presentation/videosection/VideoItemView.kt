@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection
 
+import mega.privacy.android.core.R as CoreUiR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -7,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -143,7 +143,7 @@ internal fun VideoThumbnailView(
                 contentDescription = "favourite",
                 modifier = modifier
                     .padding(top = 5.dp, end = 5.dp)
-                    .size(16.dp)
+                    .size(12.dp)
                     .align(Alignment.TopEnd)
             )
         }
@@ -160,19 +160,19 @@ internal fun VideoInfoView(
     modifier: Modifier = Modifier,
 ) {
     ConstraintLayout(
-        modifier = Modifier
+        modifier = modifier
             .padding(start = 25.dp)
             .height(80.dp),
     ) {
-        val (videoName, threeDots, infoRow) = createRefs()
+        val (videoName, threeDots, fileSizeText, offlineIcon) = createRefs()
         Text(
             text = name,
             modifier = modifier
+                .padding(bottom = 5.dp)
                 .constrainAs(videoName) {
                     start.linkTo(parent.start)
                     top.linkTo(parent.top)
                     end.linkTo(threeDots.start, margin = 10.dp)
-                    bottom.linkTo(infoRow.top)
                 }
                 .fillMaxWidth(),
             style = MaterialTheme.typography.subtitle1,
@@ -181,46 +181,46 @@ internal fun VideoInfoView(
             maxLines = 2
         )
         Image(
-            painter = painterResource(id = mega.privacy.android.core.R.drawable.ic_dots_vertical_grey),
+            painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
             contentDescription = "3 dots",
-            modifier = Modifier
+            modifier = modifier
                 .constrainAs(threeDots) {
                     end.linkTo(parent.end)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    visibility =
-                        if (showMenuButton) Visibility.Visible else Visibility.Gone
+                    visibility = if (showMenuButton) Visibility.Visible else Visibility.Gone
                 }
                 .clickable { onMenuClick() }
         )
-        Row(
-            modifier = Modifier.constrainAs(infoRow) {
-                top.linkTo(videoName.bottom, margin = 5.dp)
-                start.linkTo(videoName.start)
-            },
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            fileSize?.let {
-                Text(
-                    text = it,
-                    maxLines = 1,
-                    style = MaterialTheme.typography.caption,
-                    color = MaterialTheme.colors.textColorSecondary,
-                )
-            }
 
-            if (nodeAvailableOffline) {
-                Image(
-                    modifier = modifier.padding(start = 10.dp),
-                    colorFilter = ColorFilter.tint(
-                        MaterialTheme.colors.textColorSecondary
-                    ),
-                    painter = painterResource(id = mega.privacy.android.core.R.drawable.ic_offline_indicator),
-                    contentDescription = "Available Offline"
-                )
-            }
-        }
+        Text(
+            modifier = modifier.constrainAs(fileSizeText) {
+                start.linkTo(videoName.start)
+                top.linkTo(offlineIcon.top)
+                bottom.linkTo(offlineIcon.bottom)
+                visibility = if (fileSize.isNullOrEmpty()) Visibility.Gone else Visibility.Visible
+            },
+            text = fileSize ?: "",
+            maxLines = 1,
+            style = MaterialTheme.typography.caption,
+            color = MaterialTheme.colors.textColorSecondary,
+        )
+
+        Image(
+            modifier = modifier
+                .padding(start = 10.dp)
+                .constrainAs(offlineIcon) {
+                    start.linkTo(fileSizeText.end)
+                    top.linkTo(videoName.bottom)
+                    visibility =
+                        if (nodeAvailableOffline) Visibility.Visible else Visibility.Invisible
+                },
+            colorFilter = ColorFilter.tint(
+                MaterialTheme.colors.textColorSecondary
+            ),
+            painter = painterResource(id = CoreUiR.drawable.ic_offline_indicator),
+            contentDescription = "Available Offline"
+        )
     }
 }
 

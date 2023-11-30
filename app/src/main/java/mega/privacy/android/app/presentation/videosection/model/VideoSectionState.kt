@@ -8,9 +8,15 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property allVideos the all video items
  * @property sortOrder the sort order of video items
  * @property isPendingRefresh
+ * @property progressBarShowing the progress bar showing state
+ * @property searchMode the search mode state
+ * @property scrollToTop the scroll to top state
  */
 data class VideoSectionState(
     val allVideos: List<UIVideo> = emptyList(),
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
-    val isPendingRefresh: Boolean = false
+    val isPendingRefresh: Boolean = false,
+    val progressBarShowing: Boolean = true,
+    val searchMode: Boolean = false,
+    val scrollToTop: Boolean = false,
 )

@@ -54,6 +54,9 @@ internal fun VideoSectionComposeView(
         allVideoView = {
             AllVideosView(
                 items = uiState.allVideos,
+                progressBarShowing = uiState.progressBarShowing,
+                searchMode = uiState.searchMode,
+                scrollToTop = uiState.scrollToTop,
                 lazyListState = allLazyListState,
                 sortOrder = stringResource(
                     id = SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
