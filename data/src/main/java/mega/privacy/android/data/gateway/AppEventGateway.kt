@@ -360,4 +360,18 @@ internal interface AppEventGateway {
      * @return Flow of Boolean. True if consent has been accepted or False otherwise.
      */
     fun monitorCallRecordingConsentEvent(): Flow<Boolean>
+
+    /**
+     * Broadcast that a specific call has ended.
+     *
+     * @param chatId    ID of the chat to which the call corresponded.
+     */
+    suspend fun broadcastCallEnded(chatId: Long)
+
+    /**
+     * Monitor that a specific call has ended.
+     *
+     * @return Flow of Boolean. ID of the chat to which the call corresponded.
+     */
+    fun monitorCallEnded(): Flow<Long>
 }

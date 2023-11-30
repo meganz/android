@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
@@ -86,9 +87,11 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -136,6 +139,8 @@ import javax.inject.Inject
  * @property monitorStorageStateEventUseCase                [MonitorStorageStateEventUseCase]
  * @property hangChatCallUseCase                            [HangChatCallUseCase]
  * @property broadcastCallRecordingConsentEventUseCase      [BroadcastCallRecordingConsentEventUseCase]
+ * @property monitorCallEndedUseCase                        [MonitorCallEndedUseCase]
+ * @property broadcastCallEndedUseCase                      [BroadcastCallEndedUseCase]
  * @property state                                          Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -170,6 +175,8 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val broadcastCallRecordingConsentEventUseCase: BroadcastCallRecordingConsentEventUseCase,
+    private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
+    private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -301,12 +308,22 @@ class MeetingActivityViewModel @Inject constructor(
             .subscribeBy(
                 onNext = { chatIdOfCallEnded ->
                     if (chatIdOfCallEnded == _state.value.chatId) {
+                        resetCallRecordingState()
+                        viewModelScope.launch { broadcastCallEndedUseCase(chatIdOfCallEnded) }
                         _finishMeetingActivity.value = true
                     }
                 },
                 onError = Timber::e
             )
             .addTo(composite)
+
+        viewModelScope.launch {
+            monitorCallEndedUseCase().conflate().collect { chatId ->
+                if (chatId == state.value.chatId) {
+                    resetCallRecordingState()
+                }
+            }
+        }
 
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
@@ -1523,23 +1540,30 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
-     * End chat call
+     * Hang chat call
      */
-    fun endChatCall() = viewModelScope.launch {
+    fun hangChatCall() = viewModelScope.launch {
         runCatching {
             getChatCallUseCase(_state.value.chatId)?.let { chatCall ->
                 hangChatCallUseCase(chatCall.callId)
             }
         }.onSuccess {
-            _state.update { state ->
-                state.copy(
-                    isSessionOnRecording = false,
-                    showRecordingConsentDialog = false,
-                    isRecordingConsentAccepted = false
-                )
-            }
+            resetCallRecordingState()
         }.onFailure { exception ->
             Timber.e(exception)
+        }
+    }
+
+    /**
+     * Reset call recording status properties
+     */
+    fun resetCallRecordingState() {
+        _state.update {
+            it.copy(
+                isSessionOnRecording = false,
+                showRecordingConsentDialog = false,
+                isRecordingConsentAccepted = false
+            )
         }
     }
 

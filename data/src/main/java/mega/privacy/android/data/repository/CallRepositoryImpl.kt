@@ -677,4 +677,10 @@ internal class CallRepositoryImpl @Inject constructor(
 
     override suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean) =
         appEventGateway.broadcastCallRecordingConsentEvent(isRecordingConsentAccepted)
+
+    override fun monitorCallEnded(): Flow<Long> =
+        appEventGateway.monitorCallEnded()
+
+    override suspend fun broadcastCallEnded(chatId: Long) =
+        appEventGateway.broadcastCallEnded(chatId)
 }

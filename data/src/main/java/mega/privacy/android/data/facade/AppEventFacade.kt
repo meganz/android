@@ -66,6 +66,7 @@ internal class AppEventFacade @Inject constructor(
         _monitorCompletedTransfer.toSharedFlow(appScope)
 
     private val callRecordingConsentEvent = MutableSharedFlow<Boolean>()
+    private val callEnded = MutableSharedFlow<Long>()
 
     override suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int) {
         _monitorCameraUploadProgress.emit(Pair(progress, pending))
@@ -214,6 +215,10 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean) =
         callRecordingConsentEvent.emit(isRecordingConsentAccepted)
+
+    override fun monitorCallEnded() = callEnded.asSharedFlow()
+
+    override suspend fun broadcastCallEnded(chatId: Long) = callEnded.emit(chatId)
 }
 
 private fun <T> Flow<T>.toSharedFlow(

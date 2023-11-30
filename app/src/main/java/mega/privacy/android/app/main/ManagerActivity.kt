@@ -1227,7 +1227,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             onDismiss = {
                                 viewModel.setIsRecordingConsentAccepted(value = false)
                                 viewModel.setShowRecordingConsentDialogConsumed()
-                                viewModel.endChatCall(state.callInProgressChatId)
+                                viewModel.hangChatCall(state.callInProgressChatId)
                             },
                             onLearnMore = {
                                 val viewIntent = Intent(Intent.ACTION_VIEW)

@@ -434,4 +434,18 @@ interface CallRepository {
      * @param isRecordingConsentAccepted True if recording consent has been accepted or False otherwise.
      */
     suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean)
+
+    /**
+     * Monitor that a specific call has ended.
+     *
+     * @return Flow of Boolean. ID of the chat to which the call corresponded.
+     */
+    fun monitorCallEnded(): Flow<Long>
+
+    /**
+     * Broadcast that a specific call has ended.
+     *
+     * @param chatId    ID of the chat to which the call corresponded.
+     */
+    suspend fun broadcastCallEnded(chatId: Long)
 }

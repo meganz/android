@@ -68,6 +68,7 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableAudioLevelMonitorUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUseCase
@@ -150,6 +151,7 @@ class InMeetingViewModel @Inject constructor(
     private val stopLowResolutionVideoUseCase: StopLowResolutionVideoUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
     private val getChatRoomUseCase: GetChatRoom,
+    private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -2632,7 +2634,11 @@ class InMeetingViewModel @Inject constructor(
         endCallUseCase.endCallForAllWithChatId(chatId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { error ->
+            .subscribeBy(onComplete = {
+                viewModelScope.launch {
+                    broadcastCallEndedUseCase(chatId)
+                }
+            }, onError = { error ->
                 Timber.e(error.stackTraceToString())
             })
             .addTo(composite)
@@ -2663,7 +2669,11 @@ class InMeetingViewModel @Inject constructor(
         endCallUseCase.hangCall(callId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { error ->
+            .subscribeBy(onComplete = {
+                viewModelScope.launch {
+                    broadcastCallEndedUseCase(state.value.currentChatId)
+                }
+            }, onError = { error ->
                 Timber.e(error.stackTraceToString())
             })
             .addTo(composite)

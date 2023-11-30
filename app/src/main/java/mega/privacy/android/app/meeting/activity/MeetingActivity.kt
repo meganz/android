@@ -342,7 +342,7 @@ class MeetingActivity : PasscodeActivity() {
                             onDismiss = {
                                 meetingViewModel.setIsRecordingConsentAccepted(value = false)
                                 meetingViewModel.setShowRecordingConsentDialogConsumed()
-                                meetingViewModel.endChatCall()
+                                meetingViewModel.hangChatCall()
                             },
                             onLearnMore = {
                                 val viewIntent = Intent(Intent.ACTION_VIEW)

@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsent
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
@@ -114,6 +115,7 @@ class ChatViewModelTest {
         mock<BroadcastCallRecordingConsentEventUseCase>()
     private val monitorCallRecordingConsentEventUseCase =
         mock<MonitorCallRecordingConsentEventUseCase>()
+    private val monitorCallEndedUseCase = mock<MonitorCallEndedUseCase>()
 
     @Before
     fun setUp() {
@@ -154,6 +156,7 @@ class ChatViewModelTest {
             hangChatCallUseCase = hangChatCallUseCase,
             broadcastCallRecordingConsentEventUseCase = broadcastCallRecordingConsentEventUseCase,
             monitorCallRecordingConsentEventUseCase = monitorCallRecordingConsentEventUseCase,
+            monitorCallEndedUseCase = monitorCallEndedUseCase,
         )
     }
 

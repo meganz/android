@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
@@ -78,6 +79,7 @@ import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
@@ -151,6 +153,7 @@ import javax.inject.Inject
  * @property monitorChatSessionUpdatesUseCase [MonitorChatSessionUpdatesUseCase]
  * @property hangChatCallUseCase [HangChatCallUseCase]
  * @property monitorCallRecordingConsentEventUseCase [MonitorCallRecordingConsentEventUseCase]
+ * @property monitorCallEndedUseCase [MonitorCallEndedUseCase]
  * @property getNodeByHandle [GetNodeByHandle]
  */
 @HiltViewModel
@@ -225,6 +228,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase,
+    private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
     private val getNodeByHandle: GetNodeByHandle,
 ) : ViewModel() {
 
@@ -428,6 +432,14 @@ class ManagerViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+
+        viewModelScope.launch {
+            monitorCallEndedUseCase().conflate().collect { chatId ->
+                if (chatId == state.value.callInProgressChatId) {
+                    resetCallRecordingState()
+                }
+            }
         }
     }
 
@@ -1143,21 +1155,15 @@ class ManagerViewModel @Inject constructor(
         _state.update { state -> state.copy(isRecordingConsentAccepted = value) }
 
     /**
-     * End chat call
+     * Hang chat call
      */
-    fun endChatCall(chatId: Long) = viewModelScope.launch {
+    fun hangChatCall(chatId: Long) = viewModelScope.launch {
         runCatching {
             getChatCallUseCase(chatId)?.let { chatCall ->
                 hangChatCallUseCase(chatCall.callId)
             }
         }.onSuccess {
-            _state.update { state ->
-                state.copy(
-                    isSessionOnRecording = false,
-                    showRecordingConsentDialog = false,
-                    isRecordingConsentAccepted = false
-                )
-            }
+            resetCallRecordingState()
         }.onFailure { exception ->
             Timber.e(exception)
         }

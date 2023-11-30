@@ -68,6 +68,7 @@ import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsent
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
@@ -117,6 +118,7 @@ import javax.inject.Inject
  * @property hangChatCallUseCase                            [HangChatCallUseCase]
  * @property broadcastCallRecordingConsentEventUseCase      [BroadcastCallRecordingConsentEventUseCase]
  * @property monitorCallRecordingConsentEventUseCase        [MonitorCallRecordingConsentEventUseCase]
+ * @property monitorCallEndedUseCase                        [MonitorCallEndedUseCase]
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -154,6 +156,7 @@ class ChatViewModel @Inject constructor(
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val broadcastCallRecordingConsentEventUseCase: BroadcastCallRecordingConsentEventUseCase,
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase,
+    private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
     monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
 ) : ViewModel() {
 
@@ -246,9 +249,17 @@ class ChatViewModel @Inject constructor(
                         )
                     }
                     if (!isRecordingConsentAccepted) {
-                        endChatCall(state.value.chatId)
+                        hangChatCall(state.value.chatId)
                     }
                 }
+        }
+
+        viewModelScope.launch {
+            monitorCallEndedUseCase().conflate().collect { chatId ->
+                if (chatId == state.value.chatId) {
+                    resetCallRecordingState()
+                }
+            }
         }
 
         startMonitorChatSessionUpdates()
@@ -1060,21 +1071,15 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
-     * End chat call
+     * Hang chat call
      */
-    fun endChatCall(chatId: Long) = viewModelScope.launch {
+    fun hangChatCall(chatId: Long) = viewModelScope.launch {
         runCatching {
             getChatCallUseCase(chatId)?.let { chatCall ->
                 hangChatCallUseCase(chatCall.callId)
             }
         }.onSuccess {
-            _state.update { state ->
-                state.copy(
-                    isSessionOnRecording = false,
-                    showRecordingConsentDialog = false,
-                    isRecordingConsentAccepted = false
-                )
-            }
+            resetCallRecordingState()
         }.onFailure { exception ->
             Timber.e(exception)
         }

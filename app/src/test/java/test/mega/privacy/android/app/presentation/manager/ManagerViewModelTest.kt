@@ -85,6 +85,7 @@ import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
@@ -285,6 +286,7 @@ class ManagerViewModelTest {
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase =
         mock()
+    private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock()
     private val getNodeByHandle: GetNodeByHandle = mock()
 
     @get:Rule
@@ -367,6 +369,7 @@ class ManagerViewModelTest {
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
             monitorCallRecordingConsentEventUseCase = monitorCallRecordingConsentEventUseCase,
+            monitorCallEndedUseCase = monitorCallEndedUseCase,
             getNodeByHandle = getNodeByHandle,
         )
     }
