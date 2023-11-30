@@ -1,4 +1,3 @@
-
 apply(from = "tools/util.gradle")
 plugins {
     // change it following kotlin version, see here https://github.com/google/ksp/releases
@@ -82,7 +81,7 @@ extra["targetSdkVersion"] = 34
 extra["buildTools"] = "34.0.0"
 
 // Prebuilt MEGA SDK version
-extra["megaSdkVersion"] = "20231115.061530-rel"
+extra["megaSdkVersion"] = "20231130.034000-rel"
 
 //JDK and Java Version
 extra["jdk"] = "17"
