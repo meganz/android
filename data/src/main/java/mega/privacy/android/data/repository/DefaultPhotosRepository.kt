@@ -717,46 +717,45 @@ internal class DefaultPhotosRepository @Inject constructor(
     override suspend fun getImageNode(nodeId: NodeId) = imageNodesCache[nodeId]
 
     override suspend fun getMediaDiscoveryNodes(
-        parentID: Long,
+        parentId: NodeId,
         recursive: Boolean,
-    ): List<ImageNode> {
-        return withContext(ioDispatcher) {
-            val parent = megaApiFacade.getMegaNodeByHandle(parentID)
-            val searchString = "*"
-            parent?.let { parentNode ->
-                val token = MegaCancelToken.createInstance()
-                val images = async {
-                    megaApiFacade.searchByType(
-                        parentNode = parentNode,
-                        searchString = searchString,
-                        cancelToken = token,
-                        recursive = recursive,
-                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                        type = MegaApiAndroid.FILE_TYPE_PHOTO
-                    )
-                }
-                val videos = async {
-                    megaApiFacade.searchByType(
-                        parentNode = parentNode,
-                        searchString = searchString,
-                        cancelToken = token,
-                        recursive = recursive,
-                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                        type = MegaApiAndroid.FILE_TYPE_VIDEO
-                    )
-                }
-                (images.await() + videos.await()).map { node ->
-                    val offlineMap =
-                        megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
-                    val offline: Offline? = offlineMap?.get(node.handle.toString())
-                    imageNodeMapper(
-                        megaNode = node,
-                        hasVersion = megaApiFacade::hasVersion,
-                        requireSerializedData = true,
-                        offline = offline
-                    )
-                }
-            } ?: emptyList()
+    ): List<ImageNode> = withContext(ioDispatcher) {
+        val parentNode = megaApiFacade.getMegaNodeByHandle(
+            nodeHandle = parentId.longValue,
+        ) ?: return@withContext emptyList()
+
+        val token = MegaCancelToken.createInstance()
+        val nodes = awaitAll(
+            async {
+                megaApiFacade.searchByType(
+                    parentNode = parentNode,
+                    searchString = "*",
+                    cancelToken = token,
+                    recursive = recursive,
+                    order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+                    type = MegaApiAndroid.FILE_TYPE_PHOTO,
+                )
+            },
+            async {
+                megaApiFacade.searchByType(
+                    parentNode = parentNode,
+                    searchString = "*",
+                    cancelToken = token,
+                    recursive = recursive,
+                    order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+                    type = MegaApiAndroid.FILE_TYPE_VIDEO,
+                )
+            },
+        ).flatten()
+
+        val offlineMap = megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
+        nodes.map { megaNode ->
+            imageNodeMapper(
+                megaNode = megaNode,
+                hasVersion = megaApiFacade::hasVersion,
+                requireSerializedData = true,
+                offline = offlineMap?.get(megaNode.handle.toString()),
+            )
         }
     }
 

@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.photos.MonitorMediaDiscoveryNodesUseCase
 import javax.inject.Inject
@@ -16,7 +17,7 @@ class MediaDiscoveryImageNodeFetcher @Inject constructor(
 ) : ImageNodeFetcher {
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
         return monitorMediaDiscoveryNodesUseCase(
-            parentID = bundle.getLong(PARENT_ID),
+            parentId = NodeId(bundle.getLong(PARENT_ID)),
             recursive = bundle.getBoolean(IS_RECURSIVE),
         ).mapLatest {
             it.sortedByDescending { imageNode -> imageNode.modificationTime }

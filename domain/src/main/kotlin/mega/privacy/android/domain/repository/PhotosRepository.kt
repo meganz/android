@@ -130,7 +130,7 @@ interface PhotosRepository {
     /**
      * Monitor media discovery nodes
      */
-    suspend fun getMediaDiscoveryNodes(parentID: Long, recursive: Boolean): List<ImageNode>
+    suspend fun getMediaDiscoveryNodes(parentId: NodeId, recursive: Boolean): List<ImageNode>
 
     /**
      * Monitor imageNodes in a cloud drive folder
