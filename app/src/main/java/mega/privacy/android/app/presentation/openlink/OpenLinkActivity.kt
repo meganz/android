@@ -25,7 +25,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.LoadPreviewListener
-import mega.privacy.android.app.listeners.QueryRecoveryLinkListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
@@ -413,7 +412,8 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     finish()
                 } else {
                     Timber.d("Not logged")
-                    megaApi.queryResetPasswordLink(url, QueryRecoveryLinkListener(this))
+                    // Users can reset their passwords in the browser even when not logged in.
+                    openWebLinkInBrowser(url)
                 }
             }
             // Pending contacts
