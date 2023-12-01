@@ -344,8 +344,8 @@ class ChatViewModel @Inject constructor(
                         getChatCallUseCase(state.value.chatId)
                     }.onSuccess { call ->
                         when (call) {
-                            null -> startCall(video = false)
-                            else -> answerCall(state.value.chatId, video = false, audio = true)
+                            null -> startCall(video = video)
+                            else -> answerCall(state.value.chatId, video = video, audio = true)
                         }
                     }
                 }
