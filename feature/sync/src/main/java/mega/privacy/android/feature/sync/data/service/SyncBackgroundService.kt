@@ -21,8 +21,11 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.PauseSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.ResumeSyncUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -54,6 +57,15 @@ internal class SyncBackgroundService : LifecycleService() {
 
     @Inject
     internal lateinit var monitorSyncsUseCase: MonitorSyncsUseCase
+
+    @Inject
+    internal lateinit var pauseSyncUseCase: PauseSyncUseCase
+
+    @Inject
+    internal lateinit var resumeSyncUseCase: ResumeSyncUseCase
+
+    @Inject
+    internal lateinit var getFolderPairsUseCase: GetFolderPairsUseCase
 
     override fun onCreate() {
         super.onCreate()
@@ -116,10 +128,23 @@ internal class SyncBackgroundService : LifecycleService() {
             ) { connectedToInternet: Boolean, syncByWifi: Boolean, _ ->
                 Pair(connectedToInternet, syncByWifi)
             }.collect { (connectedToInternet, syncByWifi) ->
-                // pause syncs if not on wifi, will be implemented later
+                updateSyncState(connectedToInternet, syncByWifi)
             }
         }
         return START_STICKY
+    }
+
+    private suspend fun updateSyncState(
+        connectedToInternet: Boolean,
+        syncOnlyByWifi: Boolean,
+    ) {
+        val internetNotAvailable = !connectedToInternet
+        val userNotOnWifi = !isOnWifiNetworkUseCase()
+        if (internetNotAvailable || syncOnlyByWifi && userNotOnWifi) {
+            getFolderPairsUseCase().forEach { pauseSyncUseCase(it.id) }
+        } else {
+            getFolderPairsUseCase().forEach { resumeSyncUseCase(it.id) }
+        }
     }
 
     override fun onDestroy() {

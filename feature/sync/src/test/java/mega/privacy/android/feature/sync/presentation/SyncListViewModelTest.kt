@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -16,9 +17,11 @@ import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
+import mega.privacy.android.feature.sync.domain.usecase.SetSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissues.ClearSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissues.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.ui.mapper.StalledIssueItemMapper
@@ -47,6 +50,8 @@ class SyncListViewModelTest {
     private val stalledIssueItemMapper: StalledIssueItemMapper = mock()
     private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase = mock()
     private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase = mock()
+    private val setSyncByWiFiUseCase: SetSyncByWiFiUseCase = mock()
+    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
 
     private val stalledIssues = listOf(
         StalledIssue(
@@ -152,14 +157,30 @@ class SyncListViewModelTest {
 
     @Test
     fun `test that state changes when sync option is selected`() = runTest {
+        val monitorSyncByWiFiStateFlow = MutableStateFlow(false)
+        whenever(monitorSyncByWiFiUseCase()).thenReturn(monitorSyncByWiFiStateFlow)
         initViewModel()
 
+        underTest.state.test {
+            assertThat(awaitItem().selectedSyncOption).isEqualTo(SyncOption.WI_FI_OR_MOBILE_DATA)
+        }
+
         underTest.handleAction(SyncListAction.SyncOptionsSelected(SyncOption.WI_FI_ONLY))
+        monitorSyncByWiFiStateFlow.emit(true)
 
         underTest.state.test {
             assertThat(awaitItem().selectedSyncOption).isEqualTo(SyncOption.WI_FI_ONLY)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that set sync by wifi usecase is invoked when sync option is selected`() = runTest {
+        initViewModel()
+
+        underTest.handleAction(SyncListAction.SyncOptionsSelected(SyncOption.WI_FI_ONLY))
+
+        verify(setSyncByWiFiUseCase).invoke(true)
     }
 
     private fun initViewModel() {
@@ -169,7 +190,9 @@ class SyncListViewModelTest {
             resolveStalledIssueUseCase = resolveStalledIssueUseCase,
             stalledIssueItemMapper = stalledIssueItemMapper,
             monitorSyncSolvedIssuesUseCase = monitorSyncSolvedIssuesUseCase,
-            clearSyncSolvedIssuesUseCase = clearSyncSolvedIssuesUseCase
+            clearSyncSolvedIssuesUseCase = clearSyncSolvedIssuesUseCase,
+            setSyncByWiFiUseCase = setSyncByWiFiUseCase,
+            monitorSyncByWiFiUseCase = monitorSyncByWiFiUseCase
         )
     }
 }

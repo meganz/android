@@ -10,12 +10,15 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
+import mega.privacy.android.feature.sync.domain.usecase.SetSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissues.ClearSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissues.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.ui.mapper.StalledIssueItemMapper
+import mega.privacy.android.feature.sync.ui.model.SyncOption
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -27,6 +30,8 @@ internal class SyncListViewModel @Inject constructor(
     private val stalledIssueItemMapper: StalledIssueItemMapper,
     private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase,
     private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase,
+    private val setSyncByWiFiUseCase: SetSyncByWiFiUseCase,
+    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncListState())
@@ -36,6 +41,7 @@ internal class SyncListViewModel @Inject constructor(
         observeOnboardingFlow()
         monitorStalledIssue()
         monitorSolvedIssue()
+        monitorSyncByWifiSetting()
     }
 
     private fun observeOnboardingFlow() {
@@ -63,21 +69,41 @@ internal class SyncListViewModel @Inject constructor(
         }
     }
 
+    private fun monitorSyncByWifiSetting() {
+        viewModelScope.launch {
+            monitorSyncByWiFiUseCase()
+                .collectLatest { syncByWiFi ->
+                    _state.update { state ->
+                        state.copy(
+                            selectedSyncOption = if (syncByWiFi) {
+                                SyncOption.WI_FI_ONLY
+                            } else {
+                                SyncOption.WI_FI_OR_MOBILE_DATA
+                            }
+                        )
+                    }
+                }
+        }
+    }
+
     fun handleAction(action: SyncListAction) {
         when (action) {
             is SyncListAction.ResolveStalledIssue -> {
                 viewModelScope.launch {
                     resolveStalledIssueUseCase(
-                        action.selectedResolution,
-                        stalledIssueItemMapper(action.uiItem)
+                        action.selectedResolution, stalledIssueItemMapper(action.uiItem)
                     )
                 }
 
-                _state.update { SyncListState(snackbarMessage = "Conflict resolved") }
+                _state.update { state ->
+                    state.copy(snackbarMessage = "Conflict resolved")
+                }
             }
 
             SyncListAction.SnackBarShown -> {
-                _state.update { SyncListState(snackbarMessage = null) }
+                _state.update { state ->
+                    state.copy(snackbarMessage = null)
+                }
             }
 
             is SyncListAction.SyncOptionsSelected -> {
@@ -85,6 +111,9 @@ internal class SyncListViewModel @Inject constructor(
                     state.copy(
                         selectedSyncOption = action.selectedOption
                     )
+                }
+                viewModelScope.launch {
+                    setSyncByWiFiUseCase(action.selectedOption == SyncOption.WI_FI_ONLY)
                 }
             }
         }
