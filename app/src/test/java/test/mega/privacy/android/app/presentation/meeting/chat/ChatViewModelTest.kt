@@ -1699,7 +1699,7 @@ internal class ChatViewModelTest {
                 enabledAudio = true
             )
         ).thenThrow(RuntimeException())
-        underTest.onStartMeeting()
+        underTest.onStartOrJoinMeeting(false)
         underTest.state.test {
             assertThat(awaitItem().isStartingCall).isFalse()
         }
@@ -1739,7 +1739,7 @@ internal class ChatViewModelTest {
                 enabledAudio = true
             )
         ).thenReturn(call)
-        underTest.onStartMeeting()
+        underTest.onStartOrJoinMeeting(false)
         underTest.state.test {
             assertThat(awaitItem().isStartingCall).isTrue()
         }
@@ -1776,7 +1776,7 @@ internal class ChatViewModelTest {
                 enabledAudio = true,
             )
         ).thenThrow(RuntimeException())
-        underTest.onStartMeeting()
+        underTest.onStartOrJoinMeeting(false)
         underTest.state.test {
             assertThat(awaitItem().isStartingCall).isFalse()
         }
@@ -1816,7 +1816,7 @@ internal class ChatViewModelTest {
                 enabledAudio = true,
             )
         ).thenReturn(call)
-        underTest.onStartMeeting()
+        underTest.onStartOrJoinMeeting(false)
         underTest.state.test {
             assertThat(awaitItem().isStartingCall).isTrue()
         }
@@ -1828,7 +1828,7 @@ internal class ChatViewModelTest {
     }
 
     @Test
-    fun `test that non-host open waiting screen`() = runTest {
+    fun `test that non-host open waiting screen when starting a meeting`() = runTest {
         val invalidHandle = -1L
         val schedId = 123L
         val expectedScheduledMeeting =
@@ -1847,10 +1847,74 @@ internal class ChatViewModelTest {
             assertThat(item.scheduledMeeting).isEqualTo(expectedScheduledMeeting)
             assertThat(item.openWaitingRoomScreen).isFalse()
         }
-        underTest.onStartMeeting()
+        underTest.onStartOrJoinMeeting(false)
         underTest.state.test {
             assertThat(awaitItem().openWaitingRoomScreen).isTrue()
         }
+    }
+
+    @Test
+    fun `test that non-host open waiting screen when joining a meeting`() = runTest {
+        val invalidHandle = -1L
+        val schedId = 123L
+        val expectedScheduledMeeting =
+            ChatScheduledMeeting(parentSchedId = invalidHandle, schedId = schedId)
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Standard
+            on { isWaitingRoom } doReturn true
+        }
+        whenever(getScheduledMeetingByChat(chatId)).thenReturn(listOf(expectedScheduledMeeting))
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            val item = awaitItem()
+            assertThat(item.scheduledMeeting).isEqualTo(expectedScheduledMeeting)
+            assertThat(item.openWaitingRoomScreen).isFalse()
+        }
+        underTest.onStartOrJoinMeeting(true)
+        underTest.state.test {
+            assertThat(awaitItem().openWaitingRoomScreen).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that host answers a call when starting a waiting room meeting`() = runTest {
+        val invalidHandle = -1L
+        val schedId = 123L
+        val expectedScheduledMeeting =
+            ChatScheduledMeeting(parentSchedId = invalidHandle, schedId = schedId)
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { isWaitingRoom } doReturn true
+        }
+        whenever(getScheduledMeetingByChat(chatId)).thenReturn(listOf(expectedScheduledMeeting))
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.onStartOrJoinMeeting(true)
+        verify(answerChatCallUseCase).invoke(chatId = chatId, video = false, audio = true)
+    }
+
+    @Test
+    fun `test that answer a call when starting a non-waiting room meeting`() = runTest {
+        val invalidHandle = -1L
+        val schedId = 123L
+        val expectedScheduledMeeting =
+            ChatScheduledMeeting(parentSchedId = invalidHandle, schedId = schedId)
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Standard
+            on { isWaitingRoom } doReturn false
+        }
+        whenever(getScheduledMeetingByChat(chatId)).thenReturn(listOf(expectedScheduledMeeting))
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.onStartOrJoinMeeting(true)
+        verify(answerChatCallUseCase).invoke(chatId = chatId, video = false, audio = true)
     }
 
     @ParameterizedTest(name = " when history status is {0}")

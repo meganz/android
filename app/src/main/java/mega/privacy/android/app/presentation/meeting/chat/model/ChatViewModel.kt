@@ -791,11 +791,21 @@ internal class ChatViewModel @Inject constructor(
         _state.update { state -> state.copy(openWaitingRoomScreen = false) }
     }
 
-    fun onStartMeeting() {
-        if (state.value.isWaitingRoom) {
-            startWaitingRoomMeeting()
+    fun onStartOrJoinMeeting(isStarted: Boolean) {
+        val isWaitingRoom = state.value.isWaitingRoom
+        if (isStarted) {
+            val isHost = state.value.myPermission == ChatRoomPermission.Moderator
+            if (isWaitingRoom && !isHost) {
+                _state.update { state -> state.copy(openWaitingRoomScreen = true) }
+            } else {
+                onAnswerCall()
+            }
         } else {
-            startMeeting()
+            if (isWaitingRoom) {
+                startWaitingRoomMeeting()
+            } else {
+                startMeeting()
+            }
         }
     }
 

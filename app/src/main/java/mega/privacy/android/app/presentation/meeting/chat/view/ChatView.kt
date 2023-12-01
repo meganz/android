@@ -118,7 +118,7 @@ internal fun ChatView(
         onMutePushNotificationSelected = viewModel::mutePushNotification,
         onShowMutePushNotificationDialog = viewModel::showMutePushNotificationDialog,
         onShowMutePushNotificationDialogConsumed = viewModel::onShowMutePushNotificationDialogConsumed,
-        onStartMeeting = viewModel::onStartMeeting,
+        onStartOrJoinMeeting = viewModel::onStartOrJoinMeeting,
         onAnswerCall = viewModel::onAnswerCall,
     )
 }
@@ -149,7 +149,7 @@ internal fun ChatView(
     onMutePushNotificationSelected: (ChatPushNotificationMuteOption) -> Unit = {},
     onShowMutePushNotificationDialog: () -> Unit = {},
     onShowMutePushNotificationDialogConsumed: () -> Unit = {},
-    onStartMeeting: () -> Unit = {},
+    onStartOrJoinMeeting: (isStarted: Boolean) -> Unit = {},
     onAnswerCall: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -185,7 +185,8 @@ internal fun ChatView(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissionsResult ->
         if (permissionsResult[Manifest.permission.RECORD_AUDIO] == true) {
-            onStartMeeting()
+            val isStarted = uiState.callInThisChat?.status?.isStarted == true
+            onStartOrJoinMeeting(isStarted)
         } else {
             coroutineScope.launch {
                 val result = snackBarHostState.showSnackbar(
@@ -345,7 +346,7 @@ internal fun ChatView(
                         }
                     }
                     if (isMeeting && isActive && !isArchived) {
-                        StartOrJoinMeeting(this@with, onStartMeeting = {
+                        StartOrJoinMeeting(this@with, onStartOrJoinMeeting = {
                             callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
                         })
                     }
@@ -460,7 +461,7 @@ internal fun ChatView(
 }
 
 @Composable
-private fun BoxScope.StartOrJoinMeeting(uiState: ChatUiState, onStartMeeting: () -> Unit = {}) {
+private fun BoxScope.StartOrJoinMeeting(uiState: ChatUiState, onStartOrJoinMeeting: () -> Unit = {}) {
     val modifier = Modifier
         .padding(top = 16.dp)
         .align(Alignment.TopCenter)
@@ -468,13 +469,13 @@ private fun BoxScope.StartOrJoinMeeting(uiState: ChatUiState, onStartMeeting: ()
         ChatMeetingButton(
             modifier = modifier,
             text = stringResource(id = R.string.meetings_chat_room_start_scheduled_meeting_option),
-            onClick = onStartMeeting,
+            onClick = onStartOrJoinMeeting,
         )
     } else if (uiState.callInThisChat.status?.isJoined != true) {
         ChatMeetingButton(
             modifier = modifier,
             text = stringResource(id = R.string.meetings_chat_room_join_scheduled_meeting_option),
-            onClick = { },
+            onClick = onStartOrJoinMeeting,
         )
     }
 }
