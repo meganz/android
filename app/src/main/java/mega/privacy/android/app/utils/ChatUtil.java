@@ -1051,11 +1051,20 @@ public class ChatUtil {
 
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
+                    List<Long> chatIds = null;
+                    if (chats != null) {
+                        chatIds = new ArrayList<>();
+                        for(MegaChatListItem chat : chats) {
+                            chatIds.add(chat.getChatId());
+                        }
+                    }
+
                     MegaApplication.getPushNotificationSettingManagement()
                             .controlMuteNotifications(
                                     context,
                                     getTypeMute(itemClicked.get(), optionSelected),
-                                    chats != null ? chats.stream().map(MegaChatListItem::getChatId).toList() : null);
+                                    chatIds
+                            );
                     dialog.dismiss();
                 });
         dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
