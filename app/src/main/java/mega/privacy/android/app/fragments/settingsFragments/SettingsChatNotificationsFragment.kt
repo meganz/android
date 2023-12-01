@@ -82,27 +82,35 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
      * Method to update the UI items when the Push notification Settings change.
      */
     fun updateSwitch() {
-        val pushNotificationSettings =
-            getPushNotificationSettingManagement().pushNotificationSetting
+        with(getPushNotificationSettingManagement().pushNotificationSetting) {
+            val areChatsEnabled = this.isChatsEnabled
+            val isDndEnabled = this.isGlobalChatsDndEnabled
+            val dndTime = this.globalChatsDnd
 
-        val option = pushNotificationSettings?.let {
-            if (it.isGlobalChatsDndEnabled) {
-                if (it.globalChatsDnd == 0L)
-                    Constants.NOTIFICATIONS_DISABLED
-                else
-                    Constants.NOTIFICATIONS_DISABLED_X_TIME
-            } else {
-                Constants.NOTIFICATIONS_ENABLED
-            }
-        } ?: Constants.NOTIFICATIONS_ENABLED
+            chatNotificationsSwitch?.isChecked = (areChatsEnabled && !isDndEnabled)
 
-        if (option == Constants.NOTIFICATIONS_DISABLED) {
             chatDndSwitch?.let {
-                preferenceScreen.removePreference(it)
+                when (dndTime) {
+                    0L -> {
+                        preferenceScreen.removePreference(it)
+                    }
+
+                    else -> {
+                        preferenceScreen.addPreference(it)
+                        it.isChecked = isDndEnabled
+                        if (isDndEnabled) {
+                            it.summary = TimeUtils.getCorrectStringDependingOnOptionSelected(
+                                dndTime,
+                                requireContext()
+                            )
+                        } else {
+                            it.summary = getString(R.string.mute_chatroom_notification_option_off)
+                        }
+                    }
+                }
             }
-            return
         }
-        chatNotificationsSwitch?.isChecked = option == Constants.NOTIFICATIONS_ENABLED
+
         if (chatSettings == null) {
             chatSettings = dbH.chatSettings
         }
@@ -140,21 +148,6 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
                 }
             }
         }
-        chatDndSwitch?.let {
-            preferenceScreen.addPreference(it)
-            if (option == Constants.NOTIFICATIONS_ENABLED) {
-                it.isChecked = false
-                it.summary = getString(R.string.mute_chatroom_notification_option_off)
-            } else {
-                it.isChecked = true
-                pushNotificationSettings?.globalChatsDnd?.let { timestampMute ->
-                    it.summary = TimeUtils.getCorrectStringDependingOnOptionSelected(
-                        timestampMute,
-                        requireContext()
-                    )
-                }
-            }
-        }
 
         chatSoundPreference?.let {
             preferenceScreen.addPreference(it)
@@ -178,6 +171,7 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
                         null
                     )
                 }
+
             KEY_CHAT_VIBRATE ->
                 if (chatSettings?.vibrationEnabled == null
                     || chatSettings?.vibrationEnabled.toBoolean()
@@ -188,6 +182,7 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
                     dbH.setVibrationEnabledChat(VIBRATION_ON)
                     chatSettings = chatSettings?.copy(vibrationEnabled = VIBRATION_ON)
                 }
+
             KEY_CHAT_SOUND ->
                 (context as? ChatNotificationsPreferencesActivity)
                     ?.changeSound(chatSettings?.notificationsSound)
