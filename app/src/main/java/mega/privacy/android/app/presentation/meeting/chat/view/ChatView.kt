@@ -116,7 +116,7 @@ internal fun ChatView(
         onWaitingRoomOpened = viewModel::onWaitingRoomOpened,
         onRequestMoreMessages = viewModel::requestMessages,
         onMutePushNotificationSelected = viewModel::mutePushNotification,
-        showMutePushNotificationDialog = viewModel::showMutePushNotificationDialog,
+        onShowMutePushNotificationDialog = viewModel::showMutePushNotificationDialog,
         onShowMutePushNotificationDialogConsumed = viewModel::onShowMutePushNotificationDialogConsumed,
         onStartMeeting = viewModel::onStartMeeting,
         onAnswerCall = viewModel::onAnswerCall,
@@ -147,7 +147,7 @@ internal fun ChatView(
     onWaitingRoomOpened: () -> Unit = {},
     onRequestMoreMessages: () -> Unit = {},
     onMutePushNotificationSelected: (ChatPushNotificationMuteOption) -> Unit = {},
-    showMutePushNotificationDialog: () -> Unit = {},
+    onShowMutePushNotificationDialog: () -> Unit = {},
     onShowMutePushNotificationDialogConsumed: () -> Unit = {},
     onStartMeeting: () -> Unit = {},
     onAnswerCall: () -> Unit = {},
@@ -215,6 +215,13 @@ internal fun ChatView(
                 }
             }
 
+        val attachContactLauncher =
+            rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                // TODO attach contact to chat room
+            }
+
         val isFileModalShown = fileModalSheetState.currentValue != ModalBottomSheetValue.Hidden
 
         BottomSheet(
@@ -230,6 +237,15 @@ internal fun ChatView(
                             onBackPressed()
                             coroutineScope.launch {
                                 fileModalSheetState.show()
+                            }
+                        },
+                        onAttachContactClicked = {
+                            if (uiState.hasAnyContact) {
+                                openAttachContactActivity(context, attachContactLauncher)
+                            } else {
+                                coroutineScope.launch {
+                                    snackBarHostState.showSnackbar(context.getString(R.string.no_contacts_invite))
+                                }
                             }
                         },
                         sheetState = toolbarModalSheetState
@@ -282,7 +298,7 @@ internal fun ChatView(
                             showEndCallForAllDialog = {
                                 showEndCallForAllDialog = true
                             },
-                            showMutePushNotificationDialog = { showMutePushNotificationDialog() },
+                            showMutePushNotificationDialog = { onShowMutePushNotificationDialog() },
                             enableSelectMode = {
                                 isSelectMode = true
                             },
@@ -417,7 +433,7 @@ internal fun ChatView(
 
             EventEffect(
                 event = mutePushNotificationDialogEvent,
-                onConsumed = { onShowMutePushNotificationDialogConsumed }
+                onConsumed = onShowMutePushNotificationDialogConsumed,
             ) { options ->
                 muteNotificationDialogOptions = options
                 showMutePushNotificationDialog = true
@@ -527,6 +543,22 @@ private fun startMeetingActivity(
         enableVideo?.let { putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, it) }
         addFlags(if (enableAudio != null) Intent.FLAG_ACTIVITY_NEW_TASK else Intent.FLAG_ACTIVITY_CLEAR_TOP)
     })
+}
+
+private fun openAttachContactActivity(
+    context: Context,
+    attachContactLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+) {
+    Intent(context, AddContactActivity::class.java).apply {
+        putExtra(Constants.INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+        putExtra(Constants.INTENT_EXTRA_KEY_CHAT, true)
+        putExtra(
+            Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+            context.getString(R.string.send_contacts)
+        )
+    }.also {
+        attachContactLauncher.launch(it)
+    }
 }
 
 private fun startWaitingRoom(context: Context, chatId: Long) {

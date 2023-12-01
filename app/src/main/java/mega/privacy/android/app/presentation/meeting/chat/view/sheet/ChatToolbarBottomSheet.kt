@@ -45,6 +45,7 @@ import nz.mega.documentscanner.DocumentScannerActivity
 @Composable
 fun ChatToolbarBottomSheet(
     onAttachFileClicked: () -> Unit,
+    onAttachContactClicked: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
 ) {
@@ -130,7 +131,10 @@ fun ChatToolbarBottomSheet(
             AttachItem(
                 iconId = R.drawable.ic_attach_from_contact,
                 itemName = stringResource(id = R.string.attachment_upload_panel_contact),
-                onItemClick = { },
+                onItemClick = {
+                    coroutineScope.launch { sheetState.hide() }
+                    onAttachContactClicked()
+                },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_CONTACT)
             )
             AttachItemPlaceHolder()
@@ -184,6 +188,7 @@ private fun ChatToolbarBottomSheetPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatToolbarBottomSheet(
             onAttachFileClicked = {},
+            onAttachContactClicked = {},
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
         )
     }
