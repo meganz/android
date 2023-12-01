@@ -76,6 +76,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaChatError
@@ -196,6 +197,7 @@ internal class ChatViewModelTest {
     private val answerChatCallUseCase = mock<AnswerChatCallUseCase>()
     private val rtcAudioManagerGateway = mock<RTCAudioManagerGateway>()
     private val uiChatMessageMapper = mock<UiChatMessageMapper>()
+    private val startMeetingInWaitingRoomChatUseCase = mock<StartMeetingInWaitingRoomChatUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -237,7 +239,8 @@ internal class ChatViewModelTest {
             startChatCallNoRingingUseCase,
             answerChatCallUseCase,
             rtcAudioManagerGateway,
-            uiChatMessageMapper
+            uiChatMessageMapper,
+            startMeetingInWaitingRoomChatUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -303,7 +306,8 @@ internal class ChatViewModelTest {
             muteChatNotificationForChatRoomsUseCase = muteChatNotificationForChatRoomsUseCase,
             answerChatCallUseCase = answerChatCallUseCase,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
-            uiChatMessageMapper = uiChatMessageMapper
+            uiChatMessageMapper = uiChatMessageMapper,
+            startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase
         )
     }
 
@@ -1670,13 +1674,19 @@ internal class ChatViewModelTest {
     }
 
     @Test
-    fun `test that start schedule meeting failed`() = runTest {
+    fun `test that start non waiting schedule meeting failed`() = runTest {
         val invalidHandle = -1L
         val schedId = 123L
         val expectedScheduledMeeting =
             ChatScheduledMeeting(parentSchedId = invalidHandle, schedId = schedId)
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { isWaitingRoom } doReturn false
+        }
         whenever(getScheduledMeetingByChat(chatId)).thenReturn(listOf(expectedScheduledMeeting))
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
         initTestClass()
         underTest.state.test {
             assertThat(awaitItem().scheduledMeeting).isEqualTo(expectedScheduledMeeting)
@@ -1698,13 +1708,19 @@ internal class ChatViewModelTest {
     }
 
     @Test
-    fun `test that start schedule meeting successfully`() = runTest {
+    fun `test that start non waiting schedule meeting successfully`() = runTest {
         val invalidHandle = -1L
         val schedId = 123L
         val expectedScheduledMeeting =
             ChatScheduledMeeting(parentSchedId = invalidHandle, schedId = schedId)
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { isWaitingRoom } doReturn false
+        }
         whenever(getScheduledMeetingByChat(chatId)).thenReturn(listOf(expectedScheduledMeeting))
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
         initTestClass()
         underTest.state.test {
             assertThat(awaitItem().scheduledMeeting).isEqualTo(expectedScheduledMeeting)
@@ -1732,6 +1748,109 @@ internal class ChatViewModelTest {
         verifyNoMoreInteractions(chatManagement)
         verify(passcodeManagement).showPasscodeScreen = true
         verifyNoMoreInteractions(passcodeManagement)
+    }
+
+    @Test
+    fun `test that host starts waiting schedule meeting failed`() = runTest {
+        val invalidHandle = -1L
+        val schedId = 123L
+        val expectedScheduledMeeting =
+            ChatScheduledMeeting(parentSchedId = invalidHandle, schedId = schedId)
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { isWaitingRoom } doReturn true
+        }
+        whenever(getScheduledMeetingByChat(chatId)).thenReturn(listOf(expectedScheduledMeeting))
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().scheduledMeeting).isEqualTo(expectedScheduledMeeting)
+        }
+        whenever(
+            startMeetingInWaitingRoomChatUseCase(
+                chatId = chatId,
+                schedIdWr = schedId,
+                enabledVideo = false,
+                enabledAudio = true,
+            )
+        ).thenThrow(RuntimeException())
+        underTest.onStartMeeting()
+        underTest.state.test {
+            assertThat(awaitItem().isStartingCall).isFalse()
+        }
+        verifyNoInteractions(chatManagement)
+        verifyNoInteractions(passcodeManagement)
+    }
+
+    @Test
+    fun `test that host start waiting schedule meeting successfully`() = runTest {
+        val invalidHandle = -1L
+        val schedId = 123L
+        val expectedScheduledMeeting =
+            ChatScheduledMeeting(parentSchedId = invalidHandle, schedId = schedId)
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+            on { isWaitingRoom } doReturn true
+        }
+        whenever(getScheduledMeetingByChat(chatId)).thenReturn(listOf(expectedScheduledMeeting))
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().scheduledMeeting).isEqualTo(expectedScheduledMeeting)
+        }
+        val call = mock<ChatCall> {
+            on { this.chatId } doReturn chatId
+            on { this.callId } doReturn callId
+            on { isOutgoing } doReturn true
+            on { hasLocalVideo } doReturn false
+        }
+        whenever(
+            startMeetingInWaitingRoomChatUseCase(
+                chatId = chatId,
+                schedIdWr = schedId,
+                enabledVideo = false,
+                enabledAudio = true,
+            )
+        ).thenReturn(call)
+        underTest.onStartMeeting()
+        underTest.state.test {
+            assertThat(awaitItem().isStartingCall).isTrue()
+        }
+        verify(chatManagement).setSpeakerStatus(chatId, call.hasLocalVideo)
+        verify(chatManagement).setRequestSentCall(callId, true)
+        verifyNoMoreInteractions(chatManagement)
+        verify(passcodeManagement).showPasscodeScreen = true
+        verifyNoMoreInteractions(passcodeManagement)
+    }
+
+    @Test
+    fun `test that non-host open waiting screen`() = runTest {
+        val invalidHandle = -1L
+        val schedId = 123L
+        val expectedScheduledMeeting =
+            ChatScheduledMeeting(parentSchedId = invalidHandle, schedId = schedId)
+        val chatRoom = mock<ChatRoom> {
+            on { isGroup } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Standard
+            on { isWaitingRoom } doReturn true
+        }
+        whenever(getScheduledMeetingByChat(chatId)).thenReturn(listOf(expectedScheduledMeeting))
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        initTestClass()
+        underTest.state.test {
+            val item = awaitItem()
+            assertThat(item.scheduledMeeting).isEqualTo(expectedScheduledMeeting)
+            assertThat(item.openWaitingRoomScreen).isFalse()
+        }
+        underTest.onStartMeeting()
+        underTest.state.test {
+            assertThat(awaitItem().openWaitingRoomScreen).isTrue()
+        }
     }
 
     @ParameterizedTest(name = " when history status is {0}")
@@ -1804,7 +1923,14 @@ internal class ChatViewModelTest {
             flow.emit(message4)
             val actual4 = awaitItem()
             assertThat(actual4.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 4)
-            assertThat(actual4.messages).isEqualTo(listOf(uiMessage4,uiMessage3, uiMessage2, uiMessage1))
+            assertThat(actual4.messages).isEqualTo(
+                listOf(
+                    uiMessage4,
+                    uiMessage3,
+                    uiMessage2,
+                    uiMessage1
+                )
+            )
         }
     }
 

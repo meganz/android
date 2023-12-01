@@ -64,6 +64,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
+import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
@@ -123,6 +124,7 @@ internal class ChatViewModel @Inject constructor(
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val uiChatMessageMapper: UiChatMessageMapper,
+    private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -782,7 +784,46 @@ internal class ChatViewModel @Inject constructor(
         _state.update { state -> state.copy(isStartingCall = false) }
     }
 
+    /**
+     * On opened waiting room
+     */
+    fun onWaitingRoomOpened() {
+        _state.update { state -> state.copy(openWaitingRoomScreen = false) }
+    }
+
     fun onStartMeeting() {
+        if (state.value.isWaitingRoom) {
+            startWaitingRoomMeeting()
+        } else {
+            startMeeting()
+        }
+    }
+
+    private fun startWaitingRoomMeeting() {
+        val isHost = state.value.myPermission == ChatRoomPermission.Moderator
+        if (isHost) {
+            viewModelScope.launch {
+                runCatching {
+                    val chatId = requireNotNull(chatId)
+                    val schedId = state.value.scheduledMeeting?.schedId ?: -1L
+                    startMeetingInWaitingRoomChatUseCase(
+                        chatId = chatId,
+                        schedIdWr = schedId,
+                        enabledVideo = false,
+                        enabledAudio = true,
+                    )
+                }.onSuccess { chatCall ->
+                    setCallReady(chatCall)
+                }.onFailure {
+                    Timber.e(it)
+                }
+            }
+        } else {
+            _state.update { state -> state.copy(openWaitingRoomScreen = true) }
+        }
+    }
+
+    private fun startMeeting() {
         viewModelScope.launch {
             runCatching {
                 val chatId = requireNotNull(chatId)

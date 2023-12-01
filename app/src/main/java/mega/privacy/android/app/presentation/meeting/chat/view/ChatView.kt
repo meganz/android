@@ -24,6 +24,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,12 +48,14 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
+import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.presentation.meeting.chat.extension.hasAvatar
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
@@ -76,6 +79,7 @@ import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.ChatMeetingButton
@@ -109,6 +113,7 @@ internal fun ChatView(
         endCallForAll = viewModel::endCall,
         startCall = viewModel::startCall,
         onCallStarted = viewModel::onCallStarted,
+        onWaitingRoomOpened = viewModel::onWaitingRoomOpened,
         onRequestMoreMessages = viewModel::requestMessages,
         onMutePushNotificationSelected = viewModel::mutePushNotification,
         showMutePushNotificationDialog = viewModel::showMutePushNotificationDialog,
@@ -139,6 +144,7 @@ internal fun ChatView(
     endCallForAll: () -> Unit = {},
     startCall: (Boolean) -> Unit = {},
     onCallStarted: () -> Unit = {},
+    onWaitingRoomOpened: () -> Unit = {},
     onRequestMoreMessages: () -> Unit = {},
     onMutePushNotificationSelected: (ChatPushNotificationMuteOption) -> Unit = {},
     showMutePushNotificationDialog: () -> Unit = {},
@@ -172,6 +178,24 @@ internal fun ChatView(
     BackHandler(enabled = fileModalSheetState.isVisible) {
         coroutineScope.launch {
             fileModalSheetState.hide()
+        }
+    }
+
+    val callPermissionsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionsResult ->
+        if (permissionsResult[Manifest.permission.RECORD_AUDIO] == true) {
+            onStartMeeting()
+        } else {
+            coroutineScope.launch {
+                val result = snackBarHostState.showSnackbar(
+                    context.getString(R.string.allow_acces_calls_subtitle_microphone),
+                    context.getString(R.string.general_allow),
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    context.navigateToAppSettings()
+                }
+            }
         }
     }
 
@@ -305,7 +329,9 @@ internal fun ChatView(
                         }
                     }
                     if (isMeeting && isActive && !isArchived) {
-                        StartOrJoinMeeting(this@with, onStartMeeting)
+                        StartOrJoinMeeting(this@with, onStartMeeting = {
+                            callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
+                        })
                     }
                     ReturnToCallBanner(
                         uiState = uiState,
@@ -409,6 +435,11 @@ internal fun ChatView(
                 enableVideo = callInThisChat.hasLocalVideo
             )
         }
+
+        if (openWaitingRoomScreen) {
+            onWaitingRoomOpened()
+            startWaitingRoom(context, chatId)
+        }
     }
 }
 
@@ -496,6 +527,17 @@ private fun startMeetingActivity(
         enableVideo?.let { putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, it) }
         addFlags(if (enableAudio != null) Intent.FLAG_ACTIVITY_NEW_TASK else Intent.FLAG_ACTIVITY_CLEAR_TOP)
     })
+}
+
+private fun startWaitingRoom(context: Context, chatId: Long) {
+    context.startActivity(
+        Intent(
+            context,
+            WaitingRoomActivity::class.java
+        ).apply {
+            putExtra(WaitingRoomActivity.EXTRA_CHAT_ID, chatId)
+        },
+    )
 }
 
 private fun getInfoToShow(infoToShow: InfoToShow, context: Context): String? = with(infoToShow) {
