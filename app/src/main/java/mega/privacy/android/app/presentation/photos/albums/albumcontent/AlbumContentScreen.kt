@@ -145,6 +145,8 @@ internal fun AlbumContentScreen(
     Box {
         if (photos.isEmpty() && (albumContentState.isLoading || albumContentState.isAddingPhotos)) {
             AlbumContentSkeletonView(smallWidth = smallWidth)
+        } else if (!albumContentState.isLoading && albumContentState.uiAlbum == null) {
+            Back()
         } else if (photos.isNotEmpty()) {
             DynamicView(
                 lazyListState = lazyListState,
