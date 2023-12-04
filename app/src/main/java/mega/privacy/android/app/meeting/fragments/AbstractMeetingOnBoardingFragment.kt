@@ -26,6 +26,7 @@ import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
+import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.MEETING_BOTTOM_MARGIN
 import mega.privacy.android.app.utils.Constants.MEETING_BOTTOM_MARGIN_WITH_KEYBOARD
@@ -135,7 +136,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             args.getString(MeetingActivity.MEETING_LINK)?.let {
                 meetingLink = it
             }
-            args.getLong(MeetingActivity.MEETING_CHAT_ID).let {
+            args.getLong(MeetingActivity.MEETING_CHAT_ID, -1L).let {
                 chatId = it
                 sharedModel.updateChatRoomId(chatId)
             }
