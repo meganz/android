@@ -117,6 +117,7 @@ object SettingsConstants {
     const val KEY_COOKIE_ESSENTIAL = "settings_cookie_essential"
     const val KEY_COOKIE_ANALYTICS = "settings_cookie_performance_analytics"
     const val KEY_COOKIE_POLICIES = "setting_cookie_policies"
+    const val KEY_COOKIE_ADS = "settings_cookie_advertisement"
 
     const val REPORT_ISSUE = "settings_help_report_issue"
 }

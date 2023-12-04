@@ -3002,21 +3002,21 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">Your privacy</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We use Cookies and similar technologies (’Cookies’) to provide and enhance your experience with our services. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
+    <string name="dialog_cookie_alert_message">We use cookies and similar technologies (’Cookies’) to provide and enhance your experience with our services. Accept our use of cookies from the beginning of your visit or customise cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie Settings unsaved.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Cookie Settings changes have been saved</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_accept">Accept Cookies</string>
+    <string name="preference_cookies_accept">Accept cookies</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_essential_title">Essential Cookies</string>
+    <string name="preference_cookies_essential_title">Essential cookies</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_performance_title">Performance and Analytics Cookies</string>
+    <string name="preference_cookies_performance_title">Performance and analytics cookies</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_performance_summary">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements.</string>
+    <string name="preference_cookies_performance_summary">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these cookies will mean we will have less data available to us to help design improvements.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Always on</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4491,18 +4491,12 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -5240,4 +5234,8 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s stopped recording</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Gallery</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">Advertising Cookies</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">Used by our approved advertising partners to collect data about your browsing activities and customise the ads you see on our services and on other websites. Not accepting these cookies means you will still see ads but they won’t be personalised.</string>
 </resources>

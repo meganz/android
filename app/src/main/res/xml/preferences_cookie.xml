@@ -29,6 +29,16 @@
         app:iconSpaceReserved="false"
         app:shouldDisableView="false" />
 
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_cookie_advertisement"
+        android:summary="@string/settings_cookies_settings_ads_summary"
+        android:title="@string/settings_cookies_settings_ads_title"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false"
+        app:isPreferenceVisible="false"
+        app:shouldDisableView="false" />
+
     <mega.privacy.android.app.components.TwoButtonsPreference
         android:key="setting_cookie_policies"
         app:allowDividerAbove="true"

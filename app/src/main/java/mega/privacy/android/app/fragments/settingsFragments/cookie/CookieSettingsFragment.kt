@@ -3,46 +3,82 @@ package mega.privacy.android.app.fragments.settingsFragments.cookie
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.TwoButtonsPreference
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ACCEPT
+import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ADS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ANALYTICS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_POLICIES
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
+import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType.ADVERTISEMENT
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType.ANALYTICS
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CookieSettingsFragment : SettingsBaseFragment(),
     Preference.OnPreferenceChangeListener {
 
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
     private val viewModel by activityViewModels<CookieSettingsViewModel>()
 
-    private lateinit var acceptCookiesPreference: SwitchPreferenceCompat
-    private lateinit var analyticsCookiesPreference: SwitchPreferenceCompat
-    private lateinit var policiesPreference: TwoButtonsPreference
+    private var acceptCookiesPreference: SwitchPreferenceCompat? = null
+    private var analyticsCookiesPreference: SwitchPreferenceCompat? = null
+    private var adsCookiesPreference: SwitchPreferenceCompat? = null
+    private var policiesPreference: TwoButtonsPreference? = null
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_cookie)
 
-        acceptCookiesPreference = findPreference(KEY_COOKIE_ACCEPT)!!
-        analyticsCookiesPreference = findPreference(KEY_COOKIE_ANALYTICS)!!
-        policiesPreference = findPreference(KEY_COOKIE_POLICIES)!!
+        acceptCookiesPreference = findPreference(KEY_COOKIE_ACCEPT)
+        analyticsCookiesPreference = findPreference(KEY_COOKIE_ANALYTICS)
+        adsCookiesPreference = findPreference(KEY_COOKIE_ADS)
+        policiesPreference = findPreference(KEY_COOKIE_POLICIES)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        checkForInAppAdvertisement()
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupObservers()
         setupView()
+    }
+
+    private fun checkForInAppAdvertisement() {
+        lifecycleScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement).let {
+                    adsCookiesPreference?.isVisible = it
+                }
+            }.onFailure {
+                Timber.e("Failed to fetch feature flag with error: ${it.message}")
+            }
+        }
     }
 
     private fun setupObservers() {
@@ -57,10 +93,10 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     }
 
     private fun setupView() {
-        acceptCookiesPreference.onPreferenceChangeListener = this
-        analyticsCookiesPreference.onPreferenceChangeListener = this
-
-        policiesPreference.apply {
+        acceptCookiesPreference?.onPreferenceChangeListener = this
+        analyticsCookiesPreference?.onPreferenceChangeListener = this
+        adsCookiesPreference?.onPreferenceChangeListener = this
+        policiesPreference?.apply {
             setButton1(getString(R.string.settings_about_cookie_policy)) {
                 openBrowser("https://mega.nz/cookie".toUri())
             }
@@ -76,9 +112,10 @@ class CookieSettingsFragment : SettingsBaseFragment(),
      * @param cookies   Set of enabled cookies
      */
     private fun showCookies(cookies: Set<CookieType>) {
-        analyticsCookiesPreference.isChecked = cookies.contains(ANALYTICS) == true
-
-        acceptCookiesPreference.isChecked = analyticsCookiesPreference.isChecked
+        analyticsCookiesPreference?.isChecked = cookies.contains(ANALYTICS) == true
+        adsCookiesPreference?.isChecked = cookies.contains(ADVERTISEMENT) == true
+        acceptCookiesPreference?.isChecked = analyticsCookiesPreference?.isChecked ?: false ||
+                adsCookiesPreference?.isChecked ?: false
     }
 
     /**
@@ -93,8 +130,9 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         val enable = newValue as? Boolean ?: false
 
         when (preference.key) {
-            acceptCookiesPreference.key -> viewModel.toggleCookies(enable)
-            analyticsCookiesPreference.key -> viewModel.changeCookie(ANALYTICS, enable)
+            acceptCookiesPreference?.key -> viewModel.toggleCookies(enable)
+            analyticsCookiesPreference?.key -> viewModel.changeCookie(ANALYTICS, enable)
+            adsCookiesPreference?.key -> viewModel.changeCookie(ADVERTISEMENT, enable)
         }
 
         return false
