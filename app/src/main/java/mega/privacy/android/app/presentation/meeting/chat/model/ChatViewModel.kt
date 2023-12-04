@@ -37,11 +37,13 @@ import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
+import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
@@ -125,6 +127,8 @@ internal class ChatViewModel @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     private val scanMessageMapper: ScanMessageMapper,
+    private val isGeolocationEnabledUseCase: IsGeolocationEnabledUseCase,
+    private val enableGeolocationUseCase: EnableGeolocationUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -144,6 +148,7 @@ internal class ChatViewModel @Inject constructor(
     private var monitorAllContactParticipantsInChatJob: Job? = null
 
     init {
+        checkGeolocation()
         monitorParticipatingInACall()
         monitorStorageStateEvent()
         chatId?.let {
@@ -867,6 +872,28 @@ internal class ChatViewModel @Inject constructor(
                     chatManagement.removeJoiningCallChatId(chatId)
                 }
             }
+        }
+    }
+
+    private fun checkGeolocation() {
+        viewModelScope.launch {
+            runCatching { isGeolocationEnabledUseCase() }
+                .onSuccess { isGeolocationEnabled ->
+                    _state.update { state -> state.copy(isGeolocationEnabled = isGeolocationEnabled) }
+                }.onFailure {
+                    Timber.e(it)
+                }
+        }
+    }
+
+    fun onEnableGeolocation() {
+        viewModelScope.launch {
+            runCatching { enableGeolocationUseCase() }
+                .onSuccess {
+                    _state.update { state -> state.copy(isGeolocationEnabled = true) }
+                }.onFailure {
+                    Timber.e(it)
+                }
         }
     }
 

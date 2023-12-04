@@ -46,6 +46,7 @@ import nz.mega.documentscanner.DocumentScannerActivity
 fun ChatToolbarBottomSheet(
     onAttachFileClicked: () -> Unit,
     onAttachContactClicked: () -> Unit,
+    onPickLocation: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
 ) {
@@ -125,7 +126,7 @@ fun ChatToolbarBottomSheet(
             AttachItem(
                 iconId = R.drawable.ic_attach_from_location,
                 itemName = stringResource(id = R.string.chat_room_toolbar_location_option),
-                onItemClick = { },
+                onItemClick = onPickLocation,
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_LOCATION)
             )
             AttachItem(
@@ -189,6 +190,7 @@ private fun ChatToolbarBottomSheetPreview() {
         ChatToolbarBottomSheet(
             onAttachFileClicked = {},
             onAttachContactClicked = {},
+            onPickLocation = {},
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
         )
     }

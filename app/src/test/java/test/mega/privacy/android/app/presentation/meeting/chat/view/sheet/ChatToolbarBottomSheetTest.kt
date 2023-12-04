@@ -30,6 +30,7 @@ class ChatToolbarBottomSheetTest {
 
     private val onAttachFileClicked: () -> Unit = mock()
     private val onAttachContactClicked: () -> Unit = mock()
+    private val onPickLocation: () -> Unit = mock()
 
     @Test
     fun `test that gallery list shows`() {
@@ -87,12 +88,20 @@ class ChatToolbarBottomSheetTest {
         verify(onAttachFileClicked).invoke()
     }
 
+    @Test
+    fun `test that location button click is passed to upper caller`() {
+        initComposeRuleContent()
+        composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_LOCATION).performClick()
+        verify(onPickLocation).invoke()
+    }
+
 
     private fun initComposeRuleContent() {
         composeTestRule.setContent {
             ChatToolbarBottomSheet(
                 onAttachFileClicked = onAttachFileClicked,
                 onAttachContactClicked = onAttachContactClicked,
+                onPickLocation = onPickLocation,
                 sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
             )
         }

@@ -52,6 +52,7 @@ import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
+import mega.privacy.android.app.main.megachat.MapsActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
@@ -66,6 +67,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContactsAddedDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
+import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EnableGeolocationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EndCallForAllDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.MutePushNotificationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactToAddDialog
@@ -119,6 +121,7 @@ internal fun ChatView(
         onShowMutePushNotificationDialogConsumed = viewModel::onShowMutePushNotificationDialogConsumed,
         onStartOrJoinMeeting = viewModel::onStartOrJoinMeeting,
         onAnswerCall = viewModel::onAnswerCall,
+        onEnableGeolocation = viewModel::onEnableGeolocation,
     )
 }
 
@@ -150,6 +153,7 @@ internal fun ChatView(
     onShowMutePushNotificationDialogConsumed: () -> Unit = {},
     onStartOrJoinMeeting: (isStarted: Boolean) -> Unit = {},
     onAnswerCall: () -> Unit = {},
+    onEnableGeolocation: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -169,6 +173,25 @@ internal fun ChatView(
     val fileModalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
+    var showEnableGeolocationDialog by rememberSaveable { mutableStateOf(false) }
+    var waitingForPickLocation by rememberSaveable { mutableStateOf(false) }
+    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
+    val locationPickerLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) {
+            // Manage picked location here
+            coroutineScope.launch { toolbarModalSheetState.hide() }
+        }
+    val locationPermissionsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { permissionsResult ->
+        if (permissionsResult) {
+            openLocationPicker(context, locationPickerLauncher)
+        } else {
+            //TODO show snackbar when string is approved by content team
+        }
+    }
     BackHandler(enabled = toolbarModalSheetState.isVisible) {
         coroutineScope.launch {
             toolbarModalSheetState.hide()
@@ -247,6 +270,21 @@ internal fun ChatView(
                                     snackBarHostState.showSnackbar(context.getString(R.string.no_contacts_invite))
                                 }
                             }
+                        },
+                        onPickLocation = {
+                            checkLocationPicker(
+                                isGeolocationEnabled = isGeolocationEnabled,
+                                isPermissionGranted = locationPermissionState.status.isGranted,
+                                onShowEnableGeolocationDialog = {
+                                    showEnableGeolocationDialog = true
+                                },
+                                onAskForLocationPermission = {
+                                    locationPermissionsLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                },
+                                onPickLocation = {
+                                    openLocationPicker(context, locationPickerLauncher)
+                                }
+                            )
                         },
                         sheetState = toolbarModalSheetState
                     )
@@ -419,6 +457,21 @@ internal fun ChatView(
                         }
                     )
                 }
+
+                if (showEnableGeolocationDialog) {
+                    EnableGeolocationDialog(
+                        onConfirm = {
+                            waitingForPickLocation = true
+                            onEnableGeolocation()
+                        },
+                        onDismiss = { showEnableGeolocationDialog = false },
+                    )
+                }
+
+                if (waitingForPickLocation && isGeolocationEnabled) {
+                    waitingForPickLocation = false
+                    openLocationPicker(context, locationPickerLauncher)
+                }
             }
 
             EventEffect(
@@ -459,7 +512,10 @@ internal fun ChatView(
 }
 
 @Composable
-private fun BoxScope.StartOrJoinMeeting(uiState: ChatUiState, onStartOrJoinMeeting: () -> Unit = {}) {
+private fun BoxScope.StartOrJoinMeeting(
+    uiState: ChatUiState,
+    onStartOrJoinMeeting: () -> Unit = {},
+) {
     val modifier = Modifier
         .padding(top = 16.dp)
         .align(Alignment.TopCenter)
@@ -614,6 +670,40 @@ private fun ReturnToCallBanner(
             )
 
         else -> null
+    }
+}
+
+/**
+ * Checks if location picker can be shown depending on permissions.
+ */
+private fun checkLocationPicker(
+    isGeolocationEnabled: Boolean,
+    isPermissionGranted: Boolean,
+    onShowEnableGeolocationDialog: () -> Unit,
+    onAskForLocationPermission: () -> Unit,
+    onPickLocation: () -> Unit,
+) {
+    when {
+        !isGeolocationEnabled -> {
+            onShowEnableGeolocationDialog()
+        }
+
+        !isPermissionGranted -> {
+            onAskForLocationPermission()
+        }
+
+        else -> {
+            onPickLocation()
+        }
+    }
+}
+
+private fun openLocationPicker(
+    context: Context,
+    locationLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+) {
+    Intent(context, MapsActivity::class.java).also {
+        locationLauncher.launch(it)
     }
 }
 

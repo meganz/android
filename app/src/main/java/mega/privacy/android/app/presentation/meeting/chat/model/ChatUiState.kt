@@ -50,6 +50,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property chatHistoryLoadStatus [ChatHistoryLoadStatus]. Until this is not [ChatHistoryLoadStatus.NONE], we can request for more messages.
  * @property mutePushNotificationDialogEvent Event to show the dialog to mute push notifications.
  * @property openWaitingRoomScreen True if should open waiting room screen, false otherwise.
+ * @property isGeolocationEnabled True if geolocation internal permission (not device one) is granted, false otherwise.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -86,6 +87,7 @@ data class ChatUiState(
     val chatHistoryLoadStatus: ChatHistoryLoadStatus? = null,
     val mutePushNotificationDialogEvent: StateEventWithContent<List<ChatPushNotificationMuteOption>> = consumed(),
     val openWaitingRoomScreen: Boolean = false,
+    val isGeolocationEnabled: Boolean = false,
 ) {
 
     /**

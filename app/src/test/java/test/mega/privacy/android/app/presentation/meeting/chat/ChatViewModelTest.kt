@@ -50,11 +50,13 @@ import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
+import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
@@ -198,6 +200,8 @@ internal class ChatViewModelTest {
     private val rtcAudioManagerGateway = mock<RTCAudioManagerGateway>()
     private val scanMessageMapper = mock<ScanMessageMapper>()
     private val startMeetingInWaitingRoomChatUseCase = mock<StartMeetingInWaitingRoomChatUseCase>()
+    private val isGeolocationEnabledUseCase = mock<IsGeolocationEnabledUseCase>()
+    private val enableGeolocationUseCase = mock<EnableGeolocationUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -240,7 +244,9 @@ internal class ChatViewModelTest {
             answerChatCallUseCase,
             rtcAudioManagerGateway,
             scanMessageMapper,
-            startMeetingInWaitingRoomChatUseCase
+            startMeetingInWaitingRoomChatUseCase,
+            isGeolocationEnabledUseCase,
+            enableGeolocationUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -307,7 +313,9 @@ internal class ChatViewModelTest {
             answerChatCallUseCase = answerChatCallUseCase,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             scanMessageMapper = scanMessageMapper,
-            startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase
+            startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
+            isGeolocationEnabledUseCase = isGeolocationEnabledUseCase,
+            enableGeolocationUseCase = enableGeolocationUseCase,
         )
     }
 
@@ -2068,6 +2076,36 @@ internal class ChatViewModelTest {
             }
         } else {
             verifyNoInteractions(rtcAudioManagerGateway)
+        }
+    }
+
+    @ParameterizedTest(name = " when use case returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is geolocation enabled updates correctly`(
+        enabled: Boolean,
+    ) = runTest {
+        whenever(isGeolocationEnabledUseCase()).thenReturn(enabled)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().isGeolocationEnabled).isEqualTo(enabled)
+        }
+    }
+
+    @ParameterizedTest(name = " when use case finish with success {0}")
+    @ValueSource(booleans = [false, true])
+    fun `test that enable geolocation updates the state correctly`(
+        success: Boolean,
+    ) = runTest {
+        whenever(enableGeolocationUseCase()).apply {
+            if (success) {
+                thenReturn(Unit)
+            } else {
+                thenThrow(RuntimeException())
+            }
+        }
+        underTest.onEnableGeolocation()
+        underTest.state.test {
+            assertThat(awaitItem().isGeolocationEnabled).isEqualTo(success)
         }
     }
 

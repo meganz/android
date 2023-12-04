@@ -22,7 +22,10 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 
-internal const val TEST_TAG_ATTACHMENT_ICON = "chat_input_text_toolbar:attachment_icon"
+/**
+ * Attachment icon test tag.
+ */
+const val TEST_TAG_ATTACHMENT_ICON = "chat_input_text_toolbar:attachment_icon"
 
 /**
  * Chat input text toolbar

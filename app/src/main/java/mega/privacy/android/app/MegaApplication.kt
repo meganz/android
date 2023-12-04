@@ -554,8 +554,14 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
         /**
          * Is enabled geo location
+         *
+         * @deprecated
          */
         @JvmStatic
+        @Deprecated(
+            "Global usage is deprecated",
+            ReplaceWith("IsGeolocationEnabledUseCase")
+        )
         var isEnabledGeoLocation = false
 
         /**
