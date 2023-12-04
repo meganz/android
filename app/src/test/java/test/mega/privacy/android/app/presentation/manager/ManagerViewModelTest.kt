@@ -22,7 +22,6 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
@@ -287,7 +286,6 @@ class ManagerViewModelTest {
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase =
         mock()
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock()
-    private val getNodeByHandle: GetNodeByHandle = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -370,7 +368,6 @@ class ManagerViewModelTest {
             hangChatCallUseCase = hangChatCallUseCase,
             monitorCallRecordingConsentEventUseCase = monitorCallRecordingConsentEventUseCase,
             monitorCallEndedUseCase = monitorCallEndedUseCase,
-            getNodeByHandle = getNodeByHandle,
         )
     }
 
@@ -1223,16 +1220,4 @@ class ManagerViewModelTest {
                     assertThat(awaitItem().androidSyncServiceEnabled).isFalse()
                 }
         }
-
-    @Test
-    fun `test that a specific mega node is retrieved by handle`() = runTest {
-        val megaNodeHandle = 123456L
-        val megaNode = mock<MegaNode> {
-            on { handle }.thenReturn(megaNodeHandle)
-        }
-        whenever(getNodeByHandle(any())).thenReturn(megaNode)
-
-        val result = underTest.retrieveMegaNode(123456L)
-        assertThat(result).isEqualTo(megaNode)
-    }
 }

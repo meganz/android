@@ -233,10 +233,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionEdit.setOnClickListener { onEditClicked(node) }
                 optionLabel.setOnClickListener { onLabelClicked(node) }
                 optionFavourite.setOnClickListener { onFavouriteClicked(node) }
-                optionDownload.setOnClickListener {
-                    (requireActivity() as? ManagerActivity)?.downloadNodeToDevice(node)
-                    setStateBottomSheetBehaviorHidden()
-                }
+                optionDownload.setOnClickListener { onDownloadClicked(node) }
                 optionOffline.setOnClickListener { onOfflineClicked(node) }
                 optionInfo.setOnClickListener { onPropertiesClicked(node) }
                 optionLink.setOnClickListener {
@@ -852,6 +849,31 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         contentView.findViewById<View>(R.id.rubbish_bin_option).visibility = View.GONE
         contentView.findViewById<View>(R.id.share_option).visibility = View.GONE
         contentView.findViewById<View>(R.id.clear_share_option).visibility = View.GONE
+    }
+
+    /**
+     * Executes logic when the "Save to device" Option is clicked
+     *
+     * @param node The [MegaNode] to be downloaded
+     */
+    private fun onDownloadClicked(node: MegaNode) {
+        if (drawerItem == DrawerItem.SEARCH) {
+            Analytics.tracker.trackEvent(SearchResultSaveToDeviceMenuItemEvent)
+        }
+        lifecycleScope.launch {
+            if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                nodeOptionsDownloadViewModel.onDownloadClicked(NodeId(node.handle))
+            } else {
+                (activity as? ManagerActivity)?.saveNodesToDevice(
+                    nodes = listOf(node),
+                    highPriority = false,
+                    isFolderLink = false,
+                    fromMediaViewer = false,
+                    fromChat = false,
+                )
+            }
+        }
+        setStateBottomSheetBehaviorHidden()
     }
 
     private fun onFavouriteClicked(node: MegaNode) {

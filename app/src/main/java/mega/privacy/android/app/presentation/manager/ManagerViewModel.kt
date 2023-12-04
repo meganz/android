@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
@@ -23,7 +22,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -154,7 +152,6 @@ import javax.inject.Inject
  * @property hangChatCallUseCase [HangChatCallUseCase]
  * @property monitorCallRecordingConsentEventUseCase [MonitorCallRecordingConsentEventUseCase]
  * @property monitorCallEndedUseCase [MonitorCallEndedUseCase]
- * @property getNodeByHandle [GetNodeByHandle]
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -229,7 +226,6 @@ class ManagerViewModel @Inject constructor(
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase,
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
-    private val getNodeByHandle: GetNodeByHandle,
 ) : ViewModel() {
 
     /**
@@ -1216,14 +1212,6 @@ class ManagerViewModel @Inject constructor(
             )
         }
     }
-
-    /**
-     * Retrieves the corresponding [MegaNode] from the given handle
-     *
-     * @param nodeHandle The Node Handle
-     * @return A potentially nullable [MegaNode]
-     */
-    suspend fun retrieveMegaNode(nodeHandle: Long): MegaNode? = getNodeByHandle(nodeHandle)
 
     internal companion object {
         internal const val isFirstLoginKey = "EXTRA_FIRST_LOGIN"

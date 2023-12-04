@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.devicecenter.ui
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +21,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceCenterBottomSheetActionListener
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
 import javax.inject.Inject
@@ -49,22 +47,9 @@ class DeviceCenterFragment : Fragment() {
     lateinit var megaNavigator: MegaNavigator
 
     /**
-     * Performs Bottom Sheet actions
-     */
-    private lateinit var bottomSheetActionListener: DeviceCenterBottomSheetActionListener
-
-    /**
      * The View Model for the Device Center feature
      */
     private val viewModel by viewModels<DeviceCenterViewModel>()
-
-    /**
-     * When this Fragment is attached, initialize the [DeviceCenterBottomSheetActionListener]
-     */
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        bottomSheetActionListener = requireActivity() as DeviceCenterBottomSheetActionListener
-    }
 
     /**
      * Initialize the Device Center
