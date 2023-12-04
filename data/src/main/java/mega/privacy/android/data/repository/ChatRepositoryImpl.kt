@@ -998,6 +998,33 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun isGeolocationEnabled() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    if (error.errorCode == MegaChatError.ERROR_OK) {
+                        continuation.resume(true)
+                    } else {
+                        continuation.resume(false)
+                    }
+                })
+
+            megaApiGateway.isGeolocationEnabled(listener)
+
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun enableGeolocation() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("enableGeolocation") { }
+            megaApiGateway.enableGeolocation(listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
+
     private suspend fun getChatRoomUpdates(chatId: Long) = chatRoomUpdatesMutex.withLock {
         if (!chatRoomUpdates.containsKey(chatId)) {
             chatRoomUpdates[chatId] = megaChatApiGateway.openChatRoom(chatId).onCompletion {

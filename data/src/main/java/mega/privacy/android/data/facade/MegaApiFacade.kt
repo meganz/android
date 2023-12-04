@@ -1450,4 +1450,10 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun createInstanceMegaPushNotificationSettings(): MegaPushNotificationSettings =
         MegaPushNotificationSettings.createInstance()
+
+    override fun isGeolocationEnabled(listener: MegaRequestListenerInterface) =
+        megaApi.isGeolocationEnabled(listener)
+
+    override fun enableGeolocation(listener: MegaRequestListenerInterface) =
+        megaApi.enableGeolocation(listener)
 }

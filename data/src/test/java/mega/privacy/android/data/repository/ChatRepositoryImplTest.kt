@@ -721,4 +721,50 @@ class ChatRepositoryImplTest {
         val actual = underTest.endChatCall(chatId)
         assertThat(actual).isEqualTo(expectedResult)
     }
+
+    @Test
+    fun `test that is geolocation enabled returns true if request finish with success`() = runTest {
+
+        whenever(megaApiGateway.isGeolocationEnabled(any())).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                megaErrorSuccess,
+            )
+        }
+        assertThat(underTest.isGeolocationEnabled()).isTrue()
+        verify(megaApiGateway).isGeolocationEnabled(any())
+        verifyNoMoreInteractions(megaApiGateway)
+    }
+
+    @Test
+    fun `test that is geolocation enabled returns false if request finish with error`() = runTest {
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_EACCESS)
+        }
+        whenever(megaApiGateway.isGeolocationEnabled(any())).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                error,
+            )
+        }
+        assertThat(underTest.isGeolocationEnabled()).isFalse()
+        verify(megaApiGateway).isGeolocationEnabled(any())
+        verifyNoMoreInteractions(megaApiGateway)
+    }
+
+    @Test
+    fun `test that enable geolocation invokes mega api`() = runTest {
+        whenever(megaApiGateway.enableGeolocation(any())).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                megaErrorSuccess,
+            )
+        }
+        underTest.enableGeolocation()
+        verify(megaApiGateway).enableGeolocation(any())
+        verifyNoMoreInteractions(megaApiGateway)
+    }
 }

@@ -737,4 +737,27 @@ interface ChatRepository {
      * @return True if the call was ended, false otherwise.
      */
     suspend fun endChatCall(chatId: Long): Boolean
+
+    /**
+     * Check if the sending of geolocation messages is enabled
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_GEOLOCATION
+     * <p>
+     * Sending a Geolocation message is enabled if the MegaRequest object, received in onRequestFinish,
+     * has error code MegaError::API_OK. In other cases, send geolocation messages is not enabled and
+     * the application has to answer before send a message of this type.
+     */
+    suspend fun isGeolocationEnabled(): Boolean
+
+    /**
+     * Enable the sending of geolocation messages
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_GEOLOCATION
+
+     */
+    suspend fun enableGeolocation()
 }
