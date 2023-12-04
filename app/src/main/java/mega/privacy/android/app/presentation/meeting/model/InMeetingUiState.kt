@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property isOneToOneCall                         True, if it's one to one call. False, if it's a group call or a meeting.
  * @property showMeetingInfoFragment                True to show meeting info fragment or False otherwise
  * @property snackbarMessage                        Message to show in Snackbar.
+ * @property isMeeting                              True if it's meetings. False, if not.
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -54,4 +55,5 @@ data class InMeetingUiState(
     val isOneToOneCall: Boolean = true,
     val showMeetingInfoFragment: Boolean = false,
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
+    val isMeeting: Boolean = false,
 )
