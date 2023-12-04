@@ -95,6 +95,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override val localDCIMFolderPath: String
         get() = fileGateway.localDCIMFolderPath
 
+
+    @Deprecated(
+        "ViewerNode should be replaced by [TypedNode], there's a similar use-case to download any type of [TypedNode] and receive a flow of the progress: StartDownloadUseCase. Please add [TransferAppData.BackgroundTransfer] to avoid this transfers to be added in the counters of the DownloadService notification",
+        replaceWith = ReplaceWith("StartDownloadUseCase")
+    )
     override suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String =
         withContext(ioDispatcher) {
             getMegaNode(viewerNode)?.let { node ->
@@ -136,6 +141,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             } ?: throw NullPointerException()
         }
 
+    @Deprecated(
+        message = "ViewerNode should be replaced by [TypedNode], there's a mapper to get the corresponding [MegaNode] from any [TypedNode]: MegaNodeMapper",
+        replaceWith = ReplaceWith("MegaNodeMapper"),
+    )
     private suspend fun getMegaNode(viewerNode: ViewerNode): MegaNode? = withContext(ioDispatcher) {
         when (viewerNode) {
             is ViewerNode.ChatNode -> getMegaNodeFromChat(viewerNode)

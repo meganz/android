@@ -3136,6 +3136,14 @@ interface MegaApiGateway {
     fun createInstanceMegaPushNotificationSettings(): MegaPushNotificationSettings
 
     /**
+     * Creates a [MegaNode] from its serialized data
+     *
+     * @param serializedData [String]
+     * @return the [MegaNode]
+     */
+    fun unSerializeNode(serializedData: String): MegaNode?
+
+    /**
      * Check if the sending of geolocation messages is enabled
      *
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER

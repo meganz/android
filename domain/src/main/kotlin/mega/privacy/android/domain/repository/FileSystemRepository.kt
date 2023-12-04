@@ -42,6 +42,10 @@ interface FileSystemRepository {
      * @param viewerNode File node to download.
      * @return The local path of the downloaded file.
      */
+    @Deprecated(
+        message = "ViewerNode should be replaced by [TypedNode], there's a similar use-case to download any type of [TypedNode] and receive a flow of the progress: StartDownloadUseCase. Please add [TransferAppData.BackgroundTransfer] to avoid this transfers to be added in the counters of the DownloadService notification",
+        replaceWith = ReplaceWith("StartDownloadUseCase"),
+    )
     suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String
 
     /**

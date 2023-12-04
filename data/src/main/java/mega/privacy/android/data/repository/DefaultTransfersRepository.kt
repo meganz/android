@@ -30,11 +30,10 @@ import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
-import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
 import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.mapper.transfer.PausedTransferEventMapper
@@ -46,12 +45,7 @@ import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapp
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.chat.ChatFile
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -66,7 +60,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
@@ -88,8 +81,6 @@ import javax.inject.Singleton
 @Singleton
 internal class DefaultTransfersRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
-    private val megaChatApiGateway: MegaChatApiGateway,
-    private val megaApiFolderGateway: MegaApiFolderGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope,
     private val transferEventMapper: TransferEventMapper,
@@ -104,6 +95,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val transferDataMapper: TransferDataMapper,
     private val completedTransferMapper: CompletedTransferMapper,
     private val cancelTokenProvider: CancelTokenProvider,
+    private val megaNodeMapper: MegaNodeMapper,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
@@ -188,62 +180,26 @@ internal class DefaultTransfersRepository @Inject constructor(
         appData: TransferAppData?,
         shouldStartFirst: Boolean,
     ) = callbackFlow {
+        val megaNode = runCatching { megaNodeMapper(node) }.getOrNull()
+            ?: throw NodeDoesNotExistsException()
         val listener = transferListener(channel)
-        val megaNodeResult = runCatching { getMegaNodeFromTypedNode(node) }
-        megaNodeResult.getOrNull()?.let { megaNode ->
-            megaApiGateway.startDownload(
-                node = megaNode,
-                localPath = localPath,
-                fileName = megaNode.name,
-                appData = appData?.let { transferAppDataStringMapper(listOf(it)) },
-                startFirst = shouldStartFirst,
-                cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
-                collisionCheck = COLLISION_CHECK_FINGERPRINT,
-                collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
-                listener = listener,
-            )
-        } ?: run {
-            throw NodeDoesNotExistsException()
-        }
+        megaApiGateway.startDownload(
+            node = megaNode,
+            localPath = localPath,
+            fileName = megaNode.name,
+            appData = appData?.let { transferAppDataStringMapper(listOf(it)) },
+            startFirst = shouldStartFirst,
+            cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+            collisionCheck = COLLISION_CHECK_FINGERPRINT,
+            collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
+            listener = listener,
+        )
         awaitClose {
             megaApiGateway.removeTransferListener(listener)
         }
     }
         .flowOn(ioDispatcher)
         .cancellable()
-
-    private suspend fun getMegaNodeFromTypedNode(typedNode: TypedNode) = withContext(ioDispatcher) {
-        when (typedNode) {
-            is ChatFile -> {
-                (megaChatApiGateway.getMessage(typedNode.chatId, typedNode.messageId)
-                    ?: megaChatApiGateway.getMessageFromNodeHistory(
-                        typedNode.chatId,
-                        typedNode.messageId
-                    ))?.let { messageChat ->
-                    val node = messageChat.megaNodeList.get(typedNode.messageIndex)
-                    val chat = megaChatApiGateway.getChatRoom(typedNode.chatId)
-
-                    if (chat?.isPreview == true) {
-                        megaApiGateway.authorizeChatNode(node, chat.authorizationToken)
-                    } else {
-                        node
-                    }
-                }
-            }
-
-            is PublicLinkFile -> typedNode.node.serializedData?.let { serializedData ->
-                MegaNode.unserialize(serializedData)
-            }
-
-            is PublicLinkFolder -> {
-                megaApiFolderGateway.getMegaNodeByHandle(typedNode.id.longValue)?.let {
-                    megaApiFolderGateway.authorizeNode(it)
-                }
-            }
-
-            is TypedFileNode, is TypedFolderNode -> megaApiGateway.getMegaNodeByHandle(typedNode.id.longValue)
-        }
-    }
 
     override suspend fun getTransferData() = withContext(ioDispatcher) {
         megaApiGateway.getTransferData()?.let { transferDataMapper(it) }
