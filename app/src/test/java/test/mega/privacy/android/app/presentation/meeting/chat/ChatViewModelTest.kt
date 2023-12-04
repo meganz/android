@@ -22,7 +22,7 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
-import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.ScanMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
@@ -196,7 +196,7 @@ internal class ChatViewModelTest {
     private val startChatCallNoRingingUseCase = mock<StartChatCallNoRingingUseCase>()
     private val answerChatCallUseCase = mock<AnswerChatCallUseCase>()
     private val rtcAudioManagerGateway = mock<RTCAudioManagerGateway>()
-    private val uiChatMessageMapper = mock<UiChatMessageMapper>()
+    private val scanMessageMapper = mock<ScanMessageMapper>()
     private val startMeetingInWaitingRoomChatUseCase = mock<StartMeetingInWaitingRoomChatUseCase>()
 
     @BeforeAll
@@ -239,7 +239,7 @@ internal class ChatViewModelTest {
             startChatCallNoRingingUseCase,
             answerChatCallUseCase,
             rtcAudioManagerGateway,
-            uiChatMessageMapper,
+            scanMessageMapper,
             startMeetingInWaitingRoomChatUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
@@ -306,7 +306,7 @@ internal class ChatViewModelTest {
             muteChatNotificationForChatRoomsUseCase = muteChatNotificationForChatRoomsUseCase,
             answerChatCallUseCase = answerChatCallUseCase,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
-            uiChatMessageMapper = uiChatMessageMapper,
+            scanMessageMapper = scanMessageMapper,
             startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase
         )
     }
@@ -1962,16 +1962,20 @@ internal class ChatViewModelTest {
         val uiMessage3 = mock<UiChatMessage>()
         val uiMessage4 = mock<UiChatMessage>()
         whenever(monitorMessageLoadedUseCase(chatId)).thenReturn(flow)
-        whenever(uiChatMessageMapper(eq(message1), any())).thenReturn(uiMessage1)
-        whenever(uiChatMessageMapper(eq(message2), any())).thenReturn(uiMessage2)
-        whenever(uiChatMessageMapper(eq(message3), any())).thenReturn(uiMessage3)
-        whenever(uiChatMessageMapper(eq(message4), any())).thenReturn(uiMessage4)
+        whenever(scanMessageMapper(any(), eq(emptyList()), eq(message1)))
+            .thenReturn(listOf(uiMessage1))
+        whenever(scanMessageMapper(any(), eq(listOf(uiMessage1)), eq(message2)))
+            .thenReturn(listOf(uiMessage2, uiMessage1))
+        whenever(scanMessageMapper(any(), eq(listOf(uiMessage2, uiMessage1)), eq(message3)))
+            .thenReturn(listOf(uiMessage3, uiMessage2, uiMessage1))
+        whenever(scanMessageMapper(any(), eq(listOf(uiMessage3, uiMessage2, uiMessage1)), eq(message4)))
+            .thenReturn(listOf(uiMessage4, uiMessage3, uiMessage2, uiMessage1))
         initTestClass()
         testScheduler.advanceUntilIdle()
         underTest.state.test {
             val actual = awaitItem()
             assertThat(actual.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad)
-            assertThat(actual.messages).isEqualTo(emptyList<TypedMessage>())
+            assertThat(actual.messages).isEqualTo(emptyList<UiChatMessage>())
             flow.emit(message1)
             val actual1 = awaitItem()
             assertThat(actual1.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 1)

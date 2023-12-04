@@ -21,7 +21,7 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
-import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.ScanMessageMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatCall
@@ -123,8 +123,8 @@ internal class ChatViewModel @Inject constructor(
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
-    private val uiChatMessageMapper: UiChatMessageMapper,
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
+    private val scanMessageMapper: ScanMessageMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -200,11 +200,11 @@ internal class ChatViewModel @Inject constructor(
             monitorMessageLoadedUseCase(chatId).collect { loadedMessage ->
                 Timber.d("New message: ${loadedMessage.msgId}")
                 val state = state.value
-                val newMessage =
-                    uiChatMessageMapper(loadedMessage, !state.isGroup && !state.isMeeting)
-                val newMessages = state.messages.toMutableList().apply {
-                    add(0, newMessage)
-                }
+                val newMessages = scanMessageMapper(
+                    isOneToOne = !state.isGroup && !state.isMeeting,
+                    currentItems = state.messages,
+                    newMessage = loadedMessage
+                )
                 val pendingMessagesToLoad = state.pendingMessagesToLoad - 1
                 _state.update { state ->
                     state.copy(

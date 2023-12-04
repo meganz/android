@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.mapper
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.CallUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.TextUiMessage
@@ -20,16 +21,23 @@ class UiChatMessageMapper @Inject constructor() {
      * @param message
      * @param isOneToOne
      */
-    operator fun invoke(message: TypedMessage, isOneToOne: Boolean): UiChatMessage {
+    operator fun invoke(
+        message: TypedMessage,
+        isOneToOne: Boolean,
+        showAvatar: Boolean,
+    ): UiChatMessage {
         return when (message) {
-            is TextMessage -> TextUiMessage(message)
-            is CallMessage -> CallUiMessage(message, isOneToOne)
+            is TextMessage -> TextUiMessage(message = message, showAvatar = showAvatar)
+            is CallMessage -> CallUiMessage(message = message, isOneToOneChat = isOneToOne)
             // will remove when add new message type
             else -> object : UiChatMessage {
-                override val contentComposable: @Composable () -> Unit = {
+                override val contentComposable: @Composable (RowScope.() -> Unit) = {
 
                 }
+                override val avatarComposable: @Composable (RowScope.() -> Unit)? = null
                 override val message: TypedMessage = message
+
+                override val showAvatar: Boolean = false
             }
         }
     }

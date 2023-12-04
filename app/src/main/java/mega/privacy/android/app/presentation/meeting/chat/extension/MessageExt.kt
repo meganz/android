@@ -4,7 +4,6 @@ import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
-import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.MetaMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
@@ -25,13 +24,4 @@ val TypedMessage.canForward: Boolean
     get() = when (this) {
         is RichPreviewMessage -> true // add more types next MR
         else -> false
-    }
-
-/**
- * Check if the message has a avatar
- */
-val TypedMessage.hasAvatar: Boolean
-    get() = when (this) {
-        is ManagementMessage -> false
-        else -> true
     }

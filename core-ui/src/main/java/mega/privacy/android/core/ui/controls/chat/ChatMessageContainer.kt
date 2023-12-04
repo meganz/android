@@ -44,7 +44,7 @@ fun ChatMessageContainer(
     showForwardIcon: Boolean,
     modifier: Modifier = Modifier,
     time: String? = null,
-    avatarOrIcon: @Composable RowScope.() -> Unit = {},
+    avatarOrIcon: @Composable (RowScope.() -> Unit)? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
     Column(
@@ -69,7 +69,7 @@ fun ChatMessageContainer(
                 }
                 content()
             } else {
-                avatarOrIcon()
+                avatarOrIcon?.let { it() }
                 content()
                 if (showForwardIcon) {
                     ForwardIcon()
