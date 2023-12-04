@@ -393,8 +393,6 @@ class MeetingActivityViewModel @Inject constructor(
             call?.let {
                 checkIfPresenting(it)
                 checkEphemeralAccountAndWaitingRoom(it)
-
-
             }
         }.onFailure { exception ->
             Timber.e(exception)
@@ -1296,27 +1294,31 @@ class MeetingActivityViewModel @Inject constructor(
      * Check if the call is being recorded
      */
     private fun checkIfCallIsBeingRecorded() {
-        getCallUseCase.getMegaChatCall(_state.value.chatId).blockingGet().let { call ->
-            call.sessionsClientid?.let { listParticipants ->
-                if (listParticipants.size() > 0) {
-                    for (i in 0 until listParticipants.size()) {
-                        call.getMegaChatSession(listParticipants[i])?.let { session ->
-                            _state.value.usersInCall.find { participant -> participant.peerId == session.peerid }
+        viewModelScope.launch {
+            runCatching {
+                getChatCallUseCase(_state.value.chatId)
+            }.onSuccess { call ->
+                call?.let {
+                    call.sessionByClientId.forEach {
+                        it.value.let { session ->
+                            _state.value.usersInCall.find { participant -> participant.peerId == session.peerId }
                                 ?.let { participant ->
                                     if (session.isRecording) {
                                         _state.update { state ->
                                             state.copy(
-                                                isSessionOnRecording = session.isRecording,
-                                                showRecordingConsentDialog = if (!state.isRecordingConsentAccepted) session.isRecording else false,
+                                                isSessionOnRecording = true,
+                                                showRecordingConsentDialog = !state.isRecordingConsentAccepted,
                                                 startOrStopRecordingParticipantName = participant.name
                                             )
                                         }
-                                        return
+                                        return@forEach
                                     }
                                 }
                         }
                     }
                 }
+            }.onFailure { exception ->
+                Timber.e(exception)
             }
         }
     }
