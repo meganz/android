@@ -2999,10 +2999,10 @@
     <string name="settings_about_cookie_policy">Cookie Policy</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Cookie settings</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Your privacy</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We use cookies and similar technologies (’Cookies’) to provide and enhance your experience with our services. Accept our use of cookies from the beginning of your visit or customise cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">Manage cookies</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">We use cookies and similar technologies to help us improve our services. By continuing to use MEGA you agree with the terms of our [A]Cookie Policy[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie Settings unsaved.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
