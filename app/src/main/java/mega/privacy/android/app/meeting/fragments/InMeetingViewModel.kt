@@ -257,7 +257,7 @@ class InMeetingViewModel @Inject constructor(
         _state.value.call?.apply {
             if (it == chatId) {
                 status?.let {
-                    checkSubtitleToolbar(it, isOutgoing)
+                    checkSubtitleToolbar()
                 }
             }
         }
@@ -356,6 +356,7 @@ class InMeetingViewModel @Inject constructor(
                             chatTitle = chat.title,
                             isOpenInvite = chat.isOpenInvite,
                             isOneToOneCall = !chat.isGroup && !chat.isMeeting,
+                            isMeeting = chat.isMeeting,
                             isPublicChat = chat.isPublic
                         )
                     }
@@ -377,7 +378,7 @@ class InMeetingViewModel @Inject constructor(
                 chatCall?.let { call ->
                     _state.update { it.copy(call = call) }
                     call.status?.let { status ->
-                        checkSubtitleToolbar(status, call.isOutgoing)
+                        checkSubtitleToolbar()
                         setCall(_state.value.currentChatId, context)
                         if (status != ChatCallStatus.Initial && _state.value.previousState == ChatCallStatus.Initial) {
                             _state.update {
@@ -427,6 +428,7 @@ class InMeetingViewModel @Inject constructor(
                     getChatCallUseCase(result.chatId)?.let { call ->
                         _state.update { it.copy(call = call) }
                     }
+                    checkSubtitleToolbar()
                 }
         }
 
@@ -443,7 +445,7 @@ class InMeetingViewModel @Inject constructor(
                     call.changes?.apply {
                         if (contains(ChatCallChanges.Status)) {
                             call.status?.let { status ->
-                                checkSubtitleToolbar(status, call.isOutgoing)
+                                checkSubtitleToolbar()
                                 _state.update { state ->
                                     state.copy(
                                         previousState = status,
@@ -531,45 +533,30 @@ class InMeetingViewModel @Inject constructor(
 
     /**
      * Method to check the subtitle in the toolbar
-     *
-     * @param callStatus The current status of the call [ChatCallStatus]
-     * @param isOutgoingCall If the current call is an outgoing call
      */
-    private fun checkSubtitleToolbar(callStatus: ChatCallStatus, isOutgoingCall: Boolean) {
-        when (callStatus) {
-            ChatCallStatus.Connecting -> {
-                _state.update { state ->
+    private fun checkSubtitleToolbar() =
+        _state.value.call?.apply {
+            when (status) {
+                ChatCallStatus.Connecting -> _state.update { state ->
                     state.copy(
                         showCallDuration = false,
                         updateCallSubtitle = SubtitleCallType.Connecting
                     )
                 }
-            }
 
-            ChatCallStatus.InProgress -> {
-                getChat()?.let { chat ->
-                    if (!chat.isMeeting && isRequestSent() && isOutgoingCall) {
-                        _state.update { state ->
-                            state.copy(
-                                showCallDuration = false,
-                                updateCallSubtitle = SubtitleCallType.Calling
-                            )
-                        }
-                    } else {
-                        _state.update { state ->
-                            state.copy(
-                                showCallDuration = true,
-                                updateCallSubtitle = SubtitleCallType.Established
-
-                            )
-                        }
+                ChatCallStatus.InProgress -> {
+                    val isCalling = !_state.value.isMeeting && isRequestSent() && this.isOutgoing
+                    _state.update { state ->
+                        state.copy(
+                            showCallDuration = !isCalling,
+                            updateCallSubtitle = if (isCalling) SubtitleCallType.Calling else SubtitleCallType.Established
+                        )
                     }
                 }
-            }
 
-            else -> {}
+                else -> {}
+            }
         }
-    }
 
     /**
      * Method to get the duration of the call
