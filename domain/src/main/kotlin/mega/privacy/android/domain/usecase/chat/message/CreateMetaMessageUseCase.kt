@@ -11,27 +11,31 @@ internal class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessa
 
     override fun invoke(message: ChatMessage, isMine: Boolean) = when (message.containsMeta?.type) {
         ContainsMetaType.RICH_PREVIEW -> RichPreviewMessage(
-            message.msgId,
-            message.timestamp,
-            isMine = isMine
+            msgId = message.msgId,
+            time = message.timestamp,
+            isMine = isMine,
+            userHandle = message.userHandle
         )
 
         ContainsMetaType.GEOLOCATION -> RichPreviewMessage(
-            message.msgId,
-            message.timestamp,
-            isMine = isMine
+            msgId = message.msgId,
+            time = message.timestamp,
+            isMine = isMine,
+            userHandle = message.userHandle
         )
 
         ContainsMetaType.GIPHY -> GiphyMessage(
-            message.msgId,
-            message.timestamp,
-            isMine = isMine
+            msgId = message.msgId,
+            time = message.timestamp,
+            isMine = isMine,
+            userHandle = message.userHandle
         )
 
         else -> InvalidMessage(
-            message.msgId,
-            message.timestamp,
-            isMine = isMine
+            msgId = message.msgId,
+            time = message.timestamp,
+            isMine = isMine,
+            userHandle = message.userHandle
         )
     }
 }

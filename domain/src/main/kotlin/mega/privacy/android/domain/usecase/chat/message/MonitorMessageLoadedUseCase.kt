@@ -35,7 +35,12 @@ class MonitorMessageLoadedUseCase @Inject constructor(
             .map { message ->
                 val isMine = myUserHandle == message.userHandle
                 createTypedMessageUseCases[message.type]?.invoke(message, isMine)
-                    ?: InvalidMessage(message.msgId, message.timestamp, isMine = isMine)
+                    ?: InvalidMessage(
+                        msgId = message.msgId,
+                        time = message.timestamp,
+                        isMine = isMine,
+                        userHandle = message.userHandle,
+                    )
             }
     }
 }

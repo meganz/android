@@ -19,4 +19,9 @@ interface Message {
      * True if the message is mine
      */
     val isMine: Boolean
+
+    /**
+     * User handle
+     */
+    val userHandle: Long
 }

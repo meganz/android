@@ -12,6 +12,7 @@ data class CallEndedMessage(
     override val msgId: Long,
     override val time: Long,
     override val isMine: Boolean,
+    override val userHandle: Long,
     val termCode: ChatMessageTermCode,
     val duration: Long,
 ) : CallMessage

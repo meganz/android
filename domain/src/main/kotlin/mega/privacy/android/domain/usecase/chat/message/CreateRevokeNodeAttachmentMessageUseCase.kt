@@ -9,8 +9,9 @@ internal class CreateRevokeNodeAttachmentMessageUseCase @Inject constructor() :
     CreateTypedMessageUseCase {
 
     override fun invoke(message: ChatMessage, isMine: Boolean) = RevokeNodeAttachmentMessage(
-        message.msgId,
-        message.timestamp,
-        isMine = isMine
+        msgId = message.msgId,
+        time = message.timestamp,
+        isMine = isMine,
+        userHandle = message.userHandle
     )
 }

@@ -8,8 +8,9 @@ internal class CreateChatLinkCreatedMessageUseCase @Inject constructor() :
     CreateTypedMessageUseCase {
 
     override fun invoke(message: ChatMessage, isMine: Boolean) = ChatLinkCreatedMessage(
-        message.msgId,
-        message.timestamp,
-        isMine = isMine
+        msgId = message.msgId,
+        time = message.timestamp,
+        isMine = isMine,
+        userHandle = message.userHandle
     )
 }

@@ -30,7 +30,8 @@ class ChatCallMessageViewTest {
             message = CallStartedMessage(
                 msgId = msgId,
                 time = System.currentTimeMillis(),
-                isMine = true
+                isMine = true,
+                userHandle = 1234567890L,
             ),
             isOneToOneChat = true
         )
@@ -47,7 +48,8 @@ class ChatCallMessageViewTest {
                 time = System.currentTimeMillis(),
                 isMine = true,
                 termCode = ChatMessageTermCode.ENDED,
-                duration = 0
+                duration = 0,
+                userHandle = 1234567890L,
             ),
             isOneToOneChat = true
         )
@@ -64,7 +66,8 @@ class ChatCallMessageViewTest {
                 time = System.currentTimeMillis(),
                 isMine = true,
                 termCode = ChatMessageTermCode.ENDED,
-                duration = 0
+                duration = 0,
+                userHandle = 1234567890L,
             ),
             isOneToOneChat = false
         )
@@ -85,7 +88,8 @@ class ChatCallMessageViewTest {
                 time = System.currentTimeMillis(),
                 isMine = true,
                 termCode = ChatMessageTermCode.REJECTED,
-                duration = 0
+                duration = 0,
+                userHandle = 1234567890L,
             ),
             isOneToOneChat = true
         )
@@ -106,7 +110,8 @@ class ChatCallMessageViewTest {
                 time = System.currentTimeMillis(),
                 isMine = true,
                 termCode = ChatMessageTermCode.NO_ANSWER,
-                duration = 0
+                duration = 0,
+                userHandle = 1234567890L,
             ),
             isOneToOneChat = true
         )
@@ -127,7 +132,8 @@ class ChatCallMessageViewTest {
                 time = System.currentTimeMillis(),
                 isMine = false,
                 termCode = ChatMessageTermCode.NO_ANSWER,
-                duration = 0
+                duration = 0,
+                userHandle = 1234567890L,
             ),
             isOneToOneChat = true
         )
@@ -148,7 +154,8 @@ class ChatCallMessageViewTest {
                 time = System.currentTimeMillis(),
                 isMine = true,
                 termCode = ChatMessageTermCode.CANCELLED,
-                duration = 0
+                duration = 0,
+                userHandle = 1234567890L,
             ),
             isOneToOneChat = true
         )
@@ -169,7 +176,8 @@ class ChatCallMessageViewTest {
                 time = System.currentTimeMillis(),
                 isMine = false,
                 termCode = ChatMessageTermCode.CANCELLED,
-                duration = 0
+                duration = 0,
+                userHandle = 1234567890L,
             ),
             isOneToOneChat = true
         )
@@ -190,7 +198,8 @@ class ChatCallMessageViewTest {
                 time = System.currentTimeMillis(),
                 isMine = false,
                 termCode = ChatMessageTermCode.FAILED,
-                duration = 0
+                duration = 0,
+                userHandle = 1234567890L,
             ),
             isOneToOneChat = true
         )

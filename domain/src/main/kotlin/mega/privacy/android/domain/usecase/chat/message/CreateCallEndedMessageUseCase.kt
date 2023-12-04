@@ -7,10 +7,11 @@ import javax.inject.Inject
 internal class CreateCallEndedMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
 
     override fun invoke(message: ChatMessage, isMine: Boolean) = CallEndedMessage(
-        message.msgId,
-        message.timestamp,
+        msgId = message.msgId,
+        time = message.timestamp,
         isMine = isMine,
-        message.termCode,
-        message.duration.toLong(),
+        userHandle = message.userHandle,
+        termCode = message.termCode,
+        duration = message.duration.toLong()
     )
 }

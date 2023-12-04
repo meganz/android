@@ -9,8 +9,9 @@ internal class CreateScheduledMeetingUpdatedMessageUseCase @Inject constructor()
     CreateTypedMessageUseCase {
 
     override fun invoke(message: ChatMessage, isMine: Boolean) = ScheduledMeetingUpdatedMessage(
-        message.msgId,
-        message.timestamp,
-        isMine = isMine
+        msgId = message.msgId,
+        time = message.timestamp,
+        isMine = isMine,
+        userHandle = message.userHandle
     )
 }

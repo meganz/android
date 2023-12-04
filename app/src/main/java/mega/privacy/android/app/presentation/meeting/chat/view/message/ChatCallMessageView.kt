@@ -10,13 +10,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.chat.messages.ChatManagementMessage
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.messages.management.CallEndedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 import mega.privacy.android.domain.entity.chat.messages.management.CallStartedMessage
+import mega.privacy.android.shared.theme.MegaAppTheme
 import java.util.concurrent.TimeUnit
 
 /**
@@ -166,7 +166,8 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                 message = CallStartedMessage(
                     msgId = 123L,
                     time = System.currentTimeMillis(),
-                    isMine = true
+                    isMine = true,
+                    userHandle = 123L
                 ),
                 isOneToOneChat = true
             ),
@@ -176,7 +177,8 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
-                    duration = 0
+                    duration = 0,
+                    userHandle = 123L
                 ),
                 isOneToOneChat = true
             ),
@@ -186,7 +188,8 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
-                    duration = 0
+                    duration = 0,
+                    userHandle = 123L
                 ),
                 isOneToOneChat = false
             ),
@@ -196,7 +199,8 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
-                    duration = 100
+                    duration = 100,
+                    userHandle = 123L
                 ),
                 isOneToOneChat = true
             ),
@@ -206,7 +210,8 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
-                    duration = 100
+                    duration = 100,
+                    userHandle = 123L
                 ),
                 isOneToOneChat = false
             ),
@@ -216,7 +221,8 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.FAILED,
-                    duration = 0
+                    duration = 0,
+                    userHandle = 123L
                 ),
                 isOneToOneChat = true
             ),
@@ -226,7 +232,8 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.CANCELLED,
-                    duration = 0
+                    duration = 0,
+                    userHandle = 123L
                 ),
                 isOneToOneChat = false
             ),
@@ -236,7 +243,8 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.REJECTED,
-                    duration = 0
+                    duration = 0,
+                    userHandle = 123L
                 ),
                 isOneToOneChat = true
             ),
@@ -246,7 +254,8 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.NO_ANSWER,
-                    duration = 0
+                    duration = 0,
+                    userHandle = 123L
                 ),
                 isOneToOneChat = false
             ),

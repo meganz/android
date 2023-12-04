@@ -7,8 +7,9 @@ import javax.inject.Inject
 internal class CreateVoiceClipMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
 
     override fun invoke(message: ChatMessage, isMine: Boolean) = VoiceClipMessage(
-        message.msgId,
-        message.timestamp,
-        isMine = isMine
+        msgId = message.msgId,
+        time = message.timestamp,
+        isMine = isMine,
+        userHandle = message.userHandle
     )
 }

@@ -7,9 +7,10 @@ import javax.inject.Inject
 internal class CreateNormalChatMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
     //To be implemented the different type of normal messages. Check [NormalMessage].
     override fun invoke(message: ChatMessage, isMine: Boolean) = TextMessage(
-        message.msgId,
-        message.timestamp,
+        msgId = message.msgId,
+        time = message.timestamp,
         isMine = isMine,
+        userHandle = message.userHandle,
         content = message.content
     )
 }

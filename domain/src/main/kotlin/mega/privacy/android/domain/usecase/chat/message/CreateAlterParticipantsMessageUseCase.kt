@@ -8,8 +8,9 @@ internal class CreateAlterParticipantsMessageUseCase @Inject constructor() :
     CreateTypedMessageUseCase {
 
     override fun invoke(message: ChatMessage, isMine: Boolean) = AlterParticipantsMessage(
-        message.msgId,
-        message.timestamp,
-        isMine = isMine
+        msgId = message.msgId,
+        time = message.timestamp,
+        isMine = isMine,
+        userHandle = message.userHandle
     )
 }

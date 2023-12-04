@@ -7,4 +7,5 @@ data class ChatLinkRemovedMessage(
     override val msgId: Long,
     override val time: Long,
     override val isMine: Boolean,
+    override val userHandle: Long,
 ) : ManagementMessage
