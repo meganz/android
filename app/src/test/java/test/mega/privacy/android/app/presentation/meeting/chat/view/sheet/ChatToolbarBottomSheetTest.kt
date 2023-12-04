@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_AT
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_LOCATION
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_SCAN
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_GALLERY_LIST
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_LOADING_GALLERY
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -95,13 +96,25 @@ class ChatToolbarBottomSheetTest {
         verify(onPickLocation).invoke()
     }
 
+    @Test
+    fun `test that progress bar is shown if isLoadingGalleryFiles is true`() {
+        initComposeRuleContent(isLoadingGalleryFiles = true)
+        composeTestRule.onNodeWithTag(TEST_TAG_LOADING_GALLERY).assertIsDisplayed()
+    }
 
-    private fun initComposeRuleContent() {
+    @Test
+    fun `test that progress bar is not shown if isLoadingGalleryFiles is false`() {
+        initComposeRuleContent(isLoadingGalleryFiles = false)
+        composeTestRule.onNodeWithTag(TEST_TAG_LOADING_GALLERY).assertDoesNotExist()
+    }
+
+    private fun initComposeRuleContent(isLoadingGalleryFiles: Boolean = false) {
         composeTestRule.setContent {
             ChatToolbarBottomSheet(
                 onAttachFileClicked = onAttachFileClicked,
                 onAttachContactClicked = onAttachContactClicked,
                 onPickLocation = onPickLocation,
+                isLoadingGalleryFiles = isLoadingGalleryFiles,
                 sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
             )
         }

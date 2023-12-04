@@ -286,6 +286,7 @@ internal fun ChatView(
                                 }
                             )
                         },
+                        isLoadingGalleryFiles = isLoadingGalleryFiles,
                         sheetState = toolbarModalSheetState
                     )
                 }

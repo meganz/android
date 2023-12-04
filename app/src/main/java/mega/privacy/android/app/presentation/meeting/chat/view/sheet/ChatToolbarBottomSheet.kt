@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,6 +33,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItem
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
+import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.documentscanner.DocumentScannerActivity
@@ -47,6 +49,7 @@ fun ChatToolbarBottomSheet(
     onAttachFileClicked: () -> Unit,
     onAttachContactClicked: () -> Unit,
     onPickLocation: () -> Unit,
+    isLoadingGalleryFiles: Boolean,
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
 ) {
@@ -85,10 +88,22 @@ fun ChatToolbarBottomSheet(
             sheetState = sheetState
         )
 
+        AnimatedVisibility(visible = isLoadingGalleryFiles) {
+            MegaLinearProgressIndicator(
+                modifier = Modifier
+                    .testTag(TEST_TAG_LOADING_GALLERY)
+                    .padding(horizontal = 4.dp)
+            )
+        }
+
         Row(
-            modifier = Modifier
-                .padding(24.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().apply {
+                if (isLoadingGalleryFiles) {
+                    padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 24.dp)
+                } else {
+                    padding(24.dp)
+                }
+            },
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             AttachItem(
@@ -191,6 +206,7 @@ private fun ChatToolbarBottomSheetPreview() {
             onAttachFileClicked = {},
             onAttachContactClicked = {},
             onPickLocation = {},
+            isLoadingGalleryFiles = true,
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
         )
     }
@@ -203,5 +219,6 @@ internal const val TEST_TAG_ATTACH_FROM_GIF = "chat_view:attach_panel:attach_fro
 internal const val TEST_TAG_ATTACH_FROM_SCAN = "chat_view:attach_panel:attach_from_scan"
 internal const val TEST_TAG_ATTACH_FROM_LOCATION = "chat_view:attach_panel:attach_from_location"
 internal const val TEST_TAG_ATTACH_FROM_CONTACT = "chat_view:attach_panel:attach_from_contact"
+internal const val TEST_TAG_LOADING_GALLERY = "chat_view:attach_panel:loading_gallery"
 
 

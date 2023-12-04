@@ -24,7 +24,7 @@ import mega.privacy.android.core.ui.theme.MegaTheme
 @Composable
 fun MegaLinearProgressIndicator(
     modifier: Modifier = Modifier,
-    progress: Float? = 0f,
+    progress: Float? = null,
     strokeCap: StrokeCap = StrokeCap.Butt,
 ) = if (progress != null) {
     LinearProgressIndicator(
