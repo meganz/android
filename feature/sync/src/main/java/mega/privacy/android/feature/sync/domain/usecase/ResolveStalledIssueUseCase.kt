@@ -19,6 +19,8 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAct
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.domain.mapper.StalledIssueToSolvedIssueMapper
 import mega.privacy.android.feature.sync.domain.usecase.solvedissues.SetSyncSolvedIssueUseCase
+import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.RenameFilesWithTheSameNameUseCase
+import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.RenameNodeWithTheSameNameUseCase
 import java.io.File
 import javax.inject.Inject
 
@@ -30,6 +32,8 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
     private val setSyncSolvedIssueUseCase: SetSyncSolvedIssueUseCase,
     private val renameNodeUseCase: RenameNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
+    private val renameNodeWithTheSameNameUseCase: RenameNodeWithTheSameNameUseCase,
+    private val renameFilesWithTheSameNameUseCase: RenameFilesWithTheSameNameUseCase,
     private val stalledIssueToSolvedIssueMapper: StalledIssueToSolvedIssueMapper,
 ) {
 
@@ -50,15 +54,12 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
     ) {
         when (stalledIssueResolutionAction.resolutionActionType) {
             StalledIssueResolutionActionType.RENAME_ALL_ITEMS -> {
-                var counter = 1
-                stalledIssue.nodeIds.forEachIndexed { index, nodeId ->
-                    if (index == 0) {
-                        return@forEachIndexed
-                    }
-                    val nodeNameWithFullPath = stalledIssue.nodeNames[index]
-                    val nodeName = nodeNameWithFullPath.substringAfterLast(File.separator)
-                    addCounterToNodeName(nodeName, nodeId, counter)
-                    counter++
+                if (stalledIssue.nodeIds.size > 1) {
+                    renameNodeWithTheSameNameUseCase(
+                        stalledIssue.nodeIds.zip(stalledIssue.nodeNames)
+                    )
+                } else if (stalledIssue.localPaths.size > 1) {
+                    renameFilesWithTheSameNameUseCase(stalledIssue.localPaths)
                 }
             }
 
