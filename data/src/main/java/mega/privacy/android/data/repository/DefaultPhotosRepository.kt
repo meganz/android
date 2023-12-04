@@ -768,7 +768,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         val megaNodes = megaApiFacade.getChildrenByNode(
             parentNode = parentNode,
             order = order?.let { sortOrderIntMapper(it) },
-        ).filter { isImageNodeValid(it) || isVideoNodeValid(it) }
+        ).filter { isImageNodeValid(node = it, filterSvg = false) || isVideoNodeValid(it) }
 
         val offlineMap = megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
         megaNodes.map { megaNode ->

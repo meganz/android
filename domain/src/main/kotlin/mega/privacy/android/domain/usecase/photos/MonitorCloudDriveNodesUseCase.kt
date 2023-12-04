@@ -16,8 +16,6 @@ import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import javax.inject.Inject
 
-private typealias NodeCheck = suspend (Node, NodeId) -> Boolean
-
 /**
  * Use case to monitor timeline nodes
  */
@@ -28,7 +26,7 @@ class MonitorCloudDriveNodesUseCase @Inject constructor(
 ) {
     private val nodesCache: MutableMap<NodeId, ImageNode> = mutableMapOf()
 
-    private val constraints: List<NodeCheck> = listOf(
+    private val constraints: List<suspend (Node, targetParentId: NodeId) -> Boolean> = listOf(
         ::checkMediaNode,
         ::checkCloudDriveNode,
     )
@@ -65,9 +63,12 @@ class MonitorCloudDriveNodesUseCase @Inject constructor(
 
     private suspend fun updateNodes(parentId: NodeId, nodeUpdate: NodeUpdate): List<ImageNode> {
         for (node in nodeUpdate.changes.keys) {
-            if (constraints.any { !it(node, parentId) }) continue
-            val newNode = photosRepository.fetchImageNode(nodeId = node.id)
+            if (constraints.any { !it(node, parentId) }) {
+                nodesCache.remove(node.id)
+                continue
+            }
 
+            val newNode = photosRepository.fetchImageNode(nodeId = node.id)
             if (newNode == null) {
                 nodesCache.remove(node.id)
             } else {
@@ -76,5 +77,4 @@ class MonitorCloudDriveNodesUseCase @Inject constructor(
         }
         return nodesCache.values.toList()
     }
-
 }

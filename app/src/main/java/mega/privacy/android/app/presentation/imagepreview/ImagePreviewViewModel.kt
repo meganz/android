@@ -141,11 +141,17 @@ class ImagePreviewViewModel @Inject constructor(
 
     private fun findCurrentImageNode(imageNodes: List<ImageNode>): Pair<Int, ImageNode?> {
         val index = imageNodes.indexOfFirst { currentImageNodeIdValue == it.id.longValue }
-        return if (index != -1) {
-            index to imageNodes[index]
-        } else {
-            0 to null
+
+        if (index != -1) {
+            return index to imageNodes[index]
         }
+
+        // If the image node is not found, calculate the target index based on the current state
+        val currentImageNodeIndex = _state.value.currentImageNodeIndex
+        val targetImageNodeIndex =
+            if (currentImageNodeIndex > imageNodes.lastIndex) imageNodes.lastIndex else currentImageNodeIndex
+
+        return targetImageNodeIndex to imageNodes.getOrNull(targetImageNodeIndex)
     }
 
     private suspend fun shouldShowSlideshowOption(imageNodes: List<ImageNode>): Boolean =
@@ -158,18 +164,15 @@ class ImagePreviewViewModel @Inject constructor(
             ?.isSlideshowOptionVisible(imageNode)
             ?: false
 
-
     fun isGetLinkOptionVisible(imageNode: ImageNode): Boolean =
         imagePreviewMenuOptionsMap[imagePreviewMenuSource]
             ?.isGetLinkOptionVisible(imageNode)
             ?: false
 
-
     fun isSaveToDeviceOptionVisible(imageNode: ImageNode): Boolean =
         imagePreviewMenuOptionsMap[imagePreviewMenuSource]
             ?.isSaveToDeviceOptionVisible(imageNode)
             ?: false
-
 
     fun isForwardOptionVisible(imageNode: ImageNode): Boolean =
         imagePreviewMenuOptionsMap[imagePreviewMenuSource]
