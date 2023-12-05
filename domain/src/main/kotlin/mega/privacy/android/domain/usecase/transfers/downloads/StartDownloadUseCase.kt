@@ -66,9 +66,13 @@ class StartDownloadUseCase @Inject constructor(
                     ).filter {
                         it !is DownloadNodesEvent.SingleTransferEvent
                     }.transformWhile { event ->
+                        val finished = event is DownloadNodesEvent.FinishProcessingTransfers
+                        //emitting a FinishProcessingTransfers can cause a terminal event in the collector (firstOrNull for instance), so we need to start the worker before emitting it
+                        if (finished) {
+                            startDownloadWorkerUseCase()
+                        }
                         emit(event)
-                        // complete the flow on finish processing
-                        event !is DownloadNodesEvent.FinishProcessingTransfers
+                        return@transformWhile !finished
                     }
                         .cancellable()
                         .onCompletion { error ->
@@ -80,8 +84,6 @@ class StartDownloadUseCase @Inject constructor(
                                 if (error !is CancellationException) {
                                     throw error
                                 }
-                            } else {
-                                startDownloadWorkerUseCase()
                             }
                         }
                 } else {

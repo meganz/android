@@ -10,7 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -190,9 +190,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
                     if (it is CancellationException) {
                         _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
                     }
-                }.firstOrNull {
-                    it == DownloadNodesEvent.FinishProcessingTransfers || it == DownloadNodesEvent.NotSufficientSpace
-                }
+                }.last()
             }
         if (terminalEvent == DownloadNodesEvent.FinishProcessingTransfers) toDoAfterProcessing?.invoke()
         _uiState.updateEventAndClearProgress(

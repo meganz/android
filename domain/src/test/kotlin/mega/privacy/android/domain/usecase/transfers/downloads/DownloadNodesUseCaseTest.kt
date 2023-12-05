@@ -319,6 +319,24 @@ class DownloadNodesUseCaseTest {
     }
 
     @Test
+    fun `test that startDownload runs in parallel when there are more than one node`() = runTest {
+        fileAndFolderNodes.forEach {
+            whenever(
+                transferRepository.startDownload(
+                    it, DESTINATION_PATH_FOLDER, null, false,
+                )
+            ).thenAnswer {
+                flow<TransferEvent> { delay(100) }
+            }
+        }
+        underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
+            fileAndFolderNodes.forEach {
+                verify(transferRepository).startDownload(it, DESTINATION_PATH_FOLDER, null, false)
+            }
+        }
+    }
+
+    @Test
     fun `test that finish processing is emitted when all transfers are processed including not found nodes`() =
         runTest {
             fileAndFolderNodes.forEachIndexed { index, node ->
@@ -328,7 +346,7 @@ class DownloadNodesUseCaseTest {
                             node, DESTINATION_PATH_FOLDER, null, false,
                         )
                     ).thenAnswer {
-                        throw NodeDoesNotExistsException()
+                        flow<TransferEvent> { throw NodeDoesNotExistsException() }
                     }
                 } else {
                     stubFinishProcessingEvent(node)
@@ -367,7 +385,7 @@ class DownloadNodesUseCaseTest {
     fun `test that finish processing is not emitted if not all transfers are processed`() =
         runTest {
 
-            fileAndFolderNodes.dropLast(1).forEachIndexed { index, node ->
+            fileAndFolderNodes.dropLast(1).forEach { node ->
                 stubFinishProcessingEvent(node)
             }
 

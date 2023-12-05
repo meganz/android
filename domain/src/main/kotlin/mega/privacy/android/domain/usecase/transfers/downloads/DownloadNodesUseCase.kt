@@ -1,13 +1,16 @@
 package mega.privacy.android.domain.usecase.transfers.downloads
 
+import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
@@ -51,51 +54,56 @@ class DownloadNodesUseCase @Inject constructor(
         val alreadyProcessed = mutableSetOf<Long>()
         val allIds = nodes.map { it.id.longValue }
         var finishProcessingSend = false
-        return flow {
+        return channelFlow {
             fileSystemRepository.createDirectory(destinationPath)
-            nodes.forEach { node ->
-                runCatching {
-                    emitAll(
-                        transferRepository.startDownload(
-                            node = node,
-                            localPath = destinationPath,
-                            appData = appData,
-                            shouldStartFirst = isHighPriority,
-                        ).map { DownloadNodesEvent.SingleTransferEvent(it) }
+            //start all downloads in parallel
+            nodes.map { node ->
+                launch {
+                    transferRepository.startDownload(
+                        node = node,
+                        localPath = destinationPath,
+                        appData = appData,
+                        shouldStartFirst = isHighPriority,
                     )
-                }.onFailure { cause ->
-                    if (cause is NodeDoesNotExistsException) {
-                        alreadyProcessed.add(node.id.longValue)
-                        emit(DownloadNodesEvent.TransferNotStarted(node.id, cause))
-                    }
+                        .catch { cause ->
+                            if (cause is NodeDoesNotExistsException) {
+                                send(DownloadNodesEvent.TransferNotStarted(node.id, cause))
+                            }
+                            alreadyProcessed.add(node.id.longValue)
+                        }
+                        .collect {
+                            send(DownloadNodesEvent.SingleTransferEvent(it))
+                        }
                 }
             }
-        }.transform { event ->
-            emit(event)
+        }
+            .buffer(capacity = UNLIMITED)
+            .transform { event ->
+                emit(event)
 
-            if (event is DownloadNodesEvent.SingleTransferEvent) {
-                //update active transfers db
-                addOrUpdateActiveTransferUseCase(event.transferEvent)
+                if (event is DownloadNodesEvent.SingleTransferEvent) {
+                    //update active transfers db
+                    addOrUpdateActiveTransferUseCase(event.transferEvent)
 
-                //check if single node processing is finished
-                if (event.isFinishProcessingEvent()) {
-                    val nodeId = NodeId(event.transferEvent.transfer.nodeHandle)
-                    if (!alreadyProcessed.contains(nodeId.longValue)) {
-                        //this node is already processed: save it and emit the event
-                        alreadyProcessed.add(nodeId.longValue)
-                        emit(DownloadNodesEvent.TransferFinishedProcessing(nodeId))
+                    //check if single node processing is finished
+                    if (event.isFinishProcessingEvent()) {
+                        val nodeId = NodeId(event.transferEvent.transfer.nodeHandle)
+                        if (!alreadyProcessed.contains(nodeId.longValue)) {
+                            //this node is already processed: save it and emit the event
+                            alreadyProcessed.add(nodeId.longValue)
+                            emit(DownloadNodesEvent.TransferFinishedProcessing(nodeId))
 
-                        //check if all nodes have finished processing
-                        if (!finishProcessingSend && alreadyProcessed.containsAll(allIds)) {
-                            finishProcessingSend = true
-                            invalidateCancelTokenUseCase() //we need to avoid a future cancellation from now on
-                            emit(DownloadNodesEvent.FinishProcessingTransfers)
+                            //check if all nodes have finished processing
+                            if (!finishProcessingSend && alreadyProcessed.containsAll(allIds)) {
+                                finishProcessingSend = true
+                                invalidateCancelTokenUseCase() //we need to avoid a future cancellation from now on
+                                emit(DownloadNodesEvent.FinishProcessingTransfers)
+                            }
                         }
                     }
                 }
-            }
-        }.onCompletion {
-            runCatching { cancelCancelTokenUseCase() }
-        }.cancellable()
+            }.onCompletion {
+                runCatching { cancelCancelTokenUseCase() }
+            }.cancellable()
     }
 }
