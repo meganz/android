@@ -11,7 +11,7 @@ interface Message {
     val msgId: Long
 
     /**
-     * Time of the message
+     * Time of the message in seconds
      */
     val time: Long
 

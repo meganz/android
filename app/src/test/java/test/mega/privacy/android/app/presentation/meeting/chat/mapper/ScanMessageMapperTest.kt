@@ -31,7 +31,15 @@ class ScanMessageMapperTest {
             on { userHandle } doReturn 1234567890L
         }
         val uiMessage = mock<UiChatMessage>()
-        whenever(uiChatMessageMapper(newMessage, isOneToOne = true, showAvatar = true)).thenReturn(
+        whenever(
+            uiChatMessageMapper(
+                newMessage,
+                isOneToOne = true,
+                showAvatar = true,
+                showTime = true,
+                showDate = true
+            )
+        ).thenReturn(
             uiMessage
         )
         val result = underTest(
@@ -66,14 +74,18 @@ class ScanMessageMapperTest {
             uiChatMessageMapper(
                 message = eq(value = newMessage),
                 isOneToOne = any(),
-                showAvatar = any()
+                showAvatar = any(),
+                showTime = any(),
+                showDate = any()
             )
         ).thenReturn(newUiMessage)
         whenever(
             uiChatMessageMapper(
                 message = eq(value = oldTypedMessage),
                 isOneToOne = any(),
-                showAvatar = any()
+                showAvatar = any(),
+                showTime = any(),
+                showDate = any()
             )
         ).thenReturn(oldUiMessage)
         val result = underTest(

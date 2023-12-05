@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
  */
 data class CallUiMessage(
     override val message: CallMessage,
+    override val showDate: Boolean,
     val isOneToOneChat: Boolean,
 ) : UiChatMessage {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
@@ -22,4 +23,6 @@ data class CallUiMessage(
     override val avatarComposable: @Composable (RowScope.() -> Unit)? = null
 
     override val showAvatar: Boolean = false
+
+    override val showTime: Boolean = true
 }

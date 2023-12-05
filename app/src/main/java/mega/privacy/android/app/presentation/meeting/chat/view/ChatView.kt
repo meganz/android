@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
@@ -27,6 +28,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -192,6 +194,7 @@ internal fun ChatView(
             //TODO show snackbar when string is approved by content team
         }
     }
+    val scrollState = rememberLazyListState()
     BackHandler(enabled = toolbarModalSheetState.isVisible) {
         coroutineScope.launch {
             toolbarModalSheetState.hide()
@@ -200,6 +203,11 @@ internal fun ChatView(
     BackHandler(enabled = fileModalSheetState.isVisible) {
         coroutineScope.launch {
             fileModalSheetState.hide()
+        }
+    }
+    LaunchedEffect(uiState.messages.size) {
+        if (uiState.messages.isNotEmpty()) {
+            scrollState.scrollToItem(uiState.messages.size - 1)
         }
     }
 
@@ -372,7 +380,8 @@ internal fun ChatView(
                 ) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        state = scrollState
                     ) {
                         item("first_message_header") { FirstMessageHeader(uiState) }
                         items(messages) { uiChatMessage ->

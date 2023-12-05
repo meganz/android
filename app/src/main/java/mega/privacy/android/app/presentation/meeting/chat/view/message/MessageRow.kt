@@ -14,13 +14,11 @@ import mega.privacy.android.domain.entity.chat.messages.management.ManagementMes
  *
  * @param uiChatMessage
  * @param modifier
- * @param showTime true if the message should show time otherwise false
  */
 @Composable
 fun MessageRow(
     uiChatMessage: UiChatMessage,
     modifier: Modifier = Modifier,
-    showTime: Boolean = true,
 ) {
     val isManagementMessage = uiChatMessage.message is ManagementMessage
     val context = LocalContext.current
@@ -29,7 +27,10 @@ fun MessageRow(
         // all message content align left should be treat as other's message (Management, ...)
         isMine = uiChatMessage.message.isMine && !isManagementMessage,
         showForwardIcon = uiChatMessage.message.canForward,
-        time = if (showTime) TimeUtils.formatDate(
+        time = if (uiChatMessage.showTime) TimeUtils.formatTime(
+            uiChatMessage.message.time,
+        ) else null,
+        date = if (uiChatMessage.showDate) TimeUtils.formatDate(
             uiChatMessage.message.time,
             TimeUtils.DATE_SHORT_FORMAT,
             context,

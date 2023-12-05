@@ -25,19 +25,36 @@ class UiChatMessageMapper @Inject constructor() {
         message: TypedMessage,
         isOneToOne: Boolean,
         showAvatar: Boolean,
+        showTime: Boolean,
+        showDate: Boolean,
     ): UiChatMessage {
         return when (message) {
-            is TextMessage -> TextUiMessage(message = message, showAvatar = showAvatar)
-            is CallMessage -> CallUiMessage(message = message, isOneToOneChat = isOneToOne)
+            is TextMessage -> TextUiMessage(
+                message = message,
+                showAvatar = showAvatar,
+                showTime = showTime,
+                showDate = showDate
+            )
+
+            is CallMessage -> CallUiMessage(
+                message = message,
+                isOneToOneChat = isOneToOne,
+                showDate = showDate
+            )
             // will remove when add new message type
             else -> object : UiChatMessage {
                 override val contentComposable: @Composable (RowScope.() -> Unit) = {
 
                 }
                 override val avatarComposable: @Composable (RowScope.() -> Unit)? = null
+
                 override val message: TypedMessage = message
 
                 override val showAvatar: Boolean = false
+
+                override val showTime: Boolean = true
+
+                override val showDate: Boolean = showDate
             }
         }
     }

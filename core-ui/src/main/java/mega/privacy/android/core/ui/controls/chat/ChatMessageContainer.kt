@@ -44,25 +44,38 @@ fun ChatMessageContainer(
     showForwardIcon: Boolean,
     modifier: Modifier = Modifier,
     time: String? = null,
+    date: String? = null,
     avatarOrIcon: @Composable (RowScope.() -> Unit)? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
     Column(
-        modifier = modifier
-            .padding(start = if (isMine) 48.dp else 16.dp, end = 16.dp)
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = if (isMine) Alignment.End else Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
+        date?.let {
+            Text(
+                modifier = Modifier
+                    .padding(top = 8.dp, bottom = 16.dp)
+                    .align(Alignment.CenterHorizontally),
+                text = date,
+                style = MaterialTheme.typography.subtitle2,
+                color = MegaTheme.colors.text.secondary
+            )
+        }
         time?.let {
             Text(
-                modifier = if (isMine) Modifier.padding(0.dp) else Modifier.padding(start = 32.dp),
+                modifier = if (isMine) Modifier.padding(end = 16.dp) else Modifier.padding(start = 48.dp),
                 text = time,
                 style = MaterialTheme.typography.body4,
                 color = MegaTheme.colors.text.secondary
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier
+                .padding(if (isMine) 48.dp else 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             if (isMine) {
                 if (showForwardIcon) {
                     ForwardIcon()
@@ -112,6 +125,7 @@ private fun TextMessageContainerPreview(
                 )
             },
             time = "12:00",
+            date = "Today",
             showForwardIcon = isMe,
             content = {
                 ChatBubble(isMe = isMe) {

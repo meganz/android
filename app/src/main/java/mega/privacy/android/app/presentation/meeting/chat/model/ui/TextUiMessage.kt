@@ -18,7 +18,9 @@ import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
  */
 data class TextUiMessage(
     override val message: TextMessage,
-    override val showAvatar: Boolean = true,
+    override val showAvatar: Boolean,
+    override val showTime: Boolean,
+    override val showDate: Boolean,
 ) : UiChatMessage {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         ChatMessageTextView(text = message.content.orEmpty(), isMe = message.isMine)

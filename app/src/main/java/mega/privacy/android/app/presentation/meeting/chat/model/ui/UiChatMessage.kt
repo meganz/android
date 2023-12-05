@@ -28,4 +28,14 @@ interface UiChatMessage {
      * Show avatar
      */
     val showAvatar: Boolean
+
+    /**
+     * Show time
+     */
+    val showTime: Boolean
+
+    /**
+     * Show date
+     */
+    val showDate: Boolean
 }
