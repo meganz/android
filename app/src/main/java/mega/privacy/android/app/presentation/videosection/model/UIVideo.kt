@@ -13,6 +13,7 @@ import java.io.File
  * @property thumbnail the video's thumbnail
  * @property isFavourite the video if is Favourite
  * @property nodeAvailableOffline the video if is available for offline
+ * @property isSelected the video if is selected
  */
 data class UIVideo(
     val id: NodeId,
@@ -22,4 +23,5 @@ data class UIVideo(
     val thumbnail: File? = null,
     val isFavourite: Boolean = false,
     val nodeAvailableOffline: Boolean = false,
+    val isSelected: Boolean = false
 )

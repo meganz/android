@@ -35,7 +35,7 @@ internal fun AllVideosView(
     onClick: (item: UIVideo, index: Int) -> Unit,
     onMenuClick: (UIVideo) -> Unit,
     onSortOrderClick: () -> Unit,
-    onLongClick: (() -> Unit)? = null,
+    onLongClick: ((item: UIVideo, index: Int) -> Unit) = { _, _ -> },
 ) {
     LaunchedEffect(items) {
         if (scrollToTop) {
@@ -94,6 +94,7 @@ internal fun AllVideosView(
                         fileSize = formatFileSize(videoItem.size, LocalContext.current),
                         duration = videoItem.duration,
                         isFavourite = videoItem.isFavourite,
+                        isSelected = videoItem.isSelected,
                         thumbnailData = if (videoItem.thumbnail?.exists() == true) {
                             videoItem.thumbnail
                         } else {
@@ -102,7 +103,7 @@ internal fun AllVideosView(
                         nodeAvailableOffline = videoItem.nodeAvailableOffline,
                         onClick = { onClick(videoItem, it) },
                         onMenuClick = { onMenuClick(videoItem) },
-                        onLongClick = onLongClick,
+                        onLongClick = { onLongClick(videoItem, it) }
                     )
                 }
             }

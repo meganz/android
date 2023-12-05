@@ -11,6 +11,8 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property progressBarShowing the progress bar showing state
  * @property searchMode the search mode state
  * @property scrollToTop the scroll to top state
+ * @property selectedVideoHandles the selected video handles
+ * @property isInSelection if list is in selection mode or not
  */
 data class VideoSectionState(
     val allVideos: List<UIVideo> = emptyList(),
@@ -19,4 +21,6 @@ data class VideoSectionState(
     val progressBarShowing: Boolean = true,
     val searchMode: Boolean = false,
     val scrollToTop: Boolean = false,
+    val selectedVideoHandles: List<Long> = emptyList(),
+    val isInSelection: Boolean = false,
 )

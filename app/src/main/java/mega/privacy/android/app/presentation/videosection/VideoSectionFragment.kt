@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.FileProvider
@@ -29,6 +31,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
@@ -40,9 +43,10 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -61,8 +65,16 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    /**
+     * Mapper to get options for Action Bar
+     */
+    @Inject
+    lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
+
     private var _binding: FragmentVideoSectionBinding? = null
     private val binding get() = _binding!!
+
+    private var actionMode: ActionMode? = null
 
     /**
      * onCreateView
@@ -115,26 +127,36 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
             setContent {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
                 MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     VideoSectionComposeView(
                         onSortOrderClick = { showSortByPanel() },
                         videoSectionViewModel = videoSectionViewModel,
                         onClick = { item, index ->
-                            openVideoFile(activity = requireActivity(), item = item, index = index)
+                            if (uiState.isInSelection) {
+                                videoSectionViewModel.onItemClicked(item, index)
+                            } else {
+                                openVideoFile(
+                                    activity = requireActivity(),
+                                    item = item,
+                                    index = index
+                                )
+                            }
                         },
-                        onLongClick = null,
+                        onLongClick = { item, index ->
+                            videoSectionViewModel.onLongItemClicked(item, index)
+                            activateActionMode()
+                        },
                         onMenuClick = { item ->
                             showOptionsMenuForItem(item)
                         }
                     )
                 }
+                updateActionModeTitle(count = uiState.selectedVideoHandles.size)
             }
         }
     }
 
-    /**
-     * Shows the Sort by panel.
-     */
     private fun showSortByPanel() {
         (requireActivity() as ManagerActivity).showNewSortByPanel(Constants.ORDER_CLOUD)
     }
@@ -193,9 +215,33 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
 
-    /**
-     * Shows Options menu for item clicked
-     */
+    private fun activateActionMode() {
+        if (actionMode == null) {
+            actionMode =
+                (requireActivity() as? AppCompatActivity)?.startSupportActionMode(
+                    VideoSectionActionModeCallback(
+                        managerActivity = requireActivity() as ManagerActivity,
+                        childFragmentManager = childFragmentManager,
+                        videoSectionViewModel = videoSectionViewModel,
+                        getOptionsForToolbarMapper = getOptionsForToolbarMapper
+                    ) {
+                        disableSelectMode()
+                    }
+                )
+        }
+    }
+
+    private fun updateActionModeTitle(count: Int) {
+        if (count == 0) actionMode?.finish()
+        actionMode?.title = count.toString()
+
+        runCatching {
+            actionMode?.invalidate()
+        }.onFailure {
+            Timber.e(it, "Invalidate error")
+        }
+    }
+
     private fun showOptionsMenuForItem(item: UIVideo) {
         (requireActivity() as ManagerActivity).showNodeOptionsPanel(
             nodeId = item.id,
@@ -203,9 +249,11 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         )
     }
 
-    /**
-     * Establish the mini audio player
-     */
+    private fun disableSelectMode() {
+        actionMode = null
+        videoSectionViewModel.clearAllSelectedVideos()
+    }
+
     private fun setupMiniAudioPlayer() {
         val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
             shouldVisible = true

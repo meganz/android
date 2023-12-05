@@ -35,9 +35,9 @@ import androidx.constraintlayout.compose.Visibility
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -47,6 +47,7 @@ internal fun VideoItemView(
     fileSize: String?,
     duration: String?,
     isFavourite: Boolean,
+    isSelected: Boolean,
     onClick: () -> Unit,
     thumbnailData: Any?,
     modifier: Modifier = Modifier,
@@ -71,7 +72,8 @@ internal fun VideoItemView(
             modifier = modifier,
             thumbnailData = thumbnailData,
             duration = duration,
-            isFavourite = isFavourite
+            isFavourite = isFavourite,
+            isSelected = isSelected
         )
 
         VideoInfoView(
@@ -88,6 +90,7 @@ internal fun VideoItemView(
 @Composable
 internal fun VideoThumbnailView(
     @DrawableRes icon: Int,
+    isSelected: Boolean,
     modifier: Modifier,
     thumbnailData: Any?,
     duration: String?,
@@ -145,6 +148,16 @@ internal fun VideoThumbnailView(
                     .padding(top = 5.dp, end = 5.dp)
                     .size(12.dp)
                     .align(Alignment.TopEnd)
+            )
+        }
+        if (isSelected) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_select_thumbnail),
+                contentDescription = "selectedIcon",
+                modifier = modifier
+                    .padding(top = 5.dp, start = 5.dp)
+                    .size(20.dp)
+                    .align(Alignment.TopStart)
             )
         }
     }
@@ -237,6 +250,7 @@ private fun VideoItemViewWithFavouritePreview() {
             onClick = {},
             thumbnailData = null,
             nodeAvailableOffline = true,
+            isSelected = true
         )
     }
 }
@@ -252,7 +266,8 @@ private fun VideoItemViewWithoutFavouritePreview() {
             duration = "04:00",
             isFavourite = false,
             onClick = {},
-            thumbnailData = null
+            thumbnailData = null,
+            isSelected = false
         )
     }
 }

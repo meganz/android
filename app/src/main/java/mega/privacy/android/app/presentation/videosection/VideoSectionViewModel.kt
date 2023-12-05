@@ -25,12 +25,16 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
+import nz.mega.sdk.MegaNode
 import java.io.File
 import javax.inject.Inject
 
@@ -49,6 +53,7 @@ class VideoSectionViewModel @Inject constructor(
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -122,10 +127,10 @@ class VideoSectionViewModel @Inject constructor(
             setPendingRefreshNodes()
         }
 
-    internal fun shouldShowSearchMenu() = state.value.allVideos.isNotEmpty()
+    internal fun shouldShowSearchMenu() = _state.value.allVideos.isNotEmpty()
 
     internal fun searchReady() {
-        if (state.value.searchMode)
+        if (_state.value.searchMode)
             return
 
         _state.update { it.copy(searchMode = true) }
@@ -205,4 +210,82 @@ class VideoSectionViewModel @Inject constructor(
 
         return intent
     }
+
+    internal fun clearAllSelectedVideos() {
+        _state.update {
+            it.copy(
+                allVideos = clearVideosSelected(),
+                selectedVideoHandles = emptyList(),
+                isInSelection = false
+            )
+        }
+    }
+
+    private fun clearVideosSelected() = _state.value.allVideos.map {
+        it.copy(isSelected = false)
+    }
+
+    internal fun selectAllNodes() {
+        _state.update {
+            it.copy(
+                allVideos = _state.value.allVideos.map { item ->
+                    item.copy(isSelected = true)
+                },
+                selectedVideoHandles = _state.value.allVideos.map { item ->
+                    item.id.longValue
+                },
+                isInSelection = true
+            )
+        }
+    }
+
+    internal fun onItemClicked(item: UIVideo, index: Int) {
+        updateVideoItemInSelectionState(item = item, index = index)
+    }
+
+    internal fun onLongItemClicked(item: UIVideo, index: Int) =
+        updateVideoItemInSelectionState(item = item, index = index)
+
+    private fun updateVideoItemInSelectionState(item: UIVideo, index: Int) {
+        val isSelected = !item.isSelected
+        val selectedHandles = updateSelectedVideoHandles(item, isSelected)
+        _state.update {
+            it.copy(
+                allVideos = _state.value.allVideos.updateItemSelectedState(index, isSelected),
+                selectedVideoHandles = selectedHandles,
+                isInSelection = selectedHandles.isNotEmpty()
+            )
+        }
+    }
+
+    private fun List<UIVideo>.updateItemSelectedState(index: Int, isSelected: Boolean) =
+        if (index in indices) {
+            toMutableList().also { list ->
+                list[index] = list[index].copy(isSelected = isSelected)
+            }
+        } else this
+
+
+    private fun updateSelectedVideoHandles(item: UIVideo, isSelected: Boolean) =
+        _state.value.selectedVideoHandles.toMutableList().also { selectedHandles ->
+            if (isSelected) {
+                selectedHandles.add(item.id.longValue)
+            } else {
+                selectedHandles.remove(item.id.longValue)
+            }
+        }
+
+    internal suspend fun getSelectedNodes(): List<TypedNode> =
+        _state.value.selectedVideoHandles.mapNotNull {
+            runCatching {
+                getNodeByIdUseCase(NodeId(it))
+            }.getOrNull()
+        }
+
+    internal suspend fun getSelectedMegaNode(): List<MegaNode> =
+        _state.value.selectedVideoHandles.mapNotNull {
+            runCatching {
+                getNodeByHandle(it)
+            }.getOrNull()
+        }
 }

@@ -21,10 +21,10 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 @Composable
 internal fun VideoSectionComposeView(
     videoSectionViewModel: VideoSectionViewModel,
-    onSortOrderClick: () -> Unit = {},
     onClick: (item: UIVideo, index: Int) -> Unit,
+    onSortOrderClick: () -> Unit = {},
     onMenuClick: (UIVideo) -> Unit = {},
-    onLongClick: (() -> Unit)? = null,
+    onLongClick: (item: UIVideo, index: Int) -> Unit = { _, _ -> },
 ) {
     val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
     val tabState by videoSectionViewModel.tabState.collectAsStateWithLifecycle()
@@ -43,7 +43,7 @@ internal fun VideoSectionComposeView(
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             videoSectionViewModel.onTabSelected(selectTab = tabState.tabs[page])
-            val tab = VideoSectionTab.values()[page]
+            val tab = VideoSectionTab.entries[page]
             pagerState.scrollToPage(tab.ordinal)
         }
     }
