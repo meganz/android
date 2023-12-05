@@ -106,6 +106,39 @@ class CookieDialogHandler @Inject constructor(
             }.also { it.show() }
     }
 
+    /**
+     * function to create a Cookie dialog where Ads cookies will be mentioned specifically
+     * this dialog will be shown when the user will be part of Advertisement experiment and will see the external Ads
+     */
+    private fun createCookieDialogWithAds(context: Context) {
+        if (dialog?.isShowing == true || !context.isValid()) return
+
+        dialog = MaterialAlertDialogBuilder(context)
+            .setCancelable(false)
+            .setView(R.layout.dialog_cookie_alert)
+            .setPositiveButton(context.getString(R.string.preference_cookies_accept)) { _, _ ->
+                acceptAllCookies(context)
+            }
+            .setNegativeButton(context.getString(R.string.settings_about_cookie_settings)) { _, _ ->
+                context.startActivity(Intent(context, CookiePreferencesActivity::class.java))
+            }
+            .create()
+            .apply {
+                setOnShowListener {
+                    val message =
+                        context.getString(R.string.dialog_ads_cookie_alert_message)
+                            .replace("[A]", "<a href='https://mega.nz/cookie'>")
+                            .replace("[/A]", "</a>")
+                            .toSpannedHtmlText()
+
+                    findViewById<TextView>(R.id.message)?.apply {
+                        movementMethod = LinkMovementMethod.getInstance()
+                        text = message
+                    }
+                }
+            }.also { it.show() }
+    }
+
     private fun acceptAllCookies(context: Context) {
         updateCookieSettingsUseCase.acceptAll()
             .subscribeOn(Schedulers.io())
