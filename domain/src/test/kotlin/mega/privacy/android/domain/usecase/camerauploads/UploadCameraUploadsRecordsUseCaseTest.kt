@@ -1035,7 +1035,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
                     isSourceTemporary = false,
                     shouldStartFirst = false,
                 )
-            ).thenReturn(flowOf())
+            ).thenReturn(flowOf(TransferEvent.TransferFinishEvent(mock(), null)))
         }
 
 

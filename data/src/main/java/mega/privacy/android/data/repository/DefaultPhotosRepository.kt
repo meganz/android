@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.conflate
@@ -483,26 +484,36 @@ internal class DefaultPhotosRepository @Inject constructor(
      * @param megaNodes List<MegaNode> of Photo
      * @return List<Photo> / Images
      */
-    private suspend fun mapPhotoNodesToImages(megaNodes: List<MegaNode>): List<Photo> {
-        return megaNodes.filter {
-            fileTypeInfoMapper(it) !is SvgFileTypeInfo && it.isValidPhotoNode()
-        }.map { megaNode ->
-            mapMegaNodeToImage(megaNode)
+    private suspend fun mapPhotoNodesToImages(megaNodes: List<MegaNode>): List<Photo> =
+        coroutineScope {
+            return@coroutineScope megaNodes.map { megaNode ->
+                async {
+                    runCatching {
+                        (fileTypeInfoMapper(megaNode) !is SvgFileTypeInfo && megaNode.isValidPhotoNode())
+                            .takeIf { it }
+                            ?.let { mapMegaNodeToImage(megaNode) }
+                    }.getOrNull()
+                }
+            }.awaitAll().filterNotNull()
         }
-    }
 
     /**
      * Convert the Photos MegaNode list to Video list
      * @param megaNodes List<MegaNode> of Photo
      * @return List<Photo> / Videos
      */
-    private suspend fun mapPhotoNodesToVideos(megaNodes: List<MegaNode>): List<Photo> {
-        return megaNodes.filter {
-            it.isValidPhotoNode() && fileTypeInfoMapper(it) is VideoFileTypeInfo
-        }.map { megaNode ->
-            mapMegaNodeToVideo(megaNode)
+    private suspend fun mapPhotoNodesToVideos(megaNodes: List<MegaNode>): List<Photo> =
+        coroutineScope {
+            return@coroutineScope megaNodes.map { megaNode ->
+                async {
+                    runCatching {
+                        (fileTypeInfoMapper(megaNode) is VideoFileTypeInfo && megaNode.isValidPhotoNode())
+                            .takeIf { it }
+                            ?.let { mapMegaNodeToVideo(megaNode) }
+                    }.getOrNull()
+                }
+            }.awaitAll().filterNotNull()
         }
-    }
 
     /**
      * Check valid Photo Node, not include Photo nodes that are in rubbish bin or without thumbnail

@@ -1,10 +1,12 @@
 package mega.privacy.android.domain.usecase.photos
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.repository.NodeRepository
@@ -31,10 +33,9 @@ class GetPhotosByFolderIdUseCase @Inject constructor(
         folderId: NodeId,
         recursive: Boolean,
     ): Flow<List<Photo>> {
-        return flow {
-            emit(getFolderPhotos(folderId, recursive))
-            emitAll(getMonitoredList(folderId, recursive))
-        }
+        return flow { emitAll(getMonitoredList(folderId, recursive)) }
+            .onStart { emit(getFolderPhotos(folderId, recursive)) }
+            .cancellable()
     }
 
     private suspend fun getFolderPhotos(
@@ -47,8 +48,9 @@ class GetPhotosByFolderIdUseCase @Inject constructor(
         )
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun getMonitoredList(folderId: NodeId, recursive: Boolean) =
         nodeRepository.monitorNodeUpdates()
-            .mapLatest { getFolderPhotos(folderId, recursive) }
+            .conflate()
+            .map { getFolderPhotos(folderId, recursive) }
+            .cancellable()
 }

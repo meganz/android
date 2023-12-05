@@ -3,6 +3,9 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
@@ -215,25 +218,36 @@ internal class NodeRepositoryImpl @Inject constructor(
     ): List<UnTypedNode> {
         return withContext(ioDispatcher) {
             return@withContext megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { parent ->
-                val offlineItems = getAllOfflineNodeHandle()
-                val childList = order?.let { sortOrder ->
-                    megaApiGateway.getChildrenByNode(
-                        parent,
-                        sortOrderIntMapper(sortOrder)
-                    )
-                } ?: run {
-                    megaApiGateway.getChildrenByNode(parent)
+                val offlineItems = async { getAllOfflineNodeHandle() }
+                val childList = async {
+                    order?.let { sortOrder ->
+                        megaApiGateway.getChildrenByNode(
+                            parent,
+                            sortOrderIntMapper(sortOrder)
+                        )
+                    } ?: run {
+                        megaApiGateway.getChildrenByNode(parent)
+                    }
                 }
-                childList.map {
-                    convertToUnTypedNode(
-                        node = it,
-                        offline = offlineItems?.get(it.handle.toString())
-                    )
-                }
+                mapMegaNodesToUnTypedNodes(childList.await(), offlineItems.await())
             } ?: run {
                 emptyList()
             }
         }
+    }
+
+    private suspend fun mapMegaNodesToUnTypedNodes(
+        childList: List<MegaNode>,
+        offlineItems: Map<String, Offline>?,
+    ): List<UnTypedNode> = coroutineScope {
+        childList.map { megaNode ->
+            async {
+                convertToUnTypedNode(
+                    node = megaNode,
+                    offline = offlineItems?.get(megaNode.handle.toString())
+                )
+            }
+        }.awaitAll()
     }
 
     override suspend fun getNumVersions(handle: Long): Int = withContext(ioDispatcher) {
