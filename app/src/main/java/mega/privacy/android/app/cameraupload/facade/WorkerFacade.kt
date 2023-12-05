@@ -58,7 +58,7 @@ class WorkerFacade @Inject constructor(
                     SINGLE_CAMERA_UPLOAD_TAG,
                     ExistingWorkPolicy.KEEP,
                     cameraUploadWorkRequest
-                )
+                ).await()
             Timber.d(
                 "CameraUpload Single Job Work Status: ${
                     workManager.getWorkInfosByTag(SINGLE_CAMERA_UPLOAD_TAG)
@@ -105,7 +105,7 @@ class WorkerFacade @Inject constructor(
                 CAMERA_UPLOAD_TAG,
                 ExistingPeriodicWorkPolicy.KEEP,
                 cameraUploadWorkRequest
-            )
+            ).await()
         Timber.d(
             "CameraUpload Schedule Work Status: ${
                 workManager.getWorkInfosByTag(CAMERA_UPLOAD_TAG)
@@ -115,10 +115,9 @@ class WorkerFacade @Inject constructor(
     }
 
     /**
-     * Schedule job of camera upload active heartbeat
-     *
+     * Schedule camera uploads active heartbeat worker
      */
-    private fun scheduleCameraUploadSyncActiveHeartbeat() {
+    private suspend fun scheduleCameraUploadSyncActiveHeartbeat() {
         // periodic work that runs during the last 10 minutes of every half an hour period
         val cuSyncActiveHeartbeatWorkRequest = PeriodicWorkRequest.Builder(
             SyncHeartbeatCameraUploadWorker::class.java,
@@ -134,7 +133,7 @@ class WorkerFacade @Inject constructor(
                 HEART_BEAT_TAG,
                 ExistingPeriodicWorkPolicy.KEEP,
                 cuSyncActiveHeartbeatWorkRequest
-            )
+            ).await()
         Timber.d(
             "CameraUpload Schedule Heartbeat Work Status: ${
                 workManager.getWorkInfosByTag(HEART_BEAT_TAG)
@@ -154,7 +153,7 @@ class WorkerFacade @Inject constructor(
             HEART_BEAT_TAG,
             SINGLE_HEART_BEAT_TAG
         ).forEach {
-            workManager.cancelAllWorkByTag(it)
+            workManager.cancelAllWorkByTag(it).await()
         }
         Timber.d("cancelCameraUploadAndHeartbeatWorkRequest() SUCCESS")
     }
@@ -162,18 +161,20 @@ class WorkerFacade @Inject constructor(
     /**
      * Cancel the Camera Upload unique worker
      */
-    private fun cancelUniqueCameraUploadWorkRequest() {
+    private suspend fun cancelUniqueCameraUploadWorkRequest() {
         workManager
             .cancelAllWorkByTag(SINGLE_CAMERA_UPLOAD_TAG)
+            .await()
         Timber.d("cancelUniqueCameraUploadWorkRequest() SUCCESS")
     }
 
     /**
      * Cancel the Camera Upload periodic worker
      */
-    private fun cancelPeriodicCameraUploadWorkRequest() {
+    private suspend fun cancelPeriodicCameraUploadWorkRequest() {
         workManager
             .cancelAllWorkByTag(CAMERA_UPLOAD_TAG)
+            .await()
         Timber.d("cancelPeriodicCameraUploadWorkRequest() SUCCESS")
     }
 
@@ -182,8 +183,8 @@ class WorkerFacade @Inject constructor(
      *
      * @param tag
      */
-    private suspend fun checkWorkerRunning(tag: String): Boolean {
-        return workManager.getWorkInfosByTag(tag).await()
+    private fun checkWorkerRunning(tag: String): Boolean {
+        return workManager.getWorkInfosByTag(tag).get()
             ?.map { workInfo -> workInfo.state == WorkInfo.State.RUNNING }
             ?.contains(true)
             ?: false
