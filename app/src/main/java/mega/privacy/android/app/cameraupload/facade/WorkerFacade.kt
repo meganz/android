@@ -13,9 +13,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
 import mega.privacy.android.data.gateway.WorkerGateway
-import mega.privacy.android.data.mapper.camerauploads.CameraUploadsStatusInfoMapper
 import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -43,7 +41,6 @@ private const val SCHEDULER_FLEX_INTERVAL: Long = 50 // Minutes
  */
 class WorkerFacade @Inject constructor(
     private val workManager: WorkManager,
-    private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper,
 ) : WorkerGateway {
 
     override suspend fun startCameraUploads() {
@@ -192,14 +189,12 @@ class WorkerFacade @Inject constructor(
             ?: false
     }
 
-    override fun monitorCameraUploadsStatusInfo(): Flow<CameraUploadsStatusInfo> {
+    override fun monitorCameraUploadsStatusInfo(): Flow<List<WorkInfo>> {
         val uploadFlow = workManager.getWorkInfosByTagLiveData(CAMERA_UPLOAD_TAG).asFlow()
         val singleUploadFlow =
             workManager.getWorkInfosByTagLiveData(SINGLE_CAMERA_UPLOAD_TAG).asFlow()
         return merge(uploadFlow, singleUploadFlow).mapNotNull {
-            it.takeUnless { it.isEmpty() }?.let { workInfoList ->
-                cameraUploadsStatusInfoMapper(workInfoList.first().progress)
-            }
+            it.takeUnless { it.isEmpty() }
         }
     }
 }

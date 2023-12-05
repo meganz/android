@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
@@ -32,6 +33,7 @@ import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
+import mega.privacy.android.data.mapper.camerauploads.CameraUploadsStatusInfoMapper
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
@@ -111,6 +113,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
+    private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper,
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
@@ -762,7 +765,9 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override fun monitorCameraUploadsStatusInfo() =
-        workerGateway.monitorCameraUploadsStatusInfo().catch {
+        workerGateway.monitorCameraUploadsStatusInfo().mapNotNull { workInfoList ->
+            cameraUploadsStatusInfoMapper(workInfoList.first().progress)
+        }.catch {
             Timber.e(it)
         }.flowOn(ioDispatcher)
 

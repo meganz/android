@@ -1,6 +1,8 @@
 package mega.privacy.android.data.repository
 
 import android.net.Uri
+import androidx.work.Data
+import androidx.work.WorkInfo
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -8,6 +10,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.PROGRESS
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.STATUS_INFO
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CameraUploadsMediaGateway
@@ -25,6 +29,7 @@ import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
+import mega.privacy.android.data.mapper.camerauploads.CameraUploadsStatusInfoMapper
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
@@ -39,6 +44,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.CameraUploadRepository
@@ -95,6 +101,7 @@ class DefaultCameraUploadRepositoryTest {
     private val videoQualityIntMapper: VideoQualityIntMapper = mock()
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway =
         mock()
+    private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper = mock()
 
     private val fakeRecord = SyncRecord(
         id = 0,
@@ -140,7 +147,8 @@ class DefaultCameraUploadRepositoryTest {
             uploadOptionIntMapper = uploadOptionIntMapper,
             megaLocalRoomGateway = megaLocalRoomGateway,
             context = mock(),
-            cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway
+            cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
+            cameraUploadsStatusInfoMapper = cameraUploadsStatusInfoMapper,
         )
     }
 
@@ -163,7 +171,8 @@ class DefaultCameraUploadRepositoryTest {
             backupStateIntMapper,
             uploadOptionMapper,
             uploadOptionIntMapper,
-            cameraUploadsSettingsPreferenceGateway
+            cameraUploadsSettingsPreferenceGateway,
+            cameraUploadsStatusInfoMapper,
         )
     }
 
@@ -246,6 +255,17 @@ class DefaultCameraUploadRepositoryTest {
                     selectionQuery = "",
                 )
                 assertThat(actual).isEqualTo(result)
+            }
+
+        @Test
+        fun `test that getMediaSelectionQuery returns the result of cameraUploadsMediaGateway getMediaSelectionQuery`() =
+            runTest {
+                val expected = "selectionQuery"
+                val parentPath = "parentPath"
+                whenever(cameraUploadsMediaGateway.getMediaSelectionQuery(parentPath)).thenReturn(
+                    expected
+                )
+                assertThat(underTest.getMediaSelectionQuery(parentPath)).isEqualTo(expected)
             }
     }
 
@@ -885,14 +905,25 @@ class DefaultCameraUploadRepositoryTest {
         }
 
         @Test
-        fun `test that getMediaSelectionQuery returns the result of cameraUploadsMediaGateway getMediaSelectionQuery`() =
+        fun `test that the camera uploads status info is being observed`() {
             runTest {
-                val expected = "selectionQuery"
-                val parentPath = "parentPath"
-                whenever(cameraUploadsMediaGateway.getMediaSelectionQuery(parentPath)).thenReturn(
-                    expected
-                )
-                assertThat(underTest.getMediaSelectionQuery(parentPath)).isEqualTo(expected)
+                val progress = mock<Data> {
+                    on { keyValueMap }.thenReturn(mapOf<String, Any>(Pair(STATUS_INFO, PROGRESS)))
+                }
+                val workInfo = mock<WorkInfo> {
+                    on { this.progress }.thenReturn(progress)
+                }
+                val workInfoFlow = flowOf(listOf(workInfo, mock()))
+
+                val expected = mock<CameraUploadsStatusInfo.Progress>()
+
+                whenever(cameraUploadsStatusInfoMapper(workInfo.progress)).thenReturn(expected)
+                whenever(workerGateway.monitorCameraUploadsStatusInfo()).thenReturn(workInfoFlow)
+                underTest.monitorCameraUploadsStatusInfo().test {
+                    assertThat(awaitItem()).isEqualTo(expected)
+                    cancelAndConsumeRemainingEvents()
+                }
             }
+        }
     }
 }

@@ -1,7 +1,7 @@
 package mega.privacy.android.data.gateway
 
+import androidx.work.WorkInfo
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 
 /**
  * Worker Gateway
@@ -35,5 +35,5 @@ interface WorkerGateway {
     /**
      * Get CameraUploadsWorker Info
      */
-    fun monitorCameraUploadsStatusInfo(): Flow<CameraUploadsStatusInfo>
+    fun monitorCameraUploadsStatusInfo(): Flow<List<WorkInfo>>
 }
