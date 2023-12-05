@@ -223,15 +223,12 @@ internal fun ImagePreviewScreen(
                             exit = fadeOut() + shrinkVertically()
                         ) {
                             ImagePreviewTopBar(
-                                showSlideshowMenu = viewState.showSlideshowOption
-                                        && viewModel.isSlideshowOptionVisible(imageNode),
-                                showSaveToDeviceMenu = viewModel.isSaveToDeviceOptionVisible(
-                                    imageNode
-                                ),
-                                showManageLinkMenu = viewModel.isGetLinkOptionVisible(
-                                    imageNode
-                                ),
-                                showSendToMenu = viewModel.isSendToOptionVisible(imageNode),
+                                imageNode = imageNode,
+                                showSlideshowMenu = viewModel::isSlideshowOptionVisible,
+                                showSaveToDeviceMenu = viewModel::isSaveToDeviceOptionVisible,
+                                showManageLinkMenu = viewModel::isGetLinkOptionVisible,
+                                showSendToMenu = viewModel::isSendToOptionVisible,
+                                showMoreMenu = viewModel::isMoreOptionVisible,
                                 onClickBack = onClickBack,
                                 onClickSlideshow = onClickSlideshow,
                                 onClickSaveToDevice = { onClickSaveToDevice(imageNode) },
@@ -451,10 +448,12 @@ private fun ImageContent(
 @Composable
 private fun ImagePreviewTopBar(
     modifier: Modifier = Modifier,
-    showSlideshowMenu: Boolean,
-    showSaveToDeviceMenu: Boolean,
-    showManageLinkMenu: Boolean,
-    showSendToMenu: Boolean,
+    imageNode: ImageNode,
+    showSlideshowMenu: suspend (ImageNode) -> Boolean,
+    showSaveToDeviceMenu: suspend (ImageNode) -> Boolean,
+    showManageLinkMenu: suspend (ImageNode) -> Boolean,
+    showSendToMenu: suspend (ImageNode) -> Boolean,
+    showMoreMenu: suspend (ImageNode) -> Boolean,
     onClickBack: () -> Unit,
     onClickSlideshow: () -> Unit,
     onClickSaveToDevice: () -> Unit,
@@ -476,7 +475,27 @@ private fun ImagePreviewTopBar(
             }
         },
         actions = {
-            if (showSlideshowMenu) {
+            val isSlideshowMenuVisible by produceState(false, imageNode) {
+                value = showSlideshowMenu(imageNode)
+            }
+
+            val isSaveToDeviceMenuVisible by produceState(false, imageNode) {
+                value = showSaveToDeviceMenu(imageNode)
+            }
+
+            val isManageLinkMenuVisible by produceState(false, imageNode) {
+                value = showManageLinkMenu(imageNode)
+            }
+
+            val isSendToMenuVisible by produceState(false, imageNode) {
+                value = showSendToMenu(imageNode)
+            }
+
+            val isMoreMenuVisible by produceState(false, imageNode) {
+                value = showMoreMenu(imageNode)
+            }
+
+            if (isSlideshowMenuVisible) {
                 IconButton(onClick = onClickSlideshow) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_slideshow),
@@ -486,7 +505,7 @@ private fun ImagePreviewTopBar(
                 }
             }
 
-            if (showSaveToDeviceMenu) {
+            if (isSaveToDeviceMenuVisible) {
                 IconButton(onClick = onClickSaveToDevice) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_download_white),
@@ -496,7 +515,7 @@ private fun ImagePreviewTopBar(
                 }
             }
 
-            if (showManageLinkMenu) {
+            if (isManageLinkMenuVisible) {
                 IconButton(onClick = onClickGetLink) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_link),
@@ -506,7 +525,7 @@ private fun ImagePreviewTopBar(
                 }
             }
 
-            if (showSendToMenu) {
+            if (isSendToMenuVisible) {
                 IconButton(onClick = onClickSendTo) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_send_to_contact),
@@ -516,12 +535,14 @@ private fun ImagePreviewTopBar(
                 }
             }
 
-            IconButton(onClick = onClickMore) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_dots_vertical_white),
-                    contentDescription = null,
-                    tint = MaterialTheme.colors.black_white,
-                )
+            if (isMoreMenuVisible) {
+                IconButton(onClick = onClickMore) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_dots_vertical_white),
+                        contentDescription = null,
+                        tint = MaterialTheme.colors.black_white,
+                    )
+                }
             }
         },
         elevation = 0.dp,

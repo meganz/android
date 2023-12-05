@@ -143,14 +143,24 @@ class AlbumImportPreviewProvider @Inject constructor(
     private fun startImagePreviewFromAlbumSharing(
         activity: Activity,
         photo: Photo,
-    ) {
-        ImageViewerActivity.getIntentForAlbumSharing(
-            activity,
-            photo.id,
-        ).run {
-            activity.startActivity(this)
+    ) = (activity as LifecycleOwner).lifecycleScope.launch {
+        if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+            val intent = ImagePreviewActivity.createIntent(
+                context = activity,
+                imageSource = ImagePreviewFetcherSource.ALBUM_SHARING,
+                menuOptionsSource = ImagePreviewMenuSource.ALBUM_SHARING,
+                anchorImageNodeId = NodeId(photo.id),
+            )
+            activity.startActivity(intent)
+        } else {
+            ImageViewerActivity.getIntentForAlbumSharing(
+                activity,
+                photo.id,
+            ).run {
+                activity.startActivity(this)
+            }
+            activity.overridePendingTransition(0, 0)
         }
-        activity.overridePendingTransition(0, 0)
     }
 
     /**

@@ -10,7 +10,6 @@ data class ImagePreviewState(
     val currentImageNodeIndex: Int = 0,
     val isCurrentImageNodeAvailableOffline: Boolean = false,
     val showAppBar: Boolean = true,
-    val showSlideshowOption: Boolean = false,
     val inFullScreenMode: Boolean = false,
     val transferMessage: String = "",
     val resultMessage: String = "",

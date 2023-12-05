@@ -673,6 +673,18 @@ internal class DefaultAlbumRepository @Inject constructor(
         }
     }
 
+    override suspend fun getPublicImageNodes(): List<ImageNode> = withContext(ioDispatcher) {
+        publicNodesMap.values.map { megaNode ->
+            val offline = megaLocalRoomGateway.getOfflineInformation(nodeHandle = megaNode.handle)
+            imageNodeMapper(
+                megaNode = megaNode,
+                hasVersion = megaApiGateway::hasVersion,
+                offline = offline,
+                requireSerializedData = true,
+            )
+        }
+    }
+
     override suspend fun getPublicPhoto(nodeId: NodeId): Photo? {
         return publicNodesMap[nodeId]?.let {
             photoMapper(

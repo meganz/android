@@ -230,6 +230,13 @@ interface AlbumRepository {
     suspend fun getPublicPhotoImageNode(nodeId: NodeId): ImageNode
 
     /**
+     * Get public ImageNodes
+     *
+     * @return Image nodes
+     */
+    suspend fun getPublicImageNodes(): List<ImageNode>
+
+    /**
      * Get Photo given public photo handle
      *
      * @param nodeId Node id of public photo

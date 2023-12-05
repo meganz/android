@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.multibindings.IntoMap
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumSharingImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher
@@ -14,7 +15,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 
 @Module
 @InstallIn(ViewModelComponent::class)
-interface ImagePreviewModule {
+internal interface ImagePreviewModule {
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.TIMELINE)
@@ -35,4 +36,8 @@ interface ImagePreviewModule {
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.CLOUD_DRIVE)
     fun CloudDriveImageNodeFetcher.bindCloudDriveImageNodeFetcher(): ImageNodeFetcher
 
+    @Binds
+    @IntoMap
+    @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.ALBUM_SHARING)
+    fun AlbumSharingImageNodeFetcher.bindAlbumSharingImageNodeFetcher(): ImageNodeFetcher
 }

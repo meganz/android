@@ -5,16 +5,16 @@ import mega.privacy.android.domain.entity.node.ImageNode
 import javax.inject.Inject
 
 class AlbumContentImagePreviewMenuOptions @Inject constructor() : ImagePreviewMenuOptions {
-
-    override fun isSlideshowOptionVisible(imageNode: ImageNode) =
+    override suspend fun isSlideshowOptionVisible(imageNode: ImageNode) =
         imageNode.type !is VideoFileTypeInfo
 
-    override fun isGetLinkOptionVisible(imageNode: ImageNode): Boolean = true
+    override suspend fun isGetLinkOptionVisible(imageNode: ImageNode): Boolean = true
 
-    override fun isSaveToDeviceOptionVisible(imageNode: ImageNode): Boolean = true
+    override suspend fun isSaveToDeviceOptionVisible(imageNode: ImageNode): Boolean = true
 
-    override fun isForwardOptionVisible(imageNode: ImageNode): Boolean = false
+    override suspend fun isForwardOptionVisible(imageNode: ImageNode): Boolean = false
 
-    override fun isSendToOptionVisible(imageNode: ImageNode): Boolean = true
+    override suspend fun isSendToOptionVisible(imageNode: ImageNode): Boolean = true
 
+    override suspend fun isMoreOptionVisible(imageNode: ImageNode): Boolean = true
 }

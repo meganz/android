@@ -29,11 +29,9 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -70,7 +68,6 @@ class ImagePreviewViewModel @Inject constructor(
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val disableExportNodesUseCase: DisableExportNodesUseCase,
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
@@ -90,6 +87,9 @@ class ImagePreviewViewModel @Inject constructor(
     private val _state = MutableStateFlow(ImagePreviewState())
 
     val state: StateFlow<ImagePreviewState> = _state
+
+    private val menuOptions: ImagePreviewMenuOptions?
+        get() = imagePreviewMenuOptionsMap[imagePreviewMenuSource]
 
     init {
         monitorImageNodes()
@@ -128,7 +128,6 @@ class ImagePreviewViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isInitialized = true,
-                        showSlideshowOption = shouldShowSlideshowOption(imageNodes),
                         imageNodes = imageNodes,
                         currentImageNodeIndex = currentImageNodeIndex,
                         currentImageNode = currentImageNode,
@@ -154,35 +153,30 @@ class ImagePreviewViewModel @Inject constructor(
         return targetImageNodeIndex to imageNodes.getOrNull(targetImageNodeIndex)
     }
 
-    private suspend fun shouldShowSlideshowOption(imageNodes: List<ImageNode>): Boolean =
-        withContext(defaultDispatcher) {
-            imageNodes.count { it.type !is VideoFileTypeInfo } > 1
-        }
+    suspend fun isSlideshowOptionVisible(imageNode: ImageNode): Boolean {
+        return menuOptions?.isSlideshowOptionVisible(imageNode) ?: false
+                && _state.value.imageNodes.size > 1
+    }
 
-    fun isSlideshowOptionVisible(imageNode: ImageNode): Boolean =
-        imagePreviewMenuOptionsMap[imagePreviewMenuSource]
-            ?.isSlideshowOptionVisible(imageNode)
-            ?: false
+    suspend fun isGetLinkOptionVisible(imageNode: ImageNode): Boolean {
+        return menuOptions?.isGetLinkOptionVisible(imageNode) ?: false
+    }
 
-    fun isGetLinkOptionVisible(imageNode: ImageNode): Boolean =
-        imagePreviewMenuOptionsMap[imagePreviewMenuSource]
-            ?.isGetLinkOptionVisible(imageNode)
-            ?: false
+    suspend fun isSaveToDeviceOptionVisible(imageNode: ImageNode): Boolean {
+        return menuOptions?.isSaveToDeviceOptionVisible(imageNode) ?: false
+    }
 
-    fun isSaveToDeviceOptionVisible(imageNode: ImageNode): Boolean =
-        imagePreviewMenuOptionsMap[imagePreviewMenuSource]
-            ?.isSaveToDeviceOptionVisible(imageNode)
-            ?: false
+    suspend fun isForwardOptionVisible(imageNode: ImageNode): Boolean {
+        return menuOptions?.isForwardOptionVisible(imageNode) ?: false
+    }
 
-    fun isForwardOptionVisible(imageNode: ImageNode): Boolean =
-        imagePreviewMenuOptionsMap[imagePreviewMenuSource]
-            ?.isForwardOptionVisible(imageNode)
-            ?: false
+    suspend fun isSendToOptionVisible(imageNode: ImageNode): Boolean {
+        return menuOptions?.isSendToOptionVisible(imageNode) ?: false
+    }
 
-    fun isSendToOptionVisible(imageNode: ImageNode): Boolean =
-        imagePreviewMenuOptionsMap[imagePreviewMenuSource]
-            ?.isSendToOptionVisible(imageNode)
-            ?: false
+    suspend fun isMoreOptionVisible(imageNode: ImageNode): Boolean {
+        return menuOptions?.isMoreOptionVisible(imageNode) ?: false
+    }
 
     suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {
         val typedNode = addImageTypeUseCase(imageNode)
