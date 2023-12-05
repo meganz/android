@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
@@ -202,7 +203,8 @@ class MediaDiscoveryViewModel @Inject constructor(
             recursive = isRecursive
         )
             .catch { Timber.e(it) }
-            .collectLatest { sourcePhotos ->
+            .conflate()
+            .collect { sourcePhotos ->
                 handleFolderPhotosAndLogic(sourcePhotos)
             }
     }

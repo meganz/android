@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.yield
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
@@ -82,7 +83,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
 ) {
 
     companion object {
-        private const val CONCURRENT_UPLOADS_LIMIT = 16
+        private const val CONCURRENT_UPLOADS_LIMIT = 8
         private const val CONCURRENT_VIDEO_COMPRESSION_LIMIT = 1
     }
 
@@ -119,6 +120,8 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
             launch {
                 semaphore.acquire()
 
+                yield()
+
                 val parentNodeId =
                     getParentNodeId(record, primaryUploadNodeId, secondaryUploadNodeId)
 
@@ -130,6 +133,8 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                             record.type == SyncRecordType.TYPE_PHOTO && locationTagsDisabled
                         val shouldCompressVideo =
                             record.type == SyncRecordType.TYPE_VIDEO && videoQuality != VideoQuality.ORIGINAL
+
+                        yield()
 
                         // create temporary file
                         if (shouldRemoveLocationTags) {
@@ -151,6 +156,8 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                     return@launch
                                 }
                         }
+
+                        yield()
 
                         // Compress Video
                         if (shouldCompressVideo) {
@@ -194,6 +201,8 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                 }
                         }
 
+                        yield()
+
                         // generate fingerprint and save it
                         // This step is important to check if a file exist in the cloud drive,
                         // in case the original fingerprint cannot be assigned to the Node after the transfer finishes
@@ -206,6 +215,8 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
 
                         // retrieve path of file to upload
                         val path = getPath(record, shouldRemoveLocationTags, shouldCompressVideo)
+
+                        yield()
 
                         // upload
                         startUploadUseCase(
@@ -236,6 +247,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                 }
 
                                 is TransferEvent.TransferFinishEvent -> {
+                                    yield()
                                     processTransferFinishEvent(record, transferEvent)
                                         .collect {
                                             trySend(CameraUploadsTransferProgress.Error(record, it))
