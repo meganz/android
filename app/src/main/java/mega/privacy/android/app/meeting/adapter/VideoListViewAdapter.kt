@@ -28,10 +28,14 @@ class VideoListViewAdapter(
         if (manager is LinearLayoutManager) {
             val firstPositionVisible = manager.findFirstVisibleItemPosition()
             val lastPositionVisible = manager.findLastVisibleItemPosition() + 1
-            if (!currentList.isNullOrEmpty()) {
+            if (currentList.isNotEmpty()) {
                 val iterator = currentList.iterator()
                 iterator.forEach { participant ->
-                    val position = getParticipantPosition(participant.peerId, participant.clientId)
+                    val position = getParticipantPosition(
+                        participant.peerId,
+                        participant.clientId,
+                        participant.isScreenShared
+                    )
                     if (position == holder.bindingAdapterPosition) {
                         if (position < firstPositionVisible || position > lastPositionVisible) {
                             holder.onRecycle()
@@ -43,8 +47,8 @@ class VideoListViewAdapter(
         }
     }
 
-    private fun getParticipantPosition(peerId: Long, clientId: Long) =
-        currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId }
+    private fun getParticipantPosition(peerId: Long, clientId: Long, isScreenShared: Boolean) =
+        currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId && it.isScreenShared == isScreenShared }
 
     override fun onBindViewHolder(holder: VideoMeetingViewHolder, position: Int) {
         Timber.d("Bind view holder position $position")
@@ -80,7 +84,11 @@ class VideoListViewAdapter(
      * @param typeChange the type of change, name or avatar
      */
     fun updateNameOrAvatar(participant: Participant, typeChange: Int) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        val position = getParticipantPosition(
+            participant.peerId,
+            participant.clientId,
+            participant.isScreenShared
+        )
         if (position == INVALID_POSITION)
             return
 
@@ -99,7 +107,11 @@ class VideoListViewAdapter(
      * @param participant Participant to update
      */
     fun updatePeerSelected(participant: Participant) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        val position = getParticipantPosition(
+            participant.peerId,
+            participant.clientId,
+            participant.isScreenShared
+        )
         if (position == INVALID_POSITION)
             return
 
@@ -119,7 +131,11 @@ class VideoListViewAdapter(
      * @param participant Participant to update
      */
     fun updateParticipantAudioVideo(typeChange: TypeRemoteAVFlagChange, participant: Participant) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        val position = getParticipantPosition(
+            participant.peerId,
+            participant.clientId,
+            participant.isScreenShared
+        )
         if (position == INVALID_POSITION)
             return
 
@@ -143,7 +159,11 @@ class VideoListViewAdapter(
      * @param isOnHold True, it it's. False, otherwise.
      */
     fun updateSessionOnHold(participant: Participant, isOnHold: Boolean) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        val position = getParticipantPosition(
+            participant.peerId,
+            participant.clientId,
+            participant.isScreenShared
+        )
         if (position == INVALID_POSITION)
             return
 
@@ -164,7 +184,11 @@ class VideoListViewAdapter(
      * @param isHiRes True, if is High resolution. False, if is Low resolution
      */
     fun updateListener(participant: Participant, shouldAddListener: Boolean, isHiRes: Boolean) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        val position = getParticipantPosition(
+            participant.peerId,
+            participant.clientId,
+            participant.isScreenShared
+        )
         if (position == INVALID_POSITION)
             return
 
@@ -184,7 +208,11 @@ class VideoListViewAdapter(
      * @param isOnHold True, it it's. False, otherwise.
      */
     fun updateCallOnHold(participant: Participant, isOnHold: Boolean) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        val position = getParticipantPosition(
+            participant.peerId,
+            participant.clientId,
+            participant.isScreenShared
+        )
         if (position == INVALID_POSITION)
             return
 
@@ -197,9 +225,7 @@ class VideoListViewAdapter(
         notifyItemChanged(position)
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return position
-    }
+    override fun getItemViewType(position: Int): Int = position
 
     /**
      * Remove the texture view of a participant
@@ -207,7 +233,11 @@ class VideoListViewAdapter(
      * @param participant Participant to update
      */
     fun removeTextureView(participant: Participant) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        val position = getParticipantPosition(
+            participant.peerId,
+            participant.clientId,
+            participant.isScreenShared
+        )
         if (position == INVALID_POSITION)
             return
 

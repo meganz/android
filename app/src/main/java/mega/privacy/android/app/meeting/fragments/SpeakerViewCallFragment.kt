@@ -104,6 +104,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 surfaceContainer.isVisible = false
             } else {
                 selectSpeaker(firstParticipant.peerId, firstParticipant.clientId)
+                updateSpeakerTextViewName(firstParticipant.name, firstParticipant.isPresenting)
             }
         } else {
             inMeetingViewModel.getSession(newSpeaker.clientId)?.apply {
@@ -183,11 +184,12 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         initLiveEventBus()
 
         inMeetingViewModel.getCurrentSpeakerParticipant()?.let { currentSpeaker ->
-            updateTextViewName(currentSpeaker)
+            updateSpeakerTextViewName(currentSpeaker.name, currentSpeaker.isPresenting)
         } ?: {
             inMeetingViewModel.getFirstParticipant(MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE)
-                ?.let {
-                    selectSpeaker(it.peerId, it.clientId)
+                ?.apply {
+                    selectSpeaker(peerId, clientId)
+                    updateSpeakerTextViewName(name, isPresenting)
                 }
         }
     }
@@ -195,16 +197,17 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Update name in speaker view
      *
-     * @param speaker [Participant]
+     * @param name Speaker name
+     * @param isPresenting  True, if is presenting. False if not.
      */
-    private fun updateTextViewName(speaker: Participant) {
-        if (speaker.isPresenting) {
+    private fun updateSpeakerTextViewName(name: String, isPresenting: Boolean) {
+        if (isPresenting) {
             textViewName.text = getString(
                 R.string.meetings_meeting_screen_main_view_participant_is_presenting_label,
-                speaker.name
+                name
             )
         } else {
-            textViewName.text = speaker.name
+            textViewName.text = name
         }
     }
 
@@ -225,7 +228,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             viewLifecycleOwner,
             EventObserver { participantClicked ->
                 Timber.d("Clicked in participant with clientId ${participantClicked.clientId}")
-
                 if (inMeetingViewModel.state.value.isSpeakerSelectionAutomatic) {
                     inMeetingViewModel.setSpeakerSelection(false)
                 } else {
@@ -238,9 +240,12 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
                 inMeetingViewModel.getCurrentSpeakerParticipant()
                     ?.let { currentSpeakerParticipant ->
-                        updateTextViewName(currentSpeakerParticipant)
                         if (currentSpeakerParticipant.peerId == participantClicked.peerId && currentSpeakerParticipant.clientId == participantClicked.clientId) {
                             Timber.d(" Same participant, clientId ${currentSpeakerParticipant.clientId}")
+                            updateSpeakerTextViewName(
+                                currentSpeakerParticipant.name,
+                                currentSpeakerParticipant.isPresenting
+                            )
                             adapter.updatePeerSelected(currentSpeakerParticipant)
                             return@EventObserver
                         }
@@ -248,6 +253,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
                 Timber.d("New speaker selected with clientId ${participantClicked.clientId}")
                 selectSpeaker(participantClicked.peerId, participantClicked.clientId)
+                updateSpeakerTextViewName(
+                    participantClicked.name,
+                    participantClicked.isPresenting
+                )
             })
     }
 
@@ -260,12 +269,12 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     private fun selectSpeaker(peerId: Long, clientId: Long) {
         if (clientId == MEGACHAT_INVALID_HANDLE) return
 
-        Timber.d("Selected new speaker with clientId $clientId")
         val listParticipants = inMeetingViewModel.updatePeerSelected(peerId, clientId)
         if (listParticipants.isNotEmpty()) {
             Timber.d("Update the rest of participants")
             updateSpeakerPeers(listParticipants)
         }
+        inMeetingViewModel.checkScreensShared()
     }
 
     /**
@@ -600,7 +609,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 peer.clientId
             )?.let { participant ->
                 Timber.d("Update the peer selected")
-                updateTextViewName(participant)
                 inMeetingViewModel.getSession(participant.clientId)?.let { session ->
                     updateRemoteAudioVideo(TypeRemoteAVFlagChange.Audio, session)
                 }
@@ -637,7 +645,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
                     TypeRemoteAVFlagChange.ScreenSharing -> {
                         updateAudioIcon(speaker)
-                        updateTextViewName(speaker)
+                        updateSpeakerTextViewName(speaker.name, speaker.isPresenting)
                     }
                 }
             }

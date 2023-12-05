@@ -411,29 +411,25 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 when (callAndSession.second.status) {
                     MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
                         Timber.d("Session in progress, clientID = ${callAndSession.second.clientid}")
-                        val position =
-                            inMeetingViewModel.addParticipant(
-                                callAndSession.second, requireContext()
-                            )
-                        position?.let {
+                        inMeetingViewModel.addParticipant(
+                            callAndSession.second.clientid, requireContext()
+                        )?.let { position ->
                             if (position != INVALID_POSITION) {
                                 checkChildFragments()
-                                participantAddedOfLeftMeeting(true, it)
+                                participantAddedOrLeftMeeting(true, position)
                             }
                         }
                     }
 
                     MegaChatSession.SESSION_STATUS_DESTROYED -> {
                         Timber.d("Session destroyed, clientID = ${callAndSession.second.clientid}")
-                        val position =
-                            inMeetingViewModel.removeParticipant(
-                                callAndSession.second,
-                                requireContext()
-                            )
-                        position.let {
+                        inMeetingViewModel.removeParticipant(
+                            callAndSession.second,
+                            requireContext()
+                        ).let { position ->
                             if (position != INVALID_POSITION) {
                                 checkChildFragments()
-                                participantAddedOfLeftMeeting(false, it)
+                                participantAddedOrLeftMeeting(false, position)
                             }
                         }
                     }
@@ -457,7 +453,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         inMeetingViewModel.changesInRemoteVideoFlag(callAndSession.second)
                     val isPresentingChange =
                         inMeetingViewModel.changesInScreenSharing(callAndSession.second)
-                    Timber.d("Changes in AV flags. audio change $isAudioChange, video change $isVideoChange")
+                    Timber.d("Changes in AV flags. audio change $isAudioChange, video change $isVideoChange, is screen share change $isPresentingChange")
                     updateRemoteAVFlags(
                         callAndSession.second,
                         isAudioChange,
@@ -1004,6 +1000,26 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         SubtitleCallType.Established -> ""
                     }
                 }
+            }
+
+            state.addScreensSharedParticipantsList?.let {
+                inMeetingViewModel.addScreenShareParticipant(it, requireContext())
+                    ?.let { position ->
+                        if (position != INVALID_POSITION) {
+                            checkChildFragments()
+                            participantAddedOrLeftMeeting(true, position)
+                        }
+                    }
+            }
+
+            state.removeScreensSharedParticipantsList?.let {
+                inMeetingViewModel.removeScreenShareParticipant(it, requireContext())
+                    ?.let { position ->
+                        if (position != INVALID_POSITION) {
+                            checkChildFragments()
+                            participantAddedOrLeftMeeting(false, position)
+                        }
+                    }
             }
 
             if (state.showMeetingInfoFragment) {
@@ -1767,7 +1783,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     userSession.clientid
                 )
 
-                individualCallFragment?.let { it ->
+                individualCallFragment?.let {
                     loadChildFragment(
                         R.id.meeting_container,
                         it,
@@ -2486,7 +2502,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param isAdded True, if added. False, if gone
      * @param position The position that has changed
      */
-    private fun participantAddedOfLeftMeeting(isAdded: Boolean, position: Int) {
+    private fun participantAddedOrLeftMeeting(isAdded: Boolean, position: Int) {
         Timber.d("Participant was added or left the meeting in $position")
         speakerViewCallFragment?.let {
             if (it.isAdded) {

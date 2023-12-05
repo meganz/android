@@ -79,7 +79,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
                 when (callAndSession.second.status) {
                     MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
                         Timber.d("Session in progress, clientID = ${callAndSession.second.clientid}")
-                        inMeetingViewModel.addParticipant(callAndSession.second, requireContext())
+                        inMeetingViewModel.addParticipant(callAndSession.second.clientid, requireContext())
                     }
 
                     MegaChatSession.SESSION_STATUS_DESTROYED -> {

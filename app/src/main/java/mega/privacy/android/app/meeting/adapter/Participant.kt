@@ -13,7 +13,24 @@ import java.io.Serializable
 /**
  * Participant in a call
  *
- * @param isPresenting  If the user is presenting.
+ * @param peerId                Peer Id.
+ * @param clientId              Client Id.
+ * @param name                  Participant's name.
+ * @param avatar                Participant's avatar.
+ * @param isMe                  True if it's me. False if not.
+ * @param isModerator           True if it's moderator. False if not.
+ * @param isAudioOn             True if audio is on. False if audio is off.
+ * @param isVideoOn             True if video is on. False if video is off.
+ * @param isAudioDetected       True if audio is detected. False if not.
+ * @param isContact             True if it's my contact. False if not.
+ * @param isSpeaker             True if it's speaker. False if not.
+ * @param hasHiRes              True if has high video resolution. False if has low video resolution.
+ * @param videoListener         [GroupVideoListener].
+ * @param isChosenForAssign     True if it's chosen for assign. False if not.
+ * @param isGuest               True if it's guest. False if not.
+ * @param hasOptionsAllowed     True if has options allowed. False if not.
+ * @param isPresenting          True if the user is presenting. False if not.
+ * @param isScreenShared        True if this participant is the screen shared. False, if not.
  */
 data class Participant(
     val peerId: Long,
@@ -29,11 +46,11 @@ data class Participant(
     var isSpeaker: Boolean = false,
     var hasHiRes: Boolean = false,
     var videoListener: GroupVideoListener? = null,
-    // Flag for selected for assign moderator
     var isChosenForAssign: Boolean = false,
     var isGuest: Boolean = false,
     var hasOptionsAllowed: Boolean = true,
     var isPresenting: Boolean = false,
+    var isScreenShared: Boolean = false,
 ) : Serializable {
 
     /**
