@@ -12,7 +12,7 @@ import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
@@ -46,7 +46,7 @@ class IncomingSharesViewModel @Inject constructor(
     private val getIncomingSharesChildrenNode: GetIncomingSharesChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
-    monitorNodeUpdates: MonitorNodeUpdates,
+    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     monitorContactUpdates: MonitorContactUpdates,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getVerifiedIncomingSharesUseCase: GetVerifiedIncomingSharesUseCase,
@@ -83,7 +83,7 @@ class IncomingSharesViewModel @Inject constructor(
         refreshIncomingSharesNode()
         setContactVerification()
         viewModelScope.launch {
-            monitorNodeUpdates().collect { list ->
+            monitorNodeUpdatesUseCase().collect { list ->
                 Timber.d("Received node update")
                 // If the current incoming handle is the node that was updated,
                 // check if the current user still has access to it,

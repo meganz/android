@@ -29,6 +29,7 @@ import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetVerifiedIncomingSharesUseCase
@@ -44,7 +45,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
 @ExperimentalCoroutinesApi
 class IncomingSharesViewModelTest {
@@ -56,7 +56,8 @@ class IncomingSharesViewModelTest {
     private val getIncomingSharesChildrenNode = mock<GetIncomingSharesChildrenNode>()
     private val monitorRefreshSessionUseCase = mock<MonitorRefreshSessionUseCase>()
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
-    private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase = mock()
+    private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase =
+        mock()
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase = mock {
         onBlocking { invoke(any()) }.thenReturn(true)
     }
@@ -67,7 +68,10 @@ class IncomingSharesViewModelTest {
     private val getOtherSortOrder = mock<GetOthersSortOrder> {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_DESC)
     }
-    private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
+        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
+    }
     private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
 
     @get:Rule
@@ -103,7 +107,7 @@ class IncomingSharesViewModelTest {
             getIncomingSharesChildrenNode = getIncomingSharesChildrenNode,
             getCloudSortOrder = getCloudSortOrder,
             getOthersSortOrder = getOtherSortOrder,
-            monitorNodeUpdates = monitorNodeUpdates,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorContactUpdates = { monitorContactUpdates },
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getVerifiedIncomingSharesUseCase = getVerifiedIncomingSharesUseCase,
@@ -564,7 +568,7 @@ class IncomingSharesViewModelTest {
                     assertThat(awaitItem()).isEqualTo(-1L)
                     underTest.setIncomingTreeDepth(any(), handle)
                     assertThat(awaitItem()).isEqualTo(handle)
-                    monitorNodeUpdates.emit(NodeUpdate(map))
+                    monitorNodeUpdatesFakeFlow.emit(NodeUpdate(map))
                     assertThat(awaitItem()).isEqualTo(-1L)
                 }
         }
@@ -580,13 +584,13 @@ class IncomingSharesViewModelTest {
                     assertThat(awaitItem()).isEqualTo(-1L)
                     underTest.setIncomingTreeDepth(any(), handle)
                     assertThat(awaitItem()).isEqualTo(handle)
-                    monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
+                    monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
                 }
         }
 
     @Test
     fun `test that refresh nodes is called when receiving a node update`() = runTest {
-        monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
+        monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
         // initialization call + receiving a node update call
         verify(
             getVerifiedIncomingSharesUseCase,

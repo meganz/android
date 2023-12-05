@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
@@ -39,14 +41,16 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
 @ExperimentalCoroutinesApi
 class RubbishBinViewModelTest {
 
     private lateinit var underTest: RubbishBinViewModel
 
-    private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
+        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
+    }
     private val getRubbishBinParentNodeHandle = mock<GetParentNodeHandle>()
     private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase>()
     private val setViewType = mock<SetViewType>()
@@ -71,7 +75,7 @@ class RubbishBinViewModelTest {
 
     private fun initViewModel() {
         underTest = RubbishBinViewModel(
-            monitorNodeUpdates = monitorNodeUpdates,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getRubbishBinParentNodeHandle = getRubbishBinParentNodeHandle,
             getRubbishBinChildren = getRubbishBinChildren,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
@@ -123,7 +127,7 @@ class RubbishBinViewModelTest {
         runTest {
             val newValue = 123456789L
             whenever(getRubbishBinChildren.invoke(newValue)).thenReturn(ArrayList())
-            monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
+            monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
             underTest.setRubbishBinHandle(newValue)
             Truth.assertThat(underTest.state.value.nodeList.size).isEqualTo(0)
         }

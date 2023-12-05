@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.shares.links.model.LegacyLinksState
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
@@ -30,7 +30,7 @@ class LegacyLinksViewModel @Inject constructor(
     private val getPublicLinks: GetPublicLinks,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getLinksSortOrder: GetLinksSortOrder,
-    monitorNodeUpdates: MonitorNodeUpdates,
+    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : ViewModel() {
 
     /** private UI state */
@@ -45,7 +45,7 @@ class LegacyLinksViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             refreshNodes()?.let { setNodes(it) }
-            monitorNodeUpdates().collect {
+            monitorNodeUpdatesUseCase().collect {
                 Timber.d("Received node update")
                 refreshNodes()?.let { setNodes(it) }
             }

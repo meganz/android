@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
@@ -42,7 +42,7 @@ class VideoSectionViewModelTest {
     private val getAllVideosUseCase = mock<GetAllVideosUseCase>()
     private val uiVideoMapper = mock<UIVideoMapper>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
-    private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
@@ -62,7 +62,7 @@ class VideoSectionViewModelTest {
             getAllVideosUseCase = getAllVideosUseCase,
             uiVideoMapper = uiVideoMapper,
             getCloudSortOrder = getCloudSortOrder,
-            monitorNodeUpdates = monitorNodeUpdates,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             getNodeByHandle = getNodeByHandle,
             getFingerprintUseCase = getFingerprintUseCase,
@@ -79,7 +79,7 @@ class VideoSectionViewModelTest {
             getAllVideosUseCase,
             uiVideoMapper,
             getCloudSortOrder,
-            monitorNodeUpdates,
+            monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase,
             getNodeByHandle,
             getFingerprintUseCase,

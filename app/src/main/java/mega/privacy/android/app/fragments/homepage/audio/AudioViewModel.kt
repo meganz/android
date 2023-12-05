@@ -10,12 +10,10 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
@@ -35,13 +33,13 @@ import javax.inject.Inject
  *
  * @param repository
  * @param getCloudSortOrder
- * @param monitorNodeUpdates
+ * @param monitorNodeUpdatesUseCase
  */
 @HiltViewModel
 class AudioViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
 ) : ViewModel(), SearchCallback.Data {
@@ -138,7 +136,7 @@ class AudioViewModel @Inject constructor(
 
     private fun observeNodeChanges() {
         viewModelScope.launch {
-            monitorNodeUpdates().collectLatest {
+            monitorNodeUpdatesUseCase().collectLatest {
                 Timber.d("Received node update")
                 loadAudio(true)
             }

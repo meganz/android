@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import nz.mega.sdk.MegaNode
 import org.junit.Before
@@ -31,7 +32,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
 @ExperimentalCoroutinesApi
 class OutgoingSharesViewModelTest {
@@ -46,7 +46,10 @@ class OutgoingSharesViewModelTest {
     private val getOtherSortOrder = mock<GetOthersSortOrder> {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_DESC)
     }
-    private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
+        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
+    }
     private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
 
     @get:Rule
@@ -69,7 +72,7 @@ class OutgoingSharesViewModelTest {
             getOutgoingSharesChildrenNode,
             getCloudSortOrder,
             getOtherSortOrder,
-            monitorNodeUpdates,
+            monitorNodeUpdatesUseCase,
             { monitorContactUpdates },
             getUnverifiedOutgoingShares,
         )
@@ -377,7 +380,7 @@ class OutgoingSharesViewModelTest {
 
     @Test
     fun `test that refresh nodes is called when receiving a node update`() = runTest {
-        monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
+        monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
         // initialization call + receiving a node update call
         verify(
             getOutgoingSharesChildrenNode,

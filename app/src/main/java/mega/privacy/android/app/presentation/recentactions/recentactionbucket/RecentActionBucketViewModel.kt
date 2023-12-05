@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.UpdateRecentAction
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.data.qualifier.MegaApi
@@ -34,7 +34,7 @@ class RecentActionBucketViewModel @Inject constructor(
     private val getParentMegaNode: GetParentMegaNode,
     private val updateRecentAction: UpdateRecentAction,
     private val getRecentActionNodes: GetRecentActionNodes,
-    monitorNodeUpdates: MonitorNodeUpdates,
+    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
 
@@ -86,7 +86,7 @@ class RecentActionBucketViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            monitorNodeUpdates().collectLatest {
+            monitorNodeUpdatesUseCase().collectLatest {
                 Timber.d("Received node update")
                 updateCurrentBucket()
                 clearSelection()

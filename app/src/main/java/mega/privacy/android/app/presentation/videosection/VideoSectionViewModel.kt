@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
@@ -46,7 +46,7 @@ class VideoSectionViewModel @Inject constructor(
     private val getAllVideosUseCase: GetAllVideosUseCase,
     private val uiVideoMapper: UIVideoMapper,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     private val getFingerprintUseCase: GetFingerprintUseCase,
@@ -75,7 +75,7 @@ class VideoSectionViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             merge(
-                monitorNodeUpdates(),
+                monitorNodeUpdatesUseCase(),
                 monitorOfflineNodeUpdatesUseCase()
             ).collectLatest {
                 setPendingRefreshNodes()

@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -14,12 +15,11 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.presentation.shares.links.LegacyLinksViewModel
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
@@ -29,7 +29,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
 @ExperimentalCoroutinesApi
 class LegacyLinksViewModelTest {
@@ -44,7 +43,10 @@ class LegacyLinksViewModelTest {
     private val getLinksSortOrder = mock<GetLinksSortOrder> {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_DESC)
     }
-    private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
+        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
+    }
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -58,7 +60,7 @@ class LegacyLinksViewModelTest {
             getPublicLinks,
             getCloudSortOrder,
             getLinksSortOrder,
-            monitorNodeUpdates,
+            monitorNodeUpdatesUseCase,
         )
     }
 
@@ -362,10 +364,7 @@ class LegacyLinksViewModelTest {
 
     @Test
     fun `test that refresh nodes is called when receiving a node update`() = runTest {
-        val node = mock<Node> {
-            on { this.id }.thenReturn(NodeId(987654321L))
-        }
-        monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
+        monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
         // initialization call + receiving a node update call
         verify(getPublicLinks, times(2)).invoke(underTest.state.value.linksHandle)
     }

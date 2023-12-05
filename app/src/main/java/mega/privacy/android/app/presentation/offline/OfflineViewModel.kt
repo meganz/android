@@ -21,7 +21,7 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.presentation.offline.model.OfflineNode
@@ -51,7 +51,7 @@ class OfflineViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val crashReporter: CrashReporter,
     private val repo: MegaNodeRepo,
-    monitorNodeUpdates: MonitorNodeUpdates,
+    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
@@ -114,7 +114,7 @@ class OfflineViewModel @Inject constructor(
      * Monitor global node updates
      */
     var updateNodes =
-        monitorNodeUpdates()
+        monitorNodeUpdatesUseCase()
             .also { Timber.d("onNodesUpdate") }
             .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 

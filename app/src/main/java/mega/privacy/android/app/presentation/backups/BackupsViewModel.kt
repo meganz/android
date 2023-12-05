@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.backups.model.BackupsState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -34,7 +34,7 @@ import javax.inject.Inject
  * @property getNodeByHandle [GetNodeByHandle]
  * @property getParentNodeHandle [GetParentNodeHandle]
  * @property monitorBackupFolder [MonitorBackupFolder]
- * @property monitorNodeUpdates [MonitorNodeUpdates]
+ * @property monitorNodeUpdatesUseCase [MonitorNodeUpdatesUseCase]
  * @property monitorViewType [MonitorViewType]
  * @property savedStateHandle [SavedStateHandle]
  */
@@ -45,7 +45,7 @@ class BackupsViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getParentNodeHandle: GetParentNodeHandle,
     private val monitorBackupFolder: MonitorBackupFolder,
-    private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorViewType: MonitorViewType,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -132,10 +132,10 @@ class BackupsViewModel @Inject constructor(
     }
 
     /**
-     * Observes any Node Updates through [MonitorNodeUpdates]
+     * Observes any Node Updates through [MonitorNodeUpdatesUseCase]
      */
     private fun observeNodeUpdates() = viewModelScope.launch {
-        monitorNodeUpdates()
+        monitorNodeUpdatesUseCase()
             .catch { Timber.e(it) }
             .collect { _state.update { it.copy(isPendingRefresh = true) } }
     }

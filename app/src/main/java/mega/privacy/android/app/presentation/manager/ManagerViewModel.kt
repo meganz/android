@@ -23,7 +23,7 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
@@ -133,7 +133,7 @@ import javax.inject.Inject
  * @property stopCameraUploadsUseCase
  * @property deleteOldestCompletedTransfersUseCase
  * @property getIncomingContactRequestsUseCase
- * @param monitorNodeUpdates
+ * @param monitorNodeUpdatesUseCase
  * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares count
  * @param monitorContactRequestUpdates
  * @param monitorFinishActivityUseCase
@@ -155,7 +155,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
-    monitorNodeUpdates: MonitorNodeUpdates,
+    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     monitorContactUpdates: MonitorContactUpdates,
     private val monitorGlobalUpdates: MonitorGlobalUpdates,
     monitorContactRequestUpdates: MonitorContactRequestUpdates,
@@ -317,7 +317,7 @@ class ManagerViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            monitorNodeUpdates().collect {
+            monitorNodeUpdatesUseCase().collect {
                 val nodeList = it.changes.keys.toList()
                 onReceiveNodeUpdate(true)
                 checkCameraUploadFolder(nodeList)

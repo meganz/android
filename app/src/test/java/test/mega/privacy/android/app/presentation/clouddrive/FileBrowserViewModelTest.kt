@@ -43,6 +43,7 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -55,7 +56,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
 @ExperimentalCoroutinesApi
 class FileBrowserViewModelTest {
@@ -68,7 +68,10 @@ class FileBrowserViewModelTest {
             emptyFlow()
         )
     }
-    private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
+        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
+    }
     private val getFileBrowserParentNodeHandle = mock<GetParentNodeHandle>()
     private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
@@ -99,7 +102,7 @@ class FileBrowserViewModelTest {
         underTest = FileBrowserViewModel(
             getRootFolder = getRootFolder,
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
-            monitorNodeUpdates = monitorNodeUpdates,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getFileBrowserParentNodeHandle = getFileBrowserParentNodeHandle,
             getIsNodeInRubbish = isNodeInRubbish,
             getFileBrowserChildrenUseCase = getFileBrowserChildrenUseCase,
@@ -171,7 +174,7 @@ class FileBrowserViewModelTest {
                 mock<Node>() to emptyList(),
                 mock<Node>() to emptyList()
             )
-            monitorNodeUpdates.emit(NodeUpdate(update))
+            monitorNodeUpdatesFakeFlow.emit(NodeUpdate(update))
             underTest.setBrowserParentHandle(newValue)
             Truth.assertThat(underTest.state.value.nodesList.size).isEqualTo(2)
         }

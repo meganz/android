@@ -16,7 +16,7 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
 import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -54,7 +54,7 @@ import javax.inject.Inject
  *
  * @param getRootFolder Fetch the root node
  * @param monitorMediaDiscoveryView Monitor media discovery view settings
- * @param monitorNodeUpdates Monitor node updates
+ * @param monitorNodeUpdatesUseCase Monitor node updates
  * @param getFileBrowserParentNodeHandle To get parent handle of current node
  * @param getIsNodeInRubbish To get current node is in rubbish
  * @param getFileBrowserChildrenUseCase [GetFileBrowserChildrenUseCase]
@@ -72,7 +72,7 @@ import javax.inject.Inject
 class FileBrowserViewModel @Inject constructor(
     private val getRootFolder: GetRootFolder,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
-    private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getFileBrowserParentNodeHandle: GetParentNodeHandle,
     private val getIsNodeInRubbish: IsNodeInRubbish,
     private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase,
@@ -155,12 +155,12 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
-     * This will monitor FileBrowserNodeUpdates from [MonitorNodeUpdates] and
+     * This will monitor FileBrowserNodeUpdates from [MonitorNodeUpdatesUseCase] and
      * will update [FileBrowserState.nodesList]
      */
     private fun monitorFileBrowserChildrenNodes() {
         viewModelScope.launch {
-            monitorNodeUpdates().catch {
+            monitorNodeUpdatesUseCase().catch {
                 Timber.e(it)
             }.collect {
                 checkForNodeIsInRubbish(it.changes)

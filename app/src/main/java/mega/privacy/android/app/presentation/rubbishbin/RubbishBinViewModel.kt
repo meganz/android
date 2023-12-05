@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolderUseCase
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
@@ -42,7 +42,7 @@ import javax.inject.Inject
 /**
  * [ViewModel] class associated to RubbishBinFragment
  *
- * @param monitorNodeUpdates Monitor node updates
+ * @param monitorNodeUpdatesUseCase Monitor node updates
  * @param getRubbishBinParentNodeHandle [GetParentNodeHandle] Fetch parent handle
  * @param getRubbishBinChildren [GetRubbishBinChildren] Fetch Rubbish Bin [Node]
  * @param isNodeDeletedFromBackupsUseCase Checks whether the deleted Node came from Backups or not
@@ -54,7 +54,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class RubbishBinViewModel @Inject constructor(
-    private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getRubbishBinParentNodeHandle: GetParentNodeHandle,
     private val getRubbishBinChildren: GetRubbishBinChildren,
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
@@ -107,7 +107,7 @@ class RubbishBinViewModel @Inject constructor(
     private fun nodeUpdates() {
         viewModelScope.launch {
             refreshNodes()
-            monitorNodeUpdates().collect {
+            monitorNodeUpdatesUseCase().collect {
                 checkForDeletedNodes(it.changes)
             }
         }

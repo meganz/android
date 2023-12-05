@@ -6,13 +6,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultGetBackupsChildrenNodes
-import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.HasBackupsChildren
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -35,7 +35,7 @@ class DefaultGetBackupsChildrenNodesTest {
     }
     private val getBackupsNode = mock<GetBackupsNode>()
     private val hasBackupsChildren = mock<HasBackupsChildren>()
-    private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
 
     @Before
     fun setUp() {
@@ -44,7 +44,7 @@ class DefaultGetBackupsChildrenNodesTest {
             getCloudSortOrder = getCloudSortOrder,
             getBackupsNode = getBackupsNode,
             hasBackupsChildren = hasBackupsChildren,
-            monitorNodeUpdates = monitorNodeUpdates,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
         )
     }
 
@@ -95,7 +95,7 @@ class DefaultGetBackupsChildrenNodesTest {
         runTest {
             val testBackupsNode = mock<MegaNode>()
 
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(emptyMap())))
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(flowOf(NodeUpdate(emptyMap())))
             whenever(getBackupsNode()).thenReturn(testBackupsNode)
             whenever(hasBackupsChildren()).thenReturn(true)
 

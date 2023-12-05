@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.Feature
@@ -36,7 +36,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private val getCurrentUserStatusUseCase: GetCurrentUserStatusUseCase,
     private val hasBackupsChildren: HasBackupsChildren,
     private val getBackupsNode: GetBackupsNode,
-    private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorMyChatOnlineStatusUseCase: MonitorMyChatOnlineStatusUseCase,
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
@@ -118,7 +118,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
 
     private fun monitorNodeUpdatesEvent() {
         viewModelScope.launch {
-            monitorNodeUpdates().collect { updatedNodes ->
+            monitorNodeUpdatesUseCase().collect { updatedNodes ->
                 val backupsNode = state.value.backUpNodeHandle
                 if (backupsNode != -1L) {
                     // Check if the back up node is updated

@@ -16,7 +16,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
@@ -112,7 +112,7 @@ class ContactInfoViewModel @Inject constructor(
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val startConversationUseCase: StartConversationUseCase,
     private val createChatRoomUseCase: CreateChatRoomUseCase,
-    private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val createShareKey: CreateShareKey,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     private val monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase,
@@ -214,7 +214,7 @@ class ContactInfoViewModel @Inject constructor(
 
 
     private fun monitorNodeChanges() = viewModelScope.launch {
-        monitorNodeUpdates()
+        monitorNodeUpdatesUseCase()
             .filter { nodeUpdate ->
                 nodeUpdate.changes.keys.any { node -> node.isIncomingShare }
                         || nodeUpdate.changes.values.any { it.contains(NodeChanges.Remove) }

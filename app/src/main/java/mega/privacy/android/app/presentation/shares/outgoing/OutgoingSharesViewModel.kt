@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.domain.entity.ShareData
@@ -39,7 +39,7 @@ class OutgoingSharesViewModel @Inject constructor(
     private val getOutgoingSharesChildrenNode: GetOutgoingSharesChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
-    monitorNodeUpdates: MonitorNodeUpdates,
+    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     monitorContactUpdates: MonitorContactUpdates,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
 ) : ViewModel() {
@@ -57,7 +57,7 @@ class OutgoingSharesViewModel @Inject constructor(
         refreshOutgoingSharesNode()
 
         viewModelScope.launch {
-            monitorNodeUpdates().collectLatest {
+            monitorNodeUpdatesUseCase().collectLatest {
                 Timber.d("Received node update")
                 refreshOutgoingSharesNode()
             }

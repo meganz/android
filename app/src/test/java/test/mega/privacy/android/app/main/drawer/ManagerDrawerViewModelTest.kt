@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.main.drawer.ManagerDrawerViewModel
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
@@ -28,6 +27,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseC
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.AfterAll
@@ -55,7 +55,7 @@ internal class ManagerDrawerViewModelTest {
     }
     private val hasBackupsChildren: HasBackupsChildren = mock()
     private val getBackupsNode: GetBackupsNode = mock()
-    private val monitorNodeUpdates: MonitorNodeUpdates = mock()
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val monitorMyChatOnlineStatusUseCase: MonitorMyChatOnlineStatusUseCase = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
@@ -88,7 +88,7 @@ internal class ManagerDrawerViewModelTest {
         monitorConnectivityUseCase.stub {
             on { invoke() }.thenReturn(emptyFlow())
         }
-        monitorNodeUpdates.stub {
+        monitorNodeUpdatesUseCase.stub {
             on { invoke() }.thenReturn(emptyFlow())
         }
         monitorStorageStateEventUseCase.stub {
@@ -120,7 +120,7 @@ internal class ManagerDrawerViewModelTest {
             getCurrentUserChatStatusUseCase,
             hasBackupsChildren,
             getBackupsNode,
-            monitorNodeUpdates,
+            monitorNodeUpdatesUseCase,
             monitorMyChatOnlineStatusUseCase,
             monitorVerificationStatus,
             rootNodeExistsUseCase,

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsState
@@ -41,7 +41,7 @@ import javax.inject.Inject
  * @property getAccountDetailsUseCase
  * @param areCredentialsVerifiedUseCase
  * @param monitorHideRecentActivityUseCase
- * @param monitorNodeUpdates
+ * @param monitorNodeUpdatesUseCase
  */
 @HiltViewModel
 class RecentActionsViewModel @Inject constructor(
@@ -52,7 +52,7 @@ class RecentActionsViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
-    monitorNodeUpdates: MonitorNodeUpdates,
+    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : ViewModel() {
 
     private var _buckets = listOf<RecentActionBucket>()
@@ -80,7 +80,7 @@ class RecentActionsViewModel @Inject constructor(
 
         // monitor node updates
         viewModelScope.launch {
-            monitorNodeUpdates()
+            monitorNodeUpdatesUseCase()
                 .catch {
                     Timber.e(it)
                 }

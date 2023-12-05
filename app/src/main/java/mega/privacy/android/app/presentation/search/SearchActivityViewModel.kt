@@ -19,7 +19,7 @@ import mega.privacy.android.app.di.ui.toolbaritem.qualifier.IncomingShares
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.Links
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.OutgoingShares
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.RubbishBin
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -58,7 +58,7 @@ import javax.inject.Inject
 
 /**
  * SearchActivity View Model
- * @property monitorNodeUpdates [MonitorNodeUpdates]
+ * @property monitorNodeUpdatesUseCase [MonitorNodeUpdatesUseCase]
  * @property searchNodesUseCase [SearchNodesUseCase]
  * @property getParentNodeHandle [GetParentNodeHandle]
  * @property setViewType [SetViewType]
@@ -69,7 +69,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SearchActivityViewModel @Inject constructor(
-    private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getParentNodeHandle: GetParentNodeHandle,
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
@@ -152,7 +152,7 @@ class SearchActivityViewModel @Inject constructor(
 
     private fun monitorNodeUpdatesForSearch() {
         viewModelScope.launch {
-            merge(monitorNodeUpdates(), monitorOfflineNodeUpdatesUseCase()).conflate()
+            merge(monitorNodeUpdatesUseCase(), monitorOfflineNodeUpdatesUseCase()).conflate()
                 .collectLatest {
                     performSearch()
                 }

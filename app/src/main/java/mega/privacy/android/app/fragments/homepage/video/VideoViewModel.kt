@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
@@ -34,13 +34,13 @@ import javax.inject.Inject
  *
  * @param repository
  * @param getCloudSortOrder
- * @param monitorNodeUpdates
+ * @param monitorNodeUpdatesUseCase
  */
 @HiltViewModel
 class VideoViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) : ViewModel(), SearchCallback.Data {
@@ -136,7 +136,7 @@ class VideoViewModel @Inject constructor(
 
     private fun observeNodeChanges() {
         viewModelScope.launch {
-            monitorNodeUpdates().collectLatest {
+            monitorNodeUpdatesUseCase().collectLatest {
                 Timber.d("Received node update")
                 loadVideo(true)
             }

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRootFolder
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.fragments.homepage.Event
@@ -40,7 +40,7 @@ import javax.inject.Inject
 /**
  * ViewModel associated to SearchFragment
  *
- * @param monitorNodeUpdates Monitor global node updates
+ * @param monitorNodeUpdatesUseCase Monitor global node updates
  * @param rootNodeExistsUseCase Check if the root node exists
  * @param searchNodesUseCase Perform a search request
  * @param getCloudSortOrder Get the Cloud Sort Order
@@ -48,7 +48,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    monitorNodeUpdates: MonitorNodeUpdates,
+    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getRootFolder: GetRootFolder,
@@ -146,7 +146,7 @@ class SearchViewModel @Inject constructor(
      * Monitor global node updates
      */
     var updateNodes =
-        monitorNodeUpdates()
+        monitorNodeUpdatesUseCase()
             .also { Timber.d("onNodesUpdate") }
             .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
             .map { Event(it) }

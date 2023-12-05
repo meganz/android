@@ -23,9 +23,7 @@ import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.data.repository.MegaNodeRepository
-import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.HasBackupsChildren
@@ -63,9 +61,6 @@ abstract class ManagerUseCases {
     abstract fun bindRubbishBinChildren(useCase: DefaultGetRubbishBinChildren): GetRubbishBinChildren
 
     companion object {
-        @Provides
-        fun provideMonitorNodeUpdates(nodeRepository: NodeRepository): MonitorNodeUpdates =
-            MonitorNodeUpdates(nodeRepository::monitorNodeUpdates)
 
         @Provides
         fun provideGetRootFolder(megaNodeRepository: MegaNodeRepository): GetRootFolder =

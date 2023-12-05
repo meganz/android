@@ -94,6 +94,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
@@ -129,7 +130,10 @@ class ManagerViewModelTest {
     private lateinit var underTest: ManagerViewModel
 
     private val monitorGlobalUpdates = MutableStateFlow<GlobalUpdate>(GlobalUpdate.OnReloadNeeded)
-    private val monitorNodeUpdates = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
+        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
+    }
     private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
     private val monitorSecurityUpgradeInApp = MutableStateFlow(false)
     private val getNumUnreadUserAlertsUseCase =
@@ -295,7 +299,7 @@ class ManagerViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = ManagerViewModel(
-            monitorNodeUpdates = { monitorNodeUpdates },
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorContactUpdates = { monitorContactUpdates },
             monitorGlobalUpdates = { monitorGlobalUpdates },
             monitorContactRequestUpdates = mock {
@@ -446,7 +450,7 @@ class ManagerViewModelTest {
         testScheduler.advanceUntilIdle()
         underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
-            monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
+            monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
             assertThat(awaitItem()).isTrue()
         }
     }
@@ -456,7 +460,7 @@ class ManagerViewModelTest {
         testScheduler.advanceUntilIdle()
         underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
-            monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
+            monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
             testScheduler.advanceUntilIdle()
             assertThat(awaitItem()).isTrue()
             underTest.nodeUpdateHandled()
@@ -1021,7 +1025,7 @@ class ManagerViewModelTest {
             whenever(getSecondarySyncHandleUseCase()).thenReturn(secondaryHandle)
             whenever(areCameraUploadsFoldersInRubbishBinUseCase(primaryHandle, secondaryHandle))
                 .thenReturn(true)
-            monitorNodeUpdates.emit(nodeUpdate)
+            monitorNodeUpdatesFakeFlow.emit(nodeUpdate)
             testScheduler.advanceUntilIdle()
             verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
         }
@@ -1046,7 +1050,7 @@ class ManagerViewModelTest {
             whenever(getSecondarySyncHandleUseCase()).thenReturn(secondaryHandle)
             whenever(areCameraUploadsFoldersInRubbishBinUseCase(primaryHandle, secondaryHandle))
                 .thenReturn(true)
-            monitorNodeUpdates.emit(nodeUpdate)
+            monitorNodeUpdatesFakeFlow.emit(nodeUpdate)
             testScheduler.advanceUntilIdle()
             verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
         }
@@ -1072,7 +1076,7 @@ class ManagerViewModelTest {
             whenever(getSecondarySyncHandleUseCase()).thenReturn(secondaryHandle)
             whenever(areCameraUploadsFoldersInRubbishBinUseCase(primaryHandle, secondaryHandle))
                 .thenReturn(true)
-            monitorNodeUpdates.emit(nodeUpdate)
+            monitorNodeUpdatesFakeFlow.emit(nodeUpdate)
             testScheduler.advanceUntilIdle()
             verifyNoInteractions(stopCameraUploadsUseCase)
         }

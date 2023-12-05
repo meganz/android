@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.HasBackupsChildren
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import javax.inject.Inject
 
 /**
@@ -13,14 +14,14 @@ import javax.inject.Inject
  * @property getChildrenNode [GetChildrenNode]
  * @property getCloudSortOrder [GetCloudSortOrder]
  * @property getBackupsNode [GetBackupsNode]
- * @property monitorNodeUpdates [MonitorNodeUpdates]
+ * @property monitorNodeUpdatesUseCase [MonitorNodeUpdatesUseCase]
  */
 class DefaultGetBackupsChildrenNodes @Inject constructor(
     private val getChildrenNode: GetChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getBackupsNode: GetBackupsNode,
     private val hasBackupsChildren: HasBackupsChildren,
-    private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : GetBackupsChildrenNodes {
 
     /**
@@ -30,7 +31,7 @@ class DefaultGetBackupsChildrenNodes @Inject constructor(
      */
     override fun invoke() = flow {
         emit(getBackupsChildrenNodes())
-        emitAll(monitorNodeUpdates().map { getBackupsChildrenNodes() })
+        emitAll(monitorNodeUpdatesUseCase().map { getBackupsChildrenNodes() })
     }
 
     /**

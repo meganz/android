@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
@@ -38,7 +40,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
 @ExperimentalCoroutinesApi
 class RecentActionsViewModelTest {
@@ -68,7 +69,10 @@ class RecentActionsViewModelTest {
             emit(false)
         }
     }
-    private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
+        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
+    }
 
     private val node: TypedFileNode = mock {
         on { id }.thenReturn(NodeId(123))
@@ -112,7 +116,7 @@ class RecentActionsViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             getAccountDetailsUseCase = getAccountDetailsUseCase,
             monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
-            monitorNodeUpdates = monitorNodeUpdates,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
         )
     }
@@ -400,7 +404,7 @@ class RecentActionsViewModelTest {
                 .test {
                     assertThat(awaitItem().size).isEqualTo(0)
                     advanceUntilIdle()
-                    monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
+                    monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
                     whenever(getRecentActionsUseCase()).thenReturn(
                         listOf(megaRecentActionBucket)
                     )

@@ -6,6 +6,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -20,6 +22,7 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.FakeMonitorViewType
 import nz.mega.sdk.MegaNode
 import org.junit.Rule
@@ -38,7 +41,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
-import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 import java.util.stream.Stream
 
 /**
@@ -55,7 +57,10 @@ internal class BackupsViewModelTest {
     private val getParentNodeHandle = mock<GetParentNodeHandle>()
 
     private val monitorBackupFolder = FakeMonitorBackupFolder()
-    private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
+        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
+    }
     private val monitorViewType = FakeMonitorViewType()
 
     @get:Rule
@@ -91,7 +96,7 @@ internal class BackupsViewModelTest {
             getNodeByHandle = getNodeByHandle,
             getParentNodeHandle = getParentNodeHandle,
             monitorBackupFolder = monitorBackupFolder,
-            monitorNodeUpdates = monitorNodeUpdates,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorViewType = monitorViewType,
             savedStateHandle = savedStateHandle,
         )
@@ -219,11 +224,11 @@ internal class BackupsViewModelTest {
     @Test
     fun `test that a pending node refresh occurs when a node update is received`() = runTest {
         setUnderTest()
-        monitorNodeUpdates.emit(NodeUpdate(mapOf()))
 
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.isPendingRefresh).isTrue()
+        underTest.state.map { it.isPendingRefresh }.test {
+            assertThat(awaitItem()).isFalse()
+            monitorNodeUpdatesFakeFlow.emit(NodeUpdate(mapOf()))
+            assertThat(awaitItem()).isTrue()
         }
     }
 

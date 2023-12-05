@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
@@ -55,6 +56,7 @@ import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import org.junit.jupiter.api.AfterAll
@@ -69,7 +71,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 import kotlin.random.Random
 import kotlin.test.assertFalse
 
@@ -104,7 +105,10 @@ class ContactInfoViewModelTest {
     private var monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase =
         mock()
     private var isChatConnectedToInitiateCallUseCase: IsChatConnectedToInitiateCallUseCase = mock()
-    private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
+        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
+    }
     private var createShareKey: CreateShareKey = mock()
     private var checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
     private val copyNodesUseCase: CopyNodesUseCase = mock()
@@ -178,7 +182,7 @@ class ContactInfoViewModelTest {
             ioDispatcher = standardDispatcher,
             applicationScope = testScope,
             createShareKey = createShareKey,
-            monitorNodeUpdates = monitorNodeUpdates,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
             monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,
             monitorChatPresenceLastGreenUpdatesUseCase = monitorChatPresenceLastGreenUpdatesUseCase,
@@ -427,7 +431,7 @@ class ContactInfoViewModelTest {
             assertThat(initialState.primaryDisplayName).isEqualTo("Iron Man")
             assertThat(initialState.snackBarMessage).isNull()
             whenever(getInSharesUseCase(any())).thenReturn(listOf(unTypedNodeNew))
-            monitorNodeUpdates.emit(nodeUpdate)
+            monitorNodeUpdatesFakeFlow.emit(nodeUpdate)
             val newState = awaitItem()
             assertThat(newState.isNodeUpdated).isTrue()
         }
