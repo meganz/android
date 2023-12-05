@@ -833,8 +833,8 @@ class DefaultCameraUploadRepositoryTest {
     inner class CameraUploadsOperationTest {
         @Test
         fun `test that the worker is called to start camera uploads`() = runTest {
-            underTest.fireCameraUploadJob()
-            verify(workerGateway).fireCameraUploadJob()
+            underTest.startCameraUploads()
+            verify(workerGateway).startCameraUploads()
         }
 
         @Test
@@ -846,8 +846,8 @@ class DefaultCameraUploadRepositoryTest {
 
         @Test
         fun `test that the worker is called to schedule camera uploads`() = runTest {
-            underTest.scheduleCameraUploadJob()
-            verify(workerGateway).scheduleCameraUploadJob()
+            underTest.scheduleCameraUploads()
+            verify(workerGateway).scheduleCameraUploads()
         }
 
         @Test

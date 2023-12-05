@@ -29,7 +29,7 @@ class ScheduleCameraUploadUseCaseTest {
         runTest {
             whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             underTest()
-            verify(cameraUploadRepository).scheduleCameraUploadJob()
+            verify(cameraUploadRepository).scheduleCameraUploads()
         }
 
     @Test
@@ -37,6 +37,6 @@ class ScheduleCameraUploadUseCaseTest {
         runTest {
             whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(false)
             underTest()
-            verify(cameraUploadRepository, times(0)).scheduleCameraUploadJob()
+            verify(cameraUploadRepository, times(0)).scheduleCameraUploads()
         }
 }

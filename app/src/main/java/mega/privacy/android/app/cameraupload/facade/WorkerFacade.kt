@@ -46,13 +46,7 @@ class WorkerFacade @Inject constructor(
     private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper,
 ) : WorkerGateway {
 
-    /**
-     * Fire a one time work request of camera upload to upload immediately;
-     * It will also schedule the camera upload job inside of CameraUploadsService
-     *
-     * @return The result of the job
-     */
-    override suspend fun fireCameraUploadJob() {
+    override suspend fun startCameraUploads() {
         // Check if CU periodic worker is working. If yes, then don't start a single one
         if (!checkWorkerRunning(CAMERA_UPLOAD_TAG)) {
             Timber.d("No CU periodic process currently running, proceed with one time request")
@@ -83,11 +77,6 @@ class WorkerFacade @Inject constructor(
         }
     }
 
-    /**
-     * Fire a request to stop camera upload service.
-     *
-     * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
-     */
     override suspend fun stopCameraUploads(shouldReschedule: Boolean) {
         cancelUniqueCameraUploadWorkRequest()
         cancelPeriodicCameraUploadWorkRequest()
@@ -97,17 +86,12 @@ class WorkerFacade @Inject constructor(
         // - the user cancel all transfers without disabling the Camera Uploads
         // - the camera uploads folder have been moved to rubbish bin
         if (shouldReschedule) {
-            scheduleCameraUploadJob()
+            scheduleCameraUploads()
         }
         Timber.d("fireStopCameraUploadJob() SUCCESS")
     }
 
-    /**
-     * Schedule job of camera upload
-     *
-     * @return The result of schedule job
-     */
-    override suspend fun scheduleCameraUploadJob() {
+    override suspend fun scheduleCameraUploads() {
         scheduleCameraUploadSyncActiveHeartbeat()
         // periodic work that runs during the last 10 minutes of every one hour period
         val cameraUploadWorkRequest = PeriodicWorkRequest.Builder(

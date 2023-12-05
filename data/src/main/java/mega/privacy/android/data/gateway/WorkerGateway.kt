@@ -9,25 +9,22 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 interface WorkerGateway {
 
     /**
-     * Fire a one time work request of camera upload to upload immediately;
-     * It will also schedule the camera upload job inside of CameraUploadsService
-     *
+     * Queue a one time work request of camera upload to upload immediately.
+     * The worker will not be queued if a camera uploads worker is already running
      */
-    suspend fun fireCameraUploadJob()
+    suspend fun startCameraUploads()
 
     /**
-     * Fire a request to stop camera upload service.
+     * Cancel all camera uploads workers
      *
      * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
      */
     suspend fun stopCameraUploads(shouldReschedule: Boolean)
 
     /**
-     * Schedule job of camera upload
-     *
-     * @return The result of schedule job
+     * Schedule the camera uploads worker
      */
-    suspend fun scheduleCameraUploadJob()
+    suspend fun scheduleCameraUploads()
 
     /**
      * Cancel all camera upload workers.
