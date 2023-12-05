@@ -1051,11 +1051,14 @@ public class ChatUtil {
 
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
-                    List<Long> chatIds = null;
+                    ArrayList<Long> chatIds = null;
                     if (chats != null) {
                         chatIds = new ArrayList<>();
-                        for(MegaChatListItem chat : chats) {
-                            chatIds.add(chat.getChatId());
+                        for (int i = 0; i < chats.size(); i++) {
+                            MegaChatListItem chat = chats.get(i);
+                            if (chat != null) {
+                                chatIds.add(chat.getChatId());
+                            }
                         }
                     }
 
