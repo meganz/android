@@ -23,7 +23,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityCo
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
-import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -41,12 +40,13 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
@@ -170,7 +170,14 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun handleOpenWith(imageNode: ImageNode) {
-        ModalBottomSheetUtil.openWith(this, MegaNode.unserialize(imageNode.serializedData))
+        onNodeTapped(
+            this,
+            MegaNode.unserialize(imageNode.serializedData),
+            this::saveNodeByOpenWith,
+            this,
+            this,
+            true
+        )
     }
 
     private fun saveNodeToDevice(imageNode: ImageNode) {
@@ -276,6 +283,25 @@ class ImagePreviewActivity : BaseActivity() {
     override fun onDestroy() {
         nodeSaver.destroy()
         super.onDestroy()
+    }
+
+    /**
+     * Upon a node is open with, if it cannot be previewed in-app,
+     * then download it first, this download will be marked as "download by open with".
+     *
+     * @param node Node to be downloaded.
+     */
+    private fun saveNodeByOpenWith(node: MegaNode) {
+        PermissionUtils.checkNotificationsPermission(this)
+        nodeSaver.saveNodes(
+            nodes = listOf(node),
+            highPriority = true,
+            isFolderLink = false,
+            fromMediaViewer = false,
+            needSerialize = false,
+            downloadForPreview = true,
+            downloadByOpenWith = true
+        )
     }
 
     companion object {
