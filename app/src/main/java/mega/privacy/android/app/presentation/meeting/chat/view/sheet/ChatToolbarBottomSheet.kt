@@ -97,7 +97,7 @@ fun ChatToolbarBottomSheet(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().apply {
+            modifier = Modifier.fillMaxWidth().run {
                 if (isLoadingGalleryFiles) {
                     padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 24.dp)
                 } else {
