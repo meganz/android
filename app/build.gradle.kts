@@ -301,7 +301,6 @@ dependencies {
     implementation(project(":navigation"))
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     "baselineProfile"(project(":baselineprofile"))
-    "qaImplementation"(project(":screenshot"))
     implementation(project(":liveeventbus-x"))
     implementation(project(":analytics"))
     implementation(project(":icon-pack"))
