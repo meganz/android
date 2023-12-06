@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -85,7 +86,8 @@ internal fun SyncListScreen(
                     IssuesResolutionDialog(
                         icon = content.stalledIssueUiItem.icon,
                         conflictName = content.stalledIssueUiItem.conflictName,
-                        nodeName = content.stalledIssueUiItem.nodeNames.first(),
+                        nodeName = content.stalledIssueUiItem.nodeNames.firstOrNull()
+                            ?: content.stalledIssueUiItem.localPaths.first(),
                         actions = content.stalledIssueUiItem.actions,
                         actionSelected = { action ->
                             actionSelected(content.stalledIssueUiItem, action)
@@ -160,7 +162,7 @@ private fun SyncListScreenContent(
     addFolderClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
 ) {
-    var checkedChip by remember { mutableStateOf(SYNC_FOLDERS) }
+    var checkedChip by rememberSaveable { mutableStateOf(SYNC_FOLDERS) }
 
     Column(modifier) {
         SyncPermissionWarningBanner(
