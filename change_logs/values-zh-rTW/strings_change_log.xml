@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Change log of the Android App v3.8.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log">- 對話訊息加入表情符號回應。\n - 改善語音/視訊通話表現。\n - 改善相機上傳功能。\n - 改善對MKV影片檔案支援。\n - 改善搜尋功能。\n - 其他改進和錯誤修復。</string>
+    <!-- Change log of the Android App v3.8.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log_v3_8_1">- 加入新的傳輸小工具。\n- 改善用戶傳輸介面。\n- 加入“請勿打擾”模式。\n- 改善通知功能。\n- 改善透過Google Play的付款（新的Google Play Billing Library）。\n- 其它改進與錯誤修復。</string>
+    <!-- Change log of the Android App v3.8.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log_v3_8_2">- 新增通話保留選項。\n- 改善呼叫使用者介面與通話通知。\n- 加入對話訊息回應數量的限制。\n- 新增來自MEGA重要通知公開發布的新服務。\n- 新增對話工具列中GIPHY選項。\n- 改進對話中的GIF播放。</string>
+    <!-- Change log of the Android App v3.8.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_3">- 更新設定頁面。\n- 改善音樂/影片串流時旋轉螢幕後的加載時間。\n- 其它改進和錯誤修復。</string>
+    <!-- Change log of the Android App v3.8.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_4">- 啟用傳輸恢復。\n- 升級帳戶時顯示當地價格。\n- 其它改進和錯誤修復。</string>
+    <!-- Change log of the Android App v3.8.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_5">- 加入新的主畫面。\n- 加入可將檔案與資料夾設定為收藏的選項。\n- 加入可為檔案與資料夾設定顏色標籤。\n- 其它改進和錯誤修復。</string>
+    <!-- Change log of the Android App v4.0.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_0">- 加入新的cookie設定。\n- 改進取得連結使用者介面。\n- 改進傳輸使用者介面。\n- 改進來自MEGA任何重要通知的公開發布服務。\n- 其它改進和錯誤修復。</string>
+    <!-- Change log of the Android App v4.0.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_1">- 加入新的主畫面橫幅，用戶可以在此看到重要的功能。\n- 新增可從對話保留設定選項裡，設定自動清除對話記錄。\n- 其他改進和錯誤修復。</string>
+    <!-- Change log of the Android App v4.0.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_2">- 新增文件掃描功能。\n- 其他改進和錯誤修復。</string>
+    <!-- Change log of the Android App v4.1.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_0">- 支援深色主題。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v4.1.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_1">- 新的音樂播放器，支援自動播放列表與在背景中播放儲存在MEGA上的音樂檔案。\n- 新的影片播放器，能將儲存在MEGA上的影片檔案產生自動播放列表。\n- 垃圾筒現在位於導覽選單。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v4.1.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_2">- 密碼鎖定逾時選項與介面更新。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v4.1.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_3">- 我們新增文字編輯器。您現在可以建立和編輯純文字檔案。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v4.1.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_4">- 雙重驗證使用者介面更新。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v4.1.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_5">- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v4.1.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_6">- 您現在可以從MEGA直接將圖片與影片儲存到您裝置上的相簿.\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v4.2.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_0">- 新的相機上傳介面可幫助您找到並共享您最佳的內容。可依照天、月或年來排序與瀏覽您的照片和影片。\n- 您現在可以使用音樂播放器介面新的按鈕快轉或倒轉15秒。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v4.2.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_1">- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v4.2.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_2">- 現在您可以在影片播放介面使用新的按鈕進行快轉與倒轉15秒。\n- 改善大型文字檔的處理和編輯，最大可達20&#160;MB。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v4.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_3">- 現在可以建立與共享多個連結。\n- 聯絡人與我的帳戶介面更新。\n改進對Android 11裝置的支援。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v5.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_0">- MEGA chat通話介面看起來與感覺起來很不同。\n- 使用者現在能以訪客身份或已註冊與會者身份透過連結來加入MEGA chat通話。\n- 增加通話與會人數上限。\n - 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v5.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_1">- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v5.1.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_1_1">- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v5.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_2">- 您現在可以為相機上傳和在對話中加入的附件檔案選擇影片品質設定。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v5.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_3">- 透過設定 &gt; 使用者介面 &gt; 隱藏近期動態來隱藏您的最新動態\n- 您現在可以選擇應用程式啟動時的開始畫面\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v5.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_4">- 您現在可以使用指紋解鎖MEGA\n- 您現在可以在相機上傳設定中自訂影片品質選項以節省空間\n- 影像圖庫加入縮放選項\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v5.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_5">- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v6.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_0">- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v6.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_1">- 資料夾的副標頭位置加入相簿檢視模式。現在您可以在列表、縮圖和圖庫檢視模式之間切換\n- 現在可以全螢幕解析度影像進行預覽\n- 加回“開啟連結”選單選項\n- 錯誤修復和性能改進</string>
+    <!-- Change log of the Android App v6.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_2">- 新的「上傳資料夾」功能允許您上傳一個完整的資料夾或者選取多個資料夾項目\n- 加入音樂/影片播放列表可重新排序的選項\n- 錯誤修復和性能改進</string>
+    <!-- Change log of the Android App v6.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_3">- 改進Pro帳戶訂閱付款的客戶體驗\n - 錯誤修復和性能改進</string>
+    <!-- Change log of the Android App v6.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_4">- 終止支援Android 5.x\n- 改進對Android 12的支援\n- 改進變更Pro方案時帳戶訂閱付款的客戶體驗\n- 錯誤修復和性能改進</string>
+    <!-- Change log of the Android App v6.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_5">- 您現在可以從相片中查看您收藏的照片\n- 首頁加入通話正在進行中的提示\n- 改善無法付款時的客戶體驗\n- 改進當刪除擁有現行訂閱帳戶時的使用者體驗\n- 錯誤修復和性能改進</string>
+    <!-- Change log of the Android App v6.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_6">- 您現在可以在首頁看到您的收藏\n- 錯誤修復和性能改進</string>
+    <!-- Change log of the Android App v6.7. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_7">- 現在可以透過搜尋姓名、電子郵件或別名在聊天室中更輕鬆地找到您的聯絡人\n- 錯誤修復和性能改進</string>
+    <!-- Change log of the Android App v6.8. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_8">- 錯誤修復和性能改進</string>
+    <!-- Change log of the Android App v6.9. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_9">- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v6.10. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_10">- 您現在可以在使用行動數據網路時為對話附件選擇圖像品質設定。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v6.10.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_10_1">- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v6.11. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_11">- 主畫面加入收藏卡片，讓您現在更容易找到我的收藏。\n- 您雲端硬碟中所有圖片現在都位於「照片」區域。\n- 您現在可以使用密碼進行PIN解鎖和指紋存取。\n- 在應用程式裡上傳、複製或移動檔案時，對於重複的檔案有更好的控制。\n- 增強傳輸管理並改善下載和上傳的可靠性。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v6.12. Keep the dash character (-) and line breaks to keep the list format. Note: 'Settings'(key:action_settings), 'Help'(key: settings_help) and 'Report issue'(key:settings_help_report_issue) are UI elements-->
+    <string name="android_change_log_v6_12">- 改進對話工具列，提升聊天體驗。\n- 現在可以透過設定 &gt; 幫助 &gt; 報告問題來報告您的問題。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v6.12.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_12_1">- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v6.13. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_13">- 會議主持人可以選擇結束所有與會者的通話。\n- 錯誤修復和性能改進。</string>
+    <!-- Change log of the Android App v6.14. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_14">- 錯誤修復和性能改進</string>
+    <!-- Change log of the Android App v6.14.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_14_1">- 錯誤修復和性能改進</string>
+    <!-- Change log of the Android App v6.15. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_15">- 對話與會議新分頁\n- 可以使用Microsoft應用程式開啟Microsoft文件\n- 錯誤修復和性能改進</string>
+    <!-- Change log of the Android App 7.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v7_0">- 應用程式運行時將使用更少記憶體。\n- 將不再提供Android 6的更新。\n- 支援更多的RAW圖像格式。\n- 錯誤修復和性能提升。</string>
+    <!-- Change log of the Android App 7.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v7_6">- 您現在可以檢視和加入排程的會議。\n- 您將收到有關您已受邀加入的排程會議的通知。\n- 錯誤修複和提高性能。</string>
+    <!-- Change log of Android App 8.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v8_0">- 您現在可以將相片和影片整理到相簿中。\n- 您現在可以在您的影片中加入字幕。\n- 修復錯誤並提高了性能。</string>
+    <!-- Change log of Android App 9.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v9_0">- 您現在可以安排一次性和週期性會議。\n- 加入對Android 14的支援。\n- 加入對.mkv和.avi影片格式的支援。</string>
+    <!-- Change log of Android App 10.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v10_0">- 相簿共享功能現已發布。\n- 錯誤修復和效能改進。</string>
+</resources>

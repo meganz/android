@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Change log of the Android App v3.8.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log">- Emoji-reacties toegevoegd aan chatbericht.\n- Verbeterde audio- en videogesprekken.\n- Verbeterde Camera uploads.\n- Verbeterde ondersteuning voor MKV-videobestanden.\n- Verbeterde zoekfunctie.\n- Diverse andere verbeteringen en bugfixes.</string>
+    <!-- Change log of the Android App v3.8.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log_v3_8_1">- Nieuwe overdrachtswidget toegevoegd. \n- Verbeterde gebruikersinterface voor overdrachten. \n- Toegevoegde modus “Niet storen”. \n- Verbeterde meldingen. \n - verbeterde betalingen via Google Play (nieuwe Google Play-factureringsbibliotheek) . \n - Diverse andere verbeteringen en bugfixes.</string>
+    <!-- Change log of the Android App v3.8.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log_v3_8_2">- Een optie toegevoegd om een ​​oproep in de wacht te zetten.\n- Verbeterde gebruikersinterface voor oproepen en oproepmeldingen.\n- Limieten toegevoegd aan het aantal reacties op een chatbericht.\n- Een dienst toegevoegd voor openbare aankondigingen van belangrijke meldingen van MEGA.\n- GIPHY-optie toegevoegd aan de chatwerkbalk.\n- Verbeterde GIF-weergave in chat.</string>
+    <!-- Change log of the Android App v3.8.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_3">- Vernieuwde de instellingenpagina. \n -Verbeterde laadtijd na het draaien van het scherm tijdens audio en video streaming. \n -Diverse andere verbeteringen en bugfixes.</string>
+    <!-- Change log of the Android App v3.8.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_4">- Hervatting van overdracht ingeschakeld.\n- Toon lokale prijzen tijdens het upgraden van account.\n- Diverse andere verbeteringen en bugfixes.</string>
+    <!-- Change log of the Android App v3.8.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_5">- Nieuwe Thuispagina toegevoegd. \n- Nieuwe optie toegevoegd om bestanden en mappen als favorieten in te stellen. \n- De mogelijkheid toegevoegd om kleurlabels voor bestanden en mappen in te stellen. \n- Diverse andere verbeteringen en bugfixes.</string>
+    <!-- Change log of the Android App v4.0.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_0">- Nieuwe cookie-instellingen toegevoegd. \n- Verbeterde gebruikersinterface voor link ophalen. \n- Verbeterde gebruikersinterface voor overdracht. \n- Verbeterde dienst voor openbare aankondiging van belangrijke meldingen van MEGA. \n- Diverse andere verbeteringen en bugfixes.</string>
+    <!-- Change log of the Android App v4.0.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_1">- Nieuwe startpagina-banner toegevoegd waar gebruikers gemarkeerde functies kunnen zien. \n- Automatisch wissen van de geschiedenis toegevoegd in gesprekken met behulp van de instellingen voor het bewaren van chats.\n- Diverse andere verbeteringen en bugfixes.</string>
+    <!-- Change log of the Android App v4.0.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_2">- Een nieuwe functie voor het scannen van documenten toegevoegd. \n- Diverse andere verbeteringen en bugfixes.</string>
+    <!-- Change log of the Android App v4.1.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_0">-Donkere thema is nu beschikbaar.\n- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v4.1.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_1">- Nieuwe audiospeler met automatische afspeellijsten en achtergrond afspelen van audiobestanden die zijn opgeslagen op MEGA. \n- Nieuwe videospeler met automatische afspeellijsten van videobestanden die zijn opgeslagen op MEGA. \n- De Prullenbak bevindt zich nu in de navigatielade. \n Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v4.1.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_2">- Time-outopties voor toegangscodeslot en interface-update.\n- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v4.1.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_3">-We hebben een teksteditor toegevoegd. U kunt nu lege tekstdocumenten maken en bewerken. \n-Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v4.1.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_4">- Update van gebruikersinterface met twee-staps authenticatie. \n- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v4.1.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_5">- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v4.1.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_6">- U kunt nu afbeeldingen en video\’s van MEGA rechtstreeks in de galerij van uw apparaat opslaan.\n - Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v4.2.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_0">- Het nieuwe uitelijk voor Camera uploads helpt u bij het vinden en delen van uw beste inhoud. Sorteer en verken uw foto\’s en video\’s op dag, maand of jaar.\n - U kunt nu 15 seconden vooruit en achteruit springen met de nieuwe knoppen op de audiospeler-interface.\n- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v4.2.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_1">- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v4.2.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_2">- U kunt nu 15 seconden vooruit en achteruit springen met de nieuwe knoppen op de videospelerinterface.\n - Verbeterde verwerking en bewerking van grote tekstbestanden, tot 20&#160;MB groot.\n - Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v4.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_3">- U kunt nu meerdere links maken en delen.\n - Bijgewerkte gebruikersinterface voor contacten en mijn account. \n - Verbeterde ondersteuning voor Android 11-apparaten. \n - Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v5.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_0">- Het uiterlijk en gevoel van de MEGA chat-oproepinterface is vernieuwd. \n- Gebruikers kunnen nu deelnemen aan MEGA chat-oproepen via links als gasten of geregistreerde deelnemers. \n- Verhoogd aantal deelnemers aan een oproep.\n- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v5.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_1">- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v5.1.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_1_1">- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v5.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_2">- U kunt nu de instellingen voor videokwaliteit kiezen voor Camera Uploads en Chatbijlagen.\n- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v5.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_3">- Verberg uw laatste activiteit van Recent via Instellingen &gt; Gebruikersinterface &gt; Recente activiteit verbergen\n - U kunt nu het scherm selecteren waarin u de applicatie wilt starten\n - Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v5.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_4">- U kunt MEGA nu ontgrendelen met uw vingerafdruk\n - U kunt nu ruimte besparen door de videokwaliteitsopties te definiëren in Instellingen voor Camera Uploads\n - Zoomopties zijn toegevoegd aan afbeeldingsgalerijen\n - Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v5.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_5">- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v6.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_0">- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v6.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_1">- Galerijmodus is toegevoegd aan de subkop van de map. U kunt nu schakelen tussen lijst-, miniatuur- en galerijmodus\n - Afbeeldingen op volledig scherm kunnen nu worden bekeken\n - De menuoptie “Link openen” weer toegevoegd\n - Bugfixes en prestatieverbeteringen</string>
+    <!-- Change log of the Android App v6.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_2">- Nieuwe \’uploadmap\’ functionaliteit waarmee u een volledige map of mapitems met meerdere selecties kunt uploaden\n- Herschikkingsoptie toegevoegd aan audio- en video-afspeellijst\n - Bugfixes en prestatieverbeteringen</string>
+    <!-- Change log of the Android App v6.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_3">- Verbeterde klantervaring voor betalingen van Pro-accountabonnementen \n - Bugfixes en prestatieverbeteringen</string>
+    <!-- Change log of the Android App v6.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_4">- Geen ondersteuning meer voor Android 5.x\n- Verbeterde ondersteuning voor Android 12\n - Verbeterde klantervaring voor betalingen van accountabonnementen bij het wijzigen van Pro-abonnementen\n - Bugfixes en prestatieverbeteringen</string>
+    <!-- Change log of the Android App v6.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_5">- U kunt nu genieten van uw favoriete foto\’s in de Foto\’s sectie\n- Doorlopende oproepindicator toegevoegd aan het Home-gedeelte\n - Verbeterde klantervaring wanneer facturering niet beschikbaar is\n - Verbeterde gebruikerservaring bij het verwijderen van accounts met actieve abonnementen\n - Bugfixes en prestatieverbeteringen</string>
+    <!-- Change log of the Android App v6.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_6">- U kunt nu uw favorieten zien in het Home-gedeelte\n - Bugfixes en prestatieverbeteringen</string>
+    <!-- Change log of the Android App v6.7. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_7">- Het is nu makkelijker om uw  contacten te vinden in Chat door te zoeken naar een naam, e-mail of alias\n - Bugfixes en prestatieverbeteringen</string>
+    <!-- Change log of the Android App v6.8. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_8">- Bugfixes en prestatieverbeteringen</string>
+    <!-- Change log of the Android App v6.9. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_9">- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v6.10. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_10">- U kunt nu de instellingen voor de beeldkwaliteit voor chatbijlagen kiezen bij gebruik van mobiele data.\n - Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v6.10.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_10_1">- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v6.11. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_11">- Uw favorieten zijn nu gemakkelijker te vinden omdat er een favorietenkaart aan het startscherm is toegevoegd.\n- Alle afbeeldingen van uw clouddrive bevinden zich nu in de Foto sectie.\n- U kunt nu toegang met pincode en vingerafdruk ontgrendelen met uw wachtwoord.\n- Betere controle over dubbele bestanden bij het uploaden, kopiëren of verplaatsen binnen de app.\n - Verbeteringen in het overdrachtsbeheer en verbeterde betrouwbaarheid van downloads en uploads.\n - Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v6.12. Keep the dash character (-) and line breaks to keep the list format. Note: 'Settings'(key:action_settings), 'Help'(key: settings_help) and 'Report issue'(key:settings_help_report_issue) are UI elements-->
+    <string name="android_change_log_v6_12">- Verbeteringen aan de gesprekswerkbalk voor een betere gesprekservaring. \n- Probleemrapportage via Instellingen &gt; Hulp &gt; Probleem melden.\n - Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v6.12.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_12_1">- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v6.13. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_13">- Optie voor de vergadering gastheer/gastvrouw om de oproep te beïndigen voor alle deelnemers. \n- Bugfixes en prestatieverbeteringen.</string>
+    <!-- Change log of the Android App v6.14. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_14">- Bugfixes en prestatieverbeteringen</string>
+    <!-- Change log of the Android App v6.14.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_14_1">- Bugfixes en prestatieverbeteringen</string>
+    <!-- Change log of the Android App v6.15. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_15">- Nieuwe tabbladen voor gesprekken en vergaderingen\n- Mogelijkheid om Microsoft documenten te openen met behulp van de Microsoft-applicatie \n- Bugfixes en prestatieverbeteringen</string>
+    <!-- Change log of the Android App 7.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v7_0">- Er wordt minder apparaatgeheugen gebruikt wanneer de applicatie actief is.\n- Updates voor Android 6 worden niet meer geleverd.\n- Er worden nu meer onbewerkte afbeeldingsindelingen ondersteund.\n- Bugfixes en prestatie verbeteringen</string>
+    <!-- Change log of the Android App 7.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v7_6">- U kunt nu geplande vergaderingen bekijken en eraan deelnemen.\n - U ontvangt meldingen over de geplande vergaderingen waarvoor u bent uitgenodigd.\n - Bugs opgelost en prestaties verbeterd.</string>
+    <!-- Change log of Android App 8.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v8_0">- U kunt nu uw foto\’s en video\’s ordenen in albums.\n - U kunt nu ondertitels aan uw video\’s toevoegen.\n - Bugs zijn verholpen en de prestaties zijn verbeterd.</string>
+    <!-- Change log of Android App 9.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v9_0">- U kunt nu eenmalige en terugkerende vergaderingen plannen.\n - Ondersteuning toegevoegd voor Android 14.\n - Ondersteuning toegevoegd voor .mkv- en .avi-videoformaten.</string>
+    <!-- Change log of Android App 10.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v10_0">- Album deling is nu vrijgegeven. \n- Bug fixes en prestatieverbeteringen.</string>
+</resources>

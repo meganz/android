@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Change log of the Android App v3.8.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log">- تمت إضافة ردود فعل الرموز التعبيرية على رسالة المحادثة.\n- تحسين مكالمات الصوت والفيديو.\n- تحسين ترفيعات الكاميرا. \n- تحسين دعم ملفات فيديوMKV.\n- تحسين وظيفة البحث.\n- العديد من التحسينات الأخرى وإصلاح الأخطاء.</string>
+    <!-- Change log of the Android App v3.8.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log_v3_8_1">- تمت إضافة أداة تراسل معطيات جديدة.\n- تحسين واجهة المستخدم لتراسل المعطيات.\n- تمت إضافة ”وضع عدم الإزعاج“.\n- إشعارات محسنى.\n- تحسين الدفعات من خلال غوغل بلاي Google Play (مكتبة فواتير غوغل بلاي Google Play الجديدة).\n- العديد من التحسينات الأخرى وإصلاح الأخطاء.</string>
+    <!-- Change log of the Android App v3.8.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log_v3_8_2">- تمت إضافة خيار لوضع المكالمة على الانتظار.\n- تحسين واجهة مستخدم للمكالمات وإشعارات المكالمات.\n- تم إضافة حدود لعدد ردود الفعل على رسالة المحادثة.\n- تمت إضافة خدمة التنبيهات العامة لأي إشعار مهم من ميغا MEGA.\n- تمت إضافة خيار جيفي GIPHY إلى شريط أدوات المحادثة.\n- تحسين تشغيل صور GIF في المحادثة.</string>
+    <!-- Change log of the Android App v3.8.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_3">- تم تجديد صفحة الإعدادات.\n - تحسين وقت التحميل بعد تدوير الشاشة أثناء بث الصوت/الفيديو.\n- العديد من التحسينات الأخرى وإصلاح الأخطاء.</string>
+    <!-- Change log of the Android App v3.8.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_4">- تمكين استئناف تراسل المعطيات.\n- عرض التسعير المحلي أثناء ترقية الحساب.\n- العديد من التحسينات الأخرى وإصلاح الأخطاء.</string>
+    <!-- Change log of the Android App v3.8.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_5">- تمت إضافة صفحة رئيسية جديدة.\n- تمت إضافة خيار جديد لتعيين الملفات والمجلدات كمفضلة.\n- تمت إضافة إمكانية تعيين تصنيفات ملونة للملفات والمجلدات.\n- العديد من التحسينات الأخرى وإصلاحات لأخطاء.</string>
+    <!-- Change log of the Android App v4.0.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_0">- تمت إضافة إعدادات ملفات تعريف الارتباط cookie الجديدة.\n- تحسين واجهة الحصول على رابط .\n- تحسين واجهة عمليات التراسل. \n- خدمة محسّنة للإعلان العام عن أي تنبيهات مهمة من MEGA ميغا. \n- العديد من التحسينات الأخرى و إصلاح أخطاء.</string>
+    <!-- Change log of the Android App v4.0.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_1">- تمت إضافة لافتة جديدة للصفحة الرئيسية حيث يمكن للمستخدمين رؤية الميزات البارزة.\n- تمت إضافة المسح التلقائي لسجل المحادثات باستخدام إعدادات الاحتفاظ بالمحادثة.\n- العديد من التحسينات الأخرى وإصلاح الأخطاء.</string>
+    <!-- Change log of the Android App v4.0.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_2">- تمت إضافة ميزة جديدة لماسح المستندات ضوئياً.\n- العديد من التحسينات الأخرى وإصلاح الأخطاء.</string>
+    <!-- Change log of the Android App v4.1.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_0">- النمط الداكن متوفر الآن. \n- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v4.1.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_1">- مشغل صوتي جديد يتميز بقوائم تشغيل تلقائية وتشغيل ملفات الصوت المخزنة على ميغا MEGA في الخلفية.\n- مشغل فيديو جديد يتميز بقوائم تشغيل تلقائية لملفات الفيديو المخزنة على MEGA ميغا.\n- سلة المحذوفات موجودة الآن في درج التنقل. \n- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v4.1.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_2">- إضافة إعدادات قفل رمز المرور وتحديث الواجهة.\n- إصلاحات أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v4.1.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_3">- لقد أضفنا محرر نصوص. يمكنك الآن إنشاء و تعديل مستندات نص عادي.\n - إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v4.1.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_4">- تحديث واجهة مستخدم المصادقة المزدوجة.\n- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v4.1.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_5">- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v4.1.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_6">- يمكنك الآن حفظ الصور ومقاطع الفيديو من ميغا MEGA مباشرة إلى معرض الصور في جهازك.\n- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v4.2.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_0">- يساعدك المظهر الجديد لترفيعات الكاميرا في العثور على أفضل محتوى لديك ومشاركته. قم بفرز واستكشاف الصور ومقاطع الفيديو الخاصة بك حسب اليوم أو الشهر أو السنة. \n- يمكنك الآن التخطي للأمام وللخلف بمقدار 15 ثانية باستخدام الأزرار الجديدة في واجهة مشغل الصوت. \n- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v4.2.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_1">- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v4.2.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_2">- يمكنك الآن التخطي للأمام وللخلف بمقدار 15 ثانية باستخدام الأزرار الجديدة في واجهة مشغل الفيديو.\n- تحسين معالجة وتحرير الملفات النصية الكبيرة، التي يصل حجمها إلى 20 ميغابايت.\n- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v4.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_3">- يمكنك الآن إنشاء ومشاركة روابط متعددة.\n  - واجهة مستخدم محدثة لجهات الاتصال وحسابي.\n - تحسين الدعم لأجهزة اندرويد Android 11.\n - إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v5.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_0">- إصلاح شكل و مظهر واجهة مكالمات ميغا MEGA chat.\n- يمكن للمستخدمين الآن الانضمام إلى مكالمات ميغا MEGA chat عبر الروابط كضيوف أو مشاركين مسجلين.\n- زيادة عدد المشاركين في مكالمة.\n- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v5.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_1">- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v5.1.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_1_1">- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v5.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_2">- يمكنك الآن اختيار إعدادات جودة الفيديو لترفيعات الكاميرا ومرفقات المحادثة.\n- إصلاحات أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v5.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_3">- قم بإخفاء أحدث نشاط لك من مؤخراً من خلال الإعدادات &gt; واجهة المستخدم &gt; إخفاء الأنشطة الحديثة.\n- يمكنك الآن تحديد الشاشة التي ترغب في بدء تشغيل التطبيق بها\n- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v5.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_4">- يمكنك الآن إلغاء قفل ميغا MEGA باستخدام بصمة إصبعك\n- يمكنك الآن توفير مساحة عن طريق تحديد خيارات جودة الفيديو في إعدادات ترفيعات الكاميرا\n- تمت إضافة خيارات التكبير إلى معارض الصور\n - إصلاحات أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v5.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_5">- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v6.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_0">- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v6.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_1">- تمت إضافة وضع المعرض إلى العنوان الفرعي للمجلد. يمكنك الآن التبديل بين وضع القائمة والصورة المصغرة والمعرض\n - يمكن الآن عرض الصور بدقة على كامل الشاشة\n - تمت إعادة إضافة خيار القائمة ”فتح الرابط“\n - إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v6.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_2">- وظيفة جديدة \“ترفيع مجلد\“ تتيح لك ترفيع مجلد كامل أو عناصر مجلد متعددة التحديد\n- خيار إعادة الترتيب المضافة لقائمة تشغيل الصوت والفيديو -\nإصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v6.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_3">- تجربة عملاء محسّنة لدفعات الاشتراك في حساب برو Pro\n- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v6.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_4">- تم إسقاط الدعم لنظام أندرويد Android 5.x\n- دعم مطور لنظام أندرويد Android 12\n- تجربة عملاء مطورة لمدفوعات اشتراك الحساب عند تغيير باقات برو Pro\n- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v6.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_5">- يمكنك الآن الاستمتاع بصورك المفضلة من قسم الصور\n- تمت إضافة مؤشر الاتصال المستمر إلى قسم الصفحة الرئيسية\n- تحسين تجربة المستخدم عند عدم توفر الفواتير\n- تجربة مستخدم محسنة عند حذف الحسابات التي تحتوي على اشتراكات فعالة\n- إصلاح الأخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v6.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_6">- يمكنك الآن رؤية المفضلة في قسم الصفحة الرئيسية\n - إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v6.7. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_7">- أصبح الآن من السهل العثور على جهات الاتصال الخاصة بك في المحادثة من خلال البحث عن اسم أو بريد إلكتروني أو اسم مستعار\n- إصلاح أخطاء وتحسينات على الأداء&#160;</string>
+    <!-- Change log of the Android App v6.8. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_8">- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v6.9. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_9">- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v6.10. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_10">- يمكنك الآن اختيار إعدادات جودة الصورة لمرفقات المحادثة عند استخدام بيانات الهاتف المحمول.\n- إصلاحات أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v6.10.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_10_1">- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v6.11. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_11">- أصبح الآن العثور على المفضلة أسهل حيث تمت إضافة بطاقة المفضلة إلى الشاشة الرئيسية.\n-  جميع صورك على السواقة السحابية موجودة في قسم الصور.\n- يمكنك الآن الغاء قفل رمز PIN وبصمة الإصبع باستخدام كلمة المرور الخاصة بك.\n- تحكم أفضل في الملفات المكررة عند الترفيع أو النسخ أو النقل داخل التطبيق.\n- تحسينات لإدارة التراسل وموثوقية محسّنة للتنزيلات والترفيعات.\n- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v6.12. Keep the dash character (-) and line breaks to keep the list format. Note: 'Settings'(key:action_settings), 'Help'(key: settings_help) and 'Report issue'(key:settings_help_report_issue) are UI elements-->
+    <string name="android_change_log_v6_12">- تحسينات على شريط أدوات المحادثة لتحسين تجربة المحادثة.\n - الإبلاغ عن المشاكل من خلال الإعدادات &gt; مساعدة &gt; الإبلاغ عن مشكلة.\n- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v6.12.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_12_1">- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v6.13. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_13">- خيار لمُضيف الاجتماع لإنهاء المكالمة لجميع المشاركين.\n- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App v6.14. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_14">- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v6.14.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_14_1">- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App v6.15. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_15">- علامات تبويب جديدة للمحادثات والاجتماعات\n- إمكانية فتح مستندات ميكروسوفت  Microsoft باستخدام تطبيق ميكروسوفت  Microsoft\n- إصلاح أخطاء وتحسينات على الأداء</string>
+    <!-- Change log of the Android App 7.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v7_0">- سيتم استخدام ذاكرة أقل للجهاز عند تشغيل التطبيق.\n- لن يتم توفير تحديثات لنظام أندرويد  Android 6 بعد الآن.\n- يتم الآن دعم المزيد من تنسيقات صور raw.\n- إصلاح أخطاء وتحسينات على الأداء.</string>
+    <!-- Change log of the Android App 7.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v7_6">- يمكنك الآن عرض الاجتماعات المجدولة والانضمام إليها.\n- ستتلقى إشعارات حول الاجتماعات المجدولة التي تمت دعوتك إليها.\n- تم إصلاح أخطاء وتحسين الأداء.</string>
+    <!-- Change log of Android App 8.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v8_0">- يمكنك الآن تنظيم الصور ومقاطع الفيديو الخاصة بك في ألبومات.\n - يمكنك الآن إضافة ترجمة إلى مقاطع الفيديو الخاصة بك.\n- تم إصلاح أخطاء وتحسين الأداء.</string>
+    <!-- Change log of Android App 9.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v9_0">- يمكنك الآن جدولة اجتماعات لمرة واحدة ومتكررة.\n- تمت إضافة الدعم لنظام أندرويد Android 14.\n- تمت إضافة دعم لتنسيقات الفيديو .mkv و .avi.</string>
+    <!-- Change log of Android App 10.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v10_0">- تم الآن إصدار مشاركة الألبوم.\n - إصلاح أخطاء وتحسينات على الأداء.</string>
+</resources>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Change log of the Android App v3.8.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log">- Добавлены эмодзи-реакции на сообщения чата.\n- Улучшены аудио- и видеозвонки.\n- Улучшены Загрузки из камеры.\n- Улучшена поддержка видеофайлов MKV.\n- Улучшена функция поиска.\n- Другие улучшения и исправления.</string>
+    <!-- Change log of the Android App v3.8.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log_v3_8_1">- Добавлен новый виджет передач.\n- Улучшен пользовательский интерфейс передач.\n- Добавлен режим «Не беспокоить».\n- Улучшены уведомления.\n- Улучшены платежи через Google Play (новая библиотека биллинга Google Play).\n- Несколько других улучшений и исправлений.</string>
+    <!-- Change log of the Android App v3.8.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log_v3_8_2">- Добавлена возможность поставить звонок на удержание.\n- Улучшен пользовательский интерфейс вызовов и уведомления о вызовах.\n- Добавлены ограничения на количество реакций на сообщение в чате.\n- Добавлен сервис публичных анонсов любого важного уведомления от MEGA.\n- Добавлена вставка из GIPHY на панель инструментов чата.\n- Улучшено воспроизведение GIF в чате.</string>
+    <!-- Change log of the Android App v3.8.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_3">- Обновлена страница настроек.\n- Уменьшено время загрузки после поворота экрана во время аудио/видеотрансляции.\n- Некоторые другие улучшения и исправления ошибок.</string>
+    <!-- Change log of the Android App v3.8.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_4">- Включено возобновление передач.\n- Отображение местных цен при улучшении аккаунта.\n- Несколько других улучшений и исправлений ошибок.</string>
+    <!-- Change log of the Android App v3.8.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_5">- Добавлена новая домашняя страница.\n- Добавлена новая опция для добавления файлов и папок в избранное.\n- Добавлена возможность установки цветовых меток для файлов и папок.\n- Другие улучшения и исправленияй ошибок.</string>
+    <!-- Change log of the Android App v4.0.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_0">- Добавлены новые настройки куки-файлов.\n- Улучшен пользовательский интерфейс получения ссылки.\n- Улучшен пользовательский интерфейс передач.\n- Улучшен сервис для публичного объявления любых важных уведомлений от MEGA.\n- Некоторые другие улучшения и исправления ошибок.</string>
+    <!-- Change log of the Android App v4.0.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_1">- Добавлен новый баннер на главную страницу, где пользователи могут видеть выделенные функции.\n- Добавлена автоматическая очистка истории разговоров с использованием настроек хранения чата.\n- Несколько других улучшений и исправлений ошибок.</string>
+    <!-- Change log of the Android App v4.0.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_2">- Добавлена новая функция сканирования документов.\n- Несколько других улучшений и исправлений.</string>
+    <!-- Change log of the Android App v4.1.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_0">- Теперь доступна тёмная тема.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v4.1.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_1">- Новый аудиоплеер с автоматическими плейлистами и фоновым воспроизведением аудиофайлов, хранящихся в MEGA.\n- Новый видеоплеер с автоматическими плейлистами видеофайлов, хранящихся в MEGA.\n- Корзина теперь находится на панели навигации.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v4.1.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_2">- Параметры тайм-аута кода блокировки и обновление интерфейса.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v4.1.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_3">- Мы добавили текстовый редактор. Теперь вы можете создавать и редактировать текстовые документы.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v4.1.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_4">- Обновлён пользовательский интерфейс двухфакторной аутентификации.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v4.1.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_5">- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v4.1.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_6">- Теперь вы можете сохранять изображения и видео из MEGA прямо в галерею вашего устройства.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v4.2.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_0">- Новый вид интерфейса загрузок из камеры поможет вам найти и поделиться своим лучшим контентом. Сортируйте и просматривайте свои фотографии и видео по дню, месяцу или году.\n- Теперь вы можете промотать вперёд и назад на 15 секунд с помощью новых кнопок в интерфейсе аудиоплеера.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v4.2.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_1">- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v4.2.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_2">- Теперь вы можете проматывать вперёд и назад на 15 секунд с помощью новых кнопок в интерфейсе видеоплеера.\n- Улучшена обработка и редактирование больших текстовых файлов размером до 20 МБ.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v4.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_3">- Теперь вы можете создавать и делиться несколькими ссылками.\n- Обновлен интерфейс разделов «Контакты» и «Мой аккаунт».\n- Улучшена поддержка устройств с Android 11.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v5.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_0">- Изменён интерфейс звонков в MEGA chat.\n- Теперь пользователи могут присоединяться к звонкам MEGA chat по ссылкам как гости или зарегистрированные участники.\n- Увеличено количество участников звонка.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v5.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_1">- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v5.1.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_1_1">- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v5.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_2">- Теперь вы можете выбрать качество видео для загрузок из камеры и вложений в чат.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v5.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_3">- Скрывайте свои последние действия из «Недавних» через «Настройки» &gt; «Пользовательский интерфейс» &gt; «Скрыть недавние действия»\n- Теперь вы можете выбрать раздел, который будет открываться при запуске приложения\n- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App v5.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_4">- Теперь вы можете разблокировать MEGA с помощью отпечатка пальца\n- Теперь вы можете сэкономить место, выбрав качество видео в настройках Загрузки из камеры\n- В галереи изображений добавлены параметры масштабирования\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v5.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_5">- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v6.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_0">- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v6.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_1">- В подзаголовок папки добавлен режим галереи. Теперь можно переключаться между режимами списка, эскизов и галереи\n- Теперь можно предпросматривать изображения в оригинальном разрешении\n- Вернулись пункты меню «открыть ссылку»\n- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App v6.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_2">- Новая функция «загрузить папку», позволяющая загружать всю папку или несколько элементов папки\n- Добавлена ​​опция переупорядочить список воспроизведения аудио и видео\n- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App v6.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_3">- Улучшено взаимодействие с клиентами при оплате подписки на Pro-аккаунт\n- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App v6.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_4">- Прекращена поддержка Android 5.x\n- Улучшена поддержка Android 12\n- Улучшен процесс оплаты подписки на аккаунт при смене тарифных планов Pro\n- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App v6.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_5">- Теперь вы можете просматривать любимые фотографии в разделе «Фото»\n- Индикатор текущего звонка добавлен в домашний раздел\n- Улучшено взаимодействие с клиентами, когда оплата недоступна\n- Улучшено взаимодействие с пользователями при удалении аккаунтов с активными подписками\n- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App v6.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_6">- Теперь избранное может отображаться в главном разделе\n- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App v6.7. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_7">- Теперь проще находить ваши контакты в чате по имени, адресу электронной почты или псевдониму\n- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App v6.8. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_8">- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App v6.9. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_9">- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v6.10. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_10">- Теперь вы можете выбирать настройки качества изображений, прикладываемых в чат при использовании мобильных данных.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v6.10.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_10_1">- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v6.11. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_11">- Чтобы избранное было ещё проще найти, на главный экран добавлена карточка «Избранное».\n- Все изображения из Облачного диска теперь находятся в разделе «Фото».\n- Теперь можно разблокировать доступ, защищённый PIN-кодом или отпечатком пальца, с помощью своего пароля.\n- Улучшено управление дубликатами файлов при загрузке, копировании или перемещении внутри приложения.\n- Улучшено управление передачами и повышена надёжность скачивания и загрузки.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v6.12. Keep the dash character (-) and line breaks to keep the list format. Note: 'Settings'(key:action_settings), 'Help'(key: settings_help) and 'Report issue'(key:settings_help_report_issue) are UI elements-->
+    <string name="android_change_log_v6_12">- Улучшена панель инструментов чата для более удобного общения.\n- Сообщение о проблемах через «Настройки» &gt; «Помощь» &gt; «Сообщение о проблеме».\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v6.12.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_12_1">- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v6.13. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_13">- Теперь организатор встречи может завершить звонок для всех участников.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App v6.14. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_14">- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App v6.14.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_14_1">- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App v6.15. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_15">- Новые вкладки для чатов и встреч\n- Возможность открывать документы Microsoft с помощью приложения Microsoft\n- Исправлены ошибки и улучшена производительность</string>
+    <!-- Change log of the Android App 7.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v7_0">- Уменьшено использование памяти устройства приложением.\n- Больше не будут выходить обновления приложения для Android 6.\n- Теперь поддерживается больше форматов необработанных изображений.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of the Android App 7.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v7_6">- Теперь вы можете просматривать запланированные встречи и присоединяться к ним.\n- Вы будете получать уведомления о запланированных встречах, на которые вас пригласили.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of Android App 8.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v8_0">- Теперь можно группировать фото и видео в альбомы.\n- Теперь можно добавлять субтитры к видео.\n- Исправлены ошибки и улучшена производительность.</string>
+    <!-- Change log of Android App 9.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v9_0">- Теперь можно назначать планировать разовые и регулярные встречи.\n- Добавлена поддержка Android 14.\n- Добавлена поддержка видеоформатов .mkv и .avi.</string>
+    <!-- Change log of Android App 10.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v10_0">- Теперь доступен обмен альбомами.\n- Исправлены ошибки и улучшена производительность.</string>
+</resources>

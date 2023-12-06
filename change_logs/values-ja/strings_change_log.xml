@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Change log of the Android App v3.8.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log">－チャットメッセージに絵文字の反応を追加。\n－音声/ビデオ通話の改善。\n－カメラアップロードを改善。\n－MKV動画ファイルのサポートを改善。\n－検索機能を改善。\n－その他複数の改善とバグ修正。</string>
+    <!-- Change log of the Android App v3.8.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log_v3_8_1">－新しい転送ウィジェットを追加。\n－転送ユーザーインターフェイスを改善。\n－「邪魔しないでください」モードを追加。\n－通知を改善。\n－Google Playによる支払いを改善（新しいGoogle Play課金ライブラリ）。\n－その他複数の改善とバグ修正。</string>
+    <!-- Change log of the Android App v3.8.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="andoid_change_log_v3_8_2">－通話を保留にするオプションを追加。\n－通話ユーザーインターフェイスと通話通知を改善。\n－チャットメッセージへの反応の数に制限を追加。\n－MEGAからの重要な通知を公表するサービスを追加。\n－チャットツールバーにGIPHYオプションを追加。\n－チャットでのGIF再生を改善。</string>
+    <!-- Change log of the Android App v3.8.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_3">－設定ページを刷新。\n－音声/ビデオストリーミング中の画面回転後の読み込み時間を改善。\n－その他のいくつかの改善とバグ修正。</string>
+    <!-- Change log of the Android App v3.8.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_4">－転送の再開を有効にしました。\n－アカウントのアップグレード中にローカル価格を表示します。\n－その他複数の改善とバグ修正。</string>
+    <!-- Change log of the Android App v3.8.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v3_8_5">－新しいホームページを追加。\n－ファイルとフォルダをお気に入りとして設定する新しいオプションを追加。\n－ファイルとフォルダのカラーラベルを設定する機能を追加。\n－その他複数の改善とバグ修正。</string>
+    <!-- Change log of the Android App v4.0.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_0">－新しいクッキーの設定を追加。\n－リンク取得ユーザーインターフェイスを改善。\n－転送ユーザーインターフェイスを改善。\n－MEGAからの重要な通知を公表するためのサービスを改善。\n－その他複数の改善とバグ修正。</string>
+    <!-- Change log of the Android App v4.0.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_1">－ユーザー様がハイライトされた機能を見ることができる新しいホームページバナーを追加。\n－チャットの保持設定を使用した会話での自動履歴クリアを追加。\n－その他複数の改善とバグ修正。</string>
+    <!-- Change log of the Android App v4.0.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_0_2">－新しいドキュメントスキャナー機能を追加。\n－その他複数の改善とバグ修正。</string>
+    <!-- Change log of the Android App v4.1.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_0">－ダークテーマが利用可能になりました。\n－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v4.1.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_1">－MEGAに保存されている音声ファイルの自動プレイリストとバックグラウンド再生を備えた新しい音声プレイヤー。\n－MEGAに保存されている動画ファイルの自動プレイリストを備えた新しい動画プレイヤー。\n－ごみ箱をナビゲーションドロワー（表示パネル）に配置。\n－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v4.1.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_2">－パスコードロックのタイムアウトオプションとインターフェイスの更新\n。－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App v4.1.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_3">－テキストエディタを追加しました。プレーンテキスト文書の作成と編集ができるようになりました。\n－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v4.1.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_4">－二要素認証のユーザーインターフェイスを更新\n－バグ修正とパフォーマンスを改善。</string>
+    <!-- Change log of the Android App v4.1.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_5">－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v4.1.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_1_6">－MEGAの画像や動画を端末のギャラリーに直接保存できるようになりました。\n－バグ修正とパフォーマンスの向上。</string>
+    <!-- Change log of the Android App v4.2.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_0">－最高のコンテンツを見つけて共有するのに役立つ、カメラアップロードの新しい外観を導入しています。写真や動画を日別、月別、年別に分類して見られるようになりました。\n－オーディオプレイヤーのインターフェイスに新たなボタンが追加され、15秒単位での早送り・早戻しができるようになりました。\n-バグ修正とパフォーマンスの向上。</string>
+    <!-- Change log of the Android App v4.2.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_1">－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v4.2.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_2_2">－動画プレイヤーのインターフェイスに新しく追加されたボタンを使って、15秒単位の早送り・早戻しができるようになりました。\n－最大20&#160;MBまでの大きなテキストファイルの扱いと編集が改善。\n－バグ修正とパフォーマンスの向上。</string>
+    <!-- Change log of the Android App v4.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v4_3">－複数のリンクを作成して共有できるようになりました。\n連絡先と「私のアカウント」のUIを更新。\nAndroid 11端末への対応を強化。\nバグ修正とパフォーマンスの向上。</string>
+    <!-- Change log of the Android App v5.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_0">－MEGA chatの通話インターフェイスのルック＆フィールを一新。\n－ユーザー様はリンク経由でMEGA chatの通話にゲストまたは登録された参加者として参加できるようになりました。\n－通話の参加者数を増加。\n－バグ修正とパフォーマンスの向上。</string>
+    <!-- Change log of the Android App v5.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_1">－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v5.1.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_1_1">－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v5.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_2">－カメラアップロードの動画品質とチャットの添付ファイルの設定を選択できるようになりました。\n－バグ修正とパフォーマンスの向上。</string>
+    <!-- Change log of the Android App v5.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_3">－「設定」&gt;「ユーザーインターフェイス」&gt;「最近のアクティビティを隠す」で「最近」から最近のアクティビティを隠すことができます\n－アプリを起動する画面を選択できるようになりました\n－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v5.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_4">－指紋でMEGAのロックを解除できるようになりました\n－カメラアップロード設定で動画の画質オプションを定義することで、スペースを節約できるようになりました\n－画像ギャラリーにズームオプションが追加されました\n－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v5.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v5_5">－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v6.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_0">－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v6.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_1">－ギャラリーモードがフォルダのサブヘッダーに追加されました。リスト、サムネイル、ギャラリーモードの切り替えが可能になりました。\n－フルスクリーン解像度の画像がプレビューできるようになりました。\n－メニューオプションに「リンクを開く」が復活しました。\n－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App v6.2. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_2">－新しい「フォルダのアップロード」機能により、フォルダ全体またはフォルダ項目を複数選択してアップロード可能\n－音声と動画プレイリストに並べ替えオプションを追加\n－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App v6.3. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_3">－Proアカウントサブスクリプションのお支払いに関するカスタマーエクスペリエンスを改善\n－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App v6.4. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_4">－Android 5.xのサポートを廃止\n－Android 12のサポートを改善\n－Proプラン変更時のアカウントサブスクリプションのお支払いに関するカスタマーエクスペリエンスを改善\n－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App v6.5. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_5">－写真セクションからお気に入りの写真を楽しむことができるようになりました\n－ホームセクションに継続通話インジケータを追加\n－課金が利用できない場合の顧客体験を改善\n－アクティブなサブスクリプションをお持ちのアカウントを削除する際のユーザー体験を改善\n－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App v6.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_6">－ホームセクションにお気に入りが表示されるようになりました\n－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App v6.7. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_7">－名前、メール、またはエイリアスを検索して、チャットで連絡先を簡単に見つけることができるようになりました\n－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App v6.8. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_8">－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App v6.9. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_9">－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v6.10. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_10">－モバイルデータ使用時のチャット添付ファイルの画質設定を選択できるようになりました。\n－バグ修正とパフォーマンスの向上。</string>
+    <!-- Change log of the Android App v6.10.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_10_1">－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v6.11. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_11">－ホーム画面にお気に入りカードが追加され、お気に入りがさらに見つけやすくなりました。\n－クラウドドライブの画像がすべて写真セクションに配置されました。\n－パスワードを使用してPINと指紋アクセスを解除できるようになりました。\n－アプリ内でのアップロード、コピー、移動時に重複ファイルの制御がより向上しました。\n－転送管理の強化、ダウンロードとアップロードの信頼性が改善しました。\n－バグを修正しパフォーマンスが改善されました。</string>
+    <!-- Change log of the Android App v6.12. Keep the dash character (-) and line breaks to keep the list format. Note: 'Settings'(key:action_settings), 'Help'(key: settings_help) and 'Report issue'(key:settings_help_report_issue) are UI elements-->
+    <string name="android_change_log_v6_12">－チャットツールバーの改善によるチャット体験の向上\n－設定&amp;amp;gt、ヘルプ&gt;、問題を報告による問題報告\n－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v6.12.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_12_1">－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v6.13. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_13">－会議主催者が参加者全員に対して通話を終了させるオプション\n－バグ修正とパフォーマンスの改善。</string>
+    <!-- Change log of the Android App v6.14. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_14">－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App v6.14.1. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_14_1">－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App v6.15. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v6_15">－チャットとミーティング用の新しいタブ\n－Microsoftアプリを使用してMicrosoftドキュメントを開く機能\n－バグ修正とパフォーマンスの改善</string>
+    <!-- Change log of the Android App 7.0. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v7_0">ーアプリの実行時に使用されるデバイスメモリが少なくなります。\nAndroid 6のアップデートは提供されなくなります。\nより多くの未加工の画像形式に対応するようになりました。\nーバグが修正され、パフォーマンスが向上しました。</string>
+    <!-- Change log of the Android App 7.6. Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v7_6">－スケジュールされたミーティングを表示して参加できるようになりました。\n－招待されたミーティングのスケジュールに関する通知を受け取ります。\n－バグが修正され、パフォーマンスが向上しました。</string>
+    <!-- Change log of Android App 8.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v8_0">ー写真や動画をアルバムに整理できるようになりました。\nー動画に字幕を追加できるようになりました。\nーバグが修正され、パフォーマンスが向上しました。</string>
+    <!-- Change log of Android App 9.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v9_0">－1回限りの会議や定期的な会議をスケジュールできるようになりました。\n－Android 14のサポートが追加されました。\n.mkvと.avi動画形式のサポートが追加されました。</string>
+    <!-- Change log of Android App 10.0 . Keep the dash character (-) and line breaks to keep the list format. -->
+    <string name="android_change_log_v10_0">－アルバム共有がリリースされました。\n－バグを修正しパフォーマンスを改善しました。</string>
+</resources>
