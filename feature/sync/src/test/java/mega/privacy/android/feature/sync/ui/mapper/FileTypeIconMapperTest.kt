@@ -19,7 +19,7 @@ class FileTypeIconMapperTest {
                 whenever(fileType.extension).thenReturn(it.key)
             }
             whenever(typeFileNode.type).thenReturn(fileTypeInfo)
-            val iconRes = underTest(typeFileNode)
+            val iconRes = underTest(typeFileNode.type.extension)
             Truth.assertThat(iconRes).isEqualTo(it.value)
         }
     }
@@ -31,7 +31,7 @@ class FileTypeIconMapperTest {
             whenever(fileType.extension).thenReturn("unknownExtension")
         }
         whenever(typeFileNode.type).thenReturn(fileTypeInfo)
-        val iconRes = underTest(typeFileNode)
+        val iconRes = underTest(typeFileNode.type.extension)
         Truth.assertThat(iconRes).isEqualTo(R.drawable.ic_generic_list)
     }
 
@@ -42,7 +42,7 @@ class FileTypeIconMapperTest {
             whenever(fileType.extension).thenReturn("JpeG")
         }
         whenever(typeFileNode.type).thenReturn(fileTypeInfo)
-        val iconRes = underTest(typeFileNode)
+        val iconRes = underTest(typeFileNode.type.extension)
         Truth.assertThat(iconRes).isEqualTo(R.drawable.ic_image_list)
     }
 

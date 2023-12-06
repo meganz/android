@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
-import mega.privacy.android.core.R as CoreUIR
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +16,6 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.node.FileNode
@@ -25,9 +23,11 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.ui.extension.getIcon
 import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun MegaFolderPickerView(
@@ -68,7 +68,7 @@ internal fun MegaFolderPickerView(
                 }
 
                 is FileNode -> {
-                    fileTypeIconMapper(nodeEntity)
+                    fileTypeIconMapper(nodeEntity.type.extension)
                 }
 
                 else -> {
@@ -151,16 +151,5 @@ private fun FolderNode.folderInfo(): String {
             childFileCount,
             childFileCount
         )
-    }
-}
-
-@Composable
-private fun FolderNode.getIcon(): Int {
-    return if (isIncomingShare) {
-        CoreUIR.drawable.ic_folder_incoming
-    } else if (isShared || isPendingShare) {
-        CoreUIR.drawable.ic_folder_outgoing
-    } else {
-        CoreUIR.drawable.ic_folder_list
     }
 }

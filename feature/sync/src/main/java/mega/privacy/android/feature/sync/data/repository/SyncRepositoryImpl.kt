@@ -42,29 +42,21 @@ internal class SyncRepositoryImpl @Inject constructor(
         name: String?,
         localPath: String,
         remoteFolderId: Long,
-    ): Boolean =
-        withContext(ioDispatcher) {
-            syncGateway.syncFolderPair(name, localPath, remoteFolderId)
-        }
-
-    override suspend fun pauseSync(folderPairId: Long) {
-        withContext(ioDispatcher) {
-            syncGateway.pauseSync(folderPairId)
-        }
+    ): Boolean = withContext(ioDispatcher) {
+        syncGateway.syncFolderPair(name, localPath, remoteFolderId)
     }
 
-    override suspend fun resumeSync(folderPairId: Long) {
-        withContext(ioDispatcher) {
-            syncGateway.resumeSync(folderPairId)
-        }
+    override suspend fun pauseSync(folderPairId: Long) = withContext(ioDispatcher) {
+        syncGateway.pauseSync(folderPairId)
     }
 
-    override suspend fun getFolderPairs(): List<FolderPair> =
-        withContext(ioDispatcher) {
-            syncGateway
-                .getFolderPairs()
-                .let { mapToDomain(it) }
-        }
+    override suspend fun resumeSync(folderPairId: Long) = withContext(ioDispatcher) {
+        syncGateway.resumeSync(folderPairId)
+    }
+
+    override suspend fun getFolderPairs(): List<FolderPair> = withContext(ioDispatcher) {
+        mapToDomain(syncGateway.getFolderPairs())
+    }
 
     private suspend fun mapToDomain(model: MegaSyncList): List<FolderPair> =
         (0 until model.size())
@@ -80,10 +72,8 @@ internal class SyncRepositoryImpl @Inject constructor(
                 )
             }
 
-    override suspend fun removeFolderPair(folderPairId: Long) {
-        withContext(ioDispatcher) {
-            syncGateway.removeFolderPair(folderPairId)
-        }
+    override suspend fun removeFolderPair(folderPairId: Long) = withContext(ioDispatcher) {
+        syncGateway.removeFolderPair(folderPairId)
     }
 
 
@@ -103,10 +93,9 @@ internal class SyncRepositoryImpl @Inject constructor(
     }
     override val syncChanges: Flow<MegaSyncListenerEvent> = _syncChanges
 
-    override suspend fun getSyncStalledIssues(): List<StalledIssue> =
-        withContext(ioDispatcher) {
-            syncGateway.getSyncStalledIssues()?.let { stalledIssuesMapper(it) }.orEmpty()
-        }
+    override suspend fun getSyncStalledIssues(): List<StalledIssue> = withContext(ioDispatcher) {
+        syncGateway.getSyncStalledIssues()?.let { stalledIssuesMapper(it) }.orEmpty()
+    }
 
     private val _syncStalledIssues by lazy {
         _syncChanges

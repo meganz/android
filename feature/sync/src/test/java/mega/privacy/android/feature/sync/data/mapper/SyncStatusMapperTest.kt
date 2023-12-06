@@ -1,7 +1,6 @@
-package mega.privacy.android.feature.sync.data
+package mega.privacy.android.feature.sync.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.feature.sync.data.mapper.SyncStatusMapper
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncStats

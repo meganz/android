@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.sync.data
+package mega.privacy.android.feature.sync.data.repository
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.data.gateway.SyncSolvedIssuesGateway
 import mega.privacy.android.feature.sync.data.mapper.solvedissue.SolvedIssueEntityToSolvedIssueMapper
 import mega.privacy.android.feature.sync.data.mapper.solvedissue.SolvedIssueToSolvedIssueEntityMapper
-import mega.privacy.android.feature.sync.data.repository.SyncSolvedIssuesRepositoryImpl
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock

@@ -1,9 +1,8 @@
-package mega.privacy.android.feature.sync.data
+package mega.privacy.android.feature.sync.data.mapper
 
 import com.google.common.truth.Truth
 import com.google.gson.Gson
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
