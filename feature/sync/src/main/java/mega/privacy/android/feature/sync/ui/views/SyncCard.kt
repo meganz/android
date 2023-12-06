@@ -26,9 +26,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R
+import mega.privacy.android.core.R as coreR
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -112,7 +114,7 @@ private fun SyncCardHeader(
                 .padding(top = 16.dp)
         ) {
             Image(
-                painter = painterResource(R.drawable.ic_folder_sync),
+                painter = painterResource(coreR.drawable.ic_folder_sync),
                 contentDescription = null,
                 modifier = Modifier.padding(end = 8.dp),
             )
@@ -129,10 +131,10 @@ private fun SyncCardHeader(
                 ) {
                     Image(
                         painter = when {
-                            hasStalledIssues -> painterResource(R.drawable.ic_alert_circle)
-                            status == SyncStatus.SYNCING -> painterResource(R.drawable.ic_sync_02)
-                            status == SyncStatus.PAUSED -> painterResource(R.drawable.ic_pause)
-                            else -> painterResource(R.drawable.ic_check_circle)
+                            hasStalledIssues -> painterResource(coreR.drawable.ic_alert_circle)
+                            status == SyncStatus.SYNCING -> painterResource(coreR.drawable.ic_sync_02)
+                            status == SyncStatus.PAUSED -> painterResource(coreR.drawable.ic_pause)
+                            else -> painterResource(coreR.drawable.ic_check_circle)
                         },
                         contentDescription = null,
                         modifier = Modifier
@@ -147,10 +149,10 @@ private fun SyncCardHeader(
                     )
                     Text(
                         text = when {
-                            hasStalledIssues -> "Failed"
-                            status == SyncStatus.SYNCING -> "Syncing..."
-                            status == SyncStatus.PAUSED -> "Paused"
-                            else -> "Synced"
+                            hasStalledIssues -> stringResource(id = R.string.sync_folders_sync_state_failed)
+                            status == SyncStatus.SYNCING -> stringResource(id = R.string.sync_list_sync_state_syncing)
+                            status == SyncStatus.PAUSED -> stringResource(id = R.string.sync_list_sync_state_paused)
+                            else -> stringResource(id = R.string.sync_list_sync_state_synced)
                         },
                         Modifier.align(Alignment.CenterVertically),
                         style = MaterialTheme.typography.body2.copy(
@@ -167,9 +169,9 @@ private fun SyncCardHeader(
 
         Image(
             painter = if (expanded) {
-                painterResource(R.drawable.ic_chevron_up)
+                painterResource(coreR.drawable.ic_chevron_up)
             } else {
-                painterResource(R.drawable.ic_chevron_down)
+                painterResource(coreR.drawable.ic_chevron_down)
             },
             contentDescription = null,
             modifier = Modifier
@@ -192,7 +194,7 @@ private fun SyncCardDetailedInfo(
     Column(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)) {
         Column {
             Text(
-                text = "Device storage",
+                text = stringResource(id = R.string.sync_folders_device_storage),
                 style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.textColorPrimary),
             )
             Text(
@@ -205,7 +207,7 @@ private fun SyncCardDetailedInfo(
 
         Column {
             Text(
-                text = "MEGA storage",
+                text = stringResource(id = R.string.sync_folders_mega_storage),
                 style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.textColorPrimary),
             )
             Text(
@@ -218,7 +220,7 @@ private fun SyncCardDetailedInfo(
 
         Column {
             Text(
-                text = "Method",
+                text = stringResource(id = R.string.sync_folders_method),
                 style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.textColorPrimary),
             )
             Text(
@@ -248,9 +250,9 @@ private fun SyncCardFooter(
                 IconButtonWithText(
                     modifier = Modifier.padding(end = 8.dp),
                     onClick = issuesInfoClicked,
-                    icon = R.drawable.ic_info,
+                    icon = coreR.drawable.ic_info,
                     color = MaterialTheme.colors.error,
-                    text = "Issues info"
+                    text = stringResource(id = R.string.sync_card_sync_issues_info)
                 )
             }
             IconButtonWithText(
@@ -259,20 +261,20 @@ private fun SyncCardFooter(
                     .defaultMinSize(minWidth = 48.dp, minHeight = 36.dp),
                 onClick = pauseRunClicked,
                 icon = if (isSyncRunning) {
-                    R.drawable.ic_pause
+                    coreR.drawable.ic_pause
                 } else {
-                    R.drawable.ic_play_circle
+                    coreR.drawable.ic_play_circle
                 },
                 text = if (isSyncRunning) {
-                    "Pause"
+                    stringResource(id = R.string.sync_card_pause_sync)
                 } else {
-                    "Run"
+                    stringResource(id = R.string.sync_card_run_sync)
                 }
             )
             IconButtonWithText(
                 onClick = removeFolderClicked,
-                icon = R.drawable.ic_minus_circle,
-                text = "Remove"
+                icon = coreR.drawable.ic_minus_circle,
+                text = stringResource(id = R.string.sync_card_remove_sync)
             )
         }
     }
@@ -350,7 +352,7 @@ private fun SyncCardCollapsedPreview() {
 private fun IconButtonPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         IconButtonWithText(
-            onClick = {}, icon = R.drawable.ic_info, text = "Info"
+            onClick = {}, icon = coreR.drawable.ic_info, text = "Info"
         )
     }
 }

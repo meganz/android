@@ -56,7 +56,7 @@ internal fun InputSyncInformationView(
             text = folderPairName,
             onTextChange = { onFolderPairNameChanged(it) },
             modifier = Modifier.padding(start = 24.dp, end = 16.dp, top = 4.dp, bottom = 12.dp),
-            placeholder = "Name folder pair",
+            placeholder = stringResource(id = R.string.sync_folders_choose_folder_pair),
             imeAction = ImeAction.Done,
             keyboardActions = KeyboardActions.Default,
             colors = TextFieldDefaults.textFieldColors(
@@ -79,7 +79,7 @@ internal fun InputSyncInformationView(
 
         TwoLinesItem(
             CoreUiR.drawable.ic_smartphone,
-            "Device folder",
+            stringResource(id = R.string.sync_folder_choose_device_folder_title),
             selectedDeviceFolder,
             stringResource(R.string.general_select),
             Modifier.clickable { selectDeviceFolderClicked() }
@@ -93,7 +93,7 @@ internal fun InputSyncInformationView(
 
         TwoLinesItem(
             CoreUiR.drawable.ic_mega,
-            "MEGA folder",
+            stringResource(id = R.string.sync_folders_choose_mega_folder_title),
             selectedMEGAFolder,
             stringResource(R.string.general_select),
             Modifier.clickable {
@@ -108,8 +108,8 @@ internal fun InputSyncInformationView(
         )
         TwoLinesItem(
             CoreUiR.drawable.ic_sync,
-            "Method",
-            "Two way sync",
+            stringResource(id = R.string.sync_folders_method),
+            stringResource(id = R.string.sync_two_way),
             ""
         )
     }

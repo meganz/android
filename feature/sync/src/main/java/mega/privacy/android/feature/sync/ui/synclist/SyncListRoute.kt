@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
@@ -23,6 +24,10 @@ internal fun SyncListRoute(
     val snackBarHostState = remember { SnackbarHostState() }
 
     var showSyncOptionsDialog by remember { mutableStateOf(false) }
+
+    val message = state.snackbarMessage?.let {
+        stringResource(id = it)
+    }
 
     SyncListScreen(
         stalledIssuesCount = state.stalledIssuesCount,
@@ -62,7 +67,7 @@ internal fun SyncListRoute(
     }
 
     LaunchedEffect(key1 = state.snackbarMessage) {
-        state.snackbarMessage?.let {
+        message?.let {
             snackBarHostState.showSnackbar(it)
             viewModel.handleAction(SyncListAction.SnackBarShown)
         }

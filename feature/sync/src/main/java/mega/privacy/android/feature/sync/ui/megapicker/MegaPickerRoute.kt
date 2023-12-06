@@ -4,10 +4,12 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.FolderClicked
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
@@ -108,12 +110,12 @@ fun AllFilesAccessDialog(
     onDismiss: () -> Unit,
 ) {
     ConfirmationDialog(
-        text = " To back up your files, MEGA needs access to the files and folders in this device. Your data is always safe with us.",
-        confirmButtonText = "Continue",
-        cancelButtonText = "Not Now",
+        text = stringResource(id = R.string.sync_access_storage_permission_message),
+        confirmButtonText = stringResource(id = R.string.sync_dialog_file_permission_positive_button),
+        cancelButtonText = stringResource(id = R.string.sync_dialog_file_permission_negative_button),
         onConfirm = onConfirm,
         onDismiss = onDismiss,
-        title = "All files access",
+        title = stringResource(id = R.string.sync_dialog_storage_access_title),
     )
 }
 
@@ -123,11 +125,11 @@ private fun DisableBatteryOptimizationDialog(
     onDismiss: () -> Unit,
 ) {
     ConfirmationDialog(
-        text = "Allow MEGA to read, modify or delete all files on this device.",
-        confirmButtonText = "Allow",
-        cancelButtonText = "Cancel",
+        text = stringResource(id = R.string.sync_dialog_battery_optimization_message),
+        confirmButtonText = stringResource(id = R.string.sync_dialog_battery_optimization_positive_button),
+        cancelButtonText = stringResource(id = R.string.sync_dialog_battery_optimization_negative_button),
         onConfirm = onConfirm,
         onDismiss = onDismiss,
-        title = "Battery optimization",
+        title = stringResource(id = R.string.sync_dialog_battery_optimization_title),
     )
 }

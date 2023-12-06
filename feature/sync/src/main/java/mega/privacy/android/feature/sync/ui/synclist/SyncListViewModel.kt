@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResolveStalledIssueUseCase
@@ -94,10 +95,7 @@ internal class SyncListViewModel @Inject constructor(
                         action.selectedResolution, stalledIssueItemMapper(action.uiItem)
                     )
                 }
-
-                _state.update { state ->
-                    state.copy(snackbarMessage = "Conflict resolved")
-                }
+                _state.update { SyncListState(snackbarMessage = R.string.sync_stalled_issue_conflict_resolved) }
             }
 
             SyncListAction.SnackBarShown -> {

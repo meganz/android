@@ -69,7 +69,7 @@ private fun SyncEmptyScreenContent(
         )
 
         Text(
-            text = "Sync",
+            text = stringResource(id = R.string.sync),
             modifier = Modifier
                 .padding(bottom = 24.dp)
                 .fillMaxWidth()
@@ -78,7 +78,7 @@ private fun SyncEmptyScreenContent(
             style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.textColorPrimary)
         )
         Text(
-            text = "You will need to set up a local folder on your \n" + "device that would pair with a chosen folder on \n" + "your Cloud Drive.",
+            text = stringResource(id = R.string.sync_empty_state_message),
             modifier = Modifier
                 .padding(bottom = 32.dp)
                 .fillMaxWidth(),

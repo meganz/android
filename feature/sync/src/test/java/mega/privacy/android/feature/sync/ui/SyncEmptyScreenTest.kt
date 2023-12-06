@@ -31,7 +31,7 @@ internal class SyncEmptyScreenTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(TAG_SYNC_EMPTY_ONBOARDING_TITLE)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("You will need to set up a local folder on your \n" + "device that would pair with a chosen folder on \n" + "your Cloud Drive.")
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_empty_state_message))
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.start_screen_setting))
             .assertIsDisplayed()

@@ -19,7 +19,7 @@ internal class StalledIssueResolutionActionMapper @Inject constructor() {
                 if (areAllNodesFolders) {
                     listOf(
                         StalledIssueResolutionAction(
-                            "Rename all items",
+                            actionName = "Rename all items",
                             StalledIssueResolutionActionType.RENAME_ALL_ITEMS
                         ),
                         StalledIssueResolutionAction(

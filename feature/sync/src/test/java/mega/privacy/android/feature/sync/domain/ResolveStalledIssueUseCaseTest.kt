@@ -26,7 +26,6 @@ import mega.privacy.android.feature.sync.domain.usecase.solvedissues.SetSyncSolv
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.RenameFilesWithTheSameNameUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.RenameNodeWithTheSameNameUseCase
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito

@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.views
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 
 @Composable
@@ -23,7 +24,7 @@ internal fun SyncItemView(
         hasStalledIssues = sync.hasStalledIssues,
         deviceStoragePath = sync.deviceStoragePath,
         megaStoragePath = sync.megaStoragePath,
-        method = sync.method,
+        method = stringResource(id = sync.method),
         expanded = sync.expanded,
         expandClicked = {
             cardExpanded(sync, !sync.expanded)

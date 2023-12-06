@@ -57,7 +57,7 @@ class SyncStalledIssuesViewModelTest {
             conflictName = "conflicting folder",
             nodeNames = listOf("Camera"),
             icon = 0,
-            detailedInfo = StalledIssueDetailedInfo("", ""),
+            detailedInfo = StalledIssueDetailedInfo(-1, -1),
             actions = emptyList()
         )
     )

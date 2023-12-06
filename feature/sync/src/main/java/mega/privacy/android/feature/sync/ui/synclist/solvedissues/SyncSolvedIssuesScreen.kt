@@ -11,6 +11,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -26,7 +27,7 @@ internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
         if (solvedIssues.isEmpty()) {
             item {
                 SyncListNoItemsPlaceHolder(
-                    placeholderText = "No Solved Issues",
+                    placeholderText = stringResource(id = R.string.sync_solved_issues_empty_message),
                     placeholderIcon = R.drawable.ic_no_solved_issues,
                     modifier = Modifier
                         .fillParentMaxHeight(0.8f)

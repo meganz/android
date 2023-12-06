@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.presentation
 
+import mega.privacy.android.feature.sync.R
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +34,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -136,7 +136,7 @@ class SyncListViewModelTest {
             selectedResolution, stalledIssue
         )
         underTest.state.test {
-            assertThat(awaitItem().snackbarMessage).isEqualTo("Conflict resolved")
+            assertThat(awaitItem().snackbarMessage).isEqualTo(R.string.sync_stalled_issue_conflict_resolved)
             cancelAndIgnoreRemainingEvents()
         }
     }

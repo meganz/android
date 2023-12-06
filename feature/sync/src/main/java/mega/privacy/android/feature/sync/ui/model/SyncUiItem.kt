@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.model
 
+import androidx.annotation.StringRes
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 
 internal data class SyncUiItem(
@@ -9,6 +10,6 @@ internal data class SyncUiItem(
     val hasStalledIssues: Boolean,
     val deviceStoragePath: String,
     val megaStoragePath: String,
-    val method: String,
+    @StringRes val method: Int,
     val expanded: Boolean,
 )

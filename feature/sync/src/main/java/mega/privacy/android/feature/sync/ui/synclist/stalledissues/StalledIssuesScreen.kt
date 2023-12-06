@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
@@ -33,7 +34,7 @@ private fun StalledIssuesScreenContent(
         if (stalledIssues.isEmpty()) {
             item {
                 SyncListNoItemsPlaceHolder(
-                    placeholderText = "No Stalled Issues",
+                    placeholderText = stringResource(id = R.string.sync_stalled_issues_empty_message),
                     placeholderIcon = R.drawable.ic_no_stalled_issues,
                     modifier = Modifier
                         .fillParentMaxHeight(0.8f)

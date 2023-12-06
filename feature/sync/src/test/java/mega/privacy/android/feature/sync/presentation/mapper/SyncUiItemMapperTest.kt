@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.presentation.mapper
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -36,7 +37,7 @@ class SyncUiItemMapperTest {
                 hasStalledIssues = false,
                 deviceStoragePath = "DCIM",
                 megaStoragePath = "photos",
-                method = "Two-way sync",
+                method = R.string.sync_two_way,
                 expanded = false
             )
         )
@@ -54,7 +55,7 @@ class SyncUiItemMapperTest {
                 hasStalledIssues = false,
                 deviceStoragePath = "DCIM",
                 megaStoragePath = "photos",
-                method = "Two-way sync",
+                method = R.string.sync_two_way,
                 expanded = false
             )
         )

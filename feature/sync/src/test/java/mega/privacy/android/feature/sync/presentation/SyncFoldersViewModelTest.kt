@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
@@ -62,7 +63,7 @@ class SyncFoldersViewModelTest {
             deviceStoragePath = "DCIM",
             hasStalledIssues = false,
             megaStoragePath = "photos",
-            method = "Two-way sync",
+            method = R.string.sync_two_way,
             expanded = false
         )
     )
@@ -203,7 +204,7 @@ class SyncFoldersViewModelTest {
         deviceStoragePath = "DCIM",
         megaStoragePath = "photos",
         hasStalledIssues = false,
-        method = "Two-way sync",
+        method = R.string.sync_two_way,
         expanded = false
     )
 

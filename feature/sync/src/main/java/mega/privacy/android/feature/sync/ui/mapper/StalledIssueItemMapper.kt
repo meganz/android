@@ -1,7 +1,8 @@
 package mega.privacy.android.feature.sync.ui.mapper
 
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.core.R
+import mega.privacy.android.core.R as coreR
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.ui.model.StalledIssueDetailedInfo
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
@@ -19,12 +20,15 @@ internal class StalledIssueItemMapper @Inject constructor(
             conflictName = stalledIssueEntity.conflictName,
             nodeNames = stalledIssueEntity.nodeNames,
             icon = if (areAllNodesFolders) {
-                R.drawable.ic_folder_list
+                coreR.drawable.ic_folder_list
             } else {
                 iconPackR.drawable.ic_generic_list
             },
             detailedInfo = getMockStalledIssueResolveInfo(),
-            actions = stalledIssueResolutionActionMapper(stalledIssueEntity.issueType, areAllNodesFolders)
+            actions = stalledIssueResolutionActionMapper(
+                stalledIssueEntity.issueType,
+                areAllNodesFolders
+            )
         )
 
     operator fun invoke(stalledIssueUiItem: StalledIssueUiItem): StalledIssue =
@@ -38,9 +42,7 @@ internal class StalledIssueItemMapper @Inject constructor(
 
     private fun getMockStalledIssueResolveInfo(): StalledIssueDetailedInfo =
         StalledIssueDetailedInfo(
-            "Conflict A", "This folders contain multiple names " +
-                    "on one side, that would all become the same single name on the other side. This may" +
-                    " be due to syncing to case sensitive local filesystem, or the effects os " +
-                    "escaped characters."
+            title = R.string.sync_stalled_issue_detail_conflict_title,
+            explanation = R.string.sync_stalled_issue_detail_conflict_message
         )
 }

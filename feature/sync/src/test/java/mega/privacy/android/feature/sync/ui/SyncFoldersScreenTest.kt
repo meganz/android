@@ -11,6 +11,7 @@ import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_SYNC_ITEM_VIEW
 import org.junit.Rule
@@ -43,7 +44,7 @@ class SyncFoldersScreenTest {
                         hasStalledIssues = false,
                         deviceStoragePath = folderName,
                         megaStoragePath = folderName,
-                        method = "Two-way sync",
+                        method = R.string.sync_two_way,
                         expanded = false
                     )
                 )

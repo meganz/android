@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
@@ -51,13 +52,13 @@ class SyncNewFolderScreenRouteTest {
 
         composeTestRule.onNodeWithTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("Device folder")
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folder_choose_device_folder_title))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("MEGA folder")
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_choose_mega_folder_title))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("Method")
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_method))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("Two way sync")
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_two_way))
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON)
             .assertIsDisplayed()

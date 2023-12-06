@@ -77,8 +77,8 @@ internal fun SyncListScreen(
             when (val content = sheetContent) {
                 is SyncModalSheetContent.DetailedInfo -> {
                     ConflictDetailsDialog(
-                        content.stalledIssueUiItem.detailedInfo.title,
-                        content.stalledIssueUiItem.detailedInfo.explanation
+                        stringResource(id = content.stalledIssueUiItem.detailedInfo.title),
+                        stringResource(id = content.stalledIssueUiItem.detailedInfo.explanation)
                     )
                 }
 

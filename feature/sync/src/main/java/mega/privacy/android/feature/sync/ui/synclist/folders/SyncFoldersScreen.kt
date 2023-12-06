@@ -84,7 +84,7 @@ private fun SyncFoldersScreenSyncingPreview() {
                 false,
                 "/path/to/local/folder",
                 "/path/to/mega/folder",
-                "Two way sync",
+                R.string.sync_two_way,
                 false
             )
         ),
@@ -108,7 +108,7 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview() {
                 true,
                 "/path/to/local/folder",
                 "/path/to/mega/folder",
-                "Two way sync",
+                R.string.sync_two_way,
                 false
             )
         ),
