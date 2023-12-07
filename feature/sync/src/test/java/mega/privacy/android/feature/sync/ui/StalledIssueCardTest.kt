@@ -1,13 +1,11 @@
 package mega.privacy.android.feature.sync.ui
 
+import mega.privacy.android.core.R as CoreUiR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.feature.sync.R
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.feature.sync.ui.views.StalledIssueCard
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_STALLED_ISSUE_CARD_BUTTON_INFO
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_STALLED_ISSUE_CARD_BUTTON_MORE

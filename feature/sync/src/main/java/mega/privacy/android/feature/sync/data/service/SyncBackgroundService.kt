@@ -6,7 +6,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
@@ -21,6 +20,7 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
@@ -106,8 +106,9 @@ internal class SyncBackgroundService : LifecycleService() {
 
         return builderCompat
             .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-            .setColor(Color.parseColor("#F30C14")) // the color doesn't have a token yet
-            .setOngoing(true).setContentTitle("Sync monitoring")
+            .setColor(getColor(R.color.red_600_red_300))
+            .setOngoing(true)
+            .setContentTitle(getString(R.string.sync_notification_monitoring_description))
             .build()
     }
 

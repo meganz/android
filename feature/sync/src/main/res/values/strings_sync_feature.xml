@@ -51,7 +51,7 @@
     <!-- Sync when stalled issues, title of the conflict -->
     <string name="sync_stalled_issue_detail_conflict_message">This folders contain multiple names on one side, that would all become the same single name on the other side. This may  be due to syncing to case sensitive local filesystem, or the effects os escaped characters.</string>
     <!-- Sync when stalled issues, message of the conflict -->
-    <string name="sync_resolve_rename_all_items">"Rename all items"</string>
+    <string name="sync_resolve_rename_all_items">Rename all items</string>
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">Merge folders</string>
     <!-- Sync to resolve conflict Choose local file -->
@@ -67,7 +67,7 @@
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">Continue</string>
     <!-- Sync dialog not now button -->
-    <string name="sync_dialog_file_permission_negative_button">Not Now</string>
+    <string name="sync_dialog_file_permission_negative_button">Not now</string>
     <!-- Sync dialog title for storage access -->
     <string name="sync_dialog_storage_access_title">All files access</string>
     <!-- Sync dialog title for battery optimization -->
@@ -89,11 +89,11 @@
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">MEGA folder</string>
     <!-- Sync option for sync method -->
-    <string name="sync_folders_method">Method</string>
+    <string name="sync_folders_method">Sync type</string>
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">Paused</string>
     <!-- Sync state syncing -->
-    <string name="sync_list_sync_state_syncing">Syncing…</string>
+    <string name="sync_list_sync_state_syncing">Syncing&#8230;</string>
     <!-- Sync state failed -->
     <string name="sync_folders_sync_state_failed">Failed</string>
     <!-- Sync state synced -->
@@ -116,4 +116,6 @@
     <string name="sync_dialog_message_wifi_only">Wi-Fi only</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">You will need to set up a local folder on your\ndevice that would pair with a chosen folder on\nyour Cloud Drive.</string>
+    <!-- Sync notification title description sync monitoring-->
+    <string name="sync_notification_monitoring_description">Sync monitoring</string>
 </resources>

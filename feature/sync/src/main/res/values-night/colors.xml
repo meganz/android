@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="red_600_red_300">@color/red_300</color>
+</resources>
