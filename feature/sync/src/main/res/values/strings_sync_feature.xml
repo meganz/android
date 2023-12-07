@@ -38,6 +38,10 @@
     </plurals>
     <!-- Sync options -->
     <string name="sync_menu_sync_options">Sync options</string>
+    <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
+    <string name="sync_options_changed_to_wifi_only">Sync options were changed to: Wi-Fi only</string>
+    <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
+    <string name="sync_options_changed_to_wifi_and_mobile_data">Sync options were changed to: Wi-Fi or mobile data</string>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Clear solved issues</string>
     <!-- Sync message for two way sync-->

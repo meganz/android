@@ -3806,6 +3806,8 @@
     <string name="home_side_menu_backups_title">Backups</string>
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]No items in [/B][A]backups[/A]</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">Sync</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">This is where your backed up files and folders are stored. Your backed up items are “read-only” to protect them from being accidentally modified in your Cloud drive.\nYou can back up items from your computer to MEGA using our desktop app.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->

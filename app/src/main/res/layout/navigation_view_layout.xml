@@ -304,7 +304,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:gravity="start|center_vertical"
-                    android:text="Sync"
+                    android:text="@string/home_side_menu_sync_title"
                     android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View

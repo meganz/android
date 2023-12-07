@@ -107,7 +107,12 @@ internal class SyncListViewModel @Inject constructor(
             is SyncListAction.SyncOptionsSelected -> {
                 _state.update { state ->
                     state.copy(
-                        selectedSyncOption = action.selectedOption
+                        selectedSyncOption = action.selectedOption,
+                        snackbarMessage = if (action.selectedOption == SyncOption.WI_FI_ONLY) {
+                            R.string.sync_options_changed_to_wifi_only
+                        } else {
+                            R.string.sync_options_changed_to_wifi_and_mobile_data
+                        }
                     )
                 }
                 viewModelScope.launch {

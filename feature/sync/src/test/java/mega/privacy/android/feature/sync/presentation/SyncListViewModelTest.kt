@@ -183,6 +183,19 @@ class SyncListViewModelTest {
         verify(setSyncByWiFiUseCase).invoke(true)
     }
 
+
+    @Test
+    fun `test that snackbar is shown when sync option is selected`() = runTest {
+        initViewModel()
+
+        underTest.handleAction(SyncListAction.SyncOptionsSelected(SyncOption.WI_FI_ONLY))
+
+        underTest.state.test {
+            assertThat(awaitItem().snackbarMessage).isEqualTo(R.string.sync_options_changed_to_wifi_only)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun initViewModel() {
         underTest = SyncListViewModel(
             setOnboardingShownUseCase = setOnboardingShownUseCase,
