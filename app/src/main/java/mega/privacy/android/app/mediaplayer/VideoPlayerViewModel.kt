@@ -599,26 +599,24 @@ class VideoPlayerViewModel @Inject constructor(
             width to height
         } ?: (captureView.width to captureView.height)
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val screenshotBitmap = Bitmap.createBitmap(
-                    captureWidth,
-                    captureHeight,
-                    Bitmap.Config.ARGB_8888
-                )
-                PixelCopy.request(
-                    captureView as SurfaceView,
-                    Rect(0, 0, captureWidth, captureHeight),
-                    screenshotBitmap,
-                    { copyResult ->
-                        if (copyResult == PixelCopy.SUCCESS) {
-                            viewModelScope.launch {
-                                saveBitmap(filePath, screenshotBitmap, successCallback)
-                            }
+            val screenshotBitmap = Bitmap.createBitmap(
+                captureWidth,
+                captureHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            PixelCopy.request(
+                captureView as SurfaceView,
+                Rect(0, 0, captureWidth, captureHeight),
+                screenshotBitmap,
+                { copyResult ->
+                    if (copyResult == PixelCopy.SUCCESS) {
+                        viewModelScope.launch {
+                            saveBitmap(filePath, screenshotBitmap, successCallback)
                         }
-                    },
-                    Handler(Looper.getMainLooper())
-                )
-            }
+                    }
+                },
+                Handler(Looper.getMainLooper())
+            )
         } catch (e: Exception) {
             Timber.e("Capture screenshot error: ${e.message}")
         }

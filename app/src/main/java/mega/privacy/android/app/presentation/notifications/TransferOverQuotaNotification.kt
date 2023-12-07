@@ -111,41 +111,30 @@ internal object TransferOverQuotaNotification {
                 applicationContext.getString(if (!isLoggedIn) R.string.continue_without_account_transfer_overquota else if (isFreeAccount) R.string.my_account_upgrade_pro else R.string.plans_depleted_transfer_overquota)
             customView.setTextViewText(R.id.upgrade_button, upgradeButtonText)
             customView.setOnClickPendingIntent(R.id.upgrade_button, pendingIntent)
-            if (Util.isAndroidOreoOrUpper()) {
-                val channel = NotificationChannel(
-                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
-                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
-                channel.setShowBadge(true)
-                channel.setSound(null, null)
-                notificationManager.createNotificationChannel(channel)
-                val builderCompat = NotificationCompat.Builder(
-                    applicationContext,
-                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
-                )
-                builderCompat.setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(applicationContext, R.color.red_600_red_300))
-                    .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                    .setContent(customView)
-                    .setContentIntent(clickPendingIntent)
-                    .setOngoing(false)
-                    .setAutoCancel(true)
-                notificationManager.notify(
-                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                    builderCompat.build()
-                )
-            } else {
-                val builder = Notification.Builder(applicationContext)
-                builder.setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(applicationContext, R.color.red_600_red_300))
-                    .setContent(customView)
-                    .setContentIntent(clickPendingIntent)
-                    .setOngoing(false)
-                    .setAutoCancel(true)
-                builder.style = Notification.DecoratedCustomViewStyle()
-                notificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL, builder.build())
-            }
+            val channel = NotificationChannel(
+                Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            channel.setShowBadge(true)
+            channel.setSound(null, null)
+            notificationManager.createNotificationChannel(channel)
+            val builderCompat = NotificationCompat.Builder(
+                applicationContext,
+                Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+            )
+            builderCompat.setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                .setColor(ContextCompat.getColor(applicationContext, R.color.red_600_red_300))
+                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                .setContent(customView)
+                .setContentIntent(clickPendingIntent)
+                .setOngoing(false)
+                .setAutoCancel(true)
+            notificationManager.notify(
+                Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                builderCompat.build()
+            )
+
         }
     }
 }

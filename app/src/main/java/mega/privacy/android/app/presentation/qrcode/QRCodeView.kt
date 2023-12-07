@@ -277,12 +277,7 @@ internal fun QRCodeView(
                             .size(280.dp)
                             .testTag(QRCODE_TAG)
                             .onGloballyPositioned {
-                                qrCodeComposableBounds =
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                        it.boundsInWindow()
-                                    } else {
-                                        it.boundsInRoot()
-                                    }
+                                qrCodeComposableBounds = it.boundsInWindow()
                             },
                         contentAlignment = Alignment.Center,
                     ) {
@@ -584,34 +579,24 @@ private suspend fun captureViewToBitmap(view: View, window: Window, bounds: Rect
                 Bitmap.Config.ARGB_8888,
             )
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                PixelCopy.request(
-                    window,
-                    android.graphics.Rect(
-                        bounds.left.toInt(),
-                        bounds.top.toInt(),
-                        bounds.right.toInt(),
-                        bounds.bottom.toInt()
-                    ),
-                    bitmap,
-                    { copyResult ->
-                        if (copyResult == PixelCopy.SUCCESS) {
-                            continuation.resume(bitmap)
-                        } else {
-                            continuation.resume(null)
-                        }
-                    },
-                    Handler(Looper.getMainLooper())
-                )
-            } else {
-                val canvas = Canvas(bitmap)
-                    .apply {
-                        translate(-bounds.left, -bounds.top)
+            PixelCopy.request(
+                window,
+                android.graphics.Rect(
+                    bounds.left.toInt(),
+                    bounds.top.toInt(),
+                    bounds.right.toInt(),
+                    bounds.bottom.toInt()
+                ),
+                bitmap,
+                { copyResult ->
+                    if (copyResult == PixelCopy.SUCCESS) {
+                        continuation.resume(bitmap)
+                    } else {
+                        continuation.resume(null)
                     }
-                this.draw(canvas)
-                canvas.setBitmap(null)
-                continuation.resume(bitmap)
-            }
+                },
+                Handler(Looper.getMainLooper())
+            )
         }
     }
 }

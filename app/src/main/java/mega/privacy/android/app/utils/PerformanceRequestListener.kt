@@ -195,11 +195,7 @@ class PerformanceRequestListener(
         try {
             requireNotNull(this)
             require(isFile)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Files.size(this.toPath()).toString()
-            } else {
-                File(this.path).length().toString()
-            }
+            Files.size(this.toPath()).toString()
         } catch (ignore: Exception) {
             "0"
         }

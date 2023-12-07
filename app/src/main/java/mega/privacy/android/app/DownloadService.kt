@@ -391,23 +391,15 @@ internal class DownloadService : LifecycleService() {
 
     @Suppress("DEPRECATION")
     private fun createInitialNotification() =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createInitialServiceNotification(
-                notificationChannelId = Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
-                notificationChannelName = Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                mNotificationManager = mNotificationManager,
-                mBuilderCompat = NotificationCompat.Builder(
-                    this@DownloadService,
-                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
-                )
+        createInitialServiceNotification(
+            notificationChannelId = Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+            notificationChannelName = Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
+            mNotificationManager = mNotificationManager,
+            mBuilderCompat = NotificationCompat.Builder(
+                this@DownloadService,
+                Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
             )
-
-        } else {
-            createInitialServiceNotification(
-                Notification.Builder(this@DownloadService)
-            )
-        }
-
+        )
 
     private fun stopForeground() {
         isForeground = false
@@ -876,43 +868,28 @@ internal class DownloadService : LifecycleService() {
         )
         if (totalDownloads != 1) {
             Timber.d("Show notification")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
-                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
-                channel.setShowBadge(true)
-                channel.setSound(null, null)
-                mNotificationManager.createNotificationChannel(channel)
-                val mBuilderCompatO = NotificationCompat.Builder(
-                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
-                )
-                mBuilderCompatO
-                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true).setTicker(notificationTitle)
-                    .setContentTitle(notificationTitle).setContentText(size)
-                    .setOngoing(false)
-                mNotificationManager.notify(
-                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                    mBuilderCompatO.build()
-                )
-            } else {
-                val builder = NotificationCompat.Builder(this)
-                builder
-                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true).setTicker(notificationTitle)
-                    .setContentTitle(notificationTitle).setContentText(size)
-                    .setOngoing(false)
-                mNotificationManager.notify(
-                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                    builder.build()
-                )
-            }
+            val channel = NotificationChannel(
+                Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            channel.setShowBadge(true)
+            channel.setSound(null, null)
+            mNotificationManager.createNotificationChannel(channel)
+            val mBuilderCompatO = NotificationCompat.Builder(
+                applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+            )
+            mBuilderCompatO
+                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true).setTicker(notificationTitle)
+                .setContentTitle(notificationTitle).setContentText(size)
+                .setOngoing(false)
+            mNotificationManager.notify(
+                Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                mBuilderCompatO.build()
+            )
         } else {
             try {
                 val autoPlayEnabled = java.lang.Boolean.parseBoolean(dbH.autoPlayEnabled)
@@ -944,42 +921,28 @@ internal class DownloadService : LifecycleService() {
                         Timber.d("Pdf file")
                         if (fromMV) {
                             Timber.d("Show notification")
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                val channel =
-                                    NotificationChannel(
-                                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
-                                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                                        NotificationManager.IMPORTANCE_DEFAULT
-                                    )
-                                channel.setShowBadge(true)
-                                channel.setSound(null, null)
-                                mNotificationManager.createNotificationChannel(channel)
-                                val mBuilderCompatO = NotificationCompat.Builder(
-                                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                            val channel =
+                                NotificationChannel(
+                                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
+                                    NotificationManager.IMPORTANCE_DEFAULT
                                 )
-                                mBuilderCompatO
-                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                                    .setContentIntent(pendingIntent)
-                                    .setAutoCancel(true).setTicker(notificationTitle)
-                                    .setContentTitle(notificationTitle).setContentText(size)
-                                    .setOngoing(false)
-                                mNotificationManager.notify(
-                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    mBuilderCompatO.build()
-                                )
-                            } else {
-                                val builder = NotificationCompat.Builder(this)
-                                builder
-                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                                    .setContentIntent(pendingIntent)
-                                    .setAutoCancel(true).setTicker(notificationTitle)
-                                    .setContentTitle(notificationTitle).setContentText(size)
-                                    .setOngoing(false)
-                                mNotificationManager.notify(
-                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    builder.build()
-                                )
-                            }
+                            channel.setShowBadge(true)
+                            channel.setSound(null, null)
+                            mNotificationManager.createNotificationChannel(channel)
+                            val mBuilderCompatO = NotificationCompat.Builder(
+                                applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                            )
+                            mBuilderCompatO
+                                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                                .setContentIntent(pendingIntent)
+                                .setAutoCancel(true).setTicker(notificationTitle)
+                                .setContentTitle(notificationTitle).setContentText(size)
+                                .setOngoing(false)
+                            mNotificationManager.notify(
+                                Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                                mBuilderCompatO.build()
+                            )
                         }
                     } else if (MimeTypeList.typeForName(currentFile?.name).isVideoMimeType || MimeTypeList.typeForName(
                             currentFile?.name
@@ -988,89 +951,33 @@ internal class DownloadService : LifecycleService() {
                         Timber.d("Video/Audio file")
                         if (fromMV) {
                             Timber.d("Show notification")
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                val channel =
-                                    NotificationChannel(
-                                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
-                                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                                        NotificationManager.IMPORTANCE_DEFAULT
-                                    )
-                                channel.setShowBadge(true)
-                                channel.setSound(null, null)
-                                mNotificationManager.createNotificationChannel(channel)
-                                val mBuilderCompatO = NotificationCompat.Builder(
-                                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                            val channel =
+                                NotificationChannel(
+                                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
+                                    NotificationManager.IMPORTANCE_DEFAULT
                                 )
-                                mBuilderCompatO
-                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                                    .setContentIntent(pendingIntent)
-                                    .setAutoCancel(true).setTicker(notificationTitle)
-                                    .setContentTitle(notificationTitle).setContentText(size)
-                                    .setOngoing(false)
-                                mNotificationManager.notify(
-                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    mBuilderCompatO.build()
-                                )
-                            } else {
-                                val builder = NotificationCompat.Builder(this)
-                                builder
-                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                                    .setContentIntent(pendingIntent)
-                                    .setAutoCancel(true).setTicker(notificationTitle)
-                                    .setContentTitle(notificationTitle).setContentText(size)
-                                    .setOngoing(false)
-                                mNotificationManager.notify(
-                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    builder.build()
-                                )
-                            }
+                            channel.setShowBadge(true)
+                            channel.setSound(null, null)
+                            mNotificationManager.createNotificationChannel(channel)
+                            val mBuilderCompatO = NotificationCompat.Builder(
+                                applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                            )
+                            mBuilderCompatO
+                                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                                .setContentIntent(pendingIntent)
+                                .setAutoCancel(true).setTicker(notificationTitle)
+                                .setContentTitle(notificationTitle).setContentText(size)
+                                .setOngoing(false)
+                            mNotificationManager.notify(
+                                Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                                mBuilderCompatO.build()
+                            )
                         }
                     } else if (MimeTypeList.typeForName(currentFile?.name).isImage) {
                         Timber.d("Download is IMAGE")
                         if (fromMV) {
                             Timber.d("Show notification")
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                val channel =
-                                    NotificationChannel(
-                                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
-                                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                                        NotificationManager.IMPORTANCE_DEFAULT
-                                    )
-                                channel.setShowBadge(true)
-                                channel.setSound(null, null)
-                                mNotificationManager.createNotificationChannel(channel)
-                                val mBuilderCompatO = NotificationCompat.Builder(
-                                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
-                                )
-                                mBuilderCompatO
-                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                                    .setContentIntent(pendingIntent)
-                                    .setAutoCancel(true).setTicker(notificationTitle)
-                                    .setContentTitle(notificationTitle).setContentText(size)
-                                    .setOngoing(false)
-                                mNotificationManager.notify(
-                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    mBuilderCompatO.build()
-                                )
-                            } else {
-                                val builder = NotificationCompat.Builder(this)
-                                builder
-                                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                                    .setContentIntent(pendingIntent)
-                                    .setAutoCancel(true).setTicker(notificationTitle)
-                                    .setContentTitle(notificationTitle).setContentText(size)
-                                    .setOngoing(false)
-                                mNotificationManager.notify(
-                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    builder.build()
-                                )
-                            }
-                        }
-                    } else {
-                        Timber.d("Show notification")
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             val channel =
                                 NotificationChannel(
                                     Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
@@ -1094,25 +1001,9 @@ internal class DownloadService : LifecycleService() {
                                 Constants.NOTIFICATION_DOWNLOAD_FINAL,
                                 mBuilderCompatO.build()
                             )
-                        } else {
-                            val builder = NotificationCompat.Builder(this)
-                            builder
-                                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                                .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                                .setContentIntent(pendingIntent)
-                                .setAutoCancel(true).setTicker(notificationTitle)
-                                .setContentTitle(notificationTitle).setContentText(size)
-                                .setOngoing(false)
-                            mNotificationManager.notify(
-                                Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                builder.build()
-                            )
                         }
-                    }
-                } else {
-                    openFile = true //Set the openFile to the default
-                    Timber.d("Show notification")
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    } else {
+                        Timber.d("Show notification")
                         val channel =
                             NotificationChannel(
                                 Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
@@ -1136,31 +1027,16 @@ internal class DownloadService : LifecycleService() {
                             Constants.NOTIFICATION_DOWNLOAD_FINAL,
                             mBuilderCompatO.build()
                         )
-                    } else {
-                        val builder = NotificationCompat.Builder(this)
-                        builder
-                            .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                            .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                            .setContentIntent(pendingIntent)
-                            .setAutoCancel(true).setTicker(notificationTitle)
-                            .setContentTitle(notificationTitle).setContentText(size)
-                            .setOngoing(false)
-                        mNotificationManager.notify(
-                            Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                            builder.build()
-                        )
                     }
-                }
-            } catch (e: Exception) {
-                openFile = true //Set the openFile to the default
-                Timber.e(e)
-                Timber.d("Show notification")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val channel = NotificationChannel(
-                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
-                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                        NotificationManager.IMPORTANCE_DEFAULT
-                    )
+                } else {
+                    openFile = true //Set the openFile to the default
+                    Timber.d("Show notification")
+                    val channel =
+                        NotificationChannel(
+                            Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                            Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
+                            NotificationManager.IMPORTANCE_DEFAULT
+                        )
                     channel.setShowBadge(true)
                     channel.setSound(null, null)
                     mNotificationManager.createNotificationChannel(channel)
@@ -1178,20 +1054,33 @@ internal class DownloadService : LifecycleService() {
                         Constants.NOTIFICATION_DOWNLOAD_FINAL,
                         mBuilderCompatO.build()
                     )
-                } else {
-                    val builder = NotificationCompat.Builder(this)
-                    builder
-                        .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                        .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                        .setContentIntent(pendingIntent)
-                        .setAutoCancel(true).setTicker(notificationTitle)
-                        .setContentTitle(notificationTitle).setContentText(size)
-                        .setOngoing(false)
-                    mNotificationManager.notify(
-                        Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                        builder.build()
-                    )
                 }
+            } catch (e: Exception) {
+                openFile = true //Set the openFile to the default
+                Timber.e(e)
+                Timber.d("Show notification")
+                val channel = NotificationChannel(
+                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
+                    NotificationManager.IMPORTANCE_DEFAULT
+                )
+                channel.setShowBadge(true)
+                channel.setSound(null, null)
+                mNotificationManager.createNotificationChannel(channel)
+                val mBuilderCompatO = NotificationCompat.Builder(
+                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                )
+                mBuilderCompatO
+                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true).setTicker(notificationTitle)
+                    .setContentTitle(notificationTitle).setContentText(size)
+                    .setOngoing(false)
+                mNotificationManager.notify(
+                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                    mBuilderCompatO.build()
+                )
             }
         }
     }
@@ -1273,42 +1162,31 @@ internal class DownloadService : LifecycleService() {
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                if (mNotificationManager.getNotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID) == null) {
-                    val channel = NotificationChannel(
-                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
-                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                        NotificationManager.IMPORTANCE_HIGH
-                    )
-                    channel.setShowBadge(true)
-                    channel.setSound(null, null)
-                    mNotificationManager.createNotificationChannel(channel)
-                }
-                val mBuilderCompat = NotificationCompat.Builder(
-                    applicationContext,
-                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+
+            if (mNotificationManager.getNotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID) == null) {
+                val channel = NotificationChannel(
+                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
+                    NotificationManager.IMPORTANCE_HIGH
                 )
-                mBuilderCompat
-                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                    .setProgress(100, progressPercent, false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true).setContentTitle(message).setSubText(info)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true)
-                mBuilderCompat.build()
-            } else {
-                val mBuilder = Notification.Builder(this@DownloadService)
-                mBuilder
-                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                    .setProgress(100, progressPercent, false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true).setContentTitle(message).setContentInfo(info)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true)
-                mBuilder.build()
+                channel.setShowBadge(true)
+                channel.setSound(null, null)
+                mNotificationManager.createNotificationChannel(channel)
             }
+            val mBuilderCompat = NotificationCompat.Builder(
+                applicationContext,
+                Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+            )
+            mBuilderCompat
+                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
+                .setProgress(100, progressPercent, false)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true).setContentTitle(message).setSubText(info)
+                .setContentText(contentText)
+                .setOnlyAlertOnce(true)
+            notification = mBuilderCompat.build()
+
             if (!isForeground) {
                 Timber.d("Starting foreground!")
                 isForeground = try {

@@ -537,7 +537,7 @@ class AppRTCAudioManager private constructor(
         } else {
             Timber.e("Audio focus request failed")
         }
-        if (typeAudioManager != Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP && typeAudioManager != Constants.AUDIO_MANAGER_CALL_RINGING && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (typeAudioManager != Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP && typeAudioManager != Constants.AUDIO_MANAGER_CALL_RINGING) {
             Timber.d("Mode communication")
             audioManager?.mode = AudioManager.MODE_IN_COMMUNICATION
         } else {

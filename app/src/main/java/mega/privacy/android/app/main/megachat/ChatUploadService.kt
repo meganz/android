@@ -263,22 +263,15 @@ class ChatUploadService : LifecycleService() {
 
     @Suppress("DEPRECATION")
     private fun createInitialNotification() =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            TransfersManagement.createInitialServiceNotification(
-                notificationChannelId = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,
-                notificationChannelName = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME,
-                mNotificationManager = mNotificationManager!!,
-                mBuilderCompat = NotificationCompat.Builder(
-                    this@ChatUploadService,
-                    Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID
-                )
+        TransfersManagement.createInitialServiceNotification(
+            notificationChannelId = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,
+            notificationChannelName = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME,
+            mNotificationManager = mNotificationManager!!,
+            mBuilderCompat = NotificationCompat.Builder(
+                this@ChatUploadService,
+                Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID
             )
-
-        } else {
-            TransfersManagement.createInitialServiceNotification(
-                Notification.Builder(this@ChatUploadService)
-            )
-        }
+        )
 
     private fun stopForeground() {
         isForeground = false
@@ -1335,52 +1328,31 @@ class ChatUploadService : LifecycleService() {
         val intent = Intent(this, ManagerActivity::class.java)
         intent.action =
             if (isOverQuota == Constants.OVERQUOTA_STORAGE_STATE) Constants.ACTION_OVERQUOTA_STORAGE else Constants.ACTION_PRE_OVERQUOTA_STORAGE
-        val notification: Notification
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,
-                Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(
+            Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,
+            Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME,
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        channel.setShowBadge(true)
+        channel.setSound(null, null)
+        mNotificationManager!!.createNotificationChannel(channel)
+        mBuilderCompat?.apply {
+            setSmallIcon(iconPackR.drawable.ic_stat_notify)
+            color = ContextCompat.getColor(this@ChatUploadService, R.color.red_600_red_300)
+            setContentIntent(
+                PendingIntent.getActivity(
+                    applicationContext,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_IMMUTABLE
+                )
             )
-            channel.setShowBadge(true)
-            channel.setSound(null, null)
-            mNotificationManager!!.createNotificationChannel(channel)
-            mBuilderCompat?.apply {
-                setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                color = ContextCompat.getColor(this@ChatUploadService, R.color.red_600_red_300)
-                setContentIntent(
-                    PendingIntent.getActivity(
-                        applicationContext,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_IMMUTABLE
-                    )
-                )
-                setAutoCancel(true).setTicker(contentText)
-                setContentTitle(message).setContentText(contentText)
-                setOngoing(false)
-            }
-            notification = mBuilderCompat!!.build()
-        } else {
-            mBuilder?.apply {
-                setColor(ContextCompat.getColor(this@ChatUploadService, R.color.red_600_red_300))
-                setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                setContentIntent(
-                    PendingIntent.getActivity(
-                        applicationContext,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_IMMUTABLE
-                    )
-                )
-                setAutoCancel(true).setTicker(contentText)
-                setContentTitle(message).setContentText(contentText)
-                setOngoing(false)
-            }
-            mBuilderCompat?.color = ContextCompat.getColor(this, R.color.red_600_red_300)
-            notification = mBuilder!!.build()
+            setAutoCancel(true).setTicker(contentText)
+            setContentTitle(message).setContentText(contentText)
+            setOngoing(false)
         }
+        val notification: Notification = mBuilderCompat!!.build()
 
         mNotificationManager!!.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, notification)
     }

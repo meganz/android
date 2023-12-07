@@ -268,42 +268,21 @@ class CallService : Service() {
                 val actionTitle =
                     getString(R.string.button_notification_call_in_progress)
 
-                val newNotification: Notification? =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        mBuilderCompatO?.clearActions()
-                        mBuilderCompatO?.apply {
-                            setContentTitle(title)
-                            setContentIntent(pendingIntent)
-                            setLargeIcon(largeIcon)
-                            addAction(
-                                actionIcon,
-                                actionTitle,
-                                actionPendingIntent
-                            )
+                mBuilderCompatO?.clearActions()
+                mBuilderCompatO?.apply {
+                    setContentTitle(title)
+                    setContentIntent(pendingIntent)
+                    setLargeIcon(largeIcon)
+                    addAction(
+                        actionIcon,
+                        actionTitle,
+                        actionPendingIntent
+                    )
 
-                            if (!TextUtil.isTextEmpty(contentText))
-                                setContentText(contentText)
-                        }
-
-                        mBuilderCompatO?.build()
-                    } else {
-                        mBuilderCompat?.clearActions()
-                        mBuilderCompat?.apply {
-                            setContentTitle(title)
-                            setContentIntent(pendingIntent)
-                            setLargeIcon(largeIcon)
-                            addAction(
-                                actionIcon,
-                                actionTitle,
-                                actionPendingIntent
-                            )
-
-                            if (!TextUtil.isTextEmpty(contentText))
-                                setContentText(contentText)
-                        }
-
-                        mBuilderCompat?.build()
-                    }
+                    if (!TextUtil.isTextEmpty(contentText))
+                        setContentText(contentText)
+                }
+                val newNotification: Notification? = mBuilderCompatO?.build()
 
                 startForeground(notificationId, newNotification)
             }
@@ -345,60 +324,37 @@ class CallService : Service() {
                 val actionTitle =
                     getString(R.string.button_notification_call_in_progress)
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val channel = NotificationChannel(
-                        notificationChannelId,
-                        Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME,
-                        NotificationManager.IMPORTANCE_DEFAULT
+                val channel = NotificationChannel(
+                    notificationChannelId,
+                    Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME,
+                    NotificationManager.IMPORTANCE_DEFAULT
+                )
+
+                channel.apply {
+                    setShowBadge(true)
+                    setSound(null, null)
+                }
+
+                mNotificationManager =
+                    this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                mNotificationManager?.createNotificationChannel(channel)
+                mBuilderCompatO = NotificationCompat.Builder(this, notificationChannelId)
+
+                mBuilderCompatO?.apply {
+                    setSmallIcon(smallIcon)
+                    setAutoCancel(false)
+                    addAction(
+                        actionIcon,
+                        actionTitle,
+                        actionPendingIntent
                     )
+                    setOngoing(false)
+                    color = colorNotification
+                }
 
-                    channel.apply {
-                        setShowBadge(true)
-                        setSound(null, null)
-                    }
-
-                    mNotificationManager =
-                        this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                    mNotificationManager?.createNotificationChannel(channel)
-                    mBuilderCompatO = NotificationCompat.Builder(this, notificationChannelId)
-
-                    mBuilderCompatO?.apply {
-                        setSmallIcon(smallIcon)
-                        setAutoCancel(false)
-                        addAction(
-                            actionIcon,
-                            actionTitle,
-                            actionPendingIntent
-                        )
-                        setOngoing(false)
-                        color = colorNotification
-                    }
-
-                    mBuilderCompatO?.apply {
-                        setLargeIcon(largeIcon)
-                        setContentTitle(title)
-                    }
-                } else {
-                    mBuilderCompat = NotificationCompat.Builder(this, notificationChannelId)
-                    mNotificationManager =
-                        this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-                    mBuilderCompat?.apply {
-                        setSmallIcon(smallIcon)
-                        setAutoCancel(false)
-                        addAction(
-                            actionIcon,
-                            actionTitle,
-                            actionPendingIntent
-                        )
-                        setOngoing(false)
-                        color = colorNotification
-                    }
-
-                    mBuilderCompat?.apply {
-                        setLargeIcon(largeIcon)
-                        setContentTitle(title)
-                    }
+                mBuilderCompatO?.apply {
+                    setLargeIcon(largeIcon)
+                    setContentTitle(title)
                 }
                 updateNotificationContent()
             }

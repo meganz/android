@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Build
+import android.os.Build.VERSION_CODES.Q
 import android.os.Bundle
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
@@ -146,7 +147,7 @@ class PasscodeProcessLifecycleOwner private constructor() {
                 // Only use ReportFragment pre API 29 - after that, we can use the
                 // onActivityPostStarted and onActivityPostResumed callbacks registered in
                 // onActivityPreCreated()
-                if (Build.VERSION.SDK_INT < 29) {
+                if (Build.VERSION.SDK_INT < Q) {
                     activity.reportFragment.setProcessListener(
                         ActivityInitializationListener(
                             activity

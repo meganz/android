@@ -58,13 +58,8 @@ class GiphyViewerActivity : PasscodeActivity() {
             )
         } else {
             @Suppress("DEPRECATION")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                window?.decorView?.systemUiVisibility =
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            } else {
-                window?.decorView?.systemUiVisibility =
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
-            }
+            window?.decorView?.systemUiVisibility =
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         }
 
         binding = ActivityGiphyViewerBinding.inflate(layoutInflater)

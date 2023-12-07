@@ -115,9 +115,7 @@ public final class ChatAdvancedNotificationBuilder {
         dbH = DbHandlerModuleKt.getDbHandler();
         megaApi = MegaApplication.getInstance().getMegaApi();
         megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createChatSummaryChannel(context);
-        }
+        createChatSummaryChannel(context);
 
         chatC = new ChatController(context);
     }
@@ -349,63 +347,41 @@ public final class ChatAdvancedNotificationBuilder {
         }
 
         RemoteViews contentView = numberButtons.equals(HORIZONTAL_TWO_BUTTONS) ? expandedView : collapsedViews;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //Create a channel for android Oreo or higher
-            String channelId = shouldVibrate ? NOTIFICATION_CHANNEL_INCOMING_CALLS_ID :
-                    NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_ID;
+        //Create a channel for android Oreo or higher
+        String channelId = shouldVibrate ? NOTIFICATION_CHANNEL_INCOMING_CALLS_ID :
+                NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_ID;
 
-            String channelName = shouldVibrate ? NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME :
-                    NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_NAME;
+        String channelName = shouldVibrate ? NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME :
+                NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_NAME;
 
-            NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
-            channel.setVibrationPattern(shouldVibrate ? patternIncomingCall : new long[]{0L});
-            channel.enableLights(true);
-            channel.enableVibration(shouldVibrate);
-            channel.setDescription("");
+        NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
+        channel.setVibrationPattern(shouldVibrate ? patternIncomingCall : new long[]{0L});
+        channel.enableLights(true);
+        channel.enableVibration(shouldVibrate);
+        channel.setDescription("");
 
-            if (notificationManager == null) {
-                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            }
-
-            notificationManager.createNotificationChannel(channel);
-
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, channelId);
-            notificationBuilderO
-                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
-                    .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                    .setCustomHeadsUpContentView(contentView)
-                    .setCustomContentView(collapsedViews)
-                    .setCustomBigContentView(expandedView)
-                    .setCategory(NotificationCompat.CATEGORY_CALL)
-                    .setContentIntent(callScreen)
-                    .setShowWhen(true)
-                    .setAutoCancel(false)
-                    .setDeleteIntent(intentIgnore)
-                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
-                    .setPriority(NotificationManager.IMPORTANCE_HIGH);
-
-            notifyCall(notificationId, notificationBuilderO.build());
-
-        } else {
-            long[] noVibrationPattern = new long[]{0L};
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
-                    .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                    .setCustomHeadsUpContentView(contentView)
-                    .setCustomContentView(collapsedViews)
-                    .setCustomBigContentView(expandedView)
-                    .setCategory(NotificationCompat.CATEGORY_CALL)
-                    .setContentIntent(callScreen)
-                    .setShowWhen(true)
-                    .setAutoCancel(false)
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                    .setDeleteIntent(intentIgnore)
-                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
-                    .setPriority(Notification.PRIORITY_HIGH)
-                    .setVibrate(shouldVibrate ? patternIncomingCall : noVibrationPattern);
-
-            notifyCall(notificationId, notificationBuilder.build());
+        if (notificationManager == null) {
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         }
+
+        notificationManager.createNotificationChannel(channel);
+
+        NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, channelId);
+        notificationBuilderO
+                .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .setCustomHeadsUpContentView(contentView)
+                .setCustomContentView(collapsedViews)
+                .setCustomBigContentView(expandedView)
+                .setCategory(NotificationCompat.CATEGORY_CALL)
+                .setContentIntent(callScreen)
+                .setShowWhen(true)
+                .setAutoCancel(false)
+                .setDeleteIntent(intentIgnore)
+                .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
+                .setPriority(NotificationManager.IMPORTANCE_HIGH);
+
+        notifyCall(notificationId, notificationBuilderO.build());
     }
 
     /**
@@ -465,57 +441,33 @@ public final class ChatAdvancedNotificationBuilder {
 
         expandedView.setOnClickPendingIntent(R.id.answer_button_layout, intentAnswer);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //Create a channel for android Oreo or higher
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_INCOMING_CALLS_ID, NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME, NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription("");
-            channel.enableLights(true);
-            channel.enableVibration(true);
+        NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_INCOMING_CALLS_ID, NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME, NotificationManager.IMPORTANCE_HIGH);
+        channel.setDescription("");
+        channel.enableLights(true);
+        channel.enableVibration(true);
 
-            if (notificationManager == null) {
-                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            }
-            notificationManager.createNotificationChannel(channel);
-
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_INCOMING_CALLS_ID);
-            notificationBuilderO
-                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
-                    .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                    .setCustomHeadsUpContentView(expandedView)
-                    .setCustomContentView(collapsedViews)
-                    .setCustomBigContentView(expandedView)
-                    .setCategory(NotificationCompat.CATEGORY_CALL)
-                    .setContentIntent(callScreen)
-                    .setShowWhen(true)
-                    .setAutoCancel(false)
-                    .setDeleteIntent(intentIgnore)
-                    .setVibrate(patternIncomingCall)
-                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
-                    .setPriority(NotificationManager.IMPORTANCE_HIGH);
-
-            notifyCall(notificationId, notificationBuilderO.build());
-        } else {
-            long[] pattern = {0, 1000};
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
-                    .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                    .setCustomHeadsUpContentView(expandedView)
-                    .setCustomContentView(collapsedViews)
-                    .setCustomBigContentView(expandedView)
-                    .setCategory(NotificationCompat.CATEGORY_CALL)
-                    .setContentIntent(callScreen)
-                    .setShowWhen(true)
-                    .setAutoCancel(false)
-                    .setDeleteIntent(intentIgnore)
-                    .setVibrate(pattern)
-                    .setSound(defaultSoundUri)
-                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
-                    .setPriority(Notification.PRIORITY_HIGH);
-
-            Timber.w("Notify incoming call");
-            notifyCall(notificationId, notificationBuilder.build());
+        if (notificationManager == null) {
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         }
+        notificationManager.createNotificationChannel(channel);
+
+        NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_INCOMING_CALLS_ID);
+        notificationBuilderO
+                .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .setCustomHeadsUpContentView(expandedView)
+                .setCustomContentView(collapsedViews)
+                .setCustomBigContentView(expandedView)
+                .setCategory(NotificationCompat.CATEGORY_CALL)
+                .setContentIntent(callScreen)
+                .setShowWhen(true)
+                .setAutoCancel(false)
+                .setDeleteIntent(intentIgnore)
+                .setVibrate(patternIncomingCall)
+                .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
+                .setPriority(NotificationManager.IMPORTANCE_HIGH);
+
+        notifyCall(notificationId, notificationBuilderO.build());
     }
 
     public void checkQueuedCalls(long incomingCallChatId) {
@@ -579,61 +531,32 @@ public final class ChatAdvancedNotificationBuilder {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID, NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME, NotificationManager.IMPORTANCE_HIGH);
-            channel.setShowBadge(true);
-            if (notificationManager == null) {
-                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            }
-            notificationManager.createNotificationChannel(channel);
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID);
-            notificationBuilderO
-                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
-                    .setContentTitle(context.getString(R.string.missed_call_notification_title))
-                    .setContentText(notificationContent)
-                    .setAutoCancel(true)
-                    .setVibrate(pattern)
-                    .setSound(defaultSoundUri)
-                    .setContentIntent(pendingIntent)
-                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
-                    .setPriority(NotificationManager.IMPORTANCE_HIGH);
-
-            if (!isTextEmpty(chatC.getParticipantEmail(chat.getPeerHandle(0)))) {
-
-                Bitmap largeIcon = setUserAvatar(chat);
-                if (largeIcon != null) {
-                    notificationBuilderO.setLargeIcon(largeIcon);
-                }
-            }
-
-            notify(notificationId, notificationBuilderO.build());
-        } else {
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
-                    .setContentTitle(context.getString(R.string.missed_call_notification_title))
-                    .setContentText(notificationContent)
-                    .setAutoCancel(true)
-                    .setVibrate(pattern)
-                    .setSound(defaultSoundUri)
-                    .setContentIntent(pendingIntent);
-
-            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-
-            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-
-            if (!isTextEmpty(chatC.getParticipantEmail(chat.getPeerHandle(0)))) {
-
-                Bitmap largeIcon = setUserAvatar(chat);
-                if (largeIcon != null) {
-                    notificationBuilder.setLargeIcon(largeIcon);
-                }
-            }
-
-            if (notificationManager == null) {
-                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            }
-
-            notify(notificationId, notificationBuilder.build());
+        NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID, NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME, NotificationManager.IMPORTANCE_HIGH);
+        channel.setShowBadge(true);
+        if (notificationManager == null) {
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         }
+        notificationManager.createNotificationChannel(channel);
+        NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID);
+        notificationBuilderO
+                .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
+                .setContentTitle(context.getString(R.string.missed_call_notification_title))
+                .setContentText(notificationContent)
+                .setAutoCancel(true)
+                .setVibrate(pattern)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent)
+                .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
+                .setPriority(NotificationManager.IMPORTANCE_HIGH);
+
+        if (!isTextEmpty(chatC.getParticipantEmail(chat.getPeerHandle(0)))) {
+
+            Bitmap largeIcon = setUserAvatar(chat);
+            if (largeIcon != null) {
+                notificationBuilderO.setLargeIcon(largeIcon);
+            }
+        }
+
+        notify(notificationId, notificationBuilderO.build());
     }
 }

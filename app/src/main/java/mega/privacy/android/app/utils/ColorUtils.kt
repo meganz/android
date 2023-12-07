@@ -62,7 +62,11 @@ object ColorUtils {
 
     @JvmStatic
     fun tintIcon(context: Context, drawableId: Int): Drawable {
-        return tintIcon(context, drawableId, getThemeColor(context, MaterialR.attr.colorControlNormal))
+        return tintIcon(
+            context,
+            drawableId,
+            getThemeColor(context, MaterialR.attr.colorControlNormal)
+        )
     }
 
     @SuppressLint("RestrictedApi")
@@ -202,16 +206,8 @@ object ColorUtils {
             if (Util.isDarkMode(context)) {
                 decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
             } else {
-                when {
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
-                        decor.systemUiVisibility =
-                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                    }
-                    else -> {
-                        decor.systemUiVisibility =
-                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or 0x00000010
-                    }
-                }
+                decor.systemUiVisibility =
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
             }
         }
     }

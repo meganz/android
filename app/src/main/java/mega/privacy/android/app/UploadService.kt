@@ -328,22 +328,16 @@ internal class UploadService : LifecycleService() {
         }
     }
 
-    private fun createInitialNotification(): Notification {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createInitialServiceNotification(
-                Constants.NOTIFICATION_CHANNEL_UPLOAD_ID,
-                Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME,
-                notificationManager!!,
-                NotificationCompat.Builder(
-                    this,
-                    Constants.NOTIFICATION_CHANNEL_UPLOAD_ID
-                )
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            createInitialServiceNotification(Notification.Builder(this))
-        }
-    }
+    private fun createInitialNotification(): Notification = createInitialServiceNotification(
+        Constants.NOTIFICATION_CHANNEL_UPLOAD_ID,
+        Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME,
+        notificationManager!!,
+        NotificationCompat.Builder(
+            this,
+            Constants.NOTIFICATION_CHANNEL_UPLOAD_ID
+        )
+    )
+
 
     private fun stopForeground() {
         isForeground = false
@@ -518,52 +512,34 @@ internal class UploadService : LifecycleService() {
             putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.COMPLETED_TAB)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                channelName,
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                setShowBadge(true)
-                setSound(null, null)
+        val channel = NotificationChannel(
+            channelId,
+            channelName,
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            setShowBadge(true)
+            setSound(null, null)
+        }
+
+        notificationManager?.createNotificationChannel(channel)
+        val builderCompatOreo =
+            NotificationCompat.Builder(applicationContext, channelId).also {
+                it.setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(getInstance(), R.color.red_600_red_300))
+                    .setContentIntent(
+                        PendingIntent.getActivity(
+                            applicationContext,
+                            0,
+                            intent,
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                        )
+                    )
+                    .setAutoCancel(true).setTicker(notificationTitle)
+                    .setContentTitle(notificationTitle).setContentText(size)
+                    .setOngoing(false)
             }
 
-            notificationManager?.createNotificationChannel(channel)
-            val builderCompatOreo =
-                NotificationCompat.Builder(applicationContext, channelId).also {
-                    it.setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                        .setColor(ContextCompat.getColor(getInstance(), R.color.red_600_red_300))
-                        .setContentIntent(
-                            PendingIntent.getActivity(
-                                applicationContext,
-                                0,
-                                intent,
-                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                            )
-                        )
-                        .setAutoCancel(true).setTicker(notificationTitle)
-                        .setContentTitle(notificationTitle).setContentText(size)
-                        .setOngoing(false)
-                }
-
-            notificationManager?.notify(notificationId, builderCompatOreo.build())
-        } else {
-            notificationBuilderCompat
-                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                .setColor(ContextCompat.getColor(getInstance(), R.color.red_600_red_300))
-                .setContentIntent(
-                    PendingIntent.getActivity(
-                        applicationContext,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                )
-                .setAutoCancel(true).setTicker(notificationTitle)
-                .setContentTitle(notificationTitle).setContentText(size)
-                .setOngoing(false)
-            notificationManager?.notify(notificationId, notificationBuilderCompat.build())
-        }
+        notificationManager?.notify(notificationId, builderCompatOreo.build())
     }
 
     private fun getTransferredByte(map: HashMap<Int, Transfer>?): Long =
@@ -647,41 +623,31 @@ internal class UploadService : LifecycleService() {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val notification: Notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                Constants.NOTIFICATION_CHANNEL_UPLOAD_ID,
-                Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            channel.setShowBadge(true)
-            channel.setSound(null, null)
-            notificationManager?.createNotificationChannel(channel)
-            NotificationCompat.Builder(
-                applicationContext,
-                Constants.NOTIFICATION_CHANNEL_UPLOAD_ID
-            ).setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                .setProgress(100, progressPercent, false)
-                .setContentIntent(pendingIntent)
-                .setOngoing(true)
-                .setContentTitle(message)
-                .setSubText(info)
-                .setContentText(actionString)
-                .setOnlyAlertOnce(true)
-                .build()
-        } else {
-            notificationBuilderCompat
-                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                .setProgress(100, progressPercent, false)
-                .setContentIntent(pendingIntent)
-                .setOngoing(true)
-                .setContentTitle(message)
-                .setSubText(info)
-                .setContentText(actionString)
-                .setOnlyAlertOnce(true)
-                .build()
-        }
+
+        val channel = NotificationChannel(
+            Constants.NOTIFICATION_CHANNEL_UPLOAD_ID,
+            Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME,
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        channel.setShowBadge(true)
+        channel.setSound(null, null)
+        notificationManager?.createNotificationChannel(channel)
+
+        val notification: Notification = NotificationCompat.Builder(
+            applicationContext,
+            Constants.NOTIFICATION_CHANNEL_UPLOAD_ID
+        )
+            .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+            .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
+            .setProgress(100, progressPercent, false)
+            .setContentIntent(pendingIntent)
+            .setOngoing(true)
+            .setContentTitle(message)
+            .setSubText(info)
+            .setContentText(actionString)
+            .setOnlyAlertOnce(true)
+            .build()
+
         if (!isForeground) {
             Timber.d("Starting foreground")
             isForeground = try {
@@ -967,61 +933,37 @@ internal class UploadService : LifecycleService() {
                 Constants.ACTION_PRE_OVERQUOTA_STORAGE
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                Constants.NOTIFICATION_CHANNEL_UPLOAD_ID,
-                Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                setShowBadge(true)
-                setSound(null, null)
-            }
-            notificationManager?.createNotificationChannel(channel)
-            NotificationCompat.Builder(
-                applicationContext,
-                Constants.NOTIFICATION_CHANNEL_UPLOAD_ID
-            ).also { mBuilderCompatO ->
-                mBuilderCompatO
-                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                    .setContentIntent(
-                        PendingIntent.getActivity(
-                            applicationContext,
-                            0,
-                            intent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
+        val channel = NotificationChannel(
+            Constants.NOTIFICATION_CHANNEL_UPLOAD_ID,
+            Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME,
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            setShowBadge(true)
+            setSound(null, null)
+        }
+        notificationManager?.createNotificationChannel(channel)
+        NotificationCompat.Builder(
+            applicationContext,
+            Constants.NOTIFICATION_CHANNEL_UPLOAD_ID
+        ).also { mBuilderCompatO ->
+            mBuilderCompatO
+                .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                .setContentIntent(
+                    PendingIntent.getActivity(
+                        applicationContext,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
-                    .setAutoCancel(true).setTicker(contentText)
-                    .setContentTitle(message).setContentText(contentText)
-                    .setOngoing(false)
-
-                notificationManager?.notify(
-                    Constants.NOTIFICATION_STORAGE_OVERQUOTA,
-                    mBuilderCompatO.build()
                 )
-            }
-        } else {
-            notificationBuilderCompat.let { builder ->
-                builder
-                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                    .setContentIntent(
-                        PendingIntent.getActivity(
-                            applicationContext,
-                            0,
-                            intent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
-                    )
-                    .setAutoCancel(true).setTicker(contentText)
-                    .setContentTitle(message).setContentText(contentText)
-                    .setOngoing(false)
+                .setAutoCancel(true).setTicker(contentText)
+                .setContentTitle(message).setContentText(contentText)
+                .setOngoing(false)
 
-                notificationManager?.notify(
-                    Constants.NOTIFICATION_STORAGE_OVERQUOTA,
-                    builder.build()
-                )
-            }
-
+            notificationManager?.notify(
+                Constants.NOTIFICATION_STORAGE_OVERQUOTA,
+                mBuilderCompatO.build()
+            )
         }
     }
 

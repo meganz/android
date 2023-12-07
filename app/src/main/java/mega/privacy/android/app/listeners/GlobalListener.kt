@@ -380,15 +380,13 @@ class GlobalListener @Inject constructor(
             )
             val notificationManager =
                 appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    notificationChannelId,
-                    Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME,
-                    NotificationManager.IMPORTANCE_HIGH
-                )
-                channel.setShowBadge(true)
-                notificationManager.createNotificationChannel(channel)
-            }
+            val channel = NotificationChannel(
+                notificationChannelId,
+                Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            channel.setShowBadge(true)
+            notificationManager.createNotificationChannel(channel)
             val d: Drawable = appContext.resources
                 .getDrawable(CoreUiR.drawable.ic_folder_incoming, appContext.theme)
             val notificationBuilder: NotificationCompat.Builder =

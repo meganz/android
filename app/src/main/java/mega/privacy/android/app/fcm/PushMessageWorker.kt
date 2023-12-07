@@ -185,17 +185,15 @@ class PushMessageWorker @AssistedInject constructor(
     }
 
     private fun getNotification(iconId: Int, titleId: Int? = null): Notification {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel = NotificationChannel(
-                RETRIEVING_NOTIFICATIONS_ID,
-                RETRIEVING_NOTIFICATIONS,
-                NotificationManager.IMPORTANCE_NONE
-            ).apply {
-                enableVibration(false)
-                setSound(null, null)
-            }
-            notificationManager.createNotificationChannel(notificationChannel)
+        val notificationChannel = NotificationChannel(
+            RETRIEVING_NOTIFICATIONS_ID,
+            RETRIEVING_NOTIFICATIONS,
+            NotificationManager.IMPORTANCE_NONE
+        ).apply {
+            enableVibration(false)
+            setSound(null, null)
         }
+        notificationManager.createNotificationChannel(notificationChannel)
 
         return NotificationCompat.Builder(applicationContext, RETRIEVING_NOTIFICATIONS_ID)
             .setSmallIcon(iconId)

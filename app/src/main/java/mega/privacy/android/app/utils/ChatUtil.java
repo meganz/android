@@ -62,7 +62,6 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
-import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -136,7 +135,6 @@ public class ChatUtil {
     private static final int MIN_WIDTH = 44;
     private static final float TEXT_SIZE = 14f;
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
-    private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
     public static final int STREAM_MUSIC_DEFAULT = AudioManager.STREAM_MUSIC;
 
@@ -854,21 +852,17 @@ public class ChatUtil {
      */
     public static AudioFocusRequest getRequest(AudioManager.OnAudioFocusChangeListener listener,
                                                int focusType) {
-        if (SHOULD_BUILD_FOCUS_REQUEST) {
-            AudioAttributes mAudioAttributes =
-                    new AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .build();
-            return new AudioFocusRequest.Builder(focusType)
-                    .setAudioAttributes(mAudioAttributes)
-                    .setAcceptsDelayedFocusGain(true)
-                    .setWillPauseWhenDucked(true)
-                    .setOnAudioFocusChangeListener(listener)
-                    .build();
-        }
-
-        return null;
+        AudioAttributes mAudioAttributes =
+                new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build();
+        return new AudioFocusRequest.Builder(focusType)
+                .setAudioAttributes(mAudioAttributes)
+                .setAcceptsDelayedFocusGain(true)
+                .setWillPauseWhenDucked(true)
+                .setOnAudioFocusChangeListener(listener)
+                .build();
     }
 
     /**
@@ -884,17 +878,11 @@ public class ChatUtil {
             return false;
         }
 
-        int focusRequest;
-        if (SHOULD_BUILD_FOCUS_REQUEST) {
-            if (request == null) {
-                Timber.w("Audio Focus Request is NULL");
-                return false;
-            }
-            focusRequest = audioManager.requestAudioFocus(request);
-        } else {
-            focusRequest = audioManager.requestAudioFocus(listener, streamType, focusType);
+        if (request == null) {
+            Timber.w("Audio Focus Request is NULL");
+            return false;
         }
-
+        int focusRequest = audioManager.requestAudioFocus(request);
         return focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 
@@ -903,12 +891,8 @@ public class ChatUtil {
      */
     public static void abandonAudioFocus(AudioManager.OnAudioFocusChangeListener listener,
                                          AudioManager audioManager, AudioFocusRequest request) {
-        if (SHOULD_BUILD_FOCUS_REQUEST) {
-            if (request != null) {
-                audioManager.abandonAudioFocusRequest(request);
-            }
-        } else {
-            audioManager.abandonAudioFocus(listener);
+        if (request != null) {
+            audioManager.abandonAudioFocusRequest(request);
         }
     }
 

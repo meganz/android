@@ -120,16 +120,14 @@ class CameraUploadsNotificationManager @Inject constructor(
         progress: Int? = null,
         isAutoCancel: Boolean = true,
     ): Notification {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            channel.setShowBadge(false)
-            channel.setSound(null, null)
-            notificationManager.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            NOTIFICATION_CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        channel.setShowBadge(false)
+        channel.setSound(null, null)
+        notificationManager.createNotificationChannel(channel)
 
         val builder = NotificationCompat.Builder(
             context,

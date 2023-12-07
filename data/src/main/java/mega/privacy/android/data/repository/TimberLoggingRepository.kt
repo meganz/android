@@ -134,15 +134,10 @@ internal class TimberLoggingRepository @Inject constructor(
     private fun getLogFileName() =
         "${getFormattedDate()}_Android_${megaApiGateway.accountEmail}.zip"
 
-    private fun getFormattedDate() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    private fun getFormattedDate() =
         DateTimeFormatter.ofPattern("dd_MM_yyyy__HH_mm_ss")
             .withZone(ZoneId.from(ZoneOffset.UTC))
             .format(Instant.now())
-    } else {
-        SimpleDateFormat("dd_MM_yyyy__HH_mm_ss", Locale.US).apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-        }.format(Date())
-    }
 
     override fun isSdkLoggingEnabled(): SharedFlow<Boolean> =
         loggingPreferencesGateway.isLoggingPreferenceEnabled()

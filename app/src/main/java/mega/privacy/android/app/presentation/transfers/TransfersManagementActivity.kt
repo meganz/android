@@ -163,8 +163,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
                     val isStarted =
                         ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
                     val shouldStartForegroundService =
-                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
-                                (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || isStarted)
+                        Build.VERSION.SDK_INT < Build.VERSION_CODES.S || isStarted
                     if (shouldStartForegroundService) {
                         ContextCompat.startForegroundService(this, uploadServiceIntent)
                     } else {

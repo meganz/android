@@ -66,18 +66,16 @@ class NewTokenWorker @AssistedInject constructor(
     }
 
     private fun getNotification(): Notification {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel = NotificationChannel(
-                RETRIEVING_NEW_TOKEN_ID,
-                RETRIEVING_NEW_TOKEN,
-                NotificationManager.IMPORTANCE_NONE
-            ).apply {
-                enableVibration(false)
-                setSound(null, null)
-            }
-            (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-                .createNotificationChannel(notificationChannel)
+        val notificationChannel = NotificationChannel(
+            RETRIEVING_NEW_TOKEN_ID,
+            RETRIEVING_NEW_TOKEN,
+            NotificationManager.IMPORTANCE_NONE
+        ).apply {
+            enableVibration(false)
+            setSound(null, null)
         }
+        (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+            .createNotificationChannel(notificationChannel)
 
         val builder = NotificationCompat.Builder(
             applicationContext,

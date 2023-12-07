@@ -22,11 +22,11 @@ class VibratorFacade @Inject constructor(
      * @param milliseconds: Milliseconds to vibrate the device
      */
     override fun vibrateDevice(milliseconds: Long) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(milliseconds,
-                VibrationEffect.DEFAULT_AMPLITUDE))
-        } else {
-            vibrator.vibrate(milliseconds)
-        }
+        vibrator.vibrate(
+            VibrationEffect.createOneShot(
+                milliseconds,
+                VibrationEffect.DEFAULT_AMPLITUDE
+            )
+        )
     }
 }

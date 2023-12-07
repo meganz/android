@@ -240,10 +240,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         path = intent.getStringExtra("path")
         initializeBasedOnAdapterType()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val builder = StrictMode.VmPolicy.Builder()
-            StrictMode.setVmPolicy(builder.build())
-        }
+        val builder = StrictMode.VmPolicy.Builder()
+        StrictMode.setVmPolicy(builder.build())
         if (!isOffLine && type != Constants.ZIP_ADAPTER) {
             if (msgId != -1L && chatId != -1L) {
                 msgChat = megaChatApi.getMessage(chatId, msgId)

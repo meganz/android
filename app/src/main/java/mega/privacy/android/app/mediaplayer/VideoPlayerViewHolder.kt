@@ -63,9 +63,6 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
      */
     fun setupScreenshotButton(clickedCallback: () -> Unit) {
         // The screenshot feature is not available if the Android version is lower that API 26
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            screenshotButton.isVisible = false
-        }
         screenshotButton.setOnClickListener {
             clickedCallback()
         }

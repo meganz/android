@@ -475,11 +475,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             Timber.d("Start call Service. Chat iD = $chatId")
             Intent(this, CallService::class.java).run {
                 putExtra(Constants.CHAT_ID, chatId)
-                if (SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(this)
-                } else {
-                    startService(this)
-                }
+                startForegroundService(this)
             }
         }
     }

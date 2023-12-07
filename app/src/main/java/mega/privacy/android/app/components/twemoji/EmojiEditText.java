@@ -1,9 +1,10 @@
 package mega.privacy.android.app.components.twemoji;
 
+import static mega.privacy.android.app.utils.ChatUtil.getMaxAllowed;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
-import android.os.Build;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.util.AttributeSet;
@@ -18,16 +19,13 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.view.inputmethod.EditorInfoCompat;
 import androidx.core.view.inputmethod.InputConnectionCompat;
 
+import java.util.Objects;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-
-import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
-
-import static mega.privacy.android.app.utils.ChatUtil.getMaxAllowed;
-
-import java.util.Objects;
+import mega.privacy.android.app.utils.TextUtil;
 
 public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInterface {
     private float emojiSize;
@@ -146,8 +144,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
 
         final InputConnectionCompat.OnCommitContentListener callback =
                 (inputContentInfo, flags, opts) -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 &&
-                            (flags & InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION) != 0) {
+                    if ((flags & InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION) != 0) {
                         try {
                             inputContentInfo.requestPermission();
                         } catch (Exception e) {
