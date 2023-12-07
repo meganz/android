@@ -248,7 +248,7 @@ class MyAccountActivity : PasscodeActivity(),
     @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
-        viewModel.manageActivityResult(this, requestCode, resultCode, intent, this)
+        viewModel.manageActivityResult(requestCode, resultCode, this)
     }
 
     override fun onResume() {

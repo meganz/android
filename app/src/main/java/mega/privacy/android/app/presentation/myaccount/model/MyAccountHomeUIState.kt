@@ -23,7 +23,7 @@ import java.io.File
  * @property businessStatus
  * @property visibleContacts
  * @property accountDetail
- * @property isProFlexiAccount
+ * @property avatarFileLastModified
  * @property hasRenewableSubscription
  * @property hasExpireAbleSubscription
  * @property lastSession
@@ -45,6 +45,7 @@ data class MyAccountHomeUIState(
     val verifiedPhoneNumber: String? = null,
     val canVerifyPhoneNumber: Boolean = false,
     val avatar: File? = null,
+    val avatarFileLastModified: Long = 0L,
     val avatarColor: Int? = null,
     val accountType: AccountType? = null,
     val isBusinessAccount: Boolean = false,

@@ -10,6 +10,8 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -112,6 +114,11 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
+    private val selectPhotoLauncher =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            uri?.let { viewModel.handleAvatarChange(it) }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (shouldRefreshSessionDueToSDK(true)) return
@@ -199,7 +206,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
-        viewModel.manageActivityResult(this, requestCode, resultCode, intent, this)
+        viewModel.manageActivityResult(requestCode, resultCode, this)
     }
 
     override fun onRequestPermissionsResult(
@@ -326,14 +333,17 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 firstMessageId = R.string.email_verification_text_change_mail
                 secondMessageId = R.string.email_verification_title
             }
+
             result.exceptionOrNull() is ChangeEmailException.EmailInUse -> {
                 firstMessageId = R.string.mail_already_used
                 secondMessageId = R.string.email_verification_title
             }
+
             result.exceptionOrNull() is ChangeEmailException.AlreadyRequested -> {
                 firstMessageId = R.string.mail_changed_confirm_requested
                 secondMessageId = R.string.email_verification_title
             }
+
             else -> {
                 firstMessageId = R.string.general_text_error
                 secondMessageId = R.string.general_error_word
@@ -682,7 +692,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     }
 
     override fun choosePhoto() {
-        viewModel.launchChoosePhotoIntent(this)
+        selectPhotoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
     override fun deletePhoto() {

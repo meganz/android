@@ -6,6 +6,7 @@ import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,6 +17,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +30,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -55,7 +57,6 @@ import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActi
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants.ACTION_REFRESH
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
-import mega.privacy.android.app.utils.Constants.CHOOSE_PICTURE_PROFILE_CODE
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Constants.FREE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -77,6 +78,7 @@ import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
@@ -85,7 +87,6 @@ import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
-import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
@@ -109,9 +110,6 @@ import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaUtilsAndroid
 import timber.log.Timber
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
 import javax.inject.Inject
 
 /**
@@ -134,7 +132,6 @@ import javax.inject.Inject
  * @property confirmCancelAccountUseCase
  * @property confirmChangeEmailUseCase
  * @property filePrepareUseCase
- * @property monitorMyAvatarFile
  * @property getAccountDetailsUseCase
  * @property getExtendedAccountDetail
  * @property getNumberOfSubscription
@@ -167,7 +164,6 @@ class MyAccountViewModel @Inject constructor(
     private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase,
     private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase,
     private val filePrepareUseCase: FilePrepareUseCase,
-    private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getNumberOfSubscription: GetNumberOfSubscription,
@@ -185,6 +181,7 @@ class MyAccountViewModel @Inject constructor(
     private val monitorBackupFolder: MonitorBackupFolder,
     private val getFolderTreeInfo: GetFolderTreeInfo,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -667,17 +664,13 @@ class MyAccountViewModel @Inject constructor(
     /**
      * Manage activity result
      *
-     * @param activity
      * @param requestCode
      * @param resultCode
-     * @param data
      * @param snackbarShower
      */
     fun manageActivityResult(
-        activity: Activity,
         requestCode: Int,
         resultCode: Int,
-        data: Intent?,
         snackbarShower: SnackbarShower,
     ) {
         if (resultCode != RESULT_OK) {
@@ -706,39 +699,34 @@ class MyAccountViewModel @Inject constructor(
             }
 
             TAKE_PICTURE_PROFILE_CODE -> addProfileAvatar(null)
-            CHOOSE_PICTURE_PROFILE_CODE -> {
-                if (data == null) {
-                    showResult(context.getString(R.string.error_changing_user_avatar_image_not_available))
-                    return
-                }
+        }
+    }
 
-                /* Need to check image existence before use due to android content provider issue.
-                Can not check query count - still get count = 1 even file does not exist
-                */
-                var fileExists = false
-                val inputStream: InputStream?
-
-                try {
-                    inputStream = data.data?.let { activity.contentResolver?.openInputStream(it) }
-                    if (inputStream != null) {
-                        fileExists = true
+    /**
+     * Handle avatar change
+     * we use @ioDispatcher to avoid blocking the main thread but it's temporary
+     * will replace by the use case in the future
+     *
+     * @param uri Uri containing the file to be set as avatar.
+     */
+    fun handleAvatarChange(uri: Uri) {
+        viewModelScope.launch {
+            runCatching {
+                withContext(ioDispatcher) {
+                    context.contentResolver?.openInputStream(uri)?.use { inputStream ->
+                        CacheFolderManager.getCacheFile(
+                            CacheFolderManager.TEMPORARY_FOLDER,
+                            "picture.jpg"
+                        )?.let {
+                            it.outputStream().use { outputStream ->
+                                inputStream.copyTo(outputStream)
+                            }
+                            addProfileAvatar(it.absolutePath)
+                        }
                     }
-
-                    inputStream?.close()
-                } catch (e: FileNotFoundException) {
-                    e.printStackTrace()
-                } catch (e: IOException) {
-                    e.printStackTrace()
                 }
-
-                if (!fileExists) {
-                    showResult(context.getString(R.string.error_changing_user_avatar_image_not_available))
-                    return
-                }
-
-                data.action = Intent.ACTION_GET_CONTENT
-                _state.update { it.copy(isLoading = true) }
-                prepareAvatarFile(data)
+            }.onFailure {
+                showResult(context.getString(R.string.error_changing_user_avatar_image_not_available))
             }
         }
     }
@@ -847,29 +835,11 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Launch choose photo intent
-     *
-     * @param activity
-     */
-    fun launchChoosePhotoIntent(activity: Activity) {
-        val intent = Intent()
-        intent.action = Intent.ACTION_OPEN_DOCUMENT
-        intent.action = Intent.ACTION_GET_CONTENT
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
-        intent.type = "image/*"
-        activity.startActivityForResult(
-            Intent.createChooser(intent, null),
-            CHOOSE_PICTURE_PROFILE_CODE
-        )
-    }
-
-    /**
      * Adds a photo as avatar.
      *
      * @param path           Path of the chosen photo or null if is a new taken photo.
      */
     private fun addProfileAvatar(path: String?) {
-        val app = MegaApplication.getInstance()
         val myEmail = megaApi.myUser?.email
         val imgFile = if (!path.isNullOrEmpty()) File(path)
         else CacheFolderManager.getCacheFile(

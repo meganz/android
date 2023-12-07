@@ -34,6 +34,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -106,7 +107,6 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRAN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_SECTION
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.black
@@ -130,6 +130,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.shared.theme.MegaAppTheme
 import org.jetbrains.anko.displayMetrics
 import java.io.File
 
@@ -223,24 +224,26 @@ fun MyAccountHomeView(
                 .background(MaterialTheme.colors.grey_020_black)
                 .verticalScroll(scrollState)
         ) {
-            MyAccountHeader(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = HEADER_TOP_PADDING,
-                        bottom = 30.dp
-                    )
-                    .onGloballyPositioned { c ->
-                        headerHeight = with(density) { c.size.height.toDp() }
-                    },
-                avatar = uiState.avatar,
-                avatarColor = uiState.avatarColor,
-                name = uiState.name,
-                email = uiState.email,
-                verifiedPhoneNumber = uiState.verifiedPhoneNumber,
-                onClickUserAvatar = uiActions::onClickUserAvatar,
-                onEditProfile = uiActions::onEditProfile
-            )
+            key(uiState.avatarFileLastModified) {
+                MyAccountHeader(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = HEADER_TOP_PADDING,
+                            bottom = 30.dp
+                        )
+                        .onGloballyPositioned { c ->
+                            headerHeight = with(density) { c.size.height.toDp() }
+                        },
+                    avatar = uiState.avatar,
+                    avatarColor = uiState.avatarColor,
+                    name = uiState.name,
+                    email = uiState.email,
+                    verifiedPhoneNumber = uiState.verifiedPhoneNumber,
+                    onClickUserAvatar = uiActions::onClickUserAvatar,
+                    onEditProfile = uiActions::onEditProfile
+                )
+            }
 
             val accountTypeInfoHeight =
                 screenHeight.dp - headerHeight - accountTypeHeight - TOOLBAR_HEIGHT - HEADER_TOP_PADDING - ACCOUNT_TYPE_TOP_PADDING
