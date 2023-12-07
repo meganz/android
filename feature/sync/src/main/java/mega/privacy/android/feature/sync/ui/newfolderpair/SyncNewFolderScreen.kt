@@ -11,8 +11,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -63,17 +66,22 @@ internal fun SyncNewFolderScreen(
                 elevation = 0.dp
             )
         }, content = { paddingValues ->
-            SyncNewFolderScreenContent(
-                modifier = Modifier.padding(paddingValues),
-                localFolderSelected = localFolderSelected,
-                selectMegaFolderClicked = selectMegaFolderClicked,
-                folderNameChanged = folderNameChanged,
-                folderPairName = folderPairName,
-                selectedLocalFolder = selectedLocalFolder,
-                selectedMegaFolder = selectedMegaFolder,
-                syncClicked = syncClicked,
-                syncPermissionsManager = syncPermissionsManager
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                SyncNewFolderScreenContent(
+                    localFolderSelected = localFolderSelected,
+                    selectMegaFolderClicked = selectMegaFolderClicked,
+                    folderNameChanged = folderNameChanged,
+                    folderPairName = folderPairName,
+                    selectedLocalFolder = selectedLocalFolder,
+                    selectedMegaFolder = selectedMegaFolder,
+                    syncClicked = syncClicked,
+                    syncPermissionsManager = syncPermissionsManager
+                )
+            }
         }
     )
 }
@@ -96,8 +104,10 @@ private fun SyncNewFolderScreenContent(
     var showAllowAppAccessDialog by rememberSaveable {
         mutableStateOf(false)
     }
-
-    Column(modifier) {
+    val scrollState = rememberScrollState()
+    Column(
+        modifier.verticalScroll(scrollState)
+    ) {
         val folderPicker = launchFolderPicker {
             localFolderSelected(it)
         }

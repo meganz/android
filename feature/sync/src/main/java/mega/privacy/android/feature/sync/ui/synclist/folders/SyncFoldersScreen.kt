@@ -31,41 +31,42 @@ internal fun SyncFoldersScreen(
     issuesInfoClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(state = LazyListState(), modifier = modifier) {
-        if (syncUiItems.isEmpty()) {
-            item {
-                SyncListNoItemsPlaceHolder(
-                    placeholderText = "No Syncs",
-                    placeholderIcon = R.drawable.no_syncs_placeholder,
-                    modifier = Modifier
-                        .fillParentMaxHeight(0.8f)
-                        .fillParentMaxWidth()
-                )
-            }
-        } else {
-            items(count = syncUiItems.size, key = {
-                syncUiItems[it].id
-            }) { itemIndex ->
-                SyncItemView(
-                    Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
-                    syncUiItems,
-                    itemIndex,
-                    cardExpanded = { syncUiItem, expanded ->
-                        cardExpanded(CardExpanded(syncUiItem, expanded))
-                    },
-                    pauseRunClicked,
-                    removeFolderClicked,
-                    issuesInfoClicked
-                )
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        LazyColumn(state = LazyListState(), modifier = modifier) {
+            if (syncUiItems.isEmpty()) {
+                item {
+                    SyncListNoItemsPlaceHolder(
+                        placeholderText = "No Syncs",
+                        placeholderIcon = R.drawable.no_syncs_placeholder,
+                        modifier = Modifier
+                            .fillParentMaxHeight(0.8f)
+                            .fillParentMaxWidth()
+                    )
+                }
+            } else {
+                items(count = syncUiItems.size, key = {
+                    syncUiItems[it].id
+                }) { itemIndex ->
+                    SyncItemView(
+                        Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                        syncUiItems,
+                        itemIndex,
+                        cardExpanded = { syncUiItem, expanded ->
+                            cardExpanded(CardExpanded(syncUiItem, expanded))
+                        },
+                        pauseRunClicked,
+                        removeFolderClicked,
+                        issuesInfoClicked
+                    )
+                }
             }
         }
-    }
-    Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd
-    ) {
         FloatingActionButton(
             onClick = { addFolderClicked() },
             modifier = Modifier.padding(16.dp)
+                .align(Alignment.BottomEnd)
         ) {
             Icon(Icons.Filled.Add, contentDescription = "Add folder pair")
         }
