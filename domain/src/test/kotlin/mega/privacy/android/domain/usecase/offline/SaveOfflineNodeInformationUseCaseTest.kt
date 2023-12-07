@@ -14,8 +14,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -31,6 +33,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
     private val nodeOfflineInformation: OtherOfflineNodeInformation = mock()
     private val parentOfflineInformation: OtherOfflineNodeInformation = mock()
     private val monitorBackupFolder: MonitorBackupFolder = mock()
+    private val parentParentOfflineNodeInformation = mock<OtherOfflineNodeInformation>()
 
     private lateinit var underTest: SaveOfflineNodeInformationUseCase
 
@@ -54,6 +57,25 @@ internal class SaveOfflineNodeInformationUseCaseTest {
             parentOfflineInformation,
             monitorBackupFolder,
         )
+        nodeRepository.stub {
+            onBlocking {
+                saveOfflineNodeInformation(
+                    eq(nodeOfflineInformation),
+                    anyOrNull()
+                )
+            }.thenReturn(
+                nodeOfflineInformationId
+            )
+
+            onBlocking {
+                saveOfflineNodeInformation(
+                    eq(parentOfflineInformation),
+                    anyOrNull()
+                )
+            }.thenReturn(
+                nodeParentOfflineInformationId
+            )
+        }
     }
 
     @Test
@@ -86,8 +108,14 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
 
         underTest(nodeId)
-        verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, parentId)
-        verify(nodeRepository).saveOfflineNodeInformation(parentOfflineInformation, parentParentId)
+        verify(nodeRepository).saveOfflineNodeInformation(
+            nodeOfflineInformation,
+            nodeParentOfflineInformationId
+        )
+        verify(nodeRepository).saveOfflineNodeInformation(
+            parentOfflineInformation,
+            null
+        )
     }
 
     @Test
@@ -100,8 +128,14 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(parent.fetchChildren).thenReturn { listOf(node) }
 
         underTest(parentId)
-        verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, parentId)
-        verify(nodeRepository).saveOfflineNodeInformation(parentOfflineInformation, parentParentId)
+        verify(nodeRepository).saveOfflineNodeInformation(
+            parentOfflineInformation,
+            null
+        )
+        verify(nodeRepository).saveOfflineNodeInformation(
+            nodeOfflineInformation,
+            nodeParentOfflineInformationId
+        )
     }
 
     @Test
@@ -128,7 +162,14 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(monitorBackupFolder()).thenReturn(flowOf(Result.success(backupId)))
 
         underTest(nodeId)
-        verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, parentId)
+        verify(nodeRepository).saveOfflineNodeInformation(
+            nodeOfflineInformation,
+            nodeParentOfflineInformationId
+        )
+        verify(nodeRepository).saveOfflineNodeInformation(
+            parentOfflineInformation,
+            null
+        )
     }
 
     private fun stubDriveNodeWithoutParent() = runTest {
@@ -146,16 +187,23 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(nodeRepository.getNodeById(parentId)).thenReturn(parent)
         whenever(parent.id).thenReturn(parentId)
         whenever(parent.parentId).thenReturn(parentParentId)
+        whenever(nodeRepository.getOfflineNodeInformation(parentParentId)).thenReturn(
+            parentParentOfflineNodeInformation
+        )
+        whenever(parentParentOfflineNodeInformation.id).thenReturn(
+            nodeParentParentOfflineInformationId.toInt()
+        )
         whenever(monitorBackupFolder()).thenReturn(flowOf(Result.failure(Throwable())))
     }
 
     private fun stubNodeOfflineInfo() = runTest {
+        whenever(nodeOfflineInformation.id).thenReturn(nodeOfflineInformationId.toInt())
         whenever(getOfflineNodeInformationUseCase(node)).thenReturn(nodeOfflineInformation)
     }
 
     private fun stubParentOfflineInfo() = runTest {
+        whenever(parentOfflineInformation.id).thenReturn(nodeParentOfflineInformationId.toInt())
         whenever(getOfflineNodeInformationUseCase(parent)).thenReturn(parentOfflineInformation)
-
     }
 
     companion object {
@@ -164,5 +212,8 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         private val parentParentId = NodeId(3L)
         private val invalidId = NodeId(-1L)
         private val backupId = NodeId(2L)
+        private const val nodeOfflineInformationId = 5L
+        private const val nodeParentOfflineInformationId = 6L
+        private const val nodeParentParentOfflineInformationId = 7L
     }
 }

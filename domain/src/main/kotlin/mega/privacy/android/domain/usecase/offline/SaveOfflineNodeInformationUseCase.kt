@@ -3,7 +3,9 @@ package mega.privacy.android.domain.usecase.offline
 import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
@@ -27,14 +29,14 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
         val driveRootNode = nodeRepository.getRootNode()?.id ?: NodeId(-1L)
         nodeRepository.getNodeById(nodeId)?.let { node ->
             //we need to save parents before the node itself
-            saveNodeAndItsParentsRecursively(
-                nodeId = node.id,
+            val offlineInfoId = saveNodeAndItsParentsRecursively(
+                currentNode = node,
                 driveRootNodeId = driveRootNode,
                 backupRootNodeId = backupRootNodeId,
             )
             //and then node's children
             if (node is FolderNode) {
-                saveChildrenRecursively(node)
+                saveChildrenRecursively(node, offlineInfoId)
             }
         }
     }
@@ -43,29 +45,35 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
      * Save offline information of all node's parents (not already saved) and then the node itself.
      * As offline information in the database has a reference to it's parent id, we need to save in that way
      * Root drive node and backup root parent are not saved.
-     * @param nodeId the [NodeId] of the node we want to save
+     * @param currentNode the [NodeId] of the node we want to save
      * @param driveRootNodeId this node won't be saved as its children appear as root nodes in offline
      * @param backupRootNodeId this node needs to be saved, but not its parent ("Vault")
      */
     private suspend fun saveNodeAndItsParentsRecursively(
-        nodeId: NodeId,
+        currentNode: Node,
         driveRootNodeId: NodeId,
         backupRootNodeId: NodeId,
-    ) {
-        if (nodeId != driveRootNodeId && nodeRepository.getOfflineNodeInformation(nodeId) == null) {
-            //only save offline information if not already saved and not the drive root node
-            nodeRepository.getNodeById(nodeId)?.let { node ->
-                //we need to first save all parents recursively except explicitly skipped
-                if (node.id != backupRootNodeId) {
-                    saveNodeAndItsParentsRecursively(
-                        nodeId = node.parentId,
-                        driveRootNodeId = driveRootNodeId,
-                        backupRootNodeId = backupRootNodeId,
-                    )
-                }
-                nodeRepository.saveOfflineNodeInformation(
-                    getOfflineNodeInformationUseCase(node),
-                    if (node.parentId != driveRootNodeId && node.id != backupRootNodeId) node.parentId else null
+    ): Long? {
+        if (currentNode.id == driveRootNodeId) return null
+        val offlineNodeInformation = nodeRepository.getOfflineNodeInformation(currentNode.id)
+        return offlineNodeInformation?.id?.toLong() ?: nodeRepository.saveOfflineNodeInformation(
+            getOfflineNodeInformationUseCase(currentNode),
+            getParentOfflineInfoId(currentNode, backupRootNodeId, driveRootNodeId)
+        )
+    }
+
+    private suspend fun getParentOfflineInfoId(
+        node: Node,
+        backupRootNodeId: NodeId,
+        driveRootNodeId: NodeId,
+    ): Long? {
+        return if (node.id == backupRootNodeId) null else {
+            // This would allow us to incorrectly save a node offline information without parent offline information if the parent node is not returned. Is this a concern?
+            nodeRepository.getNodeById(node.parentId)?.let {
+                saveNodeAndItsParentsRecursively(
+                    currentNode = it,
+                    driveRootNodeId = driveRootNodeId,
+                    backupRootNodeId = backupRootNodeId,
                 )
             }
         }
@@ -75,20 +83,24 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
      * Save offline information of all children and sub-children of this folder.
      * When a folder node is saved offline, all its children needs to be saved.
      */
-    private suspend fun saveChildrenRecursively(folderNode: FolderNode) {
-        folderNode.fetchChildren(SortOrder.ORDER_NONE).filter { node ->
+    private suspend fun saveChildrenRecursively(folderNode: FolderNode, offlineInfoId: Long?) {
+        folderNode.fetchChildren(SortOrder.ORDER_NONE).filterNot { node ->
             //no need to save empty folders.
-            !(node is FolderNode && node.childFileCount == 0 && node.childFolderCount == 0)
+            isEmptyFolder(node)
         }.forEach { node ->
-            if (nodeRepository.getOfflineNodeInformation(node.id) == null) {
-                nodeRepository.saveOfflineNodeInformation(
-                    getOfflineNodeInformationUseCase(node),
-                    folderNode.id
-                )
-            }
+            val currentOfflineInfoId =
+                nodeRepository.getOfflineNodeInformation(node.id)?.id?.toLong()
+                    ?: nodeRepository.saveOfflineNodeInformation(
+                        getOfflineNodeInformationUseCase(node),
+                        offlineInfoId
+                    )
+
             if (node is FolderNode) {
-                saveChildrenRecursively(node)
+                saveChildrenRecursively(node, currentOfflineInfoId)
             }
         }
     }
+
+    private fun isEmptyFolder(node: UnTypedNode) =
+        node is FolderNode && node.childFileCount == 0 && node.childFolderCount == 0
 }

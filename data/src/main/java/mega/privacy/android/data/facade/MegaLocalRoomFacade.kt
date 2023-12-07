@@ -488,8 +488,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
             offlineModelMapper(it)
         }
 
-    override suspend fun saveOfflineInformation(offline: Offline) {
-        offlineEntityMapper(offline).let { offlineDao.insertOrUpdateOffline(it) }
+    override suspend fun saveOfflineInformation(offline: Offline): Long {
+        return offlineEntityMapper(offline).let {
+            offlineDao.insertOrUpdateOffline(it)
+        }
     }
 
     override suspend fun clearOffline() = offlineDao.deleteAllOffline()

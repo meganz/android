@@ -431,35 +431,22 @@ class NodeRepositoryImplTest {
     @Test
     fun `test that saveOfflineNodeInformation calls api gateway saveOfflineNodeInformation with the mapped data and correct parent id`() =
         runTest {
-            val parenId = 1
-            val parenNodeId = NodeId(2L)
+            val parentOfflineInfoId = 2L
             val offlineNodeInformation = mock<OtherOfflineNodeInformation>()
             val mapped = mock<Offline>()
-            val offlineParentInformation = mock<Offline> {
-                on { id }.thenReturn(parenId)
-            }
-            whenever(megaLocalRoomGateway.getOfflineInformation(parenNodeId.longValue))
-                .thenReturn(offlineParentInformation)
-            whenever(offlineInformationMapper(offlineNodeInformation, parenId)).thenReturn(mapped)
 
-            underTest.saveOfflineNodeInformation(offlineNodeInformation, parenNodeId)
+            whenever(
+                offlineInformationMapper(
+                    offlineNodeInformation,
+                    parentOfflineInfoId.toInt()
+                )
+            ).thenReturn(mapped)
+
+            underTest.saveOfflineNodeInformation(offlineNodeInformation, parentOfflineInfoId)
 
             verify(megaLocalRoomGateway).saveOfflineInformation(mapped)
         }
 
-    @Test
-    fun `test that saveOfflineNodeInformation throws an exception if parent offline information is not found`() =
-        runTest {
-            val parenNodeId = NodeId(2L)
-            val offlineNodeInformation = mock<OtherOfflineNodeInformation>()
-
-            whenever(megaLocalRoomGateway.getOfflineInformation(parenNodeId.longValue))
-                .thenReturn(null)
-
-            assertThrows<IllegalArgumentException> {
-                underTest.saveOfflineNodeInformation(offlineNodeInformation, parenNodeId)
-            }
-        }
 
     @Test
     fun `test that throw IllegalArgumentException when call moveNode and can not find node by handle`() =

@@ -16,7 +16,7 @@ internal interface OfflineDao {
     fun getOfflineFiles(): List<OfflineEntity>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdateOffline(entity: OfflineEntity)
+    suspend fun insertOrUpdateOffline(entity: OfflineEntity): Long
 
     @Query("SELECT * FROM offline WHERE handle = :handle")
     suspend fun getOfflineByHandle(handle: String?): OfflineEntity?

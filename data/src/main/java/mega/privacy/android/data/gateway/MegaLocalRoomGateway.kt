@@ -488,7 +488,7 @@ interface MegaLocalRoomGateway {
      *
      * @param offline [Offline]
      */
-    suspend fun saveOfflineInformation(offline: Offline)
+    suspend fun saveOfflineInformation(offline: Offline): Long
 
     /**
      * Clears offline files.

@@ -327,14 +327,10 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun saveOfflineNodeInformation(
         offlineNodeInformation: OfflineNodeInformation,
-        parentNodeId: NodeId?,
+        parentOfflineInformationId: Long?,
     ) = withContext(ioDispatcher) {
-        val parent = parentNodeId?.let { parentId ->
-            getOfflineNode(parentId.longValue)
-                ?: throw IllegalArgumentException("Parent offline information must have been previously saved in order to have a consistent hierarchy. ParentId: ${parentId.longValue}")
-        }
         megaLocalRoomGateway.saveOfflineInformation(
-            offlineInformationMapper(offlineNodeInformation, parent?.id)
+            offlineInformationMapper(offlineNodeInformation, parentOfflineInformationId?.toInt())
         )
     }
 
