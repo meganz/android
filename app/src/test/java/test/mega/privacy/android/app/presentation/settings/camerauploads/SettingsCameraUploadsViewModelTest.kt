@@ -873,6 +873,7 @@ class SettingsCameraUploadsViewModelTest {
             setupUnderTest()
             whenever(isCameraUploadsEnabledUseCase()).thenReturn(isEnabled)
             whenever(hasMediaPermissionUseCase()).thenReturn(!isEnabled)
+            whenever(checkEnableCameraUploadsStatus()).thenReturn(EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
             underTest.toggleCameraUploadsSettings()
             verify(updateCameraUploadTimeStamp).invoke(0L, SyncTimeStamp.PRIMARY_PHOTO)
             verify(updateCameraUploadTimeStamp).invoke(0L, SyncTimeStamp.PRIMARY_VIDEO)
