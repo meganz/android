@@ -68,7 +68,6 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
         driveRootNodeId: NodeId,
     ): Long? {
         return if (node.id == backupRootNodeId) null else {
-            // This would allow us to incorrectly save a node offline information without parent offline information if the parent node is not returned. Is this a concern?
             nodeRepository.getNodeById(node.parentId)?.let {
                 saveNodeAndItsParentsRecursively(
                     currentNode = it,
