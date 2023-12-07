@@ -125,6 +125,9 @@ dependencies {
     // Logging
     implementation(lib.bundles.logging)
 
+    implementation(lib.sqlcipher)
+    implementation(androidx.security.crypto)
+
     // Testing dependencies
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.truth.ext)

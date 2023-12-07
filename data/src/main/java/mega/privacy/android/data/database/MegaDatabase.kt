@@ -21,8 +21,8 @@ import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
-import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
 import mega.privacy.android.data.database.entity.SyncRecordEntity
+import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
 import timber.log.Timber
 
@@ -68,6 +68,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun cameraUploadsRecordDao(): CameraUploadsRecordDao
 
     companion object {
+
         private val MIGRATION_67_68 = object : Migration(67, 68) {
             override fun migrate(database: SupportSQLiteDatabase) {
             }

@@ -2,9 +2,9 @@ package mega.privacy.android.data.di
 
 import android.content.Context
 import android.provider.Settings
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import androidx.room.Room
+import androidx.security.crypto.EncryptedFile
+import androidx.security.crypto.MasterKeys
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import dagger.Module
@@ -16,6 +16,7 @@ import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.MegaOpenHelperFactor
+import mega.privacy.android.data.database.SQLCipherManager
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
@@ -24,10 +25,10 @@ import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
-import java.security.KeyStore
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
+import net.sqlcipher.database.SupportFactory
+import timber.log.Timber
+import java.io.File
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -39,8 +40,20 @@ internal object RoomDatabaseModule {
     internal fun provideMegaDatabase(
         @ApplicationContext applicationContext: Context,
         legacyDatabaseMigration: LegacyDatabaseMigration,
-    ): MegaDatabase =
-        Room.databaseBuilder(
+        sqlCipherManager: SQLCipherManager,
+    ): MegaDatabase {
+        val passphrase = sqlCipherManager.getPassphrase()
+        val isMigrateSuccess = runCatching {
+            sqlCipherManager.migrateToSecureDatabase(MegaDatabaseConstant.DATABASE_NAME, passphrase)
+        }.onFailure {
+            Timber.e(it)
+        }.isSuccess
+        val factory = if (isMigrateSuccess) {
+            SupportFactory(passphrase)
+        } else {
+            FrameworkSQLiteOpenHelperFactory()
+        }
+        return Room.databaseBuilder(
             applicationContext,
             MegaDatabase::class.java, MegaDatabaseConstant.DATABASE_NAME
         ).fallbackToDestructiveMigrationFrom(
@@ -48,11 +61,12 @@ internal object RoomDatabaseModule {
         ).addMigrations(*MegaDatabase.MIGRATIONS)
             .openHelperFactory(
                 MegaOpenHelperFactor(
-                    FrameworkSQLiteOpenHelperFactory(),
+                    factory,
                     legacyDatabaseMigration
                 )
             )
             .build()
+    }
 
     @Provides
     @Singleton
@@ -103,32 +117,22 @@ internal object RoomDatabaseModule {
 
     @Provides
     @Singleton
-    @Named("new_aes_key")
-    internal fun provideNewAesKey(): SecretKey {
-        val androidKeyStore = "AndroidKeyStore"
-        val keyName = "new_aes_key"
-        val keystore = KeyStore.getInstance(androidKeyStore)
-        keystore.load(null)
-        // only generate key one times
-        if (!keystore.containsAlias(keyName)) {
-            KeyGenerator.getInstance(
-                KeyProperties.KEY_ALGORITHM_AES,
-                androidKeyStore
-            ).apply {
-                init(
-                    KeyGenParameterSpec.Builder(
-                        keyName,
-                        KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-                    ).setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                        .setRandomizedEncryptionRequired(false)
-                        .build()
-                )
+    internal fun providePassphraseFile(
+        @ApplicationContext context: Context,
+    ): File = File(context.filesDir, "passphrase.bin")
 
-                generateKey()
-            }
-        }
-        return keystore.getKey(keyName, null) as SecretKey
+    @Provides
+    @Singleton
+    internal fun providePassphraseEncryptedFile(
+        @ApplicationContext context: Context,
+        passphraseFile: File,
+    ): EncryptedFile {
+        return EncryptedFile.Builder(
+            passphraseFile,
+            context,
+            MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+        ).build()
     }
 
     @Provides

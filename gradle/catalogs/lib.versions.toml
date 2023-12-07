@@ -24,6 +24,7 @@ kotlinpoet = "1.14.2"
 xray = "1.0"
 nocturn = "1.0"
 karma = "1.3"
+sqlcipher = "4.5.4"
 
 [libraries]
 anko-commons = { module = "org.jetbrains.anko:anko-commons", version.ref = "anko" }
@@ -77,6 +78,7 @@ nocturn = { module = "mega.privacy.android.nocturn:nocturn", version.ref = "noct
 karma-annotation = { module = "com.mega.karma:annotation", version.ref = "karma" }
 karma-compiler = { module = "com.mega.karma:compiler", version.ref = "karma" }
 karma-core = { module = "com.mega.karma:core", version.ref = "karma" }
+sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlcipher" }
 
 [bundles]
 fresco = ["fresco", "fresco-gif", "fresco-webp", "fresco-webpsupport"]

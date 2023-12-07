@@ -674,7 +674,7 @@ class SqliteDatabaseHandler @Inject constructor(
             SQLiteDatabase.CONFLICT_REPLACE,
             values,
             "$KEY_CHAT_HANDLE = '${encrypt(handle)}'",
-            null
+            emptyArray()
         )
     }
 
@@ -957,7 +957,7 @@ class SqliteDatabaseHandler @Inject constructor(
             SQLiteDatabase.CONFLICT_REPLACE,
             values,
             "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
-            null
+            emptyArray()
         )
         if (rows == 0) {
             values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
@@ -975,7 +975,7 @@ class SqliteDatabaseHandler @Inject constructor(
             SQLiteDatabase.CONFLICT_REPLACE,
             values,
             "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
-            null
+            emptyArray()
         )
         if (rows == 0) {
             values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
@@ -993,7 +993,7 @@ class SqliteDatabaseHandler @Inject constructor(
             SQLiteDatabase.CONFLICT_REPLACE,
             values,
             "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
-            null
+            emptyArray()
         )
         if (rows == 0) {
             values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
@@ -1243,7 +1243,7 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     override fun removeById(id: Int): Int {
-        return writableDatabase.delete(TABLE_OFFLINE, "$KEY_ID=$id", null)
+        return writableDatabase.delete(TABLE_OFFLINE, "$KEY_ID=$id", emptyArray())
     }
 
     override fun findByPath(path: String?): ArrayList<MegaOffline> {
@@ -2545,7 +2545,7 @@ class SqliteDatabaseHandler @Inject constructor(
             SQLiteDatabase.CONFLICT_REPLACE,
             values,
             where,
-            null
+            emptyArray()
         )
     }
 
@@ -2561,7 +2561,7 @@ class SqliteDatabaseHandler @Inject constructor(
                 SQLiteDatabase.CONFLICT_REPLACE,
                 values,
                 where,
-                null
+                emptyArray()
             )
         Timber.d("Rows updated: %s", rows)
     }
@@ -2649,7 +2649,7 @@ class SqliteDatabaseHandler @Inject constructor(
         writableDatabase.delete(
             TABLE_PENDING_MSG_SINGLE,
             KEY_PENDING_MSG_STATE + "=" + PendingMessageState.SENT.value,
-            null
+            emptyArray()
         )
     }
 
@@ -2658,12 +2658,12 @@ class SqliteDatabaseHandler @Inject constructor(
         writableDatabase.delete(
             TABLE_PENDING_MSG_SINGLE,
             "$KEY_PENDING_MSG_ID_CHAT = '${encrypt(idChat.toString())}'",
-            null
+            emptyArray()
         )
     }
 
     override fun removePendingMessageById(idMsg: Long) {
-        writableDatabase.delete(TABLE_PENDING_MSG_SINGLE, "$KEY_ID=$idMsg", null)
+        writableDatabase.delete(TABLE_PENDING_MSG_SINGLE, "$KEY_ID=$idMsg", emptyArray())
     }
 
     override val autoPlayEnabled: String?
