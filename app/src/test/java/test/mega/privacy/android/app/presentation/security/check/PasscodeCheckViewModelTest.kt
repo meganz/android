@@ -31,6 +31,10 @@ class PasscodeCheckViewModelTest {
     @BeforeEach
     internal fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
+        initViewModel()
+    }
+
+    private fun initViewModel() {
         underTest = PasscodeCheckViewModel(
             monitorPasscodeLockStateUseCase = monitorPasscodeLockStateUseCase,
         )
@@ -58,7 +62,7 @@ class PasscodeCheckViewModelTest {
         monitorPasscodeLockStateUseCase.stub {
             on { invoke() }.thenReturn(true.asHotFlow())
         }
-
+        initViewModel()
         underTest.state.filterNot { it is PasscodeCheckState.Loading }.test {
             assertThat(awaitItem()).isEqualTo(PasscodeCheckState.Locked)
             cancelAndIgnoreRemainingEvents()
@@ -70,7 +74,7 @@ class PasscodeCheckViewModelTest {
         monitorPasscodeLockStateUseCase.stub {
             on { invoke() }.thenReturn(false.asHotFlow())
         }
-
+        initViewModel()
         underTest.state.filterNot { it is PasscodeCheckState.Loading }.test {
             assertThat(awaitItem()).isEqualTo(PasscodeCheckState.UnLocked)
             cancelAndIgnoreRemainingEvents()
