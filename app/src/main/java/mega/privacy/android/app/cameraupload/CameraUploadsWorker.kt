@@ -403,17 +403,16 @@ class CameraUploadsWorker @AssistedInject constructor(
                         compressVideos()
                         uploadCompressedVideos()
                     }
-                    endService()
+                    endWork()
                     Result.success()
                 } else {
-                    Timber.w("Calling startWorker() failed. Proceed to handle error")
-                    endService(aborted = true)
+                    abortWork(cancelMessage = "Required conditions to start CU not met")
                     Result.failure()
                 }
             }
         } catch (throwable: Throwable) {
             Timber.e(throwable, "Worker cancelled")
-            endService(aborted = true)
+            abortWork(cancelMessage = throwable.message ?: "Error caught at the root level")
             Result.failure()
         }
     }
@@ -434,10 +433,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         monitorConnectivityStatusJob = scope?.launch(ioDispatcher) {
             monitorConnectivityUseCase().collect {
                 if (!it || isWifiNotSatisfiedUseCase()) {
-                    endService(
-                        cancelMessage = "Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload",
-                        aborted = true
-                    )
+                    abortWork(cancelMessage = "Camera Uploads by Wifi only")
                 }
             }
         }
@@ -448,10 +444,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             monitorBatteryInfo().collect {
                 deviceAboveMinimumBatteryLevel = (it.level > LOW_BATTERY_LEVEL || it.isCharging)
                 if (!deviceAboveMinimumBatteryLevel) {
-                    endService(
-                        cancelMessage = "Low Battery - Cancel Camera Upload",
-                        aborted = true
-                    )
+                    abortWork(cancelMessage = "Low Battery Level")
                 }
             }
         }
@@ -461,7 +454,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         monitorChargingStoppedStatusJob = scope?.launch(ioDispatcher) {
             monitorChargingStoppedState().collect {
                 if (isChargingRequired(totalVideoSize)) {
-                    Timber.d("Detected device stops charging.")
+                    Timber.d("Detected device stops charging")
                     videoCompressionJob?.cancel()
                 }
             }
@@ -473,10 +466,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             monitorStorageOverQuotaUseCase().collect {
                 if (it) {
                     showStorageOverQuotaStatus()
-                    endService(
-                        cancelMessage = "Storage Quota Filled - Cancel Camera Upload",
-                        aborted = true
-                    )
+                    abortWork(cancelMessage = "Storage Over Quota")
                 }
             }
         }
@@ -496,7 +486,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                     )
 
                 if (areCameraUploadsFoldersInRubbishBin) {
-                    endService(cancelMessage = "CU folder deleted", aborted = true)
+                    abortWork(cancelMessage = "Parent nodes deleted")
                 }
             }
         }
@@ -608,7 +598,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun isCameraUploadsSyncEnabled(): Boolean =
         isCameraUploadsEnabledUseCase().also {
-            if (!it) Timber.w("Camera Upload sync disabled")
+            if (!it) Timber.w("Camera Uploads sync disabled")
         }
 
     /**
@@ -801,7 +791,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         ).flowOn(ioDispatcher)
             .catch { throwable ->
                 Timber.e(throwable)
-                endService(throwable.message ?: "", aborted = true)
+                abortWork(throwable.message ?: "Error caught when uploading")
             }
             .collect { progressEvent ->
                 launch(ioDispatcher) {
@@ -1052,7 +1042,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun processCompressingInsufficientStorage() {
         showVideoCompressionOutOfSpaceStatus()
-        endService(aborted = true)
+        abortWork(cancelMessage = "Not enough space to compress videos")
     }
 
     /**
@@ -1073,7 +1063,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         when (error) {
             is NotEnoughStorageException -> {
                 showNotEnoughStorageStatus()
-                endService(error.message ?: "", true)
+                abortWork(cancelMessage = error.message ?: "Not enough space to create temp file")
             }
 
             else -> Timber.e(error)
@@ -1105,8 +1095,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         val primaryUploadNode =
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
         if (primaryUploadNode == null) {
-            Timber.d("ERROR: Primary Parent Folder is NULL")
-            endService(aborted = true)
+            abortWork(cancelMessage = "Primary Parent folder is null")
             return
         }
         val secondaryUploadNode = if (isSecondaryFolderEnabled()) {
@@ -1254,8 +1243,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                         if (attempt >= 60) {
                             if (state.value.totalPendingCount == 0) {
                                 showNotEnoughStorageStatus()
-                                Timber.w("Stop service due to out of space issue")
-                                endService(aborted = true)
+                                abortWork(cancelMessage = "Not enough space to create temp file")
                             } else {
                                 // we will not be retying again and skip the current record
                                 Timber.d("Stop retrying for $record")
@@ -1407,7 +1395,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                         val isSecondary = retrievedNode.parentId == NodeId(
                             getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
                         )
-                        // Delete the Camera Upload sync record by fingerprint
+                        // Delete the Camera Uploads sync record by fingerprint
                         fingerprint?.let {
                             deleteSyncRecordByFingerprint(
                                 originalPrint = fingerprint,
@@ -1543,63 +1531,62 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * Proceed with the end of the service
-     * Clean up the resources
-     *
-     * @param cancelMessage message associated to cancel
-     * @param aborted true if the service is ended prematurely
+     * Abort the worker
+     * This function is called if an error is caught inside the CameraUploadsWorker
      */
-    private suspend fun endService(
-        cancelMessage: String = "Process completed",
-        aborted: Boolean = false,
-    ) = withContext(NonCancellable) {
-        Timber.d("Finish Camera upload process: $cancelMessage")
+    private suspend fun abortWork(cancelMessage: String) = withContext(NonCancellable) {
+        Timber.e("Camera Uploads process aborted: $cancelMessage")
 
-        resetTotalUploadsUseCase()
-        resetUploadsCounts()
-        deleteCameraUploadsTemporaryRootDirectoryUseCase()
-        sendStatusToBackupCenter(aborted = aborted)
-        cancelAllPendingTransfers()
-        broadcastProgress(100, 0)
-        with(cameraUploadsNotificationManagerWrapper) {
-            cancelNotification()
-            cancelCompressionNotification()
-        }
+        cleanResources()
+        sendTransfersInterruptedInfoToBackupCenter()
+
+        scope?.coroutineContext?.cancelChildren(CancellationException(cancelMessage))
 
         // isStopped signals means that the worker has been cancelled from the WorkManager
         // If the process has been stopped for another reason, we can re-schedule the worker
         // to perform at a later time
         if (!isStopped) {
-            Timber.d("Schedule Camera Upload")
+            Timber.d("Schedule Camera Uploads")
             scheduleCameraUploadUseCase()
-        }
-
-        if (aborted) {
-            Timber.d("Camera Upload stopped prematurely, cancel all running coroutines")
-            scope?.coroutineContext?.cancelChildren(CancellationException(cancelMessage))
         } else {
-            Timber.d("Camera Upload finished normally, cancel all flow monitoring")
-            monitorUploadPauseStatusJob?.cancel()
-            monitorConnectivityStatusJob?.cancel()
-            monitorBatteryLevelStatusJob?.cancel()
-            monitorChargingStoppedStatusJob?.cancel()
-            sendBackupHeartbeatJob?.cancel()
-            monitorStorageOverQuotaStatusJob?.cancel()
-            monitorParentNodesDeletedJob?.cancel()
+            Timber.d("Camera Uploads stopped and disabled")
         }
     }
 
     /**
-     * Send the status of Camera Uploads to back up center
-     *
-     * @param aborted true if the Camera Uploads has been stopped prematurely
+     * End the worker
+     * This function is called when the CameraUploadsWorker complete successfully
      */
-    private suspend fun sendStatusToBackupCenter(aborted: Boolean) {
-        if (isConnectedToInternetUseCase()) {
-            if (aborted)
-                sendTransfersInterruptedInfoToBackupCenter()
-            else
-                sendTransfersUpToDateInfoToBackupCenter()
+    private suspend fun endWork() = withContext(NonCancellable) {
+        Timber.d("Camera Uploads process ended successfully: Process completed")
+
+        cleanResources()
+        sendTransfersUpToDateInfoToBackupCenter()
+
+        listOf(
+            monitorUploadPauseStatusJob,
+            monitorConnectivityStatusJob,
+            monitorBatteryLevelStatusJob,
+            monitorChargingStoppedStatusJob,
+            sendBackupHeartbeatJob,
+            monitorStorageOverQuotaStatusJob,
+            monitorParentNodesDeletedJob,
+        ).forEach { it?.cancel() }
+    }
+
+
+    /**
+     * Clean the resources
+     */
+    private suspend fun cleanResources() {
+        resetTotalUploadsUseCase()
+        resetUploadsCounts()
+        deleteCameraUploadsTemporaryRootDirectoryUseCase()
+        cancelAllPendingTransfers()
+        broadcastProgress(100, 0)
+        with(cameraUploadsNotificationManagerWrapper) {
+            cancelNotification()
+            cancelCompressionNotification()
         }
     }
 
@@ -1609,6 +1596,8 @@ class CameraUploadsWorker @AssistedInject constructor(
      * no user credentials, Wi-Fi not turned on)
      */
     private suspend fun sendTransfersInterruptedInfoToBackupCenter() {
+        if (!isConnectedToInternetUseCase()) return
+
         // Update both Primary and Secondary Folder Backup States to TEMPORARILY_DISABLED
         updateBackupState(BackupState.TEMPORARILY_DISABLED)
 
@@ -1623,6 +1612,8 @@ class CameraUploadsWorker @AssistedInject constructor(
      * One particular case where these states are sent is when the user "Cancel all" uploads
      */
     private suspend fun sendTransfersUpToDateInfoToBackupCenter() {
+        if (!isConnectedToInternetUseCase()) return
+
         // Update both Primary and Secondary Heartbeat Statuses to UP_TO_DATE
         updateBackupHeartbeatStatus(HeartbeatStatus.UP_TO_DATE)
     }
@@ -1885,7 +1876,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         Timber.w("Insufficient space for video compression.")
         records.forEach { setRecordPendingOrRemove(it) }
         showVideoCompressionOutOfSpaceStatus()
-        endService(aborted = true)
+        abortWork(cancelMessage = "Not enough space to compress videos")
     }
 
     /**
