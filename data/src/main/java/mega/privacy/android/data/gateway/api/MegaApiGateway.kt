@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.model.RequestEvent
@@ -3168,4 +3169,25 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun enableGeolocation(listener: MegaRequestListenerInterface)
+
+    /**
+     * check if Cookie Banner is enabled on SDK
+     *
+     * @return true if Cookie Banner is enabled, false otherwise
+     */
+    fun isCookieBannerEnabled(): Boolean
+
+
+    /**
+     * Fetch miscellaneous flags when not logged in
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_GET_MISC_FLAGS.
+     * <p>
+     * When onRequestFinish is called with MegaError::API_OK, the miscellaneous flags are available.
+     * If you are logged in into an account, the error code provided in onRequestFinish is
+     * MegaError::API_EACCESS.
+     *
+     * @param listener MegaRequestListenerInterface to track this request
+     */
+    fun getMiscFlags(listener: OptionalMegaRequestListenerInterface)
 }

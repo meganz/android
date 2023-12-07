@@ -2,10 +2,14 @@ package mega.privacy.android.data.repository
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
@@ -60,12 +64,20 @@ import nz.mega.sdk.MegaPricing
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUser
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -74,6 +86,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExperimentalContracts
 class DefaultAccountRepositoryTest {
     private lateinit var underTest: AccountRepository
@@ -134,8 +147,44 @@ class DefaultAccountRepositoryTest {
     )
     private val mockEmail = "my@email.com"
 
-    @Before
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            accountInfoWrapper,
+            megaApiGateway,
+            megaChatApiGateway,
+            megaApiFolderGateway,
+            localStorageGateway,
+            accountTypeMapper,
+            subscriptionOptionListMapper,
+            megaAchievementMapper,
+            achievementsOverviewMapper,
+            dbHandler,
+            myAccountCredentialsMapper,
+            userCredentialsMapper,
+            accountSessionMapper,
+            chatPreferencesGateway,
+            callsPreferencesGateway,
+            accountPreferencesGateway,
+            cacheGateway,
+            passwordStrengthMapper,
+            appEventGateway,
+            ephemeralCredentialsGateway,
+            megaLocalRoomGateway,
+            fileGateway,
+            recoveryKeyToFileMapper,
+            cameraUploadsSettingsPreferenceGateway
+        )
+    }
+
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    @BeforeAll
     fun setUp() {
+        Dispatchers.setMain(StandardTestDispatcher())
         underTest = DefaultAccountRepository(
             context = mock(),
             myAccountInfoFacade = accountInfoWrapper,
@@ -267,7 +316,7 @@ class DefaultAccountRepositoryTest {
             assertThat(actual[0]).isSameInstanceAs(subscriptionOption)
         }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that get subscription options throws an exception when the api returns an error`() =
         runTest {
             val api = mock<MegaApiJava>()
@@ -295,7 +344,9 @@ class DefaultAccountRepositoryTest {
                     error
                 )
             }
-            underTest.getSubscriptionOptions()
+            assertThrows<MegaException> {
+                underTest.getSubscriptionOptions()
+            }
         }
 
     @Test
@@ -385,7 +436,7 @@ class DefaultAccountRepositoryTest {
             underTest.retryChatPendingConnections(false)
         }
 
-    @Test(expected = ChatNotInitializedException::class)
+    @Test
     fun `test that retryPendingConnections finishes with ChatNotInitializedException when MegaChatApi returns ERROR_ACCESS`() =
         runTest {
 
@@ -404,11 +455,12 @@ class DefaultAccountRepositoryTest {
                     megaError,
                 )
             }
-
-            underTest.retryChatPendingConnections(false)
+            assertThrows<ChatNotInitializedException> {
+                underTest.retryChatPendingConnections(false)
+            }
         }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that retryPendingConnections finishes with general MegaException when MegaChatApi returns errors other than ERROR_ACCESS or ERROR_OK`() =
         runTest {
 
@@ -428,7 +480,9 @@ class DefaultAccountRepositoryTest {
                 )
             }
 
-            underTest.retryChatPendingConnections(false)
+            assertThrows<MegaException> {
+                underTest.retryChatPendingConnections(false)
+            }
         }
 
     @Test
@@ -464,7 +518,7 @@ class DefaultAccountRepositoryTest {
             verify(accountInfoWrapper).handleAccountDetail(megaRequest)
         }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that getSpecificAccountDetail finishes with general MegaException when MegaChatApi returns errors other than ERROR_ACCESS or ERROR_OK`() =
         runTest {
 
@@ -491,7 +545,9 @@ class DefaultAccountRepositoryTest {
                 )
             }
 
-            underTest.getSpecificAccountDetail(storage = true, transfer = false, pro = false)
+            assertThrows<MegaException> {
+                underTest.getSpecificAccountDetail(storage = true, transfer = false, pro = false)
+            }
         }
 
     @Test
@@ -547,7 +603,7 @@ class DefaultAccountRepositoryTest {
             verify(accountInfoWrapper).handleAccountDetail(megaRequest)
         }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that getExtendedAccountDetails finishes with general MegaException when MegaChatApi returns errors other than ERROR_ACCESS or ERROR_OK`() =
         runTest {
             val megaError = mock<MegaError> {
@@ -572,12 +628,13 @@ class DefaultAccountRepositoryTest {
                     megaError,
                 )
             }
-
-            underTest.getExtendedAccountDetails(
-                sessions = true,
-                purchases = false,
-                transactions = false
-            )
+            assertThrows<MegaException> {
+                underTest.getExtendedAccountDetails(
+                    sessions = true,
+                    purchases = false,
+                    transactions = false
+                )
+            }
         }
 
 
@@ -605,7 +662,7 @@ class DefaultAccountRepositoryTest {
             verify(accountInfoWrapper).handleAccountDetail(megaRequest)
         }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that requestAccount finishes with general MegaException when MegaChatApi returns errors other than ERROR_ACCESS or ERROR_OK`() =
         runTest {
             val megaError = mock<MegaError> {
@@ -624,7 +681,9 @@ class DefaultAccountRepositoryTest {
                 )
             }
 
-            underTest.requestAccount()
+            assertThrows<MegaException> {
+                underTest.requestAccount()
+            }
         }
 
     @Test
@@ -639,7 +698,7 @@ class DefaultAccountRepositoryTest {
         verify(dbHandler).resetExtendedAccountDetailsTimestamp()
     }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that deleteContactLink throws MegaException when error happens`() = runTest {
         val megaError = mock<MegaError> {
             on { errorCode }.thenReturn(MegaError.API_EACCESS)
@@ -663,7 +722,9 @@ class DefaultAccountRepositoryTest {
             )
         }
 
-        underTest.deleteContactLink(handle)
+        assertThrows<MegaException> {
+            underTest.deleteContactLink(handle)
+        }
     }
 
     @Test
@@ -723,7 +784,7 @@ class DefaultAccountRepositoryTest {
         assertThat(underTest.createContactLink(renew)).isEqualTo("https://mega.nz/C!$base64Value")
     }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that createContactLink throws exception when MegaApi returns failure`() = runTest {
         val megaError = mock<MegaError> {
             on { errorCode }.thenReturn(MegaError.API_EACCESS)
@@ -744,7 +805,9 @@ class DefaultAccountRepositoryTest {
             ))
         }
 
-        underTest.createContactLink(renew = true)
+        assertThrows<MegaException> {
+            underTest.createContactLink(renew = true)
+        }
     }
 
 
@@ -816,7 +879,7 @@ class DefaultAccountRepositoryTest {
         assertEquals(expectedEmail, actualEmail)
     }
 
-    @Test(expected = ChangeEmailException.EmailInUse::class)
+    @Test
     fun `test that changeEmail throw EmailInUse exception when API returns API_EACCESS error code`() =
         runTest {
             val expectedEmail = "myEmail"
@@ -833,11 +896,13 @@ class DefaultAccountRepositoryTest {
                     megaError
                 ))
             }
-            underTest.changeEmail(expectedEmail)
+            assertThrows<ChangeEmailException.EmailInUse> {
+                underTest.changeEmail(expectedEmail)
+            }
         }
 
 
-    @Test(expected = ChangeEmailException.AlreadyRequested::class)
+    @Test
     fun `test that changeEmail throw AlreadyRequested exception when API returns API_EEXIST error code`() =
         runTest {
             val expectedEmail = "myEmail"
@@ -854,10 +919,12 @@ class DefaultAccountRepositoryTest {
                     megaError
                 ))
             }
-            underTest.changeEmail(expectedEmail)
+            assertThrows<ChangeEmailException.AlreadyRequested> {
+                underTest.changeEmail(expectedEmail)
+            }
         }
 
-    @Test(expected = ChangeEmailException.Unknown::class)
+    @Test
     fun `test that changeEmail throw Unknown exception when API returns common error code`() =
         runTest {
             val expectedEmail = "myEmail"
@@ -874,7 +941,9 @@ class DefaultAccountRepositoryTest {
                     megaError
                 ))
             }
-            underTest.changeEmail(expectedEmail)
+            assertThrows<ChangeEmailException.Unknown> {
+                underTest.changeEmail(expectedEmail)
+            }
         }
 
     @Test
@@ -1071,4 +1140,60 @@ class DefaultAccountRepositoryTest {
             val result = underTest.getRecoveryKeyFile()
             assertThat(result).isNull()
         }
+
+    @Test
+    fun `test that isCookieBannerEnabled returns general MegaException when MegaApi returns errors other than API_EACCESS or API_OK`() =
+        runTest {
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EEXIST)
+            }
+
+            whenever(
+                megaApiGateway.getMiscFlags(listener = any())
+            ).thenAnswer {
+                ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    megaError,
+                )
+            }
+
+            assertThrows<MegaException> {
+                underTest.isCookieBannerEnabled()
+            }
+        }
+
+    @ParameterizedTest(name = "MegaApi returns error code: {0}")
+    @MethodSource("provideMegaErrors")
+    fun `test that isCookieBannerEnabled returns success when MegaApi returns specific Mega Errors`(
+        input: Int,
+    ) = runTest {
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(input)
+        }
+
+        whenever(
+            megaApiGateway.getMiscFlags(listener = any())
+        ).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                megaError,
+            )
+        }
+
+        underTest.isCookieBannerEnabled()
+        verify(megaApiGateway).isCookieBannerEnabled()
+    }
+
+    companion object {
+        @JvmStatic
+        fun provideMegaErrors() = listOf(
+            Arguments.of(MegaError.API_OK),
+            Arguments.of(MegaError.API_EACCESS),
+        )
+    }
+
+
 }

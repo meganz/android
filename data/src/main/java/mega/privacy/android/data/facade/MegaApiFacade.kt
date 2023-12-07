@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
@@ -1459,4 +1460,11 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun enableGeolocation(listener: MegaRequestListenerInterface) =
         megaApi.enableGeolocation(listener)
+
+    override fun isCookieBannerEnabled() =
+        megaApi.isCookieBannerEnabled
+
+    override fun getMiscFlags(listener: OptionalMegaRequestListenerInterface) =
+        megaApi.getMiscFlags(listener)
+
 }

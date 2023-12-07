@@ -17,7 +17,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.CheckCookieBannerEnabledUseCase
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.CheckCookieBannerEnabledUseCaseRx
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
 import mega.privacy.android.app.utils.ContextUtils.isValid
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class CookieDialogHandler @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
-    private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCase,
+    private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCaseRx,
 ) : LifecycleEventObserver {
 
     private val rxSubscriptions = CompositeDisposable()

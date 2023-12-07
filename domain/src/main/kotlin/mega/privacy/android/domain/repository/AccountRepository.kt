@@ -525,4 +525,11 @@ interface AccountRepository {
      * @return if the account is new or not
      */
     suspend fun isAccountNew(): Boolean
+
+    /**
+     * Get a boolean value that represent if the cookie banner is enabled or not
+     *
+     * @return if the cookie banner is enabled or not
+     */
+    suspend fun isCookieBannerEnabled(): Boolean
 }

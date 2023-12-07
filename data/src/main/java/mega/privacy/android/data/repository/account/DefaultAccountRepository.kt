@@ -84,6 +84,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -969,6 +970,29 @@ internal class DefaultAccountRepository @Inject constructor(
      */
     override suspend fun isAccountNew() = withContext(ioDispatcher) {
         megaApiGateway.isAccountNew()
+    }
+
+    override suspend fun isCookieBannerEnabled() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK, MegaError.API_EACCESS -> {
+                            continuation.resume(megaApiGateway.isCookieBannerEnabled())
+                        }
+
+                        else -> {
+                            continuation.failWithError(
+                                error,
+                                "failed to get cookie banner state: ${error.errorString}"
+                            )
+                        }
+                    }
+                }
+            )
+            megaApiGateway.getMiscFlags(listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
     }
 
     companion object {
