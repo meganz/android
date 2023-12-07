@@ -286,6 +286,7 @@ class DefaultPhotosRepositoryTest {
         previewFilePath: String?,
         fileTypeInfo: FileTypeInfo,
         size: Long,
+        isTakenDown: Boolean,
     ): Photo.Image = Photo.Image(
         id,
         albumPhotoId,
@@ -298,6 +299,7 @@ class DefaultPhotosRepositoryTest {
         previewFilePath,
         fileTypeInfo,
         size,
+        isTakenDown,
     )
 
     private fun createVideo(
@@ -312,6 +314,7 @@ class DefaultPhotosRepositoryTest {
         previewFilePath: String?,
         fileTypeInfo: FileTypeInfo,
         size: Long,
+        isTakenDown: Boolean,
     ): Photo.Video = Photo.Video(
         id,
         albumPhotoId,
@@ -324,6 +327,7 @@ class DefaultPhotosRepositoryTest {
         previewFilePath,
         fileTypeInfo as VideoFileTypeInfo,
         size,
+        isTakenDown,
     )
 
     private fun mapFileTypeInfo(megaNode: MegaNode): FileTypeInfo {

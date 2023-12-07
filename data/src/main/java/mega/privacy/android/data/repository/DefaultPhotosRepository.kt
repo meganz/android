@@ -539,6 +539,7 @@ internal class DefaultPhotosRepository @Inject constructor(
             getPreviewCacheFilePath(megaNode),
             fileTypeInfoMapper(megaNode),
             megaNode.size,
+            megaNode.isTakenDown,
         )
 
     /**
@@ -559,6 +560,7 @@ internal class DefaultPhotosRepository @Inject constructor(
             getPreviewCacheFilePath(megaNode),
             fileTypeInfoMapper(megaNode),
             megaNode.size,
+            megaNode.isTakenDown,
         )
 
     private suspend fun getThumbnailCacheFilePath(megaNode: MegaNode): String? {

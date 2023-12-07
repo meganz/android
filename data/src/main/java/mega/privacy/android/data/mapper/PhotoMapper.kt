@@ -29,6 +29,7 @@ typealias ImageMapper = (
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards FileTypeInfo,
     @JvmSuppressWildcards Long,
+    @JvmSuppressWildcards Boolean,
 ) -> @JvmSuppressWildcards Photo.Image
 
 internal fun toImage(
@@ -43,6 +44,7 @@ internal fun toImage(
     previewFilePath: String?,
     fileTypeInfo: FileTypeInfo,
     size: Long,
+    isTakenDown: Boolean,
 ) = Photo.Image(
     id = id,
     albumPhotoId = albumPhotoId,
@@ -55,6 +57,7 @@ internal fun toImage(
     previewFilePath = previewFilePath,
     fileTypeInfo = fileTypeInfo,
     size = size,
+    isTakenDown = isTakenDown,
 )
 
 /**
@@ -72,6 +75,7 @@ typealias VideoMapper = (
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards FileTypeInfo,
     @JvmSuppressWildcards Long,
+    @JvmSuppressWildcards Boolean,
 ) -> @JvmSuppressWildcards Photo.Video
 
 internal fun toVideo(
@@ -86,6 +90,7 @@ internal fun toVideo(
     previewFilePath: String?,
     fileTypeInfo: FileTypeInfo,
     size: Long,
+    isTakenDown: Boolean,
 ) = Photo.Video(
     id = id,
     albumPhotoId = albumPhotoId,
@@ -98,6 +103,7 @@ internal fun toVideo(
     previewFilePath = previewFilePath,
     fileTypeInfo = fileTypeInfo as VideoFileTypeInfo,
     size = size,
+    isTakenDown = isTakenDown,
 )
 
 class PhotoMapper @Inject constructor(
@@ -122,6 +128,7 @@ class PhotoMapper @Inject constructor(
                     getPreviewFilePath(node),
                     fileType,
                     node.size,
+                    node.isTakenDown,
                 )
             }
 
@@ -138,6 +145,7 @@ class PhotoMapper @Inject constructor(
                     getPreviewFilePath(node),
                     fileType,
                     node.size,
+                    node.isTakenDown,
                 )
             }
 
