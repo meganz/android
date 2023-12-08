@@ -17,16 +17,21 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedViewModel
 import mega.privacy.android.domain.usecase.IsUseHttpsEnabled
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SetUseHttps
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.extensions.asHotFlow
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SettingsAdvancedViewModelTest {
     private lateinit var underTest: SettingsAdvancedViewModel
 
@@ -44,9 +49,30 @@ class SettingsAdvancedViewModelTest {
 
     private val scheduler = TestCoroutineScheduler()
 
-    @Before
-    fun setUp() {
+    @BeforeAll
+    fun initialise() {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
+    }
+
+    @BeforeEach
+    fun setUp() {
+        initViewModel()
+    }
+
+    private fun initViewModel(
+        isUseHttpsEnabledValue: Boolean = false,
+        monitorConnectivityUseCaseValue: Boolean = false,
+        rootNodeExistsUseCaseValue: Boolean = false,
+    ) {
+        isUseHttpsEnabled.stub {
+            onBlocking { invoke() }.thenReturn(isUseHttpsEnabledValue)
+        }
+        monitorConnectivityUseCase.stub {
+            on { invoke() }.thenReturn(monitorConnectivityUseCaseValue.asHotFlow())
+        }
+        rootNodeExistsUseCase.stub {
+            onBlocking { invoke() }.thenReturn(rootNodeExistsUseCaseValue)
+        }
         underTest = SettingsAdvancedViewModel(
             isUseHttpsEnabled = isUseHttpsEnabled,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
@@ -56,7 +82,7 @@ class SettingsAdvancedViewModelTest {
         )
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -77,8 +103,7 @@ class SettingsAdvancedViewModelTest {
 
     @Test
     fun `test that checkbox is checked if preference is set to true`() = runTest {
-        whenever(isUseHttpsEnabled()).thenReturn(true)
-
+        initViewModel(isUseHttpsEnabledValue = true)
         underTest.state.map { it.useHttpsChecked }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
             assertThat(awaitItem()).isTrue()
@@ -87,9 +112,11 @@ class SettingsAdvancedViewModelTest {
 
     @Test
     fun `test that checkbox is enabled if network connected and root node exists`() = runTest {
-        whenever(isUseHttpsEnabled()).thenReturn(true)
-        whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(true))
-        whenever(rootNodeExistsUseCase()).thenReturn(true)
+        initViewModel(
+            isUseHttpsEnabledValue = true,
+            monitorConnectivityUseCaseValue = true,
+            rootNodeExistsUseCaseValue = true,
+        )
 
         underTest.state.map { it.useHttpsEnabled }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
@@ -99,10 +126,15 @@ class SettingsAdvancedViewModelTest {
 
     @Test
     fun `test that checkbox becomes not enabled if network is lost`() = runTest {
+
+        initViewModel(
+            isUseHttpsEnabledValue = true,
+            rootNodeExistsUseCaseValue = true,
+        )
+
         val monitorConnectivityStateFlow = MutableStateFlow(true)
-        whenever(isUseHttpsEnabled()).thenReturn(true)
         whenever(monitorConnectivityUseCase()).thenReturn(monitorConnectivityStateFlow)
-        whenever(rootNodeExistsUseCase()).thenReturn(true)
+
         underTest.state.map { it.useHttpsEnabled }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
             assertThat(awaitItem()).isTrue()
@@ -116,6 +148,7 @@ class SettingsAdvancedViewModelTest {
 
     @Test
     fun `test that preference is set to true when checkbox is checked`() = runTest {
+        initViewModel()
         underTest.useHttpsPreferenceChanged(true)
 
         scheduler.advanceUntilIdle()
