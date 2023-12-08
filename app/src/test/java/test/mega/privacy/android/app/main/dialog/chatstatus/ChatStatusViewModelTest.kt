@@ -21,6 +21,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -41,8 +42,8 @@ internal class ChatStatusViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
+        wheneverBlocking { getCurrentUserStatusUseCase() }.thenReturn(UserChatStatus.Invalid)
         reset(
-            getCurrentUserStatusUseCase,
             setCurrentUserStatusUseCase,
         )
     }
