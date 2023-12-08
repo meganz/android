@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
@@ -88,6 +89,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
@@ -158,6 +160,7 @@ class CameraUploadsWorkerTest {
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase = mock()
     private val monitorChargingStoppedState: MonitorChargingStoppedState = mock()
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase = mock()
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase = mock()
     private val cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase = mock()
@@ -214,6 +217,9 @@ class CameraUploadsWorkerTest {
     private val uploadCameraUploadsRecordsUseCase: UploadCameraUploadsRecordsUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
     private val initializeBackupsUseCase: InitializeBackupsUseCase = mock()
+    private val areCameraUploadsFoldersInRubbishBinUseCase: AreCameraUploadsFoldersInRubbishBinUseCase =
+        mock()
+
 
     @Before
     fun setUp() {
@@ -280,6 +286,7 @@ class CameraUploadsWorkerTest {
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
             monitorChargingStoppedState = monitorChargingStoppedState,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             handleLocalIpChangeUseCase = handleLocalIpChangeUseCase,
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             cancelAllUploadTransfersUseCase = cancelAllUploadTransfersUseCase,
@@ -326,7 +333,8 @@ class CameraUploadsWorkerTest {
             doesCameraUploadsRecordExistsInTargetNodeUseCase = doesCameraUploadsRecordExistsInTargetNodeUseCase,
             extractGpsCoordinatesUseCase = extractGpsCoordinatesUseCase,
             fileSystemRepository = fileSystemRepository,
-            initializeBackupsUseCase = initializeBackupsUseCase
+            initializeBackupsUseCase = initializeBackupsUseCase,
+            areCameraUploadsFoldersInRubbishBinUseCase = areCameraUploadsFoldersInRubbishBinUseCase,
         )
     }
 

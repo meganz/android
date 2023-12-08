@@ -3,8 +3,11 @@ package mega.privacy.android.domain.usecase.camerauploads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,13 +23,17 @@ internal class AreCameraUploadsFolderInRubbishBinUseCaseTest {
     lateinit var underTest: AreCameraUploadsFoldersInRubbishBinUseCase
 
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
-    private val isNodeInRubbish = mock<IsNodeInRubbish>()
+    private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
+
+    private val primaryHandle = 11111L
+    private val secondaryHandle = 22222L
+    private val nodeHandle = 88888L
 
     @BeforeAll
     fun setUp() {
         underTest = AreCameraUploadsFoldersInRubbishBinUseCase(
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
-            isNodeInRubbish = isNodeInRubbish,
+            isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
         )
     }
 
@@ -34,65 +41,98 @@ internal class AreCameraUploadsFolderInRubbishBinUseCaseTest {
     fun resetMocks() {
         reset(
             isSecondaryFolderEnabled,
-            isNodeInRubbish,
+            isNodeInRubbishOrDeletedUseCase,
         )
     }
 
     @Test
-    fun `test that when primary folder is in rubbish then the use case returns true`() =
+    fun `test that underTest returns true when node update with primary handle and primary folder is in rubbish bin`() =
         runTest {
-            val primaryHandle = 12345678L
-            val secondaryHandle = 87654321L
-            whenever(isSecondaryFolderEnabled())
-                .thenReturn(false)
-            whenever(isNodeInRubbish(primaryHandle))
-                .thenReturn(true)
-            val actual = underTest(primaryHandle, secondaryHandle)
-            assertThat(actual).isEqualTo(true)
+            val nodeUpdate = NodeUpdate(
+                mapOf(
+                    Pair(
+                        mock { on { id }.thenReturn(NodeId(primaryHandle)) },
+                        listOf(NodeChanges.Attributes)
+                    )
+                )
+            )
+
+            whenever(isNodeInRubbishOrDeletedUseCase(primaryHandle)).thenReturn(true)
+            whenever(isSecondaryFolderEnabled()).thenReturn(false)
+            val actual = underTest(primaryHandle, secondaryHandle, nodeUpdate)
+            val expected = true
+            assertThat(actual).isEqualTo(expected)
         }
 
     @Test
-    fun `test that when secondary folder is enabled and in rubbish then the use case returns true`() =
+    fun `test that underTest returns true when node update with secondary handle and primary folder is in rubbish bin`() =
         runTest {
-            val primaryHandle = 12345678L
-            val secondaryHandle = 87654321L
-            whenever(isSecondaryFolderEnabled())
-                .thenReturn(true)
-            whenever(isNodeInRubbish(secondaryHandle))
-                .thenReturn(true)
-            whenever(isNodeInRubbish(primaryHandle))
-                .thenReturn(false)
-            val actual = underTest(primaryHandle, secondaryHandle)
-            assertThat(actual).isEqualTo(true)
+            val nodeUpdate = NodeUpdate(
+                mapOf(
+                    Pair(
+                        mock { on { id }.thenReturn(NodeId(primaryHandle)) },
+                        listOf(NodeChanges.Attributes)
+                    )
+                )
+            )
+
+            whenever(isNodeInRubbishOrDeletedUseCase(secondaryHandle)).thenReturn(false)
+            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            whenever(isNodeInRubbishOrDeletedUseCase(primaryHandle)).thenReturn(true)
+            val actual = underTest(primaryHandle, secondaryHandle, nodeUpdate)
+            val expected = true
+            assertThat(actual).isEqualTo(expected)
         }
 
     @Test
-    fun `test that when primary folder is enabled and not in rubbish then the use case returns false`() =
+    fun `test that underTest returns false when node update is not the camera uploads primary or secondary folder`() =
         runTest {
-            val primaryHandle = 12345678L
-            val secondaryHandle = 87654321L
-            whenever(isSecondaryFolderEnabled())
-                .thenReturn(false)
-            whenever(isNodeInRubbish(secondaryHandle))
-                .thenReturn(true)
-            whenever(isNodeInRubbish(primaryHandle))
-                .thenReturn(false)
-            val actual = underTest(primaryHandle, secondaryHandle)
-            assertThat(actual).isEqualTo(false)
+            val nodeUpdate = NodeUpdate(
+                mapOf(
+                    Pair(
+                        mock { on { id }.thenReturn(NodeId(nodeHandle)) },
+                        listOf(NodeChanges.Attributes)
+                    )
+                )
+            )
+
+            val actual = underTest(primaryHandle, secondaryHandle, nodeUpdate)
+            val expected = false
+            assertThat(actual).isEqualTo(expected)
         }
 
     @Test
-    fun `test that when secondary folder is enabled and not in rubbish then the use case returns false`() =
+    fun `test that underTest returns false when node update is primary folder but not attribute change`() =
         runTest {
-            val primaryHandle = 12345678L
-            val secondaryHandle = 87654321L
-            whenever(isSecondaryFolderEnabled())
-                .thenReturn(true)
-            whenever(isNodeInRubbish(secondaryHandle))
-                .thenReturn(false)
-            whenever(isNodeInRubbish(primaryHandle))
-                .thenReturn(false)
-            val actual = underTest(primaryHandle, secondaryHandle)
-            assertThat(actual).isEqualTo(false)
+            val nodeUpdate = NodeUpdate(
+                mapOf(
+                    Pair(
+                        mock { on { id }.thenReturn(NodeId(primaryHandle)) },
+                        listOf()
+                    )
+                )
+            )
+
+            val actual = underTest(primaryHandle, secondaryHandle, nodeUpdate)
+            val expected = false
+            assertThat(actual).isEqualTo(expected)
         }
+
+    @Test
+    fun `test that underTest returns false when node update is secondary folder but not attribute change`() =
+        runTest {
+            val nodeUpdate = NodeUpdate(
+                mapOf(
+                    Pair(
+                        mock { on { id }.thenReturn(NodeId(secondaryHandle)) },
+                        listOf()
+                    )
+                )
+            )
+
+            val actual = underTest(primaryHandle, secondaryHandle, nodeUpdate)
+            val expected = false
+            assertThat(actual).isEqualTo(expected)
+        }
+
 }

@@ -69,7 +69,6 @@ import mega.privacy.android.domain.usecase.account.RenameRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -175,8 +174,6 @@ class ManagerViewModelTest {
                 )
             )
         }
-    private val areCameraUploadsFoldersInRubbishBinUseCase =
-        mock<AreCameraUploadsFoldersInRubbishBinUseCase>()
     private val getCloudSortOrder =
         mock<GetCloudSortOrder> { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_ALPHABETICAL_ASC) }
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
@@ -314,7 +311,6 @@ class ManagerViewModelTest {
             monitorCameraUploadsFolderDestinationUseCase = monitorCameraUploadsFolderDestinationUpdateUseCase,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
-            areCameraUploadsFoldersInRubbishBinUseCase = areCameraUploadsFoldersInRubbishBinUseCase,
             getCloudSortOrder = getCloudSortOrder,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
@@ -1003,82 +999,6 @@ class ManagerViewModelTest {
                 assertThat(updatedState.moveRequestResult).isNotNull()
                 assertThat(updatedState.moveRequestResult?.isFailure).isTrue()
             }
-        }
-
-    @Test
-    fun `test that camera uploads is stopped if a camera uploads primary folder update is received and primary folder is in rubbish bin`() =
-        runTest {
-            testScheduler.advanceUntilIdle()
-
-            val primaryHandle = 11111L
-            val secondaryHandle = 22222L
-            val nodeUpdate = NodeUpdate(
-                mapOf(
-                    Pair(
-                        mock { on { id }.thenReturn(NodeId(primaryHandle)) },
-                        listOf()
-                    )
-                )
-            )
-
-            whenever(getPrimarySyncHandleUseCase()).thenReturn(primaryHandle)
-            whenever(getSecondarySyncHandleUseCase()).thenReturn(secondaryHandle)
-            whenever(areCameraUploadsFoldersInRubbishBinUseCase(primaryHandle, secondaryHandle))
-                .thenReturn(true)
-            monitorNodeUpdatesFakeFlow.emit(nodeUpdate)
-            testScheduler.advanceUntilIdle()
-            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
-        }
-
-    @Test
-    fun `test that camera uploads is stopped if a camera uploads secondary folder update is received and secondary folder is enabled in rubbish bin`() =
-        runTest {
-            testScheduler.advanceUntilIdle()
-
-            val primaryHandle = 11111L
-            val secondaryHandle = 22222L
-            val nodeUpdate = NodeUpdate(
-                mapOf(
-                    Pair(
-                        mock { on { id }.thenReturn(NodeId(secondaryHandle)) },
-                        listOf()
-                    )
-                )
-            )
-
-            whenever(getPrimarySyncHandleUseCase()).thenReturn(primaryHandle)
-            whenever(getSecondarySyncHandleUseCase()).thenReturn(secondaryHandle)
-            whenever(areCameraUploadsFoldersInRubbishBinUseCase(primaryHandle, secondaryHandle))
-                .thenReturn(true)
-            monitorNodeUpdatesFakeFlow.emit(nodeUpdate)
-            testScheduler.advanceUntilIdle()
-            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
-        }
-
-    @Test
-    fun `test that camera uploads is not stopped if a node update is received and is not the camera uploads primary or secondary folder`() =
-        runTest {
-            testScheduler.advanceUntilIdle()
-
-            val nodeHandle = 88888L
-            val primaryHandle = 11111L
-            val secondaryHandle = 22222L
-            val nodeUpdate = NodeUpdate(
-                mapOf(
-                    Pair(
-                        mock { on { primaryHandle }.thenReturn(nodeHandle) },
-                        listOf()
-                    )
-                )
-            )
-
-            whenever(getPrimarySyncHandleUseCase()).thenReturn(primaryHandle)
-            whenever(getSecondarySyncHandleUseCase()).thenReturn(secondaryHandle)
-            whenever(areCameraUploadsFoldersInRubbishBinUseCase(primaryHandle, secondaryHandle))
-                .thenReturn(true)
-            monitorNodeUpdatesFakeFlow.emit(nodeUpdate)
-            testScheduler.advanceUntilIdle()
-            verifyNoInteractions(stopCameraUploadsUseCase)
         }
 
     @Test

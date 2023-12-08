@@ -23,7 +23,6 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
@@ -45,12 +44,20 @@ import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.entity.user.UserChanges
-import mega.privacy.android.domain.usecase.*
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.HasBackupsChildren
+import mega.privacy.android.domain.usecase.MonitorBackupFolder
+import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
+import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
@@ -61,7 +68,6 @@ import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticatio
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscriptionUseCase
-import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -87,6 +93,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
@@ -119,7 +126,6 @@ import javax.inject.Inject
  * @param monitorCameraUploadsFolderDestinationUseCase
  * @property getPrimarySyncHandleUseCase
  * @property getSecondarySyncHandleUseCase
- * @property areCameraUploadsFoldersInRubbishBinUseCase
  * @property getCloudSortOrder
  * @property monitorConnectivityUseCase
  * @property getExtendedAccountDetail
@@ -168,7 +174,6 @@ class ManagerViewModel @Inject constructor(
     monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
-    private val areCameraUploadsFoldersInRubbishBinUseCase: AreCameraUploadsFoldersInRubbishBinUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -318,9 +323,7 @@ class ManagerViewModel @Inject constructor(
 
         viewModelScope.launch {
             monitorNodeUpdatesUseCase().collect {
-                val nodeList = it.changes.keys.toList()
                 onReceiveNodeUpdate(true)
-                checkCameraUploadFolder(nodeList)
                 checkUnverifiedSharesCount()
             }
         }
@@ -553,31 +556,6 @@ class ManagerViewModel @Inject constructor(
      * Get Cloud Sort Order
      */
     suspend fun getOrder() = getCloudSortOrder()
-
-    /**
-     * After nodes on Cloud Drive changed or some nodes are moved to rubbish bin,
-     * need to check if CU and MU folders have been moved to rubbish bin
-     * If true, then stop the camera uploads process and reschedule
-     *
-     * @param updatedNodes  Nodes which have changed.
-     */
-    private suspend fun checkCameraUploadFolder(updatedNodes: List<Node>?) {
-        val primaryHandle = getPrimarySyncHandleUseCase()
-        val secondaryHandle = getSecondarySyncHandleUseCase()
-
-        updatedNodes?.firstOrNull {
-            it.id.longValue == primaryHandle || it.id.longValue == secondaryHandle
-        } ?: return
-
-        val areCameraFoldersInRubbishBin =
-            areCameraUploadsFoldersInRubbishBinUseCase(
-                primaryHandle,
-                secondaryHandle
-            )
-        if (areCameraFoldersInRubbishBin) {
-            stopCameraUploads(shouldReschedule = true)
-        }
-    }
 
     /**
      * Get extended account detail

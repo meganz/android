@@ -104,6 +104,7 @@ import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
@@ -141,6 +142,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
@@ -202,6 +204,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
     private val monitorChargingStoppedState: MonitorChargingStoppedState,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase,
@@ -247,6 +250,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val extractGpsCoordinatesUseCase: ExtractGpsCoordinatesUseCase,
     private val uploadCameraUploadsRecordsUseCase: UploadCameraUploadsRecordsUseCase,
     private val initializeBackupsUseCase: InitializeBackupsUseCase,
+    private val areCameraUploadsFoldersInRubbishBinUseCase: AreCameraUploadsFoldersInRubbishBinUseCase,
     private val fileSystemRepository: FileSystemRepository,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
@@ -341,6 +345,11 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Job to monitor transfer over quota status flow
      */
     private var monitorStorageOverQuotaStatusJob: Job? = null
+
+    /**
+     * Job to monitor deletion of parent nodes
+     */
+    private var monitorParentNodesDeletedJob: Job? = null
 
     /**
      * In order to not overload the memory of the app,
@@ -468,6 +477,26 @@ class CameraUploadsWorker @AssistedInject constructor(
                         cancelMessage = "Storage Quota Filled - Cancel Camera Upload",
                         aborted = true
                     )
+                }
+            }
+        }
+    }
+
+    private fun monitorParentNodesDeleted() {
+        monitorParentNodesDeletedJob = scope?.launch(ioDispatcher) {
+            monitorNodeUpdatesUseCase().collect { nodeUpdate ->
+                val primaryHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)
+                val secondaryHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
+
+                val areCameraUploadsFoldersInRubbishBin =
+                    areCameraUploadsFoldersInRubbishBinUseCase(
+                        primaryHandle,
+                        secondaryHandle,
+                        nodeUpdate
+                    )
+
+                if (areCameraUploadsFoldersInRubbishBin) {
+                    endService(cancelMessage = "CU folder deleted", aborted = true)
                 }
             }
         }
@@ -638,13 +667,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun isPrimaryFolderEstablished(): Boolean {
         val primarySyncHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)
         Timber.d("primarySyncHandle $primarySyncHandle")
-        if (primarySyncHandle == MegaApiJava.INVALID_HANDLE || isNodeInRubbishOrDeletedUseCase(
-                primarySyncHandle
-            )
-        ) {
-            return false
-        }
-        return true
+        return !(primarySyncHandle == MegaApiJava.INVALID_HANDLE
+                || isNodeInRubbishOrDeletedUseCase(primarySyncHandle))
     }
 
     /**
@@ -655,13 +679,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun isSecondaryFolderEstablished(): Boolean {
         val secondarySyncHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
         Timber.d("secondarySyncHandle $secondarySyncHandle")
-        if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE || isNodeInRubbishOrDeletedUseCase(
-                secondarySyncHandle
-            )
-        ) {
-            return false
-        }
-        return true
+        return !(secondarySyncHandle == MegaApiJava.INVALID_HANDLE
+                || isNodeInRubbishOrDeletedUseCase(secondarySyncHandle))
     }
 
     /**
@@ -1508,6 +1527,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         monitorBatteryLevelStatus()
         monitorUploadPauseStatus()
         monitorStorageOverQuotaStatus()
+        monitorParentNodesDeleted()
         handleLocalIpChangeUseCase(shouldRetryChatConnections = false)
 
         // Reset properties
@@ -1565,6 +1585,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             monitorChargingStoppedStatusJob?.cancel()
             sendBackupHeartbeatJob?.cancel()
             monitorStorageOverQuotaStatusJob?.cancel()
+            monitorParentNodesDeletedJob?.cancel()
         }
     }
 
