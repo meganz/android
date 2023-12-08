@@ -19,15 +19,17 @@ import mega.privacy.android.app.presentation.settings.startscreen.model.StartScr
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.SetStartScreenPreference
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class StartScreenViewModelTest {
     private lateinit var underTest: StartScreenViewModel
 
@@ -46,9 +48,12 @@ class StartScreenViewModelTest {
 
     private val scheduler = TestCoroutineScheduler()
 
-    @Before
+    @BeforeAll
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
+    }
+
+    private fun initViewModel() {
         underTest = StartScreenViewModel(
             monitorStartScreenPreference = monitorStartScreenPreference,
             setStartScreenPreference = setStartScreenPreference,
@@ -56,13 +61,14 @@ class StartScreenViewModelTest {
         )
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
 
     @Test
     fun `test that initial value has no screen selected`() = runTest {
+        initViewModel()
         underTest.state.test {
             val (_, selectedScreen) = awaitItem()
             assertThat(selectedScreen).isNull()
@@ -71,6 +77,7 @@ class StartScreenViewModelTest {
 
     @Test
     fun `test that all values are included as an option`() = runTest {
+        initViewModel()
         underTest.state.test {
             val (options, _) = awaitItem()
             assertThat(options.map { it.startScreen }).containsExactlyElementsIn(StartScreen.values())
@@ -81,6 +88,7 @@ class StartScreenViewModelTest {
     fun `test that selected screen is set if returned`() = runTest {
         val expected = StartScreen.Chat
         whenever(monitorStartScreenPreference()).thenReturn(flowOf(expected))
+        initViewModel()
         underTest.state
             .map { it.selectedScreen }
             .drop(1)
@@ -92,6 +100,7 @@ class StartScreenViewModelTest {
     @Test
     fun `test that set use case is called when new screen is set`() {
         val expected = StartScreen.Photos
+        initViewModel()
         underTest.newScreenClicked(expected)
         scheduler.advanceUntilIdle()
         verifyBlocking(setStartScreenPreference) { invoke(expected) }

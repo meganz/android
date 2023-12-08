@@ -21,11 +21,13 @@ class StartScreenViewModel @Inject constructor(
     startScreenOptionMapper: StartScreenOptionMapper,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(StartScreenSettingsState(
-        options = StartScreen.values()
-            .mapNotNull(startScreenOptionMapper),
-        selectedScreen = null,
-    ))
+    private val _state = MutableStateFlow(
+        StartScreenSettingsState(
+            options = StartScreen.entries
+                .mapNotNull(startScreenOptionMapper),
+            selectedScreen = null,
+        )
+    )
 
     val state: StateFlow<StartScreenSettingsState> = _state
 
