@@ -20,20 +20,24 @@ import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.usecase.AcknowledgeUserAlerts
 import mega.privacy.android.domain.usecase.MonitorUserAlerts
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NotificationViewModelTest {
     private lateinit var underTest: NotificationViewModel
 
     private val monitorUserAlerts = mock<MonitorUserAlerts> {
         onBlocking { invoke() }.thenReturn(
-            emptyFlow())
+            emptyFlow()
+        )
     }
 
     private val acknowledgeUserAlerts = mock<AcknowledgeUserAlerts>()
@@ -42,9 +46,17 @@ class NotificationViewModelTest {
 
     private val notificationMapper = mock<(UserAlert) -> Notification>()
 
-    @Before
-    fun setUp() {
+    @BeforeAll
+    fun initialise() {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
+    }
+
+    @BeforeEach
+    fun setUp() {
+        initViewModel()
+    }
+
+    private fun initViewModel() {
         underTest = NotificationViewModel(
             monitorUserAlerts = monitorUserAlerts,
             acknowledgeUserAlerts = acknowledgeUserAlerts,
@@ -52,7 +64,7 @@ class NotificationViewModelTest {
         )
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -88,6 +100,7 @@ class NotificationViewModelTest {
         whenever(monitorUserAlerts()).thenReturn(flowOf(listOf(alert)))
         whenever(notificationMapper(alert)).thenReturn(expected)
 
+        initViewModel()
 
         underTest.state.drop(1).test {
             val (notifications, _) = awaitItem()
@@ -113,7 +126,7 @@ class NotificationViewModelTest {
             backgroundColor = { "#D3D3D3" },
             separatorMargin = { 0 },
         ) {}
-        val newNotification = initialNotification.copy(title = {"New title"})
+        val newNotification = initialNotification.copy(title = { "New title" })
         whenever(notificationMapper(initialAlert)).thenReturn(initialNotification)
         whenever(notificationMapper(newAlert)).thenReturn(newNotification)
 
@@ -123,6 +136,8 @@ class NotificationViewModelTest {
                 listOf(newAlert, initialAlert)
             )
         )
+
+        initViewModel()
 
         underTest.state.drop(1).test {
             val (_, scrollToTop) = awaitItem()
