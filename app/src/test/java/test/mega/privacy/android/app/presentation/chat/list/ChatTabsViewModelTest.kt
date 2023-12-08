@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -15,6 +16,7 @@ import mega.privacy.android.app.presentation.chat.list.ChatTabsViewModel
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.usecase.chat.GetLastMessageUseCase
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
@@ -43,6 +45,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -87,6 +90,8 @@ internal class ChatTabsViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
+        whenever(monitorScheduledMeetingCanceledUseCase()).thenReturn(emptyFlow())
+        wheneverBlocking { getMeetingTooltipsUseCase() }.thenReturn(MeetingTooltipItem.NONE)
         reset(
             archiveChatUseCase,
             leaveChatUseCase,
@@ -107,9 +112,9 @@ internal class ChatTabsViewModelTest {
             loadMessagesUseCase,
             cancelScheduledMeetingUseCase,
             isParticipatingInChatCallUseCase,
-            getMeetingTooltipsUseCase,
             setNextMeetingTooltipUseCase,
             getChatsUnreadStatusUseCase,
+            startMeetingInWaitingRoomChatUseCase
         )
     }
 
