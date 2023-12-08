@@ -45,4 +45,20 @@ class RenameFilesWithTheSameNameUseCaseTest {
         Truth.assertThat(renamedFile1.exists()).isTrue()
         Truth.assertThat(renamedFile2.exists()).isTrue()
     }
+
+    @Test
+    fun `test that renaming folders with same name adds a counter`() = runTest {
+        val file1 =
+            File(temporaryFolder, "f%301").apply { createNewFile() }
+        val file2 =
+            File(temporaryFolder, "f01").apply { createNewFile() }
+        val filePaths = listOf(file1.absolutePath, file2.absolutePath)
+
+        underTest(filePaths)
+
+        val renamedFile1 = File(temporaryFolder, "f%301")
+        val renamedFile2 = File(temporaryFolder, "f01 (1)")
+        Truth.assertThat(renamedFile1.exists()).isTrue()
+        Truth.assertThat(renamedFile2.exists()).isTrue()
+    }
 }

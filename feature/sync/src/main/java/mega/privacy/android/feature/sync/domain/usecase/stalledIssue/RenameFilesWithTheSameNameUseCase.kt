@@ -16,9 +16,16 @@ internal class RenameFilesWithTheSameNameUseCase @Inject constructor() {
     }
 
     private fun generateNewName(filePath: String, index: Int): String {
-        val extension = filePath.substringAfterLast('.')
-        val baseName = filePath.substringBeforeLast('.')
+        val fileName = filePath.substringAfterLast(File.separator)
+        val pathWithoutFileName = filePath.substringBeforeLast(File.separator)
+        val fileNameWithoutExtension = fileName.substringBeforeLast(".")
+        val extension = filePath.substringAfterLast('.', missingDelimiterValue = "")
+        val fullExtension = if (extension.isNotEmpty()) {
+            ".$extension"
+        } else {
+            ""
+        }
 
-        return "$baseName ($index).$extension"
+        return "$pathWithoutFileName${File.separator}$fileNameWithoutExtension ($index)$fullExtension"
     }
 }
