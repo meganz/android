@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.ui.mapper.StalledIssueItemMapper
@@ -31,28 +30,18 @@ internal class SyncStalledIssuesViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             monitorStalledIssuesUseCase()
-                .catch {
-                    Timber.d("Error monitoring stalled issues: $it")
-                }
+                .catch { Timber.e("Error monitoring stalled issues: $it") }
                 .map { stalledIssuesList ->
                     stalledIssuesList.map { stalledIssue ->
-                        val areAllNodesFolders =
-                            stalledIssue
-                                .nodeIds
-                                .map {
-                                    getNodeByHandleUseCase(it.longValue)
-                                }
-                                .all { node ->
-                                    node is FolderNode
-                                }
-
+                        val nodes = stalledIssue.nodeIds.mapNotNull {
+                            getNodeByHandleUseCase(it.longValue)
+                        }
                         stalledIssueItemMapper(
+                            nodes = nodes,
                             stalledIssueEntity = stalledIssue,
-                            areAllNodesFolders = areAllNodesFolders
                         )
                     }
-                }
-                .collectLatest { stalledIssues ->
+                }.collectLatest { stalledIssues ->
                     _state.update { SyncStalledIssuesState(stalledIssues) }
                 }
         }

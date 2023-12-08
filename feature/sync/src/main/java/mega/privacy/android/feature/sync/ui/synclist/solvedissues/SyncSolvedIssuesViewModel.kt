@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissues.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.ui.mapper.SolvedIssueItemMapper
@@ -37,8 +36,7 @@ internal class SyncSolvedIssuesViewModel @Inject constructor(
                             },
                         )
                     }
-                }
-                .collectLatest {
+                }.collectLatest {
                     _state.value = SyncSolvedIssuesState(it)
                 }
         }

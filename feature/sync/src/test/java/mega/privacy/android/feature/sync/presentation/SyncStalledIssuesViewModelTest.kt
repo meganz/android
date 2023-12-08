@@ -25,6 +25,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -85,18 +86,20 @@ class SyncStalledIssuesViewModelTest {
                 emit(stalledIssues)
                 awaitCancellation()
             })
+            val node: FolderNode = mock {
+                on { name } doReturn "Camera"
+                on { isIncomingShare } doReturn true
+            }
             whenever(
                 stalledIssueItemMapper(
                     stalledIssues.first(),
-                    areAllNodesFolders = true
+                    listOf(node),
                 )
             ).thenReturn(
                 stalledIssuesUiItems.first()
             )
-            val node: FolderNode = mock()
-            whenever(getNodeByHandleUseCase(stalledIssues.first().nodeIds.first().longValue)).thenReturn(
-                node
-            )
+            whenever(getNodeByHandleUseCase(stalledIssues.first().nodeIds.first().longValue))
+                .thenReturn(node)
             initViewModel()
 
             underTest.state.test {

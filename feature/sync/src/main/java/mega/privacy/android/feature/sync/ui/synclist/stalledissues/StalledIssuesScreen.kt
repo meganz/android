@@ -30,7 +30,7 @@ private fun StalledIssuesScreenContent(
     issueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
 ) {
-    LazyColumn(state = LazyListState()) {
+    LazyColumn(state = LazyListState(), modifier = modifier) {
         if (stalledIssues.isEmpty()) {
             item {
                 SyncListNoItemsPlaceHolder(
@@ -47,11 +47,10 @@ private fun StalledIssuesScreenContent(
                 StalledIssueCard(
                     nodeName = issue.nodeNames.firstOrNull() ?: issue.localPaths.first(),
                     conflictName = issue.conflictName,
+                    modifier = modifier,
                     icon = issue.icon,
-                    issueDetailsClicked = { issueDetailsClicked(stalledIssues[itemIndex]) },
-                    moreClicked = {
-                        moreClicked(stalledIssues[itemIndex])
-                    },
+                    issueDetailsClicked = { issueDetailsClicked(issue) },
+                    moreClicked = { moreClicked(issue) },
                 )
                 Divider(Modifier.padding(start = 72.dp))
             }
