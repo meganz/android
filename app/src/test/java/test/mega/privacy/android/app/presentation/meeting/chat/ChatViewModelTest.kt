@@ -378,6 +378,7 @@ internal class ChatViewModelTest {
         runTest {
             val chatRoom = mock<ChatRoom> {
                 on { isGroup } doReturn true
+                on { ownPrivilege } doReturn ChatRoomPermission.Moderator
             }
             whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
             whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
@@ -1091,6 +1092,7 @@ internal class ChatViewModelTest {
         val updateFlow = MutableStateFlow(true)
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(monitorConnectivityUseCase()).thenReturn(updateFlow)
+        whenever(isChatStatusConnectedForCallUseCase(chatId)).thenReturn(true)
 
         initTestClass()
         updateFlow.emit(false)
