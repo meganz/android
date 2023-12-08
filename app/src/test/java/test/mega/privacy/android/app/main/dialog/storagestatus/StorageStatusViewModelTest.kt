@@ -25,6 +25,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -47,7 +48,8 @@ internal class StorageStatusViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(getPricing, isAchievementsEnabled, getAccountTypeUseCase, getCurrentUserEmail)
+        wheneverBlocking { getAccountTypeUseCase() }.thenReturn(AccountType.FREE)
+        reset(getPricing, isAchievementsEnabled, getCurrentUserEmail)
     }
 
     private fun initTestClass() {
