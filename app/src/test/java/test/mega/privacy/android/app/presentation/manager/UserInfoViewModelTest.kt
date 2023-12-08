@@ -19,11 +19,11 @@ import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -31,18 +31,23 @@ import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetUserLastName
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class UserInfoViewModelTest {
     private lateinit var underTest: UserInfoViewModel
     private val getCurrentUserFullName: GetCurrentUserFullName = mock()
@@ -64,12 +69,14 @@ internal class UserInfoViewModelTest {
     private val getContactEmail: GetContactEmail = mock()
     private val applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
     private val avatarContentMapper: AvatarContentMapper = mock()
-    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
+    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock {
+        onBlocking { invoke() }.thenReturn(1)
+    }
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock()
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase = mock()
 
-    @Before
+    @BeforeAll
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         initViewModel()
@@ -97,7 +104,26 @@ internal class UserInfoViewModelTest {
         )
     }
 
-    @After
+    @BeforeEach
+    fun resetMocks() {
+        wheneverBlocking { getMyAvatarColorUseCase() }.thenReturn(1)
+        reset(
+            getCurrentUserFullName,
+            getCurrentUserEmail,
+            updateMyAvatarWithNewEmail,
+            getUserFirstName,
+            getUserLastName,
+            getCurrentUserAliases,
+            context,
+            reloadContactDatabase,
+            getContactEmail,
+            getMyAvatarFileUseCase,
+            monitorMyAvatarFile,
+            checkPasswordReminderUseCase
+        )
+    }
+
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -107,8 +133,8 @@ internal class UserInfoViewModelTest {
         val expectedEmail = "myEmail"
         whenever(context.getString(any())).thenReturn("")
         whenever(getCurrentUserEmail()).thenReturn(expectedEmail)
+        whenever(getCurrentUserFullName(any(), any(), any())).thenReturn("myName")
         underTest.getUserInfo()
-        testScheduler.advanceUntilIdle()
         underTest.state.test {
             val item = awaitItem()
             assertEquals(expectedEmail, item.email)
@@ -135,8 +161,11 @@ internal class UserInfoViewModelTest {
             val expectedEmail = "myEmail"
             whenever(context.getString(any())).thenReturn("")
             whenever(getCurrentUserEmail()).thenReturn(expectedEmail)
+            whenever(getCurrentUserFullName(any(), any(), any())).thenReturn("myName")
+            whenever(getMyAvatarColorUseCase()).thenReturn(1)
             underTest.getUserInfo()
             underTest.state.test {
+                awaitItem()
                 awaitItem()
                 val item = awaitItem()
                 assertEquals(expectedEmail, item.email)
