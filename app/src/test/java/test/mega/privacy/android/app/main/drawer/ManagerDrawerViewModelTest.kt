@@ -81,10 +81,12 @@ internal class ManagerDrawerViewModelTest {
             hasBackupsChildren,
             getBackupsNode,
             rootNodeExistsUseCase,
-            monitorMyChatOnlineStatusUseCase,
             monitorMyAccountUpdateUseCase,
             monitorVerificationStatus
         )
+        monitorMyChatOnlineStatusUseCase.stub {
+            on { invoke() }.thenReturn(emptyFlow())
+        }
         monitorConnectivityUseCase.stub {
             on { invoke() }.thenReturn(emptyFlow())
         }
