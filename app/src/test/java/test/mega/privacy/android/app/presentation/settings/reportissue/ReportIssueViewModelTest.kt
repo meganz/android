@@ -1,6 +1,5 @@
 package test.mega.privacy.android.app.presentation.settings.reportissue
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -9,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
@@ -28,25 +28,26 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.GetSupportEmail
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SubmitIssue
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TestRule
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.InstantExecutorExtension
 
 @ExperimentalCoroutinesApi
+@ExtendWith(InstantExecutorExtension::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ReportIssueViewModelTest {
     private lateinit var underTest: ReportIssueViewModel
-
-    @get:Rule
-    var rule: TestRule = InstantTaskExecutorRule()
 
     private val submitIssue = mock<SubmitIssue>()
     private val areSdkLogsEnabled = mock<AreSdkLogsEnabled> {
@@ -67,9 +68,17 @@ class ReportIssueViewModelTest {
     private val getSupportEmail =
         mock<GetSupportEmail> { onBlocking { invoke() }.thenReturn("Support@Email.address") }
 
-    @Before
-    fun setUp() {
+    @BeforeAll
+    fun initialise() {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
+    }
+
+    @BeforeEach
+    fun setUp() {
+        initViewModel()
+    }
+
+    private fun initViewModel() {
         underTest = ReportIssueViewModel(
             submitIssue = submitIssue,
             areSdkLogsEnabled = areSdkLogsEnabled,
@@ -81,7 +90,7 @@ class ReportIssueViewModelTest {
         )
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -156,6 +165,8 @@ class ReportIssueViewModelTest {
         whenever(areSdkLogsEnabled()).thenReturn(flowOf(true))
         whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
 
+        initViewModel()
+
         underTest.state.map { it.includeLogs }.distinctUntilChanged()
             .test {
                 assertThat(awaitItem()).isFalse()
@@ -184,7 +195,7 @@ class ReportIssueViewModelTest {
 
     @Test
     fun `test that after setting a description can submit is true`() = runTest {
-        underTest.state.test {
+        underTest.state.distinctUntilChangedBy { it.canSubmit }.test {
             assertThat(awaitItem().canSubmit).isFalse()
             underTest.setDescription("A Description")
             assertThat(awaitItem().canSubmit).isTrue()
@@ -193,7 +204,7 @@ class ReportIssueViewModelTest {
 
     @Test
     fun `test that can submit becomes false if description is removed`() = runTest {
-        underTest.state.test {
+        underTest.state.distinctUntilChangedBy { it.canSubmit }.test {
             assertThat(awaitItem().canSubmit).isFalse()
 
             underTest.setDescription("A Description")
@@ -209,6 +220,8 @@ class ReportIssueViewModelTest {
     fun `test that connection error is returned if attempting to submit and no internet available`() =
         runTest {
             whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(false))
+
+            initViewModel()
 
             underTest.state.map { it.error }.distinctUntilChanged()
                 .test {
