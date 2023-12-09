@@ -315,13 +315,7 @@ boolean buildTypeMatches(String type, List<String> taskNames) {
  * Get flag to activate test lite mode from local.properties file.
  */
 boolean shouldActivateTestLite() {
-    def file = rootProject.file('local.properties')
-    if (file.exists()) {
-        def props = new Properties()
-        props.load(new FileInputStream(file))
-        return props["test.lite"]?.toBoolean() ?: false
-    }
-    return false
+    return true
 }
 
 boolean shouldApplyDefaultConfiguration() {

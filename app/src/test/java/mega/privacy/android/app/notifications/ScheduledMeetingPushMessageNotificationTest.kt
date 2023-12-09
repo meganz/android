@@ -5,7 +5,6 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,6 +25,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import test.mega.privacy.android.app.AnalyticsTestRule
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -41,8 +41,8 @@ class ScheduledMeetingPushMessageNotificationTest {
     }
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    @get:Rule(order = 0)
-    var hiltRule = HiltAndroidRule(this)
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule()
 
     @Before
     fun setUp() {
@@ -53,7 +53,6 @@ class ScheduledMeetingPushMessageNotificationTest {
             notificationManagerCompat,
             getFeatureFlagValueUseCase
         )
-        hiltRule.inject()
     }
 
     @After
