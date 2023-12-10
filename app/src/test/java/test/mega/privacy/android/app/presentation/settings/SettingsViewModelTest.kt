@@ -213,6 +213,8 @@ class SettingsViewModelTest {
                     }
                 )
             }
+
+            initViewModel()
             underTest.uiState
                 .map { it.autoAcceptChecked }
                 .distinctUntilChanged()
@@ -375,6 +377,8 @@ class SettingsViewModelTest {
                 on { invoke() }.thenReturn(subFolderMediaDiscoveryFlow)
             }
 
+            initViewModel()
+
             underTest.uiState
                 .map { it.subFolderMediaDiscoveryChecked }
                 .distinctUntilChanged()
@@ -404,6 +408,8 @@ class SettingsViewModelTest {
                     }
                 )
             }
+
+            initViewModel()
 
             underTest.uiState
                 .map { it.mediaDiscoveryViewState }
