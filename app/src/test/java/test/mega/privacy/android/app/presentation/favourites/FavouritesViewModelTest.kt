@@ -5,41 +5,45 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.favourites.FavouritesViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
-import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
+import mega.privacy.android.app.presentation.favourites.model.FavouriteHeaderItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
-import mega.privacy.android.app.presentation.favourites.model.mapper.toHeader
+import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.MapFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaNode
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FavouritesViewModelTest {
     private lateinit var underTest: FavouritesViewModel
 
@@ -91,8 +95,6 @@ class FavouritesViewModelTest {
     private val getAllFavorites =
         mock<GetAllFavoritesUseCase> { on { invoke() }.thenReturn(flowOf(descendingTimeNodes)) }
 
-    private val scheduler = TestCoroutineScheduler()
-
     private val connectedFlow = MutableStateFlow(false)
 
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
@@ -100,9 +102,26 @@ class FavouritesViewModelTest {
     }
 
 
-    @Before
+    @BeforeAll
+    fun initialise() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+    }
+
+    @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher(scheduler))
+        Mockito.reset(
+            mapFavouriteSortOrderUseCase
+        )
+        initViewModel()
+    }
+
+    private val headerMapper = mock<HeaderMapper> {
+        on { invoke(any()) }.thenReturn(
+            FavouriteHeaderItem(null, null)
+        )
+    }
+
+    private fun initViewModel() {
         underTest = FavouritesViewModel(
             getAllFavoritesUseCase = getAllFavorites,
             stringUtilWrapper = stringUtilWrapper,
@@ -111,19 +130,25 @@ class FavouritesViewModelTest {
             favouriteMapper = favouriteMapper,
             fetchNodeWrapper = fetchNodeWrapper,
             mapFavouriteSortOrderUseCase = mapFavouriteSortOrderUseCase,
-            headerMapper = ::toHeader,
+            headerMapper = headerMapper,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase
         )
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
 
     @Test
     fun `test default state`() = runTest {
+        whenever(getAllFavorites()).thenReturn(
+            flow { awaitCancellation() }
+        )
+
+        initViewModel()
+
         underTest.favouritesState.test {
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
         }
@@ -134,8 +159,10 @@ class FavouritesViewModelTest {
         whenever(getAllFavorites()).thenReturn(
             flowOf(emptyList())
         )
+
+        initViewModel()
+
         underTest.favouritesState.test {
-            assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Empty::class.java)
         }
     }
@@ -146,7 +173,6 @@ class FavouritesViewModelTest {
             flowOf(descendingTimeNodes)
         )
         underTest.favouritesState.test {
-            assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Success::class.java)
         }
     }
@@ -154,7 +180,6 @@ class FavouritesViewModelTest {
     @Test
     fun `test that favourites are mapped according to returned order`() = runTest {
         underTest.favouritesState.test {
-            assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             val items = awaitItem()
             verifyDefaultSortOrder(items)
         }
@@ -166,12 +191,14 @@ class FavouritesViewModelTest {
         whenever(getFavouriteSortOrderUseCase()).thenReturn(sortOrder)
         whenever(mapFavouriteSortOrderUseCase(any())).thenReturn(sortOrder.copy(sortDescending = !sortOrder.sortDescending))
 
+        whenever(getAllFavorites()).thenReturn(flowOf(descendingTimeNodes))
+
+        initViewModel()
+
         underTest.favouritesState.test {
-            assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             val items = awaitItem()
             verifyDefaultSortOrder(items)
             underTest.onOrderChange(SortOrder.ORDER_CREATION_DESC)
-            scheduler.advanceUntilIdle()
             val sortedItems = awaitItem()
             verifyInOrder(sortedItems, timeDescending)
         }
@@ -197,7 +224,6 @@ class FavouritesViewModelTest {
     @Test
     fun `test that list is filtered according to query string`() = runTest {
         underTest.favouritesState.test {
-            assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             val items = awaitItem()
             verifyDefaultSortOrder(items)
 
@@ -215,7 +241,6 @@ class FavouritesViewModelTest {
     fun `test that s filtered list retains its sort order`() = runTest {
         val timeDescendingOddOnly = timeDescending.filter { it.mod(2) != 0 }
         underTest.favouritesState.test {
-            assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             val items = awaitItem()
             verifyDefaultSortOrder(items)
 
@@ -235,11 +260,13 @@ class FavouritesViewModelTest {
                 true
             )
         )
+        whenever(getAllFavorites()).thenReturn(flowOf(descendingTimeNodes))
+
+        initViewModel()
+
         underTest.favouritesState.test {
-            assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             val items = awaitItem()
             verifyDefaultSortOrder(items)
-
             underTest.searchQuery(oddString)
 
             val filteredItems = awaitItem()
@@ -249,7 +276,6 @@ class FavouritesViewModelTest {
                 expected,
                 "Items contain odd values in ascending time order"
             )
-
             underTest.onOrderChange(SortOrder.ORDER_CREATION_DESC)
 
             val sortedItems = awaitItem()
@@ -273,7 +299,6 @@ class FavouritesViewModelTest {
                 }
             }.first()
         underTest.favouritesState.test {
-            assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Success::class.java)
             underTest.itemSelected(mock<FavouriteFile> { on { typedNode }.thenReturn(expected) })
             assertThat((awaitItem() as FavouriteLoadState.Success).selectedItems).containsExactly(
@@ -290,8 +315,11 @@ class FavouritesViewModelTest {
                     on { id }.thenReturn(NodeId(longValue))
                 }
             }.first()
+
+        whenever(getAllFavorites()).thenReturn(flowOf(descendingTimeNodes))
+        initViewModel()
+
         underTest.favouritesState.test {
-            assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Success::class.java)
             val selected = mock<FavouriteFile> { on { typedNode }.thenReturn(expected) }
             underTest.itemSelected(selected)
@@ -308,7 +336,6 @@ class FavouritesViewModelTest {
         val expected = timeDescending
             .map { NodeId(it) }
         underTest.favouritesState.test {
-            assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Success::class.java)
             underTest.selectAll()
             assertThat((awaitItem() as FavouriteLoadState.Success).selectedItems).containsExactlyElementsIn(
@@ -321,8 +348,9 @@ class FavouritesViewModelTest {
     fun `test that clear selection returns an empty selected set`() = runTest {
         val expected = timeDescending
             .map { NodeId(it) }
+        whenever(getAllFavorites()).thenReturn(flowOf(descendingTimeNodes))
+        initViewModel()
         underTest.favouritesState.test {
-            assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Success::class.java)
             underTest.selectAll()
             assertThat((awaitItem() as FavouriteLoadState.Success).selectedItems).containsExactlyElementsIn(
@@ -365,11 +393,13 @@ class FavouritesViewModelTest {
     @Test
     fun `test that subsequent connected state matches latest value`() = runTest {
         connectedFlow.emit(true)
-
         val initial = connectedFlow.value
-        connectedFlow.emit(!initial)
+
+        initViewModel()
+
         underTest.favouritesState.test {
             assertThat(awaitItem().isConnected).isEqualTo(initial)
+            connectedFlow.emit(!initial)
             assertThat(awaitItem().isConnected).isEqualTo(!initial)
         }
     }
