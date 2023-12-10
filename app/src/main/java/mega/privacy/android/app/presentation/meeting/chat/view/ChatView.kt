@@ -6,9 +6,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -53,12 +51,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
-import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
-import mega.privacy.android.app.main.megachat.MapsActivity
-import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
-import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
-import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
 import mega.privacy.android.app.presentation.meeting.chat.extension.toInfoText
@@ -76,12 +68,16 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactT
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
 import mega.privacy.android.app.presentation.meeting.chat.view.message.MessageRow
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAddContactActivity
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openLocationPicker
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.showGroupOrContactInfoActivity
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startWaitingRoom
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatAttachFileBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
@@ -94,7 +90,6 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.shared.theme.MegaAppTheme
-import timber.log.Timber
 
 @Composable
 internal fun ChatView(
@@ -544,99 +539,6 @@ private fun BoxScope.StartOrJoinMeeting(
     }
 }
 
-private fun openAddContactActivity(
-    context: Context,
-    chatId: Long,
-    addContactLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-) {
-    val intent =
-        Intent(context, AddContactActivity::class.java).apply {
-            putExtra(
-                AddContactActivity.EXTRA_CONTACT_TYPE,
-                CONTACT_TYPE_MEGA
-            )
-            putExtra(Constants.INTENT_EXTRA_KEY_CHAT, true)
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_CHAT_ID,
-                chatId
-            )
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                context.getString(R.string.add_participants_menu_item)
-            )
-        }
-
-    addContactLauncher.launch(intent)
-}
-
-private fun showGroupOrContactInfoActivity(context: Context, uiState: ChatUiState) {
-    with(uiState) {
-        if (scheduledMeeting != null && schedIsPending && isMeeting && isActive) {
-            Timber.d("show scheduled meeting info")
-            Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
-                putExtra(Constants.CHAT_ID, scheduledMeeting.chatId)
-                putExtra(Constants.SCHEDULED_MEETING_ID, scheduledMeeting.schedId)
-            }.also {
-                context.startActivity(it)
-            }
-        } else {
-            val targetActivity =
-                if (isGroup) GroupChatInfoActivity::class.java else ContactInfoActivity::class.java
-            Intent(context, targetActivity).apply {
-                putExtra(Constants.HANDLE, chatId)
-                putExtra(Constants.ACTION_CHAT_OPEN, true)
-            }.also {
-                context.startActivity(it)
-            }
-        }
-    }
-}
-
-private fun startMeetingActivity(
-    context: Context,
-    chatId: Long,
-    enableAudio: Boolean? = null,
-    enableVideo: Boolean? = null,
-) {
-    context.startActivity(Intent(context, MeetingActivity::class.java).apply {
-        action =
-            if (enableAudio != null && !enableAudio) MeetingActivity.MEETING_ACTION_RINGING
-            else MeetingActivity.MEETING_ACTION_IN
-
-        putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
-        enableAudio?.let { putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, it) }
-        enableVideo?.let { putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, it) }
-        addFlags(if (enableAudio != null) Intent.FLAG_ACTIVITY_NEW_TASK else Intent.FLAG_ACTIVITY_CLEAR_TOP)
-    })
-}
-
-private fun openAttachContactActivity(
-    context: Context,
-    attachContactLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-) {
-    Intent(context, AddContactActivity::class.java).apply {
-        putExtra(Constants.INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-        putExtra(Constants.INTENT_EXTRA_KEY_CHAT, true)
-        putExtra(
-            Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-            context.getString(R.string.send_contacts)
-        )
-    }.also {
-        attachContactLauncher.launch(it)
-    }
-}
-
-private fun startWaitingRoom(context: Context, chatId: Long) {
-    context.startActivity(
-        Intent(
-            context,
-            WaitingRoomActivity::class.java
-        ).apply {
-            putExtra(WaitingRoomActivity.EXTRA_CHAT_ID, chatId)
-        },
-    )
-}
-
 private fun getInfoToShow(infoToShow: InfoToShow, context: Context): String? = with(infoToShow) {
     inviteContactToChatResult?.toInfoText(context)
         ?: chatPushNotificationMuteOption?.toInfoText(context)
@@ -705,15 +607,6 @@ private fun checkLocationPicker(
         else -> {
             onPickLocation()
         }
-    }
-}
-
-private fun openLocationPicker(
-    context: Context,
-    locationLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-) {
-    Intent(context, MapsActivity::class.java).also {
-        locationLauncher.launch(it)
     }
 }
 
