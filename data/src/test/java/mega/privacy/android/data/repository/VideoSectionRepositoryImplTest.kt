@@ -12,7 +12,7 @@ import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
-import mega.privacy.android.data.mapper.videos.VideoNodeMapper
+import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
@@ -37,7 +37,7 @@ class VideoSectionRepositoryImplTest {
     private val sortOrderIntMapper = mock<SortOrderIntMapper>()
     private val fileNodeMapper = mock<FileNodeMapper>()
     private val cacheGateway = mock<CacheGateway>()
-    private val videoNodeMapper = mock<VideoNodeMapper>()
+    private val typedVideoNodeMapper = mock<TypedVideoNodeMapper>()
     private val cancelTokenProvider = mock<CancelTokenProvider>()
     private val megaCancelToken = mock<MegaCancelToken>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
@@ -49,7 +49,7 @@ class VideoSectionRepositoryImplTest {
             sortOrderIntMapper = sortOrderIntMapper,
             fileNodeMapper = fileNodeMapper,
             cacheGateway = cacheGateway,
-            videoNodeMapper = videoNodeMapper,
+            typedVideoNodeMapper = typedVideoNodeMapper,
             cancelTokenProvider = cancelTokenProvider,
             megaLocalRoomGateway = megaLocalRoomGateway,
             ioDispatcher = UnconfinedTestDispatcher()
@@ -63,7 +63,7 @@ class VideoSectionRepositoryImplTest {
             sortOrderIntMapper,
             fileNodeMapper,
             cacheGateway,
-            videoNodeMapper,
+            typedVideoNodeMapper,
             megaLocalRoomGateway
         )
     }
@@ -88,7 +88,7 @@ class VideoSectionRepositoryImplTest {
 
         whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
 
-        whenever(videoNodeMapper(any(), any())).thenReturn(mock())
+        whenever(typedVideoNodeMapper(any(), any(), any())).thenReturn(mock())
 
         val actual = underTest.getAllVideos(SortOrder.ORDER_MODIFICATION_DESC)
         assertThat(actual.isNotEmpty()).isTrue()

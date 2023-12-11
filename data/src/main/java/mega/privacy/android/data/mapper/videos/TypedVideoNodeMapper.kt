@@ -1,19 +1,17 @@
 package mega.privacy.android.data.mapper.videos
 
-import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.VideoNode
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import javax.inject.Inject
 
-internal class VideoNodeMapper @Inject constructor(
-    private val durationMapper: FileDurationMapper,
-) {
+internal class TypedVideoNodeMapper @Inject constructor() {
     operator fun invoke(
         fileNode: FileNode,
+        duration: Int,
         thumbnailFilePath: String?
-    ) = VideoNode(
+    ) = TypedVideoNode(
         fileNode = fileNode,
-        duration = durationMapper(fileNode.type) ?: 0,
+        duration = duration,
         thumbnailFilePath = thumbnailFilePath
     )
 }

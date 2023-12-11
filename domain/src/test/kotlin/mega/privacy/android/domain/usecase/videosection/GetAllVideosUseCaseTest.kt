@@ -6,7 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.VideoNode
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import org.junit.jupiter.api.AfterAll
@@ -50,7 +50,7 @@ class GetAllVideosUseCaseTest {
 
     @Test
     fun `test that videos is not empty`() = runTest {
-        val list = listOf(mock<VideoNode>())
+        val list = listOf(mock<TypedVideoNode>())
         whenever(videoSectionRepository.getAllVideos(order)).thenReturn(list)
         whenever(getCloudSortOrder()).thenReturn(order)
         assertThat(underTest()).isNotEmpty()

@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.videosection.mapper
 
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.domain.entity.node.VideoNode
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import java.io.File
 import javax.inject.Inject
 
@@ -14,14 +14,14 @@ class UIVideoMapper @Inject constructor() {
      * Convert to VideoNode to UIVideo
      */
     operator fun invoke(
-        videoNode: VideoNode,
+        typedVideoNode: TypedVideoNode,
     ) = UIVideo(
-        id = videoNode.id,
-        name = videoNode.name,
-        size = videoNode.size,
-        duration = TimeUtils.getVideoDuration(videoNode.duration),
-        thumbnail = videoNode.thumbnailFilePath?.let { File(it) },
-        isFavourite = videoNode.isFavourite,
-        nodeAvailableOffline = videoNode.isAvailableOffline
+        id = typedVideoNode.id,
+        name = typedVideoNode.name,
+        size = typedVideoNode.size,
+        duration = TimeUtils.getVideoDuration(typedVideoNode.duration),
+        thumbnail = typedVideoNode.thumbnailFilePath?.let { File(it) },
+        isFavourite = typedVideoNode.isFavourite,
+        nodeAvailableOffline = typedVideoNode.isAvailableOffline
     )
 }

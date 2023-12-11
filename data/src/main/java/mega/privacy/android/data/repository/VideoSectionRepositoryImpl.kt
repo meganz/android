@@ -9,10 +9,10 @@ import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
-import mega.privacy.android.data.mapper.videos.VideoNodeMapper
+import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.VideoNode
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
@@ -29,14 +29,14 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val fileNodeMapper: FileNodeMapper,
     private val cacheGateway: CacheGateway,
-    private val videoNodeMapper: VideoNodeMapper,
+    private val typedVideoNodeMapper: TypedVideoNodeMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : VideoSectionRepository {
 
     private var thumbnailFolderPath: String? = null
-    override suspend fun getAllVideos(order: SortOrder): List<VideoNode> =
+    override suspend fun getAllVideos(order: SortOrder): List<TypedVideoNode> =
         withContext(ioDispatcher) {
             val offlineItems = getAllOfflineNodeHandle()
             val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
@@ -46,10 +46,11 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                 FILE_TYPE_VIDEO,
                 SEARCH_TARGET_ROOTNODE
             ).map { megaNode ->
-                videoNodeMapper(
+                typedVideoNodeMapper(
                     fileNode = megaNode.convertToFileNode(
                         offlineItems?.get(megaNode.handle.toString())
                     ),
+                    duration = megaNode.duration,
                     thumbnailFilePath = getThumbnailCacheFilePath(megaNode)
                 )
             }

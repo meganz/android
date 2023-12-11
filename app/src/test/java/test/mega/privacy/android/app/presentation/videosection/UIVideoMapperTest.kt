@@ -5,7 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.VideoNode
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -30,7 +30,7 @@ class UIVideoMapperTest {
         val expectedThumbnail = "video file thumbnail"
         val expectedAvailableOffline = true
 
-        val expectedVideoNode = mock<VideoNode> {
+        val expectedTypedVideoNode = mock<TypedVideoNode> {
             on { id }.thenReturn(expectedId)
             on { name }.thenReturn(expectedName)
             on { size }.thenReturn(expectedSize)
@@ -40,7 +40,7 @@ class UIVideoMapperTest {
             on { thumbnailFilePath }.thenReturn(expectedThumbnail)
         }
 
-        underTest(videoNode = expectedVideoNode).let {
+        underTest(typedVideoNode = expectedTypedVideoNode).let {
             assertThat(it.id.longValue).isEqualTo(expectedId.longValue)
             assertThat(it.name).isEqualTo(expectedName)
             assertThat(it.size).isEqualTo(expectedSize)
