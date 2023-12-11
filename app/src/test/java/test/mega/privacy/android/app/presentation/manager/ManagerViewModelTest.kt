@@ -1,6 +1,5 @@
 package test.mega.privacy.android.app.presentation.manager
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.Event
 import app.cash.turbine.test
@@ -12,6 +11,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -93,7 +93,6 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
@@ -110,36 +109,39 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
-import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import nz.mega.sdk.MegaNode
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
+import test.mega.privacy.android.app.InstantExecutorExtension
 import test.mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
 import kotlin.test.assertFalse
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(value = [InstantExecutorExtension::class])
 class ManagerViewModelTest {
     private lateinit var underTest: ManagerViewModel
 
     private val monitorGlobalUpdates = MutableStateFlow<GlobalUpdate>(GlobalUpdate.OnReloadNeeded)
-    private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
-    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
-        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
-    }
+    private lateinit var monitorNodeUpdatesFakeFlow: MutableSharedFlow<NodeUpdate>
     private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
     private val monitorSecurityUpgradeInApp = MutableStateFlow(false)
     private val getNumUnreadUserAlertsUseCase =
         mock<GetNumUnreadUserAlertsUseCase> { onBlocking { invoke() }.thenReturn(0) }
     private val hasBackupsChildren =
         mock<HasBackupsChildren> { onBlocking { invoke() }.thenReturn(false) }
-    private val monitorContactRequestUpdates = MutableStateFlow(emptyList<ContactRequest>())
+    private lateinit var monitorContactRequestUpdates: MutableStateFlow<List<ContactRequest>>
 
     private val initialIsFirsLoginValue = true
     private val sendStatisticsMediaDiscoveryUseCase = mock<SendStatisticsMediaDiscoveryUseCase>()
@@ -178,7 +180,9 @@ class ManagerViewModelTest {
         mock<GetCloudSortOrder> { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_ALPHABETICAL_ASC) }
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
-    private val monitorSyncStalledIssuesUseCase = mock<MonitorSyncStalledIssuesUseCase>()
+    private val monitorSyncStalledIssuesUseCase = mock<MonitorSyncStalledIssuesUseCase> {
+        onBlocking { invoke() }.thenReturn(emptyFlow())
+    }
     private val getFeatureFlagValueUseCase =
         mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(false) }
     private val shareDataList = listOf(
@@ -233,7 +237,9 @@ class ManagerViewModelTest {
         mock<RequireTwoFactorAuthenticationUseCase>()
     private val setCopyLatestTargetPathUseCase = mock<SetCopyLatestTargetPathUseCase>()
     private val setMoveLatestTargetPathUseCase = mock<SetMoveLatestTargetPathUseCase>()
-    private val monitorUserUpdates = mock<MonitorUserUpdates>()
+    private val monitorUserUpdates = mock<MonitorUserUpdates> {
+        onBlocking { invoke() }.thenReturn(emptyFlow())
+    }
     private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase> {
         onBlocking { invoke() }.thenReturn(
             flowOf(
@@ -281,32 +287,30 @@ class ManagerViewModelTest {
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val chatManagement: ChatManagement = mock()
     private val passcodeManagement: PasscodeManagement = mock()
-    private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
+    private lateinit var monitorSyncsUseCaseFakeFlow: MutableSharedFlow<List<FolderPair>>
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase =
-        mock()
-    private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock()
+        mock {
+            onBlocking { invoke() }.thenReturn(emptyFlow())
+        }
+    private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock {
+        onBlocking { invoke() }.thenReturn(emptyFlow())
+    }
 
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
-
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
+    private fun initViewModel() {
         underTest = ManagerViewModel(
-            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            monitorNodeUpdatesUseCase = mock {
+                on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
+            },
             monitorContactUpdates = { monitorContactUpdates },
             monitorGlobalUpdates = { monitorGlobalUpdates },
-            monitorContactRequestUpdates = mock {
-                onBlocking { invoke() }.thenReturn(monitorContactRequestUpdates)
-            },
+            monitorContactRequestUpdates = { monitorContactRequestUpdates },
+            getBackupsNode = getBackupsNode,
             getNumUnreadUserAlertsUseCase = getNumUnreadUserAlertsUseCase,
             hasBackupsChildren = hasBackupsChildren,
             sendStatisticsMediaDiscoveryUseCase = sendStatisticsMediaDiscoveryUseCase,
             savedStateHandle = savedStateHandle,
-            getBackupsNode = getBackupsNode,
             monitorStorageStateEventUseCase = monitorStorageState,
             monitorCameraUploadsFolderDestinationUseCase = monitorCameraUploadsFolderDestinationUpdateUseCase,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
@@ -327,16 +331,16 @@ class ManagerViewModelTest {
             monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
             listenToNewMediaUseCase = mock(),
             monitorUserUpdates = monitorUserUpdates,
-            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
-            monitorUpdatePushNotificationSettingsUseCase = monitorPushNotificationSettingsUpdate,
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
-            createShareKey = createShareKey,
             saveContactByEmailUseCase = saveContactByEmailUseCase,
+            createShareKey = createShareKey,
             deleteOldestCompletedTransfersUseCase = deleteOldestCompletedTransfersUseCase,
-            monitorOfflineNodeAvailabilityUseCase = monitorOfflineNodeAvailabilityUseCase,
             getIncomingContactRequestsUseCase = getIncomingContactRequestUseCase,
+            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
+            monitorUpdatePushNotificationSettingsUseCase = monitorPushNotificationSettingsUpdate,
+            monitorOfflineNodeAvailabilityUseCase = monitorOfflineNodeAvailabilityUseCase,
             monitorChatArchivedUseCase = monitorChatArchivedUseCase,
             restoreNodesUseCase = restoreNodesUseCase,
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
@@ -363,7 +367,9 @@ class ManagerViewModelTest {
             chatManagement = chatManagement,
             passcodeManagement = passcodeManagement,
             monitorSyncStalledIssuesUseCase = monitorSyncStalledIssuesUseCase,
-            monitorSyncsUseCase = monitorSyncsUseCase,
+            monitorSyncsUseCase = mock {
+                on { invoke() }.thenReturn(monitorSyncsUseCaseFakeFlow)
+            },
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
             monitorCallRecordingConsentEventUseCase = monitorCallRecordingConsentEventUseCase,
@@ -371,7 +377,73 @@ class ManagerViewModelTest {
         )
     }
 
-    @After
+    @BeforeAll
+    fun setUp() {
+        Dispatchers.setMain(StandardTestDispatcher())
+    }
+
+    @BeforeEach
+    fun reset() {
+        reset(
+            getBackupsNode,
+            hasBackupsChildren,
+            sendStatisticsMediaDiscoveryUseCase,
+            isConnectedToInternetUseCase,
+            getFullAccountInfoUseCase,
+            requireTwoFactorAuthenticationUseCase,
+            setCopyLatestTargetPathUseCase,
+            setMoveLatestTargetPathUseCase,
+            establishCameraUploadsSyncHandlesUseCase,
+            startCameraUploadUseCase,
+            stopCameraUploadsUseCase,
+            saveContactByEmailUseCase,
+            createShareKey,
+            deleteOldestCompletedTransfersUseCase,
+            restoreNodesUseCase,
+            checkNodesNameCollisionUseCase,
+            moveNodesToRubbishUseCase,
+            deleteNodesUseCase,
+            moveNodesUseCase,
+            copyNodesUseCase,
+            renameRecoveryKeyFileUseCase,
+            removeShareUseCase,
+            removeShareResultMapper,
+            getNumUnreadChatsUseCase,
+            disableExportNodesUseCase,
+            removePublicLinkResultMapper,
+            dismissPsaUseCase,
+            rootNodeUseCase,
+            getChatLinkContentUseCase,
+            getScheduledMeetingByChat,
+            getChatCallUseCase,
+            startMeetingInWaitingRoomChatUseCase,
+            answerChatCallUseCase,
+            setChatVideoInDeviceUseCase,
+            rtcAudioManagerGateway,
+            chatManagement,
+            passcodeManagement,
+            hangChatCallUseCase,
+            monitorChatArchivedUseCase,
+            monitorPushNotificationSettingsUpdate
+        )
+        wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_ALPHABETICAL_ASC)
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(true)
+        whenever(monitorUserUpdates()).thenReturn(emptyFlow())
+        whenever(monitorCallRecordingConsentEventUseCase()).thenReturn(emptyFlow())
+        whenever(monitorCallEndedUseCase()).thenReturn(emptyFlow())
+        whenever(monitorChatArchivedUseCase()).thenReturn(flowOf("Chat Title"))
+        whenever(monitorPushNotificationSettingsUpdate()).thenReturn(flowOf(true))
+        wheneverBlocking { getPrimarySyncHandleUseCase() }.thenReturn(0L)
+        wheneverBlocking { getSecondarySyncHandleUseCase() }.thenReturn(0L)
+        wheneverBlocking { getNumUnreadUserAlertsUseCase() }.thenReturn(0)
+        wheneverBlocking { getIncomingContactRequestUseCase() }.thenReturn(emptyList())
+        monitorContactRequestUpdates = MutableStateFlow(emptyList())
+        monitorNodeUpdatesFakeFlow = MutableSharedFlow()
+        monitorSyncsUseCaseFakeFlow = MutableSharedFlow()
+        initViewModel()
+    }
+
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -542,7 +614,9 @@ class ManagerViewModelTest {
                 UserChanges.Country,
             )
 
+            testScheduler.advanceUntilIdle()
             whenever(monitorUserUpdates()).thenReturn(userUpdates.asFlow())
+            initViewModel()
             testScheduler.advanceUntilIdle()
 
             verify(establishCameraUploadsSyncHandlesUseCase).invoke()
@@ -1108,8 +1182,9 @@ class ManagerViewModelTest {
                 RemoteFolder(1L, "folder name"),
                 SyncStatus.SYNCING
             )
+            testScheduler.advanceUntilIdle()
             whenever(getFeatureFlagValueUseCase(AppFeatures.AndroidSync)).thenReturn(true)
-            whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(mockFolderPair)))
+            monitorSyncsUseCaseFakeFlow.emit(listOf(mockFolderPair))
             testScheduler.advanceUntilIdle()
             underTest
                 .state
@@ -1122,7 +1197,7 @@ class ManagerViewModelTest {
     fun `test that if Android Sync feature is on and syncs are empty Sync service is disabled`() =
         runTest {
             whenever(getFeatureFlagValueUseCase(AppFeatures.AndroidSync)).thenReturn(true)
-            whenever(monitorSyncsUseCase()).thenReturn(flowOf((listOf())))
+            monitorSyncsUseCaseFakeFlow.emit(listOf())
             testScheduler.advanceUntilIdle()
 
             underTest
