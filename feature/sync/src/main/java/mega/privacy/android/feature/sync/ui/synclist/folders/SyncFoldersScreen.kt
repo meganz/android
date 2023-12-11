@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
@@ -34,7 +34,7 @@ internal fun SyncFoldersScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        LazyColumn(state = LazyListState(), modifier = modifier) {
+        LazyColumn(state = rememberLazyListState(), modifier = modifier.fillMaxSize()) {
             if (syncUiItems.isEmpty()) {
                 item {
                     SyncListNoItemsPlaceHolder(
@@ -65,7 +65,8 @@ internal fun SyncFoldersScreen(
         }
         FloatingActionButton(
             onClick = { addFolderClicked() },
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .padding(16.dp)
                 .align(Alignment.BottomEnd)
         ) {
             Icon(Icons.Filled.Add, contentDescription = "Add folder pair")
