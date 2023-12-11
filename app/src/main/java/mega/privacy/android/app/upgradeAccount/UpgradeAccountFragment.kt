@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -19,14 +18,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.upgradeAccount.payment.PaymentActivity
-import mega.privacy.android.app.upgradeAccount.view.LegacyUpgradeAccountView
 import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
@@ -93,59 +90,36 @@ class UpgradeAccountFragment : Fragment() {
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         MegaAppTheme(isDark = mode.isDarkMode()) {
-            val useNewPlansPageUI by produceState(initialValue = false) {
-                value = getFeatureFlagUseCase(ABTestFeatures.sus2023)
-            }
-            if (useNewPlansPageUI) {
-                UpgradeAccountView(
-                    modifier = Modifier.semantics {
-                        testTagsAsResourceId = true
-                    },
-                    state = uiState,
-                    onBackPressed = upgradeAccountActivity.onBackPressedDispatcher::onBackPressed,
-                    onBuyClicked = {
-                        billingViewModel.startPurchase(
-                            upgradeAccountActivity,
-                            upgradeAccountViewModel.getProductId(
-                                uiState.isMonthlySelected,
-                                convertAccountTypeToInt(uiState.chosenPlan)
-                            )
+            UpgradeAccountView(
+                modifier = Modifier.semantics {
+                    testTagsAsResourceId = true
+                },
+                state = uiState,
+                onBackPressed = upgradeAccountActivity.onBackPressedDispatcher::onBackPressed,
+                onBuyClicked = {
+                    billingViewModel.startPurchase(
+                        upgradeAccountActivity,
+                        upgradeAccountViewModel.getProductId(
+                            uiState.isMonthlySelected,
+                            convertAccountTypeToInt(uiState.chosenPlan)
                         )
-                    },
-                    onTOSClicked = this::redirectToTOSPage,
-                    onPricingPageClicked = this::redirectToPricingPage,
-                    onChoosingMonthlyYearlyPlan = upgradeAccountViewModel::onSelectingMonthlyPlan,
-                    onChoosingPlanType = {
-                        with(upgradeAccountViewModel) {
-                            if (!isBillingAvailable()) {
-                                Timber.w("Billing not available")
-                                setBillingWarningVisibility(true)
-                            } else {
-                                onSelectingPlanType(it)
-                            }
+                    )
+                },
+                onTOSClicked = this::redirectToTOSPage,
+                onPricingPageClicked = this::redirectToPricingPage,
+                onChoosingMonthlyYearlyPlan = upgradeAccountViewModel::onSelectingMonthlyPlan,
+                onChoosingPlanType = {
+                    with(upgradeAccountViewModel) {
+                        if (isBillingAvailable()) {
+                            onSelectingPlanType(it)
+                        } else {
+                            Timber.w("Billing not available")
+                            setBillingWarningVisibility(true)
                         }
-                    },
-                    hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
-                )
-            } else {
-                LegacyUpgradeAccountView(
-                    state = uiState,
-                    onBackPressed = upgradeAccountActivity.onBackPressedDispatcher::onBackPressed,
-                    onPlanClicked = ::onPlanClicked,
-                    onCustomLabelClicked = {
-                        uiState.currentSubscriptionPlan?.let {
-                            onCustomLabelClick(it)
-                        }
-                    },
-                    hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
-                    onDialogPositiveButtonClicked = ::onDialogPositiveButtonClicked,
-                    onDialogDismissButtonClicked = {
-                        upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
-                            showBuyNewSubscriptionDialog = false
-                        )
-                    },
-                )
-            }
+                    }
+                },
+                hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
+            )
         }
     }
 
