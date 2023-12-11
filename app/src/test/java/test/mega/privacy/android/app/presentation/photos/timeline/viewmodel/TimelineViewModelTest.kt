@@ -48,24 +48,28 @@ import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TimelineViewModelTest {
     private lateinit var underTest: TimelineViewModel
 
     private val isCameraUploadsEnabledUseCase =
         mock<IsCameraUploadsEnabledUseCase> { onBlocking { invoke() }.thenReturn(true) }
 
-    private val getTimelinePhotosUseCase =
-        mock<GetTimelinePhotosUseCase> { on { invoke() }.thenReturn(emptyFlow()) }
+    private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
 
     private val filterCameraUploadPhotos =
         mock<FilterCameraUploadPhotos> { onBlocking { invoke(any()) }.thenAnswer { it.arguments[0] } }
@@ -104,9 +108,31 @@ class TimelineViewModelTest {
     private val broadcastBusinessAccountExpiredUseCase =
         mock<BroadcastBusinessAccountExpiredUseCase>()
 
-    @Before
-    fun setUp() {
+    @BeforeAll
+    fun initialise() {
         Dispatchers.setMain(StandardTestDispatcher())
+    }
+
+    @BeforeEach
+    fun setUp() {
+        getTimelinePhotosUseCase.stub {
+            on { invoke() }.thenReturn(emptyFlow())
+        }
+        monitorCameraUploadProgress.stub {
+            on { invoke() }.thenReturn(emptyFlow())
+        }
+        reset(
+            enableCameraUploadsInPhotosUseCase
+        )
+        initViewModel()
+    }
+
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    fun initViewModel() {
         underTest = TimelineViewModel(
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
@@ -129,11 +155,6 @@ class TimelineViewModelTest {
             timelinePreferencesMapper = timelinePreferencesMapper,
             broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase
         )
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -216,6 +237,8 @@ class TimelineViewModelTest {
             false
         )
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(photo)))
+
+        initViewModel()
 
         underTest.state.test {
             awaitItem()
@@ -302,6 +325,8 @@ class TimelineViewModelTest {
             whenever(monitorCameraUploadProgress()).thenReturn(flowOf(pair))
 
             advanceUntilIdle()
+
+            underTest.updateCameraUploadProgressIfNeeded(expectedProgress, expectedPending)
 
             underTest.state.test {
                 val state = awaitItem()
@@ -442,6 +467,8 @@ class TimelineViewModelTest {
         whenever(getTimelineFilterPreferencesUseCase()).thenReturn(mapOf())
 
         whenever(timelinePreferencesMapper(any())).thenReturn(latestPref)
+
+        initViewModel()
 
         underTest.state.drop(3).test {
             val state = awaitItem()

@@ -166,7 +166,7 @@ class TimelineViewModel @Inject constructor(
      * @param progress value between 0 and 100
      * @param pending count of pending items to be uploaded
      */
-    private fun updateCameraUploadProgressIfNeeded(progress: Int, pending: Int) {
+    fun updateCameraUploadProgressIfNeeded(progress: Int, pending: Int) {
         if (state.value.selectedPhotoCount > 0 || !isInAllView()) {
             setShowProgressBar(show = false)
         } else {
