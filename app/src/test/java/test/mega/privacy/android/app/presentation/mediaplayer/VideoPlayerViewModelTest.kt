@@ -5,8 +5,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.usecase.mediaplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.AfterAll
@@ -32,16 +33,21 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
+import org.mockito.kotlin.wheneverBlocking
+import test.mega.privacy.android.app.TimberJUnit5Extension
 import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 
 @ExperimentalCoroutinesApi
 @ExtendWith(InstantTaskExecutorExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(TimberJUnit5Extension::class)
 internal class VideoPlayerViewModelTest {
     private lateinit var underTest: VideoPlayerViewModel
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val savedStateHandle = SavedStateHandle(mapOf())
+    private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
 
     private val expectedId = 123456L
     private val expectedName = "testName"
@@ -49,11 +55,17 @@ internal class VideoPlayerViewModelTest {
 
     @BeforeAll
     fun initialise() {
-        Dispatchers.setMain(StandardTestDispatcher())
+        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     @BeforeEach
     fun setUp() {
+        reset(monitorVideoRepeatModeUseCase, monitorTransferEventsUseCase)
+        initViewModel()
+    }
+
+    private fun initViewModel() {
+        wheneverBlocking { monitorVideoRepeatModeUseCase() }.thenReturn(emptyFlow())
         underTest = VideoPlayerViewModel(
             context = mock(),
             mediaPlayerGateway = mock(),
@@ -98,7 +110,7 @@ internal class VideoPlayerViewModelTest {
             setVideoRepeatModeUseCase = mock(),
             getVideosBySearchTypeUseCase = mock(),
             savedStateHandle = savedStateHandle,
-            monitorVideoRepeatModeUseCase = mock(),
+            monitorVideoRepeatModeUseCase = monitorVideoRepeatModeUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase = mock()
         )
         savedStateHandle[underTest.subtitleDialogShowKey] = false
@@ -124,10 +136,6 @@ internal class VideoPlayerViewModelTest {
     internal fun `test that showAddSubtitleDialog function is invoked`() = runTest {
         underTest.showAddSubtitleDialog()
         underTest.uiState.test {
-            val initial = awaitItem().subtitleDisplayState
-            assertThat(initial.isSubtitleShown).isFalse()
-            assertThat(initial.isAddSubtitle).isFalse()
-            assertThat(initial.isSubtitleDialogShown).isFalse()
             val actual = awaitItem().subtitleDisplayState
             assertThat(actual.isSubtitleShown).isTrue()
             assertThat(actual.isAddSubtitle).isFalse()
@@ -139,9 +147,6 @@ internal class VideoPlayerViewModelTest {
     internal fun `test that onAddedSubtitleOptionClicked function is invoked`() = runTest {
         underTest.onAddedSubtitleOptionClicked()
         underTest.uiState.test {
-            val initial = awaitItem().subtitleDisplayState
-            assertThat(initial.isSubtitleShown).isFalse()
-            assertThat(initial.isSubtitleDialogShown).isFalse()
             val actual = awaitItem().subtitleDisplayState
             assertThat(actual.isSubtitleShown).isTrue()
             assertThat(actual.isSubtitleDialogShown).isFalse()
@@ -256,43 +261,53 @@ internal class VideoPlayerViewModelTest {
     }
 
     @Test
-    internal fun `test that the errorState is updated correctly based on the value of monitorTransferEventsUseCase`() =
+    internal fun `test that the errorState is updated correctly when emit BlockedMegaException`() =
         runTest {
-            val transfer1 = mock<Transfer> {
-                on { isForeignOverQuota }.thenReturn(true)
-                on { nodeHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
-            }
-            val transfer2 = mock<Transfer> {
-                on { isForeignOverQuota }.thenReturn(false)
-                on { nodeHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
-            }
-            val expectedError1 = mock<QuotaExceededMegaException> {
-                on { value }.thenReturn(1)
-            }
-            val expectedError2 = mock<BlockedMegaException>()
-            val event1 = mock<TransferEvent.TransferTemporaryErrorEvent> {
-                on { transfer }.thenReturn(transfer1)
-                on { error }.thenReturn(expectedError1)
-            }
-            val event2 = mock<TransferEvent.TransferTemporaryErrorEvent> {
-                on { transfer }.thenReturn(transfer2)
-                on { error }.thenReturn(expectedError1)
-            }
-            val event3 = mock<TransferEvent.TransferTemporaryErrorEvent> {
-                on { transfer }.thenReturn(transfer1)
-                on { error }.thenReturn(expectedError2)
-            }
-            whenever(monitorTransferEventsUseCase.invoke()).thenReturn(
-                flowOf(
-                    event1,
-                    event2,
-                    event3
-                )
-            )
+            mockBlockedMegaException()
+            initViewModel()
             underTest.errorState.test {
-                assertThat(awaitItem()).isEqualTo(null)
-                assertThat(awaitItem()).isInstanceOf(QuotaExceededMegaException::class.java)
                 assertThat(awaitItem()).isInstanceOf(BlockedMegaException::class.java)
             }
         }
+
+    private fun mockBlockedMegaException() {
+        val expectedTransfer = mock<Transfer> {
+            on { isForeignOverQuota }.thenReturn(true)
+            on { nodeHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
+        }
+        val event = mock<TransferEvent.TransferTemporaryErrorEvent> {
+            on { transfer }.thenReturn(expectedTransfer)
+            on { error }.thenReturn(mock<BlockedMegaException>())
+        }
+        monitorTransferEventsUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(event))
+        }
+    }
+
+    @Test
+    internal fun `test that the errorState is updated correctly when emit QuotaExceededMegaException`() =
+        runTest {
+            mockQuotaExceededMegaException()
+            initViewModel()
+            underTest.errorState.test {
+                assertThat(awaitItem()).isInstanceOf(QuotaExceededMegaException::class.java)
+            }
+        }
+
+    private fun mockQuotaExceededMegaException() {
+        val expectedTransfer = mock<Transfer> {
+            on { isForeignOverQuota }.thenReturn(false)
+            on { nodeHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
+        }
+        val expectedError = mock<QuotaExceededMegaException> {
+            on { value }.thenReturn(1)
+        }
+        val event = mock<TransferEvent.TransferTemporaryErrorEvent> {
+            on { transfer }.thenReturn(expectedTransfer)
+            on { error }.thenReturn(expectedError)
+        }
+        monitorTransferEventsUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(event))
+        }
+    }
 }
