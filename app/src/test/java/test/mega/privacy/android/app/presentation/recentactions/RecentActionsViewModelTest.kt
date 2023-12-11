@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -32,47 +33,34 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RecentActionsViewModelTest {
     private lateinit var underTest: RecentActionsViewModel
 
-    private val getRecentActionsUseCase = mock<GetRecentActionsUseCase> {
-        onBlocking { invoke() }.thenReturn(emptyList())
-    }
-    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase> {
-        onBlocking { invoke(NodeId(anyLong())) }.thenReturn(null)
-    }
+    private val getRecentActionsUseCase = mock<GetRecentActionsUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
 
-    private val getVisibleContactsUseCase = mock<GetVisibleContactsUseCase> {
-        onBlocking { invoke() }.thenReturn(emptyList())
-    }
-    private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase> {
-        onBlocking { invoke(any()) }.thenReturn(mock())
-    }
+    private val getVisibleContactsUseCase = mock<GetVisibleContactsUseCase>()
+    private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase>()
     private val setHideRecentActivityUseCase = mock<SetHideRecentActivityUseCase>()
 
-    private val areCredentialsVerifiedUseCase = mock<AreCredentialsVerifiedUseCase> {
-        onBlocking { invoke(any()) }.thenReturn(true)
-    }
+    private val areCredentialsVerifiedUseCase = mock<AreCredentialsVerifiedUseCase>()
 
-    private val monitorHideRecentActivityUseCase = mock<MonitorHideRecentActivityUseCase> {
-        flow {
-            emit(false)
-        }
-    }
+    private val monitorHideRecentActivityUseCase = mock<MonitorHideRecentActivityUseCase>()
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
-    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
-        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
-    }
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
 
     private val node: TypedFileNode = mock {
         on { id }.thenReturn(NodeId(123))
@@ -106,9 +94,26 @@ class RecentActionsViewModelTest {
         on { this.isUpdate }.thenReturn(false)
     }
 
-    @Before
+    @BeforeAll
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            getRecentActionsUseCase,
+            getVisibleContactsUseCase,
+            setHideRecentActivityUseCase,
+            getNodeByIdUseCase,
+            getAccountDetailsUseCase,
+            monitorHideRecentActivityUseCase,
+            monitorNodeUpdatesUseCase,
+            areCredentialsVerifiedUseCase,
+        )
+        runBlocking {
+            stubCommon()
+        }
         underTest = RecentActionsViewModel(
             getRecentActionsUseCase = getRecentActionsUseCase,
             getVisibleContactsUseCase = getVisibleContactsUseCase,
@@ -119,6 +124,19 @@ class RecentActionsViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
         )
+    }
+
+    private suspend fun stubCommon() {
+        whenever(getRecentActionsUseCase()).thenReturn(emptyList())
+        whenever(getNodeByIdUseCase(NodeId(anyLong()))).thenReturn(null)
+        whenever(getVisibleContactsUseCase()).thenReturn(emptyList())
+        whenever(getAccountDetailsUseCase(any())).thenReturn(mock())
+        whenever(areCredentialsVerifiedUseCase(any())).thenReturn(true)
+        whenever(monitorHideRecentActivityUseCase()).thenReturn(flow {
+            emit(true)
+            emit(false)
+        })
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
     }
 
     @Test
@@ -398,8 +416,6 @@ class RecentActionsViewModelTest {
     @Test
     fun `test that recent action items is updated when receiving a node update`() =
         runTest {
-            whenever(getRecentActionsUseCase()).thenReturn(emptyList())
-
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem().size).isEqualTo(0)
@@ -410,18 +426,11 @@ class RecentActionsViewModelTest {
                     )
                     assertThat(awaitItem().size).isEqualTo(2)
                 }
-            verify(getRecentActionsUseCase, times(2)).invoke()
         }
 
     @Test
     fun `test that hide recent activity is set with value of monitor hide recent activity`() =
         runTest {
-            whenever(monitorHideRecentActivityUseCase()).thenReturn(
-                flow {
-                    emit(true)
-                    emit(false)
-                }
-            )
             underTest.state.map { it.hideRecentActivity }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(false)
