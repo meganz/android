@@ -1,6 +1,5 @@
 package test.mega.privacy.android.app.presentation.shares.outgoing
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -8,6 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -21,48 +21,77 @@ import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import nz.mega.sdk.MegaNode
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.InstantExecutorExtension
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(value = [InstantExecutorExtension::class])
 class OutgoingSharesViewModelTest {
     private lateinit var underTest: OutgoingSharesViewModel
 
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getParentNodeHandle = mock<GetParentNodeHandle>()
     private val getOutgoingSharesChildrenNode = mock<GetOutgoingSharesChildrenNode>()
-    private val getCloudSortOrder = mock<GetCloudSortOrder> {
-        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-    }
-    private val getOtherSortOrder = mock<GetOthersSortOrder> {
-        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_DESC)
-    }
+    private val getCloudSortOrder = mock<GetCloudSortOrder>()
+    private val getOtherSortOrder = mock<GetOthersSortOrder>()
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
-    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
-        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
-    }
-    private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
+    private val monitorContactUpdatesFakeFlow = MutableSharedFlow<UserUpdate>()
+    private val monitorContactUpdates = mock<MonitorContactUpdates>()
 
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
+    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>()
 
-    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
-        onBlocking { invoke(any()) }.thenReturn(emptyList())
-    }
-
-    @Before
+    @BeforeAll
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+    }
+
+    @BeforeEach
+    fun initUnderTest() {
+        runBlocking {
+            stubCommon()
+        }
         initViewModel()
+    }
+
+    @AfterEach
+    fun resetMocks() {
+        reset(
+            getNodeByHandle,
+            getParentNodeHandle,
+            getOutgoingSharesChildrenNode,
+            getCloudSortOrder,
+            getOtherSortOrder,
+            monitorNodeUpdatesUseCase,
+            monitorContactUpdates,
+            getUnverifiedOutgoingShares,
+        )
+    }
+
+    private suspend fun stubCommon() {
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(getOtherSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
+        whenever(monitorContactUpdates()).thenReturn(monitorContactUpdatesFakeFlow)
+        whenever(getUnverifiedOutgoingShares(any())).thenReturn(emptyList())
     }
 
     private fun initViewModel() {
@@ -73,7 +102,7 @@ class OutgoingSharesViewModelTest {
             getCloudSortOrder,
             getOtherSortOrder,
             monitorNodeUpdatesUseCase,
-            { monitorContactUpdates },
+            monitorContactUpdates,
             getUnverifiedOutgoingShares,
         )
     }
@@ -100,7 +129,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that outgoing tree depth is increased when calling increaseOutgoingTreeDepth`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
 
             underTest.state.map { it.outgoingTreeDepth }.distinctUntilChanged()
                 .test {
@@ -113,7 +142,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that outgoing tree depth is decreased when calling decreaseOutgoingTreeDepth`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
 
             underTest.state.map { it.outgoingTreeDepth }.distinctUntilChanged()
                 .test {
@@ -128,7 +157,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that outgoing tree depth is reset to 0 if fails to get node list when calling set outgoing tree depth`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
             underTest.increaseOutgoingTreeDepth(any())
 
             underTest.state.map { it.outgoingTreeDepth }
@@ -143,7 +172,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that outgoing tree depth equals 0 if resetOutgoingTreeDepth`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
 
             underTest.state.map { it.outgoingTreeDepth }.distinctUntilChanged()
                 .test {
@@ -155,7 +184,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that outgoing handle is updated when increase outgoing tree depth`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
 
             underTest.state.map { it.outgoingHandle }.distinctUntilChanged()
                 .test {
@@ -169,7 +198,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that outgoing handle is updated when decrease outgoing tree depth`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
 
             underTest.state.map { it.outgoingHandle }.distinctUntilChanged()
                 .test {
@@ -183,7 +212,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that outgoing handle is set to -1L when reset outgoing tree depth`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
 
             underTest.state.map { it.outgoingHandle }.distinctUntilChanged()
                 .test {
@@ -198,7 +227,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that outgoing handle is reset to default if fails to get node list when calling set outgoing tree depth`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
             underTest.increaseOutgoingTreeDepth(123456789L)
 
             underTest.state.map { it.outgoingHandle }
@@ -286,7 +315,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that getOutgoingSharesChildrenNode executes when refresh`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
 
             val handle = 123456789L
             val job = underTest.increaseOutgoingTreeDepth(handle)
@@ -349,7 +378,7 @@ class OutgoingSharesViewModelTest {
         runTest {
             val expected = 111111111L
             whenever(getParentNodeHandle(any())).thenReturn(expected)
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
             underTest.state.map { it.outgoingParentHandle }.distinctUntilChanged()
@@ -364,7 +393,7 @@ class OutgoingSharesViewModelTest {
     fun `test that parent handle is set to null when refreshNodes fails`() =
         runTest {
             whenever(getParentNodeHandle(any())).thenReturn(111111111L)
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
             underTest.state.map { it.outgoingParentHandle }.distinctUntilChanged()
@@ -380,12 +409,14 @@ class OutgoingSharesViewModelTest {
 
     @Test
     fun `test that refresh nodes is called when receiving a node update`() = runTest {
+        whenever(getOutgoingSharesChildrenNode(any())).thenReturn(listOf(mock(), mock()))
         monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
         // initialization call + receiving a node update call
-        verify(
-            getOutgoingSharesChildrenNode,
-            times(2)
-        ).invoke(underTest.state.value.outgoingHandle)
+        underTest.state.test {
+            val item = awaitItem()
+            assertThat(item.nodes.size).isEqualTo(2)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -393,7 +424,7 @@ class OutgoingSharesViewModelTest {
         runTest {
             val default = SortOrder.ORDER_NONE
             val expected = SortOrder.ORDER_CREATION_ASC
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
             whenever(getOtherSortOrder()).thenReturn(expected)
 
             underTest.state.map { it.sortOrder }.distinctUntilChanged()
@@ -409,7 +440,7 @@ class OutgoingSharesViewModelTest {
         runTest {
             val default = SortOrder.ORDER_NONE
             val expected = SortOrder.ORDER_CREATION_ASC
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
             whenever(getCloudSortOrder()).thenReturn(expected)
 
             underTest.state.map { it.sortOrder }.distinctUntilChanged()
@@ -436,19 +467,14 @@ class OutgoingSharesViewModelTest {
                 }
         }
 
-    @Test
-    fun `test that the list view type is set when updating the current view type`() =
-        testSetCurrentViewType(ViewType.LIST)
+    @ParameterizedTest(name = "View type is {0}")
+    @EnumSource(ViewType::class)
+    fun `test that the  view type is set when updating the current view type`(expectedValue: ViewType) =
+        runTest {
+            underTest.setCurrentViewType(expectedValue)
 
-    @Test
-    fun `test that the grid view type is set when updating the current view type`() =
-        testSetCurrentViewType(ViewType.GRID)
-
-    private fun testSetCurrentViewType(expectedValue: ViewType) = runTest {
-        underTest.setCurrentViewType(expectedValue)
-
-        underTest.state.test {
-            assertThat(awaitItem().currentViewType).isEqualTo(expectedValue)
+            underTest.state.test {
+                assertThat(awaitItem().currentViewType).isEqualTo(expectedValue)
+            }
         }
-    }
 }
