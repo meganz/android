@@ -111,6 +111,7 @@
     <application
         android:name=".MegaApplication"
         android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:gwpAsanMode="always"
         android:icon="@mipmap/ic_launcher_mega"
         android:label="@string/app_name"
