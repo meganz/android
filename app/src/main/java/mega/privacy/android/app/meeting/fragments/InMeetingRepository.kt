@@ -99,6 +99,15 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
+     * Get MegaChatSession
+     *
+     * @param chatId    Chat id
+     * @param clientId  Client Id
+     */
+    fun getMegaChatSession(chatId: Long, clientId: Long): MegaChatSession? =
+        getMeeting(chatId)?.getMegaChatSession(clientId)
+
+    /**
      * Get a chat from a chat id
      *
      * @param chatId chat ID

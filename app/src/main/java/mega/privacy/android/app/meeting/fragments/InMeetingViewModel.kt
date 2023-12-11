@@ -281,7 +281,6 @@ class InMeetingViewModel @Inject constructor(
     init {
         startMonitorChatRoomUpdates()
         startMonitorChatCallUpdates()
-        startMonitorChatSessionUpdates()
 
         getParticipantsChangesUseCase.getChangesFromParticipants()
             .subscribeOn(Schedulers.io())
@@ -418,21 +417,6 @@ class InMeetingViewModel @Inject constructor(
         }
 
     /**
-     * Get chat session updates
-     */
-    private fun startMonitorChatSessionUpdates() =
-        viewModelScope.launch {
-            monitorChatSessionUpdatesUseCase()
-                .filter { it.chatId == _state.value.currentChatId }
-                .collectLatest { result ->
-                    getChatCallUseCase(result.chatId)?.let { call ->
-                        _state.update { it.copy(call = call) }
-                    }
-                    checkSubtitleToolbar()
-                }
-        }
-
-    /**
      * Get chat call updates
      */
     private fun startMonitorChatCallUpdates() =
@@ -441,7 +425,7 @@ class InMeetingViewModel @Inject constructor(
                 .filter { it.chatId == _state.value.currentChatId }
                 .collectLatest { call ->
                     _state.update { it.copy(call = call) }
-
+                    checkSubtitleToolbar()
                     call.changes?.apply {
                         if (contains(ChatCallChanges.Status)) {
                             call.status?.let { status ->
@@ -1423,10 +1407,10 @@ class InMeetingViewModel @Inject constructor(
      */
     private fun createParticipant(isScreenShared: Boolean, clientId: Long): Participant? {
         _state.value.call?.apply {
-            sessionByClientId[clientId]?.let { session ->
+            inMeetingRepository.getMegaChatSession(this.chatId, clientId)?.let { session ->
                 when {
                     isScreenShared ->
-                        participants.value?.filter { it.peerId == session.peerId && it.clientId == session.clientId && it.isScreenShared }
+                        participants.value?.filter { it.peerId == session.peerid && it.clientId == session.clientid && it.isScreenShared }
                             ?.let {
                                 if (it.isNotEmpty()) {
                                     Timber.d("Screen shared already shown")
@@ -1435,7 +1419,7 @@ class InMeetingViewModel @Inject constructor(
                             }
 
                     else ->
-                        participants.value?.filter { it.peerId == session.peerId && it.clientId == session.clientId }
+                        participants.value?.filter { it.peerId == session.peerid && it.clientId == session.clientid }
                             ?.let {
                                 if (it.isNotEmpty()) {
                                     Timber.d("Participants already shown")
@@ -1444,14 +1428,14 @@ class InMeetingViewModel @Inject constructor(
                             }
                 }
 
-                val isModerator = isParticipantModerator(session.peerId)
-                val name = getParticipantName(session.peerId)
-                val isContact = isMyContact(session.peerId)
+                val isModerator = isParticipantModerator(session.peerid)
+                val name = getParticipantName(session.peerid)
+                val isContact = isMyContact(session.peerid)
                 val hasHiRes = needHiRes()
 
-                val avatar = inMeetingRepository.getAvatarBitmap(session.peerId)
+                val avatar = inMeetingRepository.getAvatarBitmap(session.peerid)
                 val email = inMeetingRepository.getEmailParticipant(
-                    session.peerId,
+                    session.peerid,
                     GetUserEmailListener(
                         MegaApplication.getInstance().applicationContext,
                         this@InMeetingViewModel
@@ -1460,19 +1444,19 @@ class InMeetingViewModel @Inject constructor(
                 val isGuest = email == null
 
                 val isSpeaker = getCurrentSpeakerParticipant()?.let { participant ->
-                    participant.clientId == session.clientId && participant.peerId == session.peerId && participant.isSpeaker
+                    participant.clientId == session.clientid && participant.peerId == session.peerid && participant.isSpeaker
                 } ?: false
 
 
                 return Participant(
-                    peerId = session.peerId,
-                    clientId = session.clientId,
+                    peerId = session.peerid,
+                    clientId = session.clientid,
                     name = name,
                     avatar = avatar,
                     isMe = false,
                     isModerator = isModerator,
-                    isAudioOn = session.hasAudio,
-                    isVideoOn = session.hasVideo,
+                    isAudioOn = session.hasAudio(),
+                    isVideoOn = session.hasVideo(),
                     isAudioDetected = session.isAudioDetected,
                     isContact = isContact,
                     isSpeaker = isSpeaker,
@@ -1481,7 +1465,7 @@ class InMeetingViewModel @Inject constructor(
                     isChosenForAssign = false,
                     isGuest = isGuest,
                     hasOptionsAllowed = shouldParticipantsOptionBeVisible(false, isGuest),
-                    isPresenting = session.hasScreenShare,
+                    isPresenting = session.hasScreenShare(),
                     isScreenShared = isScreenShared
                 )
             }
