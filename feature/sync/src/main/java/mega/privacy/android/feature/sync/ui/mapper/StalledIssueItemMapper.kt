@@ -14,6 +14,7 @@ import javax.inject.Inject
 internal class StalledIssueItemMapper @Inject constructor(
     private val stalledIssueResolutionActionMapper: StalledIssueResolutionActionMapper,
     private val fileTypeIconMapper: FileTypeIconMapper,
+    private val stalledIssueTypeToStalledIssueStringMapper: StalledIssueTypeToStalledIssueStringMapper
 ) {
 
     operator fun invoke(
@@ -26,7 +27,7 @@ internal class StalledIssueItemMapper @Inject constructor(
             nodeIds = stalledIssueEntity.nodeIds,
             localPaths = stalledIssueEntity.localPaths,
             issueType = stalledIssueEntity.issueType,
-            conflictName = stalledIssueEntity.conflictName,
+            conflictName = stalledIssueTypeToStalledIssueStringMapper(stalledIssueEntity.issueType),
             nodeNames = stalledIssueEntity.nodeNames,
             icon = when (firstNode) {
                 is FolderNode -> firstNode.getIcon()

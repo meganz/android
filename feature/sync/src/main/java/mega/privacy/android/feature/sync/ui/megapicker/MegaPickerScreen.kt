@@ -101,7 +101,7 @@ private fun MegaPickerScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 24.dp, top = 8.dp, end = 24.dp, bottom = 8.dp),
-                textId = R.string.general_select_to_download,
+                textId = R.string.sync_general_select_to_download,
                 onClick = {
                     currentFolderSelected()
                 },

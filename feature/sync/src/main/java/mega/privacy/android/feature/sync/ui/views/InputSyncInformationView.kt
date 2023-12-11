@@ -81,7 +81,7 @@ internal fun InputSyncInformationView(
             CoreUiR.drawable.ic_smartphone,
             stringResource(id = R.string.sync_folder_choose_device_folder_title),
             selectedDeviceFolder,
-            stringResource(R.string.general_select),
+            stringResource(R.string.sync_general_select),
             Modifier.clickable { selectDeviceFolderClicked() }
         )
 
@@ -95,7 +95,7 @@ internal fun InputSyncInformationView(
             CoreUiR.drawable.ic_mega,
             stringResource(id = R.string.sync_folders_choose_mega_folder_title),
             selectedMEGAFolder,
-            stringResource(R.string.general_select),
+            stringResource(R.string.sync_general_select),
             Modifier.clickable {
                 selectMEGAFolderClicked()
             }

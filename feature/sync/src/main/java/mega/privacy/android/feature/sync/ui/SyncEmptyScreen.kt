@@ -94,7 +94,7 @@ private fun SyncEmptyScreenContent(
                  *  So I'm reusing a similar string from :app module
                  *
                  */
-                textId = R.string.start_screen_setting,
+                textId = R.string.sync_start_sync,
                 onClick = getStartedClicked,
             )
         }

@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -193,22 +194,21 @@ private fun HeaderChips(
 ) {
     Row(modifier.padding(16.dp)) {
         PhotoChip(
-            text = "Folders",
+            text = stringResource(id = R.string.sync_folders),
             onClick = { onChipSelected(SYNC_FOLDERS) },
             isChecked = selectedChip == SYNC_FOLDERS
         )
         PhotoChip(
-            text = if (stalledIssuesCount > 0) {
-                "Stalled Issues ($stalledIssuesCount)"
-            } else {
-                "Stalled Issues"
-            },
+            text = if (stalledIssuesCount > 0) stringResource(
+                R.string.sync_stalled_issues,
+                stalledIssuesCount
+            ) else stringResource(id = R.string.sync_stalled_issue_zero),
             onClick = { onChipSelected(STALLED_ISSUES) },
             Modifier.padding(horizontal = 8.dp),
             isChecked = selectedChip == STALLED_ISSUES,
         )
         PhotoChip(
-            text = "Solved Issues",
+            text = stringResource(id = R.string.sync_solved_issues),
             onClick = { onChipSelected(SOLVED_ISSUES) },
             isChecked = selectedChip == SOLVED_ISSUES,
         )

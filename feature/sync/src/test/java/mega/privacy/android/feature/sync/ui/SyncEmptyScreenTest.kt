@@ -33,7 +33,7 @@ internal class SyncEmptyScreenTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_empty_state_message))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.start_screen_setting))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_start_sync))
             .assertIsDisplayed()
     }
 }

@@ -2,16 +2,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- Sync title for toolbar when inside sync screen-->
     <string name="sync_toolbar_title">Sync</string>
-    <string name="start_screen_setting" />
-    <string name="general_select" />
     <!-- Sync text for the the button to begin sync-->
     <string name="sync_button_label">Sync</string>
-    <string name="file_browser_empty_folder" />
     <!-- Sync text of sync-->
     <string name="sync">Sync</string>
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Sync [A](%1$d)[/A]</string>
-    <string name="general_select_to_download" />
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap to grant access</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
@@ -38,12 +34,8 @@
     </plurals>
     <!-- Sync options -->
     <string name="sync_menu_sync_options">Sync options</string>
-    <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
-    <string name="sync_options_changed_to_wifi_only">Sync options were changed to: Wi-Fi only</string>
-    <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
-    <string name="sync_options_changed_to_wifi_and_mobile_data">Sync options were changed to: Wi-Fi or mobile data</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear solved issues</string>
+    <string name="sync_menu_clear_issues">Clear resolved issues</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Two-way sync</string>
     <!-- Sync conflict message -->
@@ -79,11 +71,11 @@
     <!-- Sync dialog battery optimization message -->
     <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">No Solved Issues</string>
+    <string name="sync_solved_issues_empty_message">No resolved issues</string>
     <!-- Sync state message for No Stalled Issues -->
-    <string name="sync_stalled_issues_empty_message">No Stalled Issues</string>
+    <string name="sync_stalled_issues_empty_message">No issues</string>
     <!-- Sync option to choose folder pair -->
-    <string name="sync_folders_choose_folder_pair">Name folder pair</string>
+    <string name="sync_folders_choose_folder_pair">Name a sync</string>
     <!-- Sync option to choose device folder -->
     <string name="sync_folder_choose_device_folder_title">Device folder</string>
     <!-- Sync option to choose Mega folder -->
@@ -118,4 +110,54 @@
     <string name="sync_empty_state_message">You will need to set up a local folder on your\ndevice that would pair with a chosen folder on\nyour Cloud Drive.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">Sync monitoring</string>
+    <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
+    <string name="sync_options_changed_to_wifi_only">Sync options were changed to: Wi-Fi only</string>
+    <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
+    <string name="sync_options_changed_to_wifi_and_mobile_data">Sync options were changed to: Wi-Fi or mobile data</string>
+    <!-- Sync stalled issue reason is no reason-->
+    <string name="sync_stalled_issue_no_reason">No Reason</string>
+    <!-- Sync stalled issue reason is no file issue-->
+    <string name="sync_stalled_issue_file_issue">File Issue</string>
+    <!-- Sync stalled issue reason is move or rename-->
+    <string name="sync_stalled_issue_move_or_rename">Move Or Rename Cannot Occur</string>
+    <!-- Sync stalled issue reason is delete or move scanning-->
+    <string name="sync_stalled_issue_delete_or_move_scanning">Delete Or Move Waiting On Scanning</string>
+    <!-- Sync stalled issue reason is delete or move-->
+    <string name="sync_stalled_issue_delete_or_move">Delete Waiting On Moves</string>
+    <!-- Sync stalled issue reason is upload issue-->
+    <string name="sync_stalled_issue_upload_issue">Upload Issue</string>
+    <!-- Sync stalled issue reason is download issue-->
+    <string name="sync_stalled_issue_download_issue">Download Issue</string>
+    <!-- Sync stalled issue reason is can not create folder-->
+    <string name="sync_stalled_issue_cannot_create_folder">Cannot Create Folder</string>
+    <!-- Sync stalled issue reason is can not perform deletion-->
+    <string name="sync_stalled_issue_cannot_perform_deletion">Cannot Perform Deletion</string>
+    <!-- Sync stalled issue reason is can not support tree depth-->
+    <string name="sync_stalled_issue_cannot_support_tree_depth">Sync Item Exceeds Supported Tree Depth</string>
+    <!-- Sync stalled issue reason is Folder Matched Against File-->
+    <string name="sync_stalled_issue_folder_matched_against_file">Folder Matched Against File</string>
+    <!-- Sync stalled issue reason is Local and remote changed since last sync-->
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Local And Remote Changed Since Last Sync</string>
+    <!-- Sync stalled issue reason is Local and remote not synced-->
+    <string name="sync_stalled_issue_local_and_remote_not_synced">Local And Remote Previously Not Synced</string>
+    <!-- Sync stalled issue reason is Name clash-->
+    <string name="sync_stalled_issue_name_clash">Names Would Clash When Synced</string>
+    <!-- Sync stalled issue reason is Last PlusOne-->
+    <string name="sync_stalled_issue_last_plus_one">Last Plus One</string>
+    <!-- Sync chip folder chip title-->
+    <string name="sync_folders">Folders</string>
+    <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
+    <string name="sync_stalled_issues">Stalled Issues (%d)</string>
+    <!-- Sync stalled issue count chip title for 0 stalled issues-->
+    <string name="sync_stalled_issue_zero">Stalled Issues</string>
+    <!-- Sync solved issues chip title -->
+    <string name="sync_solved_issues">Solved Issues</string>
+    <!-- Sync start sync button -->
+    <string name="sync_start_sync">Start Sync</string>
+    <!-- Text that indicates that a folder is currently empty -->
+    <string name="sync_file_browser_empty_folder">Empty Folder</string>
+    <!-- Selecting a specific location in MEGA. This is the text of the button -->
+    <string name="sync_general_select_to_download">Select folder</string>
+    <!-- Selecting a specific location in MEGA. This is the text of the button -->
+    <string name="sync_general_select">Select</string>
 </resources>
