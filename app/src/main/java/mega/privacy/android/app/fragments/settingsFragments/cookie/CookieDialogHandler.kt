@@ -20,6 +20,7 @@ import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesA
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.CheckCookieBannerEnabledUseCaseRx
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.GetCookieSettingsUseCaseRx
 import mega.privacy.android.app.utils.ContextUtils.isValid
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import timber.log.Timber
@@ -29,7 +30,7 @@ import javax.inject.Inject
  * Cookie dialog handler class to manage Cookie Dialog visibility based on view's lifecycle.
  */
 class CookieDialogHandler @Inject constructor(
-    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
+    private val getCookieSettingsUseCase: GetCookieSettingsUseCaseRx,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
     private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCaseRx,
 ) : LifecycleEventObserver {

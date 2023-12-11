@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.settingsFragments.cookie.data
+package mega.privacy.android.domain.entity.settings.cookie
 
 enum class CookieType(val value: Int) {
     ESSENTIAL(0), PREFERENCE(1), ANALYTICS(2), ADVERTISEMENT(3), THIRDPARTY(4);

@@ -38,6 +38,7 @@ import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
+import mega.privacy.android.data.mapper.settings.CookieSettingsMapper
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
@@ -48,6 +49,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ChangeEmailException
@@ -119,6 +121,7 @@ class DefaultAccountRepositoryTest {
     private val recoveryKeyToFileMapper = mock<RecoveryKeyToFileMapper>()
     private val cameraUploadsSettingsPreferenceGateway =
         mock<CameraUploadsSettingsPreferenceGateway>()
+    private val cookieSettingsMapper = mock<CookieSettingsMapper>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -173,7 +176,8 @@ class DefaultAccountRepositoryTest {
             megaLocalRoomGateway,
             fileGateway,
             recoveryKeyToFileMapper,
-            cameraUploadsSettingsPreferenceGateway
+            cameraUploadsSettingsPreferenceGateway,
+            cookieSettingsMapper
         )
     }
 
@@ -216,7 +220,8 @@ class DefaultAccountRepositoryTest {
             megaLocalRoomGateway = megaLocalRoomGateway,
             fileGateway = fileGateway,
             recoveryKeyToFileMapper = recoveryKeyToFileMapper,
-            cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway
+            cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
+            cookieSettingsMapper = cookieSettingsMapper
         )
 
     }
@@ -1164,8 +1169,70 @@ class DefaultAccountRepositoryTest {
             }
         }
 
+
+    fun provideGetCookieSettingsParameters() = listOf(
+        Arguments.of(
+            MegaError.API_OK, mutableSetOf(CookieType.ADVERTISEMENT, CookieType.ANALYTICS)
+        ),
+        Arguments.of(MegaError.API_ENOENT, emptySet<CookieType>()),
+    )
+
+    @ParameterizedTest(name = "return cookie settings: {1} when MegaApi returns error code: {0}")
+    @MethodSource("provideGetCookieSettingsParameters")
+    fun `test that getCookieSettings returns the right cookie settings when MegaApi returns specific Mega Errors`(
+        input: Int,
+        expectedCookieSettings: MutableSet<CookieType>,
+    ) = runTest {
+
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(input)
+        }
+
+        whenever(cookieSettingsMapper(any())).thenReturn(expectedCookieSettings)
+        whenever(
+            megaApiGateway.getCookieSettings(listener = any())
+        ).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                megaError,
+            )
+        }
+
+        val result = underTest.getCookieSettings()
+        assertThat(result).isEqualTo(expectedCookieSettings)
+    }
+
+    @Test
+    fun `test that getCookieSettings returns general MegaException when MegaApi returns errors other than API_ENOENT or API_OK`() =
+        runTest {
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EEXIST)
+            }
+
+            whenever(
+                megaApiGateway.getCookieSettings(listener = any())
+            ).thenAnswer {
+                ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    megaError,
+                )
+            }
+
+            assertThrows<MegaException> {
+                underTest.getCookieSettings()
+            }
+        }
+
+    private fun provideGetMiscFlagsMegaErrors() = listOf(
+        Arguments.of(MegaError.API_OK),
+        Arguments.of(MegaError.API_EACCESS),
+    )
+
     @ParameterizedTest(name = "MegaApi returns error code: {0}")
-    @MethodSource("provideMegaErrors")
+    @MethodSource("provideGetMiscFlagsMegaErrors")
     fun `test that isCookieBannerEnabled returns success when MegaApi returns specific Mega Errors`(
         input: Int,
     ) = runTest {
@@ -1185,14 +1252,6 @@ class DefaultAccountRepositoryTest {
 
         underTest.isCookieBannerEnabled()
         verify(megaApiGateway).isCookieBannerEnabled()
-    }
-
-    companion object {
-        @JvmStatic
-        fun provideMegaErrors() = listOf(
-            Arguments.of(MegaError.API_OK),
-            Arguments.of(MegaError.API_EACCESS),
-        )
     }
 
 

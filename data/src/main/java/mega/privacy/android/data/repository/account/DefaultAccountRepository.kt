@@ -51,6 +51,7 @@ import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
+import mega.privacy.android.data.mapper.settings.CookieSettingsMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
@@ -62,6 +63,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
@@ -112,6 +114,13 @@ import kotlin.coroutines.suspendCoroutine
  * @property callsPreferencesGateway      [CallsPreferencesGateway]
  * @property cacheGateway                 [CacheGateway]
  * @property appEventGateway              [AppEventGateway]
+ * @property ephemeralCredentialsGateway  [EphemeralCredentialsGateway]
+ * @property accountBlockedDetailMapper   [AccountBlockedDetailMapper]
+ * @property megaLocalRoomGateway         [MegaLocalRoomGateway]
+ * @property fileGateway                  [FileGateway]
+ * @property recoveryKeyToFileMapper      [RecoveryKeyToFileMapper]
+ * @property cameraUploadsSettingsPreferenceGateway [CameraUploadsSettingsPreferenceGateway]
+ * @property cookieSettingsMapper         [CookieSettingsMapper]
  */
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
@@ -146,6 +155,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val fileGateway: FileGateway,
     private val recoveryKeyToFileMapper: RecoveryKeyToFileMapper,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
+    private val cookieSettingsMapper: CookieSettingsMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -991,6 +1001,33 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             )
             megaApiGateway.getMiscFlags(listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override suspend fun getCookieSettings() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            continuation.resume(
+                                cookieSettingsMapper(request.numDetails)
+                            )
+                        }
+
+                        MegaError.API_ENOENT -> {
+                            // Cookie Settings has not been set before
+                            continuation.resume(emptySet<CookieType>())
+                        }
+
+                        else -> {
+                            continuation.failWithError(error, "failed to get cookie settings")
+                        }
+                    }
+                }
+            )
+            megaApiGateway.getCookieSettings(listener)
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }

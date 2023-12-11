@@ -3190,4 +3190,12 @@ interface MegaApiGateway {
      * @param listener MegaRequestListenerInterface to track this request
      */
     fun getMiscFlags(listener: OptionalMegaRequestListenerInterface)
+
+    /**
+     * Get cookie settings from SDK
+     *
+     * @param listener MegaRequestListenerInterface to track this request
+     */
+    fun getCookieSettings(listener: OptionalMegaRequestListenerInterface)
+
 }

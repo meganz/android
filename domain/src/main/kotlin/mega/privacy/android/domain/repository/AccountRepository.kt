@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -532,4 +533,11 @@ interface AccountRepository {
      * @return if the cookie banner is enabled or not
      */
     suspend fun isCookieBannerEnabled(): Boolean
+
+    /**
+     * Get cookie settings
+     *
+     * @return Set of CookieType
+     */
+    suspend fun getCookieSettings(): Set<CookieType>
 }

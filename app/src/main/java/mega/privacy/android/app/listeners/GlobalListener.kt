@@ -10,7 +10,6 @@ import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.media.RingtoneManager
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
@@ -29,8 +28,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
-import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.GetCookieSettingsUseCaseRx
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.monitoring.CrashReporter
@@ -47,6 +45,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
@@ -80,7 +79,7 @@ import javax.inject.Inject
 class GlobalListener @Inject constructor(
     private val dbH: DatabaseHandler,
     private val megaChatNotificationHandler: MegaChatNotificationHandler,
-    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
+    private val getCookieSettingsUseCase: GetCookieSettingsUseCaseRx,
     private val crashReporter: CrashReporter,
     private val enablePerformanceReporterUseCase: EnablePerformanceReporterUseCase,
     @ApplicationContext private val appContext: Context,

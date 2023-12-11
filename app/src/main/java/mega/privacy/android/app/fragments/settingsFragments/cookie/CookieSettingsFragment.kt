@@ -24,9 +24,9 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ANALYTICS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_POLICIES
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
-import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
-import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType.ADVERTISEMENT
-import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType.ANALYTICS
+import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.entity.settings.cookie.CookieType.ADVERTISEMENT
+import mega.privacy.android.domain.entity.settings.cookie.CookieType.ANALYTICS
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject

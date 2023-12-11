@@ -28,8 +28,7 @@ import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.fcm.CreateNotificationChannelsUseCase
 import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
 import mega.privacy.android.app.fetcher.MegaThumbnailKeyer
-import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.GetCookieSettingsUseCaseRx
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
@@ -52,6 +51,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
 import mega.privacy.android.domain.usecase.monitoring.EnablePerformanceReporterUseCase
@@ -113,7 +113,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var dbH: LegacyDatabaseHandler
 
     @Inject
-    lateinit var getCookieSettingsUseCase: GetCookieSettingsUseCase
+    lateinit var getCookieSettingsUseCase: GetCookieSettingsUseCaseRx
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo

@@ -1467,4 +1467,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun getMiscFlags(listener: OptionalMegaRequestListenerInterface) =
         megaApi.getMiscFlags(listener)
 
+    override fun getCookieSettings(
+        listener: OptionalMegaRequestListenerInterface,
+    ) = megaApi.getCookieSettings(listener)
 }
