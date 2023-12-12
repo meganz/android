@@ -1,11 +1,9 @@
 package mega.privacy.android.core.ui.controls.chat.messages
 
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.core.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -94,15 +92,15 @@ class ChatRickLinkMessageTest {
         host: String,
     ) {
         composeRule.setContent {
-            ChatRickLinkMessage(
+            ChatRichLinkMessage(
                 isMe = isMe,
                 title = title,
                 contentTitle = contentTitle,
                 contentDescription = contentDescription,
                 url = url,
                 host = host,
-                image = painterResource(id = R.drawable.ic_emoji_smile),
-                icon = painterResource(id = R.drawable.ic_emoji_smile),
+                image = null,
+                icon = null,
                 modifier = Modifier,
             )
         }

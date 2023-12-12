@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.chat.messages.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
+import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import javax.inject.Inject
 
@@ -14,10 +15,11 @@ internal class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessa
             msgId = message.msgId,
             time = message.timestamp,
             isMine = isMine,
-            userHandle = message.userHandle
+            userHandle = message.userHandle,
+            preview = message.containsMeta.richPreview
         )
 
-        ContainsMetaType.GEOLOCATION -> RichPreviewMessage(
+        ContainsMetaType.GEOLOCATION -> LocationMessage(
             msgId = message.msgId,
             time = message.timestamp,
             isMine = isMine,

@@ -3,10 +3,12 @@ package mega.privacy.android.app.presentation.meeting.chat.mapper
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.CallUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatRichLinkUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.TextUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.UiChatMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
+import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import javax.inject.Inject
 
@@ -41,7 +43,14 @@ class UiChatMessageMapper @Inject constructor() {
                 isOneToOneChat = isOneToOne,
                 showDate = showDate
             )
-            // will remove when add new message type
+
+            is RichPreviewMessage -> ChatRichLinkUiMessage(
+                message = message,
+                showDate = showDate,
+                showAvatar = showAvatar,
+                showTime = showTime
+            )
+
             else -> object : UiChatMessage {
                 override val contentComposable: @Composable (RowScope.() -> Unit) = {
 

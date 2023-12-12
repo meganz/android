@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.ui
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
@@ -18,6 +20,12 @@ interface UiChatMessage {
      * Avatar composable
      */
     val avatarComposable: (@Composable RowScope.() -> Unit)?
+
+    /**
+     * Modifier
+     */
+    val modifier: Modifier
+        get() = Modifier.fillMaxWidth()
 
     /**
      * Message
