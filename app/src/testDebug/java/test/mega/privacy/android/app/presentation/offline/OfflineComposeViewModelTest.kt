@@ -101,6 +101,10 @@ internal class OfflineComposeViewModelTest {
     fun `test that dismissOfflineWarning will invoke setOfflineWarningMessageVisibilityUseCase`() {
         runTest {
             val expectedResult = false
+            whenever(monitorTransfersFinishedUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorOfflineWarningMessageVisibilityUseCase()).thenReturn(flowOf(true))
+            whenever(loadOfflineNodesUseCase("/", "")).thenReturn(emptyList())
+            initTestClass()
             underTest.dismissOfflineWarning()
             testScheduler.advanceUntilIdle()
             verify(setOfflineWarningMessageVisibilityUseCase).invoke(expectedResult)
@@ -112,6 +116,9 @@ internal class OfflineComposeViewModelTest {
         runTest {
             val expected = false
             whenever(monitorOfflineWarningMessageVisibilityUseCase()).thenReturn(flowOf(expected))
+            whenever(monitorTransfersFinishedUseCase()).thenReturn(flowOf(mock()))
+            whenever(loadOfflineNodesUseCase("/", "")).thenReturn(emptyList())
+            initTestClass()
             underTest.monitorOfflineWarningMessage()
             underTest.uiState.test {
                 val state = awaitItem()
@@ -124,6 +131,8 @@ internal class OfflineComposeViewModelTest {
         runTest {
             val path = "/"
             val searchQuery = ""
+            whenever(monitorTransfersFinishedUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorOfflineWarningMessageVisibilityUseCase()).thenReturn(flowOf(true))
             whenever(loadOfflineNodesUseCase(path, searchQuery)).thenReturn(emptyList())
             initTestClass()
             underTest.loadOfflineNodes()
@@ -142,6 +151,8 @@ internal class OfflineComposeViewModelTest {
             whenever(loadOfflineNodesUseCase(path, searchQuery)).thenAnswer {
                 throw Throwable()
             }
+            whenever(monitorTransfersFinishedUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorOfflineWarningMessageVisibilityUseCase()).thenReturn(flowOf(true))
             initTestClass()
             underTest.loadOfflineNodes()
             testScheduler.advanceUntilIdle()
@@ -158,6 +169,8 @@ internal class OfflineComposeViewModelTest {
             val path = "/"
             val searchQuery = ""
             whenever(loadOfflineNodesUseCase(path, searchQuery)).thenReturn(emptyList())
+            whenever(monitorTransfersFinishedUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorOfflineWarningMessageVisibilityUseCase()).thenReturn(flowOf(true))
             initTestClass()
             underTest.loadOfflineNodes()
             underTest.uiState.test {
