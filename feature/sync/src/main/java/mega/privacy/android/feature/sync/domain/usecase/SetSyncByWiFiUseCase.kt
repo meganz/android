@@ -10,7 +10,7 @@ internal class SetSyncByWiFiUseCase @Inject constructor(
     private val syncPreferencesRepository: SyncPreferencesRepository,
 ) {
 
-    operator fun invoke(checked: Boolean) {
+    suspend operator fun invoke(checked: Boolean) {
         syncPreferencesRepository.setSyncByWiFi(checked)
     }
 }

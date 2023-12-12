@@ -22,6 +22,7 @@ import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResumeSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
@@ -46,6 +47,7 @@ class SyncFoldersViewModelTest {
     private val resumeSyncUseCase: ResumeSyncUseCase = mock()
     private val pauseSyncUseCase: PauseSyncUseCase = mock()
     private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase = mock()
+    private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase = mock()
 
     private lateinit var underTest: SyncFoldersViewModel
 
@@ -91,7 +93,9 @@ class SyncFoldersViewModelTest {
             syncUiItemMapper,
             removeFolderPairUseCase,
             resumeSyncUseCase,
-            pauseSyncUseCase
+            pauseSyncUseCase,
+            getSyncStalledIssuesUseCase,
+            setUserPausedSyncsUseCase
         )
     }
 
@@ -162,6 +166,7 @@ class SyncFoldersViewModelTest {
         underTest.handleAction(SyncFoldersAction.PauseRunClicked(syncUiItem))
 
         verify(pauseSyncUseCase).invoke(syncUiItem.id)
+        verify(setUserPausedSyncsUseCase).invoke(syncUiItem.id, true)
     }
 
     @Test
@@ -176,6 +181,7 @@ class SyncFoldersViewModelTest {
         underTest.handleAction(SyncFoldersAction.PauseRunClicked(syncUiItem))
 
         verify(resumeSyncUseCase).invoke(syncUiItem.id)
+        verify(setUserPausedSyncsUseCase).invoke(syncUiItem.id, false)
     }
 
     @Test
@@ -215,7 +221,8 @@ class SyncFoldersViewModelTest {
             monitorSyncsUseCase,
             resumeSyncUseCase,
             pauseSyncUseCase,
-            getSyncStalledIssuesUseCase
+            getSyncStalledIssuesUseCase,
+            setUserPausedSyncsUseCase
         )
     }
 }

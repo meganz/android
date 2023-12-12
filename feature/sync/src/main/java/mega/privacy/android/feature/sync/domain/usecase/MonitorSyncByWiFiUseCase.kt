@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.sync.domain.usecase
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.feature.sync.domain.repository.SyncPreferencesRepository
 import javax.inject.Inject
 
@@ -11,6 +13,8 @@ internal class MonitorSyncByWiFiUseCase @Inject constructor(
     private val syncPreferencesRepository: SyncPreferencesRepository,
 ) {
 
-    operator fun invoke(): StateFlow<Boolean> =
-        syncPreferencesRepository.monitorSyncByWiFi()
+    operator fun invoke(): Flow<Boolean> =
+        syncPreferencesRepository
+            .monitorSyncByWiFi()
+            .map { it ?: false }
 }

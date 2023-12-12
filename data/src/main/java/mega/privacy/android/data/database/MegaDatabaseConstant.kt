@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 80
+    const val DATABASE_VERSION = 81
 
     /**
      * Database Name
@@ -59,4 +59,9 @@ object MegaDatabaseConstant {
      * Table For Android Sync solved issues list
      */
     const val TABLE_SYNC_SOLVED_ISSUES = "syncsolvedissues"
+
+    /**
+     * Table For Android Sync paused syncs list
+     */
+    const val TABLE_USER_PAUSED_SYNCS = "userpausedsyncs"
 }

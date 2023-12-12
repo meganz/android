@@ -26,6 +26,7 @@ import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
+import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import net.sqlcipher.database.SupportFactory
 import timber.log.Timber
 import java.io.File
@@ -144,4 +145,9 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideSyncSolvedIssuesDao(database: MegaDatabase): SyncSolvedIssuesDao =
         database.syncSolvedIssuesDao()
+
+    @Provides
+    @Singleton
+    internal fun provideUserPausedSyncDao(database: MegaDatabase): UserPausedSyncsDao =
+        database.userPausedSyncDao()
 }

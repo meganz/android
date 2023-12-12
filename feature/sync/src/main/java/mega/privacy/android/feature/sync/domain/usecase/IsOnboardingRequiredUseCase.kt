@@ -6,9 +6,10 @@ import javax.inject.Inject
 
 internal class IsOnboardingRequiredUseCase @Inject constructor(
     private val syncPreferencesRepository: SyncPreferencesRepository,
-    private val syncRepository: SyncRepository
+    private val syncRepository: SyncRepository,
 ) {
 
     suspend operator fun invoke(): Boolean =
-        syncRepository.getFolderPairs().isEmpty() && !syncPreferencesRepository.getOnboardingShown()
+        syncRepository.getFolderPairs()
+            .isEmpty() && syncPreferencesRepository.getOnboardingShown() != true
 }

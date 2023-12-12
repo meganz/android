@@ -18,6 +18,8 @@ import mega.privacy.android.feature.sync.data.gateway.SyncSolvedIssuesGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncSolvedIssuesGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGatewayImpl
+import mega.privacy.android.feature.sync.data.gateway.UserPausedSyncGateway
+import mega.privacy.android.feature.sync.data.gateway.UserPausedSyncGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStore
 import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStoreName
 import mega.privacy.android.feature.sync.data.repository.SyncNewFolderParamsRepositoryImpl
@@ -66,6 +68,10 @@ internal interface SyncDataModule {
     @Binds
     @Singleton
     fun bindSyncSolvedIssuesGateway(implementation: SyncSolvedIssuesGatewayImpl): SyncSolvedIssuesGateway
+
+    @Binds
+    @Singleton
+    fun bindUserPausedSyncGateway(implementation: UserPausedSyncGatewayImpl): UserPausedSyncGateway
 
     companion object {
         @Provides

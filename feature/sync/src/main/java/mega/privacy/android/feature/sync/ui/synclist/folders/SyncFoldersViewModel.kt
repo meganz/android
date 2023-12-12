@@ -16,6 +16,7 @@ import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResumeSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.RemoveFolderClicked
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.PauseRunClicked
@@ -29,6 +30,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val resumeSyncUseCase: ResumeSyncUseCase,
     private val pauseSyncUseCase: PauseSyncUseCase,
     private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase,
+    private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncFoldersState(emptyList()))
@@ -84,8 +86,10 @@ internal class SyncFoldersViewModel @Inject constructor(
                 viewModelScope.launch {
                     if (action.syncUiItem.status != SyncStatus.PAUSED) {
                         pauseSyncUseCase(action.syncUiItem.id)
+                        setUserPausedSyncsUseCase(action.syncUiItem.id, true)
                     } else {
                         resumeSyncUseCase(action.syncUiItem.id)
+                        setUserPausedSyncsUseCase(action.syncUiItem.id, false)
                     }
                 }
             }

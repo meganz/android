@@ -14,6 +14,7 @@ import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
+import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
@@ -23,6 +24,7 @@ import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.SyncRecordEntity
 import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
+import mega.privacy.android.data.database.entity.UserPausedSyncEntity
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
 import timber.log.Timber
 
@@ -36,6 +38,7 @@ import timber.log.Timber
         BackupEntity::class,
         OfflineEntity::class,
         SyncSolvedIssueEntity::class,
+        UserPausedSyncEntity::class,
         CameraUploadsRecordEntity::class,
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
@@ -46,6 +49,7 @@ import timber.log.Timber
         AutoMigration(73, 74, spec = AutoMigrationSpec73to74::class),
         AutoMigration(78, 79),
         AutoMigration(79, 80),
+        AutoMigration(80, 81),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -64,6 +68,8 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun offlineDao(): OfflineDao
 
     abstract fun syncSolvedIssuesDao(): SyncSolvedIssuesDao
+
+    abstract fun userPausedSyncDao(): UserPausedSyncsDao
 
     abstract fun cameraUploadsRecordDao(): CameraUploadsRecordDao
 

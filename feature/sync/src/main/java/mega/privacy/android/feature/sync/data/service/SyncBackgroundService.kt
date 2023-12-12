@@ -22,8 +22,10 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.IsSyncPausedByTheUserUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.PauseResumeSyncsBasedOnWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResumeSyncUseCase
 import timber.log.Timber
@@ -66,6 +68,12 @@ internal class SyncBackgroundService : LifecycleService() {
 
     @Inject
     internal lateinit var getFolderPairsUseCase: GetFolderPairsUseCase
+
+    @Inject
+    internal lateinit var isSyncPausedByTheUserUseCase: IsSyncPausedByTheUserUseCase
+
+    @Inject
+    internal lateinit var pauseResumeSyncsBasedOnWiFiUseCase: PauseResumeSyncsBasedOnWiFiUseCase
 
     override fun onCreate() {
         super.onCreate()
@@ -139,13 +147,10 @@ internal class SyncBackgroundService : LifecycleService() {
         connectedToInternet: Boolean,
         syncOnlyByWifi: Boolean,
     ) {
-        val internetNotAvailable = !connectedToInternet
-        val userNotOnWifi = !isOnWifiNetworkUseCase()
-        if (internetNotAvailable || syncOnlyByWifi && userNotOnWifi) {
-            getFolderPairsUseCase().forEach { pauseSyncUseCase(it.id) }
-        } else {
-            getFolderPairsUseCase().forEach { resumeSyncUseCase(it.id) }
-        }
+        pauseResumeSyncsBasedOnWiFiUseCase(
+            connectedToInternet = connectedToInternet,
+            syncOnlyByWifi = syncOnlyByWifi
+        )
     }
 
     override fun onDestroy() {
