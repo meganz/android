@@ -5,6 +5,7 @@ internal data class StalledIssueResolutionAction(
     val resolutionActionType: StalledIssueResolutionActionType,
 )
 
+
 internal enum class StalledIssueResolutionActionType {
     RENAME_ALL_ITEMS,
     REMOVE_DUPLICATES,
@@ -12,5 +13,6 @@ internal enum class StalledIssueResolutionActionType {
     REMOVE_DUPLICATES_AND_REMOVE_THE_REST,
     CHOOSE_LOCAL_FILE,
     CHOOSE_REMOTE_FILE,
-    CHOOSE_LATEST_MODIFIED_TIME
+    CHOOSE_LATEST_MODIFIED_TIME,
+    UNKNOWN
 }

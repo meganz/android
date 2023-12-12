@@ -108,6 +108,8 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
                     }
                 }
             }
+
+            else -> {}
         }
     }
 
@@ -202,7 +204,8 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
         stalledIssueResolutionAction: StalledIssueResolutionAction,
     ) {
         val solvedIssue = stalledIssueToSolvedIssueMapper(
-            stalledIssue, stalledIssueResolutionAction.actionName
+            stalledIssue,
+            stalledIssueResolutionAction.resolutionActionType
         )
         setSyncSolvedIssueUseCase(solvedIssue = solvedIssue)
     }

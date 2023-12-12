@@ -391,7 +391,8 @@ class ResolveStalledIssueUseCaseTest {
         whenever(getFileByPathUseCase(localPath)).thenReturn(localFile)
         whenever(
             stalledIssueToSolvedIssueMapper(
-                stalledIssue, stalledIssueResolutionAction.actionName
+                stalledIssue,
+                stalledIssueResolutionAction.resolutionActionType
             )
         ).thenReturn(solvedIssue)
 
