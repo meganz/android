@@ -2,13 +2,13 @@ package test.mega.privacy.android.app.presentation.folderlink
 
 import android.content.Intent
 import android.net.Uri
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -53,24 +53,26 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TestRule
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FolderLinkViewModelTest {
 
     private lateinit var underTest: FolderLinkViewModel
-    private val monitorViewType = mock<MonitorViewType>()
-    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
-    private val loginToFolderUseCase = mock<LoginToFolderUseCase>()
+    private val monitorViewType: MonitorViewType = mock()
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
+    private val loginToFolderUseCase: LoginToFolderUseCase = mock()
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase = mock()
     private val copyRequestMessageMapper: CopyRequestMessageMapper = mock()
@@ -100,18 +102,55 @@ class FolderLinkViewModelTest {
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase = mock()
     private val getFileUriUseCase: GetFileUriUseCase = mock()
 
-    @get:Rule
-    var rule: TestRule = InstantTaskExecutorRule()
-
-    @Before
-    fun setUp() {
+    @BeforeAll
+    fun initialise() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+    }
+
+    @BeforeEach
+    fun setup() {
+        whenever(monitorViewType.invoke()).thenReturn(emptyFlow())
+        resetMocks()
         initViewModel()
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    private fun resetMocks() {
+        reset(
+            isConnectedToInternetUseCase,
+            monitorViewType,
+            loginToFolderUseCase,
+            checkNameCollisionUseCase,
+            legacyCopyNodeUseCase,
+            copyRequestMessageMapper,
+            hasCredentials,
+            rootNodeExistsUseCase,
+            setViewType,
+            fetchFolderNodesUseCase,
+            getFolderParentNodeUseCase,
+            getFolderLinkChildrenNodesUseCase,
+            addNodeType,
+            getPublicNodeListByIds,
+            getNodeUseCase,
+            getStringFromStringResMapper,
+            areAchievementsEnabledUseCase,
+            getAccountTypeUseCase,
+            getCurrentUserEmail,
+            getPricing,
+            containsMediaItemUseCase,
+            getLocalFileForNode,
+            getLocalFolderLinkFromMegaApiFolderUseCase,
+            megaApiFolderHttpServerStartUseCase,
+            megaApiFolderHttpServerIsRunningUseCase,
+            httpServerStart,
+            httpServerIsRunning,
+            getLocalFolderLinkFromMegaApiUseCase,
+            getFileUriUseCase
+        )
     }
 
     private fun initViewModel() {
