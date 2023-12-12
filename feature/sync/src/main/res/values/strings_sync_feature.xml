@@ -114,6 +114,13 @@
     <string name="sync_options_changed_to_wifi_only">Sync options were changed to: Wi-Fi only</string>
     <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
     <string name="sync_options_changed_to_wifi_and_mobile_data">Sync options were changed to: Wi-Fi or mobile data</string>
+    <string name="sync_start_sync">Start Sync</string>
+    <!-- Text that indicates that a folder is currently empty -->
+    <string name="sync_file_browser_empty_folder">Empty Folder</string>
+    <!-- Selecting a specific location in MEGA. This is the text of the button -->
+    <string name="sync_general_select_to_download">Select folder</string>
+    <!-- Selecting a specific location in MEGA. This is the text of the button -->
+    <string name="sync_general_select">Select</string>
     <!-- Sync stalled issue reason is no reason-->
     <string name="sync_stalled_issue_no_reason">No Reason</string>
     <!-- Sync stalled issue reason is no file issue-->
@@ -152,12 +159,4 @@
     <string name="sync_stalled_issue_zero">Stalled Issues</string>
     <!-- Sync solved issues chip title -->
     <string name="sync_solved_issues">Solved Issues</string>
-    <!-- Sync start sync button -->
-    <string name="sync_start_sync">Start Sync</string>
-    <!-- Text that indicates that a folder is currently empty -->
-    <string name="sync_file_browser_empty_folder">Empty Folder</string>
-    <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="sync_general_select_to_download">Select folder</string>
-    <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="sync_general_select">Select</string>
 </resources>

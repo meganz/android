@@ -31,6 +31,7 @@ internal class StalledIssueCardTest {
                 icon = CoreUiR.drawable.ic_folder_list,
                 issueDetailsClicked = {},
                 moreClicked = {},
+                shouldShowMoreIcon = true
             )
         }
 

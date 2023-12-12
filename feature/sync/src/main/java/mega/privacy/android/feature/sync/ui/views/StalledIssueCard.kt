@@ -14,6 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
@@ -31,6 +32,7 @@ internal fun StalledIssueCard(
     nodeName: String,
     conflictName: String,
     @DrawableRes icon: Int,
+    shouldShowMoreIcon: Boolean,
     issueDetailsClicked: () -> Unit,
     moreClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -83,8 +85,9 @@ internal fun StalledIssueCard(
             )
             Image(
                 modifier = Modifier
-                    .clickable { moreClicked() }
-                    .testTag(TEST_TAG_STALLED_ISSUE_CARD_BUTTON_MORE),
+                    .clickable(shouldShowMoreIcon) { moreClicked() }
+                    .testTag(TEST_TAG_STALLED_ISSUE_CARD_BUTTON_MORE)
+                    .alpha(if (shouldShowMoreIcon) 1f else 0f),
                 painter = painterResource(R.drawable.ic_universal_more),
                 contentDescription = "More",
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
@@ -101,6 +104,7 @@ private fun StalledIssueCardPreview() {
             nodeName = "Some folder",
             conflictName = "Conflicting name",
             icon = R.drawable.ic_folder_list,
+            true,
             issueDetailsClicked = {},
             moreClicked = {},
         )

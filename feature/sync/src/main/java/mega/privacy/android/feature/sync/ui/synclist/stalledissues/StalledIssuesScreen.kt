@@ -51,6 +51,7 @@ private fun StalledIssuesScreenContent(
                     icon = issue.icon,
                     issueDetailsClicked = { issueDetailsClicked(issue) },
                     moreClicked = { moreClicked(issue) },
+                    shouldShowMoreIcon = issue.actions.isNotEmpty()
                 )
                 Divider(Modifier.padding(start = 72.dp))
             }
