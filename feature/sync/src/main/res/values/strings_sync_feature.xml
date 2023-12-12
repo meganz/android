@@ -114,49 +114,78 @@
     <string name="sync_options_changed_to_wifi_only">Sync options were changed to: Wi-Fi only</string>
     <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
     <string name="sync_options_changed_to_wifi_and_mobile_data">Sync options were changed to: Wi-Fi or mobile data</string>
-    <string name="sync_start_sync">Start Sync</string>
+    <!-- Sync stalled issue reason is no reason-->
+    <string name="sync_stalled_issue_no_reason">No reason</string>
+    <!-- Sync stalled issue reason is no file issue-->
+    <string name="sync_stalled_issue_file_issue">File issue</string>
+    <!-- Sync stalled issue reason is move or rename-->
+    <string name="sync_stalled_issue_move_or_rename">Move or rename cannot occur</string>
+    <!-- Sync stalled issue reason is delete or move scanning-->
+    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move waiting on scanning</string>
+    <!-- Sync stalled issue reason is delete or move-->
+    <string name="sync_stalled_issue_delete_or_move">Delete waiting on moves</string>
+    <!-- Sync stalled issue reason is upload issue-->
+    <string name="sync_stalled_issue_upload_issue">Upload issue</string>
+    <!-- Sync stalled issue reason is download issue-->
+    <string name="sync_stalled_issue_download_issue">Download issue</string>
+    <!-- Sync stalled issue reason is can not create folder-->
+    <string name="sync_stalled_issue_cannot_create_folder">Cannot create folder</string>
+    <!-- Sync stalled issue reason is can not perform deletion-->
+    <string name="sync_stalled_issue_cannot_perform_deletion">Cannot perform deletion</string>
+    <!-- Sync stalled issue reason is can not support tree depth-->
+    <string name="sync_stalled_issue_cannot_support_tree_depth">Sync item exceeds supported tree depth</string>
+    <!-- Sync stalled issue reason is Folder Matched Against File-->
+    <string name="sync_stalled_issue_folder_matched_against_file">Folder matched against file</string>
+    <!-- Sync stalled issue reason is Local and remote changed since last sync-->
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Local and remote changed since last sync</string>
+    <!-- Sync stalled issue reason is Local and remote not synced-->
+    <string name="sync_stalled_issue_local_and_remote_not_synced">Local and remote previously not synced</string>
+    <!-- Sync stalled issue reason is Name clash-->
+    <string name="sync_stalled_issue_name_clash">Names would clash when synced</string>
+    <!-- Sync stalled issue reason is Last PlusOne-->
+    <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
+    <!-- Sync chip folder chip title-->
+    <string name="sync_folders">Folders</string>
+    <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
+    <string name="sync_stalled_issues">Issues (%d)</string>
+    <!-- Sync stalled issue count chip title for 0 stalled issues-->
+    <string name="sync_stalled_issue_zero">Issues</string>
+    <!-- Sync solved issues chip title -->
+    <string name="sync_solved_issues">Solved issues</string>
+    <!-- Sync start sync button -->
+    <string name="sync_start_sync">Start sync</string>
     <!-- Text that indicates that a folder is currently empty -->
-    <string name="sync_file_browser_empty_folder">Empty Folder</string>
+    <string name="sync_file_browser_empty_folder">Empty folder</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select_to_download">Select folder</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Select</string>
-    <!-- Sync stalled issue reason is no reason-->
-    <string name="sync_stalled_issue_no_reason">No Reason</string>
-    <!-- Sync stalled issue reason is no file issue-->
-    <string name="sync_stalled_issue_file_issue">File Issue</string>
-    <!-- Sync stalled issue reason is move or rename-->
-    <string name="sync_stalled_issue_move_or_rename">Move Or Rename Cannot Occur</string>
-    <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Delete Or Move Waiting On Scanning</string>
-    <!-- Sync stalled issue reason is delete or move-->
-    <string name="sync_stalled_issue_delete_or_move">Delete Waiting On Moves</string>
-    <!-- Sync stalled issue reason is upload issue-->
-    <string name="sync_stalled_issue_upload_issue">Upload Issue</string>
-    <!-- Sync stalled issue reason is download issue-->
-    <string name="sync_stalled_issue_download_issue">Download Issue</string>
-    <!-- Sync stalled issue reason is can not create folder-->
-    <string name="sync_stalled_issue_cannot_create_folder">Cannot Create Folder</string>
-    <!-- Sync stalled issue reason is can not perform deletion-->
-    <string name="sync_stalled_issue_cannot_perform_deletion">Cannot Perform Deletion</string>
-    <!-- Sync stalled issue reason is can not support tree depth-->
-    <string name="sync_stalled_issue_cannot_support_tree_depth">Sync Item Exceeds Supported Tree Depth</string>
-    <!-- Sync stalled issue reason is Folder Matched Against File-->
-    <string name="sync_stalled_issue_folder_matched_against_file">Folder Matched Against File</string>
-    <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Local And Remote Changed Since Last Sync</string>
-    <!-- Sync stalled issue reason is Local and remote not synced-->
-    <string name="sync_stalled_issue_local_and_remote_not_synced">Local And Remote Previously Not Synced</string>
-    <!-- Sync stalled issue reason is Name clash-->
-    <string name="sync_stalled_issue_name_clash">Names Would Clash When Synced</string>
-    <!-- Sync stalled issue reason is Last PlusOne-->
-    <string name="sync_stalled_issue_last_plus_one">Last Plus One</string>
-    <!-- Sync chip folder chip title-->
-    <string name="sync_folders">Folders</string>
-    <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
-    <string name="sync_stalled_issues">Stalled Issues (%d)</string>
-    <!-- Sync stalled issue count chip title for 0 stalled issues-->
-    <string name="sync_stalled_issue_zero">Stalled Issues</string>
-    <!-- Sync solved issues chip title -->
-    <string name="sync_solved_issues">Solved Issues</string>
+    <!-- Sync stalled issue reason is no file issue detailed description-->
+    <string name="sync_stalled_issue_file_issue_detail">A single file or folder had an issue that needs a user decision to solve</string>
+    <!-- Sync stalled issue reason is delete or move detailed description-->
+    <string name="sync_stalled_issue_delete_or_move_detail">Waiting for other processes to complete.</string>
+    <!-- Sync stalled issue reason is upload issue detailed description-->
+    <string name="sync_stalled_issue_upload_issue_detail">Cannot reach the destination folder.</string>
+    <!-- Sync stalled issue reason is download issue detailed description-->
+    <string name="sync_stalled_issue_download_issue_detail">A failure occurred either downloading the file, or moving the downloaded temporary file to its final name and location.</string>
+    <!-- Sync stalled issue reason is can not create folder detailed description-->
+    <string name="sync_stalled_issue_cannot_create_folder_detail">Filesystem error preventing folder access.</string>
+    <!-- Sync stalled issue reason is can not perform deletion detailed description-->
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <!-- Sync stalled issue reason is can not support tree depth detailed description-->
+    <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Target is too deep on your folder structure.\nPlease move it to a location that is less than 64 folders deep.</string>
+    <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
+    <string name="sync_stalled_issue_folder_matched_against_file_detail">Cannot sync folders against files.</string>
+    <!-- Sync stalled issue reason is Local and remote changed since last sync detailed description-->
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">This file has been changed both in MEGA and locally since it was last synced.</string>
+    <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
+    <string name="sync_stalled_issue_local_and_remote_not_synced_detail">This file has conflicting copies</string>
+    <!-- Sync stalled issue reason is Name clash detailed description-->
+    <string name="sync_stalled_issue_name_clash_detail">These items contain multiple names on one side, that would all become the same single name on the other side.\nThis may be due to syncing to case insensitive local filesystems, or the effects of escaped characters.</string>
+    <!-- Sync notification title description sync monitoring-->
+    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename was detected in MEGA, but could not be replicated in the local filesystem.</string>
+    <!-- Sync notification title description sync monitoring-->
+    <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename was detected in the local filesystem, but could not be replicated in MEGA.</string>
+    <!-- Sync stalled issue delete or move scanning detail-->
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Waiting to finish scan to see if the file was moved or deleted.</string>
 </resources>

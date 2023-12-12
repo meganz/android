@@ -48,7 +48,7 @@ class SyncStalledIssuesScreenTest {
                         conflictName = "Names conflict",
                         nodeNames = listOf(folderName),
                         icon = R.drawable.ic_folder_list,
-                        detailedInfo = StalledIssueDetailedInfo(-1 , -1),
+                        detailedInfo = StalledIssueDetailedInfo("", ""),
                         actions = listOf(
                             StalledIssueResolutionAction(
                                 "choose local",

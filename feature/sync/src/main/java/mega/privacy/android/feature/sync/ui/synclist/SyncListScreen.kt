@@ -23,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -78,8 +77,8 @@ internal fun SyncListScreen(
             when (val content = sheetContent) {
                 is SyncModalSheetContent.DetailedInfo -> {
                     ConflictDetailsDialog(
-                        stringResource(id = content.stalledIssueUiItem.detailedInfo.title),
-                        stringResource(id = content.stalledIssueUiItem.detailedInfo.explanation)
+                        content.stalledIssueUiItem.detailedInfo.title,
+                        content.stalledIssueUiItem.detailedInfo.explanation,
                     )
                 }
 

@@ -4,17 +4,15 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.ui.extensions.getIcon
-import mega.privacy.android.feature.sync.ui.model.StalledIssueDetailedInfo
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import javax.inject.Inject
 
 internal class StalledIssueItemMapper @Inject constructor(
     private val stalledIssueResolutionActionMapper: StalledIssueResolutionActionMapper,
     private val fileTypeIconMapper: FileTypeIconMapper,
-    private val stalledIssueTypeToStalledIssueStringMapper: StalledIssueTypeToStalledIssueStringMapper
+    private val stalledIssueDetailInfoMapper: StalledIssueDetailInfoMapper,
 ) {
 
     operator fun invoke(
@@ -23,11 +21,12 @@ internal class StalledIssueItemMapper @Inject constructor(
     ): StalledIssueUiItem {
         val firstNode = nodes.firstOrNull()
         val areAllNodesFolders = nodes.all { it is FolderNode }
+        val detailedInfo = stalledIssueDetailInfoMapper(stalledIssueEntity)
         return StalledIssueUiItem(
             nodeIds = stalledIssueEntity.nodeIds,
             localPaths = stalledIssueEntity.localPaths,
             issueType = stalledIssueEntity.issueType,
-            conflictName = stalledIssueTypeToStalledIssueStringMapper(stalledIssueEntity.issueType),
+            conflictName = detailedInfo.title,
             nodeNames = stalledIssueEntity.nodeNames,
             icon = when (firstNode) {
                 is FolderNode -> firstNode.getIcon()
@@ -36,7 +35,7 @@ internal class StalledIssueItemMapper @Inject constructor(
                     fileTypeIconMapper(it.substringAfterLast('.'))
                 } ?: iconPackR.drawable.ic_generic_list
             },
-            detailedInfo = getMockStalledIssueResolveInfo(),
+            detailedInfo = detailedInfo,
             actions = stalledIssueResolutionActionMapper(
                 stalledIssueEntity.issueType,
                 areAllNodesFolders
@@ -51,11 +50,5 @@ internal class StalledIssueItemMapper @Inject constructor(
             issueType = stalledIssueUiItem.issueType,
             conflictName = stalledIssueUiItem.conflictName,
             nodeNames = stalledIssueUiItem.nodeNames,
-        )
-
-    private fun getMockStalledIssueResolveInfo(): StalledIssueDetailedInfo =
-        StalledIssueDetailedInfo(
-            title = R.string.sync_stalled_issue_detail_conflict_title,
-            explanation = R.string.sync_stalled_issue_detail_conflict_message
         )
 }
