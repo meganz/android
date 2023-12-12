@@ -57,6 +57,7 @@ class SelectSubtitleFileActivity : PasscodeActivity() {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 SelectSubtitleComposeView(
+                    viewModel = viewModel,
                     onAddSubtitle = { info ->
                         viewModel.sendAddSubtitleClickedEvent()
                         Analytics.tracker.trackEvent(AddSubtitlePressedEvent)

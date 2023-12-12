@@ -8,9 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -19,11 +18,11 @@ import mega.privacy.android.app.mediaplayer.mapper.SubtitleFileInfoItemMapper
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.mobile.analytics.event.SearchModeEnablePressedEvent
 import javax.inject.Inject
 
@@ -37,15 +36,18 @@ class SelectSubtitleFileViewModel @Inject constructor(
     private val sendStatisticsMediaPlayerUseCase: SendStatisticsMediaPlayerUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+    private val _state = MutableStateFlow<SubtitleLoadState>(SubtitleLoadState.Loading)
+
     /**
      * The state for updating the subtitle file info item list
      */
-    var state by mutableStateOf<SubtitleLoadState>(SubtitleLoadState.Loading)
-        private set
+    val state = _state.asStateFlow()
 
     private val query = MutableStateFlow<String?>(null)
 
     private val selected = MutableStateFlow<SubtitleFileInfo?>(null)
+
+    private val subtitleFileListState = MutableStateFlow(emptyList<SubtitleFileInfo>())
 
     /**
      * The state for updating search widget
@@ -61,13 +63,15 @@ class SelectSubtitleFileViewModel @Inject constructor(
             combine(
                 query,
                 selected,
-                getSubtitleFileInfoList(),
+                subtitleFileListState,
                 ::mapToSubtitleFileInfoItem
-            ).collectLatest {
-                state = if (it.isEmpty()) {
-                    SubtitleLoadState.Empty
-                } else {
-                    SubtitleLoadState.Success(it)
+            ).collect { list ->
+                _state.update {
+                    if (list.isEmpty()) {
+                        SubtitleLoadState.Empty
+                    } else {
+                        SubtitleLoadState.Success(list)
+                    }
                 }
             }
         }
@@ -98,7 +102,7 @@ class SelectSubtitleFileViewModel @Inject constructor(
      * @return subtitle file info list
      */
     suspend fun getSubtitleFileInfoList() =
-        flowOf(getSRTSubtitleFileListUseCase())
+        subtitleFileListState.update { getSRTSubtitleFileListUseCase() }
 
     /**
      * Update when the item is clicked

@@ -100,19 +100,21 @@ internal object Constants {
  */
 @Composable
 internal fun SelectSubtitleComposeView(
+    viewModel: SelectSubtitleFileViewModel = viewModel(),
     onAddSubtitle: (SubtitleFileInfo?) -> Unit,
     onBackPressed: () -> Unit,
 ) {
-    val viewModel: SelectSubtitleFileViewModel = viewModel()
     val selectedSubtitleFileInfo by viewModel.getSelectedSubtitleFileInfoFlow()
         .collectAsStateWithLifecycle()
     val query by viewModel.getQueryStateFlow().collectAsStateWithLifecycle()
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         viewModel.getSubtitleFileInfoList()
     }
 
     SelectSubtitleView(
-        uiState = viewModel.state,
+        uiState = uiState,
         searchState = viewModel.searchState,
         query = query,
         selectedSubtitleFileInfo = selectedSubtitleFileInfo,
@@ -459,7 +461,7 @@ internal fun EmptyTopBar(
 @Composable
 private fun PreviewSelectSubtitleFileViewWithEmptyList() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-        SelectSubtitleComposeView({}, {})
+        SelectSubtitleComposeView(onAddSubtitle = {}, onBackPressed = {})
     }
 }
 
@@ -467,7 +469,7 @@ private fun PreviewSelectSubtitleFileViewWithEmptyList() {
 @Composable
 private fun PreviewSelectSubtitleFileView() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-        SelectSubtitleComposeView({}, {})
+        SelectSubtitleComposeView(onAddSubtitle = {}, onBackPressed = {})
     }
 }
 
