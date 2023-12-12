@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.login
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BillingRepository
@@ -89,7 +90,7 @@ class LocalLogoutAppUseCaseTest {
         verify(pushesRepository).clearPushToken()
         verify(billingRepository).clearCache()
         verify(loginRepository).broadcastLogout()
-        verify(stopCameraUploadsUseCase).invoke(shouldReschedule = false)
+        verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
         verify(stopAudioService).invoke()
         verify(clearPsaUseCase).invoke()
         verify(settingsRepository).resetSetting()

@@ -347,7 +347,7 @@ internal class TransferPageFragment : Fragment() {
                 R.string.cancel_all_action
             ) { _: DialogInterface?, _: Int ->
                 viewModel.cancelAllTransfers()
-                viewModel.stopCameraUploads(shouldReschedule = true)
+                viewModel.stopCameraUploads()
             }
             .setNegativeButton(R.string.general_dismiss, null)
         confirmationTransfersDialog = builder.create()

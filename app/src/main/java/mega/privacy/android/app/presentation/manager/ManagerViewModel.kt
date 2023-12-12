@@ -38,6 +38,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
@@ -660,13 +661,12 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Stop camera upload
-     *
-     * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
+     * Stop and disable camera uploads
      */
-    fun stopCameraUploads(shouldReschedule: Boolean) = viewModelScope.launch {
-        runCatching { stopCameraUploadsUseCase(shouldReschedule = shouldReschedule) }
-            .onFailure { Timber.d(it) }
+    fun stopAndDisableCameraUploads() = viewModelScope.launch {
+        runCatching {
+            stopCameraUploadsUseCase(restartMode = CameraUploadsRestartMode.StopAndDisable)
+        }.onFailure { Timber.d(it) }
     }
 
     /**

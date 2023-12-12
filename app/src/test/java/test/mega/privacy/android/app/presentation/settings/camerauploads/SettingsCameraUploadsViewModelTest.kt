@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
@@ -469,7 +470,7 @@ class SettingsCameraUploadsViewModelTest {
 
             verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
             verify(clearCacheDirectory).invoke()
-            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             underTest.state.test {
                 assertThat(awaitItem().uploadOption).isEqualTo(uploadOption)
             }
@@ -541,7 +542,7 @@ class SettingsCameraUploadsViewModelTest {
             whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(expectedAnswer)
             underTest.changeChargingRequiredForVideoCompression(expectedAnswer)
             verify(setChargingRequiredForVideoCompressionUseCase).invoke(expectedAnswer)
-            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             underTest.state.test {
                 assertThat(awaitItem().isChargingRequiredForVideoCompression).isEqualTo(
                     expectedAnswer
@@ -557,7 +558,7 @@ class SettingsCameraUploadsViewModelTest {
         underTest.changeVideoCompressionSizeLimit(newSize)
 
         verify(setVideoCompressionSizeLimitUseCase).invoke(newSize)
-        verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
+        verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
         underTest.state.test {
             assertThat(awaitItem().videoCompressionSizeLimit).isEqualTo(newSize)
         }
@@ -570,7 +571,7 @@ class SettingsCameraUploadsViewModelTest {
         whenever(areUploadFileNamesKeptUseCase()).thenReturn(expected)
         underTest.keepUploadFileNames(expected)
         verify(setUploadFileNamesKeptUseCase).invoke(expected)
-        verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
+        verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
         underTest.state.test {
             assertThat(awaitItem().areUploadFileNamesKept).isEqualTo(expected)
         }
@@ -589,7 +590,7 @@ class SettingsCameraUploadsViewModelTest {
         )
         verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
         verify(clearCacheDirectory).invoke()
-        verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
+        verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
         underTest.state.test {
             assertThat(awaitItem().primaryFolderPath).isEqualTo(testPath)
         }
@@ -616,7 +617,7 @@ class SettingsCameraUploadsViewModelTest {
 
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             underTest.includeLocationTags(true)
-            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
 
             underTest.state.map { it.areLocationTagsIncluded }.distinctUntilChanged().test {
                 assertThat(awaitItem()).isTrue()
@@ -763,7 +764,7 @@ class SettingsCameraUploadsViewModelTest {
             underTest.updateMediaUploadsLocalFolder(mediaUploadsFolderPath)
             verify(setSecondaryFolderLocalPathUseCase).invoke(mediaUploadsFolderPath)
             verify(restoreSecondaryTimestamps).invoke()
-            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = true)
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
         }
 
     @Test
@@ -878,7 +879,7 @@ class SettingsCameraUploadsViewModelTest {
             verify(updateCameraUploadTimeStamp).invoke(0L, SyncTimeStamp.PRIMARY_PHOTO)
             verify(updateCameraUploadTimeStamp).invoke(0L, SyncTimeStamp.PRIMARY_VIDEO)
             if (isEnabled) {
-                verify(stopCameraUploadsUseCase).invoke(shouldReschedule = false)
+                verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
                 verify(stopCameraUploadAndHeartbeatUseCase).invoke()
             } else {
                 verify(checkEnableCameraUploadsStatus).invoke()

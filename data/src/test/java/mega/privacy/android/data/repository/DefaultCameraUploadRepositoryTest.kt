@@ -859,9 +859,8 @@ class DefaultCameraUploadRepositoryTest {
 
         @Test
         fun `test that the worker is called to stop camera uploads`() = runTest {
-            val shouldReschedule = false
-            underTest.stopCameraUploads(shouldReschedule)
-            verify(workerGateway).stopCameraUploads(shouldReschedule)
+            underTest.stopCameraUploads()
+            verify(workerGateway).stopCameraUploads()
         }
 
         @Test

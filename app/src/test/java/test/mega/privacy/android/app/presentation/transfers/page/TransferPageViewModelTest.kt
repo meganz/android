@@ -9,10 +9,11 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.DeleteAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.DeleteFailedOrCanceledTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.AfterAll
@@ -20,10 +21,12 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -165,5 +168,21 @@ internal class TransferPageViewModelTest {
                 val newValue = awaitItem()
                 Truth.assertThat(newValue.deleteFailedOrCancelledTransfersResult).isNull()
             }
+        }
+
+    @Test
+    fun `test that stopCameraUploads calls stopCameraUploadsUseCase with restartMode StopAndDisable`() =
+        runTest {
+            underTest.stopCameraUploads()
+            verify(stopCameraUploadsUseCase).invoke(restartMode = CameraUploadsRestartMode.StopAndDisable)
+        }
+
+    @Test
+    fun `test that stopCameraUploads catch the error if stopCameraUploadsUseCase throws an error`() =
+        runTest {
+            whenever(stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable))
+                .thenThrow(RuntimeException::class.java)
+
+            assertDoesNotThrow { underTest.stopCameraUploads() }
         }
 }

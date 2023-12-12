@@ -62,6 +62,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
@@ -154,7 +155,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfe
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
-import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
@@ -223,7 +224,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val createCameraUploadTemporaryRootDirectoryUseCase: CreateCameraUploadTemporaryRootDirectoryUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
     private val broadcastCameraUploadProgress: BroadcastCameraUploadProgress,
-    private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
+    private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase,
     private val updateCameraUploadsBackupStatesUseCase: UpdateCameraUploadsBackupStatesUseCase,
     private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase,
@@ -1534,7 +1535,10 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Abort the worker
      * This function is called if an error is caught inside the CameraUploadsWorker
      */
-    private suspend fun abortWork(cancelMessage: String) = withContext(NonCancellable) {
+    private suspend fun abortWork(
+        cancelMessage: String,
+        restartMode: CameraUploadsRestartMode = CameraUploadsRestartMode.Reschedule,
+    ) = withContext(NonCancellable) {
         Timber.e("Camera Uploads process aborted: $cancelMessage")
 
         cleanResources()
@@ -1546,8 +1550,8 @@ class CameraUploadsWorker @AssistedInject constructor(
         // If the process has been stopped for another reason, we can re-schedule the worker
         // to perform at a later time
         if (!isStopped) {
-            Timber.d("Schedule Camera Uploads")
-            scheduleCameraUploadUseCase()
+            Timber.d("Camera Upload stopped with restartMode : $restartMode")
+            stopCameraUploadsUseCase(restartMode = restartMode)
         } else {
             Timber.d("Camera Uploads stopped and disabled")
         }

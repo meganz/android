@@ -8,6 +8,7 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -31,7 +32,7 @@ class FileProviderViewModel @Inject constructor(
      * Stop camera uploads
      */
     fun stopCameraUploads() = viewModelScope.launch {
-        runCatching { stopCameraUploadsUseCase(shouldReschedule = false) }
+        runCatching { stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable) }
             .onFailure { Timber.d(it) }
     }
 

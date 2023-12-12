@@ -74,17 +74,10 @@ class WorkerFacade @Inject constructor(
         }
     }
 
-    override suspend fun stopCameraUploads(shouldReschedule: Boolean) {
+    override suspend fun stopCameraUploads() {
         cancelUniqueCameraUploadWorkRequest()
         cancelPeriodicCameraUploadWorkRequest()
 
-        // Reschedule the Camera Upload to launch in a later time
-        // This case only happens if :
-        // - the user cancel all transfers without disabling the Camera Uploads
-        // - the camera uploads folder have been moved to rubbish bin
-        if (shouldReschedule) {
-            scheduleCameraUploads()
-        }
         Timber.d("fireStopCameraUploadJob() SUCCESS")
     }
 

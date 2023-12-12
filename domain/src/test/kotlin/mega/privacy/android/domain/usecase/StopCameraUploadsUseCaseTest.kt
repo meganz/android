@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
@@ -9,8 +10,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.Mockito.never
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -40,48 +41,50 @@ class StopCameraUploadsUseCaseTest {
     }
 
     @Test
-    fun `test that if Camera Uploads is not enabled then enable settings is not set to false`() =
+    fun `test that Camera Uploads is not disabled if the Camera Uploads were previously disabled`() =
         runTest {
-            val shouldReschedule = true
             whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(false)
-            underTest(shouldReschedule = shouldReschedule)
-            verify(disableCameraUploadsUseCase, never()).invoke()
+            underTest(mock())
+            verify(cameraUploadRepository, never()).stopCameraUploads()
         }
 
     @Test
-    fun `test that if Camera Uploads is enabled and should not reschedule then Camera Uploads is disabled in settings`() =
+    fun `test that Camera Uploads is disabled if the Camera Uploads were previously enabled`() =
         runTest {
-            val shouldReschedule = false
             whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
-            underTest(shouldReschedule = shouldReschedule)
+            underTest(mock())
+            verify(cameraUploadRepository).stopCameraUploads()
+        }
+
+    @Test
+    fun `test that Camera Uploads should restart immediately if restart mode is RestartImmediately `() =
+        runTest {
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
+            underTest(CameraUploadsRestartMode.RestartImmediately)
+            verify(cameraUploadRepository).startCameraUploads()
+        }
+
+    @Test
+    fun `test that Camera Uploads should be rescheduled immediately if restart mode is Reschedule`() =
+        runTest {
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
+            underTest(CameraUploadsRestartMode.Reschedule)
+            verify(cameraUploadRepository).scheduleCameraUploads()
+        }
+
+    @Test
+    fun `test that Camera Uploads should be stopped if restart mode is Stop`() =
+        runTest {
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
+            underTest(CameraUploadsRestartMode.Stop)
+            verify(cameraUploadRepository).stopCameraUploads()
+        }
+
+    @Test
+    fun `test that Camera Uploads should be disabled if restart mode is StopAndDisable`() =
+        runTest {
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
+            underTest(CameraUploadsRestartMode.StopAndDisable)
             verify(disableCameraUploadsUseCase).invoke()
-        }
-
-    @Test
-    fun `test that if Camera Uploads is enabled and should reschedule then Camera Uploads is not disabled in settings`() =
-        runTest {
-            val shouldReschedule = true
-            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
-            underTest(shouldReschedule = shouldReschedule)
-            verify(disableCameraUploadsUseCase, never()).invoke()
-        }
-
-    @Test
-    fun `test that if camera upload is enabled that stop camera upload repository method is invoked`() =
-        runTest {
-            val shouldReschedule = true
-            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
-            underTest(shouldReschedule = shouldReschedule)
-            verify(cameraUploadRepository).stopCameraUploads(shouldReschedule = shouldReschedule)
-        }
-
-    @Test
-    fun `test that if camera upload is not enabled that stop camera upload repository method is not invoked`() =
-        runTest {
-            val shouldReschedule = true
-            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(false)
-            underTest(shouldReschedule = shouldReschedule)
-            verify(cameraUploadRepository, never())
-                .stopCameraUploads(shouldReschedule = shouldReschedule)
         }
 }

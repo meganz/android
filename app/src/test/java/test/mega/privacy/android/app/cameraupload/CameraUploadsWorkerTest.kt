@@ -101,7 +101,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfe
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
-import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -182,7 +182,7 @@ class CameraUploadsWorkerTest {
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase =
         mock()
     private val broadcastCameraUploadProgress: BroadcastCameraUploadProgress = mock()
-    private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase = mock()
+    private val stopCameraUploadsUseCase: StopCameraUploadsUseCase = mock()
     private val createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase =
         mock()
     private val updateCameraUploadsBackupStatesUseCase: UpdateCameraUploadsBackupStatesUseCase =
@@ -305,7 +305,7 @@ class CameraUploadsWorkerTest {
             createCameraUploadTemporaryRootDirectoryUseCase = createCameraUploadTemporaryRootDirectoryUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
             broadcastCameraUploadProgress = broadcastCameraUploadProgress,
-            scheduleCameraUploadUseCase = scheduleCameraUploadUseCase,
+            stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             createTempFileAndRemoveCoordinatesUseCase = createTempFileAndRemoveCoordinatesUseCase,
             updateCameraUploadsBackupStatesUseCase = updateCameraUploadsBackupStatesUseCase,
             sendBackupHeartBeatSyncUseCase = sendBackupHeartBeatSyncUseCase,

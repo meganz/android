@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.DeleteFailedOrCanceledTransfersUseCase
@@ -82,12 +83,10 @@ internal class TransferPageViewModel @Inject constructor(
     }
 
     /**
-     * Stop camera upload
-     *
-     * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
+     * Stop camera uploads
      */
-    fun stopCameraUploads(shouldReschedule: Boolean) = viewModelScope.launch {
-        runCatching { stopCameraUploadsUseCase(shouldReschedule = shouldReschedule) }
+    fun stopCameraUploads() = viewModelScope.launch {
+        runCatching { stopCameraUploadsUseCase(restartMode = CameraUploadsRestartMode.StopAndDisable) }
             .onFailure { Timber.d(it) }
     }
 

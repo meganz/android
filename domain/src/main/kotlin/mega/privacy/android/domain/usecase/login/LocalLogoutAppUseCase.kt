@@ -12,6 +12,7 @@ import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.psa.ClearPsaUseCase
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import javax.inject.Inject
 
@@ -52,7 +53,7 @@ class LocalLogoutAppUseCase @Inject constructor(
         photosRepository.clearCache()
         settingsRepository.resetSetting()
         loginRepository.broadcastLogout()
-        stopCameraUploadsUseCase(shouldReschedule = false)
+        stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable)
         clearCameraUploadsRecordUseCase(
             listOf(CameraUploadFolderType.Primary, CameraUploadFolderType.Secondary)
         )

@@ -40,6 +40,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
@@ -642,12 +643,11 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that when stopCameraUpload is called, stopCameraUploadUseCase is called`() =
+    fun `test that when stopAndDisableCameraUploads is called, stopCameraUploadUseCase is called`() =
         runTest {
-            val shouldReschedule = true
-            underTest.stopCameraUploads(shouldReschedule)
+            underTest.stopAndDisableCameraUploads()
             testScheduler.advanceUntilIdle()
-            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = shouldReschedule)
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
         }
 
     @Test

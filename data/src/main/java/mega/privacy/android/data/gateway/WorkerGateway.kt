@@ -16,10 +16,8 @@ interface WorkerGateway {
 
     /**
      * Cancel all camera uploads workers
-     *
-     * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
      */
-    suspend fun stopCameraUploads(shouldReschedule: Boolean)
+    suspend fun stopCameraUploads()
 
     /**
      * Schedule the camera uploads worker

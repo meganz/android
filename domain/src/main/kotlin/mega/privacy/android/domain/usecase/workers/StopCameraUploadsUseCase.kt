@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.workers
 
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import javax.inject.Inject
@@ -13,14 +14,24 @@ class StopCameraUploadsUseCase @Inject constructor(
 ) {
     /**
      * invoke
-     * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
+     * @param restartMode [CameraUploadsRestartMode]
      */
-    suspend operator fun invoke(shouldReschedule: Boolean) {
+    suspend operator fun invoke(restartMode: CameraUploadsRestartMode) {
         if (cameraUploadRepository.isCameraUploadsEnabled() == true) {
-            if (!shouldReschedule) {
-                disableCameraUploadsUseCase()
+            cameraUploadRepository.stopCameraUploads()
+
+            when (restartMode) {
+                CameraUploadsRestartMode.RestartImmediately ->
+                    cameraUploadRepository.startCameraUploads()
+
+                CameraUploadsRestartMode.Reschedule ->
+                    cameraUploadRepository.scheduleCameraUploads()
+
+                CameraUploadsRestartMode.StopAndDisable ->
+                    disableCameraUploadsUseCase()
+
+                CameraUploadsRestartMode.Stop -> Unit
             }
-            cameraUploadRepository.stopCameraUploads(shouldReschedule = shouldReschedule)
         }
     }
 }

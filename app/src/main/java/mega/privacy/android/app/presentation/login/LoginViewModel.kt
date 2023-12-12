@@ -36,6 +36,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
@@ -781,7 +782,7 @@ class LoginViewModel @Inject constructor(
      */
     fun stopCameraUploads() =
         viewModelScope.launch {
-            runCatching { stopCameraUploadsUseCase(shouldReschedule = false) }
+            runCatching { stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable) }
                 .onFailure { Timber.e(it) }
         }
 
