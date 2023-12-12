@@ -28,10 +28,6 @@ import kotlin.coroutines.suspendCoroutine
 
 /**
  * Gateway implementation to access Sync API
- * Note: calls to MegaApi here are commented out because
- * they are only available in new sync core version of MegaApi.
- * New sync core is still not merged to SDK develop.
- *
  */
 internal class SyncGatewayImpl @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
