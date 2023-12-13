@@ -1,13 +1,14 @@
 package mega.privacy.android.app.presentation.rubbishbin
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -32,25 +33,25 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RubbishBinViewModelTest {
 
     private lateinit var underTest: RubbishBinViewModel
 
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
-    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
-        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
-    }
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val getRubbishBinParentNodeHandle = mock<GetParentNodeHandle>()
     private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase>()
     private val setViewType = mock<SetViewType>()
@@ -60,16 +61,14 @@ class RubbishBinViewModelTest {
     private val getRubbishBinFolderUseCase = mock<GetRubbishBinFolderUseCase>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getRubbishBinChildren = mock<GetRubbishBinChildren>()
-    private val fileDurationMapper: FileDurationMapper = mock {
-        onBlocking { invoke(any()) }.thenReturn(null)
-    }
+    private val fileDurationMapper: FileDurationMapper = mock()
 
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
-
-    @Before
+    @BeforeEach
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        runBlocking {
+            stubCommon()
+        }
         initViewModel()
     }
 
@@ -106,7 +105,7 @@ class RubbishBinViewModelTest {
             Truth.assertThat(initial.selectedNodeHandles).isEmpty()
             Truth.assertThat(initial.selectedMegaNodes).isNull()
             Truth.assertThat(initial.isPendingRefresh).isFalse()
-            Truth.assertThat(initial.isRubbishBinEmpty).isFalse()
+            Truth.assertThat(initial.isRubbishBinEmpty).isTrue()
             Truth.assertThat(initial.restoreType).isNull()
         }
     }
@@ -432,8 +431,31 @@ class RubbishBinViewModelTest {
             }
         }
 
-    @After
-    fun tearDown() {
+    private suspend fun stubCommon() {
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
+        whenever(monitorViewType()).thenReturn(emptyFlow())
+        whenever(getRubbishBinChildren(any())).thenReturn(emptyList())
+        whenever(getRubbishBinParentNodeHandle(any())).thenReturn(null)
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        whenever(getRubbishBinFolderUseCase()).thenReturn(null)
+        whenever(fileDurationMapper(any())).thenReturn(1)
+    }
+
+    @AfterEach
+    fun resetMocks() {
         Dispatchers.resetMain()
+        reset(
+            monitorNodeUpdatesUseCase,
+            getRubbishBinParentNodeHandle,
+            isNodeDeletedFromBackupsUseCase,
+            setViewType,
+            monitorViewType,
+            getCloudSortOrder,
+            getIntentToOpenFileMapper,
+            getRubbishBinFolderUseCase,
+            getNodeByHandle,
+            getRubbishBinChildren,
+            fileDurationMapper
+        )
     }
 }
