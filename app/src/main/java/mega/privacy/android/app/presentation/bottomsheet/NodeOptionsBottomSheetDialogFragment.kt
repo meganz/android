@@ -1291,7 +1291,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val intent = getIntentForParentNode(
             requireContext(),
             megaApi.getParentNode(node)?.handle,
-            SortOrder.ORDER_PHOTO_ASC,
+            SortOrder.ORDER_DEFAULT_ASC,
             node.handle,
             true
         )

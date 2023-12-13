@@ -42,7 +42,7 @@ internal class FetchChildrenMapperTest {
         runTest {
             val megaNode = mock<MegaNode>()
             val expectedOrder = 5
-            val sortOrder = SortOrder.ORDER_ALPHABETICAL_ASC
+            val sortOrder = SortOrder.ORDER_DEFAULT_ASC
             whenever(sortOrderIntMapper(sortOrder)).thenReturn(expectedOrder)
             val child = mock<MegaNode>()
             megaApiGateway.stub {

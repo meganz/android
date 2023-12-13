@@ -92,20 +92,6 @@
             android:text="@string/file_properties_label"
             app:drawableStartCompat="@drawable/ic_label" />
 
-        <TextView
-            android:id="@+id/sort_by_photos_media_type"
-            style="@style/BottomSheetItem"
-            android:text="@string/sortby_type_photo_first"
-            android:visibility="gone"
-            app:drawableStartCompat="@drawable/ic_cu_photos"/>
-
-        <TextView
-            android:id="@+id/sort_by_videos_media_type"
-            style="@style/BottomSheetItem"
-            android:text="@string/sortby_type_video_first"
-            android:visibility="gone"
-            app:drawableStartCompat="@drawable/ic_cu_videos" />
-
     </LinearLayout>
 
 </ScrollView>

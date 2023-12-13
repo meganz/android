@@ -209,8 +209,8 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that set others sort order invokes set others sort order of gateway`() = runTest {
-        val order = SortOrder.ORDER_ALPHABETICAL_ASC
-        val expected = MegaApiJava.ORDER_ALPHABETICAL_ASC
+        val order = SortOrder.ORDER_DEFAULT_ASC
+        val expected = MegaApiJava.ORDER_DEFAULT_ASC
         whenever(sortOrderIntMapper.invoke(order)).thenReturn(expected)
         underTest.setOthersSortOrder(order)
         verify(megaLocalStorageGateway).setOthersSortOrder(expected)
@@ -218,8 +218,8 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that set others sort order invokes sort order int mapper`() = runTest {
-        val order = SortOrder.ORDER_ALPHABETICAL_ASC
-        val expected = MegaApiJava.ORDER_ALPHABETICAL_ASC
+        val order = SortOrder.ORDER_DEFAULT_ASC
+        val expected = MegaApiJava.ORDER_DEFAULT_ASC
         whenever(sortOrderIntMapper.invoke(order)).thenReturn(expected)
         underTest.setOthersSortOrder(order)
         verify(sortOrderIntMapper).invoke(order)

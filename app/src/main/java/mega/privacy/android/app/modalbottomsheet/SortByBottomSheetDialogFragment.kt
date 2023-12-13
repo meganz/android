@@ -116,8 +116,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         SortOrder.ORDER_SIZE_ASC -> setSelectedColor(binding.sortBySmallestSize)
                         SortOrder.ORDER_FAV_ASC -> setSelectedColor(binding.sortByFavoritesType)
                         SortOrder.ORDER_LABEL_ASC -> setSelectedColor(binding.sortByLabelType)
-                        SortOrder.ORDER_PHOTO_DESC -> setSelectedColor(binding.sortByPhotosMediaType)
-                        SortOrder.ORDER_VIDEO_DESC -> setSelectedColor(binding.sortByVideosMediaType)
                         else -> {}
                     }
                 }
@@ -134,8 +132,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.sortBySizeSeparator.isVisible = false
                 binding.sortByFavoritesType.isVisible = false
                 binding.sortByLabelType.isVisible = false
-                binding.sortByPhotosMediaType.isVisible = true
-                binding.sortByVideosMediaType.isVisible = true
             }
             ORDER_OTHERS -> {
                 binding.sortByNameSeparator.isVisible = false
@@ -185,14 +181,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         binding.sortByLabelType.setOnClickListener {
             setNewOrder(SortOrder.ORDER_LABEL_ASC)
-        }
-
-        binding.sortByPhotosMediaType.setOnClickListener {
-            setNewOrder(SortOrder.ORDER_PHOTO_DESC)
-        }
-
-        binding.sortByVideosMediaType.setOnClickListener {
-            setNewOrder(SortOrder.ORDER_VIDEO_DESC)
         }
 
         super.onViewCreated(view, savedInstanceState)

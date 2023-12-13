@@ -50,36 +50,6 @@ enum class SortOrder {
     ORDER_MODIFICATION_DESC,
 
     /**
-     * Order ORDER_ALPHABETICAL_ASC refers to MegaApiJava.ORDER_ALPHABETICAL_ASC
-     */
-    ORDER_ALPHABETICAL_ASC,
-
-    /**
-     * Order ORDER_ALPHABETICAL_DESC refers to MegaApiJava.ORDER_ALPHABETICAL_DESC
-     */
-    ORDER_ALPHABETICAL_DESC,
-
-    /**
-     * Order ORDER_PHOTO_ASC refers to MegaApiJava.ORDER_PHOTO_ASC
-     */
-    ORDER_PHOTO_ASC,
-
-    /**
-     * Order ORDER_PHOTO_DESC refers to MegaApiJava.ORDER_PHOTO_DESC
-     */
-    ORDER_PHOTO_DESC,
-
-    /**
-     * Order ORDER_VIDEO_ASC refers to MegaApiJava.ORDER_VIDEO_ASC
-     */
-    ORDER_VIDEO_ASC,
-
-    /**
-     * Order ORDER_VIDEO_DESC refers to MegaApiJava.ORDER_VIDEO_DESC
-     */
-    ORDER_VIDEO_DESC,
-
-    /**
      * Order ORDER_LINK_CREATION_ASC refers to MegaApiJava.ORDER_LINK_CREATION_ASC
      */
     ORDER_LINK_CREATION_ASC,

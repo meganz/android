@@ -178,7 +178,7 @@ class ManagerViewModelTest {
             )
         }
     private val getCloudSortOrder =
-        mock<GetCloudSortOrder> { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_ALPHABETICAL_ASC) }
+        mock<GetCloudSortOrder> { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC) }
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val monitorSyncStalledIssuesUseCase = mock<MonitorSyncStalledIssuesUseCase> {
@@ -427,7 +427,7 @@ class ManagerViewModelTest {
             monitorChatArchivedUseCase,
             monitorPushNotificationSettingsUpdate
         )
-        wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_ALPHABETICAL_ASC)
+        wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(true)
         whenever(monitorUserUpdates()).thenReturn(emptyFlow())
         whenever(monitorCallRecordingConsentEventUseCase()).thenReturn(emptyFlow())

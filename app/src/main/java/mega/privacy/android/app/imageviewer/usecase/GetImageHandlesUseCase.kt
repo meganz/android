@@ -77,7 +77,7 @@ class GetImageHandlesUseCase @Inject constructor(
         chatMessageIds: LongArray? = null,
         imageFileUri: Uri? = null,
         showNearbyFiles: Boolean? = false,
-        sortOrder: SortOrder? = SortOrder.ORDER_PHOTO_ASC,
+        sortOrder: SortOrder? = SortOrder.ORDER_DEFAULT_ASC,
         isOffline: Boolean? = false,
         isTimeline: Boolean? = false,
         isAlbumSharing: Boolean? = false,
@@ -94,7 +94,7 @@ class GetImageHandlesUseCase @Inject constructor(
                 parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
                     val parentNode = getNodeUseCase.get(parentNodeHandle).blockingGetOrNull()
                     if (parentNode != null && megaApi.hasChildren(parentNode)) {
-                        items.addChildrenNodes(parentNode, sortOrder ?: SortOrder.ORDER_PHOTO_ASC)
+                        items.addChildrenNodes(parentNode, sortOrder ?: SortOrder.ORDER_DEFAULT_ASC)
                     } else {
                         error("Node is null or has no children")
                     }

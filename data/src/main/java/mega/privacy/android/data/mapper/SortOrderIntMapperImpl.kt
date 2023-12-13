@@ -23,12 +23,6 @@ class SortOrderIntMapperImpl @Inject constructor() : SortOrderIntMapper {
         SortOrder.ORDER_CREATION_DESC -> MegaApiJava.ORDER_CREATION_DESC
         SortOrder.ORDER_MODIFICATION_ASC -> MegaApiJava.ORDER_MODIFICATION_ASC
         SortOrder.ORDER_MODIFICATION_DESC -> MegaApiJava.ORDER_MODIFICATION_DESC
-        SortOrder.ORDER_ALPHABETICAL_ASC -> MegaApiJava.ORDER_ALPHABETICAL_ASC
-        SortOrder.ORDER_ALPHABETICAL_DESC -> MegaApiJava.ORDER_ALPHABETICAL_DESC
-        SortOrder.ORDER_PHOTO_ASC -> MegaApiJava.ORDER_PHOTO_ASC
-        SortOrder.ORDER_PHOTO_DESC -> MegaApiJava.ORDER_PHOTO_DESC
-        SortOrder.ORDER_VIDEO_ASC -> MegaApiJava.ORDER_VIDEO_ASC
-        SortOrder.ORDER_VIDEO_DESC -> MegaApiJava.ORDER_VIDEO_DESC
         SortOrder.ORDER_LINK_CREATION_ASC -> MegaApiJava.ORDER_LINK_CREATION_ASC
         SortOrder.ORDER_LINK_CREATION_DESC -> MegaApiJava.ORDER_LINK_CREATION_DESC
         SortOrder.ORDER_LABEL_ASC -> MegaApiJava.ORDER_LABEL_ASC

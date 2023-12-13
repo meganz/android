@@ -21,7 +21,6 @@ import mega.privacy.android.feature.sync.domain.mapper.StalledIssueToSolvedIssue
 import mega.privacy.android.feature.sync.domain.usecase.solvedissues.SetSyncSolvedIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.RenameFilesWithTheSameNameUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.RenameNodeWithTheSameNameUseCase
-import java.io.File
 import javax.inject.Inject
 
 internal class ResolveStalledIssueUseCase @Inject constructor(
@@ -129,8 +128,8 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
                 val (currentMainFolder, currentSecondaryFolder) = stack.removeLast()
 
                 val (mainFolderChildren, secondaryFolderChildren) = awaitAll(
-                    async { currentMainFolder.fetchChildren(SortOrder.ORDER_ALPHABETICAL_ASC) },
-                    async { currentSecondaryFolder.fetchChildren(SortOrder.ORDER_ALPHABETICAL_ASC) },
+                    async { currentMainFolder.fetchChildren(SortOrder.ORDER_DEFAULT_ASC) },
+                    async { currentSecondaryFolder.fetchChildren(SortOrder.ORDER_DEFAULT_ASC) },
                 )
 
                 for (secondaryNode in secondaryFolderChildren) {

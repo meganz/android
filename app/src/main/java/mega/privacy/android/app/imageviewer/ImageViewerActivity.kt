@@ -177,7 +177,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         fun getIntentForParentNode(
             context: Context,
             parentNodeHandle: Long?,
-            childOrder: SortOrder = SortOrder.ORDER_PHOTO_ASC,
+            childOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
             currentNodeHandle: Long? = null,
             showSlideshow: Boolean = false,
         ): Intent =
@@ -349,11 +349,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             intent.getSerializableExtra(
                 INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
                 SortOrder::class.java
-            ) ?: SortOrder.ORDER_PHOTO_ASC
+            ) ?: SortOrder.ORDER_DEFAULT_ASC
         } else {
             @Suppress("DEPRECATION")
             intent.getSerializableExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN) as SortOrder?
-                ?: SortOrder.ORDER_PHOTO_ASC
+                ?: SortOrder.ORDER_DEFAULT_ASC
         }
     }
     private val chatRoomId by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, INVALID_HANDLE) }
