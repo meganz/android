@@ -1,7 +1,6 @@
 package test.mega.privacy.android.app.presentation.clouddrive
 
 import android.view.MenuItem
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import de.palm.composestateevents.StateEventWithContentConsumed
@@ -12,13 +11,16 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
 import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
+import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -47,17 +49,20 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FileBrowserViewModelTest {
     private lateinit var underTest: FileBrowserViewModel
 
@@ -69,9 +74,7 @@ class FileBrowserViewModelTest {
         )
     }
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
-    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
-        on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
-    }
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val getFileBrowserParentNodeHandle = mock<GetParentNodeHandle>()
     private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
@@ -82,19 +85,16 @@ class FileBrowserViewModelTest {
     private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase = mock()
     private val transfersManagement: TransfersManagement = mock()
     private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
-    private val fileDurationMapper: FileDurationMapper = mock {
-        onBlocking { invoke(any()) }.thenReturn(null)
-    }
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-        onBlocking { invoke(AppFeatures.DownloadWorker) }.thenReturn(false)
-    }
+    private val fileDurationMapper: FileDurationMapper = mock()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
 
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
-
-    @Before
+    @BeforeEach
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        runBlocking {
+            stubCommon()
+        }
         initViewModel()
     }
 
@@ -115,7 +115,7 @@ class FileBrowserViewModelTest {
             transfersManagement = transfersManagement,
             containsMediaItemUseCase = containsMediaItemUseCase,
             fileDurationMapper = fileDurationMapper,
-            monitorOfflineNodeUpdatesUseCase = mock(),
+            monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
@@ -455,5 +455,39 @@ class FileBrowserViewModelTest {
         whenever(handleOptionClickMapper(eq(menuItem), any())).thenReturn(optionsItemInfo)
         whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
         underTest.onOptionItemClicked(menuItem)
+    }
+
+    private suspend fun stubCommon() {
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
+        whenever(monitorViewType()).thenReturn(emptyFlow())
+        whenever(getFileBrowserChildrenUseCase(any())).thenReturn(emptyList())
+        whenever(getFileBrowserParentNodeHandle(any())).thenReturn(null)
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
+        whenever(getBandWidthOverQuotaDelayUseCase()).thenReturn(null)
+        whenever(fileDurationMapper(any())).thenReturn(1)
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
+
+    }
+
+    @AfterEach
+    fun resetMocks() {
+        Dispatchers.resetMain()
+        reset(
+            monitorNodeUpdatesUseCase,
+            getFileBrowserParentNodeHandle,
+            getFileBrowserChildrenUseCase,
+            getCloudSortOrder,
+            handleOptionClickMapper,
+            monitorViewType,
+            setViewType,
+            monitorRefreshSessionUseCase,
+            getBandWidthOverQuotaDelayUseCase,
+            transfersManagement,
+            containsMediaItemUseCase,
+            fileDurationMapper,
+            getFeatureFlagValueUseCase,
+            monitorOfflineNodeUpdatesUseCase
+        )
     }
 }
