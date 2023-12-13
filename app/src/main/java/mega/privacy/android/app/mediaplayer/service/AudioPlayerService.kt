@@ -52,6 +52,11 @@ import mega.privacy.android.app.utils.ChatUtil.getRequest
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.icon.pack.R as iconPackR
+import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import androidx.core.app.NotificationCompat
+import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -239,7 +244,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         mediaPlayerGateway.createPlayerControlNotification(
             PlayerNotificationCreatedParams(
                 notificationId = PLAYBACK_NOTIFICATION_ID,
-                channelId = Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID,
+                channelId = NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID,
                 channelNameResourceId = R.string.audio_player_notification_channel_name,
                 metadata = metadata,
                 pendingIntent = PendingIntent.getActivity(
@@ -295,7 +300,11 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         val command = intent?.getIntExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_CREATE)
         if (command == COMMAND_PAUSE || command == COMMAND_RESUME || command == COMMAND_STOP) {
             currentNotification?.let {
+                crashReporter.log("currentNotification is not null")
                 startForeground(PLAYBACK_NOTIFICATION_ID, it)
+            } ?: run {
+                crashReporter.log("currentNotification is null and create new notification")
+                startForeground(PLAYBACK_NOTIFICATION_ID, createNotificationForStartForeground())
             }
         }
         when (command) {
@@ -329,6 +338,22 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             }
         }
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    @SuppressLint("ServiceCast")
+    private fun createNotificationForStartForeground(): Notification {
+        val notificationManager =
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(
+            NotificationChannel(
+                NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID,
+                getString(R.string.audio_player_notification_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+        )
+        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID)
+            .setSmallIcon(R.drawable.ic_mega_logo)
+            .build()
     }
 
     private fun observeData() {
