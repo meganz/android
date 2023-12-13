@@ -45,8 +45,8 @@ import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
-import mega.privacy.mobile.analytics.event.AlbumItemSelected
-import mega.privacy.mobile.analytics.event.AlbumItemSelectedEvent
+import mega.privacy.mobile.analytics.event.PhotoItemSelected
+import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -562,12 +562,12 @@ class AlbumsViewModel @Inject constructor(
         val selectedPhotos = _state.value.selectedPhotos.toMutableSet()
         if (photo in selectedPhotos) {
             Analytics.tracker.trackEvent(
-                AlbumItemSelectedEvent(selectionType = AlbumItemSelected.SelectionType.MultiRemove)
+                PhotoItemSelectedEvent(selectionType = PhotoItemSelected.SelectionType.MultiRemove)
             )
             selectedPhotos.remove(photo)
         } else {
             Analytics.tracker.trackEvent(
-                AlbumItemSelectedEvent(selectionType = AlbumItemSelected.SelectionType.MultiAdd)
+                PhotoItemSelectedEvent(selectionType = PhotoItemSelected.SelectionType.MultiAdd)
             )
             selectedPhotos.add(photo)
         }
