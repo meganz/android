@@ -143,6 +143,8 @@ class UpgradeAccountViewModelTest {
     @Test
     fun `test that initial state has current payment listed if current payment is available`() =
         runTest {
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
             initViewModel()
             underTest.state.map { it.currentPayment }.distinctUntilChanged().test {
@@ -247,6 +249,8 @@ class UpgradeAccountViewModelTest {
     @Test
     fun `test that isPaymentMethodAvailable returns true when isBillingAvailableUseCase returns true and getPaymentMethodUseCase contains PAYMENT_METHOD_GOOGLE_WALLET`() =
         runTest {
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
             whenever(isBillingAvailableUseCase()).thenReturn(true)
             whenever(getPaymentMethodUseCase(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
             initViewModel()
