@@ -166,7 +166,7 @@ class SyncNewFolderScreenRouteTest {
             )
         }
 
-        composeTestRule.onNodeWithText("MEGA folder")
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_choose_mega_folder_title))
             .performClick()
 
         verify(openSelectMegaFolderScreenLambda).invoke()
