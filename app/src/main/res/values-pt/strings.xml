@@ -131,7 +131,7 @@
     <!-- Login button -->
     <string name="login_text">Fazer login</string>
     <!-- email label -->
-    <string name="email_text">E-mail</string>
+    <string name="email_text">Email</string>
     <!-- password label -->
     <string name="password_text">Senha</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -764,7 +764,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Este é o último passo para excluir a sua conta. Todos os dados armazenados na sua nuvem de arquivos serão permanentemente deletados. Por favor, digite sua senha abaixo para confirmar.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Comprovação de e-mail</string>
+    <string name="email_verification_title">Email address verification</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Por favor, verifique seu e-mail para continuar.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1407,9 +1407,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Mover para a Lixeira?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Você tem certeza de quera mover esta pasta para a Lixeira? Fazer isso desativará os Uploads da câmera.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Você tem certeza de que quer mover esta pasta para a Lixeira? Fazer isso desativará o upload secundário de mídia.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Mover para a Lixeira?</string>
     <!-- confirmation message before removing a file -->
@@ -1453,7 +1453,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Convite enviado</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Formato de e-mail incorreto</string>
+    <string name="invalid_email_to_invite">Email address is malformed</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Ao instalar o aplicativo para desktop do MEGA, você recebe grátis %1$s de espaço de armazenamento, válidos por 365 dias. O aplicativo para desktop do MEGA está disponível para Windows, macOS e a maioria das distribuições Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -2050,7 +2050,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Ativar ou desativar o controle das versões de arquivos na sua conta. \nDesativar o controle das versões de arquivos não impede que os seus contatos criem novas versões em pastas compartilhadas.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Digite o nome ou e-mail</string>
+    <string name="type_mail">Tap, enter name or email address</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Você quer adicionar %s aos seus contatos?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2386,7 +2386,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurar o MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">O MEGA precisa da sua permissão para ter acesso aos seus arquivos para poder compartilhá-los. Podem ser necessárias outras permissões para enviar e receber mensagens criptografadas e fazer chamadas seguras.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Permitir acesso a fotos, arquivos multimídia e outros arquivos</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -3077,10 +3077,10 @@
     <string name="settings_about_cookie_policy">Política de cookies</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Configurações de cookies</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">A sua privacidade</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Usamos Cookies e tecnologias semelhantes (“Cookies”) para fornecer e melhorar a sua experiência com os nossos serviços. Você pode aceitar o nosso uso de Cookies desde o início da sua visita ou personalizar os Cookies nas Configurações de Cookies. Para mais informações, acesse a nossa [A]Política de Cookies[/A].</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">Gerenciar cookies</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">We use cookies and similar technologies to help us improve our services. Learn more in our [A]Cookie Policy[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">As configurações dos cookies não foram salvas.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -5404,7 +5404,7 @@
         <item quantity="other">Uploads da câmera concluídos, foi feito o upload de %1$d arquivos</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">O MEGA tem acesso limitado à biblioteca de fotos e não pode fazer backup de todas as suas fotos.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Pressione para alterar as permissões.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5469,4 +5469,12 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s deixou de gravar</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galeria</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">Cookies de publicidade</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">Usados por parceiros de publicidade aprovados para coletar dados sobre as suas atividades de navegação e personalizar os anúncios que você vê nos nossos serviços e em outros sites. Não aceitar esses cookies significa que você ainda verá anúncios, mas eles não personalizados.</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">We use cookies and similar technologies to help us improve our services and for advertising purposes. By continuing to use MEGA you agree with the terms of our updated [A]Cookie Policy[/A].</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">Sincronizar</string>
 </resources>

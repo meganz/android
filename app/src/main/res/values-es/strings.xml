@@ -764,7 +764,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Este es el último paso para eliminar tu cuenta. Perderás de forma permanente todos los datos almacenados en la nube. Por favor, introduce tu contraseña a continuación.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Confirma el correo electrónico</string>
+    <string name="email_verification_title">Email address verification</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Ve a la bandeja de entrada de tu correo electrónico para continuar.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1407,9 +1407,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">¿Mover elemento a la Papelera?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivarán las Subidas de la cámara.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivará la subida multimedia secundaria.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">¿Mover elemento a la Papelera?</string>
     <!-- confirmation message before removing a file -->
@@ -1453,7 +1453,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Invitación enviada</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Correo electrónico no válido</string>
+    <string name="invalid_email_to_invite">Email address is malformed</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Al instalar la aplicación de escritorio, obtienes %1$s de almacenamiento adicional válido durante 365 días. La aplicación de escritorio de MEGA está disponible para Windows, macOS y la mayoría de las distribuciones de Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -2050,7 +2050,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Activa o desactiva el control de versiones de archivos para toda tu cuenta.\nDesactivar el control de versiones no impedirá que tus contactos creen nuevas versiones en carpetas compartidas.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Toca, introduce el nombre o el correo electrónico</string>
+    <string name="type_mail">Tap, enter name or email address</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">¿Añadir a %s a tus contactos?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2386,7 +2386,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurar MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA necesita permisos de acceso a tus archivos multimedia para que los puedas compartir. Es posible que se necesiten otros permisos de acceso para intercambiar mensajes cifrados y hacer llamadas seguras.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Permitir acceso a fotos, archivos multimedia y archivos</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -3077,10 +3077,10 @@
     <string name="settings_about_cookie_policy">Política de Cookies</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Ajustes de Cookies</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Tu privacidad</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Utilizamos cookies y tecnologías similares (“Cookies”) para ofrecerte nuestros servicios y mejorar tu experiencia al usarlos. Acepta el uso de Cookies o personalízalo en los ajustes. Encuentra más información al respecto en nuestra [A]Política de cookies[/A].</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">Manage cookies</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">We use cookies and similar technologies to help us improve our services. Learn more in our [A]Cookie Policy[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Ajustes de Cookies no guardados.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -5404,7 +5404,7 @@
         <item quantity="other">Subidas de la cámara completadas, %1$d archivos subidos</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA tiene acceso limitado a la biblioteca de fotos y no puede hacer un backup de todas tus fotos.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Pulsa para cambiar los permisos.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5469,4 +5469,12 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s ha dejado de grabar</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galería</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">Cookies publicitarias</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">Used by our approved advertising partners to collect data about your browsing activities and customise the ads you see on our services and on other websites. Not accepting these cookies means you will still see ads but they won’t be personalised.</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">We use cookies and similar technologies to help us improve our services and for advertising purposes. By continuing to use MEGA you agree with the terms of our updated [A]Cookie Policy[/A].</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">Sincronizar</string>
 </resources>

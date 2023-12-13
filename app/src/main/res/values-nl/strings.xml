@@ -129,7 +129,7 @@
     <!-- Login button -->
     <string name="login_text">Log&#160;in</string>
     <!-- email label -->
-    <string name="email_text">E-mail</string>
+    <string name="email_text">E-mail adres</string>
     <!-- password label -->
     <string name="password_text">Wachtwoord</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -755,7 +755,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Dit is de laatste stap om uw account te verwijderen. U verliest al uw gegevens die opgeslagen zijn in de cloud. Voer uw wachtwoord hieronder in.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">E-mail verificatie</string>
+    <string name="email_verification_title">E-mail adres verificatie</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Controleer uw e-mail om door te gaan.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1376,9 +1376,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Verplaatsen naar Prullenbak?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Weet u zeker dat u deze map naar de Prullenbak wilt verplaatsen? Dit schakelt de Camera uploads uit.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Weet u zeker dat u deze map wilt verplaatsen naar de Prullenbak? Hierdoor worden secundaire media uploads uitgeschakeld.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Verplaatsen naar Prullenbak?</string>
     <!-- confirmation message before removing a file -->
@@ -1422,7 +1422,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Uitnodiging verstuurd</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">E-mail is misvormed</string>
+    <string name="invalid_email_to_invite">Email address is malformed</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Wanneer u de MEGA Desktop Applicatie installeert krijgt u %1$s aan extra opslag ruimte, geldig voor 365 dagen. De MEGA Desktop Applicatie is beschikbaar voor Windows, macOS en de meeste Linux distributies.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -2005,7 +2005,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Versionering inschakelen of uitschakelen voor uw gehele account. \nVersionering uischakelen zorgt er niet voor dat uw contacten nieuwe versies kunnen creëren in gedeelde mappen.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Tik, naam of e-mail invoeren</string>
+    <string name="type_mail">Tik op, voer naam of e-mailadres in</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Wilt u %s tot uw contacten toevoegen?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2332,7 +2332,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA Instellen</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA heeft uw toestemming nodig om toegang te krijgen tot uw media en bestanden om te delen. Andere toegangsrechten kunnen nodig zijn voor het uitwisselen van versleutelde berichten en om veilig te bellen.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Toegang tot foto’s, media en bestanden toestaan</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2999,10 +2999,10 @@
     <string name="settings_about_cookie_policy">Cookiebeleid</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Cookie Instellingen</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Uw privacy</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We gebruiken Cookies en vergelijkbare technologieën (“Cookies”) om uw ervaring met onze diensten te bieden en te verbeteren. Accepteer ons gebruik van Cookies vanaf het begin van uw bezoek of pas Cookies aan in de Cookie-Instellingen. Lees meer in ons [A]Cookiebeleid[/A].</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">Cookies beheren</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">Wij gebruiken cookies en dergelijken technologieën om ons te helpen onze diensten te verbeteren. Leer meer in ons [A]Cookie Beleid[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie-Instellingen niet opgeslagen.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -5171,7 +5171,7 @@
         <item quantity="other">Camera uploads voltooid, %1$d bestanden geüpload</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA heeft beperkte toegang tot de fotobibliotheek en kan geen back-up maken van al uw foto\’s.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Tik om de toestemmingen te wijzigen.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5234,4 +5234,12 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s is gestopt met opnemen</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Gallerij</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">Advertentie Cookies</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">Gebruikt door onze goedgekeurde advertentiepartners om gegevens over uw browse-activiteiten te verzamelen en de advertenties die u op onze diensten en op andere websites ziet, aan te passen. Als u deze cookies niet accepteert, krijgt u nog steeds advertenties te zien, maar niet gepersonaliseerd.</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">Wij gebruiken cookies en soortgelijke technologieën om ons te helpen onze dienstverlening te verbeteren. Als u MEGA blijft gebruiken, gaat u akkoord met de voorwaarden van ons [A]Cookiebeleid[/A].</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">Synchroniseren</string>
 </resources>

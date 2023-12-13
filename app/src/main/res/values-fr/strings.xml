@@ -155,13 +155,13 @@
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">Connexion au serveur</string>
     <!-- Status text when updating the file manager -->
-    <string name="download_updating_filelist">Mise à jour de la liste des fichiers</string>
+    <string name="download_updating_filelist">Mise à jour de la liste de fichiers</string>
     <!-- when the user clicks on the link sent by MEGA after creating the account, this message is shown -->
     <string name="login_querying_signup_link">Vérification du lien de validation</string>
     <!-- Attempting to activate a MEGA account for a user. -->
     <string name="login_confirming_account">Activation du compte</string>
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
-    <string name="login_preparing_filelist">Préparation de la liste des fichiers</string>
+    <string name="login_preparing_filelist">Préparation de la liste de fichiers</string>
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">Veuillez vous connecter pour partager avec MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
@@ -1407,9 +1407,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Déplacer vers la Corbeille ?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la Corbeille ? Téléversements de l’appareil photo sera désactivée.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la Corbeille ? Les téléversements secondaires de médias seront désactivée.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Déplacer vers la Corbeille ?</string>
     <!-- confirmation message before removing a file -->
@@ -2236,7 +2236,7 @@
     <!-- Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown -->
     <string name="section_notification_user_with_nickname">[A]%1$s (%2$s)[/A]</string>
     <!-- Title of the historic notification for an account deleted -->
-    <string name="title_account_notification_deleted">Le compte a été supprimé</string>
+    <string name="title_account_notification_deleted">Compte supprimé</string>
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]Le compte [/B][A]%s[/A][B] a été supprimé.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
@@ -2386,7 +2386,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurer MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA a besoin de votre autorisation pour accéder à vos fichiers afin de les partager. D’autres permissions d’accès pourraient être nécessaires pour échanger des messages chiffrés et faire des appels sécurisés.</string>
+    <string name="setup_mega_explanation">MEGA a besoin de votre autorisation pour accéder à vos médias et fichiers afin de les partager. D’autres permissions d’accès pourraient être nécessaires pour utiliser les fonctions et services fournis par cette appli.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Autoriser l’accès aux photos, aux médias et aux fichiers</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -3077,10 +3077,10 @@
     <string name="settings_about_cookie_policy">Politique d’utilisation des Témoins</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Paramètres des Témoins</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Protection de vos renseignements personnels</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Nous utilisons des Témoins de connexion et des technologies semblables («&#160;Témoins&#160;») pour vous fournir nos services et améliorer votre expérience d’utilisation de nos services. Acceptez notre utilisation de Témoins dès le début de votre visite ou personnalisez les Témoins dans les paramètres des Témoins. Apprenez-en davantage dans notre [A]Politique d’utilisation des Témoins[/A].</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">Gérer les témoins</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">Nous utilisons des témoins et des technologies semblables pour nous aider à améliorer nos services. Apprenez-en davantage dans notre [A]Politique d’utilisation des Témoins[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Des paramètres de témoins ne sont pas enregistrés.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -5404,7 +5404,7 @@
         <item quantity="other">Téléversements de l’appareil photo terminés, %1$d&#160;fichiers téléversés</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA a un accès limité à la photothèque et ne peut pas sauvegarder toutes vos photos.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Toucher pour changer les autorisations.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5466,7 +5466,15 @@
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">%1$s a commencé l’enregistrement</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
-    <string name="meetings_call_recording_stopped_snackbar_message">%1$s a mis fin à l’enregistrement</string>
+    <string name="meetings_call_recording_stopped_snackbar_message">%1$s a arrêté l’enregistrement</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galerie</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">Témoins publicitaires</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">Utilisés par nos partenaires publicitaires agréés pour collecter des données sur vos activités de navigation et personnaliser les publicités que vous voyez sur nos services et sur d’autres sites web. Ne pas accepter ces témoins implique que vous continuerez à voir des publicités, mais elles ne seront pas personnalisées.</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">Nous utilisons des témoins et des technologies semblables pour nous aider à améliorer nos services, ainsi qu’à des fins publicitaires. En continuant à utiliser MEGA, vous acceptez les conditions de notre [A]Politique d’utilisation des Témoins[/A] mise à jour.</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">Synchronisations</string>
 </resources>

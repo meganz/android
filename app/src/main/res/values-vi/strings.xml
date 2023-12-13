@@ -127,7 +127,7 @@
     <!-- Login button -->
     <string name="login_text">Đăng&#160;nhập</string>
     <!-- email label -->
-    <string name="email_text">E-mail</string>
+    <string name="email_text">Email</string>
     <!-- password label -->
     <string name="password_text">Mật khẩu</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -497,7 +497,7 @@
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Đăng&#160;tải camêra bị dừng. Không tìm thấy thư&#160;mục cục&#160;bộ.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">Đăng tải thư&#160;mục Second Media đã bị tắt. Thư&#160;mục cục&#160;bộ không có tồn&#160;tại.</string>
+    <string name="camera_notif_secondary_local_unavailable">Các phiên tải lên phương tiện đã bị vô hiệu hóa. Thư&#160;mục cục&#160;bộ không có tồn&#160;tại.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Giao Diện</string>
     <!-- settings of the Features section -->
@@ -746,7 +746,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Đây là bước cuối cùng để hoàn tất việc xóa bỏ tài khoản. Bạn sẽ mất hoàn toàn tất cả dữ liệu bạn đã lưu trên ổ mây. Để tiến hành, xin nhập mật khẩu vào dưới đây.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Xác thực e-mail</string>
+    <string name="email_verification_title">Email address verification</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Xin kiểm tra hộp thư e-mail để thục hiện bước kế tiếp.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1345,9 +1345,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Chuyển vào Thùng Rác?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Bạn có chắc muốn chuyển thư mục này vào Thùng Rác? Thao tác ngày sẽ tắt Đăng Tải Camêra.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Bạn có chắc muốn chuyển thư&#160;mục này vào Thùng&#160;Rác? Thao&#160;tác ngày sẽ ngưng tính&#160;năng đăng tải thư&#160;mục phương&#160;tiện số bổ&#160;sung.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Bỏ vào Thùng Rác?</string>
     <!-- confirmation message before removing a file -->
@@ -1391,7 +1391,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Lời mời đã gửi đi</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Địa chỉ e-mail không đúng cú pháp</string>
+    <string name="invalid_email_to_invite">Email address is malformed</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Sau khi cài đặt MEGA trên máy tính, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, có hạn sử dụng là 365 ngày. MEGA còn có apps dành cho Windows, macOS và đa số các máy Linux distros.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1960,7 +1960,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Kích hoạt hoặc tắt tính&#160;năng ghi nhật&#160;ký phiên&#160;bản tệp&#160;tin cho toàn bộ tài&#160;khoản.\nTắt đi tính&#160;năng ghi nhật&#160;ký phiên&#160;bản sẽ không ngăn&#160;cản các tên liên&#160;lạc trong tài&#160;khoản của bạn tạo ra phiên&#160;bản mới của thư&#160;mục chia&#160;sẻ chung.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Chạm vào đây, nhập tên hay email</string>
+    <string name="type_mail">Tap, enter name or email address</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Thêm %s vào sổ liên lạc?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2278,7 +2278,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Thiếp Lập MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA cần quyền cấp phép của bạn để truy cập vào nội dung phương tiện số và tệp tin để thực hiện chia sẻ. Một số quyền truy cập khác cũng sẽ được cần để trao đổi tin nhắn bảo mật và gọi điện an toàn.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Cho phép truy cập vào hình ảnh, phương tiện số và tệp tin</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2921,10 +2921,10 @@
     <string name="settings_about_cookie_policy">Chính Sách Cookie</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Thiết đặt cookie</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Quyền riêng tư của bạn</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Chúng tôi sử dụng Cookie và các công nghệ tương tự (“Cookies”) để cung cấp và nâng cao trải nghiệm dịch vụ cho  người sử dụng. Chấp nhận việc sử dụng Cookies của chúng tôi trước khi sử dụng hoặc tùy chỉnh theo ý thích trong phần Cài Đặt Cookie. Đọc thêm về [A]Chính Sách Cookie[/A].</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">Manage cookies</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">We use cookies and similar technologies to help us improve our services. Learn more in our [A]Cookie Policy[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cài Đặt Cookie chưa được lưu lại.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -4938,7 +4938,7 @@
         <item quantity="other">Đăng tải camêra hoàn tất, %1$d tệp tin đã được tải lên</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA có quyền truy&#160;cập bị hạn&#160;chế vào thư&#160;viện ảnh và không thể sao lưu tất cả ảnh của bạn.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Chạm để đổi quyền&#160;hạn.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -4999,4 +4999,12 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s stopped recording</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Thư Viện Phim Ảnh</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">Cookies Quảng Cáo</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">Used by our approved advertising partners to collect data about your browsing activities and customise the ads you see on our services and on other websites. Not accepting these cookies means you will still see ads but they won’t be personalised.</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">We use cookies and similar technologies to help us improve our services and for advertising purposes. By continuing to use MEGA you agree with the terms of our updated [A]Cookie Policy[/A].</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">Đồng bộ</string>
 </resources>

@@ -67,7 +67,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
     <string name="device_center_list_view_item_sub_state_initial_scan_failed">Scanarea inițială a eșuat. Va trebui să reactivați sincronizarea sau backupul din aplicația desktop.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="device_center_list_view_item_sub_state_remote_node_not_found">Dosarul din MEGA nu poate fi localizat deoarece a fost mutat sau șters sau este posibil să nu aveți acces.</string>
+    <string name="device_center_list_view_item_sub_state_remote_node_not_found">Folderul din MEGA nu poate fi localizat deoarece a fost mutat sau șters sau este posibil să nu aveți acces.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota">Storage quota has reached the limit.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
@@ -127,7 +127,7 @@
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Folderul nu poate fi sincronizat sau backup-uit, deoarece folderul MEGA se află în Coșul de gunoi.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Dosarul din dispozitiv nu poate fi localizat acum, încercați din nou mai târziu.</string>
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Folderul din dispozitiv nu poate fi localizat acum, încercați din nou mai târziu.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Folder in your device can’t be located</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->

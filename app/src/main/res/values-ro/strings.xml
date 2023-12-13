@@ -764,7 +764,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Acesta este ultimul pas pentru a vă șterge contul. Veți pierde definitiv toate datele stocate în cloud. Vă rugăm să introduceți parola mai jos.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Verificarea e-mailului</string>
+    <string name="email_verification_title">Verificarea adresei de e-mail</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Te rugăm să verifici e-mailul pentru a continua.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1407,9 +1407,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Muți în Coșul de gunoi?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Sigur vrei să muți acest folder în Coșul de gunoi? Acest lucru va dezactiva Încărcări cameră.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Sigur vrei să muți acest folder în Coșul de gunoi? Acest lucru va dezactiva Încărcări media secundare.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Muți în Coșul de gunoi?</string>
     <!-- confirmation message before removing a file -->
@@ -1453,7 +1453,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Invitație trimisă</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">E-mailul este malformat</string>
+    <string name="invalid_email_to_invite">Adresa de e-mail este malformată</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Când instalezi Aplicația Desktop MEGA, primești %1$s spațiu de stocare complementar, valabil timp de 365 de zile. Aplicația desktop MEGA este disponibilă pentru Windows, macOS și majoritatea distribuțiilor Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -2386,7 +2386,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurare MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA are nevoie de permisiunea ta ca să îți acceseze conținutul media și fișiere pentru partajare. Alte permisiuni de acces pot fi necesare pentru schimbul de mesaje criptate și pentru a efectua apeluri securizate.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Permite accesul la fotografii, conținut media și fișiere</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -3077,10 +3077,10 @@
     <string name="settings_about_cookie_policy">Politica privind cookie-urile</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Setări privind cookie-urile</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Intimitatea ta</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Folosim cookie-uri și tehnologii similare („Cookie-uri”) pentru a-ți oferi și a-ți îmbunătăți experiența cu serviciile noastre. Acceptă folosirea cookie-urilor de la începutul vizitei tale sau personalizează cookie-urile în Setări privind cookie-urile. Citește mai multe în [A]Politica noastră privind cookie-urile[/A].</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">Gestionați cookie-urile</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">Folosim cookie-uri și tehnologii similare pentru a ne ajuta să ne îmbunătățim serviciile. Aflați mai multe în [A]Politica privind cookie-urile[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Setările privind cookie-urile nu au fost salvate.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -4646,7 +4646,7 @@
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Pornește</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">Acest dosar a fost eliminat în conformitate cu [A]Politica pentru ghidul de eliminare [/A].</string>
+    <string name="cloud_drive_info_taken_down_file_warning">Acest folder a fost eliminat în conformitate cu [A]Politica pentru ghidul de eliminare [/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
     <string name="cloud_drive_info_taken_down_folder_warning">Acest folder a fost eliminat în conformitate cu [A]Politica pentru ghidul de eliminare [/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
@@ -5404,7 +5404,7 @@
         <item quantity="other">Încărcări cameră complete, %1$d de fișiere încărcate</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA are acces limitat la biblioteca foto și nu poate face backup la toate fotografiile dvs.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Atinge pentru a modifica permisiunile.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5456,17 +5456,25 @@
     <!-- Title of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_title">Acest apel este înregistrat</string>
     <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">By staying in the call you give permission to be recorded. The recording is only stored on the device of the person who records it.</string>
+    <string name="meetings_call_recording_consent_dialog_message">Rămânând în apel, dați permisiunea de a fi înregistrat. Înregistrarea este stocată numai pe dispozitivul persoanei care o înregistrează.</string>
     <!-- Label for the positive or confirm button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_positive_button">OK, am înțeles</string>
     <!-- Label for the negative or cancel button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_negative_button">Părăsește apelul</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Learn more[/A]</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]En apprendre davantage[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
-    <string name="meetings_call_recording_started_snackbar_message">%1$s started recording</string>
+    <string name="meetings_call_recording_started_snackbar_message">%1$s a început înregistrarea</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
-    <string name="meetings_call_recording_stopped_snackbar_message">%1$s stopped recording</string>
+    <string name="meetings_call_recording_stopped_snackbar_message">%1$s a oprit înregistrarea</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galerie</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">Cookie-uri de publicitate</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">Utilizate de partenerii noștri de publicitate aprobați pentru a colecta date despre activitățile dvs. de navigare și pentru a personaliza anunțurile pe care le vedeți în serviciile noastre și pe alte site-uri web. Dacă nu acceptați aceste cookie-uri, veți vedea în continuare anunțuri, dar acestea nu vor fi personalizate.</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">Folosim cookie-uri și tehnologii similare pentru a ne ajuta să ne îmbunătățim serviciile și în scopuri publicitare. Continuând să folosiți MEGA sunteți de acord cu termenii actualizați [A]Politica privind cookie-urile[/A].</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">Sincronizează</string>
 </resources>

@@ -755,7 +755,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Dies ist die letzte Stufe der Accountlöschung. Sie werden Ihre online gespeicherten Daten verlieren. Bitte geben Sie Ihr Passwort ein.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">E-Mail-Bestätigung</string>
+    <string name="email_verification_title">Verifizierung der E-Mail-Adresse</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Bitte sehen Sie in Ihrem Posteingang nach.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1376,9 +1376,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">In den Papierkorb verschieben?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Möchten Sie diesen Ordner wirklich in den Papierkorb verschieben? Dadurch werden Kamera-Uploads deaktiviert.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Möchten Sie diesen Ordner wirklich in den Papierkorb verschieben? Dadurch werden Zweitmedienuploads deaktiviert.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">In den Papierkorb verschieben?</string>
     <!-- confirmation message before removing a file -->
@@ -1422,7 +1422,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Einladung versandt</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Fehlerhafte E-Mail-Adresse</string>
+    <string name="invalid_email_to_invite">Die E-Mail-Adresse hat ein falsches Format</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Nach Installation der MEGA-Desktop-App erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage. Die MEGA-Desktop-App ist für Windows, macOS und die meisten Linux-Distributionen erhältlich.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -2005,7 +2005,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Dateiversionierung für den gesamten Account ein- und ausschalten.\nDas Ausschalten der Dateiversionierung hindert Ihre Kontakte nicht daran, in Ordnerfreigaben neue Versionen zu erstellen.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Namen oder E-Mail-Adresse eingeben</string>
+    <string name="type_mail">Antippen und Namen oder E-Mail-Adresse eingeben</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">%s zu Ihren Kontakten hinzufügen?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2332,7 +2332,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA konfigurieren</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">Zum Freigeben muss MEGA auf Ihre Medien und Dateien zugreifen können. Für verschlüsselte Nachrichten und sichere Anrufe könnten weitere Berechtigungen erforderlich sein.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Zugriff auf Fotos und (Medien-)dateien erlauben</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2999,10 +2999,10 @@
     <string name="settings_about_cookie_policy">Cookie-Richtlinien</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Cookie-Einstellungen</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Ihre Privatsphäre</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Im Rahmen der technischen Umsetzung unserer Dienstleistungen nutzen wir Cookies und verwandte Technologien („Cookies“). Sie können unserer Cookie-Nutzung sofort zustimmen oder sie im Detail konfigurieren. Weitere Informationen dazu in unseren [A]Cookie-Regelungen[/A].</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">Cookies verwalten</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">Wir verwenden Cookies und verwandte Technologien, um unsere Dienste zu verbessern. Weitere Informationen finden Sie in unseren [A]Cookie-Richtlinien[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie-Einstellungen noch nicht gespeichert.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -5171,7 +5171,7 @@
         <item quantity="other">Kamera-Uploads abgeschlossen, %1$d Dateien hochgeladen</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA hat nur eingeschränkten Zugriff auf die Fotobibliothek und kann nicht alle Ihre Fotos sichern.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Antippen, um die Berechtigungen zu ändern.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5229,9 +5229,17 @@
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Mehr erfahren[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
-    <string name="meetings_call_recording_started_snackbar_message">%1$s started recording</string>
+    <string name="meetings_call_recording_started_snackbar_message">%1$s hat die Aufzeichnung gestartet</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
-    <string name="meetings_call_recording_stopped_snackbar_message">%1$s stopped recording</string>
+    <string name="meetings_call_recording_stopped_snackbar_message">%1$s hat die Aufzeichnung beendet</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galerie</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">Werbe-Cookies</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">Verwendet von unseren autorisierten Werbepartnern, um Daten über Ihre Browsing-Aktivitäten zu sammeln und die Werbung, die Sie auf unseren Diensten und auf anderen Websites sehen, zu individualisieren. Wenn Sie diese Cookies nicht akzeptieren, werden Sie zwar weiterhin Werbeanzeigen sehen, diese werden aber nicht personalisiert sein.</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">Wir verwenden Cookies und verwandte Technologien zur Verbesserung unserer Dienste und zu Werbezwecken. Durch die weitere Nutzung von MEGA erklären Sie sich mit den Bedingungen unserer aktualisierten [A]Cookie-Richtlinien[/A] einverstanden.</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">Synchronisierung</string>
 </resources>

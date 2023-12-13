@@ -127,7 +127,7 @@
     <!-- Login button -->
     <string name="login_text">登入</string>
     <!-- email label -->
-    <string name="email_text">電子郵件</string>
+    <string name="email_text">電子郵件地止</string>
     <!-- password label -->
     <string name="password_text">密碼</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -746,7 +746,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">這是刪除帳戶的最後步驟。您將永久遺失儲存在雲端空間中的所有資料。請於下方輸入您的密碼。</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">電子郵件驗證</string>
+    <string name="email_verification_title">電子郵件地址驗證</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">請確認您的電子信箱以繼續。</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1345,9 +1345,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">要移至垃圾筒嗎？</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">您確定要將此資料夾移至垃圾筒嗎？這將會停用相機上傳。</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">您確定要將此資料夾移至垃圾筒嗎？這將會停用次要媒體上傳。</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">要移至垃圾筒嗎？</string>
     <!-- confirmation message before removing a file -->
@@ -1391,7 +1391,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">邀請已發送</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">電子郵件格式錯誤</string>
+    <string name="invalid_email_to_invite">電子郵件地址格式錯誤</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">當您安裝MEGA桌面應用程式時，您可免費獲得%1$s的儲存空間，有效期為365天。 MEGA桌面應用程式可在Windows、macOS和大多數Linux發行版使用。</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1798,11 +1798,11 @@
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">開始設定</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
-    <string name="explain_qr_seed_2fa_1">掃描或複製種子金鑰到您的身份驗證應用程式。</string>
+    <string name="explain_qr_seed_2fa_1">掃描或複製金鑰種子到您的身份驗證器應用程式。</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">請務必將此種子金鑰備份於安全的地方，以防您的裝置遺失。</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">請輸入您身份驗證程式所生成的6位數字代碼。</string>
+    <string name="explain_confirm_2fa">請輸入您身份驗證器應用程式所生成的6位數字代碼。</string>
     <!-- Text button -->
     <string name="general_next">下一步</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
@@ -1960,7 +1960,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">啟用或停用您整個帳戶的檔案版本控制功能。\n停用檔案版本控制並不會讓您的聯絡人無法在共享資料夾建立新版本的檔案。</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">點擊、輸入姓名或電子郵件</string>
+    <string name="type_mail">點選，輸入姓名或電子郵件地址</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">將%s新增為您的聯絡人？</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2278,7 +2278,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">設定MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA需要您的授權才能存取您的多媒體與檔案以進行共享。交換加密訊息和進行安全通話可能也需要其他存取權限。</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">允許存取相片、媒體與檔案</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2496,7 +2496,7 @@
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">已還原版本</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">長按即可錄音</string>
+    <string name="recording_less_than_second">長按即可錄製</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">滑動以取消</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -2921,10 +2921,10 @@
     <string name="settings_about_cookie_policy">Cookie政策</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Cookie設定</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">您的隱私</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">我們使用Cookies和類似技術（“Cookies”）來提供並增強我們服務的體驗。在您開始到訪時就接受我們所使用的Cookies或在Cookie設定中自訂Cookies選項。閱讀我們的[A]Cookie政策[/A]以瞭解更多資訊。</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">管理cookies</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">我們使用cookie和類似技術來幫助我們改善我們的服務。在我們的[A]Cookie政策[/A]中瞭解更多資訊。</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie設定未儲存。</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -3829,7 +3829,7 @@
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">正在準備檔案預覽</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="other">獎勵將在%1$d天後到期</item>
+        <item quantity="other">獎金將在%1$d天後到期</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">說明</string>
@@ -4938,7 +4938,7 @@
         <item quantity="other">相機上傳已完成，%1$d個檔案已上傳</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA對相簿的存取權限有限，無法備份您的所有照片。</string>
+    <string name="camera_uploads_limited_access">MEGA對相簿的存取權限有限，無法備份您所的有照片。</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">點選以更改權限。</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -4999,4 +4999,12 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s已停止錄影</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">相簿</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">廣告Cookies</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">由我們認可的廣告合作伙伴用於收集有關您的瀏覽活動的資料，並自訂您在我們的服務和其它網站上看到的廣告。不接受這些cookie意味著您仍然會看到廣告，但它們不會個人化。</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">我們使用cookie和類似技術來幫助我們改善服務和廣告目的。繼續使用MEGA即表示您同意我們更新過的[A]Cookie政策[/A]條款。</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">同步</string>
 </resources>

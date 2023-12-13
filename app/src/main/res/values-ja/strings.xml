@@ -127,7 +127,7 @@
     <!-- Login button -->
     <string name="login_text">ログ&#160;イン</string>
     <!-- email label -->
-    <string name="email_text">メール</string>
+    <string name="email_text">メールアドレス</string>
     <!-- password label -->
     <string name="password_text">パスワード</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -746,7 +746,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">これはあなたのアカウントを削除する最後のステップです。クラウドに保存されているデータはすべて完全に失われます。以下にパスワードを入力してください。</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">メール確認</string>
+    <string name="email_verification_title">メールアドレスの認証</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">メールを確認して続行してください。</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1345,9 +1345,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">ごみ箱に移動しますか？</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">このフォルダをごみ箱に移動してもよろしいですか？これによりカメラアップロードが無効になります。</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">このフォルダをごみ箱に移動してもよろしいですか？これによりセカンダリメディアアップロードが無効になります。</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">ごみ箱に移動しますか？</string>
     <!-- confirmation message before removing a file -->
@@ -1391,7 +1391,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">招待状が送信されました</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">メールが不正です</string>
+    <string name="invalid_email_to_invite">メールアドレスの形式が間違っています</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">MEGAデスクトップアプリをインストールすると、無料のストレージスペース%1$sが得られます。これは365日間有効です。MEGAデスクトップアプリは、Windows、macOS、そして大半のLinuxディストリビューションでご利用いただけます。</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1960,7 +1960,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">あなたの全アカウントを対象にファイルのバージョン管理を有効または無効にします。\nファイルのバージョン管理を無効にしても、あなたの連絡先が共有フォルダで新しいバージョンを作成するのを妨げません。</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">タップして、名前かメールアドレスを入力</string>
+    <string name="type_mail">タップして名前またはメールアドレスを入力</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">連絡先に%sさんを追加しますか？</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2278,7 +2278,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGAをセットアップ</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGAは、共有するために、あなたのメディアやファイルにアクセスするためのあなたの許可が必要です。暗号化されたメッセージを交換したり、安全な通話を行うためには、他のアクセス権限が必要な場合があります。</string>
+    <string name="setup_mega_explanation">MEGAは、共有するメディアやファイルにアクセスするためにあなたの許可を必要とします。このアプリがご提供する機能やサービスをご利用いただくには、他のアクセス許可が必要になる場合がございます。&#160;</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">写真、メディア、ファイルへのアクセスを許可します</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2921,10 +2921,10 @@
     <string name="settings_about_cookie_policy">クッキーポリシー</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">クッキーの設定</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">お客様のプライバシー</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">当社は、お客様に当社のサービスをご提供し、その利便性を高めるために、クッキー（Cookie）および類似の技術（以下、「クッキー」）を使用いたします。お客様がご訪問された最初から当社のクッキーの使用を受け入れるか、クッキー設定でクッキーをカスタマイズしてください。詳しくは、当社の[A]クッキーポリシー[/A]をご覧ください。</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">クッキーの管理</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">当社では、サービスの向上を目的としてクッキー（Cookie）および同様のテクノロジーを使用しています。詳細については、当社の[A]クッキーポリシー[/A]をご覧ください。</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">保存されていないクッキーの設定。</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -4999,4 +4999,12 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$sさんが録音を停止しました</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">ギャラリー</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">広告クッキー</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">お客様の閲覧活動に関するデータを収集し、当社のサービスや他のウェブサイトで表示される広告をカスタマイズするために、当社の承認された広告パートナーによって使用されます。これらのクッキーを受け入れない場合、広告は引き続き表示される一方で、パーソナライズされません。</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">当社では、サービスの向上および広告目的としてクッキー（Cookie）および同様のテクノロジーを使用しています。MEGAのご使用を続けることで、当社の更新された[A]クッキーポリシー[/A]の条件に同意されたことになります。</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">同期</string>
 </resources>

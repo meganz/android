@@ -773,7 +773,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Остался один шаг перед удалением аккаунта. Все данные в облаке будут безвозвратно утрачены. Введите пароль.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Проверка электронной почты</string>
+    <string name="email_verification_title">Подтверждение электронной почты</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Проверьте электронную почту для продолжения.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1438,9 +1438,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Переместить в Корзину?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Вы действительно хотите переместить эту папку в Корзину? Это отключит Загрузки из камеры.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Вы действительно хотите переместить эту папку в Корзину? Это отключит загрузку мультимедиа.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Переместить в Корзину?</string>
     <!-- confirmation message before removing a file -->
@@ -1484,7 +1484,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Приглашение отправлено</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Неверный адрес</string>
+    <string name="invalid_email_to_invite">Неправильный формат адреса электронной почты</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Установив настольное приложение MEGA, вы получите %1$s бонусного места на диске на 365 дней. Приложение MEGA для компьютера доступно на Windows, macOS и большинстве дистрибутивов Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -2095,7 +2095,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Включите или отключите управление версиями файлов для всего аккаунта.\nОтключение версий файлов не запретит вашим контактам создавать новые версии в общих папках.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Коснитесь, введите имя или эл. почту</string>
+    <string name="type_mail">Коснитесь, введите имя или электронную почту</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Добавить пользователя %s в контакты?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2440,7 +2440,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Настроить MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">Чтобы делиться файлами, MEGA требуется ваше разрешение на доступ к медиафайлам и файлам. Другие разрешения доступа могут потребоваться для обмена зашифрованными сообщениями и для безопасных звонков.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Разрешите доступ к фотографиям, медиа и файлам</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -3155,10 +3155,10 @@
     <string name="settings_about_cookie_policy">Политика использования куки-файлов</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Настройки куки-файлов</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Ваша конфиденциальность</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Мы используем куки-файлы и аналогичные технологии («Cookies»), чтобы предоставить вам возможность пользоваться нашими услугами и сделать их более удобными. Согласитесь с использованием куки-файлов с самого начала вашего посещения или настройте куки в настройках файлов куки. Подробнее читайте в нашей [A]политике в отношении куки-файлов[/A].</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">Управление куки-файлами</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">Мы используем куки и аналогичные технологии, чтобы улучшать наши сервисы. Подробнее в нашей [A]Политике в отношении куки-файлов[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Настройки куки-файлов не сохранены.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -5637,7 +5637,7 @@
         <item quantity="other">Загрузка из камеры завершена, загружено %1$d файла</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA имеет ограниченный доступ к библиотеке фотографий и не может создавать резервные копии всех ваших фотографий.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Нажмите, чтобы изменить разрешения.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5704,4 +5704,12 @@
     <string name="meetings_call_recording_stopped_snackbar_message">Пользователь %1$s остановил запись</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Галерея</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">Рекламные куки</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">Используются нашими одобренными рекламными партнерами для сбора данных о вашей активности в Интернете и настройки рекламы, которую вы видите в наших сервисах и на других веб-сайтах. Если вы не примете эти куки-файлы, вы всё равно будете видеть рекламу, но она не будет персонализированной.</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">Мы используем куки и аналогичные технологии для улучшения наших сервисов и в рекамных целях. Продолжая использовать MEGA, вы соглашаетесь с условиями нашей обновлённой [A]Политики в отношении куки-файлов[/A].</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">Синхронизация</string>
 </resources>

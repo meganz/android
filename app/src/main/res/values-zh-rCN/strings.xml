@@ -127,7 +127,7 @@
     <!-- Login button -->
     <string name="login_text">登录</string>
     <!-- email label -->
-    <string name="email_text">电子邮件</string>
+    <string name="email_text">电子邮件地址</string>
     <!-- password label -->
     <string name="password_text">密码</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -746,7 +746,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">这是删除帐户的最后一步。您将永久丢失存储在云盘中的所有数据。请在下方输入您的密码。</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">电子邮件验证</string>
+    <string name="email_verification_title">电子邮件地址验证</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">请确认您的电子邮箱以继续。</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1345,9 +1345,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">要移至回收站吗？</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">您确定要将此文件夹移至回收站吗？这将禁用相机上传。</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">您确定要将此文件夹移至回收站吗？这将禁用辅助媒体上传。</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">要移至回收站吗？</string>
     <!-- confirmation message before removing a file -->
@@ -1391,7 +1391,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">邀请已发送</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">电子邮件格式不正确</string>
+    <string name="invalid_email_to_invite">电子邮件地址格式错误</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">安装MEGA桌面应用程序后，您会获得%1$s免费存储空间，有效期为365天。MEGA桌面应用程序适用于Windows，macOS和大多数Linux发行版。</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1960,7 +1960,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">为整个帐户启用或禁用文件历史版本。\n禁用文件历史版本功能不会阻止您的联系人在共享文件夹中创建新版本。</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">点击，输入姓名或邮箱</string>
+    <string name="type_mail">点按，输入姓名或电子邮件地址</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">将%s添加为您的联系人？</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2278,7 +2278,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">设置MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA需要开启权限才能访问并共享您的媒体和文件。收发加密消息和安全通话可能需要开启其他访问权限。</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">允许访问照片、媒体内容和文件</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2921,10 +2921,10 @@
     <string name="settings_about_cookie_policy">Cookie政策</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Cookie设置</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">您的隐私</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">我们使用Cookie和类似技术（“Cookies”）来提供并增强您对我们服务的体验。在您开始访问时就接受我们对Cookie的使用或在Cookie设置中个性化设置Cookie。您可以在我们的[A]Cookie政策[/A]中阅读更多信息。</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">管理cookies</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">我们使用cookies和类似技术来帮助我们改善我们的服务。在我们的[A]Cookie政策[/A]中了解更多信息。</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie设置未保存。</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -4938,7 +4938,7 @@
         <item quantity="other">相机上传完成，%1$d个文件已上传</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA对照片库的访问权限有限，无法备份您的所有照片。</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">点按以更改权限。</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -4999,4 +4999,12 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s已停止录制</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">图库</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">广告Cookies</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">由我们认可的广告合作伙伴用于收集有关您的浏览活动的数据，并自定义您在我们的服务和其它网站上看到的广告。不接受这些cookies意味着您仍然会看到广告，但它们不会是个性化的。</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">我们使用cookies和类似技术来帮助我们改善服务并用于广告目的。继续使用MEGA即表示您同意我们更新后的[A]Cookie政策[/A]条款。</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">同步</string>
 </resources>

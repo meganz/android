@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+    <!-- Sync title for toolbar when inside sync screen-->
+    <string name="sync_toolbar_title">مزامنة</string>
+    <!-- Sync text for the the button to begin sync-->
+    <string name="sync_button_label">مزامنة</string>
+    <!-- Sync text of sync-->
+    <string name="sync">مزامنة</string>
+    <!-- Sync spannable section to show sync count with notification count-->
+    <string name="section_sync_with_notification">Sync [A](%1$d)[/A]</string>
+    <!-- Sync when storage permission is denied we show banner with text to the user-->
+    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap to grant access</string>
+    <!-- Sync when battery optimization is turned on we show banner with text to the user-->
+    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background.</string>
+    <!-- Sync file counts to show ongoing syncing-->
+    <plurals name="num_files_with_parameter">
+        <item quantity="zero">%d ملف</item>
+        <item quantity="one">%d ملف</item>
+        <item quantity="two">%d ملفان</item>
+        <item quantity="few">%d ملفات</item>
+        <item quantity="many">%d ملفاً</item>
+        <item quantity="other">%d ملف</item>
+    </plurals>
+    <!-- Sync folder counts to show ongoing syncing-->
+    <plurals name="num_folders_with_parameter">
+        <item quantity="zero">%d مجلد</item>
+        <item quantity="one">%d مجلد</item>
+        <item quantity="two">%d مجلدان</item>
+        <item quantity="few">%d مجلدات</item>
+        <item quantity="many">%d مجلد</item>
+        <item quantity="other">%d مجلد</item>
+    </plurals>
+    <!-- Sync folder counts to show ongoing syncing-->
+    <plurals name="num_folders_num_files">
+        <item quantity="zero">%1$d مجلد&#160;.&#160;</item>
+        <item quantity="one">%1$d مجلد&#160;.&#160;</item>
+        <item quantity="two">%1$d مجلدان&#160;.&#160;</item>
+        <item quantity="few">%1$d مجلدات&#160;.&#160;</item>
+        <item quantity="many">%1$d مجلداً&#160;.&#160;</item>
+        <item quantity="other">%1$d مجلد&#160;.&#160;</item>
+    </plurals>
+    <!-- Sync file counts to show ongoing syncing-->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="zero">%1$d ملف</item>
+        <item quantity="one">%1$d ملف</item>
+        <item quantity="two">%1$d ملفان</item>
+        <item quantity="few">%1$d ملفات</item>
+        <item quantity="many">%1$d ملفاً</item>
+        <item quantity="other">%1$d ملف</item>
+    </plurals>
+    <!-- Sync options -->
+    <string name="sync_menu_sync_options">Sync options</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">Clear resolved issues</string>
+    <!-- Sync message for two way sync-->
+    <string name="sync_two_way">Two-way sync</string>
+    <!-- Sync conflict message -->
+    <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
+    <!-- Sync when stalled issues, title of the conflict -->
+    <string name="sync_stalled_issue_detail_conflict_message">This folders contain multiple names on one side, that would all become the same single name on the other side. This may  be due to syncing to case sensitive local filesystem, or the effects os escaped characters.</string>
+    <!-- Sync when stalled issues, message of the conflict -->
+    <string name="sync_resolve_rename_all_items">Rename all items</string>
+    <!-- Sync to resolve conflict Merge folders -->
+    <string name="sync_stalled_issue_merge_folders">Merge folders</string>
+    <!-- Sync to resolve conflict Choose local file -->
+    <string name="sync_stalled_issue_choose_local_file">Choose local file</string>
+    <!-- Sync to resolve conflict Choose remote file -->
+    <string name="sync_stalled_issue_choose_remote_file">Choose remote file</string>
+    <!-- Sync to resolve conflict Choose the one with the latest modified time -->
+    <string name="sync_stalled_issue_choose_latest_modified_time">Choose the one with the latest modified time</string>
+    <!-- Sync message when conflict resolved -->
+    <string name="sync_stalled_issue_conflict_resolved">Conflict resolved</string>
+    <!-- Sync message to access storage permission on device -->
+    <string name="sync_access_storage_permission_message">To back up your files, MEGA needs access to the files and folders in this device. Your data is always safe with us.</string>
+    <!-- Sync dialog continue button -->
+    <string name="sync_dialog_file_permission_positive_button">تابع</string>
+    <!-- Sync dialog not now button -->
+    <string name="sync_dialog_file_permission_negative_button">ليس الآن</string>
+    <!-- Sync dialog title for storage access -->
+    <string name="sync_dialog_storage_access_title">All files access</string>
+    <!-- Sync dialog title for battery optimization -->
+    <string name="sync_dialog_battery_optimization_title">Battery optimization</string>
+    <!-- Sync dialog cancel button text -->
+    <string name="sync_dialog_battery_optimization_negative_button">إلغاء</string>
+    <!-- Sync dialog allow button text -->
+    <string name="sync_dialog_battery_optimization_positive_button">سماح</string>
+    <!-- Sync dialog battery optimization message -->
+    <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
+    <!-- Sync state message for No Solved Issues -->
+    <string name="sync_solved_issues_empty_message">No resolved issues</string>
+    <!-- Sync state message for No Stalled Issues -->
+    <string name="sync_stalled_issues_empty_message">No issues</string>
+    <!-- Sync option to choose folder pair -->
+    <string name="sync_folders_choose_folder_pair">Name a sync</string>
+    <!-- Sync option to choose device folder -->
+    <string name="sync_folder_choose_device_folder_title">Device folder</string>
+    <!-- Sync option to choose Mega folder -->
+    <string name="sync_folders_choose_mega_folder_title">مجلد ميغا MEGA</string>
+    <!-- Sync option for sync method -->
+    <string name="sync_folders_method">Sync type</string>
+    <!-- Sync state Paused -->
+    <string name="sync_list_sync_state_paused">متوقف مؤقتاً</string>
+    <!-- Sync state syncing -->
+    <string name="sync_list_sync_state_syncing">Syncing&#8230;</string>
+    <!-- Sync state failed -->
+    <string name="sync_folders_sync_state_failed">فشل</string>
+    <!-- Sync state synced -->
+    <string name="sync_list_sync_state_synced">Synced</string>
+    <!-- Sync permission title for device storage -->
+    <string name="sync_folders_device_storage">Device storage</string>
+    <!-- Sync permission title for mega storage -->
+    <string name="sync_folders_mega_storage">MEGA storage</string>
+    <!-- Sync while syncing title for Issues info -->
+    <string name="sync_card_sync_issues_info">Issues info</string>
+    <!-- Sync Pause -->
+    <string name="sync_card_pause_sync">توقيف مؤقتاً</string>
+    <!-- Sync Run -->
+    <string name="sync_card_run_sync">Run</string>
+    <!-- Sync Remove -->
+    <string name="sync_card_remove_sync">احذف</string>
+    <!-- Sync dialog for sync over Wi-Fi or mobile data -->
+    <string name="sync_dialog_message_wifi_or_mobile_data">شبكة الوايرلس او بيانات الموبايل</string>
+    <!-- Sync dialog for sync only over Wi-Fi -->
+    <string name="sync_dialog_message_wifi_only">شبكة الوايرلس فقط</string>
+    <!-- Sync empty state message -->
+    <string name="sync_empty_state_message">You will need to set up a local folder on your\ndevice that would pair with a chosen folder on\nyour Cloud Drive.</string>
+    <!-- Sync notification title description sync monitoring-->
+    <string name="sync_notification_monitoring_description">Sync monitoring</string>
+    <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
+    <string name="sync_options_changed_to_wifi_only">Sync options were changed to: Wi-Fi only</string>
+    <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
+    <string name="sync_options_changed_to_wifi_and_mobile_data">Sync options were changed to: Wi-Fi or mobile data</string>
+    <!-- Sync stalled issue reason is no reason-->
+    <string name="sync_stalled_issue_no_reason">No reason</string>
+    <!-- Sync stalled issue reason is no file issue-->
+    <string name="sync_stalled_issue_file_issue">File issue</string>
+    <!-- Sync stalled issue reason is move or rename-->
+    <string name="sync_stalled_issue_move_or_rename">Move or rename cannot occur</string>
+    <!-- Sync stalled issue reason is delete or move scanning-->
+    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move waiting on scanning</string>
+    <!-- Sync stalled issue reason is delete or move-->
+    <string name="sync_stalled_issue_delete_or_move">Can\’t delete yet</string>
+    <!-- Sync stalled issue reason is upload issue-->
+    <string name="sync_stalled_issue_upload_issue">Upload issue</string>
+    <!-- Sync stalled issue reason is download issue-->
+    <string name="sync_stalled_issue_download_issue">Download problem</string>
+    <!-- Sync stalled issue reason is can not create folder-->
+    <string name="sync_stalled_issue_cannot_create_folder">Cannot create folder</string>
+    <!-- Sync stalled issue reason is can not perform deletion-->
+    <string name="sync_stalled_issue_cannot_perform_deletion">Cannot delete item</string>
+    <!-- Sync stalled issue reason is can not support tree depth-->
+    <string name="sync_stalled_issue_cannot_support_tree_depth">Sync item exceeds supported folder depth</string>
+    <!-- Sync stalled issue reason is Folder Matched Against File-->
+    <string name="sync_stalled_issue_folder_matched_against_file">Folder matched against file</string>
+    <!-- Sync stalled issue reason is Local and remote changed since last sync-->
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Local and remote changed since last sync</string>
+    <!-- Sync stalled issue reason is Local and remote not synced-->
+    <string name="sync_stalled_issue_local_and_remote_not_synced">Local and remote previously not synced</string>
+    <!-- Sync stalled issue reason is Name clash-->
+    <string name="sync_stalled_issue_name_clash">File or folder name conflict</string>
+    <!-- Sync stalled issue reason is Last PlusOne-->
+    <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
+    <!-- Sync chip folder chip title-->
+    <string name="sync_folders">مجلدات</string>
+    <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
+    <string name="sync_stalled_issues">Issues (%d)</string>
+    <!-- Sync stalled issue count chip title for 0 stalled issues-->
+    <string name="sync_stalled_issue_zero">Issues</string>
+    <!-- Sync solved issues chip title -->
+    <string name="sync_solved_issues">Solved issues</string>
+    <!-- Sync start sync button -->
+    <string name="sync_start_sync">Start sync</string>
+    <!-- Text that indicates that a folder is currently empty -->
+    <string name="sync_file_browser_empty_folder">Empty folder</string>
+    <!-- Selecting a specific location in MEGA. This is the text of the button -->
+    <string name="sync_general_select_to_download">حدد المجلد</string>
+    <!-- Selecting a specific location in MEGA. This is the text of the button -->
+    <string name="sync_general_select">تحديد</string>
+    <!-- Sync stalled issue reason is no file issue detailed description-->
+    <string name="sync_stalled_issue_file_issue_detail">A single file or folder had an issue that needs a user decision to solve</string>
+    <!-- Sync stalled issue reason is delete or move detailed description-->
+    <string name="sync_stalled_issue_delete_or_move_detail">Waiting for other processes to complete.</string>
+    <!-- Sync stalled issue reason is upload issue detailed description-->
+    <string name="sync_stalled_issue_upload_issue_detail">Cannot reach the destination folder.</string>
+    <!-- Sync stalled issue reason is download issue detailed description-->
+    <string name="sync_stalled_issue_download_issue_detail">A failure occurred either downloading the file, or moving the downloaded temporary file to its final name and location.</string>
+    <!-- Sync stalled issue reason is can not create folder detailed description-->
+    <string name="sync_stalled_issue_cannot_create_folder_detail">Filesystem error preventing folder access.</string>
+    <!-- Sync stalled issue reason is can not perform deletion detailed description-->
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <!-- Sync stalled issue reason is can not support tree depth detailed description-->
+    <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Target is too deep on your folder structure.\nPlease move it to a location that is less than 64 folders deep.</string>
+    <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
+    <string name="sync_stalled_issue_folder_matched_against_file_detail">Cannot sync folders against files.</string>
+    <!-- Sync stalled issue reason is Local and remote changed since last sync detailed description-->
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">This file has been changed both in MEGA and locally since it was last synced.</string>
+    <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
+    <string name="sync_stalled_issue_local_and_remote_not_synced_detail">This file has conflicting copies</string>
+    <!-- Sync stalled issue reason is Name clash detailed description-->
+    <string name="sync_stalled_issue_name_clash_detail">These items contain multiple names on one side, that would all become the same single name on the other side.</string>
+    <!-- Sync notification title description sync monitoring-->
+    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename was detected in MEGA, but could not be replicated in the local filesystem.</string>
+    <!-- Sync notification title description sync monitoring-->
+    <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename was detected in the local filesystem, but could not be replicated in MEGA.</string>
+    <!-- Sync stalled issue delete or move scanning detail-->
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Waiting to finish scan to see if the file was moved or deleted.</string>
+</resources>

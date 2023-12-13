@@ -127,7 +127,7 @@
     <!-- Login button -->
     <string name="login_text">Masuk</string>
     <!-- email label -->
-    <string name="email_text">E-mail</string>
+    <string name="email_text">Email</string>
     <!-- password label -->
     <string name="password_text">Kata Sandi</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -746,7 +746,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Ini adalah langkah terakhir untuk menghapus akun anda. Anda akan  kehilangan semua data yang disimpan di cloud secara permanen. Silakan masukkan kata sandi anda di bawah ini.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Verifikasi e-mail</string>
+    <string name="email_verification_title">Verifikasi alamat email</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Harap cek e-mail anda untuk melanjutkan.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1345,9 +1345,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Pindahkan ke Sampah?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Anda yakin ingin memindahkan folder ini ke Tempat Sampah? Ini akan menonaktifkan Unggahan camera.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Anda yakin ingin memindahkan folder ini ke Tempat Sampah? Ini akan menonaktifkan unggahan media sekunder.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Pindahkan ke Sampah?</string>
     <!-- confirmation message before removing a file -->
@@ -1391,7 +1391,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Undangan terkirim</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">E-mail salah</string>
+    <string name="invalid_email_to_invite">Alamat email salah format</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Saat anda menginstal aplikasi desktop MEGA, anda mendapatkan %1$sruang penyimpanan gratis, berlaku selama 365 hari. Aplikasi desktop MEGA tersedia untuk Windows, macOS, dan sebagian besar distro Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1960,7 +1960,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Aktifkan atau nonaktifkan versi file untuk seluruh akun anda.\nAnda masih dapat menerima versi file dari folder bersama jika kontak anda telah mengaktifkan ini.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Ketuk, masukkan nama atau e-mail</string>
+    <string name="type_mail">Ketuk, masukkan nama atau alamat email</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Tambahkan %s ke kontak anda?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2278,7 +2278,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Siapkan MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA memerlukan izin anda untuk mengakses media dan file anda untuk dibagikan. Izin akses lain mungkin diperlukan untuk bertukar pesan terenkripsi dan untuk melakukan panggilan aman.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Izinkan akses ke foto, media, dan file</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2921,10 +2921,10 @@
     <string name="settings_about_cookie_policy">Kebijakan Cookie</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Pengaturan Cookie</string>
-    <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Privasi anda</string>
-    <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Kami menggunakan Cookie dan teknologi serupa (“Cookies”) untuk menyediakan dan meningkatkan pengalaman anda dengan layanan kami. Terima penggunaan Cookie kami sejak awal kunjungan anda atau sesuaikan Cookie di Pengaturan Cookie. Baca selengkapnya di [A]Kebijakan Cookie[/A] kami.</string>
+    <!-- Title for Cookie dialog, visible for new users. -->
+    <string name="dialog_cookie_alert_title">Kelola cookie</string>
+    <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
+    <string name="dialog_cookie_alert_message">Kami menggunakan cookie dan teknologi serupa untuk membantu kami meningkatkan layanan kami. Pelajari lebih lanjut di [A]Kebijakan Cookie[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Pengaturan Cookie belum disimpan.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -4558,7 +4558,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Cadangan otomatis</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III (coming soon)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226; &#160; Putar mundur hingga 90 hari di Pro&#160;Lite dan hingga 180 hari pada Pro&#160;I, II, dan III (segera hadir)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Jadwalkan pembersihan tempat sampah antara 7 hari dan 10 tahun</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4938,7 +4938,7 @@
         <item quantity="other">Unggahan kamera selesai, %1$d file diunggah</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA memiliki akses terbatas ke perpustakaan foto dan tidak dapat mencadangkan semua foto anda.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Ketuk untuk mengubah izin.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -4980,23 +4980,31 @@
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">Lihat paket Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
-    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s is presenting</string>
+    <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s sedang mempresentasikan</string>
     <!-- Warning indicating that a participant is sharing the screen-->
-    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">This person is screen sharing</string>
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Orang ini sedang berbagi layar</string>
     <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">This call is being recorded</string>
+    <string name="meetings_call_recording_consent_dialog_title">Panggilan ini sedang direkam</string>
     <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">By staying in the call you give permission to be recorded. The recording is only stored on the device of the person who records it.</string>
+    <string name="meetings_call_recording_consent_dialog_message">Dengan tetap berada dalam panggilan anda memberikan izin untuk direkam. Rekaman hanya disimpan di perangkat orang yang merekamnya.</string>
     <!-- Label for the positive or confirm button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_positive_button">OK, mengerti</string>
     <!-- Label for the negative or cancel button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_negative_button">Tinggalkan panggilan</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Learn more[/A]</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Pelajari lebih lanjut[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
-    <string name="meetings_call_recording_started_snackbar_message">%1$s started recording</string>
+    <string name="meetings_call_recording_started_snackbar_message">%1$s mulai merekam</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
-    <string name="meetings_call_recording_stopped_snackbar_message">%1$s stopped recording</string>
+    <string name="meetings_call_recording_stopped_snackbar_message">%1$s berhenti merekam</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galeri</string>
+    <!-- Preference screen item title for Ads Cookie -->
+    <string name="settings_cookies_settings_ads_title">Cookie Iklan</string>
+    <!-- Preference screen item summary for Ads Cookie-->
+    <string name="settings_cookies_settings_ads_summary">Digunakan oleh mitra periklanan kami yang disetujui untuk mengumpulkan data tentang aktivitas penjelajahan anda dan menyesuaikan iklan yang anda lihat di layanan kami dan di situs web lain. Tidak menerima cookie ini berarti anda masih akan melihat iklan tetapi iklan tersebut tidak akan dipersonalisasi.</string>
+    <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
+    <string name="dialog_ads_cookie_alert_message">Kami menggunakan cookie dan teknologi serupa untuk membantu kami meningkatkan layanan kami dan untuk tujuan periklanan. Dengan terus menggunakan MEGA, anda setuju dengan ketentuan pembaruan kami [A]Kebijakan Cookie[/A].</string>
+    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
+    <string name="home_side_menu_sync_title">Sinkronkan</string>
 </resources>
