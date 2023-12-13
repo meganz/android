@@ -20,9 +20,26 @@ data class Contact @JvmOverloads constructor(
     val hasPendingRequest: Boolean = false,
     val isVisible: Boolean = false,
 ) {
+    /**
+     * Short name
+     */
     val shortName: String? =
         nickname?.takeIf { it.isNotEmpty() }
             ?: firstName?.takeIf { it.isNotEmpty() }
             ?: lastName?.takeIf { it.isNotEmpty() }
             ?: email?.takeIf { it.isNotEmpty() }
+
+
+    /**
+     * Full name
+     */
+    val fullName: String?
+        get() {
+            if (!firstName.isNullOrEmpty() && !lastName.isNullOrEmpty()) {
+                return "$firstName $lastName"
+            }
+            return firstName?.takeIf { it.isNotBlank() }
+                ?: lastName?.takeIf { it.isNotBlank() }
+                ?: email?.takeIf { it.isNotBlank() }
+        }
 }

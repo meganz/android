@@ -698,6 +698,14 @@ interface ChatRepository {
     suspend fun getParticipantFirstName(handle: Long, contemplateEmail: Boolean): String?
 
     /**
+     * Get participant full name
+     *
+     * @param handle
+     * @return full name of a chat participant
+     */
+    suspend fun getParticipantFullName(handle: Long): String?
+
+    /**
      * Get my user handle
      *
      * @return my user handle
@@ -760,4 +768,11 @@ interface ChatRepository {
 
      */
     suspend fun enableGeolocation()
+
+    /**
+     * Get my full name
+     *
+     * @return my full name
+     */
+    suspend fun getMyFullName(): String?
 }

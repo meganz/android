@@ -639,6 +639,65 @@ class ChatRepositoryImplTest {
             assertThat(underTest.getParticipantFirstName(handle, true)).isNull()
         }
 
+    @Test
+    fun `test that full name returns correctly when calling from contact database`() = runTest {
+        val handle = 123L
+        val contact = Contact(
+            email = "email",
+            firstName = "firstName",
+            lastName = "lastName",
+            nickname = "nickname",
+            userId = handle,
+        )
+        whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(contact)
+        assertThat(underTest.getParticipantFullName(handle)).isEqualTo(contact.fullName)
+    }
+
+    @Test
+    fun `test that full name returns correctly when calling from non-contact database`() =
+        runTest {
+            val handle = 123L
+            val nonContact = NonContactInfo(
+                handle.toString(),
+                "fullName",
+                "firstName",
+                "lastName",
+                "email",
+            )
+            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
+            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(
+                nonContact
+            )
+            assertThat(underTest.getParticipantFullName(handle)).isEqualTo(nonContact.fullName)
+        }
+
+    @Test
+    fun `test that full name returns correctly when calling from full name sdk cache`() =
+        runTest {
+            val handle = 123L
+            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
+            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaChatApiGateway.getUserFullNameFromCache(handle)).thenReturn("fullName")
+            assertThat(underTest.getParticipantFullName(handle)).isEqualTo("fullName")
+        }
+
+    @Test
+    fun `test that full name returns correctly when calling from email sdk cache`() =
+        runTest {
+            val handle = 123L
+            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
+            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaChatApiGateway.getUserFullNameFromCache(handle)).thenReturn(null)
+            whenever(megaChatApiGateway.getUserEmailFromCache(handle)).thenReturn("email")
+            assertThat(underTest.getParticipantFullName(handle)).isEqualTo("email")
+        }
+
+    @Test
+    fun `test that my full name returns correctly`() = runTest {
+        val fullName = "fullName"
+        whenever(megaChatApiGateway.getMyFullname()).thenReturn(fullName)
+        assertThat(underTest.getMyFullName()).isEqualTo(fullName)
+    }
 
     @Test
     fun `test that returns correctly when calling get my user handle`() = runTest {
