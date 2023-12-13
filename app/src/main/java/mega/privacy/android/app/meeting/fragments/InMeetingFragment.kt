@@ -1959,10 +1959,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     individualCallFragment = null
                 }
             }
-            initLocal(chatId)
         }
 
+        initLocal(chatId)
         inMeetingViewModel.enableAudioLevelMonitor(chatId)
+
         if (isParticipantSharingScreen) {
             changeToSpeakerView()
         } else {

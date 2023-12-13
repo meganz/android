@@ -122,7 +122,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
 
         listenAction(binding.pingToSpeaker) {
             // Pin to speaker view
-            inMeetingViewModel.onItemClick(participantItem.peerId, participantItem.clientId)
+            inMeetingViewModel.onItemClick(participantItem)
         }
 
         listenAction(binding.makeModerator) {

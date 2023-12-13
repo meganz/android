@@ -87,7 +87,9 @@ class VideoMeetingViewHolder(
             layoutParams.width = dp2px(ITEM_WIDTH)
             layoutParams.height = dp2px(ITEM_HEIGHT)
             binding.root.setOnClickListener {
-                inMeetingViewModel.onItemClick(participant.peerId, participant.clientId)
+                inMeetingViewModel.onItemClick(
+                    participant
+                )
             }
 
             binding.root.background = ContextCompat.getDrawable(

@@ -172,27 +172,23 @@ class InMeetingViewModel @Inject constructor(
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
 
-
     /**
      * Participant selected
      *
-     * @param peerId Peer Id
-     * @param clientId  Client Id
+     * @param participant [Participant]
      */
-    fun onItemClick(peerId: Long, clientId: Long) {
+    fun onItemClick(participant: Participant) {
         onSnackbarMessageConsumed()
-        getParticipant(peerId, clientId)?.let { participant ->
-            getSession(clientId)?.let {
-                if (it.hasScreenShare() && _state.value.callUIStatus == CallUIStatusType.SpeakerView) {
-                    _state.update { state ->
-                        state.copy(
-                            snackbarMessage = triggered(R.string.meetings_meeting_screen_main_view_participant_is_sharing_screen_warning),
-                        )
-                    }
+        getSession(participant.clientId)?.let {
+            if (it.hasScreenShare() && _state.value.callUIStatus == CallUIStatusType.SpeakerView && !participant.isScreenShared) {
+                _state.update { state ->
+                    state.copy(
+                        snackbarMessage = triggered(R.string.meetings_meeting_screen_main_view_participant_is_sharing_screen_warning),
+                    )
                 }
             }
-            _pinItemEvent.value = Event(participant)
         }
+        _pinItemEvent.value = Event(participant)
     }
 
     /**
@@ -202,7 +198,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun onItemClick(chatParticipant: ChatParticipant) =
         participants.value?.find { it.peerId == chatParticipant.handle }?.let {
-            onItemClick(peerId = it.peerId, clientId = it.clientId)
+            onItemClick(it)
         }
 
     // Meeting
