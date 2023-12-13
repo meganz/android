@@ -3198,4 +3198,12 @@ interface MegaApiGateway {
      */
     fun getCookieSettings(listener: OptionalMegaRequestListenerInterface)
 
+    /**
+     * Set cookie settings from SDK
+     *
+     * @param bitSetToDecimal Int with cookie settings
+     * @param listener MegaRequestListenerInterface to track this request
+     */
+    fun setCookieSettings(bitSetToDecimal: Int, listener: OptionalMegaRequestListenerInterface)
+
 }

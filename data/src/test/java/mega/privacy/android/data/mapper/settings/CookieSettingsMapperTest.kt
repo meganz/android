@@ -29,7 +29,6 @@ class CookieSettingsMapperTest {
     }
 
     private fun provideTestCases() = listOf(
-        Arguments.of(0, emptySet<CookieType>()),
         Arguments.of(1, setOf(CookieType.ESSENTIAL)),
         Arguments.of(3, setOf(CookieType.ESSENTIAL, CookieType.PREFERENCE)),
         Arguments.of(

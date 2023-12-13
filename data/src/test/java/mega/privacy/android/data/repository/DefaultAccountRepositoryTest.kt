@@ -38,6 +38,7 @@ import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
+import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsMapper
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.model.GlobalUpdate
@@ -122,6 +123,7 @@ class DefaultAccountRepositoryTest {
     private val cameraUploadsSettingsPreferenceGateway =
         mock<CameraUploadsSettingsPreferenceGateway>()
     private val cookieSettingsMapper = mock<CookieSettingsMapper>()
+    private val cookieSettingsIntMapper = mock<CookieSettingsIntMapper>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -177,7 +179,8 @@ class DefaultAccountRepositoryTest {
             fileGateway,
             recoveryKeyToFileMapper,
             cameraUploadsSettingsPreferenceGateway,
-            cookieSettingsMapper
+            cookieSettingsMapper,
+            cookieSettingsIntMapper,
         )
     }
 
@@ -221,7 +224,8 @@ class DefaultAccountRepositoryTest {
             fileGateway = fileGateway,
             recoveryKeyToFileMapper = recoveryKeyToFileMapper,
             cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
-            cookieSettingsMapper = cookieSettingsMapper
+            cookieSettingsMapper = cookieSettingsMapper,
+            cookieSettingsIntMapper = cookieSettingsIntMapper,
         )
 
     }
@@ -1253,6 +1257,56 @@ class DefaultAccountRepositoryTest {
         underTest.isCookieBannerEnabled()
         verify(megaApiGateway).isCookieBannerEnabled()
     }
+
+    @Test
+    fun `test that setCookieSettings is success when MegaApi returns API_OK`() = runTest {
+        val cookieSettings = mutableSetOf(CookieType.ADVERTISEMENT, CookieType.ANALYTICS)
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        whenever(
+            megaApiGateway.setCookieSettings(
+                any(),
+                listener = any()
+            )
+        ).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                megaError,
+            )
+        }
+
+        underTest.setCookieSettings(cookieSettings)
+    }
+
+    @Test
+    fun `test that setCookieSettings returns general MegaException when MegaApi returns errors other than API_OK`() =
+        runTest {
+
+            val cookieSettings = mutableSetOf(CookieType.ADVERTISEMENT, CookieType.ANALYTICS)
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EEXIST)
+            }
+
+            whenever(
+                megaApiGateway.setCookieSettings(
+                    any(),
+                    listener = any()
+                )
+            ).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    megaError,
+                )
+            }
+
+            assertThrows<MegaException> {
+                underTest.setCookieSettings(cookieSettings)
+            }
+        }
 
 
 }

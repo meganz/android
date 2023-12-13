@@ -7,7 +7,7 @@ import javax.inject.Inject
 internal class CookieSettingsMapper @Inject constructor() {
 
     /**
-     * Converts a list of [CookieType] to a [BitSet]
+     * Converts a list of [CookieType] to a Set of [CookieType]
      *
      * @param numDetails
      */

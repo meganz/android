@@ -10,7 +10,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.UpdateCookieSettingsUseCaseRx
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.GetCookieSettingsUseCaseRx
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CookieSettingsViewModel @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCaseRx,
-    private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
+    private val updateCookieSettingsUseCaseRx: UpdateCookieSettingsUseCaseRx,
 ) : BaseRxViewModel() {
 
     private val enabledCookies = MutableLiveData(mutableSetOf(CookieType.ESSENTIAL))
@@ -84,7 +84,7 @@ class CookieSettingsViewModel @Inject constructor(
      * Save cookie settings to SDK
      */
     fun saveCookieSettings() {
-        updateCookieSettingsUseCase.update(enabledCookies.value)
+        updateCookieSettingsUseCaseRx.update(enabledCookies.value)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

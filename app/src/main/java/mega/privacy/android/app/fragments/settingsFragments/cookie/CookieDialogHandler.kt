@@ -18,8 +18,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.CheckCookieBannerEnabledUseCaseRx
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.UpdateCookieSettingsUseCaseRx
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.GetCookieSettingsUseCaseRx
 import mega.privacy.android.app.utils.ContextUtils.isValid
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -31,7 +30,7 @@ import javax.inject.Inject
  */
 class CookieDialogHandler @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCaseRx,
-    private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
+    private val updateCookieSettingsUseCaseRx: UpdateCookieSettingsUseCaseRx,
     private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCaseRx,
 ) : LifecycleEventObserver {
 
@@ -141,7 +140,7 @@ class CookieDialogHandler @Inject constructor(
     }
 
     private fun acceptAllCookies(context: Context) {
-        updateCookieSettingsUseCase.acceptAll()
+        updateCookieSettingsUseCaseRx.acceptAll()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

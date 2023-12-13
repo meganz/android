@@ -51,6 +51,7 @@ import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
+import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.AccountType
@@ -156,6 +157,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val recoveryKeyToFileMapper: RecoveryKeyToFileMapper,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val cookieSettingsMapper: CookieSettingsMapper,
+    private val cookieSettingsIntMapper: CookieSettingsIntMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -1031,6 +1033,28 @@ internal class DefaultAccountRepository @Inject constructor(
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
+
+    override suspend fun setCookieSettings(cookieSettings: Set<CookieType>) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val cookieDecimal = cookieSettingsIntMapper(cookieSettings)
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { _, error ->
+                        when (error.errorCode) {
+                            MegaError.API_OK -> {
+                                continuation.resume(Unit)
+                            }
+
+                            else -> {
+                                continuation.failWithError(error, "failed to set cookie settings")
+                            }
+                        }
+                    }
+                )
+                megaApiGateway.setCookieSettings(cookieDecimal, listener)
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

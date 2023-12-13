@@ -540,4 +540,11 @@ interface AccountRepository {
      * @return Set of CookieType
      */
     suspend fun getCookieSettings(): Set<CookieType>
+
+    /**
+     * Set cookie settings
+     *
+     * @param cookieSettings Set of CookieType
+     */
+    suspend fun setCookieSettings(cookieSettings: Set<CookieType>)
 }

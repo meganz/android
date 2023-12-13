@@ -1470,4 +1470,9 @@ internal class MegaApiFacade @Inject constructor(
     override fun getCookieSettings(
         listener: OptionalMegaRequestListenerInterface,
     ) = megaApi.getCookieSettings(listener)
+
+    override fun setCookieSettings(
+        bitSetToDecimal: Int,
+        listener: OptionalMegaRequestListenerInterface,
+    ) = megaApi.setCookieSettings(bitSetToDecimal, listener)
 }
