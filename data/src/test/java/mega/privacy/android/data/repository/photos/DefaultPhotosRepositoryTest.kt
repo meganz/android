@@ -1,4 +1,4 @@
-package mega.privacy.android.data.repository
+package mega.privacy.android.data.repository.photos
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
@@ -8,7 +8,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -55,7 +54,6 @@ class DefaultPhotosRepositoryTest {
         onBlocking { getOrCreateCacheFolder(any()) }.thenReturn(null)
     }
     private val fileGateway = mock<FileGateway>()
-    private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val dateUtilWrapper = mock<DateUtilWrapper> {
         on { fromEpoch(any()) }.thenReturn(LocalDateTime.now())
     }
@@ -85,6 +83,12 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
+        whenever(megaApiGateway.isInRubbish(any()))
+            .thenReturn(false)
+
+        whenever(nodeRepository.isNodeInRubbish(any()))
+            .thenReturn(false)
+
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo)
@@ -99,6 +103,12 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
+        whenever(megaApiGateway.isInRubbish(any()))
+            .thenReturn(false)
+
+        whenever(nodeRepository.isNodeInRubbish(any()))
+            .thenReturn(false)
+
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo).isInstanceOf(GifFileTypeInfo::class.java)
@@ -112,6 +122,9 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
+        whenever(nodeRepository.isNodeInRubbish(any()))
+            .thenReturn(false)
+
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo).isInstanceOf(RawFileTypeInfo::class.java)
@@ -124,6 +137,12 @@ class DefaultPhotosRepositoryTest {
 
         whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
+
+        whenever(megaApiGateway.isInRubbish(any()))
+            .thenReturn(false)
+
+        whenever(nodeRepository.isNodeInRubbish(any()))
+            .thenReturn(false)
 
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -244,7 +263,6 @@ class DefaultPhotosRepositoryTest {
         ioDispatcher = UnconfinedTestDispatcher(),
         cacheGateway = cacheGateway,
         fileGateway = fileGateway,
-        megaLocalStorageFacade = megaLocalStorageGateway,
         dateUtilFacade = dateUtilWrapper,
         imageMapper = imageMapper,
         videoMapper = videoMapper,
@@ -253,7 +271,6 @@ class DefaultPhotosRepositoryTest {
         timelineFilterPreferencesJSONMapper = timelineFilterPreferencesJSONMapper,
         contentConsumptionMegaStringMapMapper = contentConsumptionMegaStringMapMapper,
         imageNodeMapper = mock(),
-        megaLocalRoomGateway = mock(),
         cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
         sortOrderIntMapper = mock(),
     )
@@ -272,6 +289,8 @@ class DefaultPhotosRepositoryTest {
         on { this.isFavourite }.thenReturn(isFavourite)
         on { this.size }.thenReturn(size)
         on { this.duration }.thenReturn(duration)
+        on { this.isFile }.thenReturn(true)
+        on { this.hasThumbnail() }.thenReturn(true)
     }
 
     private fun createImage(

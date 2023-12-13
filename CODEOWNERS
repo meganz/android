@@ -2,6 +2,7 @@
 [Photos Owners]
 /app/src/main/java/mega/privacy/android/app/presentation/photos/ @es @jj @jta @ks @lh @kh @do @yenel @rsh
 /domain/src/main/kotlin/mega/privacy/android/domain/usecase/photos/ @es @jj @rsh
+/data/src/main/java/mega/privacy/android/data/repository/photos/ @es @jj @rsh
 
 [Chat Owners] @jg @raquelgc @yenel @rsh @kh @do @lh @pau
 app/src/main/java/mega/privacy/android/app/di/chat/

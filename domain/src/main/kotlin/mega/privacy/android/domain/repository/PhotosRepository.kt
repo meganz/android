@@ -18,11 +18,6 @@ interface PhotosRepository {
     fun monitorPhotos(): Flow<List<Photo>>
 
     /**
-     * Refresh photos
-     */
-    fun refreshPhotos()
-
-    /**
      * Get public links count
      */
     suspend fun getPublicLinksCount(): Int
@@ -122,10 +117,16 @@ interface PhotosRepository {
     fun monitorImageNodes(): Flow<List<ImageNode>>
 
     /**
-     * Get image node
+     * Get image node from cache
      * @param nodeId
      */
     suspend fun getImageNode(nodeId: NodeId): ImageNode?
+
+    /**
+     * Get image node
+     * @param nodeId
+     */
+    suspend fun fetchImageNode(nodeId: NodeId, filterSvg: Boolean = true): ImageNode?
 
     /**
      * Monitor media discovery nodes
@@ -136,9 +137,4 @@ interface PhotosRepository {
      * Monitor imageNodes in a cloud drive folder
      */
     suspend fun getCloudDriveImageNodes(parentId: NodeId, order: SortOrder?): List<ImageNode>
-
-    /**
-     * Map ImageNode by NodeId
-     */
-    suspend fun fetchImageNode(nodeId: NodeId): ImageNode?
 }

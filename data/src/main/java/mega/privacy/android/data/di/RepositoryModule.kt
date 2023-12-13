@@ -26,7 +26,7 @@ import mega.privacy.android.data.repository.DefaultLoginRepository
 import mega.privacy.android.data.repository.DefaultMediaPlayerRepository
 import mega.privacy.android.data.repository.DefaultNetworkRepository
 import mega.privacy.android.data.repository.DefaultNotificationsRepository
-import mega.privacy.android.data.repository.DefaultPhotosRepository
+import mega.privacy.android.data.repository.photos.DefaultPhotosRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
 import mega.privacy.android.data.repository.DefaultQRCodeRepository
 import mega.privacy.android.data.repository.DefaultRecentActionsRepository
