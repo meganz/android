@@ -123,17 +123,17 @@
     <!-- Sync stalled issue reason is delete or move scanning-->
     <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move waiting on scanning</string>
     <!-- Sync stalled issue reason is delete or move-->
-    <string name="sync_stalled_issue_delete_or_move">Delete waiting on moves</string>
+    <string name="sync_stalled_issue_delete_or_move">Can\’t delete yet</string>
     <!-- Sync stalled issue reason is upload issue-->
     <string name="sync_stalled_issue_upload_issue">Upload issue</string>
     <!-- Sync stalled issue reason is download issue-->
-    <string name="sync_stalled_issue_download_issue">Download issue</string>
+    <string name="sync_stalled_issue_download_issue">Download problem</string>
     <!-- Sync stalled issue reason is can not create folder-->
     <string name="sync_stalled_issue_cannot_create_folder">Cannot create folder</string>
     <!-- Sync stalled issue reason is can not perform deletion-->
-    <string name="sync_stalled_issue_cannot_perform_deletion">Cannot perform deletion</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion">Cannot delete item</string>
     <!-- Sync stalled issue reason is can not support tree depth-->
-    <string name="sync_stalled_issue_cannot_support_tree_depth">Sync item exceeds supported tree depth</string>
+    <string name="sync_stalled_issue_cannot_support_tree_depth">Sync item exceeds supported folder depth</string>
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">Folder matched against file</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
@@ -141,7 +141,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">Local and remote previously not synced</string>
     <!-- Sync stalled issue reason is Name clash-->
-    <string name="sync_stalled_issue_name_clash">Names would clash when synced</string>
+    <string name="sync_stalled_issue_name_clash">File or folder name conflict</string>
     <!-- Sync stalled issue reason is Last PlusOne-->
     <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
     <!-- Sync chip folder chip title-->
@@ -181,7 +181,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">This file has conflicting copies</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">These items contain multiple names on one side, that would all become the same single name on the other side.\nThis may be due to syncing to case insensitive local filesystems, or the effects of escaped characters.</string>
+    <string name="sync_stalled_issue_name_clash_detail">These items contain multiple names on one side, that would all become the same single name on the other side.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename was detected in MEGA, but could not be replicated in the local filesystem.</string>
     <!-- Sync notification title description sync monitoring-->

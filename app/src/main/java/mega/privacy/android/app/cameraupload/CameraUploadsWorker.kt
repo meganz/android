@@ -487,7 +487,10 @@ class CameraUploadsWorker @AssistedInject constructor(
                     )
 
                 if (areCameraUploadsFoldersInRubbishBin) {
-                    abortWork(cancelMessage = "Parent nodes deleted")
+                    abortWork(
+                        cancelMessage = "Parent nodes deleted",
+                        restartMode = CameraUploadsRestartMode.RestartImmediately,
+                    )
                 }
             }
         }

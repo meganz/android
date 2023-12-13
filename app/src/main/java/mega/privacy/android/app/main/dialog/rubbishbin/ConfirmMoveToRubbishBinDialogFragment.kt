@@ -16,10 +16,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -46,6 +46,8 @@ internal class ConfirmMoveToRubbishBinDialogFragment : DialogFragment() {
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
                 val message = when {
                     uiState.isNodeInRubbish -> stringResource(id = R.string.confirmation_delete_from_mega)
+                    uiState.isCameraUploadsPrimaryNodeHandle -> stringResource(id = R.string.confirmation_move_cu_folder_to_rubbish)
+                    uiState.isCameraUploadsSecondaryNodeHandle -> stringResource(id = R.string.confirmation_move_mu_folder_to_rubbish)
                     else -> stringResource(id = R.string.confirmation_move_to_rubbish)
                 }
                 val positiveText = if (uiState.isNodeInRubbish) {
