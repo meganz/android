@@ -1105,7 +1105,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     )
                 }
 
-                if (isParticipantSharingScreen) {
+                if (isParticipantSharingScreen && !inMeetingViewModel.isOneToOneCall()) {
                     changeToSpeakerView()
                 }
             }
