@@ -396,4 +396,12 @@ interface ContactsRepository {
      * @return List of user ids of the new contacts.
      */
     fun monitorNewContacts(): Flow<List<Long>>
+
+    /**
+     * Retrieves the contact's username from the database
+     *
+     * @param user The user, which can be potentially nullable
+     * @return The username from the database, which can be potentially nullable
+     */
+    suspend fun getContactUserNameFromDatabase(user: String?): String?
 }

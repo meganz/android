@@ -1306,4 +1306,29 @@ class DefaultContactsRepositoryTest {
             assertThat(actual).isEqualTo(listOf(userHandle))
         }
     }
+
+    @Test
+    fun `test that null is returned when the provided user in getContactUserNameFromDatabase is null`() =
+        runTest {
+            assertThat(underTest.getContactUserNameFromDatabase(null)).isNull()
+        }
+
+    @Test
+    fun `test that the provided user is returned in getContactUserNameFromDatabase when getContact returns null`() =
+        runTest {
+            val user = "Test User"
+            whenever(megaApiGateway.getContact(any())).thenReturn(null)
+            assertThat(underTest.getContactUserNameFromDatabase(user)).isEqualTo(user)
+        }
+
+    @Test
+    fun `test that the user name in the mega database is returned in getContactUserNameFromDatabase`() =
+        runTest {
+            val user = "Test User"
+            val userNameInDatabase = "Test Username in Database"
+
+            whenever(megaApiGateway.getContact(any())).thenReturn(mock<MegaUser>())
+            whenever(contactWrapper.getMegaUserNameDB(any())).thenReturn(userNameInDatabase)
+            assertThat(underTest.getContactUserNameFromDatabase(user)).isEqualTo(userNameInDatabase)
+        }
 }

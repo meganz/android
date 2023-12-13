@@ -163,6 +163,7 @@ import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsDownloadViewModel
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
+import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
 import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserComposeFragment
@@ -5725,11 +5726,23 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         (supportFragmentManager.findFragmentByTag(FragmentTag.PHOTOS.tag) as? PhotosFragment)?.refreshViewLayout()
     }
 
+    /**
+     * Instantiates the [NodeOptionsBottomSheetDialogFragment]
+     *
+     * @param node The [MegaNode]
+     * @param mode Specifies the Bottom Sheet style. This is set to
+     * [NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE] by default
+     * @param shareData An optional [ShareData]
+     * @param nodeDeviceCenterInformation An optional [NodeDeviceCenterInformation] which contains
+     * specific information of a Device Center Node to be displayed. This is provided when the
+     * Bottom Dialog is instantiated from Device Center
+     */
     @JvmOverloads
     fun showNodeOptionsPanel(
         node: MegaNode?,
         mode: Int = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
         shareData: ShareData? = null,
+        nodeDeviceCenterInformation: NodeDeviceCenterInformation? = null,
     ) {
         Timber.d("showNodeOptionsPanel")
         if (node == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
@@ -5740,14 +5753,27 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             nodeId = NodeId(node.handle),
             shareData = shareData,
             mode = mode,
+            nodeDeviceCenterInformation = nodeDeviceCenterInformation,
         )
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
+    /**
+     * Instantiates the [NodeOptionsBottomSheetDialogFragment]
+     *
+     * @param nodeId The [NodeId]
+     * @param mode Specifies the Bottom Sheet style. This is set to
+     * [NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE] by default
+     * @param shareData An optional [ShareData]
+     * @param nodeDeviceCenterInformation An optional [NodeDeviceCenterInformation] which contains
+     * specific information of a Device Center Node to be displayed. This is provided when the
+     * Bottom Dialog is instantiated from Device Center
+     */
     fun showNodeOptionsPanel(
         nodeId: NodeId?,
         mode: Int = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
         shareData: ShareData? = null,
+        nodeDeviceCenterInformation: NodeDeviceCenterInformation? = null,
     ) {
         Timber.d("showNodeOptionsPanel")
         if (nodeId == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
@@ -5755,6 +5781,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             nodeId = nodeId,
             shareData = shareData,
             mode = mode,
+            nodeDeviceCenterInformation = nodeDeviceCenterInformation,
         )
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }

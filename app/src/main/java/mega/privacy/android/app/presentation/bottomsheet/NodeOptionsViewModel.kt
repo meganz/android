@@ -14,8 +14,10 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
+import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
@@ -31,6 +33,7 @@ import javax.inject.Inject
  * @property isNodeDeletedFromBackupsUseCase [IsNodeDeletedFromBackupsUseCase]
  * @property monitorConnectivityUseCase [MonitorConnectivityUseCase]
  * @property removeOfflineNodeUseCase [RemoveOfflineNodeUseCase]
+ * @property getContactUserNameFromDatabaseUseCase [GetContactUserNameFromDatabaseUseCase]
  */
 @HiltViewModel
 class NodeOptionsViewModel @Inject constructor(
@@ -39,6 +42,7 @@ class NodeOptionsViewModel @Inject constructor(
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
+    private val getContactUserNameFromDatabaseUseCase: GetContactUserNameFromDatabaseUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -57,13 +61,15 @@ class NodeOptionsViewModel @Inject constructor(
                 savedStateHandle.getStateFlow(NODE_ID_KEY, -1L)
                     .map { getNodeByHandle(it) },
                 savedStateHandle.getStateFlow(SHARE_DATA_KEY, null),
+                savedStateHandle.getStateFlow(NODE_DEVICE_CENTER_INFORMATION_KEY, null),
                 shareKeyCreated,
                 monitorConnectivityUseCase(),
-            ) { node: MegaNode?, shareData: NodeShareInformation?, shareKeyCreated: Boolean?, isOnline: Boolean ->
+            ) { node: MegaNode?, shareData: NodeShareInformation?, nodeDeviceCenterInformation: NodeDeviceCenterInformation?, shareKeyCreated: Boolean?, isOnline: Boolean ->
                 { state: NodeBottomSheetUIState ->
                     state.copy(
                         node = node,
                         shareData = shareData,
+                        nodeDeviceCenterInformation = nodeDeviceCenterInformation,
                         shareKeyCreated = shareKeyCreated,
                         isOnline = isOnline,
                     )
@@ -147,6 +153,16 @@ class NodeOptionsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Retrieves the Node Information of the Unverified Node with the Contact Name
+     */
+    suspend fun getUnverifiedOutgoingNodeUserName(): String? {
+        val shareData = _state.value.shareData
+        return shareData?.let { nonNullShareData ->
+            getContactUserNameFromDatabaseUseCase(nonNullShareData.user)
+        }
+    }
+
     companion object {
         /**
          * The Mode Key
@@ -162,5 +178,10 @@ class NodeOptionsViewModel @Inject constructor(
          * The Share Data Key
          */
         const val SHARE_DATA_KEY = "SHARE_DATA_KEY"
+
+        /**
+         * Key that holds specific information about a Device Center Node
+         */
+        const val NODE_DEVICE_CENTER_INFORMATION_KEY = "NODE_DEVICE_CENTER_INFORMATION_KEY"
     }
 }

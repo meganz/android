@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation
 
+import mega.privacy.android.core.R as CoreR
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -16,8 +17,10 @@ import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
+import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
@@ -28,6 +31,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.whenever
 
 /**
  * Test class for [NodeOptionsViewModel]
@@ -48,11 +52,16 @@ class NodeOptionsViewModelTest {
         )
     }
 
-    private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase = mock()
+    private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
+    private val getContactUserNameFromDatabaseUseCase =
+        mock<GetContactUserNameFromDatabaseUseCase>()
 
     private val nodeIdFlow = MutableStateFlow(-1L)
 
     private val nodeShareInformationFlow = MutableStateFlow<NodeShareInformation?>(null)
+
+    private val nodeDeviceCenterInformationFlow =
+        MutableStateFlow<NodeDeviceCenterInformation?>(null)
 
     private val savedStateHandle = mock<SavedStateHandle> {
         on {
@@ -65,6 +74,13 @@ class NodeOptionsViewModelTest {
         on {
             getStateFlow<NodeShareInformation?>(NodeOptionsViewModel.SHARE_DATA_KEY, null)
         }.thenReturn(nodeShareInformationFlow)
+
+        on {
+            getStateFlow<NodeDeviceCenterInformation?>(
+                NodeOptionsViewModel.NODE_DEVICE_CENTER_INFORMATION_KEY,
+                null,
+            )
+        }.thenReturn(nodeDeviceCenterInformationFlow)
     }
 
     @Before
@@ -77,6 +93,7 @@ class NodeOptionsViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             savedStateHandle = savedStateHandle,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
+            getContactUserNameFromDatabaseUseCase = getContactUserNameFromDatabaseUseCase,
         )
     }
 
@@ -94,6 +111,7 @@ class NodeOptionsViewModelTest {
             assertThat(initial.isOnline).isTrue()
             assertThat(initial.node).isNull()
             assertThat(initial.shareData).isNull()
+            assertThat(initial.nodeDeviceCenterInformation).isNull()
             assertThat(initial.shareKeyCreated).isNull()
         }
     }
@@ -173,6 +191,23 @@ class NodeOptionsViewModelTest {
     }
 
     @Test
+    fun `test that the node device center information is returned if found`() = runTest {
+        val expectedNodeDeviceCenterInformation = NodeDeviceCenterInformation(
+            name = "Device Center Node",
+            status = "Up to date",
+            icon = CoreR.drawable.ic_check_circle,
+        )
+
+        underTest.state.test {
+            assertThat(awaitItem().nodeDeviceCenterInformation).isNull()
+            nodeDeviceCenterInformationFlow.emit(expectedNodeDeviceCenterInformation)
+            assertThat(awaitItem().nodeDeviceCenterInformation).isEqualTo(
+                expectedNodeDeviceCenterInformation
+            )
+        }
+    }
+
+    @Test
     fun `test that the restore node functionality works as expected for deleted non-backup nodes`() =
         runTest {
             val node = mock<MegaNode>()
@@ -213,4 +248,34 @@ class NodeOptionsViewModelTest {
                 assertThat(awaitItem().canMoveNode).isTrue()
             }
         }
+
+    @Test
+    fun `test that the unverified outgoing node user name is null`() = runTest {
+        underTest.state.test {
+            assertThat(awaitItem().shareData).isNull()
+            assertThat(underTest.getUnverifiedOutgoingNodeUserName()).isNull()
+        }
+    }
+
+    @Test
+    fun `test that the unverified outgoing node user name is retrieved`() = runTest {
+        val nodeShareInformation = NodeShareInformation(
+            user = "Test User",
+            isPending = false,
+            isVerified = true,
+        )
+        val expectedUserNameFromDatabase = "Test User Name from Database"
+        underTest.state.test {
+            assertThat(awaitItem().shareData).isNull()
+            nodeShareInformationFlow.emit(nodeShareInformation)
+            assertThat(awaitItem().shareData).isEqualTo(nodeShareInformation)
+
+            whenever(getContactUserNameFromDatabaseUseCase(any())).thenReturn(
+                expectedUserNameFromDatabase
+            )
+            assertThat(underTest.getUnverifiedOutgoingNodeUserName()).isEqualTo(
+                expectedUserNameFromDatabase
+            )
+        }
+    }
 }

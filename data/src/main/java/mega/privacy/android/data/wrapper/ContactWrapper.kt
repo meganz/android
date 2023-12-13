@@ -1,12 +1,22 @@
 package mega.privacy.android.data.wrapper
 
 import android.content.Context
+import nz.mega.sdk.MegaUser
 
 /**
  * Contact wrapper
  *
  */
 interface ContactWrapper {
+
+    /**
+     * Retrieves the Mega User Name from the database
+     *
+     * @param megaUser A potentially nullable [MegaUser]
+     * @return The Mega User Name from the database, or null if it cannot be found
+     */
+    fun getMegaUserNameDB(megaUser: MegaUser?): String?
+
     /**
      * Notify first name update
      *

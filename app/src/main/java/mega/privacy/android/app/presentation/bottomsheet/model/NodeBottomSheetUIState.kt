@@ -9,6 +9,7 @@ import nz.mega.sdk.MegaNode
  * @property isOnline
  * @property node
  * @property shareData
+ * @property nodeDeviceCenterInformation
  * @property shareKeyCreated
  */
 data class NodeBottomSheetUIState(
@@ -17,5 +18,6 @@ data class NodeBottomSheetUIState(
     val isOnline: Boolean = true,
     val node: MegaNode? = null,
     val shareData: NodeShareInformation? = null,
+    val nodeDeviceCenterInformation: NodeDeviceCenterInformation? = null,
     val shareKeyCreated: Boolean? = null,
 )

@@ -2,6 +2,7 @@ package mega.privacy.android.navigation
 
 import android.app.Activity
 import android.content.Context
+import androidx.annotation.DrawableRes
 
 /**
  * App module navigator
@@ -52,5 +53,28 @@ interface AppNavigator {
         messageId: Long? = null,
         isOverQuota: Int? = null,
         flags: Int = 0,
+    )
+
+    /**
+     * When originating from Bottom Sheet, this opens the Node Options Bottom Sheet. Specific
+     * information of the Device Center Node is needed in order to display said information in the
+     * Bottom Sheet
+     *
+     * @param activity the Activity
+     * @param nodeName the Node Name
+     * @param nodeHandle the Node Handle
+     * @param nodeStatus the Node Status
+     * @param nodeStatusColorInt an optional Text Color for the Node Status, represented as an [Int]
+     * @param nodeIcon the Node Icon as an [Int]
+     * @param nodeStatusIcon an optional Icon for the Node Status, represented as an [Int]
+     */
+    fun openNodeOptionsBottomSheetFromDeviceCenter(
+        activity: Activity,
+        nodeName: String,
+        nodeHandle: Long,
+        nodeStatus: String,
+        nodeStatusColorInt: Int? = null,
+        @DrawableRes nodeIcon: Int,
+        @DrawableRes nodeStatusIcon: Int? = null,
     )
 }

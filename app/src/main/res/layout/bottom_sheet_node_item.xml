@@ -8,84 +8,102 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/node_title_layout"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_gravity="center_vertical">
+        android:padding="12dp">
 
         <ImageView
             android:id="@+id/node_thumbnail"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_centerVertical="true"
-            android:layout_margin="12dp"
             android:scaleType="fitCenter"
-            tools:ignore="ContentDescription" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/ic_folder_incoming" />
 
-        <RelativeLayout
-            android:id="@+id/node_relative_layout_info"
+        <TextView
+            android:id="@+id/node_name_text"
+            style="@style/textAppearanceSubtitle1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="middle"
+            android:textAlignment="textStart"
+            app:layout_constraintEnd_toStartOf="@+id/permissions_icon"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/node_thumbnail"
+            app:layout_constraintTop_toTopOf="@+id/node_thumbnail"
+            tools:text="Sample Node Name" />
+
+        <LinearLayout
+            android:id="@+id/node_info_icon_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@+id/permissions_icon"
-            android:layout_toEndOf="@id/node_thumbnail">
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            app:layout_constraintTop_toTopOf="@+id/node_info_text"
+            app:layout_constraintBottom_toBottomOf="@+id/node_info_text"
+            app:layout_constraintStart_toEndOf="@+id/node_thumbnail">
 
-            <TextView
-                android:id="@+id/node_name_text"
+            <ImageView
+                android:id="@+id/node_info_versions_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:ellipsize="middle"
-                style="@style/textAppearanceSubtitle1" />
+                android:background="@null"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_versions_small"
+                app:tint="?android:attr/textColorSecondary" />
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/node_name_text">
+            <ImageView
+                android:id="@+id/node_status_icon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:contentDescription="@null"
+                android:visibility="gone"
+                tools:src="@drawable/ic_info" />
 
-                <ImageView
-                    android:id="@+id/node_info_versions_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_versions_small"
-                    android:background="@null"
-                    android:layout_marginEnd="8dp"
-                    android:layout_centerVertical="true"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+        </LinearLayout>
 
-                <TextView
-                    android:id="@+id/node_info_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:layout_toEndOf="@id/node_info_versions_icon"
-                    android:ellipsize="middle"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
-            </RelativeLayout>
-
-        </RelativeLayout>
+        <TextView
+            android:id="@+id/node_info_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"
+            android:ellipsize="middle"
+            app:layout_constraintEnd_toStartOf="@+id/permissions_icon"
+            app:layout_constraintStart_toEndOf="@id/node_info_icon_container"
+            app:layout_constraintTop_toBottomOf="@+id/node_name_text"
+            tools:text="Sample Node Description"/>
 
         <ImageView
             android:id="@+id/permissions_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="47dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            app:tint="?android:attr/textColorSecondary"
+            android:layout_marginEnd="35dp"
             android:background="@null"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:contentDescription="@null"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?android:attr/textColorSecondary"
+            tools:src="@drawable/ic_shared_fullaccess"
+            tools:visibility="visible" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="16dp"
-            android:background="@color/grey_012_white_012"
-            android:layout_alignParentBottom="true"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </RelativeLayout>
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

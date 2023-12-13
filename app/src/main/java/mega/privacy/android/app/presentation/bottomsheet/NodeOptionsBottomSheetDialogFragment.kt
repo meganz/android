@@ -14,6 +14,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -42,9 +44,11 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.MODE_KEY
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.NODE_DEVICE_CENTER_INFORMATION_KEY
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.NODE_ID_KEY
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.SHARE_DATA_KEY
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
+import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -83,10 +87,8 @@ import mega.privacy.mobile.analytics.event.SearchResultSaveToDeviceMenuItemEvent
 import mega.privacy.mobile.analytics.event.SearchResultShareMenuItemEvent
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
-import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
-import java.util.stream.Collectors
 
 /**
  * [BaseBottomSheetDialogFragment] used to display actions of a particular Node
@@ -95,10 +97,9 @@ import java.util.stream.Collectors
 class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private var mode = DEFAULT_MODE
     private lateinit var nodeController: NodeController
-    private lateinit var nodeInfo: TextView
+    private var nodeInfo: TextView? = null
     private var drawerItem: DrawerItem? = null
     private var cannotOpenFileDialog: AlertDialog? = null
-    private var user: MegaUser? = null
 
     private val nodeOptionsViewModel: NodeOptionsViewModel by viewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
@@ -128,6 +129,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val nodeName = contentView.findViewById<TextView>(R.id.node_name_text)
         nodeInfo = contentView.findViewById(R.id.node_info_text)
         val nodeVersionsIcon = contentView.findViewById<ImageView>(R.id.node_info_versions_icon)
+        val nodeStatusIcon = contentView.findViewById<ImageView>(R.id.node_status_icon)
         val optionOffline = contentView.findViewById<LinearLayout>(R.id.option_offline_layout)
         val permissionsIcon = contentView.findViewById<ImageView>(R.id.permissions_icon)
         val optionEdit = contentView.findViewById<LinearLayout>(R.id.edit_file_option)
@@ -176,10 +178,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (!Util.isScreenInPortrait(requireContext())) {
             Timber.d("Landscape configuration")
             nodeName.maxWidth = Util.scaleWidthPx(275, resources.displayMetrics)
-            nodeInfo.maxWidth = Util.scaleWidthPx(275, resources.displayMetrics)
+            nodeInfo?.maxWidth = Util.scaleWidthPx(275, resources.displayMetrics)
         } else {
             nodeName.maxWidth = Util.scaleWidthPx(210, resources.displayMetrics)
-            nodeInfo.maxWidth = Util.scaleWidthPx(210, resources.displayMetrics)
+            nodeInfo?.maxWidth = Util.scaleWidthPx(210, resources.displayMetrics)
         }
 
         viewLifecycleOwner.collectFlow(
@@ -291,19 +293,32 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 //Due to requirement change, not just hide slideshow entry in node context menu
                 optionSlideshow.visibility = View.GONE
                 if (state.isOnline) {
-                    nodeName.text = node.name
+                    nodeName.setupNodeTitleText(
+                        nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
+                        nodeShareInformation = state.shareData,
+                        megaNode = node,
+                    )
+                    nodeThumb.setupNodeIcon(
+                        nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
+                        megaNode = node,
+                    )
+                    nodeInfo?.run {
+                        setupNodeBodyText(
+                            isClearSharesVisible = optionClearShares.isVisible,
+                            nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
+                            nodeShareInformation = state.shareData,
+                            megaNode = node,
+                        )
+                        setupNodeBodyIcon(
+                            nodeVersionsImageView = nodeVersionsIcon,
+                            nodeStatusImageView = nodeStatusIcon,
+                            nodeBodyTextView = this,
+                            nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
+                            megaNode = node,
+                        )
+                    }
                     if (node.isFolder) {
                         optionVersionsLayout.visibility = View.GONE
-                        nodeInfo.text = MegaApiUtils.getMegaNodeFolderInfo(node, context)
-                        nodeVersionsIcon.visibility = View.GONE
-                        drawerItem?.let { item ->
-                            nodeThumb.setImageResource(
-                                getFolderIcon(
-                                    node,
-                                    item
-                                )
-                            )
-                        }
                         if (isEmptyFolder(node)) {
                             counterSave--
                             optionOffline.visibility = View.GONE
@@ -317,16 +332,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         ) {
                             optionEdit.visibility = View.VISIBLE
                         }
-                        nodeInfo.text = getFileInfo(node, requireContext())
                         if (megaApi.hasVersions(node) && !isTakenDown) {
-                            nodeVersionsIcon.visibility = View.VISIBLE
                             optionVersionsLayout.visibility = View.VISIBLE
                             versions.text = (megaApi.getNumVersions(node) - 1).toString()
                         } else {
-                            nodeVersionsIcon.visibility = View.GONE
                             optionVersionsLayout.visibility = View.GONE
                         }
-                        setNodeThumbnail(requireContext(), node, nodeThumb)
                         if (isTakenDown) {
                             counterShares--
                             optionSendChat.visibility = View.GONE
@@ -500,8 +511,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                             if (dBT > Constants.FIRST_NAVIGATION_LEVEL) {
                                 optionLeaveShares.visibility = View.GONE
                             } else {
-                                //Show the owner of the shared folder
-                                showOwnerSharedFolder(node)
                                 optionLeaveShares.visibility =
                                     if (isTakenDown) View.GONE else View.VISIBLE
                                 permissionsIcon.visibility = View.VISIBLE
@@ -569,18 +578,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                             }
                         } else if (tabSelected === SharesTab.OUTGOING_TAB) {
                             Timber.d("showOptionsPanelOutgoing")
-                            if (!isTakenDown && (requireActivity() as ManagerActivity).deepBrowserTreeOutgoing == Constants.FIRST_NAVIGATION_LEVEL && optionClearShares.isVisible()) {
-                                //Show the number of contacts who shared the folder
-                                val sl = megaApi.getOutShares(node)
-                                    .stream().filter { obj: MegaShare -> obj.isVerified }
-                                    .collect(Collectors.toList())
-                                if (sl.size != 0) {
-                                    nodeInfo.text = resources.getQuantityString(
-                                        R.plurals.general_num_shared_with,
-                                        sl.size, sl.size
-                                    )
-                                }
-                            } else if (optionClearShares.isVisible()) {
+                            val isClearSharesVisible = optionClearShares.isVisible
+                            if (!canShowOutgoingShareContacts(
+                                    isNodeTakenDown = isTakenDown,
+                                    isClearSharesVisible = isClearSharesVisible,
+                                ) && isClearSharesVisible
+                            ) {
                                 counterShares--
                                 optionClearShares.visibility = View.GONE
                             }
@@ -659,11 +662,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 } else {
                     optionLabelCurrent.visibility = View.GONE
                 }
-                state.shareData?.let { data ->
-                    setUnverifiedOutgoingNodeUserName(data)
-                    hideNodeActions(data, node)
-                }
-
+                state.shareData?.let { data -> hideNodeActions(data, node) }
 
                 if (savedInstanceState?.getBoolean(
                         Constants.CANNOT_OPEN_FILE_SHOWN,
@@ -681,6 +680,288 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
         }
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    /**
+     * Sets the Node Icon based on varying conditions
+     *
+     * @param nodeDeviceCenterInformation Contains specific information of a Device Center Node to
+     * be displayed
+     * @param megaNode The [MegaNode] that was loaded
+     */
+    private fun ImageView.setupNodeIcon(
+        nodeDeviceCenterInformation: NodeDeviceCenterInformation?,
+        megaNode: MegaNode,
+    ) {
+        if (nodeDeviceCenterInformation != null) {
+            setImageResource(nodeDeviceCenterInformation.icon)
+        } else {
+            if (megaNode.isFolder) {
+                drawerItem?.let { nonNullDrawerItem ->
+                    setImageResource(
+                        getFolderIcon(
+                            node = megaNode,
+                            drawerItem = nonNullDrawerItem,
+                        )
+                    )
+                }
+            } else {
+                setNodeThumbnail(
+                    context = context ?: return,
+                    node = megaNode,
+                    nodeThumb = this,
+                )
+            }
+        }
+    }
+
+    /**
+     * Sets the Node Title text based on varying conditions
+     *
+     * @param nodeDeviceCenterInformation Contains specific information of a Device Center Node to
+     * be displayed
+     * @param nodeShareInformation The Share Information
+     * @param megaNode The [MegaNode] that was loaded
+     */
+    private fun TextView.setupNodeTitleText(
+        nodeDeviceCenterInformation: NodeDeviceCenterInformation?,
+        nodeShareInformation: NodeShareInformation?,
+        megaNode: MegaNode,
+    ) {
+        text = when {
+            // Triggered if the Bottom Sheet is accessed from Device Center
+            nodeDeviceCenterInformation != null -> nodeDeviceCenterInformation.name
+            nodeShareInformation != null && nodeController.nodeComesFromIncoming(megaNode) -> {
+                resources.getString(R.string.shared_items_verify_credentials_undecrypted_folder)
+            }
+
+            else -> megaNode.name
+        }
+    }
+
+    /**
+     * Sets the Node Body Text based on varying conditions
+     *
+     * @param isClearSharesVisible true if the "Clear Shares" is visible and false if otherwise
+     * @param nodeDeviceCenterInformation Contains specific information of a Device Center Node to
+     * be displayed
+     * @param nodeShareInformation The Share Information
+     * @param megaNode The [MegaNode] that was loaded
+     */
+    private fun TextView.setupNodeBodyText(
+        isClearSharesVisible: Boolean,
+        nodeDeviceCenterInformation: NodeDeviceCenterInformation?,
+        nodeShareInformation: NodeShareInformation?,
+        megaNode: MegaNode,
+    ) {
+        if (nodeDeviceCenterInformation != null) {
+            text = nodeDeviceCenterInformation.status
+            nodeDeviceCenterInformation.statusColorInt?.let { statusColorInt ->
+                setTextColor(statusColorInt)
+            }
+        } else {
+            text = if (megaNode.isFolder) {
+                MegaApiUtils.getMegaNodeFolderInfo(megaNode, context)
+            } else {
+                getFileInfo(megaNode, requireContext())
+            }
+            if (megaNode.isFirstNavIncomingNode()) {
+                setIncomingSharesNodeBodyText(megaNode)
+            } else if (megaNode.isOutgoingNodeBeingShared(isClearSharesVisible)) {
+                setOutgoingSharesNodeBodyText(megaNode)
+            }
+            setUnverifiedOutgoingNodeUserName(nodeShareInformation)
+        }
+    }
+
+    /**
+     * Checks whether the provided [MegaNode] originated from Incoming Shares and is in the first
+     * Navigation Level
+     *
+     * @return True if the [MegaNode] is in Incoming Shares and is in the first Navigation Level.
+     * False is returned if any of the conditions do not match
+     */
+    private fun MegaNode.isFirstNavIncomingNode(): Boolean {
+        val tabSelected = (requireActivity() as? ManagerActivity)?.tabItemShares
+        val isInSharedItemsMode = mode == SHARED_ITEMS_MODE
+        val isIncomingNode =
+            (tabSelected === SharesTab.INCOMING_TAB) || (nodeController.nodeComesFromIncoming(
+                this
+            ))
+        val isIncomingFirstNavLevel =
+            nodeController.getIncomingLevel(this) <= Constants.FIRST_NAVIGATION_LEVEL
+
+        return isInSharedItemsMode && isIncomingNode && isIncomingFirstNavLevel
+    }
+
+    /**
+     * Sets the Incoming Shares Node Body Text by retrieving the owner of the Shared [MegaNode]
+     *
+     * @param megaNode The passed [MegaNode]
+     */
+    private fun TextView.setIncomingSharesNodeBodyText(megaNode: MegaNode) {
+        megaApi.inSharesList?.let { incomingShares ->
+            incomingShares.forEach {
+                it?.let { incomingShare ->
+                    if (incomingShare.nodeHandle == megaNode.handle) {
+                        text = megaApi.getContact(incomingShare.user)?.let { megaUser ->
+                            ContactUtil.getMegaUserNameDB(megaUser)
+                        } ?: incomingShare.user
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks whether the [MegaNode] originated from Outgoing Shares and is being Shared
+     *
+     * @param isClearSharesVisible true if the "Clear Shares" is visible and false if otherwise
+     * @return true if the [MegaNode] is in Outgoing Shares and is being shared. It is false if any
+     * of the conditions fail
+     */
+    private fun MegaNode.isOutgoingNodeBeingShared(
+        isClearSharesVisible: Boolean,
+    ): Boolean = (requireActivity() as? ManagerActivity)?.let { managerActivity ->
+        val isInSharedItemsMode = mode == SHARED_ITEMS_MODE
+        val isOutgoingTabSelected = managerActivity.tabItemShares === SharesTab.OUTGOING_TAB
+
+        isInSharedItemsMode && isOutgoingTabSelected && canShowOutgoingShareContacts(
+            isNodeTakenDown = isTakenDown,
+            isClearSharesVisible = isClearSharesVisible,
+        )
+    } ?: false
+
+    /**
+     * Checks if the Contacts listed in the Outgoing Shares can be shown or not
+     *
+     * @param isNodeTakenDown true if the [MegaNode] is taken down, and false if otherwise
+     * @param isClearSharesVisible true if the "Clear Shares" is visible and false if otherwise
+     *
+     * @return true if the listed Contacts can be shown, and false if otherwise
+     */
+    private fun canShowOutgoingShareContacts(
+        isNodeTakenDown: Boolean,
+        isClearSharesVisible: Boolean,
+    ): Boolean = (requireActivity() as? ManagerActivity)?.let { managerActivity ->
+        val isOutgoingInFirstNavigationLevel =
+            managerActivity.deepBrowserTreeOutgoing == Constants.FIRST_NAVIGATION_LEVEL
+        !isNodeTakenDown && isOutgoingInFirstNavigationLevel && isClearSharesVisible
+    } ?: false
+
+    /**
+     * Sets the Outgoing Shares Node Body Text by retrieving the number of contacts who shared the [MegaNode]
+     *
+     * @param megaNode The passed [MegaNode]
+     */
+    private fun TextView.setOutgoingSharesNodeBodyText(megaNode: MegaNode) {
+        megaApi.getOutShares(megaNode)?.let { outgoingShares ->
+            val verifiedOutgoingShares =
+                outgoingShares.filter { megaShare -> megaShare != null && megaShare.isVerified }
+            if (verifiedOutgoingShares.isNotEmpty()) {
+                text = resources.getQuantityString(
+                    R.plurals.general_num_shared_with,
+                    verifiedOutgoingShares.size,
+                    verifiedOutgoingShares.size,
+                )
+            }
+        }
+    }
+
+    /**
+     * Sets the Node Information of the Unverified Node with the Contact Name
+     *
+     * @param nodeShareInformation The [NodeShareInformation] which can be potentially nullable
+     */
+    private fun TextView.setUnverifiedOutgoingNodeUserName(nodeShareInformation: NodeShareInformation?) {
+        nodeShareInformation?.let {
+            viewLifecycleOwner.lifecycleScope.launch {
+                text = nodeOptionsViewModel.getUnverifiedOutgoingNodeUserName()
+            }
+        }
+    }
+
+    /**
+     * Sets the Node Body Icon based on varying conditions
+     *
+     * @param nodeVersionsImageView The [ImageView] holding the Versions Icon
+     * @param nodeStatusImageView The [ImageView] holding the Node Status Icon
+     * @param nodeBodyTextView The [TextView] holding the Node Body Text
+     * @param nodeDeviceCenterInformation Contains specific information of a Device Center Node to
+     * be displayed
+     * @param megaNode The [MegaNode] that was loaded
+     */
+    private fun setupNodeBodyIcon(
+        nodeVersionsImageView: ImageView,
+        nodeStatusImageView: ImageView,
+        nodeBodyTextView: TextView,
+        nodeDeviceCenterInformation: NodeDeviceCenterInformation?,
+        megaNode: MegaNode,
+    ) {
+        if (nodeDeviceCenterInformation != null) {
+            nodeVersionsImageView.visibility = View.GONE
+            nodeStatusImageView.setupNodeStatusIcon(nodeDeviceCenterInformation)
+        } else {
+            nodeStatusImageView.visibility = View.GONE
+            nodeVersionsImageView.setupVersionsIconVisibility(megaNode)
+        }
+        nodeBodyTextView.handleStartMargin(
+            isNodeVersionsImageVisible = nodeVersionsImageView.isVisible,
+            isNodeStatusImageVisible = nodeStatusImageView.isVisible,
+        )
+    }
+
+    /**
+     * Sets the Node Status Icon
+     *
+     * @param nodeDeviceCenterInformation Contains specific information of a Device Center Node to
+     * be displayed
+     */
+    private fun ImageView.setupNodeStatusIcon(
+        nodeDeviceCenterInformation: NodeDeviceCenterInformation,
+    ) {
+        val nodeStatusIcon = nodeDeviceCenterInformation.statusIcon
+        val nodeStatusIconColorInt = nodeDeviceCenterInformation.statusColorInt
+
+        if (nodeStatusIcon != null) {
+            visibility = View.VISIBLE
+            setImageResource(nodeStatusIcon)
+            nodeStatusIconColorInt?.let { nonNullNodeStatusIconColorInt ->
+                setColorFilter(nonNullNodeStatusIconColorInt)
+            }
+        } else {
+            visibility = View.GONE
+        }
+    }
+
+    /**
+     * Sets the Versions Icon Visibility
+     *
+     * @param megaNode The [MegaNode] that was loaded
+     */
+    private fun ImageView.setupVersionsIconVisibility(
+        megaNode: MegaNode,
+    ) = if (!megaNode.isFolder && !megaNode.isTakenDown && megaApi.hasVersions(megaNode)) {
+        visibility = View.VISIBLE
+    } else {
+        visibility = View.GONE
+    }
+
+    /**
+     * Checks whether the Node Body Text should apply a Start Margin of 8 dp or not
+     *
+     * @param isNodeVersionsImageVisible true if the Node Versions Image is visible, and false if otherwise
+     * @param isNodeStatusImageVisible true if the Node Status Image is visible, and false if otherwise
+     */
+    private fun TextView.handleStartMargin(
+        isNodeVersionsImageVisible: Boolean,
+        isNodeStatusImageVisible: Boolean,
+    ) {
+        if (isNodeVersionsImageVisible || isNodeStatusImageVisible) {
+            updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                marginStart = Util.dp2px(8F)
+            }
+        }
     }
 
     /**
@@ -790,34 +1071,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
     }
 
-    private fun showOwnerSharedFolder(node: MegaNode?) {
-        val sharesIncoming = megaApi.inSharesList
-        for (j in sharesIncoming.indices) {
-            val mS = sharesIncoming[j]
-            if (mS.nodeHandle == node?.handle) {
-                user = megaApi.getContact(mS.user)
-                if (user != null) {
-                    nodeInfo.text = ContactUtil.getMegaUserNameDB(user)
-                } else {
-                    nodeInfo.text = mS.user
-                }
-            }
-        }
-    }
-
-    /**
-     * Set the node info of the unverified node with the name of the contact
-     * @param nodeShareInformation
-     */
-    private fun setUnverifiedOutgoingNodeUserName(nodeShareInformation: NodeShareInformation) {
-        user = megaApi.getContact(nodeShareInformation.user)
-        if (user != null) {
-            nodeInfo.text = ContactUtil.getMegaUserNameDB(user)
-        } else {
-            nodeInfo.text = nodeShareInformation.user
-        }
-    }
-
     private fun hideNodeActions(nodeShareInformation: NodeShareInformation, node: MegaNode) {
         val optionVerifyUser = contentView.findViewById<TextView>(R.id.verify_user_option)
         optionVerifyUser.visibility = View.VISIBLE
@@ -825,17 +1078,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (!nodeShareInformation.isVerified) {
             optionVerifyUser.text = getString(
                 R.string.shared_items_bottom_sheet_menu_verify_user,
-                nodeInfo.text
+                nodeInfo?.text
             )
         }
         optionVerifyUser.setOnClickListener { onVerifyUserClicked(nodeShareInformation, node) }
-        val nodeName = contentView.findViewById<TextView>(R.id.node_name_text)
-        if (nodeController.nodeComesFromIncoming(node)) {
-            nodeName.text =
-                resources.getString(R.string.shared_items_verify_credentials_undecrypted_folder)
-        } else {
-            nodeName.text = node.name
-        }
         contentView.findViewById<View>(R.id.favorite_option).visibility = View.GONE
         contentView.findViewById<View>(R.id.rename_option).visibility = View.GONE
         contentView.findViewById<View>(R.id.link_option).visibility =
@@ -1244,11 +1490,14 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
          * @param nodeId The [NodeId]
          * @param shareData The [ShareData], which can be nullable
          * @param mode The Mode used to display what Node actions are available
+         * @param nodeDeviceCenterInformation When instantiating the Bottom Dialog from Device
+         * Center, this holds specific information of the Device Center Node to be displayed
          */
         fun newInstance(
             nodeId: NodeId,
             shareData: ShareData? = null,
             mode: Int? = null,
+            nodeDeviceCenterInformation: NodeDeviceCenterInformation? = null,
         ): NodeOptionsBottomSheetDialogFragment {
             val fragment = NodeOptionsBottomSheetDialogFragment()
 
@@ -1264,6 +1513,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     isVerified = it.isVerified
                 )
                 args.putParcelable(SHARE_DATA_KEY, shareInfo)
+            }
+            nodeDeviceCenterInformation?.let {
+                args.putParcelable(NODE_DEVICE_CENTER_INFORMATION_KEY, it)
             }
 
             fragment.arguments = args

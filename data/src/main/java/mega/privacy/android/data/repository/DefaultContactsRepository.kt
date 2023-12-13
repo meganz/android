@@ -866,4 +866,13 @@ internal class DefaultContactsRepository @Inject constructor(
             }.map { it.handle }
         }
         .flowOn(ioDispatcher)
+
+    override suspend fun getContactUserNameFromDatabase(user: String?): String? =
+        withContext(ioDispatcher) {
+            if (user != null) {
+                megaApiGateway.getContact(user)?.let { megaUser ->
+                    contactWrapper.getMegaUserNameDB(megaUser)
+                } ?: user
+            } else null
+        }
 }

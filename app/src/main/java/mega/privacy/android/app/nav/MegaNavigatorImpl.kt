@@ -1,14 +1,20 @@
 package mega.privacy.android.app.nav
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.annotation.DrawableRes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -51,5 +57,27 @@ internal class MegaNavigatorImpl @Inject constructor(
             }
             context.startActivity(intent)
         }
+    }
+
+    override fun openNodeOptionsBottomSheetFromDeviceCenter(
+        activity: Activity,
+        nodeName: String,
+        nodeHandle: Long,
+        nodeStatus: String,
+        nodeStatusColorInt: Int?,
+        @DrawableRes nodeIcon: Int,
+        @DrawableRes nodeStatusIcon: Int?,
+    ) {
+        (activity as? ManagerActivity)?.showNodeOptionsPanel(
+            nodeId = NodeId(nodeHandle),
+            mode = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
+            nodeDeviceCenterInformation = NodeDeviceCenterInformation(
+                name = nodeName,
+                status = nodeStatus,
+                statusColorInt = nodeStatusColorInt,
+                icon = nodeIcon,
+                statusIcon = nodeStatusIcon,
+            )
+        )
     }
 }
