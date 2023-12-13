@@ -1531,7 +1531,10 @@ class InMeetingViewModel @Inject constructor(
      * Method to control when the number of participants changes
      */
     private fun updateParticipantsList(context: Context) {
-        participants.value = participants.value
+        when (_state.value.callUIStatus) {
+            CallUIStatusType.SpeakerView -> sortParticipantsListForSpeakerView()
+            else -> participants.value = participants.value
+        }
         updateMeetingInfoBottomPanel(context)
     }
 
@@ -1766,21 +1769,25 @@ class InMeetingViewModel @Inject constructor(
      * Method to get the first participant in the list, who will be the new speaker
      */
     fun getFirstParticipant(peerId: Long, clientId: Long): Participant? {
-        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
-            if (participants.value != null && (participants.value ?: return@let).size > 0) {
-                if (peerId == MEGACHAT_INVALID_HANDLE && clientId == MEGACHAT_INVALID_HANDLE) {
-                    return (participants.value ?: return@let)[0]
-                }
+        participants.value?.let { participantsList ->
+            if (participantsList.isEmpty()) return null
 
-                val iterator = participants.value?.iterator()
-                iterator?.let { participant ->
-                    participant.forEach {
-                        if (it.peerId != peerId || it.clientId != clientId) {
-                            return it
+            when {
+                peerId == -1L && clientId == -1L ->
+                    participantsList.filter { it.isPresenting }.apply {
+                        if (isNotEmpty()) {
+                            return first()
                         }
+
+                        return participantsList.first()
                     }
-                }
+
+                else -> participantsList.filter { it.peerId != peerId || it.clientId != clientId }
+                    .forEach {
+                        return it
+                    }
             }
+
         }
 
         return null
@@ -1847,27 +1854,39 @@ class InMeetingViewModel @Inject constructor(
      */
     fun changesInScreenSharing(session: MegaChatSession): Boolean {
         var hasChanged = false
+        var participantToUpdate: Participant? = null
         participants.value = participants.value?.map { participant ->
             return@map when {
                 participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isPresenting != session.hasScreenShare() -> {
                     hasChanged = true
+                    if (session.hasScreenShare()) {
+                        participantToUpdate = participant
+
+                    }
+
                     participant.copy(isPresenting = session.hasScreenShare())
+
                 }
 
                 else -> participant
             }
         }?.toMutableList()
 
-        speakerParticipants.value = speakerParticipants.value?.map { participant ->
-            return@map when {
-                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isPresenting != session.hasScreenShare() -> {
-                    hasChanged = true
-                    participant.copy(isPresenting = session.hasScreenShare())
-                }
+        participantToUpdate?.let {
+            _pinItemEvent.value = Event(it)
+        } ?: {
+            speakerParticipants.value = speakerParticipants.value?.map { participant ->
+                return@map when {
+                    participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isPresenting != session.hasScreenShare() -> {
+                        hasChanged = true
+                        participant.copy(isPresenting = session.hasScreenShare())
 
-                else -> participant
-            }
-        }?.toMutableList()
+                    }
+
+                    else -> participant
+                }
+            }?.toMutableList()
+        }
         return hasChanged
     }
 
@@ -2824,7 +2843,18 @@ class InMeetingViewModel @Inject constructor(
      * @param newStatus [CallUIStatusType]
      */
     fun setStatus(newStatus: CallUIStatusType) {
+        if (_state.value.callUIStatus != newStatus && newStatus == CallUIStatusType.SpeakerView) {
+            sortParticipantsListForSpeakerView()
+        }
         _state.update { it.copy(callUIStatus = newStatus) }
+
+    }
+
+    /**
+     * Sort participants list for speaker view
+     */
+    private fun sortParticipantsListForSpeakerView() {
+        participants.value?.sortByDescending { it.isPresenting }
     }
 
     /**
