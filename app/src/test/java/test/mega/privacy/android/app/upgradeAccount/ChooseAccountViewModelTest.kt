@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.billing.GetCheapestSubscriptionUseCase
@@ -109,6 +110,8 @@ class ChooseAccountViewModelTest {
 
     @Test
     fun `test that initial state has all Pro plans listed`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
         whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
         initViewModel()
@@ -133,9 +136,11 @@ class ChooseAccountViewModelTest {
             localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
             formattedSize = formattedSizeMapper,
         )
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
         whenever(getCheapestSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
         whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
         whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         initViewModel()
         underTest.state.map { it.cheapestSubscriptionAvailable }.test {
             assertThat(awaitItem()).isEqualTo(expectedResult)
@@ -144,6 +149,7 @@ class ChooseAccountViewModelTest {
 
     @Test
     fun `test that initial state has a feature flag set properly if it's enabled`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
         whenever(getCheapestSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
         whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
         whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
