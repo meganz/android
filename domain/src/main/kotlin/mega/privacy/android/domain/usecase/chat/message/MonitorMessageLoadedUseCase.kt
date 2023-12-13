@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
-import mega.privacy.android.domain.entity.chat.messages.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
@@ -19,6 +18,7 @@ import javax.inject.Inject
 class MonitorMessageLoadedUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
     private val createTypedMessageUseCases: Map<@JvmSuppressWildcards ChatMessageType, @JvmSuppressWildcards CreateTypedMessageUseCase>,
+    private val createInvalidMessageUseCase: CreateInvalidMessageUseCase,
 ) {
 
     /**
@@ -35,12 +35,7 @@ class MonitorMessageLoadedUseCase @Inject constructor(
             .map { message ->
                 val isMine = myUserHandle == message.userHandle
                 createTypedMessageUseCases[message.type]?.invoke(message, isMine)
-                    ?: InvalidMessage(
-                        msgId = message.msgId,
-                        time = message.timestamp,
-                        isMine = isMine,
-                        userHandle = message.userHandle,
-                    )
+                    ?: createInvalidMessageUseCase(message, isMine)
             }
     }
 }

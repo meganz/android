@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.CallUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatRichLinkUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.ui.InvalidUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.TextUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.UiChatMessage
+import mega.privacy.android.domain.entity.chat.messages.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
@@ -49,6 +51,13 @@ class UiChatMessageMapper @Inject constructor() {
                 showDate = showDate,
                 showAvatar = showAvatar,
                 showTime = showTime
+            )
+
+            is InvalidMessage -> InvalidUiMessage(
+                message = message,
+                showAvatar = showAvatar,
+                showTime = showTime,
+                showDate = showDate
             )
 
             else -> object : UiChatMessage {
