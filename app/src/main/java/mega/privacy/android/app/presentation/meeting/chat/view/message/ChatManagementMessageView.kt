@@ -6,10 +6,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.core.ui.model.MegaSpanStyle
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Chat management message view
@@ -21,14 +23,15 @@ import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 @Composable
 fun ChatManagementMessageView(
     text: String,
-    styles: Map<SpanIndicator, SpanStyle>,
+    styles: Map<SpanIndicator, MegaSpanStyle>,
     modifier: Modifier = Modifier,
 ) {
     MegaSpannedText(
         modifier = modifier,
         value = text,
         baseStyle = MaterialTheme.typography.subtitle2,
-        styles = styles
+        styles = styles,
+        color = TextColor.Secondary
     )
 }
 
@@ -39,8 +42,11 @@ private fun ChatManagementMessageViewPreview() {
         ChatManagementMessageView(
             text = "[A]Hello[/A] World",
             styles = mapOf(
-                SpanIndicator('A') to SpanStyle(
-                    fontWeight = FontWeight.Bold
+                SpanIndicator('A') to MegaSpanStyle(
+                    spanStyle = SpanStyle(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = TextColor.Primary
                 )
             )
         )

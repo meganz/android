@@ -378,7 +378,12 @@ internal fun ChatView(
                         state = scrollState
                     ) {
                         item("first_message_header") { FirstMessageHeader(uiState) }
-                        items(messages) { uiChatMessage ->
+                        items(
+                            items = messages,
+                            key = {
+                                "${it.message.msgId}_${it.showAvatar}_${it.showTime}_${it.showDate}"
+                            },
+                        ) { uiChatMessage ->
                             MessageRow(
                                 uiChatMessage = uiChatMessage,
                                 modifier = uiChatMessage.modifier,

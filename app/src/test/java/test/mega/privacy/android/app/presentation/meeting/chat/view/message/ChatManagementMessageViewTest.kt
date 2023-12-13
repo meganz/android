@@ -6,7 +6,9 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatManagementMessageView
+import mega.privacy.android.core.ui.model.MegaSpanStyle
 import mega.privacy.android.core.ui.model.SpanIndicator
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,8 +23,11 @@ class ChatManagementMessageViewTest {
         initComposeRuleContent(
             text = "[A]Hello[/A] World",
             styles = mapOf(
-                SpanIndicator('A') to SpanStyle(
-                    fontWeight = FontWeight.Bold
+                SpanIndicator('A') to MegaSpanStyle(
+                    spanStyle = SpanStyle(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = TextColor.OnColor
                 )
             )
         )
@@ -31,7 +36,7 @@ class ChatManagementMessageViewTest {
 
     private fun initComposeRuleContent(
         text: String,
-        styles: Map<SpanIndicator, SpanStyle>,
+        styles: Map<SpanIndicator, MegaSpanStyle>,
     ) {
         composeTestRule.setContent {
             ChatManagementMessageView(text = text, styles = styles)
