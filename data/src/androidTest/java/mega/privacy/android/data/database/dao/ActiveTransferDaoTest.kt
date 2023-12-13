@@ -22,15 +22,18 @@ class ActiveTransferDaoTest {
     private lateinit var activeTransferDao: ActiveTransferDao
     private lateinit var db: MegaDatabase
 
-    private val entities = (0..20).map { tag ->
-        ActiveTransferEntity(
-            tag = tag,
-            transferType = TransferType.values()[tag.rem(TransferType.values().size)],
-            totalBytes = 1024 * (tag.toLong() % 5 + 1),
-            isFinished = tag.rem(5) == 0,
-            isPaused = false,
-            isFolderTransfer = false,
-        )
+    private val entities = TransferType.values().flatMap { transferType: TransferType ->
+        (1..4).map { index ->
+            val tag = index + (10 * transferType.ordinal)
+            ActiveTransferEntity(
+                tag = tag,
+                transferType = transferType,
+                totalBytes = 1024 * (tag.toLong() % 5 + 1),
+                isFinished = index.rem(3) == 0,
+                isPaused = false,
+                isFolderTransfer = false,
+            )
+        }
     }
 
     @Before
