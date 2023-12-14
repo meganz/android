@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message
 
 import android.content.Context
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -12,13 +13,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.model.MegaSpanStyle
 import mega.privacy.android.core.ui.model.SpanIndicator
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.messages.management.AlterParticipantsMessage
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Alter participants message view
@@ -127,3 +132,48 @@ fun AlterParticipantsMessageView(
         ),
     )
 }
+
+@CombinedThemePreviews
+@Composable
+private fun AlterParticipantsMessageViewSameHandlePreview(
+    @PreviewParameter(ChatRoomPermissionProvider::class) permission: ChatRoomPermission,
+) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        AlterParticipantsMessageView(
+            message = AlterParticipantsMessage(
+                userHandle = 1L,
+                handleOfAction = 1L,
+                privilege = permission,
+                isMine = true,
+                time = System.currentTimeMillis(),
+                msgId = 1L,
+            ),
+            ownerActionFullName = "Owner",
+            targetActionFullName = "Target",
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun AlterParticipantsMessageViewDifferentHandlePreview(
+    @PreviewParameter(ChatRoomPermissionProvider::class) permission: ChatRoomPermission,
+) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        AlterParticipantsMessageView(
+            message = AlterParticipantsMessage(
+                userHandle = 1L,
+                handleOfAction = 2L,
+                privilege = permission,
+                isMine = true,
+                time = System.currentTimeMillis(),
+                msgId = 1L,
+            ),
+            ownerActionFullName = "Owner",
+            targetActionFullName = "Target",
+        )
+    }
+}
+
+private class ChatRoomPermissionProvider :
+    CollectionPreviewParameterProvider<ChatRoomPermission>(ChatRoomPermission.entries)

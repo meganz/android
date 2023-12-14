@@ -7,6 +7,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ui.CallUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatGiphyUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatRichLinkUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.InvalidUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.ui.PermissionChangeUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.TextUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.UiChatMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
@@ -15,6 +16,7 @@ import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.SignatureInvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.AlterParticipantsMessage
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
+import mega.privacy.android.domain.entity.chat.messages.management.PermissionChangeMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
@@ -71,6 +73,10 @@ class UiChatMessageMapper @Inject constructor() {
                 showDate = showDate,
             )
 
+            is PermissionChangeMessage -> PermissionChangeUiMessage(
+                message = message,
+                showDate = showDate
+            )
 
             is InvalidMessage -> mapInvalidMessage(message, showAvatar, showTime, showDate)
 
