@@ -1,7 +1,6 @@
 package test.mega.privacy.android.app.presentation.fileinfo
 
 import android.app.Activity
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth
@@ -87,15 +86,15 @@ import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.ArgumentMatchers.anyLong
-import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -106,7 +105,7 @@ import java.net.URI
 import kotlin.test.assertNull
 
 @ExperimentalCoroutinesApi
-@RunWith(MockitoJUnitRunner::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class FileInfoViewModelTest {
     private lateinit var underTest: FileInfoViewModel
 
@@ -158,17 +157,65 @@ internal class FileInfoViewModelTest {
     private val previewFile: File = mock()
     private val activity = WeakReference(mock<Activity>())
 
-
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
-
-    @Before
+    @BeforeAll
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        runTest {
-            initDefaultMockBehaviour()
-        }
+    }
+
+    @BeforeEach
+    fun cleanUp() = runTest {
+        resetMocks()
+        initDefaultMockBehaviour()
         initUnderTestViewModel()
+    }
+
+    private fun resetMocks() {
+        reset(
+            fileUtilWrapper,
+            monitorStorageStateEventUseCase,
+            isConnectedToInternetUseCase,
+            getFileHistoryNumVersionsUseCase,
+            isNodeInBackupsUseCase,
+            isNodeInRubbish,
+            checkNameCollision,
+            moveNodeUseCase,
+            moveNodeToRubbishBinUseCase,
+            copyNodeUseCase,
+            deleteNodeByHandleUseCase,
+            deleteNodeVersionsUseCase,
+            node,
+            getPreviewUseCase,
+            getFolderTreeInfo,
+            getNodeByIdUseCase,
+            getContactItemFromInShareFolder,
+            monitorNodeUpdatesById,
+            monitorChildrenUpdates,
+            monitorContactUpdates,
+            megaNodeRepository,
+            getNodeVersionsByHandleUseCase,
+            getNodeLocationInfo,
+            getOutShares,
+            getNodeOutSharesUseCase,
+            isAvailableOffline,
+            setNodeAvailableOffline,
+            getNodeAccessPermission,
+            setOutgoingPermissions,
+            stopSharingNode,
+            nodeActionMapper,
+            getAvailableNodeActionsUseCase,
+            monitorChatOnlineStatusUseCase,
+            clipboardGateway,
+            getPrimarySyncHandleUseCase,
+            getSecondarySyncHandleUseCase,
+            isCameraUploadsEnabledUseCase,
+            isSecondaryFolderEnabled,
+            monitorOfflineFileAvailabilityUseCase,
+            getFeatureFlagValueUseCase,
+            getContactVerificationWarningUseCase,
+            typedFileNode,
+            previewFile,
+        )
+        activity
     }
 
     private fun initUnderTestViewModel() {
@@ -244,9 +291,11 @@ internal class FileInfoViewModelTest {
         whenever(getAvailableNodeActionsUseCase(any())).thenReturn(emptyList())
         whenever(getNodeOutSharesUseCase(nodeId)).thenReturn(emptyList())
         whenever(getOutShares(nodeId)).thenReturn(emptyList())
+        whenever(getContactVerificationWarningUseCase()).thenReturn(false)
+        whenever(monitorOfflineFileAvailabilityUseCase()).thenReturn(emptyFlow())
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -778,7 +827,6 @@ internal class FileInfoViewModelTest {
         mockMonitorStorageStateEvent(StorageState.Green)
         val expected = true
         whenever(isAvailableOffline.invoke(any())).thenReturn(false)
-        whenever(monitorOfflineFileAvailabilityUseCase()).thenReturn(emptyFlow())
         whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
         underTest.setNode(node.handle, true)
         underTest.availableOfflineChanged(expected, activity)
@@ -793,7 +841,6 @@ internal class FileInfoViewModelTest {
     fun `test availableOfflineChanged does not start download if storage state is pay wall`() =
         runTest {
             mockMonitorStorageStateEvent(StorageState.PayWall)
-            whenever(monitorOfflineFileAvailabilityUseCase()).thenReturn(emptyFlow())
             whenever(isAvailableOffline.invoke(typedFileNode)).thenReturn(false)
             underTest.setNode(node.handle, true)
             underTest.availableOfflineChanged(true, activity)
