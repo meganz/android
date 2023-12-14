@@ -5,7 +5,10 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -23,8 +26,10 @@ import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
@@ -40,8 +45,7 @@ import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -55,6 +59,7 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SearchActivityViewModelTest {
     private lateinit var underTest: SearchActivityViewModel
+    private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val getParentNodeHandle: GetParentNodeHandle = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
@@ -82,28 +87,19 @@ class SearchActivityViewModelTest {
         setOf(Download(DownloadMenuAction()))
     private val rubbishBinToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
         setOf(Download(DownloadMenuAction()))
+    private val nodeList = mutableListOf<TypedNode>()
 
-
-    @BeforeAll
-    fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
+    private val parentHandle = 123456L
+    private val isFirstLevel = false
+    private val searchType = SearchType.CLOUD_DRIVE
 
     @BeforeEach
-    fun resetMocks() {
-        reset(
-            getParentNodeHandle,
-            cancelCancelTokenUseCase,
-            searchNodesUseCase,
-            getSearchCategoriesUseCase,
-            searchFilterMapper,
-            emptySearchViewMapper,
-            stateHandle,
-            setViewType,
-            monitorViewType,
-            getCloudSortOrder,
-            monitorOfflineNodeUpdatesUseCase,
-        )
+    fun setUp() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+        runBlocking {
+            stubCommon()
+        }
+        initViewModel()
     }
 
     private fun initViewModel() {
@@ -143,7 +139,6 @@ class SearchActivityViewModelTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-            initViewModel()
             underTest.onSortOrderChanged()
             underTest.onLongItemClicked(
                 NodeUIItem(
@@ -168,7 +163,6 @@ class SearchActivityViewModelTest {
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-            initViewModel()
             underTest.onSortOrderChanged()
             underTest.onItemClicked(
                 NodeUIItem(
@@ -204,7 +198,6 @@ class SearchActivityViewModelTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-            initViewModel()
             underTest.onSortOrderChanged()
             underTest.onLongItemClicked(
                 NodeUIItem(
@@ -242,7 +235,6 @@ class SearchActivityViewModelTest {
     @Test
     fun `test that setViewType is called at least once when changing the view type to grid`() =
         runTest {
-            initViewModel()
             underTest.onChangeViewTypeClicked()
             verify(setViewType).invoke(ViewType.GRID)
         }
@@ -250,7 +242,6 @@ class SearchActivityViewModelTest {
     @Test
     fun `test that the current file node and item index have correct values when onItemPerformedClicked is invoked`() =
         runTest {
-            initViewModel()
             underTest.onItemPerformedClicked()
             underTest.state.test {
                 val state = awaitItem()
@@ -270,16 +261,8 @@ class SearchActivityViewModelTest {
                 on { id }.thenReturn(NodeId(123L))
                 on { name }.thenReturn("file node")
             }
-            val parentHandle = 123456L
-            val isFirstLevel = false
-            val searchType = SearchType.CLOUD_DRIVE
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-            whenever(stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE)).thenReturn(searchType)
-            whenever(stateHandle.get<Long>(SearchActivity.PARENT_HANDLE)).thenReturn(parentHandle)
-            whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
-                isFirstLevel
-            )
             whenever(
                 searchNodesUseCase(
                     query = "",
@@ -289,7 +272,6 @@ class SearchActivityViewModelTest {
                     searchCategory = filter.filter
                 )
             ).thenReturn(listOf(typedFileNode, typedFolderNode))
-            initViewModel()
             underTest.updateFilter(filter)
             underTest.state.test {
                 val state = awaitItem()
@@ -303,6 +285,7 @@ class SearchActivityViewModelTest {
     fun `test that the search functionality is performed with an updated filter when update search query is called`() =
         runTest {
             val query = "query"
+
             val typedFolderNode = mock<TypedFolderNode> {
                 on { id }.thenReturn(NodeId(345L))
                 on { name }.thenReturn("folder node")
@@ -311,16 +294,16 @@ class SearchActivityViewModelTest {
                 on { id }.thenReturn(NodeId(123L))
                 on { name }.thenReturn("file node")
             }
+
             val parentHandle = 123456L
             val isFirstLevel = false
             val searchType = SearchType.CLOUD_DRIVE
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-            whenever(stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE)).thenReturn(searchType)
-            whenever(stateHandle.get<Long>(SearchActivity.PARENT_HANDLE)).thenReturn(parentHandle)
-            whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
-                isFirstLevel
-            )
+
+            nodeList.add(typedFileNode)
+            nodeList.add(typedFolderNode)
+
             whenever(
                 searchNodesUseCase(
                     query = query,
@@ -328,13 +311,12 @@ class SearchActivityViewModelTest {
                     searchType = searchType,
                     isFirstLevel = isFirstLevel,
                 )
-            ).thenReturn(listOf(typedFileNode, typedFolderNode))
-            initViewModel()
+            ).thenReturn(nodeList)
             underTest.updateSearchQuery(query)
             underTest.state.test {
                 val state = awaitItem()
                 Truth.assertThat(state.searchQuery).isEqualTo(query)
-                Truth.assertThat(state.searchItemList.size).isEqualTo(2)
+                Truth.assertThat(state.searchItemList.size).isEqualTo(nodeList.size)
             }
         }
 
@@ -348,11 +330,6 @@ class SearchActivityViewModelTest {
             val searchType = SearchType.CLOUD_DRIVE
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-            whenever(stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE)).thenReturn(searchType)
-            whenever(stateHandle.get<Long>(SearchActivity.PARENT_HANDLE)).thenReturn(parentHandle)
-            whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
-                isFirstLevel
-            )
             whenever(
                 searchNodesUseCase(
                     query = "",
@@ -362,7 +339,6 @@ class SearchActivityViewModelTest {
                     searchCategory = filter.filter
                 )
             ).thenThrow(IllegalStateException("Search exception"))
-            initViewModel()
             underTest.updateFilter(filter)
             underTest.state.test {
                 val state = awaitItem()
@@ -375,7 +351,6 @@ class SearchActivityViewModelTest {
     fun `test that the error message id is updated when show error message is called`() =
         runTest {
             val errorMessageId = 123
-            initViewModel()
             underTest.showShowErrorMessage(errorMessageId)
             underTest.state.test {
                 val state = awaitItem()
@@ -400,16 +375,9 @@ class SearchActivityViewModelTest {
                 on { id }.thenReturn(NodeId(123L))
                 on { name }.thenReturn("file node")
             }
-            val parentHandle = 123456L
-            val isFirstLevel = false
-            val searchType = SearchType.CLOUD_DRIVE
+
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-            whenever(stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE)).thenReturn(searchType)
-            whenever(stateHandle.get<Long>(SearchActivity.PARENT_HANDLE)).thenReturn(parentHandle)
-            whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
-                isFirstLevel
-            )
             whenever(
                 searchNodesUseCase(
                     query = query,
@@ -418,7 +386,6 @@ class SearchActivityViewModelTest {
                     isFirstLevel = isFirstLevel,
                 )
             ).thenReturn(listOf(typedFileNode, typedFolderNode))
-            initViewModel()
             underTest.updateSearchQuery(query)
             underTest.state.test {
                 val state = awaitItem()
@@ -436,8 +403,40 @@ class SearchActivityViewModelTest {
             }
         }
 
-    @AfterAll
+    private suspend fun stubCommon() {
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
+        whenever(monitorViewType()).thenReturn(emptyFlow())
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+        whenever(stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE)).thenReturn(SearchType.CLOUD_DRIVE)
+        whenever(stateHandle.get<Long>(SearchActivity.PARENT_HANDLE)).thenReturn(123456L)
+        whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
+            false
+        )
+    }
+
+    @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
+        nodeList.clear()
+        reset(
+            monitorNodeUpdatesUseCase,
+            getParentNodeHandle,
+            cancelCancelTokenUseCase,
+            searchNodesUseCase,
+            getSearchCategoriesUseCase,
+            searchFilterMapper,
+            emptySearchViewMapper,
+            stateHandle,
+            setViewType,
+            monitorViewType,
+            getCloudSortOrder,
+            getRubbishNodeUseCase,
+            getNodeAccessPermission,
+            checkNodeCanBeMovedToTargetNode,
+            isNodeInBackupsUseCase,
+            monitorOfflineNodeUpdatesUseCase
+        )
     }
 }
