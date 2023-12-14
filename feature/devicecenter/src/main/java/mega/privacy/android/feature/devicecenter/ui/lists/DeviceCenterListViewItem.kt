@@ -12,7 +12,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
@@ -24,6 +23,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.shared.theme.MegaAppTheme
 import java.io.File
 
 /**
@@ -42,14 +42,18 @@ internal const val DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG =
  * @param uiNode The [DeviceCenterUINode] to be displayed
  * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
  * @param onBackupFolderClicked Lambda that performs a specific action when a Backup Folder is clicked
- * @param onMenuClicked Lambda that performs a specific action when the Menu icon is clicked
+ * @param onBackupFolderMenuClicked Lambda that performs a specific action when a Backup Folder's
+ * Menu Icon is clicked
+ * @param onNonBackupFolderMenuClicked Lambda that performs a specific action when a Non Backup Folder's
+ * Menu icon is clicked
  */
 @Composable
 internal fun DeviceCenterListViewItem(
     uiNode: DeviceCenterUINode,
     onDeviceClicked: (DeviceUINode) -> Unit = {},
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit = {},
-    onMenuClicked: (DeviceCenterUINode) -> Unit,
+    onBackupFolderMenuClicked: (BackupDeviceFolderUINode) -> Unit = {},
+    onNonBackupFolderMenuClicked: (DeviceCenterUINode) -> Unit,
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -91,7 +95,12 @@ internal fun DeviceCenterListViewItem(
                     else -> Unit
                 }
             },
-            onMenuClick = { onMenuClicked(uiNode) },
+            onMenuClick = {
+                when (uiNode) {
+                    is BackupDeviceFolderUINode -> onBackupFolderMenuClicked(uiNode)
+                    else -> onNonBackupFolderMenuClicked(uiNode)
+                }
+            },
         )
         CustomDivider(
             modifier = Modifier
@@ -147,7 +156,7 @@ private fun PreviewDeviceCenterListViewItem() {
                 folders = emptyList(),
             ),
             onDeviceClicked = {},
-            onMenuClicked = {},
+            onNonBackupFolderMenuClicked = {},
         )
     }
 }
@@ -169,7 +178,7 @@ private fun PreviewDeviceCenterListViewItemWithEmptyTitle() {
                 folders = emptyList(),
             ),
             onDeviceClicked = {},
-            onMenuClicked = {},
+            onNonBackupFolderMenuClicked = {},
         )
     }
 }

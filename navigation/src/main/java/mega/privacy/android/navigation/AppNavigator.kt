@@ -56,9 +56,7 @@ interface AppNavigator {
     )
 
     /**
-     * When originating from Bottom Sheet, this opens the Node Options Bottom Sheet. Specific
-     * information of the Device Center Node is needed in order to display said information in the
-     * Bottom Sheet
+     * Shows the legacy Bottom Sheet with specific Options for Backup Folders
      *
      * @param activity the Activity
      * @param nodeName the Node Name
@@ -68,7 +66,7 @@ interface AppNavigator {
      * @param nodeIcon the Node Icon as an [Int]
      * @param nodeStatusIcon an optional Icon for the Node Status, represented as an [Int]
      */
-    fun openNodeOptionsBottomSheetFromDeviceCenter(
+    fun openBackupFolderNodeOptions(
         activity: Activity,
         nodeName: String,
         nodeHandle: Long,

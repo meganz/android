@@ -59,7 +59,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
     }
 
-    override fun openNodeOptionsBottomSheetFromDeviceCenter(
+    override fun openBackupFolderNodeOptions(
         activity: Activity,
         nodeName: String,
         nodeHandle: Long,
@@ -70,7 +70,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     ) {
         (activity as? ManagerActivity)?.showNodeOptionsPanel(
             nodeId = NodeId(nodeHandle),
-            mode = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
+            mode = NodeOptionsBottomSheetDialogFragment.BACKUPS_MODE,
             nodeDeviceCenterInformation = NodeDeviceCenterInformation(
                 name = nodeName,
                 status = nodeStatus,

@@ -4,13 +4,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * A Preview Composable that displays all possible Device and Device Folder Icons
@@ -32,7 +32,7 @@ private fun PreviewDeviceCenterUINodeIcon(
                 folders = emptyList(),
             ),
             onDeviceClicked = {},
-            onMenuClicked = {},
+            onNonBackupFolderMenuClicked = {},
         )
     }
 }

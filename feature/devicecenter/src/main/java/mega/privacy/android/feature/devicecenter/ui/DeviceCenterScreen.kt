@@ -21,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
@@ -43,6 +42,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.feature.devicecenter.ui.renamedevice.RenameDeviceDialog
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Test tags for the Device Center Screen
@@ -60,8 +60,10 @@ internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
  * @param snackbarHostState The [SnackbarHostState]
  * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
  * @param onBackupFolderClicked Lambda that performs a specific action when a Backup Folder is clicked
- * @param onNodeMenuIconClicked Lambda that performs a specific action when the Node Menu Icon is
- * clicked
+ * @param onBackupFolderMenuClicked Lambda that performs a specific action when a Backup Folder's Menu
+ * Icon is clicked
+ * @param onNonBackupFolderMenuClicked Lambda that performs a specific action when a Non-Backup Backup
+ * Folder's Menu Icon is clicked
  * @param onCameraUploadsClicked Lambda that performs a specific action when the User clicks the
  * "Camera uploads" Bottom Dialog Option
  * @param onShowInCloudDriveClicked Lambda that performs a specific action when the User clicks the
@@ -85,7 +87,8 @@ internal fun DeviceCenterScreen(
     snackbarHostState: SnackbarHostState,
     onDeviceClicked: (DeviceUINode) -> Unit,
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit,
-    onNodeMenuIconClicked: (DeviceCenterUINode) -> Unit,
+    onBackupFolderMenuClicked: (BackupDeviceFolderUINode) -> Unit,
+    onNonBackupFolderMenuClicked: (DeviceCenterUINode) -> Unit,
     onCameraUploadsClicked: () -> Unit,
     onShowInCloudDriveClicked: (Long) -> Unit,
     onRenameDeviceOptionClicked: (DeviceUINode) -> Unit,
@@ -159,8 +162,9 @@ internal fun DeviceCenterScreen(
                     itemsToDisplay = uiState.itemsToDisplay,
                     onDeviceClicked = onDeviceClicked,
                     onBackupFolderClicked = onBackupFolderClicked,
-                    onNodeMenuIconClicked = { menuClickedNode ->
-                        onNodeMenuIconClicked(menuClickedNode)
+                    onBackupFolderMenuClicked = onBackupFolderMenuClicked,
+                    onNonBackupFolderMenuClicked = { nonBackupFolderNode ->
+                        onNonBackupFolderMenuClicked(nonBackupFolderNode)
                         if (!modalSheetState.isVisible) {
                             coroutineScope.launch { modalSheetState.show() }
                         }
@@ -197,7 +201,10 @@ internal fun DeviceCenterScreen(
  * @param itemsToDisplay The list of Backup Devices / Device Folders to be displayed
  * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
  * @param onBackupFolderClicked Lambda that performs a specific action when a Backup Folder is clicked
- * @param onNodeMenuIconClicked Lambda that performs a specific action when the Node Menu Icon is clicked
+ * @param onBackupFolderMenuClicked Lambda that performs a specific action when a Backup Folder's
+ * Menu Icon is clicked
+ * @param onNonBackupFolderMenuClicked Lambda that performs a specific action when a Non-Backup Folder's
+ * Menu Icon is clicked
  * @param modifier The Modifier object
  */
 @Composable
@@ -205,7 +212,8 @@ private fun DeviceCenterContent(
     itemsToDisplay: List<DeviceCenterUINode>,
     onDeviceClicked: (DeviceUINode) -> Unit,
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit,
-    onNodeMenuIconClicked: (DeviceCenterUINode) -> Unit,
+    onBackupFolderMenuClicked: (BackupDeviceFolderUINode) -> Unit,
+    onNonBackupFolderMenuClicked: (DeviceCenterUINode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (itemsToDisplay.isNotEmpty()) {
@@ -225,7 +233,8 @@ private fun DeviceCenterContent(
                     DeviceCenterListViewItem(
                         uiNode = deviceFolders[itemIndex],
                         onBackupFolderClicked = onBackupFolderClicked,
-                        onMenuClicked = { node -> onNodeMenuIconClicked(node) },
+                        onBackupFolderMenuClicked = onBackupFolderMenuClicked,
+                        onNonBackupFolderMenuClicked = { node -> onNonBackupFolderMenuClicked(node) },
                     )
                 }
                 // User is in Device View
@@ -243,7 +252,9 @@ private fun DeviceCenterContent(
                         DeviceCenterListViewItem(
                             uiNode = currentlyUsedDevices[itemIndex],
                             onDeviceClicked = onDeviceClicked,
-                            onMenuClicked = { node -> onNodeMenuIconClicked(node) },
+                            onNonBackupFolderMenuClicked = { node ->
+                                onNonBackupFolderMenuClicked(node)
+                            },
                         )
                     }
                 }
@@ -260,7 +271,9 @@ private fun DeviceCenterContent(
                         DeviceCenterListViewItem(
                             uiNode = otherDevices[itemIndex],
                             onDeviceClicked = onDeviceClicked,
-                            onMenuClicked = { node -> onNodeMenuIconClicked(node) },
+                            onNonBackupFolderMenuClicked = { node ->
+                                onNonBackupFolderMenuClicked(node)
+                            },
                         )
                     }
                 }
@@ -281,7 +294,8 @@ private fun PreviewDeviceCenterInInitialLoading() {
             snackbarHostState = SnackbarHostState(),
             onDeviceClicked = {},
             onBackupFolderClicked = {},
-            onNodeMenuIconClicked = {},
+            onBackupFolderMenuClicked = {},
+            onNonBackupFolderMenuClicked = {},
             onCameraUploadsClicked = {},
             onShowInCloudDriveClicked = {},
             onRenameDeviceOptionClicked = {},
@@ -315,7 +329,8 @@ private fun PreviewDeviceCenterInDeviceView() {
             snackbarHostState = SnackbarHostState(),
             onDeviceClicked = {},
             onBackupFolderClicked = {},
-            onNodeMenuIconClicked = {},
+            onBackupFolderMenuClicked = {},
+            onNonBackupFolderMenuClicked = {},
             onCameraUploadsClicked = {},
             onShowInCloudDriveClicked = {},
             onRenameDeviceOptionClicked = {},
@@ -345,7 +360,8 @@ private fun PreviewDeviceCenterInFolderView() {
             snackbarHostState = SnackbarHostState(),
             onDeviceClicked = {},
             onBackupFolderClicked = {},
-            onNodeMenuIconClicked = {},
+            onBackupFolderMenuClicked = {},
+            onNonBackupFolderMenuClicked = {},
             onCameraUploadsClicked = {},
             onShowInCloudDriveClicked = {},
             onRenameDeviceOptionClicked = {},
@@ -369,7 +385,8 @@ private fun PreviewDeviceCenterContentWithOwnDeviceSectionOnly() {
             itemsToDisplay = listOf(ownDeviceUINode),
             onDeviceClicked = {},
             onBackupFolderClicked = {},
-            onNodeMenuIconClicked = {},
+            onBackupFolderMenuClicked = {},
+            onNonBackupFolderMenuClicked = {},
         )
     }
 }
@@ -385,7 +402,8 @@ private fun PreviewDeviceCenterContentWithOtherDevicesSectionOnly() {
             itemsToDisplay = listOf(otherDeviceUINodeOne),
             onDeviceClicked = {},
             onBackupFolderClicked = {},
-            onNodeMenuIconClicked = {},
+            onBackupFolderMenuClicked = {},
+            onNonBackupFolderMenuClicked = {},
         )
     }
 }
@@ -406,7 +424,8 @@ private fun PreviewDeviceCenterContentWithBothDeviceSections() {
             ),
             onDeviceClicked = {},
             onBackupFolderClicked = {},
-            onNodeMenuIconClicked = {},
+            onBackupFolderMenuClicked = {},
+            onNonBackupFolderMenuClicked = {},
         )
     }
 }

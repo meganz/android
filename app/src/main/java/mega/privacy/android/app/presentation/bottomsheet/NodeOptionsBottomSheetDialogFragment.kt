@@ -28,7 +28,6 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -721,7 +720,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         )
                         listener(
                             onSuccess = { _, _ ->
-                                thumbnailParams.width = Util.dp2px(Constants.THUMB_SIZE_DP.toFloat())
+                                thumbnailParams.width =
+                                    Util.dp2px(Constants.THUMB_SIZE_DP.toFloat())
                                 thumbnailParams.height = thumbnailParams.width
                                 thumbnailParams.setMargins(0, 0, 0, 0)
                                 layoutParams = thumbnailParams
@@ -1375,18 +1375,29 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
     }
 
+    /**
+     * Saves the selected [MegaNode] Offline, causing it to appear in the "Offline" section
+     *
+     * @param node A potentially nullable [MegaNode]
+     */
     private fun saveForOffline(node: MegaNode?) {
-        var adapterType = Constants.FROM_OTHERS
-        when (drawerItem) {
-            DrawerItem.BACKUPS -> adapterType = Constants.FROM_BACKUPS
-            DrawerItem.SHARED_ITEMS -> if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.INCOMING_TAB) {
-                adapterType = Constants.FROM_INCOMING_SHARES
+        val originatingFeature = when (drawerItem) {
+            DrawerItem.BACKUPS,
+            DrawerItem.DEVICE_CENTER,
+            -> Constants.FROM_BACKUPS
+
+            DrawerItem.SHARED_ITEMS -> {
+                if ((requireActivity() as? ManagerActivity)?.tabItemShares === SharesTab.INCOMING_TAB) {
+                    Constants.FROM_INCOMING_SHARES
+                } else {
+                    Constants.FROM_OTHERS
+                }
             }
 
-            else -> {}
+            else -> Constants.FROM_OTHERS
         }
         val offlineParent =
-            OfflineUtils.getOfflineParentFile(requireActivity(), adapterType, node, megaApi)
+            OfflineUtils.getOfflineParentFile(requireActivity(), originatingFeature, node, megaApi)
         if (FileUtil.isFileAvailable(offlineParent)) {
             val offlineFile = node?.name?.let { File(offlineParent, it) }
             if (FileUtil.isFileAvailable(offlineFile)) {
@@ -1397,10 +1408,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     return
                 } else {
                     // if the file does not match the latest on the cloud, delete the old file offline database record
-                    val parentName = OfflineUtils.getOfflineParentFileName(
-                        requireContext(),
-                        node
-                    ).absolutePath + File.separator
                     node?.let {
                         nodeOptionsViewModel.removeOfflineNode(it.handle)
                         refreshView()
@@ -1429,10 +1436,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> mode = CLOUD_DRIVE_MODE
             DrawerItem.RUBBISH_BIN -> mode = RUBBISH_BIN_MODE
-            DrawerItem.BACKUPS -> mode = BACKUPS_MODE
+            DrawerItem.BACKUPS, DrawerItem.DEVICE_CENTER -> mode = BACKUPS_MODE
             DrawerItem.SHARED_ITEMS -> mode = SHARED_ITEMS_MODE
             DrawerItem.SEARCH -> mode = SEARCH_MODE
-            else -> {}
+            else -> Unit
         }
     }
 

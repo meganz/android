@@ -32,7 +32,7 @@ internal class DeviceCenterListViewItemTest {
                     folders = emptyList(),
                 ),
                 onDeviceClicked = {},
-                onMenuClicked = {},
+                onNonBackupFolderMenuClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_LIST_VIEW_ITEM_TAG).assertIsDisplayed()

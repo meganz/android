@@ -9,6 +9,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,10 +19,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -73,17 +74,31 @@ class DeviceCenterFragment : Fragment() {
                         onDeviceClicked = viewModel::showDeviceFolders,
                         onBackupFolderClicked = { backupFolderUINode ->
                             megaNavigator.openNodeInBackups(
-                                activity = requireActivity(),
+                                activity = this@DeviceCenterFragment.activity
+                                    ?: return@DeviceCenterScreen,
                                 backupsHandle = backupFolderUINode.rootHandle,
                             )
                         },
-                        onNodeMenuIconClicked = viewModel::setMenuClickedNode,
+                        onBackupFolderMenuClicked = { backupDeviceFolderUINode ->
+                            megaNavigator.openBackupFolderNodeOptions(
+                                activity = this@DeviceCenterFragment.activity
+                                    ?: return@DeviceCenterScreen,
+                                nodeName = backupDeviceFolderUINode.name,
+                                nodeHandle = backupDeviceFolderUINode.rootHandle,
+                                nodeStatus = getString(backupDeviceFolderUINode.status.name),
+                                nodeStatusColorInt = backupDeviceFolderUINode.status.color?.toArgb(),
+                                nodeIcon = backupDeviceFolderUINode.icon.iconRes,
+                                nodeStatusIcon = backupDeviceFolderUINode.status.icon,
+                            )
+                        },
+                        onNonBackupFolderMenuClicked = viewModel::setMenuClickedNode,
                         onCameraUploadsClicked = {
                             megaNavigator.openSettingsCameraUploads(requireActivity())
                         },
                         onShowInCloudDriveClicked = { nodeHandle ->
                             megaNavigator.openNodeInCloudDrive(
-                                activity = requireActivity(),
+                                activity = this@DeviceCenterFragment.activity
+                                    ?: return@DeviceCenterScreen,
                                 nodeHandle = nodeHandle,
                             )
                         },
