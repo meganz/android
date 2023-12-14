@@ -8,6 +8,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +20,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
@@ -82,9 +82,12 @@ import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.ChatMeetingButton
 import mega.privacy.android.core.ui.controls.chat.ReturnToCallBanner
+import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
+import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
@@ -294,7 +297,7 @@ internal fun ChatView(
                 }
             },
         ) {
-            Scaffold(
+            MegaScaffold(
                 topBar = {
                     if (isSelectMode) {
                         SelectModeAppBar(
@@ -377,7 +380,14 @@ internal fun ChatView(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         state = scrollState
                     ) {
-                        item("first_message_header") { FirstMessageHeader(uiState) }
+                        item("header") {
+                            AnimatedVisibility(visible = chatHistoryLoadStatus == ChatHistoryLoadStatus.NONE) {
+                                FirstMessageHeader(uiState)
+                            }
+                            AnimatedVisibility(visible = chatHistoryLoadStatus != ChatHistoryLoadStatus.NONE) {
+                                LoadingMessagesHeader()
+                            }
+                        }
                         items(
                             items = messages,
                             key = {

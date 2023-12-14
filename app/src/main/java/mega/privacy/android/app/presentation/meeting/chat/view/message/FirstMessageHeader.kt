@@ -8,25 +8,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.view.getRecurringMeetingDateTime
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.chat.messages.FirstMessageHeaderParagraph
 import mega.privacy.android.core.ui.controls.chat.messages.FirstMessageHeaderSubtitleWithIcon
 import mega.privacy.android.core.ui.controls.chat.messages.FirstMessageHeaderTitle
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun FirstMessageHeader(uiState: ChatUiState) {
     val context = LocalContext.current
     val is24HourFormat = remember { DateFormat.is24HourFormat(context) }
     Column(
-        modifier = Modifier.padding(start = 72.dp, top = 40.dp, end = 24.dp),
+        modifier = Modifier
+            .padding(start = 72.dp, top = 40.dp, end = 24.dp)
+            .testTag(TEST_TAG_FIRST_MESSAGE_HEADER),
     ) {
         uiState.title?.let { title ->
             val subtitle = uiState.scheduledMeeting?.let { scheduledMeeting ->
@@ -79,3 +82,5 @@ private fun FirstMessageHeaderPreview() {
         )
     }
 }
+
+internal const val TEST_TAG_FIRST_MESSAGE_HEADER = "chat_view:first_message_header"
