@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
@@ -20,11 +21,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -41,7 +45,6 @@ import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDi
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith
-import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.MODE_KEY
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.NODE_DEVICE_CENTER_INFORMATION_KEY
@@ -81,6 +84,7 @@ import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.mobile.analytics.event.SearchResultGetLinkMenuItemEvent
 import mega.privacy.mobile.analytics.event.SearchResultOpenWithMenuItemEvent
 import mega.privacy.mobile.analytics.event.SearchResultSaveToDeviceMenuItemEvent
@@ -706,11 +710,32 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     )
                 }
             } else {
-                setNodeThumbnail(
-                    context = context ?: return,
-                    node = megaNode,
-                    nodeThumb = this,
-                )
+                val thumbnailParams = layoutParams as? ConstraintLayout.LayoutParams
+                thumbnailParams?.let {
+                    load(ThumbnailRequest(NodeId(megaNode.handle))) {
+                        size(Util.dp2px(Constants.THUMB_SIZE_DP.toFloat()))
+                        transformations(
+                            RoundedCornersTransformation(
+                                Util.dp2px(Constants.THUMB_CORNER_RADIUS_DP).toFloat()
+                            )
+                        )
+                        listener(
+                            onSuccess = { _, _ ->
+                                thumbnailParams.width = Util.dp2px(Constants.THUMB_SIZE_DP.toFloat())
+                                thumbnailParams.height = thumbnailParams.width
+                                thumbnailParams.setMargins(0, 0, 0, 0)
+                                layoutParams = thumbnailParams
+                            },
+                            onError = { _, _ ->
+                                thumbnailParams.width = Util.dp2px(Constants.ICON_SIZE_DP.toFloat())
+                                thumbnailParams.height = thumbnailParams.width
+                                thumbnailParams.setMargins(0, 0, 0, 0)
+                                setImageResource(typeForName(megaNode.name).iconResourceId)
+                                layoutParams = thumbnailParams
+                            },
+                        )
+                    }
+                }
             }
         }
     }
