@@ -215,7 +215,6 @@ internal class FileInfoViewModelTest {
             typedFileNode,
             previewFile,
         )
-        activity
     }
 
     private fun initUnderTestViewModel() {

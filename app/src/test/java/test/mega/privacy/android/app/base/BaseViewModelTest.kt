@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -37,6 +38,7 @@ class BaseViewModelTest {
     @BeforeAll
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        baseStubbing()
         initUnderTest()
     }
 
@@ -46,12 +48,23 @@ class BaseViewModelTest {
     }
 
     @BeforeEach
-    fun resetMocks() {
+    fun cleanUp() {
+        resetMocks()
+        baseStubbing()
+    }
+
+    private fun resetMocks() {
         reset(
             monitorBusinessAccountExpiredUseCase,
             monitorAccountBlockedUseCase,
             monitorBusinessAccountExpiredUseCase,
         )
+    }
+
+    private fun baseStubbing() {
+        whenever(monitorTransfersFinishedUseCase()).thenReturn(emptyFlow())
+        whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+        whenever(monitorBusinessAccountExpiredUseCase()).thenReturn(emptyFlow())
     }
 
     private fun initUnderTest() {
