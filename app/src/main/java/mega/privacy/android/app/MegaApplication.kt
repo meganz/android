@@ -252,6 +252,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
+            .respectCacheHeaders(false)
             .components {
                 if (SDK_INT >= Build.VERSION_CODES.P) {
                     add(ImageDecoderDecoder.Factory())

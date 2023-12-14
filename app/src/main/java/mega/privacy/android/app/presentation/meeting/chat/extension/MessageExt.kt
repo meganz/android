@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
+import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.MetaMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
@@ -18,10 +19,10 @@ val TypedMessage.isSelectable: Boolean
     }
 
 /**
- * Is selectable
+ * can forward
  */
 val TypedMessage.canForward: Boolean
     get() = when (this) {
-        is RichPreviewMessage -> true // add more types next MR
+        is RichPreviewMessage, is GiphyMessage -> true  //add more types in next MR
         else -> false
     }
