@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.imagepreview
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
@@ -83,6 +84,7 @@ class ImagePreviewActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Toast.makeText(this, "New Image Preview", Toast.LENGTH_SHORT).show()
         if (savedInstanceState != null) {
             nodeSaver.restoreState(savedInstanceState)
             nodeAttacher.restoreState(savedInstanceState)

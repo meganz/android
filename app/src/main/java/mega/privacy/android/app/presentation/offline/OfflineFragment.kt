@@ -48,6 +48,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
@@ -56,6 +57,10 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.offline.adapter.OfflineAdapter
 import mega.privacy.android.app.presentation.offline.adapter.OfflineNodeListener
 import mega.privacy.android.app.presentation.offline.adapter.viewholder.OfflineListViewHolder
@@ -91,6 +96,8 @@ import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.autoCleared
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -117,6 +124,9 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
 
     @Inject
     lateinit var databaseHandler: LegacyDatabaseHandler
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
@@ -770,20 +780,33 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
                 ZipBrowserActivity.start(requireActivity(), file.path)
             }
 
-            mime.isImage -> {
-                val handles =
-                    (adapter ?: return).getOfflineNodes().map { it.handle.toLong() }.toLongArray()
-                val intent = ImageViewerActivity.getIntentForOfflineChildren(
-                    requireContext(),
-                    handles,
-                    node.node.handle.toLongOrNull()
-                )
+            mime.isImage -> viewLifecycleOwner.lifecycleScope.launch {
+                val intent = if (!getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                    val handles = (adapter ?: return@launch).getOfflineNodes().map {
+                        it.handle.toLong()
+                    }.toLongArray()
+                    ImageViewerActivity.getIntentForOfflineChildren(
+                        requireContext(),
+                        handles,
+                        node.node.handle.toLongOrNull()
+                    )
+                } else {
+                    val handle = node.node.handle.toLongOrNull() ?: return@launch
+                    ImagePreviewActivity.createIntent(
+                        context = requireContext(),
+                        imageSource = ImagePreviewFetcherSource.OFFLINE,
+                        menuOptionsSource = ImagePreviewMenuSource.OFFLINE,
+                        anchorImageNodeId = NodeId(handle),
+                        params = mapOf(OfflineImageNodeFetcher.PATH to node.node.path),
+                    )
+                }
+
                 putThumbnailLocation(
                     launchIntent = intent,
-                    rv = recyclerView ?: return,
+                    rv = recyclerView ?: return@launch,
                     position = position,
                     viewerFrom = VIEWER_FROM_OFFLINE,
-                    thumbnailGetter = adapter ?: return,
+                    thumbnailGetter = adapter ?: return@launch,
                 )
                 startActivity(intent)
                 requireActivity().overridePendingTransition(0, 0)

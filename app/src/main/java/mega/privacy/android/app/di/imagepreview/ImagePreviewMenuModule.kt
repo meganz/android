@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.imagepreview.menu.AlbumSharingImage
 import mega.privacy.android.app.presentation.imagepreview.menu.CloudDriveImagePreviewMenuOptions
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenuOptions
 import mega.privacy.android.app.presentation.imagepreview.menu.MediaDiscoveryImagePreviewMenuOptions
+import mega.privacy.android.app.presentation.imagepreview.menu.OfflineImagePreviewMenuOptions
 import mega.privacy.android.app.presentation.imagepreview.menu.TimelineImagePreviewMenuOptions
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 
@@ -40,4 +41,9 @@ internal interface ImagePreviewMenuModule {
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.ALBUM_SHARING)
     fun AlbumSharingImagePreviewMenuOptions.bindAlbumSharingMenuOptions(): ImagePreviewMenuOptions
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.OFFLINE)
+    fun OfflineImagePreviewMenuOptions.bindOfflineMenuOptions(): ImagePreviewMenuOptions
 }
