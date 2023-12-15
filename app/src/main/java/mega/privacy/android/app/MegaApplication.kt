@@ -26,6 +26,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.fcm.CreateNotificationChannelsUseCase
+import mega.privacy.android.app.fetcher.MegaAvatarFetcher
+import mega.privacy.android.app.fetcher.MegaAvatarKeyer
 import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
 import mega.privacy.android.app.fetcher.MegaThumbnailKeyer
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.GetCookieSettingsUseCaseRx
@@ -55,8 +57,6 @@ import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
 import mega.privacy.android.domain.usecase.monitoring.EnablePerformanceReporterUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GetPublicNodeThumbnailUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -177,10 +177,10 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var greeter: Provider<Greeter>
 
     @Inject
-    lateinit var getThumbnailUseCase: dagger.Lazy<GetThumbnailUseCase>
+    internal lateinit var thumbnailFactory: MegaThumbnailFetcher.Factory
 
     @Inject
-    lateinit var getPublicNodeThumbnailUseCase: dagger.Lazy<GetPublicNodeThumbnailUseCase>
+    internal lateinit var avatarFactory: MegaAvatarFetcher.Factory
 
     @Inject
     lateinit var updateApiServerUseCase: UpdateApiServerUseCase
@@ -260,13 +260,10 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                     add(GifDecoder.Factory())
                 }
                 add(SvgDecoder.Factory())
-                add(
-                    MegaThumbnailFetcher.Factory(
-                        getThumbnailUseCase = getThumbnailUseCase,
-                        getPublicNodeThumbnailUseCase = getPublicNodeThumbnailUseCase
-                    )
-                )
+                add(thumbnailFactory)
+                add(avatarFactory)
                 add(MegaThumbnailKeyer)
+                add(MegaAvatarKeyer)
             }
             .build()
     }

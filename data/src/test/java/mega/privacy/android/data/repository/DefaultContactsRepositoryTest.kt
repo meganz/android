@@ -958,7 +958,7 @@ class DefaultContactsRepositoryTest {
         whenever(megaChatApiGateway.getUserEmailFromCache(any())).thenReturn(userEmail)
         whenever(megaChatApiGateway.getUserFullNameFromCache(any())).thenReturn(expectedFullName)
         whenever(megaChatApiGateway.getUserOnlineStatus(any())).thenReturn(expectedStatus)
-        whenever(cacheGateway.getCacheFile(any(), any())).thenReturn(cacheFile)
+        whenever(cacheGateway.buildAvatarFile(any())).thenReturn(cacheFile)
         whenever(megaChatApiGateway.getUserAliasFromCache(any())).thenReturn(testName)
 
         val expectedContactData = contactDataMapper(expectedFullName, testName, avatarUri)

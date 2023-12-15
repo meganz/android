@@ -36,7 +36,6 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Default [AvatarRepository] implementation
@@ -147,22 +146,25 @@ internal class DefaultAvatarRepository @Inject constructor(
                 return@withContext file
             }
 
-            suspendCoroutine { continuation ->
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { _: MegaRequest, error: MegaError ->
+                        if (error.errorCode == MegaError.API_OK) {
+                            continuation.resume(file)
+                        } else {
+                            if (error.errorCode == MegaError.API_ENOENT && file.exists()) {
+                                file.delete()
+                            }
+                            continuation.failWithError(error, "getAvatarFile")
+                        }
+                    }
+                )
                 megaApiGateway.getContactAvatar(
                     userEmail,
                     file.absolutePath,
-                    OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { _: MegaRequest, error: MegaError ->
-                            if (error.errorCode == MegaError.API_OK) {
-                                continuation.resume(file)
-                            } else {
-                                if (error.errorCode == MegaError.API_ENOENT && file.exists()) {
-                                    file.delete()
-                                }
-                                continuation.failWithError(error, "getAvatarFile")
-                            }
-                        }
-                    ))
+                    listener,
+                )
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 

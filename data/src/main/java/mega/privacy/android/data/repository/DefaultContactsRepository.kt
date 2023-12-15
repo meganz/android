@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
@@ -213,10 +212,7 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun getAvatarUri(email: String): String? =
         runCatching {
             val avatarFile =
-                cacheGateway.getCacheFile(
-                    CacheFolderConstant.AVATAR_FOLDER,
-                    email + FileConstant.JPG_EXTENSION
-                )
+                cacheGateway.buildAvatarFile(email + FileConstant.JPG_EXTENSION)
 
             getContactAvatar(email, avatarFile?.absolutePath ?: return@runCatching null)
         }.fold(
@@ -227,8 +223,7 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun deleteAvatar(email: String) {
         withContext(ioDispatcher) {
             val avatarFile =
-                cacheGateway.getCacheFile(
-                    CacheFolderConstant.AVATAR_FOLDER,
+                cacheGateway.buildAvatarFile(
                     email + FileConstant.JPG_EXTENSION
                 )
             avatarFile?.delete()
@@ -434,8 +429,7 @@ internal class DefaultContactsRepository @Inject constructor(
         val avatarUri = if (skipCache) {
             getAvatarUri(megaUser.email)
         } else {
-            cacheGateway.getCacheFile(
-                folderName = CacheFolderConstant.AVATAR_FOLDER,
+            cacheGateway.buildAvatarFile(
                 fileName = megaUser.email + FileConstant.JPG_EXTENSION
             )?.takeIf { it.exists() }?.absolutePath
         }

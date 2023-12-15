@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPublicNodeThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import okio.Path.Companion.toOkioPath
+import javax.inject.Inject
 
 /**
  * Mega thumbnail fetcher to load thumbnails from normal MegaNode
@@ -37,7 +38,7 @@ internal class MegaThumbnailFetcher(
     /**
      * Factory
      */
-    class Factory(
+    class Factory @Inject constructor(
         private val getThumbnailUseCase: dagger.Lazy<GetThumbnailUseCase>,
         private val getPublicNodeThumbnailUseCase: dagger.Lazy<GetPublicNodeThumbnailUseCase>,
     ) : Fetcher.Factory<ThumbnailRequest> {
