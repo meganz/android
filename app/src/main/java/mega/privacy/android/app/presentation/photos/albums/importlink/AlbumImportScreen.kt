@@ -91,6 +91,8 @@ import mega.privacy.mobile.analytics.event.AlbumImportScreenEvent
 import mega.privacy.mobile.analytics.event.AlbumImportStorageOverQuotaDialogEvent
 import mega.privacy.mobile.analytics.event.AlbumsStorageOverQuotaUpgradeAccountButtonEvent
 import mega.privacy.mobile.analytics.event.ImportAlbumContentLoadedEvent
+import mega.privacy.mobile.analytics.event.PhotoItemSelected
+import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
 import nz.mega.sdk.MegaNode
 
 private typealias ImageDownloader = (
@@ -283,6 +285,9 @@ internal fun AlbumImportScreen(
                 onDownloadImage = albumImportViewModel::downloadImage,
                 onClickPhoto = { photo ->
                     if (state.selectedPhotos.isEmpty()) {
+                        Analytics.tracker.trackEvent(
+                            PhotoItemSelectedEvent(selectionType = PhotoItemSelected.SelectionType.Single)
+                        )
                         if (state.isNetworkConnected) {
                             onPreviewPhoto(photo)
                         } else {
@@ -293,8 +298,14 @@ internal fun AlbumImportScreen(
                             }
                         }
                     } else if (photo in state.selectedPhotos) {
+                        Analytics.tracker.trackEvent(
+                            PhotoItemSelectedEvent(selectionType = PhotoItemSelected.SelectionType.MultiRemove)
+                        )
                         albumImportViewModel.unselectPhoto(photo)
                     } else {
+                        Analytics.tracker.trackEvent(
+                            PhotoItemSelectedEvent(selectionType = PhotoItemSelected.SelectionType.MultiAdd)
+                        )
                         albumImportViewModel.selectPhoto(photo)
                     }
                 },

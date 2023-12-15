@@ -122,6 +122,7 @@ import mega.privacy.mobile.analytics.event.VideoPlayerInfoMenuItemEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerSaveToDeviceMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerScreenEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerSendToChatMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerShareMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -204,6 +205,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Analytics.tracker.trackEvent(VideoPlayerScreenEvent)
 
         // Setup the Back Press dispatcher to receive Back Press events
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)

@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
@@ -48,6 +49,8 @@ import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.mobile.analytics.event.PhotoPreviewSaveToDeviceMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
@@ -85,6 +88,7 @@ class ImagePreviewActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Toast.makeText(this, "New Image Preview", Toast.LENGTH_SHORT).show()
+        Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
         if (savedInstanceState != null) {
             nodeSaver.restoreState(savedInstanceState)
             nodeAttacher.restoreState(savedInstanceState)
@@ -183,6 +187,7 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun saveNodeToDevice(imageNode: ImageNode) {
+        Analytics.tracker.trackEvent(PhotoPreviewSaveToDeviceMenuToolbarEvent)
         viewModel.executeTransfer(transferMessage = getString(R.string.resume_paused_transfers_text)) {
             saveNode(MegaNode.unserialize(imageNode.serializedData))
         }

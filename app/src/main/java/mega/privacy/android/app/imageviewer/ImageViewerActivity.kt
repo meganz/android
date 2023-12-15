@@ -79,6 +79,8 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.PhotoPreviewSaveToDeviceMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
 import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -410,6 +412,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setupAttachers(savedInstanceState)
 
@@ -690,6 +693,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
 
             R.id.action_download -> {
+                Analytics.tracker.trackEvent(PhotoPreviewSaveToDeviceMenuToolbarEvent)
                 viewModel.getCurrentImageItem()?.nodeItem?.let { nodeItem ->
                     viewModel.executeTransfer {
                         if (nodeItem.isAvailableOffline) {
