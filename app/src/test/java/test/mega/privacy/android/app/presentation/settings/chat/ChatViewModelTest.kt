@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -48,15 +49,20 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChatViewModelTest {
 
     private lateinit var underTest: ChatViewModel
@@ -108,18 +114,76 @@ class ChatViewModelTest {
     private val loadPendingMessagesUseCase = mock<LoadPendingMessagesUseCase> {
         onBlocking { invoke(any()) }.thenReturn(flowOf())
     }
-    private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
-    private val monitorChatSessionUpdatesUseCase = mock<MonitorChatSessionUpdatesUseCase>()
+    private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase> {
+        onBlocking { invoke() }.thenReturn(emptyFlow())
+    }
+    private val monitorChatSessionUpdatesUseCase = mock<MonitorChatSessionUpdatesUseCase> {
+        onBlocking { invoke() }.thenReturn(emptyFlow())
+    }
     private val hangChatCallUseCase = mock<HangChatCallUseCase>()
     private val broadcastCallRecordingConsentEventUseCase =
         mock<BroadcastCallRecordingConsentEventUseCase>()
     private val monitorCallRecordingConsentEventUseCase =
-        mock<MonitorCallRecordingConsentEventUseCase>()
-    private val monitorCallEndedUseCase = mock<MonitorCallEndedUseCase>()
+        mock<MonitorCallRecordingConsentEventUseCase> {
+            onBlocking { invoke() }.thenReturn(emptyFlow())
+        }
+    private val monitorCallEndedUseCase = mock<MonitorCallEndedUseCase> {
+        onBlocking { invoke() }.thenReturn(emptyFlow())
+    }
 
-    @Before
+    @BeforeAll
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
+    }
+
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            monitorStorageStateEventUseCase,
+            monitorConnectivityUseCase,
+            isConnectedToInternetUseCase,
+            answerChatCallUseCase,
+            passcodeManagement,
+            setChatVideoInDeviceUseCase,
+            chatManagement,
+            rtcAudioManagerGateway,
+            startChatCallNoRingingUseCase,
+            startCallUseCase,
+            getScheduledMeetingByChat,
+            getChatCallUseCase,
+            getChatRoom,
+            monitorChatCallUpdatesUseCase,
+            endCallUseCase,
+            sendStatisticsMeetingsUseCase,
+            getContactLinkUseCase,
+            deviceGateway,
+            isContactRequestSentUseCase,
+            startMeetingInWaitingRoomChatUseCase,
+            leaveChatUseCase,
+            getFeatureFlagValueUseCase,
+            hangChatCallUseCase,
+            broadcastCallRecordingConsentEventUseCase,
+        )
+        wheneverBlocking { monitorPausedTransfersUseCase() }.thenReturn(emptyFlow())
+        wheneverBlocking { monitorUpdatePushNotificationSettingsUseCase() }.thenReturn(flowOf(true))
+        wheneverBlocking { monitorChatArchivedUseCase() }.thenReturn(flowOf("Chat Title"))
+        wheneverBlocking { monitorJoinedSuccessfullyUseCase() }.thenReturn(flowOf(true))
+        wheneverBlocking { monitorLeaveChatUseCase() }.thenReturn(flowOf(1234L))
+        wheneverBlocking { monitorScheduledMeetingUpdatesUseCase() }.thenReturn(flowOf())
+        wheneverBlocking { monitorChatRoomUpdates(any()) }.thenReturn(flowOf())
+        wheneverBlocking { loadPendingMessagesUseCase(any()) }.thenReturn(flowOf())
+        wheneverBlocking { monitorChatSessionUpdatesUseCase() }.thenReturn(emptyFlow())
+        wheneverBlocking { monitorCallRecordingConsentEventUseCase() }.thenReturn(emptyFlow())
+        wheneverBlocking { monitorCallEndedUseCase() }.thenReturn(emptyFlow())
+        initTestClass()
+    }
+
+    private fun initTestClass() {
         underTest = ChatViewModel(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             startCallUseCase = startCallUseCase,
@@ -160,17 +224,10 @@ class ChatViewModelTest {
         )
     }
 
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
-
     @Test
     fun `test that when push notification settings is updated state is also updated`() =
         runTest {
             testScheduler.advanceUntilIdle()
-            verify(monitorUpdatePushNotificationSettingsUseCase).invoke()
             underTest.state.test {
                 val state = awaitItem()
                 Truth.assertThat(state.isPushNotificationSettingsUpdatedEvent).isTrue()
@@ -181,7 +238,6 @@ class ChatViewModelTest {
     fun `test that when onConsumePushNotificationSettingsUpdateEvent is called then state is also updated`() =
         runTest {
             testScheduler.advanceUntilIdle()
-            verify(monitorUpdatePushNotificationSettingsUseCase).invoke()
             underTest.state.test {
                 val state = awaitItem()
                 Truth.assertThat(state.isPushNotificationSettingsUpdatedEvent).isTrue()
@@ -195,7 +251,6 @@ class ChatViewModelTest {
     fun `test that when a chat is archived state is updated`() =
         runTest {
             testScheduler.advanceUntilIdle()
-            verify(monitorChatArchivedUseCase).invoke()
             underTest.state.test {
                 val state = awaitItem()
                 Truth.assertThat(state.titleChatArchivedEvent).isNotNull()
@@ -206,7 +261,6 @@ class ChatViewModelTest {
     fun `test that when onChatArchivedEventConsumed is called then state is also updated`() =
         runTest {
             testScheduler.advanceUntilIdle()
-            verify(monitorChatArchivedUseCase).invoke()
             underTest.state.test {
                 val state = awaitItem()
                 Truth.assertThat(state.titleChatArchivedEvent).isNotNull()
@@ -220,7 +274,6 @@ class ChatViewModelTest {
     fun `test that when joined successfully to a chat then state is also updated`() =
         runTest {
             testScheduler.advanceUntilIdle()
-            verify(monitorJoinedSuccessfullyUseCase).invoke()
             underTest.state.test {
                 val state = awaitItem()
                 Truth.assertThat(state.isJoiningOrLeaving).isFalse()

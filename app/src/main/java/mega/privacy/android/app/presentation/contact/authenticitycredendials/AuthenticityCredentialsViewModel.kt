@@ -61,7 +61,8 @@ class AuthenticityCredentialsViewModel @Inject constructor(
      */
     fun requestData(userEmail: String) {
         viewModelScope.launch {
-            _state.update { it.copy(contactCredentials = getContactCredentials(userEmail)) }
+            val credentials = getContactCredentials(userEmail)
+            _state.update { it.copy(contactCredentials = credentials) }
         }
         viewModelScope.launch {
             runCatching { areCredentialsVerifiedUseCase(userEmail) }

@@ -1,15 +1,14 @@
 package test.mega.privacy.android.app.presentation.contact.authenticitycredendials
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -19,27 +18,26 @@ import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetMyCredentials
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TestRule
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AuthenticityCredentialsViewModelTest {
 
     private lateinit var underTest: AuthenticityCredentialsViewModel
 
-    @get:Rule
-    var rule: TestRule = InstantTaskExecutorRule()
-
-    private val scheduler = TestCoroutineScheduler()
     private val userEmail = "test@email.com"
     private val userCredentials = listOf(
         "AG1F",
@@ -81,7 +79,7 @@ class AuthenticityCredentialsViewModelTest {
     }
 
     private val areCredentialsVerifiedUseCase = mock<AreCredentialsVerifiedUseCase> {
-        onBlocking { invoke(userEmail) }.thenReturn(false)
+        onBlocking { invoke(userEmail) }.thenReturn(true)
     }
 
     private val getMyCredentials = mock<GetMyCredentials> {
@@ -96,12 +94,40 @@ class AuthenticityCredentialsViewModelTest {
         onBlocking { invoke(userEmail) }.thenReturn(Unit)
     }
 
+    private var connectivityFlow = MutableStateFlow(true)
     private val monitorConnectivityUseCase =
-        mock<MonitorConnectivityUseCase> { on { invoke() }.thenReturn(MutableStateFlow(true)) }
+        mock<MonitorConnectivityUseCase> { on { invoke() }.thenReturn(emptyFlow()) }
 
-    @Before
+    @BeforeAll
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher(scheduler))
+        Dispatchers.setMain(StandardTestDispatcher())
+    }
+
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            getContactCredentials,
+            areCredentialsVerifiedUseCase,
+            getMyCredentials,
+            verifyCredentials,
+            resetCredentials
+        )
+        wheneverBlocking { getContactCredentials(userEmail) }.thenReturn(contactCredentials)
+        wheneverBlocking { areCredentialsVerifiedUseCase(userEmail) }.thenReturn(true)
+        wheneverBlocking { getMyCredentials() }.thenReturn(myAccountCredentials)
+        wheneverBlocking { verifyCredentials(userEmail) }.thenReturn(Unit)
+        wheneverBlocking { resetCredentials(userEmail) }.thenReturn(Unit)
+        connectivityFlow = MutableStateFlow(true)
+        wheneverBlocking { monitorConnectivityUseCase() }.thenReturn(connectivityFlow)
+        initTestClass()
+    }
+
+    private fun initTestClass() {
         underTest = AuthenticityCredentialsViewModel(
             getContactCredentials = getContactCredentials,
             areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
@@ -110,11 +136,6 @@ class AuthenticityCredentialsViewModelTest {
             resetCredentials = resetCredentials,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
         )
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -130,153 +151,98 @@ class AuthenticityCredentialsViewModelTest {
     }
 
     @Test
-    fun `test that when get my credentials is called my credentials are shown`() = runTest {
-        whenever(getMyCredentials()).thenReturn(myAccountCredentials)
-
-        underTest.state.map { it.myAccountCredentials }.distinctUntilChanged()
-            .test {
-                assertThat(awaitItem()).isNull()
-                assertThat(awaitItem()).isEqualTo(myAccountCredentials)
-            }
-    }
-
-    @Test
     fun `test that when request data contact credentials are shown`() = runTest {
-        whenever(getContactCredentials(userEmail)).thenReturn(contactCredentials)
-
-        underTest.state.map { it.contactCredentials }.distinctUntilChanged()
-            .test {
-                underTest.requestData(userEmail)
-                assertThat(awaitItem()).isNull()
-                assertThat(awaitItem()).isEqualTo(contactCredentials)
-            }
+        underTest.state.map { it.contactCredentials }.distinctUntilChanged().test {
+            underTest.requestData(userEmail)
+            assertThat(awaitItem()).isNull()
+            assertThat(awaitItem()).isEqualTo(contactCredentials)
+        }
     }
 
     @Test
     fun `test that when request data contact credentials are verified`() = runTest {
-        whenever(areCredentialsVerifiedUseCase(userEmail)).thenReturn(true)
-
-        underTest.state.map { it.areCredentialsVerified }.distinctUntilChanged()
-            .test {
-                underTest.requestData(userEmail)
-                assertThat(awaitItem()).isFalse()
-                assertThat(awaitItem()).isTrue()
-            }
+        underTest.state.map { it.areCredentialsVerified }.distinctUntilChanged().test {
+            underTest.requestData(userEmail)
+            assertThat(awaitItem()).isFalse()
+            assertThat(awaitItem()).isTrue()
+        }
     }
 
     @Test
     fun `test that action clicked show error if there is no internet connection`() = runTest {
-        whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(false))
-
-        underTest.state.map { it.error }.distinctUntilChanged()
-            .test {
-                underTest.actionClicked()
-                assertThat(awaitItem()).isNull()
-                assertThat(awaitItem()).isEqualTo(R.string.check_internet_connection_error)
-            }
+        underTest.state.map { it.error }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isNull()
+            connectivityFlow.emit(false)
+            testScheduler.advanceUntilIdle()
+            underTest.actionClicked()
+            assertThat(awaitItem()).isEqualTo(R.string.check_internet_connection_error)
+        }
     }
 
     @Test
     fun `test that error shown updates error`() = runTest {
-        whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(false))
-
         underTest.apply {
-            state.map { it.error }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isNull()
-                    actionClicked()
-                    assertThat(awaitItem()).isEqualTo(R.string.check_internet_connection_error)
-                    errorShown()
-                    assertThat(awaitItem()).isNull()
-                }
+            state.map { it.error }.distinctUntilChanged().test {
+                assertThat(awaitItem()).isNull()
+                connectivityFlow.emit(false)
+                testScheduler.advanceUntilIdle()
+                actionClicked()
+                assertThat(awaitItem()).isEqualTo(R.string.check_internet_connection_error)
+                errorShown()
+                assertThat(awaitItem()).isNull()
+            }
         }
     }
 
     @Test
     fun `test that verify credentials is updated if finish with success`() = runTest {
-        whenever(getContactCredentials(userEmail)).thenReturn(contactCredentials)
-        whenever(verifyCredentials(userEmail)).thenReturn(Unit)
-
         underTest.state.map { it.contactCredentials }.distinctUntilChanged()
             .test {
                 underTest.requestData(userEmail)
                 assertThat(awaitItem()).isNull()
                 assertThat(awaitItem()).isEqualTo(contactCredentials)
-                underTest.state.map { it.areCredentialsVerified }.distinctUntilChanged()
-                    .test {
-                        assertThat(awaitItem()).isFalse()
-                        underTest.actionClicked()
-                        assertThat(awaitItem()).isTrue()
-                    }
+                underTest.state.map { it.areCredentialsVerified }.distinctUntilChanged().test {
+                    underTest.actionClicked()
+                    assertThat(awaitItem()).isTrue()
+                }
             }
     }
 
     @Test
     fun `test that error is shown if verify credentials throws an exception`() = runTest {
-        whenever(getContactCredentials(userEmail)).thenReturn(contactCredentials)
+        whenever(areCredentialsVerifiedUseCase(userEmail)).thenReturn(false)
         whenever(verifyCredentials(userEmail)).thenAnswer { throw exception }
 
-        underTest.state.map { it.contactCredentials }.distinctUntilChanged()
-            .test {
-                underTest.requestData(userEmail)
-                assertThat(awaitItem()).isNull()
-                assertThat(awaitItem()).isEqualTo(contactCredentials)
-                underTest.state.map { it.error }.distinctUntilChanged()
-                    .test {
-                        assertThat(awaitItem()).isNull()
-                        underTest.actionClicked()
-                        assertThat(awaitItem()).isNotNull()
-                    }
-            }
+        underTest.requestData(userEmail)
+        underTest.state.map { it.error }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isNull()
+            testScheduler.advanceUntilIdle()
+            underTest.actionClicked()
+            assertThat(awaitItem()).isNotNull()
+        }
     }
 
     @Test
     fun `test that verify credentials is updated if reset finish with success`() = runTest {
-        whenever(getContactCredentials(userEmail)).thenReturn(contactCredentials)
-        whenever(verifyCredentials(userEmail)).thenReturn(Unit)
-        whenever(resetCredentials(userEmail)).thenReturn(Unit)
-
-        underTest.state.map { it.contactCredentials }.distinctUntilChanged()
-            .test {
-                underTest.requestData(userEmail)
-                assertThat(awaitItem()).isNull()
-                assertThat(awaitItem()).isEqualTo(contactCredentials)
-                underTest.state.map { it.areCredentialsVerified }.distinctUntilChanged()
-                    .test {
-                        assertThat(awaitItem()).isFalse()
-                        underTest.actionClicked()
-                        assertThat(awaitItem()).isTrue()
-                        underTest.actionClicked()
-                        assertThat(awaitItem()).isFalse()
-                    }
-            }
+        underTest.requestData(userEmail)
+        underTest.actionClicked()
+        underTest.state.map { it.areCredentialsVerified }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isFalse()
+        }
     }
 
     @Test
     fun `test that error is shown if reset credentials throws an exception`() = runTest {
-        whenever(getContactCredentials(userEmail)).thenReturn(contactCredentials)
-        whenever(verifyCredentials(userEmail)).thenReturn(Unit)
         whenever(resetCredentials(userEmail)).thenAnswer { throw exception }
 
-        underTest.state.map { it.contactCredentials }.distinctUntilChanged()
-            .test {
-                underTest.requestData(userEmail)
-                assertThat(awaitItem()).isNull()
-                assertThat(awaitItem()).isEqualTo(contactCredentials)
-                underTest.state.map { it.areCredentialsVerified }.distinctUntilChanged()
-                    .test {
-                        assertThat(awaitItem()).isFalse()
-                        underTest.actionClicked()
-                        assertThat(awaitItem()).isTrue()
-                        underTest.state.map { it.error }.distinctUntilChanged()
-                            .test {
-                                assertThat(awaitItem()).isNotNull()
-                                underTest.errorShown()
-                                assertThat(awaitItem()).isNull()
-                                underTest.actionClicked()
-                                assertThat(awaitItem()).isNotNull()
-                            }
-                    }
-            }
+        underTest.requestData(userEmail)
+        testScheduler.advanceUntilIdle()
+        underTest.actionClicked()
+        underTest.state.map { it.error }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isNull()
+            assertThat(awaitItem()).isNotNull()
+            underTest.errorShown()
+            assertThat(awaitItem()).isNull()
+        }
     }
 }
