@@ -4,9 +4,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -33,12 +32,8 @@ class SettingsChatImageQualityViewModelTest {
 
     private lateinit var underTest: SettingsChatImageQualityViewModel
 
-
-    private var getQualityFlow = MutableStateFlow(ChatImageQuality.Automatic)
-    private val getChatImageQuality = mock<GetChatImageQuality> {
-        onBlocking { invoke() }.thenReturn(emptyFlow())
-    }
-
+    private var getQualityFlow = MutableSharedFlow<ChatImageQuality>()
+    private val getChatImageQuality = mock<GetChatImageQuality>()
     private val setChatImageQuality = mock<SetChatImageQuality>()
 
     @BeforeAll
@@ -61,7 +56,6 @@ class SettingsChatImageQualityViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(setChatImageQuality)
-        getQualityFlow = MutableStateFlow(ChatImageQuality.Automatic)
         wheneverBlocking { getChatImageQuality() }.thenReturn(getQualityFlow)
         initTestClass()
     }
@@ -78,20 +72,18 @@ class SettingsChatImageQualityViewModelTest {
     @Test
     fun `test that the option returned by getChatImageQuality is set as the selected option`() =
         runTest {
-            underTest.state.map { it.selectedQuality }.distinctUntilChanged().test {
-                assertThat(awaitItem()).isNull()
+            testScheduler.advanceUntilIdle()
+            underTest.state.map { it.selectedQuality }.drop(1).test {
                 getQualityFlow.emit(ChatImageQuality.Original)
-                testScheduler.advanceUntilIdle()
                 assertThat(awaitItem()).isEqualTo(ChatImageQuality.Original)
             }
         }
 
     @Test
     fun `test that selected quality is updated when a new value is emitted`() = runTest {
-        underTest.state.map { it.selectedQuality }.distinctUntilChanged().test {
-            assertThat(awaitItem()).isNull()
+        testScheduler.advanceUntilIdle()
+        underTest.state.map { it.selectedQuality }.drop(1).test {
             getQualityFlow.emit(ChatImageQuality.Original)
-            testScheduler.advanceUntilIdle()
             assertThat(awaitItem()).isEqualTo(ChatImageQuality.Original)
             getQualityFlow.emit(ChatImageQuality.Optimised)
             assertThat(awaitItem()).isEqualTo(ChatImageQuality.Optimised)

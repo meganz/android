@@ -88,48 +88,26 @@ class ChatViewModelTest {
     private val deviceGateway: DeviceGateway = mock()
     private val isContactRequestSentUseCase: IsContactRequestSentUseCase = mock()
     private val monitorUpdatePushNotificationSettingsUseCase =
-        mock<MonitorUpdatePushNotificationSettingsUseCase> {
-            onBlocking { invoke() }.thenReturn(flowOf(true))
-        }
-    private val monitorChatArchivedUseCase = mock<MonitorChatArchivedUseCase> {
-        onBlocking { invoke() }.thenReturn(flowOf("Chat Title"))
-    }
+        mock<MonitorUpdatePushNotificationSettingsUseCase>()
+    private val monitorChatArchivedUseCase = mock<MonitorChatArchivedUseCase>()
     private val broadcastChatArchivedUseCase = mock<BroadcastChatArchivedUseCase>()
-    private val monitorJoinedSuccessfullyUseCase = mock<MonitorJoinedSuccessfullyUseCase> {
-        onBlocking { invoke() }.thenReturn(flowOf(true))
-    }
-    private val monitorLeaveChatUseCase = mock<MonitorLeaveChatUseCase> {
-        onBlocking { invoke() }.thenReturn(flowOf(1234L))
-    }
+    private val monitorJoinedSuccessfullyUseCase = mock<MonitorJoinedSuccessfullyUseCase>()
+    private val monitorLeaveChatUseCase = mock<MonitorLeaveChatUseCase>()
     private val monitorScheduledMeetingUpdatesUseCase =
-        mock<MonitorScheduledMeetingUpdatesUseCase> {
-            onBlocking { invoke() }.thenReturn(flowOf())
-        }
-    private val monitorChatRoomUpdates = mock<MonitorChatRoomUpdates> {
-        onBlocking { invoke(any()) }.thenReturn(flowOf())
-    }
+        mock<MonitorScheduledMeetingUpdatesUseCase>()
+    private val monitorChatRoomUpdates = mock<MonitorChatRoomUpdates>()
     private val startMeetingInWaitingRoomChatUseCase = mock<StartMeetingInWaitingRoomChatUseCase>()
     private val leaveChatUseCase = mock<LeaveChatUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val loadPendingMessagesUseCase = mock<LoadPendingMessagesUseCase> {
-        onBlocking { invoke(any()) }.thenReturn(flowOf())
-    }
-    private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase> {
-        onBlocking { invoke() }.thenReturn(emptyFlow())
-    }
-    private val monitorChatSessionUpdatesUseCase = mock<MonitorChatSessionUpdatesUseCase> {
-        onBlocking { invoke() }.thenReturn(emptyFlow())
-    }
+    private val loadPendingMessagesUseCase = mock<LoadPendingMessagesUseCase>()
+    private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
+    private val monitorChatSessionUpdatesUseCase = mock<MonitorChatSessionUpdatesUseCase>()
     private val hangChatCallUseCase = mock<HangChatCallUseCase>()
     private val broadcastCallRecordingConsentEventUseCase =
         mock<BroadcastCallRecordingConsentEventUseCase>()
     private val monitorCallRecordingConsentEventUseCase =
-        mock<MonitorCallRecordingConsentEventUseCase> {
-            onBlocking { invoke() }.thenReturn(emptyFlow())
-        }
-    private val monitorCallEndedUseCase = mock<MonitorCallEndedUseCase> {
-        onBlocking { invoke() }.thenReturn(emptyFlow())
-    }
+        mock<MonitorCallRecordingConsentEventUseCase>()
+    private val monitorCallEndedUseCase = mock<MonitorCallEndedUseCase>()
 
     @BeforeAll
     fun setUp() {
