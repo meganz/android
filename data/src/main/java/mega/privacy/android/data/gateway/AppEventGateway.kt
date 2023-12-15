@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
+import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 
@@ -25,6 +26,20 @@ internal interface AppEventGateway {
      * Monitor completed transfer
      */
     val monitorCompletedTransfer: Flow<CompletedTransfer>
+
+    /**
+     * Monitor cookie settings saved.
+     * [Set]  value representing set of enabled cookies of [CookieType]
+     */
+    val monitorCookieSettings: Flow<Set<CookieType>>
+
+
+    /**
+     * Broadcast enabled cookie settings
+     *
+     * @param enabledCookieSettings set of enabled cookies of [CookieType]
+     */
+    suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>)
 
     /**
      * Broadcast camera upload progress

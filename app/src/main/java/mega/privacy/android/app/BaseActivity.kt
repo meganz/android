@@ -45,6 +45,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.TransferOverquotaLayoutBinding
+import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -190,6 +191,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     @Inject
     lateinit var monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase
+
+    @Inject
+    lateinit var monitorCookieSettingsSavedUseCase: MonitorCookieSettingsSavedUseCase
 
     @Inject
     lateinit var fetchPsaUseCase: FetchPsaUseCase
@@ -343,7 +347,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             ) return
 
             transfersManagement.hasResumeTransfersWarningAlreadyBeenShown = true
-            showResumeTransfersWarning(this@BaseActivity){
+            showResumeTransfersWarning(this@BaseActivity) {
                 lifecycleScope.launch {
                     pauseAllTransfersUseCase(false)
                 }
@@ -354,6 +358,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     /**
      * Broadcast to show a snackbar when the Cookie settings has been saved
      */
+    @Deprecated("replaced with flow event _cookieSettings in AppEventGateway")
     protected var cookieSettingsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (isActivityInBackground || intent == null) {
@@ -445,6 +450,16 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             cookieSettingsReceiver,
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED)
         )
+
+        collectFlow(monitorCookieSettingsSavedUseCase()) {
+            val view = window.decorView.findViewById<View>(android.R.id.content)
+            if (view != null) {
+                showSnackbar(
+                    view,
+                    getString(R.string.dialog_cookie_snackbar_saved)
+                )
+            }
+        }
 
         collectFlow(monitorTransferOverQuotaUseCase()) { isCurrentOverQuota ->
             if (transfersManagement.shouldShowTransferOverQuotaWarning()) {

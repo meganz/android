@@ -11,7 +11,7 @@ internal class CookieSettingsMapper @Inject constructor() {
      *
      * @param numDetails
      */
-    operator fun invoke(numDetails: Int): MutableSet<CookieType> {
+    operator fun invoke(numDetails: Int): Set<CookieType> {
         val result = mutableSetOf<CookieType>()
         val bitSet = BitSet.valueOf(longArrayOf(numDetails.toLong()))
 

@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
+import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -32,6 +33,7 @@ internal class AppEventFacade @Inject constructor(
     private val _transferOverQuota = MutableSharedFlow<Boolean>()
     private val _storageOverQuota = MutableSharedFlow<Boolean>()
     private val _fileAvailableOffline = MutableSharedFlow<Long>()
+    private val _cookieSettings = MutableSharedFlow<Set<CookieType>>()
     private val logout = MutableSharedFlow<Boolean>()
     private val fetchNodesFinish = MutableSharedFlow<Boolean>()
     private val _transferFailed = MutableSharedFlow<Boolean>()
@@ -59,6 +61,9 @@ internal class AppEventFacade @Inject constructor(
         MutableSharedFlow<CameraUploadsSettingsAction>()
     private val _businessAccountExpired = MutableSharedFlow<Unit>()
 
+
+    override val monitorCookieSettings: Flow<Set<CookieType>> = _cookieSettings.asSharedFlow()
+
     override val monitorCameraUploadProgress =
         _monitorCameraUploadProgress.toSharedFlow(appScope)
 
@@ -67,6 +72,11 @@ internal class AppEventFacade @Inject constructor(
 
     private val callRecordingConsentEvent = MutableSharedFlow<Boolean>()
     private val callEnded = MutableSharedFlow<Long>()
+
+
+    override suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>) {
+        _cookieSettings.emit(enabledCookieSettings)
+    }
 
     override suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int) {
         _monitorCameraUploadProgress.emit(Pair(progress, pending))

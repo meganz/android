@@ -544,7 +544,21 @@ interface AccountRepository {
     /**
      * Set cookie settings
      *
-     * @param cookieSettings Set of CookieType
+     * @param enabledCookieSettings Set of CookieType
      */
-    suspend fun setCookieSettings(cookieSettings: Set<CookieType>)
+    suspend fun setCookieSettings(enabledCookieSettings: Set<CookieType>)
+
+    /**
+     * Monitor cookie settings saved
+     *
+     * @return Flow of Set of CookieType
+     */
+    fun monitorCookieSettingsSaved(): Flow<Set<CookieType>>
+
+    /**
+     * Broadcast cookie settings
+     *
+     * @param enabledCookieSettings Set of CookieType
+     */
+    suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>)
 }

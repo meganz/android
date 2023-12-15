@@ -9,14 +9,14 @@ internal class CookieSettingsIntMapper @Inject constructor() {
     /**
      * Converts a Set of [CookieType] to a decimal number
      *
-     * @param cookieSettings
+     * @param enabledCookieSettings
      */
-    operator fun invoke(cookieSettings: Set<CookieType>): Int {
+    operator fun invoke(enabledCookieSettings: Set<CookieType>): Int {
         val bitSet = BitSet(CookieType.entries.size).apply {
             this[CookieType.ESSENTIAL.value] = true // Essential cookies are always enabled
         }
 
-        cookieSettings.forEach { cookie ->
+        enabledCookieSettings.forEach { cookie ->
             bitSet[cookie.value] = true
         }
 

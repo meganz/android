@@ -1034,10 +1034,10 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    override suspend fun setCookieSettings(cookieSettings: Set<CookieType>) =
+    override suspend fun setCookieSettings(enabledCookieSettings: Set<CookieType>) =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
-                val cookieDecimal = cookieSettingsIntMapper(cookieSettings)
+                val cookieDecimal = cookieSettingsIntMapper(enabledCookieSettings)
                 val listener = OptionalMegaRequestListenerInterface(
                     onRequestFinish = { _, error ->
                         when (error.errorCode) {
@@ -1055,6 +1055,14 @@ internal class DefaultAccountRepository @Inject constructor(
                 continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
+
+    override suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>) {
+        appEventGateway.broadcastCookieSettings(enabledCookieSettings)
+    }
+
+    override fun monitorCookieSettingsSaved(): Flow<Set<CookieType>> =
+        appEventGateway.monitorCookieSettings
+
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

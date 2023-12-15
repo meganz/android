@@ -1176,7 +1176,7 @@ class DefaultAccountRepositoryTest {
 
     fun provideGetCookieSettingsParameters() = listOf(
         Arguments.of(
-            MegaError.API_OK, mutableSetOf(CookieType.ADVERTISEMENT, CookieType.ANALYTICS)
+            MegaError.API_OK, setOf(CookieType.ADVERTISEMENT, CookieType.ANALYTICS)
         ),
         Arguments.of(MegaError.API_ENOENT, emptySet<CookieType>()),
     )
@@ -1185,7 +1185,7 @@ class DefaultAccountRepositoryTest {
     @MethodSource("provideGetCookieSettingsParameters")
     fun `test that getCookieSettings returns the right cookie settings when MegaApi returns specific Mega Errors`(
         input: Int,
-        expectedCookieSettings: MutableSet<CookieType>,
+        expectedCookieSettings: Set<CookieType>,
     ) = runTest {
 
         val megaError = mock<MegaError> {
@@ -1260,7 +1260,7 @@ class DefaultAccountRepositoryTest {
 
     @Test
     fun `test that setCookieSettings is success when MegaApi returns API_OK`() = runTest {
-        val cookieSettings = mutableSetOf(CookieType.ADVERTISEMENT, CookieType.ANALYTICS)
+        val cookieSettings = setOf(CookieType.ADVERTISEMENT, CookieType.ANALYTICS)
         val megaError = mock<MegaError> {
             on { errorCode }.thenReturn(MegaError.API_OK)
         }
@@ -1285,7 +1285,7 @@ class DefaultAccountRepositoryTest {
     fun `test that setCookieSettings returns general MegaException when MegaApi returns errors other than API_OK`() =
         runTest {
 
-            val cookieSettings = mutableSetOf(CookieType.ADVERTISEMENT, CookieType.ANALYTICS)
+            val cookieSettings = setOf(CookieType.ADVERTISEMENT, CookieType.ANALYTICS)
             val megaError = mock<MegaError> {
                 on { errorCode }.thenReturn(MegaError.API_EEXIST)
             }
@@ -1308,5 +1308,19 @@ class DefaultAccountRepositoryTest {
             }
         }
 
+    @Test
+    fun `test that appEventGateway invokes monitorCookieSettingsSaved when calling monitorCookieSettingsSaved`() =
+        runTest {
+            underTest.monitorCookieSettingsSaved()
+            verify(appEventGateway).monitorCookieSettings
+        }
+
+    @Test
+    fun `test that appEventGateway invokes broadcastCookieSettings when calling broadcastCookieSettings`() =
+        runTest {
+            val cookieSettings = setOf(CookieType.ADVERTISEMENT, CookieType.ANALYTICS)
+            underTest.broadcastCookieSettings(cookieSettings)
+            verify(appEventGateway).broadcastCookieSettings(cookieSettings)
+        }
 
 }
