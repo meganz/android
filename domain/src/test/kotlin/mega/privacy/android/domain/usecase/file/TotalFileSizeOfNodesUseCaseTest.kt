@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -40,7 +40,7 @@ class TotalFileSizeOfNodesUseCaseTest {
     @ParameterizedTest
     @MethodSource("provideParameters")
     fun `test that file size is calculated correctly when different sets of nodes are provided`(
-        nodes: List<Node>,
+        nodes: List<TypedNode>,
         expectedSize: Long,
     ) = runTest {
         stubFolderTreeInfoResponse()
@@ -48,7 +48,7 @@ class TotalFileSizeOfNodesUseCaseTest {
     }
 
     private fun provideParameters() = listOf(
-        Arguments.of(emptyList<Node>(), 0L),
+        Arguments.of(emptyList<TypedNode>(), 0L),
         Arguments.of(listOf(mockFile()), FILE_SIZE),
         Arguments.of(listOf(mockFolder()), FOLDER_SIZE),
         Arguments.of(listOf(mockFolder(), mockFile()), FOLDER_SIZE + FILE_SIZE),

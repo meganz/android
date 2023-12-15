@@ -23,6 +23,7 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.updateItemAt
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -36,6 +37,7 @@ import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.GetNodeUseCase
@@ -53,6 +55,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.AddNodeType
@@ -65,6 +68,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
@@ -76,6 +80,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSt
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
@@ -116,6 +121,8 @@ class FolderLinkViewModel @Inject constructor(
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
     private val getFileUriUseCase: GetFileUriUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
 ) : ViewModel() {
 
     /**
@@ -676,22 +683,42 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun handleSaveToDevice(nodeUIItem: NodeUIItem<TypedNode>?) {
         viewModelScope.launch {
-            if (isMultipleNodeSelected()) {
-                val selectedNodeIds = getSelectedNodes().map { it.id.longValue }
-                val selectedNodes = getPublicNodeListByIds(selectedNodeIds)
-                _state.update { it.copy(downloadNodes = triggered(selectedNodes)) }
-                clearAllSelection()
+            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                val nodes = if (isMultipleNodeSelected()) {
+                    getSelectedNodes().map { it.node }
+                } else {
+                    val node = nodeUIItem?.node
+                        ?: state.value.parentNode
+                        ?: state.value.rootNode
+                    listOfNotNull(node)
+                }.mapNotNull {
+                    mapNodeToPublicLinkUseCase(it as UnTypedNode, null) as? TypedNode
+                }
+                _state.update {
+                    it.copy(
+                        downloadEvent = triggered(
+                            TransferTriggerEvent.StartDownloadNode(nodes)
+                        )
+                    )
+                }
             } else {
-                val downloadNodeId =
-                    nodeUIItem?.id?.longValue
-                        ?: state.value.parentNode?.id?.longValue
-                        ?: state.value.rootNode?.id?.longValue
+                if (isMultipleNodeSelected()) {
+                    val selectedNodeIds = getSelectedNodes().map { it.id.longValue }
+                    val selectedNodes = getPublicNodeListByIds(selectedNodeIds)
+                    _state.update { it.copy(downloadNodes = triggered(selectedNodes)) }
+                    clearAllSelection()
+                } else {
+                    val downloadNodeId =
+                        nodeUIItem?.id?.longValue
+                            ?: state.value.parentNode?.id?.longValue
+                            ?: state.value.rootNode?.id?.longValue
 
-                downloadNodeId?.let {
-                    getPublicNodeListByIds(listOf(downloadNodeId)).let { downloadNode ->
-                        _state.update { it.copy(downloadNodes = triggered(downloadNode)) }
-                    }
-                } ?: Timber.w("rootNode null!!")
+                    downloadNodeId?.let {
+                        getPublicNodeListByIds(listOf(downloadNodeId)).let { downloadNode ->
+                            _state.update { it.copy(downloadNodes = triggered(downloadNode)) }
+                        }
+                    } ?: Timber.w("rootNode null!!")
+                }
             }
         }
     }
@@ -809,10 +836,21 @@ class FolderLinkViewModel @Inject constructor(
     /**
      * Update nodes to download
      */
-    fun updateNodesToDownload(ids: List<Long>) {
+    fun updateNodesToDownload(nodes: List<TypedNode>) {
         viewModelScope.launch {
-            val nodes = getPublicNodeListByIds(ids)
-            _state.update { it.copy(downloadNodes = triggered(nodes)) }
+            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                val linkNodes = nodes.mapNotNull {
+                    mapNodeToPublicLinkUseCase(it as UnTypedNode, null) as? TypedNode
+                }
+                _state.update {
+                    it.copy(
+                        downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
+                    )
+                }
+            } else {
+                val megaNodes = getPublicNodeListByIds(nodes.map { it.id.longValue })
+                _state.update { it.copy(downloadNodes = triggered(megaNodes)) }
+            }
         }
     }
 
@@ -859,7 +897,9 @@ class FolderLinkViewModel @Inject constructor(
     /**
      * Reset and notify that downloadNodes event is consumed
      */
-    fun resetDownloadNode() = _state.update { it.copy(downloadNodes = consumed()) }
+    fun resetDownloadNode() = _state.update {
+        it.copy(downloadNodes = consumed(), downloadEvent = consumed())
+    }
 
     /**
      * Trigger event to show Snackbar message

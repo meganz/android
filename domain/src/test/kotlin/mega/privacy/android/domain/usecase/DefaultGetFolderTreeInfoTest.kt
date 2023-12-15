@@ -4,8 +4,8 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.FolderTreeInfo
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Before
 import org.junit.Test
@@ -18,7 +18,7 @@ class DefaultGetFolderTreeInfoTest {
     private lateinit var underTest: GetFolderTreeInfo
 
     private lateinit var nodeRepository: NodeRepository
-    private lateinit var folderNode: FolderNode
+    private lateinit var folderNode: TypedFolderNode
 
     @Before
     fun setUp() {

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -25,9 +27,12 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetLocalFileForNode
@@ -39,6 +44,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
@@ -50,6 +56,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSt
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
@@ -101,6 +108,8 @@ class FolderLinkViewModelTest {
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase = mock()
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase = mock()
     private val getFileUriUseCase: GetFileUriUseCase = mock()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase>()
 
     @BeforeAll
     fun initialise() {
@@ -109,8 +118,8 @@ class FolderLinkViewModelTest {
 
     @BeforeEach
     fun setup() {
-        whenever(monitorViewType.invoke()).thenReturn(emptyFlow())
         resetMocks()
+        whenever(monitorViewType.invoke()).thenReturn(emptyFlow())
         initViewModel()
     }
 
@@ -149,7 +158,8 @@ class FolderLinkViewModelTest {
             httpServerStart,
             httpServerIsRunning,
             getLocalFolderLinkFromMegaApiUseCase,
-            getFileUriUseCase
+            getFileUriUseCase,
+            mapNodeToPublicLinkUseCase,
         )
     }
 
@@ -183,7 +193,9 @@ class FolderLinkViewModelTest {
             httpServerStart,
             httpServerIsRunning,
             getLocalFolderLinkFromMegaApiUseCase,
-            getFileUriUseCase
+            getFileUriUseCase,
+            getFeatureFlagValueUseCase,
+            mapNodeToPublicLinkUseCase,
         )
     }
 
@@ -577,15 +589,42 @@ class FolderLinkViewModelTest {
 
     @Test
     fun `test that downloadNodes is triggered when updateNodesToDownload is invoked`() = runTest {
-        val nodes: List<MegaNode> = mock()
-        val ids = listOf(1234L)
+        val nodeHandle = 1234L
+        val nodeId = NodeId(nodeHandle)
+        val megaNodes: List<MegaNode> = mock()
+        val node: TypedFileNode = mock {
+            on { this.id }.thenReturn(nodeId)
+        }
+        val nodes = listOf(node)
+        val ids = listOf(nodeHandle)
 
-        whenever(getPublicNodeListByIds(ids)).thenReturn(nodes)
-        underTest.updateNodesToDownload(ids)
+        whenever(getPublicNodeListByIds(ids)).thenReturn(megaNodes)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
+        underTest.updateNodesToDownload(nodes)
         underTest.state.test {
             val res = awaitItem()
-            assertThat(res.downloadNodes).isInstanceOf(triggered(nodes).javaClass)
+            assertThat(res.downloadNodes).isInstanceOf(triggered(megaNodes).javaClass)
         }
     }
+
+    @Test
+    fun `test that downloadEvent is triggered when updateNodesToDownload is invoked and feature flag is true`() =
+        runTest {
+            val node1 = mock<TypedFileNode>()
+            val node2 = mock<TypedFolderNode>()
+            val nodes = listOf(node1, node2)
+            val link1 = mock<PublicLinkFile>()
+            val link2 = mock<PublicLinkFolder>()
+            whenever(mapNodeToPublicLinkUseCase(node1, null)).thenReturn(link1)
+            whenever(mapNodeToPublicLinkUseCase(node2, null)).thenReturn(link2)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
+            underTest.updateNodesToDownload(nodes)
+            underTest.state.test {
+                val res = awaitItem()
+                assertThat(res.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((res.downloadEvent as StateEventWithContentTriggered).content.nodes)
+                    .containsExactly(link1, link2)
+            }
+        }
 
 }

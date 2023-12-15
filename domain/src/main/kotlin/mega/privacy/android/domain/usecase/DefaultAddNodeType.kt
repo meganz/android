@@ -17,6 +17,7 @@ class DefaultAddNodeType @Inject constructor(private val getFolderType: GetFolde
     AddNodeType {
     override suspend fun invoke(node: UnTypedNode): TypedNode {
         return when (node) {
+            is TypedNode -> node
             is FileNode -> DefaultTypedFileNode(node)
             is FolderNode -> DefaultTypedFolderNode(node, getFolderType(node))
         }

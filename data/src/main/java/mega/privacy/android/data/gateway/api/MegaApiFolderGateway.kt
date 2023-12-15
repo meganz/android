@@ -225,4 +225,12 @@ interface MegaApiFolderGateway {
      * @param disablePkp True to disable public key pinning for this URL
      */
     suspend fun changeApiUrl(apiURL: String, disablePkp: Boolean)
+
+    /**
+     * Get folder info
+     *
+     * @param node
+     * @param listener
+     */
+    fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
 }

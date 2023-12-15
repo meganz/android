@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.folderlink
 
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -43,6 +44,7 @@ class FolderLinkViewTest {
         composeTestRule.setContent {
             FolderLinkView(
                 state = uiState,
+                snackBarHostState = SnackbarHostState(),
                 onBackPressed = { },
                 onShareClicked = { },
                 onMoreOptionClick = { },

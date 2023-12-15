@@ -75,7 +75,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Feature
-import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -254,7 +254,7 @@ class MyAccountViewModel @Inject constructor(
                     backupsFolderNodeId?.let {
                         runCatching {
                             getNodeByIdUseCase(it)?.let { node ->
-                                getFolderTreeInfo(node as FolderNode).let { folderTreeInfo ->
+                                getFolderTreeInfo(node as TypedFolderNode).let { folderTreeInfo ->
                                     _state.update {
                                         it.copy(
                                             backupStorageSize = folderTreeInfo.totalCurrentSizeInBytes

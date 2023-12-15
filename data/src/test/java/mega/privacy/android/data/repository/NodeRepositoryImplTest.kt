@@ -24,6 +24,7 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.FetchChildrenMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
+import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
@@ -37,6 +38,7 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.MegaException
@@ -70,6 +72,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.stream.Stream
@@ -96,12 +99,14 @@ class NodeRepositoryImplTest {
     private val streamingGateway: StreamingGateway = mock()
     private val nodeUpdateMapper: NodeUpdateMapper = mock()
     private val folderNode: TypedFolderNode = mock()
+    private val publicLinkFolder: PublicLinkFolder = mock()
     private val accessPermissionMapper: AccessPermissionMapper = mock()
     private val accessPermissionIntMapper: AccessPermissionIntMapper = AccessPermissionIntMapper()
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
     private val fetChildrenMapper = mock<FetchChildrenMapper>()
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper = mock()
+    private val megaNodeMapper = mock<MegaNodeMapper>()
     private val fileNodeMapper = FileNodeMapper(
         cacheGateway = cacheGateway,
         megaApiGateway = megaApiGateway,
@@ -145,6 +150,7 @@ class NodeRepositoryImplTest {
             nodeShareKeyResultMapper = nodeShareKeyResultMapper,
             accessPermissionIntMapper = accessPermissionIntMapper,
             megaLocalRoomGateway = megaLocalRoomGateway,
+            megaNodeMapper = megaNodeMapper
         )
     }
 
@@ -168,7 +174,8 @@ class NodeRepositoryImplTest {
             accessPermissionMapper,
             nodeShareKeyResultMapper,
             accessPermissionMapper,
-            megaLocalStorageGateway
+            megaLocalStorageGateway,
+            megaNodeMapper,
         )
     }
 
@@ -187,6 +194,7 @@ class NodeRepositoryImplTest {
             mockFolderInfoResponse()
             underTest.getFolderTreeInfo(folderNode)
             verify(megaApiGateway).getFolderInfo(any(), any())
+            verifyNoInteractions(megaApiFolderGateway)
         }
 
     @Test
@@ -194,6 +202,23 @@ class NodeRepositoryImplTest {
         runTest {
             mockFolderInfoResponse()
             val result = underTest.getFolderTreeInfo(folderNode)
+            assertThat(result).isEqualTo(folderInfo)
+        }
+
+    @Test
+    fun `test getFolderVersionInfo queries megaApiFolderGateway when the node is a PublicLinkFolder`() =
+        runTest {
+            mockPublicLinkFolderInfoResponse()
+            underTest.getFolderTreeInfo(publicLinkFolder)
+            verify(megaApiFolderGateway).getFolderInfo(any(), any())
+            verifyNoInteractions(megaApiGateway)
+        }
+
+    @Test
+    fun `test getFolderVersionInfo is returning correct info from megaApiFolderGateway when the node is a PublicLinkFolder`() =
+        runTest {
+            mockPublicLinkFolderInfoResponse()
+            val result = underTest.getFolderTreeInfo(publicLinkFolder)
             assertThat(result).isEqualTo(folderInfo)
         }
 
@@ -536,7 +561,7 @@ class NodeRepositoryImplTest {
         val fileNode: MegaNode = mock()
         whenever(folderNode.id).thenReturn(nodeId)
         whenever(fileNode.isFolder).thenReturn(true)
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle)).thenReturn(fileNode)
+        whenever(megaNodeMapper(any())).thenReturn(fileNode)
         val response = mock<MegaRequest>()
         val megaFolderInfo = mock<MegaFolderInfo>()
         whenever(response.megaFolderInfo).thenReturn(megaFolderInfo)
@@ -546,6 +571,26 @@ class NodeRepositoryImplTest {
         whenever(megaFolderInfo.numFolders).thenReturn(folderInfo.numberOfFolders)
         whenever(megaFolderInfo.numFiles).thenReturn(folderInfo.numberOfFiles)
         whenever(megaApiGateway.getFolderInfo(any(), any())).thenAnswer {
+            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                mock(), response, mock()
+            )
+        }
+    }
+
+    private suspend fun mockPublicLinkFolderInfoResponse() {
+        val fileNode: MegaNode = mock()
+        whenever(publicLinkFolder.id).thenReturn(nodeId)
+        whenever(fileNode.isFolder).thenReturn(true)
+        whenever(megaNodeMapper(any())).thenReturn(fileNode)
+        val response = mock<MegaRequest>()
+        val megaFolderInfo = mock<MegaFolderInfo>()
+        whenever(response.megaFolderInfo).thenReturn(megaFolderInfo)
+        whenever(megaFolderInfo.numVersions).thenReturn(folderInfo.numberOfVersions)
+        whenever(megaFolderInfo.versionsSize).thenReturn(folderInfo.sizeOfPreviousVersionsInBytes)
+        whenever(megaFolderInfo.currentSize).thenReturn(folderInfo.totalCurrentSizeInBytes)
+        whenever(megaFolderInfo.numFolders).thenReturn(folderInfo.numberOfFolders)
+        whenever(megaFolderInfo.numFiles).thenReturn(folderInfo.numberOfFiles)
+        whenever(megaApiFolderGateway.getFolderInfo(any(), any())).thenAnswer {
             (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
                 mock(), response, mock()
             )

@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
@@ -131,6 +132,14 @@ interface NodeRepository {
      * @return the history versions of the node, including current one
      */
     suspend fun getNodeHistoryVersions(handle: NodeId): List<UnTypedNode>
+
+    /**
+     * Get [FolderTreeInfo] of the required folder
+     * @param folderNode [TypedFolderNode]
+     *
+     * @return info [FolderTreeInfo]
+     */
+    suspend fun getFolderTreeInfo(folderNode: TypedFolderNode): FolderTreeInfo
 
     /**
      * Get [FolderTreeInfo] of the required folder

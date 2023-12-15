@@ -68,7 +68,6 @@ import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BU
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SNACKBAR_TAG
 import mega.privacy.android.app.presentation.view.NodesView
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_700
@@ -76,6 +75,7 @@ import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaNode
 
 internal object Constants {
@@ -120,6 +120,7 @@ internal object Constants {
 @Composable
 internal fun FolderLinkView(
     state: FolderLinkState,
+    snackBarHostState: SnackbarHostState,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
     onMoreOptionClick: (NodeUIItem<TypedNode>?) -> Unit,
@@ -154,7 +155,6 @@ internal fun FolderLinkView(
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     val scaffoldState = rememberScaffoldState()
-    val snackBarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,

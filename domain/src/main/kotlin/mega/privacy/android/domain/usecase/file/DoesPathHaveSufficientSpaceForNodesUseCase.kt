@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.file
 
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
 
 /**
@@ -17,6 +17,6 @@ class DoesPathHaveSufficientSpaceForNodesUseCase @Inject constructor(
      * @param nodes the list of nodes to get the required space
      * @return true if path has sufficient space, otherwise false
      */
-    suspend operator fun invoke(destinationPath: String, nodes: List<Node>) =
+    suspend operator fun invoke(destinationPath: String, nodes: List<TypedNode>) =
         doesPathHaveSufficientSpaceUseCase(destinationPath, totalFileSizeOfNodesUseCase(nodes))
 }

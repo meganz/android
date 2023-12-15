@@ -1,8 +1,8 @@
 package mega.privacy.android.domain.usecase.file
 
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import javax.inject.Inject
 
@@ -17,10 +17,10 @@ class TotalFileSizeOfNodesUseCase @Inject constructor(
      * @param nodes the list of nodes that will be checked
      * @return total size of the files represented with the provided list of nodes
      */
-    suspend operator fun invoke(nodes: List<Node>) = nodes.sumOf {
+    suspend operator fun invoke(nodes: List<TypedNode>) = nodes.sumOf {
         when (it) {
             is FileNode -> it.size
-            is FolderNode -> getFolderTreeInfo(it).totalCurrentSizeInBytes
+            is TypedFolderNode -> getFolderTreeInfo(it).totalCurrentSizeInBytes
             else -> 0L
         }
     }

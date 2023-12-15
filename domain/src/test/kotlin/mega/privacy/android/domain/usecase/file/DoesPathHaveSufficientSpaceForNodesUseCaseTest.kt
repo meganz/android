@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.file
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +25,7 @@ class DoesPathHaveSufficientSpaceForNodesUseCaseTest {
 
     private val totalFileSizeOfNodesUseCase = mock<TotalFileSizeOfNodesUseCase>()
     private val doesPathHaveSufficientSpaceUseCase = mock<DoesPathHaveSufficientSpaceUseCase>()
-    private val nodes = mock<List<Node>>()
+    private val nodes = mock<List<TypedNode>>()
 
 
     @BeforeAll

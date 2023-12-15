@@ -140,16 +140,25 @@ class MegaNodeMapperTest {
     @DisplayName("Test mapping public file links")
     inner class PublicLinksFile {
         @Test
-        fun `test that null is returned when the node has no serialized data`() = runTest {
-            val typedFileNode = mock<TypedFileNode> {
-                on { this.serializedData }.thenReturn(null)
+        fun `test that the authorized node from gateway is returned when the node has no serialized data`() =
+            runTest {
+                val handle = 23L
+                val nodeId = NodeId(handle)
+                val megaNode = mock<MegaNode>()
+                val authorizedNode = mock<MegaNode>()
+                val typedFileNode = mock<TypedFileNode> {
+                    on { this.serializedData }.thenReturn(null)
+                }
+                val publicLinkFile = mock<PublicLinkFile> {
+                    on { this.node }.thenReturn(typedFileNode)
+                    on { this.id }.thenReturn(nodeId)
+                }
+
+                whenever(megaApiFolderGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
+                whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(authorizedNode)
+                assertThat(underTest(publicLinkFile)).isEqualTo(authorizedNode)
+                verifyNoInteractions(megaApiGateway)
             }
-            val publicLinkFile = mock<PublicLinkFile> {
-                on { this.node }.thenReturn(typedFileNode)
-            }
-            assertThat(underTest(publicLinkFile)).isNull()
-            verifyNoInteractions(megaApiGateway)
-        }
 
         @Test
         fun `test that the correct node from gateway is returned`() = runTest {

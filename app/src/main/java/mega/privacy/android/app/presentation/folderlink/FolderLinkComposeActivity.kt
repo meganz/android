@@ -14,8 +14,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,6 +51,7 @@ import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadTransferComponent
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
@@ -59,12 +62,12 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -192,9 +195,12 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val adsUiState by adsViewModel.uiState.collectAsStateWithLifecycle()
 
+
+        val snackBarHostState = remember { SnackbarHostState() }
         MegaAppTheme(isDark = themeMode.isDarkMode()) {
             FolderLinkView(
                 state = uiState,
+                snackBarHostState = snackBarHostState,
                 onBackPressed = viewModel::handleBackPress,
                 onShareClicked = ::onShareClicked,
                 onMoreOptionClick = viewModel::handleMoreOptionClick,
@@ -237,6 +243,11 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                     adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
                 },
                 onAdDismissed = adsViewModel::onAdConsumed
+            )
+            StartDownloadTransferComponent(
+                event = uiState.downloadEvent,
+                onConsumeEvent = viewModel::resetDownloadNode,
+                snackBarHostState = snackBarHostState
             )
         }
     }
@@ -311,7 +322,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
 
                     else -> {
                         Timber.w("Unknown File Type")
-                        viewModel.updateNodesToDownload(listOf(fileNode.id.longValue))
+                        viewModel.updateNodesToDownload(listOf(fileNode))
                     }
                 }
             }

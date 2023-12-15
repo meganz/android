@@ -32,6 +32,7 @@ import mega.privacy.android.data.mapper.OfflineInformationMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
+import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
@@ -46,8 +47,10 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
@@ -105,6 +108,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val nodeShareKeyResultMapper: NodeShareKeyResultMapper,
     private val accessPermissionIntMapper: AccessPermissionIntMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
+    private val megaNodeMapper: MegaNodeMapper,
 ) : NodeRepository {
     override suspend fun getOutgoingSharesNode(order: SortOrder) =
         withContext(ioDispatcher) {
@@ -264,25 +268,54 @@ internal class NodeRepositoryImpl @Inject constructor(
         } ?: throw SynchronisationException("Non null node found be null when fetched from api")
     }
 
+    override suspend fun getFolderTreeInfo(folderNode: TypedFolderNode): FolderTreeInfo =
+        withContext(ioDispatcher) {
+            if (folderNode is PublicLinkFolder) {
+                getPublicLinkFolderTreeInfo(megaNodeMapper(folderNode))
+            } else {
+                getFolderTreeInfo(megaNodeMapper(folderNode))
+            }
+        }
+
     override suspend fun getFolderTreeInfo(folderNode: FolderNode): FolderTreeInfo =
         withContext(ioDispatcher) {
-            val megaNode = megaApiGateway.getMegaNodeByHandle(folderNode.id.longValue)
-            suspendCoroutine { continuation ->
-                megaApiGateway.getFolderInfo(
-                    megaNode,
-                    continuation.getRequestListener("getFolderTreeInfo") {
-                        with(it.megaFolderInfo) {
-                            FolderTreeInfo(
-                                numberOfFiles = numFiles,
-                                numberOfFolders = numFolders,
-                                totalCurrentSizeInBytes = currentSize,
-                                numberOfVersions = numVersions,
-                                sizeOfPreviousVersionsInBytes = versionsSize,
-                            )
-                        }
+            getFolderTreeInfo(megaApiGateway.getMegaNodeByHandle(folderNode.id.longValue))
+        }
+
+    private suspend fun getFolderTreeInfo(megaNode: MegaNode?) =
+        suspendCoroutine { continuation ->
+            megaApiGateway.getFolderInfo(
+                megaNode,
+                continuation.getRequestListener("getFolderTreeInfo") {
+                    with(it.megaFolderInfo) {
+                        FolderTreeInfo(
+                            numberOfFiles = numFiles,
+                            numberOfFolders = numFolders,
+                            totalCurrentSizeInBytes = currentSize,
+                            numberOfVersions = numVersions,
+                            sizeOfPreviousVersionsInBytes = versionsSize,
+                        )
                     }
-                )
-            }
+                }
+            )
+        }
+
+    private suspend fun getPublicLinkFolderTreeInfo(megaNode: MegaNode?) =
+        suspendCoroutine { continuation ->
+            megaApiFolderGateway.getFolderInfo(
+                megaNode,
+                continuation.getRequestListener("getFolderTreeInfo") {
+                    with(it.megaFolderInfo) {
+                        FolderTreeInfo(
+                            numberOfFiles = numFiles,
+                            numberOfFolders = numFolders,
+                            totalCurrentSizeInBytes = currentSize,
+                            numberOfVersions = numVersions,
+                            sizeOfPreviousVersionsInBytes = versionsSize,
+                        )
+                    }
+                }
+            )
         }
 
     override suspend fun deleteNodeVersionByHandle(nodeVersionToDelete: NodeId): Unit =

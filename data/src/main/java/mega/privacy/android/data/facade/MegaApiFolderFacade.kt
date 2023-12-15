@@ -106,4 +106,7 @@ internal class MegaApiFolderFacade @Inject constructor(
 
     override suspend fun changeApiUrl(apiURL: String, disablePkp: Boolean) =
         megaApiFolder.changeApiUrl(apiURL, disablePkp)
+
+    override fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface) =
+        megaApiFolder.getFolderInfo(node, listener)
 }
