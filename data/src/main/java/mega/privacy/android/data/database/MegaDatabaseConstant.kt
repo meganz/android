@@ -64,4 +64,9 @@ object MegaDatabaseConstant {
      * Table For Android Sync paused syncs list
      */
     const val TABLE_USER_PAUSED_SYNCS = "userpausedsyncs"
+
+    /**
+     * Passphrase File Name
+     */
+    const val PASSPHRASE_FILE_NAME = "passphrase.bin"
 }

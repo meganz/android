@@ -7,6 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.database.MegaDatabaseConstant
 import org.junit.After
 import org.junit.Assert.fail
 import org.junit.Before
@@ -261,4 +262,13 @@ class CacheGatewayImplTest {
             assertThat(underTest.getFullSizeCacheFolder()).isEqualTo(expected)
             assertThat(expected.exists()).isEqualTo(true)
         }
+
+    @Test
+    fun test_that_passphrase_still_exist_after_calling_clearAppData() = runTest {
+        val passphraseFile = File(context.filesDir, MegaDatabaseConstant.PASSPHRASE_FILE_NAME)
+        createFile(passphraseFile)
+        assertThat(passphraseFile.exists()).isEqualTo(true)
+        underTest.clearAppData()
+        assertThat(passphraseFile.exists()).isEqualTo(true)
+    }
 }
