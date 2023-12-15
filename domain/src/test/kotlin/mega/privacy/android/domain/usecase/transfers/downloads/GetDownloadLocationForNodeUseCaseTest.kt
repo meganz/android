@@ -76,7 +76,7 @@ class GetDownloadLocationForNodeUseCaseTest {
             stubDeviceFolder()
             val actual = underTest(parent)
             Truth.assertThat(actual)
-                .isEqualTo(DEVICE_PATH)
+                .isEqualTo(DEVICE_PATH + File.separator)
         }
 
     private fun stubNodes() {

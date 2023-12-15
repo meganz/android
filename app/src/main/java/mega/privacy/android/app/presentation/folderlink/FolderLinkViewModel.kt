@@ -685,7 +685,9 @@ class FolderLinkViewModel @Inject constructor(
         viewModelScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
                 val nodes = if (isMultipleNodeSelected()) {
-                    getSelectedNodes().map { it.node }
+                    getSelectedNodes().map { it.node }.also {
+                        clearAllSelection()
+                    }
                 } else {
                     val node = nodeUIItem?.node
                         ?: state.value.parentNode

@@ -27,7 +27,7 @@ class GetDownloadLocationForNodeUseCase @Inject constructor(
                 .drop(1) //we don't want to add "Cloud Drive" root to the path
                 .joinAsPath()
         } else {
-            location
+            location + File.separator
         }
     }
 }
