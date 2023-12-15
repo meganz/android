@@ -120,7 +120,7 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun providePassphraseFile(
         @ApplicationContext context: Context,
-    ): File = File(context.filesDir, "passphrase.bin")
+    ): File = File(context.filesDir, MegaDatabaseConstant.PASSPHRASE_FILE_NAME)
 
     @Provides
     @Singleton

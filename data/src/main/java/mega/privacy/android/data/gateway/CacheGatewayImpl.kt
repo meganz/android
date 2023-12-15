@@ -5,7 +5,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
-import mega.privacy.android.data.facade.CacheFolderFacade
+import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
 import java.io.File
@@ -71,9 +71,11 @@ internal class CacheGatewayImpl @Inject constructor(
     override suspend fun clearAppData() {
         try {
             val dir = context.filesDir
-            dir.list()?.forEach {
-                deleteDir(File(dir, it))
-            }
+            dir.list()?.asSequence()
+                ?.filter { it != MegaDatabaseConstant.PASSPHRASE_FILE_NAME }
+                ?.forEach {
+                    deleteDir(File(dir, it))
+                }
         } catch (e: Exception) {
             Timber.e(e)
         }
