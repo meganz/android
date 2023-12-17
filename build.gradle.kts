@@ -111,3 +111,5 @@ if (!shouldUsePrebuiltSdk() || isServerBuild()) {
 tasks.register<mega.privacy.megagradle.PreReleaseTask>("preRelease")
 tasks.register<mega.privacy.megagradle.ReleaseTask>("release")
 tasks.register<mega.privacy.megagradle.PostReleaseTask>("postRelease")
+tasks.register<mega.privacy.megagradle.CreateJiraVersionTask>("createJiraVersion")
+
