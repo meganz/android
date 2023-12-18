@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.AlterParticipantsUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.CallUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatGiphyUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatLinkCreatedUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatLinkRemovedUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatRichLinkUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.InvalidUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.PermissionChangeUiMessage
@@ -18,6 +20,8 @@ import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.SignatureInvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.AlterParticipantsMessage
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
+import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkCreatedMessage
+import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkRemovedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.PermissionChangeMessage
 import mega.privacy.android.domain.entity.chat.messages.management.TitleChangeMessage
 import mega.privacy.android.domain.entity.chat.messages.management.TruncateHistoryMessage
@@ -88,6 +92,16 @@ class UiChatMessageMapper @Inject constructor() {
             )
 
             is TruncateHistoryMessage -> TruncateHistoryUiMessage(
+                message = message,
+                showDate = showDate
+            )
+
+            is ChatLinkCreatedMessage -> ChatLinkCreatedUiMessage(
+                message = message,
+                showDate = showDate
+            )
+
+            is ChatLinkRemovedMessage -> ChatLinkRemovedUiMessage(
                 message = message,
                 showDate = showDate
             )

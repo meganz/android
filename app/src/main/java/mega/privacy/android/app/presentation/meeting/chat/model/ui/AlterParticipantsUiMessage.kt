@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.meeting.chat.view.message.AlterParticipantsMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.AlterParticipantsMessageView
 import mega.privacy.android.domain.entity.chat.messages.management.AlterParticipantsMessage
 
 /**

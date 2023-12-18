@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.model.ui
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
-import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatCallMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatCallMessageView
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 
 /**

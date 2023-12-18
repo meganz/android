@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message
+package mega.privacy.android.app.presentation.meeting.chat.view.message.normal
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
@@ -6,9 +6,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Text view for chat message

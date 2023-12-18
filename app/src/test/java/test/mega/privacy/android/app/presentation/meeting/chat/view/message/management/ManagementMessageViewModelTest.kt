@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.meeting.chat.view.message
+package test.mega.privacy.android.app.presentation.meeting.chat.view.message.management
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.meeting.chat.view.message.ManagementMessageViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ManagementMessageViewModel
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFullNameUseCase

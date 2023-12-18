@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message.permission
+package mega.privacy.android.app.presentation.meeting.chat.view.message.management.permission
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatManagementMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatManagementMessageView
 import mega.privacy.android.core.ui.model.MegaSpanStyle
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message
+package mega.privacy.android.app.presentation.meeting.chat.view.message.management.permission
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,11 +9,14 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Alter participants message view model
+ * Permission change message view model
  *
+ * @property getParticipantFullNameUseCase
+ * @property getMyFullNameUseCase
+ * @property getMyUserHandleUseCase
  */
 @HiltViewModel
-class ManagementMessageViewModel @Inject constructor(
+class PermissionChangeMessageViewModel @Inject constructor(
     private val getParticipantFullNameUseCase: GetParticipantFullNameUseCase,
     private val getMyFullNameUseCase: GetMyFullNameUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,

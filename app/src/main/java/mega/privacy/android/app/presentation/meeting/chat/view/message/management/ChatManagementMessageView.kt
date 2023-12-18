@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message
+package mega.privacy.android.app.presentation.meeting.chat.view.message.management
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

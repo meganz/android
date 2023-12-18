@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
-import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatRichLinkMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.richlink.ChatRichLinkMessageView
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 
 /**

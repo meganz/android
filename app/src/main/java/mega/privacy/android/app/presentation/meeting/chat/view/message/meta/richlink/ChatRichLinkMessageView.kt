@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message
+package mega.privacy.android.app.presentation.meeting.chat.view.message.meta.richlink
 
 import android.graphics.Bitmap
 import androidx.compose.runtime.Composable

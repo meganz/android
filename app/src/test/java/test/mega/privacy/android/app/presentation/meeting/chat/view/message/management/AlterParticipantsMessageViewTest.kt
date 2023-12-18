@@ -1,11 +1,11 @@
-package test.mega.privacy.android.app.presentation.meeting.chat.view.message
+package test.mega.privacy.android.app.presentation.meeting.chat.view.message.management
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.message.AlterParticipantsMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.AlterParticipantsMessageView
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.messages.management.AlterParticipantsMessage

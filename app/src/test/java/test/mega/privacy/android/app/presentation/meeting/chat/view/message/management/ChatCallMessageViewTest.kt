@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.meeting.chat.view.message
+package test.mega.privacy.android.app.presentation.meeting.chat.view.message.management
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatCallMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatCallMessageView
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.core.ui.controls.chat.messages.TEST_TAG_MANAGEMENT_MESSAGE_ICON
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode

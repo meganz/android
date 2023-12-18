@@ -1,11 +1,11 @@
-package test.mega.privacy.android.app.presentation.meeting.chat.view.message
+package test.mega.privacy.android.app.presentation.meeting.chat.view.message.management
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatManagementMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatManagementMessageView
 import mega.privacy.android.core.ui.model.MegaSpanStyle
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.tokens.TextColor

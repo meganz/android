@@ -5,21 +5,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.meeting.chat.view.message.management.TitleChangeMessageView
-import mega.privacy.android.domain.entity.chat.messages.management.TitleChangeMessage
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatLinkCreatedView
+import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkCreatedMessage
+
 
 /**
- * Title change ui message
- *
- * @property message
- * @property showDate
+ * Chat link created UI message.
  */
-data class TitleChangeUiMessage(
-    override val message: TitleChangeMessage,
+data class ChatLinkCreatedUiMessage(
+    override val message: ChatLinkCreatedMessage,
     override val showDate: Boolean,
 ) : UiChatMessage {
+
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
-        TitleChangeMessageView(message = message, modifier = Modifier.padding(start = 32.dp))
+        ChatLinkCreatedView(
+            message = message,
+            modifier = Modifier.padding(start = 32.dp)
+        )
     }
 
     override val avatarComposable: @Composable (RowScope.() -> Unit)? = null

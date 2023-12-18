@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message
+package mega.privacy.android.app.presentation.meeting.chat.view.message.meta
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box

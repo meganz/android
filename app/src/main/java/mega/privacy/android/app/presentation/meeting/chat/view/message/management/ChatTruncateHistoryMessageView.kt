@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message
+package mega.privacy.android.app.presentation.meeting.chat.view.message.management
 
 import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -79,7 +79,7 @@ internal fun ChatTruncateHistoryMessageView(
 
 @CombinedThemePreviews
 @Composable
-private fun ChatInvalidMessagePreview() {
+private fun ChatTruncateHistoryMessagePreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatTruncateHistoryMessageView(
             ownerActionFullName = "Name"

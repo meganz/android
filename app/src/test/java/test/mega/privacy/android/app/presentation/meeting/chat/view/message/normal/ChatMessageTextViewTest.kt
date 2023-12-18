@@ -1,9 +1,9 @@
-package test.mega.privacy.android.app.presentation.meeting.chat.view.message
+package test.mega.privacy.android.app.presentation.meeting.chat.view.message.normal
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatMessageTextView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.normal.ChatMessageTextView
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

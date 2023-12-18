@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
-import mega.privacy.android.app.presentation.meeting.chat.view.message.GiphyMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.GiphyMessageView
 import mega.privacy.android.app.utils.GiphyUtil
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 
