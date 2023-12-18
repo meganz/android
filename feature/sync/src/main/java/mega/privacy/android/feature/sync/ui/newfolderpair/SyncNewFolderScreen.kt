@@ -61,7 +61,7 @@ internal fun SyncNewFolderScreen(
                 modifier = Modifier.testTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR),
                 appBarType = AppBarType.BACK_NAVIGATION,
                 title = stringResource(R.string.sync_toolbar_title),
-                subtitle = "Choose folders",
+                subtitle = stringResource(id = R.string.sync_choose_folders),
                 onNavigationPressed = { onBackPressedDispatcher?.onBackPressed() },
                 elevation = 0.dp
             )
