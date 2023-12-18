@@ -196,6 +196,7 @@ class NodeOptionsViewModelTest {
             name = "Device Center Node",
             status = "Up to date",
             icon = CoreR.drawable.ic_check_circle,
+            isBackupsFolder = true,
         )
 
         underTest.state.test {

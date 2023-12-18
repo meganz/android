@@ -12,61 +12,54 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
-import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.BackupFolderBottomSheetBody
-import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.NonBackupFolderBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.OtherDeviceBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.OwnDeviceBottomSheetBody
-import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
-import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWithBody
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
- * Test Tags for the Device Center Bottom Sheet
+ * Test Tags for the Device Bottom Sheet
  */
 internal const val BOTTOM_SHEET_CONTAINER =
-    "device_center_bottom_sheet:menu_action_bottom_sheet_container"
+    "device_bottom_sheet:menu_action_bottom_sheet_container"
 internal const val BOTTOM_SHEET_HEADER =
-    "device_center_bottom_sheet:menu_action_node_header_with_body_node_information"
+    "device_bottom_sheet:menu_action_node_header_with_body_node_information"
 
 /**
- * A [Composable] Bottom Sheet shown when clicking a Device Center Node's Menu Icon
- *
- * Various options are displayed depending on the [selectedNode]
+ * A [Composable] Bottom Sheet shown when clicking a Device's Context Menu Icon, showing all
+ * available Options
  *
  * @param coroutineScope The [CoroutineScope] used to hide the Bottom Sheet
  * @param modalSheetState The Bottom Sheet State
- * @param selectedNode The selected [DeviceCenterUINode]
+ * @param device The selected [DeviceUINode]
  * @param isCameraUploadsEnabled true if Camera Uploads is Enabled, and false if otherwise
  * @param onCameraUploadsClicked Lambda that is executed when the "Camera uploads" Tile is selected
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
- * @param onShowInCloudDriveClicked Lambda that is executed when the "Show in Cloud Drive" Tile is
- * selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-internal fun DeviceCenterBottomSheet(
+internal fun DeviceBottomSheet(
     coroutineScope: CoroutineScope,
     modalSheetState: ModalBottomSheetState,
-    selectedNode: DeviceCenterUINode,
+    device: DeviceUINode,
     isCameraUploadsEnabled: Boolean,
     onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: (DeviceUINode) -> Unit,
-    onShowInCloudDriveClicked: (Long) -> Unit,
     onInfoClicked: () -> Unit,
 ) {
     BottomSheet(
@@ -75,18 +68,18 @@ internal fun DeviceCenterBottomSheet(
         sheetHeader = {
             MenuActionNodeHeaderWithBody(
                 modifier = Modifier.testTag(BOTTOM_SHEET_HEADER),
-                title = getTitleText(selectedNode.name),
-                body = getStatusText(selectedNode.status),
-                nodeIcon = selectedNode.icon.iconRes,
-                bodyIcon = selectedNode.status.icon,
-                bodyColor = getStatusColor(selectedNode.status),
-                bodyIconColor = getStatusColor(selectedNode.status),
-                nodeIconColor = getNodeIconColor(selectedNode.icon),
+                title = getTitleText(device.name),
+                body = getStatusText(device.status),
+                nodeIcon = device.icon.iconRes,
+                bodyIcon = device.status.icon,
+                bodyColor = getStatusColor(device.status),
+                bodyIconColor = getStatusColor(device.status),
+                nodeIconColor = getNodeIconColor(device.icon),
             )
         },
         sheetBody = {
-            // Display the specific Bottom Sheet Body depending on the selected Node's type
-            when (selectedNode) {
+            // Display the Options depending on the Device type
+            when (device) {
                 is OwnDeviceUINode -> {
                     OwnDeviceBottomSheetBody(
                         isCameraUploadsEnabled = isCameraUploadsEnabled,
@@ -96,7 +89,7 @@ internal fun DeviceCenterBottomSheet(
                         },
                         onRenameDeviceClicked = {
                             coroutineScope.launch { modalSheetState.hide() }
-                            onRenameDeviceClicked(selectedNode)
+                            onRenameDeviceClicked(device)
                         },
                         onInfoClicked = {
                             coroutineScope.launch { modalSheetState.hide() }
@@ -109,29 +102,7 @@ internal fun DeviceCenterBottomSheet(
                     OtherDeviceBottomSheetBody(
                         onRenameDeviceClicked = {
                             coroutineScope.launch { modalSheetState.hide() }
-                            onRenameDeviceClicked(selectedNode)
-                        },
-                        onInfoClicked = {
-                            coroutineScope.launch { modalSheetState.hide() }
-                            onInfoClicked.invoke()
-                        },
-                    )
-                }
-
-                is BackupDeviceFolderUINode -> {
-                    BackupFolderBottomSheetBody(
-                        onInfoClicked = {
-                            coroutineScope.launch { modalSheetState.hide() }
-                            onInfoClicked.invoke()
-                        },
-                    )
-                }
-
-                is NonBackupDeviceFolderUINode -> {
-                    NonBackupFolderBottomSheetBody(
-                        onShowInCloudDriveClicked = {
-                            coroutineScope.launch { modalSheetState.hide() }
-                            onShowInCloudDriveClicked.invoke(selectedNode.rootHandle)
+                            onRenameDeviceClicked(device)
                         },
                         onInfoClicked = {
                             coroutineScope.launch { modalSheetState.hide() }
@@ -145,7 +116,7 @@ internal fun DeviceCenterBottomSheet(
 }
 
 /**
- * Retrieves the Title Text to be displayed in [DeviceCenterBottomSheet]
+ * Retrieves the Title Text to be displayed in [DeviceBottomSheet]
  *
  * @param uiNodeName The Node name
  * @return The corresponding Title Text
@@ -156,7 +127,7 @@ private fun getTitleText(uiNodeName: String) = uiNodeName.ifBlank {
 }
 
 /**
- * Retrieves the Status Text to be displayed in [DeviceCenterBottomSheet]
+ * Retrieves the Status Text to be displayed in [DeviceBottomSheet]
  *
  * @param uiNodeStatus The [DeviceCenterUINodeStatus]
  * @return The corresponding Status Text
@@ -171,7 +142,7 @@ private fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
     }
 
 /**
- * Retrieves the Status Color to be applied in the Status Text and Icon of [DeviceCenterBottomSheet]
+ * Retrieves the Status Color to be applied in the Status Text and Icon of [DeviceBottomSheet]
  *
  * @param uiNodeStatus The [DeviceCenterUINodeStatus]
  * @return The corresponding Status Color
@@ -181,7 +152,7 @@ private fun getStatusColor(uiNodeStatus: DeviceCenterUINodeStatus) =
     uiNodeStatus.color ?: MaterialTheme.colors.textColorSecondary
 
 /**
- * Retrieves the Color to be applied in the Node Icon of [DeviceCenterBottomSheet]
+ * Retrieves the Color to be applied in the Node Icon of [DeviceBottomSheet]
  *
  * @param uiNodeIcon The [DeviceCenterUINodeIcon]
  * @return The corresponding Node Icon Color
@@ -195,33 +166,50 @@ private fun getNodeIconColor(uiNodeIcon: DeviceCenterUINodeIcon) =
     }
 
 /**
- * A Preview Composable that displays the Bottom Sheet and its options
+ * A Preview Composable that displays the Device Bottom Sheet with its Options
  */
 @OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews
 @Composable
-private fun PreviewDeviceCenterBottomSheet() {
+private fun PreviewDeviceBottomSheet(
+    @PreviewParameter(DeviceBottomSheetPreviewProvider::class) device: DeviceUINode,
+) {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-        val ownDeviceUINode = OwnDeviceUINode(
-            id = "1234-5678",
-            name = "Test Device",
-            icon = DeviceIconType.Android,
-            status = DeviceCenterUINodeStatus.UpToDate,
-            folders = emptyList(),
-        )
-        DeviceCenterBottomSheet(
+        DeviceBottomSheet(
             coroutineScope = rememberCoroutineScope(),
             modalSheetState = ModalBottomSheetState(
                 initialValue = ModalBottomSheetValue.Expanded,
                 isSkipHalfExpanded = false,
                 density = LocalDensity.current,
             ),
-            selectedNode = ownDeviceUINode,
+            device = device,
             isCameraUploadsEnabled = true,
             onCameraUploadsClicked = {},
             onRenameDeviceClicked = {},
-            onShowInCloudDriveClicked = {},
             onInfoClicked = {},
         )
     }
+}
+
+/**
+ * A class that provides Preview Parameters for the [DeviceBottomSheet]
+ */
+private class DeviceBottomSheetPreviewProvider : PreviewParameterProvider<DeviceUINode> {
+    override val values: Sequence<DeviceUINode>
+        get() = sequenceOf(
+            OwnDeviceUINode(
+                id = "1234-5678",
+                name = "Own Device",
+                icon = DeviceIconType.Android,
+                status = DeviceCenterUINodeStatus.UpToDate,
+                folders = emptyList(),
+            ),
+            OtherDeviceUINode(
+                id = "9012-3456",
+                name = "Other Device",
+                icon = DeviceIconType.IOS,
+                status = DeviceCenterUINodeStatus.Offline,
+                folders = emptyList(),
+            )
+        )
 }

@@ -72,6 +72,7 @@ class DeviceCenterFragment : Fragment() {
                         uiState = uiState,
                         snackbarHostState = snackbarHostState,
                         onDeviceClicked = viewModel::showDeviceFolders,
+                        onDeviceMenuClicked = viewModel::setMenuClickedDevice,
                         onBackupFolderClicked = { backupFolderUINode ->
                             megaNavigator.openNodeInBackups(
                                 activity = this@DeviceCenterFragment.activity
@@ -80,9 +81,10 @@ class DeviceCenterFragment : Fragment() {
                             )
                         },
                         onBackupFolderMenuClicked = { backupDeviceFolderUINode ->
-                            megaNavigator.openBackupFolderNodeOptions(
+                            megaNavigator.openDeviceCenterFolderNodeOptions(
                                 activity = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
+                                isBackupsFolder = true,
                                 nodeName = backupDeviceFolderUINode.name,
                                 nodeHandle = backupDeviceFolderUINode.rootHandle,
                                 nodeStatus = getString(backupDeviceFolderUINode.status.name),
@@ -91,16 +93,21 @@ class DeviceCenterFragment : Fragment() {
                                 nodeStatusIcon = backupDeviceFolderUINode.status.icon,
                             )
                         },
-                        onNonBackupFolderMenuClicked = viewModel::setMenuClickedNode,
-                        onCameraUploadsClicked = {
-                            megaNavigator.openSettingsCameraUploads(requireActivity())
-                        },
-                        onShowInCloudDriveClicked = { nodeHandle ->
-                            megaNavigator.openNodeInCloudDrive(
+                        onNonBackupFolderMenuClicked = { nonBackupDeviceFolderUINode ->
+                            megaNavigator.openDeviceCenterFolderNodeOptions(
                                 activity = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
-                                nodeHandle = nodeHandle,
+                                isBackupsFolder = false,
+                                nodeName = nonBackupDeviceFolderUINode.name,
+                                nodeHandle = nonBackupDeviceFolderUINode.rootHandle,
+                                nodeStatus = getString(nonBackupDeviceFolderUINode.status.name),
+                                nodeStatusColorInt = nonBackupDeviceFolderUINode.status.color?.toArgb(),
+                                nodeIcon = nonBackupDeviceFolderUINode.icon.iconRes,
+                                nodeStatusIcon = nonBackupDeviceFolderUINode.status.icon,
                             )
+                        },
+                        onCameraUploadsClicked = {
+                            megaNavigator.openSettingsCameraUploads(requireActivity())
                         },
                         onRenameDeviceOptionClicked = viewModel::setDeviceToRename,
                         onRenameDeviceCancelled = viewModel::resetDeviceToRename,

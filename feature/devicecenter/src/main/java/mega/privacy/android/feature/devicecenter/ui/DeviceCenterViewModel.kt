@@ -18,7 +18,6 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -107,7 +106,7 @@ internal class DeviceCenterViewModel @Inject constructor(
      * Handles specific Back Press behavior
      */
     fun handleBackPress() {
-        _state.update { it.copy(menuIconClickedNode = null) }
+        _state.update { it.copy(menuClickedDevice = null) }
         if (_state.value.deviceToRename != null) {
             // The Rename Device feature is shown. Mark deviceToRename as null to dismiss the feature
             _state.update { it.copy(deviceToRename = null) }
@@ -129,12 +128,12 @@ internal class DeviceCenterViewModel @Inject constructor(
     fun resetExitFeature() = _state.update { it.copy(exitFeature = consumed) }
 
     /**
-     * Updates the Menu-icon Clicked Node [DeviceCenterState.menuIconClickedNode]
+     * Updates the value of [DeviceCenterState.menuClickedDevice]
      *
-     * @param menuIconClickedNode The Menu-icon Clicked Node
+     * @param menuClickedDevice The [DeviceUINode] whose Context Menu is clicked
      */
-    fun setMenuClickedNode(menuIconClickedNode: DeviceCenterUINode) =
-        _state.update { it.copy(menuIconClickedNode = menuIconClickedNode) }
+    fun setMenuClickedDevice(menuClickedDevice: DeviceUINode) =
+        _state.update { it.copy(menuClickedDevice = menuClickedDevice) }
 
     /**
      * Updates the value of [DeviceCenterState.deviceToRename]

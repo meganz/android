@@ -11,8 +11,8 @@ import de.palm.composestateevents.consumed
  * @property isInitialLoadingFinished true if the call to retrieve the User's Backup Information is
  * finished for the first time, and false if otherwise
  * @property selectedDevice The Device selected by the User. It is null when the User is in Device View
- * @property menuIconClickedNode The Node that was Menu-selected by the User
- * @property deviceToRename The Device to be renamed by the User
+ * @property menuClickedDevice The Device whose Context Menu is selected
+ * @property deviceToRename The Device to be renamed
  * @property itemsToDisplay The list of [DeviceCenterUINode] objects shown in the UI. The list of
  * Devices are shown if [selectedDevice] is null. Otherwise, the list of Device Folders of
  * [selectedDevice] are shown
@@ -24,7 +24,7 @@ data class DeviceCenterState(
     val isCameraUploadsEnabled: Boolean = false,
     val isInitialLoadingFinished: Boolean = false,
     val selectedDevice: DeviceUINode? = null,
-    val menuIconClickedNode: DeviceCenterUINode? = null,
+    val menuClickedDevice: DeviceUINode? = null,
     val deviceToRename: DeviceUINode? = null,
     val exitFeature: StateEvent = consumed,
     val renameDeviceSuccess: StateEvent = consumed,

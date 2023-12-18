@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.utils.Constants
@@ -59,8 +58,9 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
     }
 
-    override fun openBackupFolderNodeOptions(
+    override fun openDeviceCenterFolderNodeOptions(
         activity: Activity,
+        isBackupsFolder: Boolean,
         nodeName: String,
         nodeHandle: Long,
         nodeStatus: String,
@@ -70,13 +70,13 @@ internal class MegaNavigatorImpl @Inject constructor(
     ) {
         (activity as? ManagerActivity)?.showNodeOptionsPanel(
             nodeId = NodeId(nodeHandle),
-            mode = NodeOptionsBottomSheetDialogFragment.BACKUPS_MODE,
             nodeDeviceCenterInformation = NodeDeviceCenterInformation(
                 name = nodeName,
                 status = nodeStatus,
                 statusColorInt = nodeStatusColorInt,
                 icon = nodeIcon,
                 statusIcon = nodeStatusIcon,
+                isBackupsFolder = isBackupsFolder,
             )
         )
     }

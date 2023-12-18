@@ -14,6 +14,7 @@ import kotlinx.parcelize.Parcelize
  * @property icon The specific Icon of the Device Center Node, represented as an [Int]
  * @property statusIcon An optional Icon shown beside the Device Center Node Status, represented as
  * an [Int]
+ * @property isBackupsFolder true if it is a Backups Folder, and false if otherwise
  */
 @Parcelize
 data class NodeDeviceCenterInformation(
@@ -22,4 +23,5 @@ data class NodeDeviceCenterInformation(
     val statusColorInt: Int? = null,
     @DrawableRes val icon: Int,
     @DrawableRes val statusIcon: Int? = null,
+    val isBackupsFolder: Boolean,
 ) : Parcelable

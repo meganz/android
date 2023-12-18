@@ -95,7 +95,7 @@ internal class DeviceCenterViewModelTest {
             assertThat(initialState.isCameraUploadsEnabled).isFalse()
             assertThat(initialState.isInitialLoadingFinished).isFalse()
             assertThat(initialState.selectedDevice).isNull()
-            assertThat(initialState.menuIconClickedNode).isNull()
+            assertThat(initialState.menuClickedDevice).isNull()
             assertThat(initialState.deviceToRename).isNull()
             assertThat(initialState.itemsToDisplay).isEmpty()
             assertThat(initialState.exitFeature).isEqualTo(consumed)
@@ -239,26 +239,26 @@ internal class DeviceCenterViewModelTest {
     }
 
     @Test
-    fun `test that the bottom dialog is shown when the menu icon of a node is selected`() =
+    fun `test that the bottom dialog is shown when the device context menu is selected`() =
         runTest {
             setupDefaultMocks()
-            underTest.setMenuClickedNode(ownDeviceUINode)
+            underTest.setMenuClickedDevice(ownDeviceUINode)
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.menuIconClickedNode).isEqualTo(ownDeviceUINode)
+                assertThat(state.menuClickedDevice).isEqualTo(ownDeviceUINode)
             }
         }
 
     @Test
     fun `test that the bottom dialog is hidden when a back press event occurs`() = runTest {
         setupDefaultMocks()
-        underTest.setMenuClickedNode(ownDeviceUINode)
+        underTest.setMenuClickedDevice(ownDeviceUINode)
         underTest.handleBackPress()
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.menuIconClickedNode).isNull()
+            assertThat(state.menuClickedDevice).isNull()
         }
     }
 

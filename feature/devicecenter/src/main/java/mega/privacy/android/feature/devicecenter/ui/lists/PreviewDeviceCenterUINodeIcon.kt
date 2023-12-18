@@ -31,8 +31,6 @@ private fun PreviewDeviceCenterUINodeIcon(
                 status = DeviceCenterUINodeStatus.UpToDate,
                 folders = emptyList(),
             ),
-            onDeviceClicked = {},
-            onNonBackupFolderMenuClicked = {},
         )
     }
 }

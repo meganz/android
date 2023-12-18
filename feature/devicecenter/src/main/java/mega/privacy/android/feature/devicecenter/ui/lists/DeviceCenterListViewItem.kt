@@ -18,6 +18,7 @@ import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
+import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
@@ -41,6 +42,8 @@ internal const val DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG =
  *
  * @param uiNode The [DeviceCenterUINode] to be displayed
  * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
+ * @param onDeviceMenuClicked Lambda that performs a specific action when a Device's Menu Icon is
+ * clicked
  * @param onBackupFolderClicked Lambda that performs a specific action when a Backup Folder is clicked
  * @param onBackupFolderMenuClicked Lambda that performs a specific action when a Backup Folder's
  * Menu Icon is clicked
@@ -51,9 +54,10 @@ internal const val DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG =
 internal fun DeviceCenterListViewItem(
     uiNode: DeviceCenterUINode,
     onDeviceClicked: (DeviceUINode) -> Unit = {},
+    onDeviceMenuClicked: (DeviceUINode) -> Unit = {},
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit = {},
     onBackupFolderMenuClicked: (BackupDeviceFolderUINode) -> Unit = {},
-    onNonBackupFolderMenuClicked: (DeviceCenterUINode) -> Unit,
+    onNonBackupFolderMenuClicked: (NonBackupDeviceFolderUINode) -> Unit = {},
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -77,9 +81,7 @@ internal fun DeviceCenterListViewItem(
             applySecondaryColorIconTint = uiNode.icon.applySecondaryColorTint,
             fileSize = null,
             modifiedDate = null,
-            name = uiNode.name.ifBlank {
-                stringResource(R.string.device_center_list_view_item_title_unknown_device)
-            },
+            name = uiNode.name.ifBlank { stringResource(R.string.device_center_list_view_item_title_unknown_device) },
             infoColor = getStatusColor(uiNode.status),
             infoIcon = uiNode.status.icon,
             infoIconTint = getStatusColor(uiNode.status),
@@ -92,13 +94,13 @@ internal fun DeviceCenterListViewItem(
                 when (uiNode) {
                     is DeviceUINode -> onDeviceClicked(uiNode)
                     is BackupDeviceFolderUINode -> onBackupFolderClicked(uiNode)
-                    else -> Unit
                 }
             },
             onMenuClick = {
                 when (uiNode) {
+                    is DeviceUINode -> onDeviceMenuClicked(uiNode)
                     is BackupDeviceFolderUINode -> onBackupFolderMenuClicked(uiNode)
-                    else -> onNonBackupFolderMenuClicked(uiNode)
+                    is NonBackupDeviceFolderUINode -> onNonBackupFolderMenuClicked(uiNode)
                 }
             },
         )
@@ -155,8 +157,6 @@ private fun PreviewDeviceCenterListViewItem() {
                 status = DeviceCenterUINodeStatus.UpToDate,
                 folders = emptyList(),
             ),
-            onDeviceClicked = {},
-            onNonBackupFolderMenuClicked = {},
         )
     }
 }
@@ -177,8 +177,6 @@ private fun PreviewDeviceCenterListViewItemWithEmptyTitle() {
                 status = DeviceCenterUINodeStatus.UpToDate,
                 folders = emptyList(),
             ),
-            onDeviceClicked = {},
-            onNonBackupFolderMenuClicked = {},
         )
     }
 }

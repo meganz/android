@@ -30,8 +30,6 @@ private fun PreviewDeviceCenterUINodeStatus(
                 status = status,
                 folders = emptyList(),
             ),
-            onDeviceClicked = {},
-            onNonBackupFolderMenuClicked = {},
         )
     }
 }

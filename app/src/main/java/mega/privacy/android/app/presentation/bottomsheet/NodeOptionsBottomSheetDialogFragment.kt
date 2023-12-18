@@ -59,7 +59,6 @@ import mega.privacy.android.app.presentation.search.SearchViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -239,8 +238,13 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLabel.setOnClickListener { onLabelClicked(node) }
                 optionFavourite.setOnClickListener { onFavouriteClicked(node) }
                 optionDownload.setOnClickListener { onDownloadClicked(node) }
-                optionOffline.setOnClickListener { onOfflineClicked(node) }
-                optionInfo.setOnClickListener { onPropertiesClicked(node) }
+                optionOffline.setOnClickListener {
+                    onOfflineClicked(
+                        node = node,
+                        nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
+                    )
+                }
+                optionInfo.setOnClickListener { onInfoClicked(node) }
                 optionLink.setOnClickListener {
                     if (drawerItem == DrawerItem.SEARCH) {
                         Analytics.tracker.trackEvent(SearchResultGetLinkMenuItemEvent)
@@ -419,7 +423,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     }
                 }
                 if (mode == DEFAULT_MODE) {
-                    mapDrawerItemToMode(drawerItem)
+                    mapDrawerItemToMode(state.nodeDeviceCenterInformation)
                 }
                 when (mode) {
                     CLOUD_DRIVE_MODE, SEARCH_MODE -> {
@@ -637,7 +641,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 separatorShares.visibility = if (counterShares <= 0) View.GONE else View.VISIBLE
                 separatorModify.visibility = if (counterModify <= 0) View.GONE else View.VISIBLE
                 offlineSwitch.setOnCheckedChangeListener { _: CompoundButton, _: Boolean ->
-                    onOfflineClicked(node)
+                    onOfflineClicked(
+                        node = node,
+                        nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
+                    )
                 }
                 optionFavourite.setText(if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite)
                 optionFavourite.setCompoundDrawablesWithIntrinsicBounds(
@@ -1159,7 +1166,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         setStateBottomSheetBehaviorHidden()
     }
 
-    private fun onOfflineClicked(node: MegaNode) {
+    private fun onOfflineClicked(
+        node: MegaNode,
+        nodeDeviceCenterInformation: NodeDeviceCenterInformation?,
+    ) {
         if (OfflineUtils.availableOffline(
                 requireContext(),
                 node
@@ -1173,47 +1183,33 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
                     nodeOptionsDownloadViewModel.onSaveOfflineClicked(NodeId(node.handle))
                 } else {
-                    saveForOffline(node)
+                    saveForOffline(
+                        node = node,
+                        nodeDeviceCenterInformation = nodeDeviceCenterInformation,
+                    )
                 }
             }
         }
         setStateBottomSheetBehaviorHidden()
     }
 
-    private fun onPropertiesClicked(
-        node: MegaNode,
-    ) {
+    /**
+     * Navigates to [FileInfoActivity] with data, and hides the Bottom Dialog
+     *
+     * @param node The [MegaNode] that was passed
+     */
+    private fun onInfoClicked(node: MegaNode) {
+        val managerActivity = requireActivity() as? ManagerActivity
         val fileInfoIntent = Intent(requireContext(), FileInfoActivity::class.java)
+
         fileInfoIntent.putExtra(Constants.HANDLE, node.handle)
-        if (drawerItem === DrawerItem.SHARED_ITEMS) {
-            if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.INCOMING_TAB) {
-                fileInfoIntent.putExtra(INTENT_EXTRA_KEY_FROM, Constants.FROM_INCOMING_SHARES)
-                fileInfoIntent.putExtra(
-                    Constants.INTENT_EXTRA_KEY_FIRST_LEVEL,
-                    (requireActivity() as ManagerActivity).deepBrowserTreeIncoming <= Constants.FIRST_NAVIGATION_LEVEL
-                )
-            } else if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.OUTGOING_TAB) {
-                fileInfoIntent.putExtra(
-                    Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                    Constants.OUTGOING_SHARES_ADAPTER
-                )
-            }
-        } else if (drawerItem === DrawerItem.BACKUPS) {
-            if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.INCOMING_TAB) {
-                fileInfoIntent.putExtra(INTENT_EXTRA_KEY_FROM, Constants.FROM_BACKUPS)
-            }
-        } else if (drawerItem === DrawerItem.SEARCH && nodeController.nodeComesFromIncoming(
-                node
-            )
-        ) {
-            fileInfoIntent.putExtra(INTENT_EXTRA_KEY_FROM, Constants.FROM_INCOMING_SHARES)
-            val dBT = nodeController.getIncomingLevel(node)
+        if (drawerItem === DrawerItem.SHARED_ITEMS && managerActivity?.tabItemShares === SharesTab.OUTGOING_TAB) {
             fileInfoIntent.putExtra(
-                Constants.INTENT_EXTRA_KEY_FIRST_LEVEL,
-                dBT <= Constants.FIRST_NAVIGATION_LEVEL
+                Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                Constants.OUTGOING_SHARES_ADAPTER,
             )
         }
-        fileInfoIntent.putExtra(Constants.NAME, node.name)
+
         startActivityForResult(fileInfoIntent, Constants.REQUEST_CODE_FILE_INFO)
         dismissAllowingStateLoss()
         setStateBottomSheetBehaviorHidden()
@@ -1379,12 +1375,22 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      * Saves the selected [MegaNode] Offline, causing it to appear in the "Offline" section
      *
      * @param node A potentially nullable [MegaNode]
+     * @param nodeDeviceCenterInformation Contains specific information of a Device Center Node to
+     * be displayed
      */
-    private fun saveForOffline(node: MegaNode?) {
+    private fun saveForOffline(
+        node: MegaNode?,
+        nodeDeviceCenterInformation: NodeDeviceCenterInformation?,
+    ) {
         val originatingFeature = when (drawerItem) {
-            DrawerItem.BACKUPS,
-            DrawerItem.DEVICE_CENTER,
-            -> Constants.FROM_BACKUPS
+            DrawerItem.BACKUPS -> Constants.FROM_BACKUPS
+            DrawerItem.DEVICE_CENTER -> {
+                if (nodeDeviceCenterInformation?.isBackupsFolder == true) {
+                    Constants.FROM_BACKUPS
+                } else {
+                    Constants.FROM_OTHERS
+                }
+            }
 
             DrawerItem.SHARED_ITEMS -> {
                 if ((requireActivity() as? ManagerActivity)?.tabItemShares === SharesTab.INCOMING_TAB) {
@@ -1432,11 +1438,19 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         )
     }
 
-    private fun mapDrawerItemToMode(drawerItem: DrawerItem?) {
+    private fun mapDrawerItemToMode(nodeDeviceCenterInformation: NodeDeviceCenterInformation?) {
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> mode = CLOUD_DRIVE_MODE
             DrawerItem.RUBBISH_BIN -> mode = RUBBISH_BIN_MODE
-            DrawerItem.BACKUPS, DrawerItem.DEVICE_CENTER -> mode = BACKUPS_MODE
+            DrawerItem.BACKUPS -> mode = BACKUPS_MODE
+            DrawerItem.DEVICE_CENTER -> {
+                mode = if (nodeDeviceCenterInformation?.isBackupsFolder == true) {
+                    BACKUPS_MODE
+                } else {
+                    CLOUD_DRIVE_MODE
+                }
+            }
+
             DrawerItem.SHARED_ITEMS -> mode = SHARED_ITEMS_MODE
             DrawerItem.SEARCH -> mode = SEARCH_MODE
             else -> Unit

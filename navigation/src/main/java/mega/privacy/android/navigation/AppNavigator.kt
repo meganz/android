@@ -56,9 +56,11 @@ interface AppNavigator {
     )
 
     /**
-     * Shows the legacy Bottom Sheet with specific Options for Backup Folders
+     * Shows the legacy Bottom Sheet with specific Options depending on the type of Device Center
+     * Folder
      *
      * @param activity the Activity
+     * @param isBackupsFolder true if this is a Backups Folder, and false if otherwise
      * @param nodeName the Node Name
      * @param nodeHandle the Node Handle
      * @param nodeStatus the Node Status
@@ -66,8 +68,9 @@ interface AppNavigator {
      * @param nodeIcon the Node Icon as an [Int]
      * @param nodeStatusIcon an optional Icon for the Node Status, represented as an [Int]
      */
-    fun openBackupFolderNodeOptions(
+    fun openDeviceCenterFolderNodeOptions(
         activity: Activity,
+        isBackupsFolder: Boolean,
         nodeName: String,
         nodeHandle: Long,
         nodeStatus: String,
