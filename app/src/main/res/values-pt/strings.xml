@@ -2843,10 +2843,6 @@
     <string name="label_time_in_minutes">%dm</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%ds</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Verificação pendente</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Verificado</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Credenciais de autenticidade</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -5261,8 +5257,6 @@
     <string name="contact_approve_credentials_secure_share_description">Protegemos os seus dados com criptografia de conhecimento zero para que todas as informações que você armazene, compartilhe e receba no MEGA estejam seguras. Para garantir segurança extra, pedimos que você verifique os contatos com os quais você compartilha informações ou dos quais recebe dados.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Para verificar o seu contato, confirme que as credenciais que você vê acima correspondem às credenciais da conta dele. Você pode pedir que eles compartilhem as credenciais com você.</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Confirmar</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">Validar credenciais</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -5285,10 +5279,6 @@
     <string name="general_app_update_action_restart">Reiniciar</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Permitir acesso aos arquivos de áudio</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Verificado</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Verificação pendente</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Aumentar o zoom</string>
     <!-- Photos action menu zoom out -->
@@ -5335,12 +5325,6 @@
     <string name="photos_album_deleted_message_singular">“%s” foi deletado</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s está esperando para entrar em “%2$s”</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="one">%1$d participante entrou na chamada</item>
-        <item quantity="many">%1$d de participantes entraram na chamada</item>
-        <item quantity="other">%1$d participantes entraram na chamada</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="one">%1$d participante está esperando para entrar em “%2$s“</item>

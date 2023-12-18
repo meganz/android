@@ -2701,10 +2701,6 @@
     <string name="label_time_in_minutes">%d น.</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d วิ.</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">ไม่ผ่านการตรวจสอบ</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">ตรวจสอบแล้ว</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">ความถูกต้องของข้อมูลประจำตัว</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -4807,8 +4803,6 @@
     <string name="contact_approve_credentials_secure_share_description">เราใช้การเข้ารหัสแบบวิธีซีโร่-นอว์เลจเพื่อรักษาความปลอดภัยข้อมูลทั้งหมดที่คุณจัดเก็บ แชร์ และรับบน MEGA และเพื่อเป็นการเพิ่มความปลอดภัยให้ดียิ่งขึ้น เราขอให้คุณตรวจสอบผู้ติดต่อที่คุณแชร์ข้อมูลหรือรับข้อมูลด้วย</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">ในการตรวจสอบผู้ติดต่อของคุณ ตรวจสอบให้แน่ใจว่าข้อมูลประจำตัวที่แสดงด้านบนตรงกับข้อมูลประจำตัวของคุณ คุณสามารถขอให้ผู้ติดต่อของคุณให้ข้อมูลประจำตัวแก่คุณได้</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">ตรวจสอบ</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">ตรวจสอบข้อมูลประจำตัว</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -4829,10 +4823,6 @@
     <string name="general_app_update_action_restart">เริ่มใหม่ตั้งแต่ต้น</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">อนุญาตให้เข้าถึงไฟล์เสียง</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">ตรวจสอบแล้ว</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">ไม่ผ่านการตรวจสอบ</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">ขยาย</string>
     <!-- Photos action menu zoom out -->
@@ -4877,10 +4867,6 @@
     <string name="photos_album_deleted_message_singular">ลบ “%s” ออกแล้ว</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s กำลังรอเข้าร่วมสาย “%2$s”</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="other">เข้าร่วมสายแล้ว %1$d คน</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="other">มีคนกำลังรอเข้าร่วมสาย “%2$s” อยู่ %1$d คน</item>

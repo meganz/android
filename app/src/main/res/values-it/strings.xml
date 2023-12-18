@@ -764,7 +764,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Questo è l’ultimo step prima di eliminare il tuo account. Perderai in modo permanente tutti i tuoi dati salvati nel cloud. Inserisci la tua password qui sotto.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Email address verification</string>
+    <string name="email_verification_title">Verifica dell\’indirizzo email</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Per favore, controlla la tua e-mail per procedere.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1407,9 +1407,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Spostare nel Cestino?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Vuoi spostare questa cartella nel Cestino? Una nuova cartella verrà automaticamente creata per i Caricamenti da fotocamera.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Vuoi spostare questa cartella nel Cestino? Una nuova cartella verrà automaticamente creata per i Caricamenti dei media.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Spostare nel Cestino?</string>
     <!-- confirmation message before removing a file -->
@@ -1453,7 +1453,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Invito spedito</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Email address is malformed</string>
+    <string name="invalid_email_to_invite">Indirizzo email scritto erroneamente</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Quando installi l\’app per desktop di MEGA ottieni %1$s di spazio complementare di archiviazione, valido per 365 giorni. L\’app per desktop di MEGA è disponibile per Windows, macOS e la maggior parte delle distribuzioni Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -2050,7 +2050,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Attiva o disattiva le versioni dei file per il tuo account.\nDisabilitare le versioni dei file non esclude che i tuoi contatti creino nuove versioni nelle cartelle condivise.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Tap, enter name or email address</string>
+    <string name="type_mail">Tocca, inserisci nome o indirizzo email</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Aggiungere %s ai tuoi contatti?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2843,10 +2843,6 @@
     <string name="label_time_in_minutes">%dm</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%ds</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Non verificato</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Verificato</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Credenziali di autenticità</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3078,9 +3074,9 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Impostazioni dei Cookie</string>
     <!-- Title for Cookie dialog, visible for new users. -->
-    <string name="dialog_cookie_alert_title">Manage cookies</string>
+    <string name="dialog_cookie_alert_title">Gestisci i cookie</string>
     <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We use cookies and similar technologies to help us improve our services. Learn more in our [A]Cookie Policy[/A].</string>
+    <string name="dialog_cookie_alert_message">Utilizziamo cookie e tecnologie simili per aiutarci a migliorare i nostri servizi. Leggi di più nella nostra [A]Politica dei Cookie[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Impostazioni dei cookie non salvate.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -5261,8 +5257,6 @@
     <string name="contact_approve_credentials_secure_share_description">Proteggiamo i tuoi dati con criptazione a conoscenza zero affinché tutte le informazioni che archivi, condividi, e ricevi su MEGA siano al sicuro. Per aumentare la sicurezza, ti chiediamo di verificare i contatti con cui condividi informazioni o da cui ricevi dati.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Per verificare il tuo contatto, assicurati che le credenziali che vedi qui sopra siano le stesse credenziali dell\’account. Puoi chiedere di condividere queste credenziali con te.</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Verifica</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">Verifica credenziali</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -5285,10 +5279,6 @@
     <string name="general_app_update_action_restart">Riavvia</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Permetti l\’accesso ai file audio</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Verificato</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Non verificato</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Aumenta lo zoom</string>
     <!-- Photos action menu zoom out -->
@@ -5335,12 +5325,6 @@
     <string name="photos_album_deleted_message_singular">“%s” eliminato</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s è in attesa di unirsi a “%2$s”.</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="one">%1$d partecipante si è unito alla chiamata</item>
-        <item quantity="many">%1$d di partecipanti si sono uniti alla chiamata</item>
-        <item quantity="other">%1$d partecipanti si sono uniti alla chiamata</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="one">%1$d partecipante è in attesa di unirsi a “%2$s”.</item>
@@ -5404,7 +5388,7 @@
         <item quantity="other">Caricamenti da fotocamera completati, %1$d file caricati</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA ha accesso limitato alla Galleria e non può effettuare il backup di tutte le tue foto.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Tocca per cambiare i permessi.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5464,17 +5448,17 @@
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Scopri di più[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
-    <string name="meetings_call_recording_started_snackbar_message">%1$s started recording</string>
+    <string name="meetings_call_recording_started_snackbar_message">%1$s ha fatto partire la registrazione</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
-    <string name="meetings_call_recording_stopped_snackbar_message">%1$s stopped recording</string>
+    <string name="meetings_call_recording_stopped_snackbar_message">%1$s ha fermato la registrazione</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galleria</string>
     <!-- Preference screen item title for Ads Cookie -->
     <string name="settings_cookies_settings_ads_title">Cookie pubblicitari</string>
     <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">Used by our approved advertising partners to collect data about your browsing activities and customise the ads you see on our services and on other websites. Not accepting these cookies means you will still see ads but they won’t be personalised.</string>
+    <string name="settings_cookies_settings_ads_summary">Utilizzati dai nostri partner pubblicitari approvati per raccogliere dati riguardo le tue attività di navigazione su internet e per personalizzare le pubblicità che vedi nei nostri servizi e su altri siti. Non accettare questi cookie implicherà che vedrai ancora pubblicità ma che non saranno personalizzate.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
-    <string name="dialog_ads_cookie_alert_message">We use cookies and similar technologies to help us improve our services and for advertising purposes. By continuing to use MEGA you agree with the terms of our updated [A]Cookie Policy[/A].</string>
+    <string name="dialog_ads_cookie_alert_message">Utilizziamo cookie e tecnologie simili per aiutarci a migliorare i nostri servizi e per motivi pubblicitari. Continuando ad utilizzare MEGA accetti i termini della nostra [A]Politica dei Cookie[/A] aggiornata.</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sincronizza</string>
 </resources>

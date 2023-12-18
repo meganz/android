@@ -3056,10 +3056,6 @@
     <string name="label_time_in_minutes">%dدقيقة</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%dثانية</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">لم يتم التحقق</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">تم التحقق</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">بيانات الاعتماد صالحة</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -5942,8 +5938,6 @@
     <string name="contact_approve_credentials_secure_share_description">نحن نحمي بياناتك بتشفير المعرفة الصفرية بحيث تكون جميع المعلومات التي تقوم بتخزينها ومشاركتها وتلقيها على ميغا MEGA آمنة. لضمان أمان إضافي نطلب منك التحقق من جهات الاتصال التي تشارك المعلومات معها أو تتلقى البيانات منها.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">للتحقق من جهة الاتصال الخاصة بك، تأكد من أن بيانات الاعتماد التي تراها أعلاه تطابق بيانات اعتماد حسابهم. يمكنك أن تطلب منهم مشاركة بيانات اعتمادهم معك.</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">تحقق</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">وثق بيانات الإعتماد لديك</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -5969,10 +5963,6 @@
     <string name="general_app_update_action_restart">إعادة تشغيل</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">السماح بالوصول إلى الملفات الصوتية</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">تم التحقق</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">لم يتم التحقق</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">تكبير</string>
     <!-- Photos action menu zoom out -->
@@ -6022,15 +6012,6 @@
     <string name="photos_album_deleted_message_singular">تم حذف ”%s“ ألبوم</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s في انتظار الانضمام إلى ”%2$s\“.</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="zero">%1$d مشارك انضم إلى المكالمة</item>
-        <item quantity="one">%1$d مشارك انضم إلى المكالمة</item>
-        <item quantity="two">%1$d مشاركان انضما إلى المكالمة</item>
-        <item quantity="few">%1$d مشاركون انضموا إلى المكالمة</item>
-        <item quantity="many">%1$d مشاركاً انضموا إلى المكالمة</item>
-        <item quantity="other">%1$d مشارك انضموا إلى المكالمة</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="zero">%1$d مشارك ينتظرون الانضمام إلى ”%2$s\“.</item>

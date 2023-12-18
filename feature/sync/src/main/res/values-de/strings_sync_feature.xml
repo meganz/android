@@ -91,9 +91,9 @@
     <!-- Sync state synced -->
     <string name="sync_list_sync_state_synced">Synchronisiert</string>
     <!-- Sync permission title for device storage -->
-    <string name="sync_folders_device_storage">Device storage</string>
+    <string name="sync_folders_device_storage">Device folder</string>
     <!-- Sync permission title for mega storage -->
-    <string name="sync_folders_mega_storage">MEGA storage</string>
+    <string name="sync_folders_mega_storage">MEGA folder</string>
     <!-- Sync while syncing title for Issues info -->
     <string name="sync_card_sync_issues_info">Informationen zu Problemen</string>
     <!-- Sync Pause -->
@@ -123,7 +123,7 @@
     <!-- Sync stalled issue reason is delete or move scanning-->
     <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move waiting on scanning</string>
     <!-- Sync stalled issue reason is delete or move-->
-    <string name="sync_stalled_issue_delete_or_move">Can\’t delete yet</string>
+    <string name="sync_stalled_issue_delete_or_move">Can’t delete yet</string>
     <!-- Sync stalled issue reason is upload issue-->
     <string name="sync_stalled_issue_upload_issue">Upload issue</string>
     <!-- Sync stalled issue reason is download issue-->
@@ -188,4 +188,6 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename was detected in the local filesystem, but could not be replicated in MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Waiting to finish scan to see if the file was moved or deleted.</string>
+    <!-- Sync subtitle for sync screen to choose folders-->
+    <string name="sync_choose_folders">Choose folders</string>
 </resources>

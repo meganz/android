@@ -1345,9 +1345,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">ごみ箱に移動しますか？</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">このフォルダをごみ箱に移動してもよろしいですか？その場合、新しいフォルダがカメラアップロード用に自動的に生成されます。</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">このフォルダをごみ箱に移動してもよろしいですか？その場合、新しいフォルダがメディアアップロード用に自動的に生成されます。</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">ごみ箱に移動しますか？</string>
     <!-- confirmation message before removing a file -->
@@ -2701,10 +2701,6 @@
     <string name="label_time_in_minutes">%d分</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d秒</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">認証されていません</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">認証済み</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">認証資格情報</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -4807,8 +4803,6 @@
     <string name="contact_approve_credentials_secure_share_description">当社はゼロ知識暗号化でデータを保護するため、MEGAで保存、共有、受信する情報はすべて安全です。さらなるセキュリティを確保するために、情報を共有する連絡先、またはデータを受信する連絡先を認証するようお願いいたします。</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">連絡先を認証するには、上記の認証情報がアカウントの認証情報と一致していることを確認してください。連絡先に認証情報を共有するように依頼できます。</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">認証する</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">認証情報の認証</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -4829,10 +4823,6 @@
     <string name="general_app_update_action_restart">再起動</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">音声ファイルへのアクセスを許可する</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">認証済み</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">認証されていません</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">ズームイン</string>
     <!-- Photos action menu zoom out -->
@@ -4877,10 +4867,6 @@
     <string name="photos_album_deleted_message_singular">「%s」が削除されました</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$sさんが「%2$s」への参加を待っています</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="other">%1$d人の参加者が通話に参加しました</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="other">%1$d人の参加者が「%2$s」への参加を待っています。</item>
