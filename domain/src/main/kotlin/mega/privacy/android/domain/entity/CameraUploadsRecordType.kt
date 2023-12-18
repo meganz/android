@@ -3,7 +3,7 @@ package mega.privacy.android.domain.entity
 /**
  * Type of sync record
  */
-enum class SyncRecordType {
+enum class CameraUploadsRecordType {
     /**
      * type photo
      */

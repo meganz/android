@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import javax.inject.Inject
@@ -42,7 +42,7 @@ class ProcessCameraUploadsMediaUseCase @Inject constructor(
                     parentPath = primaryFolderPath,
                     types = it,
                     folderType = CameraUploadFolderType.Primary,
-                    fileType = SyncRecordType.TYPE_PHOTO,
+                    fileType = CameraUploadsRecordType.TYPE_PHOTO,
                     tempRoot = tempRoot,
                 )
             } ?: emptyList()
@@ -54,7 +54,7 @@ class ProcessCameraUploadsMediaUseCase @Inject constructor(
                     parentPath = primaryFolderPath,
                     types = it,
                     folderType = CameraUploadFolderType.Primary,
-                    fileType = SyncRecordType.TYPE_VIDEO,
+                    fileType = CameraUploadsRecordType.TYPE_VIDEO,
                     tempRoot = tempRoot,
                 )
             } ?: emptyList()
@@ -71,7 +71,7 @@ class ProcessCameraUploadsMediaUseCase @Inject constructor(
                             parentPath = secondaryFolderPath,
                             types = it,
                             folderType = CameraUploadFolderType.Secondary,
-                            fileType = SyncRecordType.TYPE_PHOTO,
+                            fileType = CameraUploadsRecordType.TYPE_PHOTO,
                             tempRoot = tempRoot,
                         )
                     }.orEmpty()
@@ -86,7 +86,7 @@ class ProcessCameraUploadsMediaUseCase @Inject constructor(
                             parentPath = secondaryFolderPath,
                             types = it,
                             folderType = CameraUploadFolderType.Secondary,
-                            fileType = SyncRecordType.TYPE_VIDEO,
+                            fileType = CameraUploadsRecordType.TYPE_VIDEO,
                             tempRoot = tempRoot,
                         )
                     }.orEmpty()

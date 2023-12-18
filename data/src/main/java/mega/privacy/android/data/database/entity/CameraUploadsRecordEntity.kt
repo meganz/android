@@ -3,7 +3,7 @@ package mega.privacy.android.data.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import mega.privacy.android.data.database.MegaDatabaseConstant
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 
@@ -34,7 +34,7 @@ internal data class CameraUploadsRecordEntity(
     @ColumnInfo(name = "folder_type") val folderType: CameraUploadFolderType,
     @ColumnInfo(name = "file_name") val encryptedFileName: String?,
     @ColumnInfo(name = "file_path") val encryptedFilePath: String?,
-    @ColumnInfo(name = "file_type") val fileType: SyncRecordType,
+    @ColumnInfo(name = "file_type") val fileType: CameraUploadsRecordType,
     @ColumnInfo(name = "upload_status") val uploadStatus: CameraUploadsRecordUploadStatus,
     @ColumnInfo(name = "original_fingerprint") val encryptedOriginalFingerprint: String?,
     @ColumnInfo(name = "generated_fingerprint") val encryptedGeneratedFingerprint: String?,

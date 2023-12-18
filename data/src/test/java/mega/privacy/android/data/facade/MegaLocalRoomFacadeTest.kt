@@ -33,7 +33,7 @@ import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferMode
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
 import mega.privacy.android.domain.entity.SdTransfer
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -451,7 +451,7 @@ internal class MegaLocalRoomFacadeTest {
                 whenever(cameraUploadsRecordModelMapper(entity)).thenReturn(expected[index])
             }
             val status = listOf<CameraUploadsRecordUploadStatus>(mock())
-            val types = listOf<SyncRecordType>(mock())
+            val types = listOf<CameraUploadsRecordType>(mock())
             val folderTypes = listOf<CameraUploadFolderType>(mock())
             whenever(
                 cameraUploadsRecordDao.getCameraUploadsRecordsBy(status, types, folderTypes)

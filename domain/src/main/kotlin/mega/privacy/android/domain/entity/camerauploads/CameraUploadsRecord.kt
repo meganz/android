@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.camerauploads
 
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -29,7 +29,7 @@ data class CameraUploadsRecord(
     val filePath: String,
     val timestamp: Long,
     val folderType: CameraUploadFolderType,
-    val type: SyncRecordType,
+    val type: CameraUploadsRecordType,
     val uploadStatus: CameraUploadsRecordUploadStatus,
     val originalFingerprint: String,
     val generatedFingerprint: String?,

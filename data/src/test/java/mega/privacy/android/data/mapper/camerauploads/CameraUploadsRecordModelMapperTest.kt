@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
@@ -75,7 +75,7 @@ class CameraUploadsRecordModelMapperTest {
             encryptedFilePath = "filePath",
             encryptedTimestamp = "timestamp",
             folderType = CameraUploadFolderType.Primary,
-            fileType = SyncRecordType.TYPE_PHOTO,
+            fileType = CameraUploadsRecordType.TYPE_PHOTO,
             uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
             encryptedOriginalFingerprint = "originalFingerprint",
             encryptedGeneratedFingerprint = "null",
@@ -88,7 +88,7 @@ class CameraUploadsRecordModelMapperTest {
             filePath = "filePath",
             timestamp = 56789L,
             folderType = CameraUploadFolderType.Primary,
-            type = SyncRecordType.TYPE_PHOTO,
+            type = CameraUploadsRecordType.TYPE_PHOTO,
             uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
             originalFingerprint = "originalFingerprint",
             generatedFingerprint = null,
@@ -116,7 +116,7 @@ class CameraUploadsRecordModelMapperTest {
             encryptedFilePath = "filePath",
             encryptedTimestamp = "timestamp",
             folderType = CameraUploadFolderType.Primary,
-            fileType = SyncRecordType.TYPE_PHOTO,
+            fileType = CameraUploadsRecordType.TYPE_PHOTO,
             uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
             encryptedOriginalFingerprint = "originalFingerprint",
             encryptedGeneratedFingerprint = "null",
@@ -129,7 +129,7 @@ class CameraUploadsRecordModelMapperTest {
             filePath = "",
             timestamp = 56789L,
             folderType = CameraUploadFolderType.Primary,
-            type = SyncRecordType.TYPE_PHOTO,
+            type = CameraUploadsRecordType.TYPE_PHOTO,
             uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
             originalFingerprint = "",
             generatedFingerprint = null,

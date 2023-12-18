@@ -4,7 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.yield
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import javax.inject.Inject
@@ -34,7 +34,7 @@ class ExtractGpsCoordinatesUseCase @Inject constructor(
                     runCatching {
                         getGPSCoordinatesUseCase(
                             record.filePath,
-                            record.type == SyncRecordType.TYPE_VIDEO,
+                            record.type == CameraUploadsRecordType.TYPE_VIDEO,
                         )?.let { (latitude, longitude) ->
                             record.copy(latitude = latitude, longitude = longitude)
                         } ?: record

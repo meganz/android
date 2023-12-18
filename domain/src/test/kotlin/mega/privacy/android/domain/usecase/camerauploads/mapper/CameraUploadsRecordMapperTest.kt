@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -53,7 +53,7 @@ internal class CameraUploadsRecordMapperTest {
                 timestamp = 1L
             )
             val cameraUploadFolderType = mock<CameraUploadFolderType>()
-            val syncRecordType = mock<SyncRecordType>()
+            val type = mock<CameraUploadsRecordType>()
             val tempRoot = "tempRoot"
 
             val fingerprint = "fingerprint"
@@ -64,7 +64,7 @@ internal class CameraUploadsRecordMapperTest {
             val actual = underTest(
                 media = media,
                 folderType = cameraUploadFolderType,
-                fileType = syncRecordType,
+                fileType = type,
                 tempRoot = tempRoot
             )
 
@@ -74,7 +74,7 @@ internal class CameraUploadsRecordMapperTest {
                 filePath = media.filePath,
                 timestamp = media.timestamp,
                 folderType = cameraUploadFolderType,
-                type = syncRecordType,
+                type = type,
                 uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
                 originalFingerprint = fingerprint,
                 generatedFingerprint = null,
@@ -93,7 +93,7 @@ internal class CameraUploadsRecordMapperTest {
                 timestamp = 1L
             )
             val cameraUploadFolderType = mock<CameraUploadFolderType>()
-            val syncRecordType = mock<SyncRecordType>()
+            val type = mock<CameraUploadsRecordType>()
             val tempRoot = "tempRoot"
 
             whenever(getFingerprintUseCase(media.filePath)).thenReturn(null)
@@ -101,7 +101,7 @@ internal class CameraUploadsRecordMapperTest {
             val actual = underTest(
                 media = media,
                 folderType = cameraUploadFolderType,
-                fileType = syncRecordType,
+                fileType = type,
                 tempRoot = tempRoot
             )
 

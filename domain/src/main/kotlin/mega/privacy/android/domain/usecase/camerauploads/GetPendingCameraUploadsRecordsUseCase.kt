@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
@@ -33,10 +33,10 @@ class GetPendingCameraUploadsRecordsUseCase @Inject constructor(
         )
 
         val types = when (getUploadOptionUseCase()) {
-            UploadOption.PHOTOS -> listOf(SyncRecordType.TYPE_PHOTO)
-            UploadOption.VIDEOS -> listOf(SyncRecordType.TYPE_VIDEO)
+            UploadOption.PHOTOS -> listOf(CameraUploadsRecordType.TYPE_PHOTO)
+            UploadOption.VIDEOS -> listOf(CameraUploadsRecordType.TYPE_VIDEO)
             UploadOption.PHOTOS_AND_VIDEOS ->
-                listOf(SyncRecordType.TYPE_PHOTO, SyncRecordType.TYPE_VIDEO)
+                listOf(CameraUploadsRecordType.TYPE_PHOTO, CameraUploadsRecordType.TYPE_VIDEO)
         }
 
         val folderTypes =

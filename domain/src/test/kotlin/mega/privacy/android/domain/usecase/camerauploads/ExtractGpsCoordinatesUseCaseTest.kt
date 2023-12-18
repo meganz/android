@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
@@ -33,7 +33,7 @@ class ExtractGpsCoordinatesUseCaseTest {
         filePath = "filePath",
         timestamp = 0L,
         folderType = CameraUploadFolderType.Primary,
-        type = SyncRecordType.TYPE_VIDEO,
+        type = CameraUploadsRecordType.TYPE_VIDEO,
         uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
         originalFingerprint = "originalFingerprint",
         generatedFingerprint = "generatedFingerprint",
@@ -67,7 +67,7 @@ class ExtractGpsCoordinatesUseCaseTest {
         whenever(
             getGPSCoordinatesUseCase(
                 record.filePath,
-                record.type == SyncRecordType.TYPE_VIDEO
+                record.type == CameraUploadsRecordType.TYPE_VIDEO
             )
         ).thenReturn(expected)
 
@@ -94,7 +94,7 @@ class ExtractGpsCoordinatesUseCaseTest {
                 whenever(
                     getGPSCoordinatesUseCase(
                         list[i].filePath,
-                        list[i].type == SyncRecordType.TYPE_VIDEO,
+                        list[i].type == CameraUploadsRecordType.TYPE_VIDEO,
                     )
                 ).thenReturn(Pair(0.0, 0.0))
             }
@@ -116,7 +116,7 @@ class ExtractGpsCoordinatesUseCaseTest {
                 val stub = whenever(
                     getGPSCoordinatesUseCase(
                         list[i].filePath,
-                        list[i].type == SyncRecordType.TYPE_VIDEO,
+                        list[i].type == CameraUploadsRecordType.TYPE_VIDEO,
                     )
                 )
                 if (i == 0)

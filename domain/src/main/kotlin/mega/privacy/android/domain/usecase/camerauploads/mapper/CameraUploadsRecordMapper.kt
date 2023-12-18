@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.camerauploads.mapper
 
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -29,7 +29,7 @@ class CameraUploadsRecordMapper @Inject constructor(
     suspend operator fun invoke(
         media: CameraUploadsMedia,
         folderType: CameraUploadFolderType,
-        fileType: SyncRecordType,
+        fileType: CameraUploadsRecordType,
         tempRoot: String,
     ): CameraUploadsRecord? {
         val fingerprint = getFingerprintUseCase(media.filePath) ?: return null

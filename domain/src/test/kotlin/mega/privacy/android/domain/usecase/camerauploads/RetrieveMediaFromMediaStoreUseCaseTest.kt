@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.MediaStoreFileType
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -54,7 +54,7 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
             val mediaStoreFileType2 = mock<MediaStoreFileType>()
             val types = listOf(mediaStoreFileType1, mediaStoreFileType2)
             val folderType = mock<CameraUploadFolderType>()
-            val fileType = mock<SyncRecordType>()
+            val fileType = mock<CameraUploadsRecordType>()
             val tempRoot = "tempRoot"
             val selectionQuery = "selectionQuery"
 
@@ -119,7 +119,7 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
             val mediaStoreFileType2 = mock<MediaStoreFileType>()
             val types = listOf(mediaStoreFileType1, mediaStoreFileType2)
             val folderType = mock<CameraUploadFolderType>()
-            val fileType = mock<SyncRecordType>()
+            val fileType = mock<CameraUploadsRecordType>()
             val tempRoot = "tempRoot"
             val selectionQuery = "selectionQuery"
 
@@ -180,7 +180,7 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
             val mediaStoreFileType1 = mock<MediaStoreFileType>()
             val types = listOf(mediaStoreFileType1)
             val folderType = mock<CameraUploadFolderType>()
-            val fileType = mock<SyncRecordType>()
+            val fileType = mock<CameraUploadsRecordType>()
             val tempRoot = "tempRoot"
             val selectionQuery = "selectionQuery"
 

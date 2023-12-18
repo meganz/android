@@ -15,7 +15,7 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.yield
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -130,9 +130,9 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                     record.existingNodeId == null -> {
 
                         val shouldRemoveLocationTags =
-                            record.type == SyncRecordType.TYPE_PHOTO && locationTagsDisabled
+                            record.type == CameraUploadsRecordType.TYPE_PHOTO && locationTagsDisabled
                         val shouldCompressVideo =
-                            record.type == SyncRecordType.TYPE_VIDEO && videoQuality != VideoQuality.ORIGINAL
+                            record.type == CameraUploadsRecordType.TYPE_VIDEO && videoQuality != VideoQuality.ORIGINAL
 
                         yield()
 

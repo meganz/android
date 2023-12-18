@@ -9,7 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import org.junit.After
@@ -44,7 +44,7 @@ class CameraUploadsRecordDaoTest {
             folderType = if (it % 2 == 0) CameraUploadFolderType.Primary else CameraUploadFolderType.Secondary,
             encryptedFileName = "encryptedFileName$it",
             encryptedFilePath = "encryptedFilePath$it",
-            fileType = if (it < 6) SyncRecordType.TYPE_PHOTO else SyncRecordType.TYPE_VIDEO,
+            fileType = if (it < 6) CameraUploadsRecordType.TYPE_PHOTO else CameraUploadsRecordType.TYPE_VIDEO,
             uploadStatus = when {
                 it < 3 -> CameraUploadsRecordUploadStatus.UPLOADED
                 it < 7 -> CameraUploadsRecordUploadStatus.PENDING
@@ -93,7 +93,7 @@ class CameraUploadsRecordDaoTest {
                 CameraUploadsRecordUploadStatus.PENDING,
                 CameraUploadsRecordUploadStatus.FAILED,
             )
-            val types = listOf(SyncRecordType.TYPE_PHOTO)
+            val types = listOf(CameraUploadsRecordType.TYPE_PHOTO)
             val folderTypes = listOf(CameraUploadFolderType.Primary)
             val expected =
                 entities.filter {

@@ -5,7 +5,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.yield
 import mega.privacy.android.domain.entity.MediaStoreFileType
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -33,7 +33,7 @@ class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
         parentPath: String,
         types: List<MediaStoreFileType>,
         folderType: CameraUploadFolderType,
-        fileType: SyncRecordType,
+        fileType: CameraUploadsRecordType,
         tempRoot: String,
     ): List<CameraUploadsRecord> = coroutineScope {
         val selectionQuery = cameraUploadRepository.getMediaSelectionQuery(parentPath)

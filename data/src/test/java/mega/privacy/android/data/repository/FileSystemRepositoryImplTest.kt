@@ -209,7 +209,7 @@ internal class FileSystemRepositoryImplTest {
     }
 
     @Test
-    fun `test that temporary file is created successfully when sync record is valid`() = runTest {
+    fun `test that temporary file is created successfully`() = runTest {
         val localPath = "/path/to/local"
         val newPath = "/path/to/new"
         val rootPath = "/path/to/root"

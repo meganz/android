@@ -29,7 +29,7 @@ import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SdTransfer
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -224,7 +224,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun getCameraUploadsRecordsBy(
         uploadStatus: List<CameraUploadsRecordUploadStatus>,
-        types: List<SyncRecordType>,
+        types: List<CameraUploadsRecordType>,
         folderTypes: List<CameraUploadFolderType>,
     ): List<CameraUploadsRecord> =
         cameraUploadsRecordDao.getCameraUploadsRecordsBy(

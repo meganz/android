@@ -50,7 +50,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BackupState
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -720,7 +720,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             records
         } else {
             val videoRecords =
-                records.filter { it.type == SyncRecordType.TYPE_VIDEO }
+                records.filter { it.type == CameraUploadsRecordType.TYPE_VIDEO }
             totalVideoSize = getTotalVideoSizeInMB(videoRecords.map { it.filePath })
             Timber.d("Total videos count are ${videoRecords.size}, $totalVideoSize MB to Conversion")
             if (shouldStartVideoCompression(totalVideoSize)) {
@@ -728,7 +728,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             } else {
                 Timber.d("Compression queue bigger than setting, show notification to user.")
                 showVideoCompressionErrorStatus()
-                records.filter { it.type == SyncRecordType.TYPE_PHOTO }
+                records.filter { it.type == CameraUploadsRecordType.TYPE_PHOTO }
             }
         }
     }

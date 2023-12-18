@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SdTransfer
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -243,7 +243,7 @@ interface MegaLocalRoomGateway {
      */
     suspend fun getCameraUploadsRecordsBy(
         uploadStatus: List<CameraUploadsRecordUploadStatus>,
-        types: List<SyncRecordType>,
+        types: List<CameraUploadsRecordType>,
         folderTypes: List<CameraUploadFolderType>
     ): List<CameraUploadsRecord>
 

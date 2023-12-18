@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
@@ -58,10 +58,10 @@ class GetPendingCameraUploadsRecordsUseCaseTest {
         whenever(isSecondaryFolderEnabled()).thenReturn(isSecondaryFolderEnabled)
 
         val expectedTypes = when (uploadOption) {
-            UploadOption.PHOTOS -> listOf(SyncRecordType.TYPE_PHOTO)
-            UploadOption.VIDEOS -> listOf(SyncRecordType.TYPE_VIDEO)
+            UploadOption.PHOTOS -> listOf(CameraUploadsRecordType.TYPE_PHOTO)
+            UploadOption.VIDEOS -> listOf(CameraUploadsRecordType.TYPE_VIDEO)
             UploadOption.PHOTOS_AND_VIDEOS ->
-                listOf(SyncRecordType.TYPE_PHOTO, SyncRecordType.TYPE_VIDEO)
+                listOf(CameraUploadsRecordType.TYPE_PHOTO, CameraUploadsRecordType.TYPE_VIDEO)
         }
 
         val expectedFolderTypes =

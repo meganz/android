@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -92,7 +92,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
         filePath = "filePath",
         timestamp = 0L,
         folderType = CameraUploadFolderType.Secondary,
-        type = SyncRecordType.TYPE_PHOTO,
+        type = CameraUploadsRecordType.TYPE_PHOTO,
         uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
         originalFingerprint = "originalFingerprint",
         generatedFingerprint = null,
@@ -797,7 +797,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
 
         private fun setInput(
             cameraUploadFolderType: CameraUploadFolderType,
-            type: SyncRecordType = SyncRecordType.TYPE_PHOTO,
+            type: CameraUploadsRecordType = CameraUploadsRecordType.TYPE_PHOTO,
         ) {
             record = record1.copy(
                 folderType = cameraUploadFolderType,
@@ -848,7 +848,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
         fun `test that if record is of type VIDEO and location tags is disabled then a temporary file is not created`(
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
-            setInput(cameraUploadFolderType, SyncRecordType.TYPE_VIDEO)
+            setInput(cameraUploadFolderType, CameraUploadsRecordType.TYPE_VIDEO)
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
@@ -1010,7 +1010,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
 
         private fun setInput(
             cameraUploadFolderType: CameraUploadFolderType,
-            type: SyncRecordType = SyncRecordType.TYPE_PHOTO,
+            type: CameraUploadsRecordType = CameraUploadsRecordType.TYPE_PHOTO,
         ) {
             record = record1.copy(
                 folderType = cameraUploadFolderType,
@@ -1067,7 +1067,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
         fun `test that when the file uploaded is a video and the compression option is not original, then compress the video`(
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
-            setInput(cameraUploadFolderType, SyncRecordType.TYPE_VIDEO)
+            setInput(cameraUploadFolderType, CameraUploadsRecordType.TYPE_VIDEO)
             val quality = VideoQuality.MEDIUM
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
@@ -1093,7 +1093,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
             compressionEvents: List<VideoCompressionState>,
         ) = runTest {
-            setInput(cameraUploadFolderType, SyncRecordType.TYPE_VIDEO)
+            setInput(cameraUploadFolderType, CameraUploadsRecordType.TYPE_VIDEO)
             val quality = VideoQuality.MEDIUM
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
@@ -1145,7 +1145,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
         fun `test that when video compression failed, then upload the original file`(
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
-            setInput(cameraUploadFolderType, SyncRecordType.TYPE_VIDEO)
+            setInput(cameraUploadFolderType, CameraUploadsRecordType.TYPE_VIDEO)
             val quality = VideoQuality.MEDIUM
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)

@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
@@ -43,7 +43,7 @@ class RenameCameraUploadsRecordsUseCaseTest {
                 filePath = "filepath",
                 timestamp = 1696294469,
                 folderType = folderType,
-                type = SyncRecordType.TYPE_PHOTO,
+                type = CameraUploadsRecordType.TYPE_PHOTO,
                 uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
                 originalFingerprint = "originalFingerprint",
                 generatedFingerprint = null,
@@ -55,7 +55,7 @@ class RenameCameraUploadsRecordsUseCaseTest {
                 filePath = "filepath",
                 timestamp = 1696294470,
                 folderType = folderType,
-                type = SyncRecordType.TYPE_PHOTO,
+                type = CameraUploadsRecordType.TYPE_PHOTO,
                 uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
                 originalFingerprint = "originalFingerprint",
                 generatedFingerprint = null,

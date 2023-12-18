@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MediaStoreFileType
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -551,7 +551,7 @@ interface CameraUploadRepository {
      */
     suspend fun getCameraUploadsRecordsBy(
         uploadStatus: List<CameraUploadsRecordUploadStatus>,
-        types: List<SyncRecordType>,
+        types: List<CameraUploadsRecordType>,
         folderTypes: List<CameraUploadFolderType>,
     ): List<CameraUploadsRecord>
 

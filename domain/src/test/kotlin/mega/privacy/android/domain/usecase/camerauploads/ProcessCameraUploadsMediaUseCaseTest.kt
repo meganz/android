@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.MediaStoreFileType
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
@@ -77,7 +77,7 @@ class ProcessCameraUploadsMediaUseCaseTest {
         ) = runTest {
             val primaryFolderPath = "primaryFolderPath"
             val folderType = CameraUploadFolderType.Primary
-            val fileType = SyncRecordType.TYPE_PHOTO
+            val fileType = CameraUploadsRecordType.TYPE_PHOTO
             val tempRoot = "tempRoot"
             whenever(getMediaStoreFileTypesUseCase()).thenReturn(mediaStoreFileType)
             whenever(getPrimaryFolderPathUseCase()).thenReturn(primaryFolderPath)
@@ -127,14 +127,14 @@ class ProcessCameraUploadsMediaUseCaseTest {
                 primaryFolderPath,
                 photoFileTypes,
                 folderType,
-                SyncRecordType.TYPE_PHOTO,
+                CameraUploadsRecordType.TYPE_PHOTO,
                 tempRoot,
             )
             verify(retrieveMediaFromMediaStoreUseCase).invoke(
                 primaryFolderPath,
                 videoFileTypes,
                 folderType,
-                SyncRecordType.TYPE_VIDEO,
+                CameraUploadsRecordType.TYPE_VIDEO,
                 tempRoot,
             )
         }
@@ -161,14 +161,14 @@ class ProcessCameraUploadsMediaUseCaseTest {
                 primaryFolderPath,
                 types.first,
                 folderType,
-                SyncRecordType.TYPE_PHOTO,
+                CameraUploadsRecordType.TYPE_PHOTO,
                 tempRoot,
             )
             verify(retrieveMediaFromMediaStoreUseCase).invoke(
                 primaryFolderPath,
                 types.second,
                 folderType,
-                SyncRecordType.TYPE_VIDEO,
+                CameraUploadsRecordType.TYPE_VIDEO,
                 tempRoot,
             )
         }
@@ -222,14 +222,14 @@ class ProcessCameraUploadsMediaUseCaseTest {
                 secondaryFolderPath,
                 types.first,
                 folderType,
-                SyncRecordType.TYPE_PHOTO,
+                CameraUploadsRecordType.TYPE_PHOTO,
                 tempRoot,
             )
             verify(retrieveMediaFromMediaStoreUseCase, never()).invoke(
                 secondaryFolderPath,
                 types.second,
                 folderType,
-                SyncRecordType.TYPE_VIDEO,
+                CameraUploadsRecordType.TYPE_VIDEO,
                 tempRoot
             )
         }
@@ -258,14 +258,14 @@ class ProcessCameraUploadsMediaUseCaseTest {
                 secondaryFolderPath,
                 types.first,
                 folderType,
-                SyncRecordType.TYPE_PHOTO,
+                CameraUploadsRecordType.TYPE_PHOTO,
                 tempRoot,
             )
             verify(retrieveMediaFromMediaStoreUseCase).invoke(
                 secondaryFolderPath,
                 types.second,
                 folderType,
-                SyncRecordType.TYPE_VIDEO,
+                CameraUploadsRecordType.TYPE_VIDEO,
                 tempRoot,
             )
         }
@@ -294,14 +294,14 @@ class ProcessCameraUploadsMediaUseCaseTest {
                 secondaryFolderPath,
                 types.first,
                 folderType,
-                SyncRecordType.TYPE_PHOTO,
+                CameraUploadsRecordType.TYPE_PHOTO,
                 tempRoot,
             )
             verify(retrieveMediaFromMediaStoreUseCase).invoke(
                 secondaryFolderPath,
                 types.second,
                 folderType,
-                SyncRecordType.TYPE_VIDEO,
+                CameraUploadsRecordType.TYPE_VIDEO,
                 tempRoot,
             )
         }
@@ -322,8 +322,8 @@ class ProcessCameraUploadsMediaUseCaseTest {
                 val secondaryFolderPath = "secondaryFolderPath"
                 val primaryFolderType = CameraUploadFolderType.Primary
                 val secondaryFolderType = CameraUploadFolderType.Secondary
-                val photoRecordType = SyncRecordType.TYPE_PHOTO
-                val videoRecordType = SyncRecordType.TYPE_VIDEO
+                val photoRecordType = CameraUploadsRecordType.TYPE_PHOTO
+                val videoRecordType = CameraUploadsRecordType.TYPE_VIDEO
                 val tempRoot = "tempRoot"
                 val types = mediaStoreFileType.partition { it.isImageFileType() }
 
