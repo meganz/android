@@ -3,7 +3,6 @@ package mega.privacy.android.app.di
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
-import android.net.Uri
 import android.util.Base64
 import dagger.Binds
 import dagger.Module
@@ -19,7 +18,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
@@ -27,7 +25,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtilWrapperImpl
 import mega.privacy.android.app.utils.wrapper.CameraEnumeratorWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
-import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
@@ -71,15 +68,6 @@ abstract class UtilWrapperModule {
 
 
     companion object {
-
-        @Provides
-        fun provideGetFullPathFileWrapper(): GetFullPathFileWrapper {
-            return object : GetFullPathFileWrapper {
-                override fun getFullPathFromTreeUri(uri: Uri, context: Context): String? {
-                    return FileUtil.getFullPathFromTreeUri(uri, context)
-                }
-            }
-        }
 
         @Provides
         fun provideFetchNodeWrapper(megaApiGateway: MegaApiGateway): FetchNodeWrapper =

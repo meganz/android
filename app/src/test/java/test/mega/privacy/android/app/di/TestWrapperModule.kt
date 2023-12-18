@@ -8,7 +8,6 @@ import mega.privacy.android.app.di.UtilWrapperModule
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
-import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
@@ -24,14 +23,10 @@ import org.mockito.kotlin.mock
 )
 object TestWrapperModule {
 
-    val getFullPathWrapper = mock<GetFullPathFileWrapper>()
     val permissionUtilWrapper = mock<PermissionUtilWrapper>()
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
     val fetchNodeWrapper = mock<FetchNodeWrapper>()
     val avatarWrapper = mock<AvatarWrapper>()
-
-    @Provides
-    fun provideGetFullPathFileWrapper(): GetFullPathFileWrapper = getFullPathWrapper
 
     @Provides
     fun providePermissionUtilWrapper(): PermissionUtilWrapper = permissionUtilWrapper
