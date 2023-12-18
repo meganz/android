@@ -5046,14 +5046,25 @@ public class ChatActivity extends PasscodeActivity
             } else if (itemId == R.id.chat_cab_menu_delete) {//Delete
                 showConfirmationDeleteMessages(messagesSelected, chatRoom);
             } else if (itemId == R.id.chat_cab_menu_download) {
-                Timber.d("chat_cab_menu_download ");
-                ArrayList<MegaNodeList> list = new ArrayList<>();
+                ArrayList<Long> messageIds = new ArrayList<>();
                 for (int i = 0; i < messagesSelected.size(); i++) {
-                    MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
-                    list.add(megaNodeList);
+                    Long megaNodeHandle = messagesSelected.get(i).getMessage().getMsgId();
+                    messageIds.add(megaNodeHandle);
                 }
-                PermissionUtils.checkNotificationsPermission(chatActivity);
-                nodeSaver.saveNodeLists(list, false, false, false, true);
+                nodeOptionsDownloadViewModel.downloadChatNodesOnlyIfFeatureFlagIsTrue(
+                        idChat,
+                        messageIds,
+                        () -> {
+                            Timber.d("chat_cab_menu_download ");
+                            ArrayList<MegaNodeList> list = new ArrayList<>();
+                            for (int i = 0; i < messagesSelected.size(); i++) {
+                                MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
+                                list.add(megaNodeList);
+                            }
+                            PermissionUtils.checkNotificationsPermission(chatActivity);
+                            nodeSaver.saveNodeLists(list, false, false, false, true);
+                            return Unit.INSTANCE;
+                        });
             } else if (itemId == R.id.chat_cab_menu_import) {
                 finishMultiselectionMode();
                 chatC.importNodesFromAndroidMessages(messagesSelected, IMPORT_ONLY_OPTION);

@@ -27,6 +27,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -115,6 +117,38 @@ class NodeOptionsDownloadViewModelTest {
     }
 
     @Test
+    fun `test that onDownloadClicked for chat files launches the correct event`() = runTest {
+        val chatId = 11L
+        val messageId1 = 22L
+        val messageId2 = 33L
+        val chatFile1 = mock<ChatDefaultFile>()
+        val chatFile2 = mock<ChatDefaultFile>()
+        whenever(getChatFileUseCase(chatId, messageId1)).thenReturn(chatFile1)
+        whenever(getChatFileUseCase(chatId, messageId2)).thenReturn(chatFile2)
+        underTest.onDownloadClicked(chatId, listOf(messageId1, messageId2))
+        assertStartDownloadNode(chatFile1, chatFile2)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that downloadChatNodesOnlyIfFeatureFlagIsTrue executes the lambda if and only if feature is false`(
+        featureFlagValue: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(featureFlagValue)
+        val toDoIfFeatureFlagIsFalse = mock<() -> Unit>()
+        underTest.downloadChatNodesOnlyIfFeatureFlagIsTrue(
+            1L,
+            listOf(11L),
+            toDoIfFeatureFlagIsFalse
+        )
+        if (featureFlagValue) {
+            verifyNoInteractions(toDoIfFeatureFlagIsFalse)
+        } else {
+            verify(toDoIfFeatureFlagIsFalse).invoke()
+        }
+    }
+
+    @Test
     fun `test that onSaveOfflineClicked for chat file launches the correct event`() = runTest {
         val chatId = 11L
         val messageId = 22L
@@ -124,14 +158,14 @@ class NodeOptionsDownloadViewModelTest {
         assertStartDownloadForOffline(chatFile)
     }
 
-    private suspend fun assertStartDownloadNode(node: TypedNode) {
+    private suspend fun assertStartDownloadNode(vararg node: TypedNode) {
         underTest.state.test {
             val event = awaitItem()
             assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
             val content = (event as StateEventWithContentTriggered).content
             assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
             assertThat((content as TransferTriggerEvent.StartDownloadNode).nodes)
-                .containsExactly(node)
+                .containsExactly(*node)
         }
     }
 

@@ -74,6 +74,21 @@ class NodeOptionsDownloadViewModel @Inject constructor(
     }
 
     /**
+     * Triggers the event related to download a list of chat nodes (all from the same chat)
+     * @param chatId
+     * @param messageIds
+     */
+    fun onDownloadClicked(chatId: Long, messageIds: List<Long>) {
+        viewModelScope.launch {
+            val chatFiles =
+                messageIds.mapNotNull { getChatFileUseCase(chatId, it) }
+            _state.update {
+                triggered(TransferTriggerEvent.StartDownloadNode(chatFiles))
+            }
+        }
+    }
+
+    /**
      * Triggers the event related to download a node
      * @param node
      */
@@ -126,5 +141,27 @@ class NodeOptionsDownloadViewModel @Inject constructor(
      */
     fun consumeDownloadEvent() {
         _state.update { consumed() }
+    }
+
+    /**
+     * Triggers the event related to download a list of chat nodes if the corresponding feature flag is true, if not it will execute [toDoIfFalse]
+     * This is a temporal solution while ChatActivity is still in java (because it's hard to execute suspended functions) and we need to keep giving support with the old DownloadService if feature flag i false
+     */
+    @Deprecated(
+        "Please don't use this method, it will be removed once ChatActivity is refactored",
+        ReplaceWith("onDownloadClicked")
+    )
+    fun downloadChatNodesOnlyIfFeatureFlagIsTrue(
+        chatId: Long,
+        messageIds: List<Long?>,
+        toDoIfFalse: () -> Unit,
+    ) {
+        viewModelScope.launch {
+            if (shouldDownloadWithDownloadWorker()) {
+                onDownloadClicked(chatId, messageIds.filterNotNull())
+            } else {
+                toDoIfFalse()
+            }
+        }
     }
 }
