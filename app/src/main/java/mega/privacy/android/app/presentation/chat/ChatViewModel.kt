@@ -1071,6 +1071,13 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
+     * Sets isSessionOnRecording.
+     */
+    fun setIsSessionOnRecording(value: Boolean) {
+        _state.update { state -> state.copy(isSessionOnRecording = value) }
+    }
+
+    /**
      * Hang chat call
      */
     fun hangChatCall(chatId: Long) = viewModelScope.launch {

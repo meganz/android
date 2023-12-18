@@ -32,6 +32,7 @@ import static mega.privacy.android.app.main.megachat.MapsActivity.MSG_ID;
 import static mega.privacy.android.app.main.megachat.MapsActivity.SNAPSHOT;
 import static mega.privacy.android.app.main.megachat.MapsActivity.getAddresses;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CALL_RECORDING;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
@@ -2209,6 +2210,7 @@ public class ChatActivity extends PasscodeActivity
                     if (savedInstanceState != null) {
 
                         Timber.d("Bundle is NOT NULL");
+                        viewModel.setIsSessionOnRecording(savedInstanceState.getBoolean(MEETING_CALL_RECORDING, false));
                         selectedMessageId = savedInstanceState.getLong("selectedMessageId", -1);
                         Timber.d("Handle of the message: %s", selectedMessageId);
                         selectedPosition = savedInstanceState.getInt("selectedPosition", -1);
@@ -8674,6 +8676,7 @@ public class ChatActivity extends PasscodeActivity
         outState.putBoolean(END_CALL_FOR_ALL_DIALOG, AlertDialogUtil.isAlertDialogShown(endCallForAllDialog));
         isOnlyMeInCallDialogShown = AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall);
         outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, isOnlyMeInCallDialogShown);
+        outState.putBoolean(MEETING_CALL_RECORDING, viewModel.getState().getValue().isSessionOnRecording());
         hideDialogCall();
     }
 
