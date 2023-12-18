@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -68,6 +69,7 @@ import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -143,7 +145,6 @@ class ContactInfoViewModelTest {
     @BeforeAll
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        initViewModel()
     }
 
     @AfterAll
@@ -153,10 +154,41 @@ class ContactInfoViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(getInSharesUseCase)
+        reset(
+            monitorStorageStateEventUseCase,
+            isConnectedToInternetUseCase,
+            passcodeManagement,
+            setChatVideoInDeviceUseCase,
+            chatManagement,
+            monitorContactUpdates,
+            getUserOnlineStatusByHandleUseCase,
+            requestUserLastGreenUseCase,
+            getChatRoom,
+            getContactFromEmailUseCase,
+            getContactFromChatUseCase,
+            getChatRoomByUserUseCase,
+            applyContactUpdatesUseCase,
+            setUserAliasUseCase,
+            removeContactByEmailUseCase,
+            getInSharesUseCase,
+            monitorChatCallUpdatesUseCase,
+            monitorChatSessionUpdatesUseCase,
+            monitorUpdatePushNotificationSettingsUseCase,
+            startConversationUseCase,
+            createChatRoomUseCase,
+            monitorChatConnectionStateUseCase,
+            monitorChatOnlineStatusUseCase,
+            monitorChatPresenceLastGreenUpdatesUseCase,
+            isChatConnectedToInitiateCallUseCase,
+            createShareKey,
+            checkNodesNameCollisionUseCase,
+            copyNodesUseCase,
+            openOrStartCallUseCase,
+        )
     }
 
-    private fun initViewModel() {
+    private suspend fun initViewModel() {
+        stubCommon()
         underTest = ContactInfoViewModel(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
@@ -193,20 +225,35 @@ class ContactInfoViewModelTest {
         )
     }
 
-    private suspend fun initUserInfo() {
+    private suspend fun stubCommon() {
+        monitorContactUpdates.stub { on { invoke() }.thenReturn(emptyFlow()) }
+        monitorChatCallUpdatesUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
+        monitorChatSessionUpdatesUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
+        monitorUpdatePushNotificationSettingsUseCase.stub {
+            on { invoke() }.thenReturn(emptyFlow())
+        }
+        monitorChatConnectionStateUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
+        monitorChatOnlineStatusUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
+        monitorChatPresenceLastGreenUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(emptyFlow())
+        }
+        val node = mock<FileNode> {
+            on { name }.thenReturn("Node name")
+            on { id }.thenReturn(NodeId(123456L))
+        }
+        getInSharesUseCase.stub { onBlocking { invoke(any()) }.thenReturn(listOf(node)) }
         whenever(getContactFromEmailUseCase(email = testEmail, skipCache = true)).thenReturn(
             contactItem
         )
-        whenever(getChatRoomByUserUseCase(contactItem.handle)).thenReturn(chatRoom)
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
-        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
     }
 
     @Test
     fun `test that get user status and request last green does not trigger last green when user status is online`() =
         runTest {
-            initUserInfo()
             whenever(getUserOnlineStatusByHandleUseCase(testHandle)).thenReturn(UserChatStatus.Online)
+            initViewModel()
+            underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             underTest.getUserStatusAndRequestForLastGreen()
             underTest.state.test {
                 assertThat(awaitItem().userChatStatus).isEqualTo(UserChatStatus.Online)
@@ -217,8 +264,9 @@ class ContactInfoViewModelTest {
     @Test
     fun `test that get user status and request last green triggers last green when user status is away`() =
         runTest {
-            initUserInfo()
             whenever(getUserOnlineStatusByHandleUseCase(anyLong())).thenReturn(UserChatStatus.Away)
+            initViewModel()
+            underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             underTest.getUserStatusAndRequestForLastGreen()
             underTest.state.test {
                 assertThat(awaitItem().userChatStatus).isEqualTo(UserChatStatus.Away)
@@ -230,6 +278,8 @@ class ContactInfoViewModelTest {
     fun `test when update last green method is called state is updated with the last green value`() =
         runTest {
             whenever(getUserOnlineStatusByHandleUseCase(testHandle)).thenReturn(UserChatStatus.Online)
+            initViewModel()
+            underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             underTest.updateLastGreen(testHandle, lastGreen = 5)
             underTest.state.test {
                 val nextState = awaitItem()
@@ -241,7 +291,6 @@ class ContactInfoViewModelTest {
     @Test
     fun `test when contact info screen launched from contacts emits title`() =
         runTest {
-            whenever(isConnectedToInternetUseCase()).thenReturn(true)
             whenever(getChatRoom(testHandle)).thenReturn(chatRoom)
             whenever(
                 getContactFromChatUseCase(
@@ -249,6 +298,7 @@ class ContactInfoViewModelTest {
                     skipCache = true
                 )
             ).thenReturn(contactItem)
+            initViewModel()
             underTest.updateContactInfo(testHandle)
             underTest.state.test {
                 val nextState = awaitItem()
@@ -261,15 +311,9 @@ class ContactInfoViewModelTest {
     @Test
     fun `test when contact info screen launched from chats emits title`() =
         runTest {
-            whenever(isConnectedToInternetUseCase()).thenReturn(true)
-            whenever(
-                getContactFromEmailUseCase(
-                    testEmail,
-                    skipCache = true
-                )
-            ).thenReturn(contactItem)
             whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
-            underTest.updateContactInfo(-1L, testEmail)
+            initViewModel()
+            underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             underTest.state.test {
                 val nextState = awaitItem()
                 assertThat(nextState.primaryDisplayName).isEqualTo("Iron Man")
@@ -281,16 +325,10 @@ class ContactInfoViewModelTest {
     @Test
     fun `test when new nickname is given the nick name added snack bar message is emitted`() =
         runTest {
-            whenever(isConnectedToInternetUseCase()).thenReturn(true)
-            whenever(
-                getContactFromEmailUseCase(
-                    testEmail,
-                    skipCache = true
-                )
-            ).thenReturn(contactItem)
             whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
             whenever(setUserAliasUseCase("Spider Man", testHandle)).thenReturn("Spider Man")
-            underTest.updateContactInfo(-1L, testEmail)
+            initViewModel()
+            underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             verifyInitialData()
             underTest.updateNickName("Spider Man")
             underTest.state.test {
@@ -308,8 +346,10 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when remove contact is success isUserRemoved is emitted as true`() = runTest {
-        initContactInfoOpenedFromContact()
+        whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
         whenever(removeContactByEmailUseCase(testEmail)).thenReturn(true)
+        initViewModel()
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.removeContact()
         underTest.state.test {
@@ -318,23 +358,13 @@ class ContactInfoViewModelTest {
         }
     }
 
-    private suspend fun initContactInfoOpenedFromContact() {
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
-        whenever(getContactFromEmailUseCase(email = testEmail, skipCache = true))
-            .thenReturn(contactItem)
-        whenever(getChatRoomByUserUseCase(userHandle = testHandle)).thenReturn(chatRoom)
-        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
-    }
 
     @Test
     fun `test that if get in share is success the value is updated in state`() = runTest {
-        val node = mock<FileNode> {
-            on { name }.thenReturn("Node name")
-            on { id }.thenReturn(NodeId(123456L))
-        }
-        initContactInfoOpenedFromContact()
+        whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
+        initViewModel()
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
-        whenever(getInSharesUseCase(any())).thenReturn(listOf(node))
         underTest.getInShares()
         underTest.state.test {
             val nextState = awaitItem()
@@ -353,7 +383,9 @@ class ContactInfoViewModelTest {
     @Test
     fun `test that when chatNotificationsClicked is clicked chatNotificationChange is fired`() =
         runTest {
-            initContactInfoOpenedFromContact()
+            whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
+            initViewModel()
+            underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             verifyInitialData()
             underTest.chatNotificationsClicked()
             underTest.state.test {
@@ -369,7 +401,6 @@ class ContactInfoViewModelTest {
             val newChatRoom = mock<ChatRoom> {
                 on { chatId }.thenReturn(newChatId)
             }
-            whenever(isConnectedToInternetUseCase()).thenReturn(true)
             whenever(getContactFromEmailUseCase(email = testEmail, skipCache = true)).thenReturn(
                 contactItem
             )
@@ -377,6 +408,7 @@ class ContactInfoViewModelTest {
             whenever(createChatRoomUseCase(isGroup = false, userHandles = listOf(testHandle)))
                 .thenReturn(newChatId)
             whenever(getChatRoom(newChatId)).thenReturn(newChatRoom)
+            initViewModel()
             underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             verifyInitialData()
             underTest.chatNotificationsClicked()
@@ -389,8 +421,7 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when send message is clicked chat activity is opened`() = runTest {
-        initContactInfoOpenedFromContact()
-        verifyInitialData()
+        whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
         val chatId = Random.nextLong()
         val exampleStorageStateEvent = StorageStateEvent(
             handle = 1L,
@@ -406,6 +437,9 @@ class ContactInfoViewModelTest {
         whenever(startConversationUseCase(isGroup = false, userHandles = listOf(testHandle)))
             .thenReturn(chatId)
         whenever(getChatRoom(chatId)).thenReturn(chatRoom)
+        initViewModel()
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
+        verifyInitialData()
         underTest.sendMessageToChat()
         underTest.state.test {
             val state = awaitItem()
@@ -425,7 +459,9 @@ class ContactInfoViewModelTest {
         val nodeUpdate = mock<NodeUpdate> {
             on { changes }.thenReturn(mapOf(Pair(node, listOf(NodeChanges.Remove))))
         }
-        initContactInfoOpenedFromContact()
+        whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
+        initViewModel()
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         underTest.state.test {
             val initialState = awaitItem()
             assertThat(initialState.primaryDisplayName).isEqualTo("Iron Man")
@@ -439,7 +475,8 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when onConsumeNameCollisions is triggered state is updated`() = runTest {
-        initContactInfoOpenedFromContact()
+        initViewModel()
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeNameCollisions()
         underTest.state.test {
@@ -450,7 +487,8 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when onConsumeCopyException is called state is updated`() = runTest {
-        initContactInfoOpenedFromContact()
+        initViewModel()
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeCopyException()
         underTest.state.test {
@@ -461,7 +499,8 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when onConsumeNodeUpdateEvent is called state is updated`() = runTest {
-        initContactInfoOpenedFromContact()
+        initViewModel()
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeNodeUpdateEvent()
         underTest.state.test {
@@ -472,7 +511,8 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when onConsumeStorageOverQuotaEvent is called state is updated`() = runTest {
-        initContactInfoOpenedFromContact()
+        initViewModel()
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeStorageOverQuotaEvent()
         underTest.state.test {
@@ -484,7 +524,8 @@ class ContactInfoViewModelTest {
     @Test
     fun `test that when onConsumeChatNotificationChangeEvent is called state is updated`() =
         runTest {
-            initContactInfoOpenedFromContact()
+            initViewModel()
+            underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             verifyInitialData()
             underTest.onConsumeChatNotificationChangeEvent()
             underTest.state.test {
@@ -495,7 +536,8 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when onConsumeNavigateToChatEvent is called state is updated`() = runTest {
-        initContactInfoOpenedFromContact()
+        initViewModel()
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeNavigateToChatEvent()
         underTest.state.test {
@@ -507,7 +549,8 @@ class ContactInfoViewModelTest {
     @Test
     fun `test that when onConsumePushNotificationSettingsUpdateEvent is called state is updated`() =
         runTest {
-            initContactInfoOpenedFromContact()
+            initViewModel()
+            underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             verifyInitialData()
             underTest.onConsumePushNotificationSettingsUpdateEvent()
             underTest.state.test {
@@ -518,7 +561,8 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when onConsumeSnackBarMessageEvent is called state is updated`() = runTest {
-        initContactInfoOpenedFromContact()
+        initViewModel()
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeSnackBarMessageEvent()
         underTest.state.test {
@@ -530,7 +574,8 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when onConsumeChatCallStatusChangeEvent is called state is updated`() = runTest {
-        initContactInfoOpenedFromContact()
+        initViewModel()
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeChatCallStatusChangeEvent()
         underTest.state.test {
@@ -543,7 +588,7 @@ class ContactInfoViewModelTest {
     fun `test that an exception from remove contact by email is not propagated`() = runTest {
         whenever(removeContactByEmailUseCase(any()))
             .thenAnswer { throw MegaException(1, "It's broken") }
-
+        initViewModel()
         with(underTest) {
             removeContact()
             state.test {
