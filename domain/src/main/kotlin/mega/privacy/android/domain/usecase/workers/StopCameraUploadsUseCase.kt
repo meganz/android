@@ -18,19 +18,25 @@ class StopCameraUploadsUseCase @Inject constructor(
      */
     suspend operator fun invoke(restartMode: CameraUploadsRestartMode) {
         if (cameraUploadRepository.isCameraUploadsEnabled() == true) {
-            cameraUploadRepository.stopCameraUploads()
-
             when (restartMode) {
-                CameraUploadsRestartMode.RestartImmediately ->
+                CameraUploadsRestartMode.RestartImmediately -> {
+                    cameraUploadRepository.stopCameraUploads()
                     cameraUploadRepository.startCameraUploads()
+                }
 
-                CameraUploadsRestartMode.Reschedule ->
+                CameraUploadsRestartMode.Reschedule -> {
+                    cameraUploadRepository.stopCameraUploads()
                     cameraUploadRepository.scheduleCameraUploads()
+                }
 
-                CameraUploadsRestartMode.StopAndDisable ->
+                CameraUploadsRestartMode.StopAndDisable -> {
+                    cameraUploadRepository.stopCameraUploadsAndBackupHeartbeat()
                     disableCameraUploadsUseCase()
+                }
 
-                CameraUploadsRestartMode.Stop -> Unit
+                CameraUploadsRestartMode.Stop -> {
+                    cameraUploadRepository.stopCameraUploads()
+                }
             }
         }
     }

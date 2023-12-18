@@ -86,7 +86,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermiss
 import mega.privacy.android.app.utils.permission.PermissionUtils.getNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getPartialMediaPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -94,6 +93,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.PhotoScreenEvent
 import javax.inject.Inject
 
@@ -330,7 +330,7 @@ class PhotosFragment : Fragment() {
             timelineViewModel.setTriggerCameraUploadsState(shouldTrigger = false)
         }
         if (state.shouldTriggerMediaPermissionsDeniedLogic) {
-            timelineViewModel.stopCameraUploadAndHeartbeat()
+            timelineViewModel.stopCameraUploads()
             if (!shouldShowMediaPermissionsRationale()) {
                 requireContext().navigateToAppSettings()
             }

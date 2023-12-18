@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -55,7 +56,7 @@ import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUs
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import nz.mega.sdk.MegaNode
 import org.jetbrains.anko.collections.forEachWithIndex
 import timber.log.Timber
@@ -76,7 +77,7 @@ import javax.inject.Inject
  * @property mainDispatcher
  * @property defaultDispatcher
  * @property checkEnableCameraUploadsStatus
- * @property stopCameraUploadAndHeartbeatUseCase
+ * @property stopCameraUploadsUseCase
  * @property broadcastBusinessAccountExpiredUseCase
  * @param monitorCameraUploadProgress
  */
@@ -94,7 +95,7 @@ class TimelineViewModel @Inject constructor(
     @MainDispatcher val mainDispatcher: CoroutineDispatcher,
     @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
-    private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
+    private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
@@ -545,8 +546,8 @@ class TimelineViewModel @Inject constructor(
     /**
      * Cancel camera upload and heartbeat workers
      */
-    fun stopCameraUploadAndHeartbeat() = viewModelScope.launch {
-        stopCameraUploadAndHeartbeatUseCase()
+    fun stopCameraUploads() = viewModelScope.launch {
+        stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable)
     }
 
     /**

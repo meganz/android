@@ -110,7 +110,6 @@ import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
-import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DoesCameraUploadsRecordExistsInTargetNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
@@ -217,7 +216,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase,
-    private val disableCameraUploadsUseCase: DisableCameraUploadsUseCase,
     private val compressVideos: CompressVideos,
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
@@ -1434,11 +1432,14 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun handlePrimaryFolderDisabled() {
         showFolderUnavailableStatus(CameraUploadFolderType.Primary)
-        disableCameraUploadsUseCase()
         setPrimaryFolderLocalPathUseCase(INVALID_NON_NULL_VALUE)
         setSecondaryFolderLocalPathUseCase(INVALID_NON_NULL_VALUE)
         // Refresh SettingsCameraUploadsFragment
         broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.RefreshSettings)
+        abortWork(
+            cancelMessage = "Primary Folder is disabled",
+            restartMode = CameraUploadsRestartMode.StopAndDisable
+        )
     }
 
     /**

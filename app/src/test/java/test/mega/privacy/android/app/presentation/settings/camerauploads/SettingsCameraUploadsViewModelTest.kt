@@ -71,7 +71,6 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUse
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -134,7 +133,6 @@ class SettingsCameraUploadsViewModelTest {
     private val setupSecondaryFolderUseCase = mock<SetupSecondaryFolderUseCase>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
-    private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
     private val hasMediaPermissionUseCase = mock<HasMediaPermissionUseCase>()
     private val monitorCameraUploadsSettingsActionsUseCase =
         mock<MonitorCameraUploadsSettingsActionsUseCase>()
@@ -201,7 +199,6 @@ class SettingsCameraUploadsViewModelTest {
             setupSecondaryFolderUseCase,
             startCameraUploadUseCase,
             stopCameraUploadsUseCase,
-            stopCameraUploadAndHeartbeatUseCase,
             hasMediaPermissionUseCase,
             monitorCameraUploadsSettingsActionsUseCase,
             isConnectedToInternetUseCase,
@@ -262,7 +259,6 @@ class SettingsCameraUploadsViewModelTest {
             setupSecondaryFolderUseCase = setupSecondaryFolderUseCase,
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
-            stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
@@ -880,7 +876,6 @@ class SettingsCameraUploadsViewModelTest {
             verify(updateCameraUploadTimeStamp).invoke(0L, SyncTimeStamp.PRIMARY_VIDEO)
             if (isEnabled) {
                 verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
-                verify(stopCameraUploadAndHeartbeatUseCase).invoke()
             } else {
                 verify(checkEnableCameraUploadsStatus).invoke()
             }

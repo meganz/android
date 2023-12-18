@@ -85,6 +85,7 @@ class StopCameraUploadsUseCaseTest {
         runTest {
             whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             underTest(CameraUploadsRestartMode.StopAndDisable)
+            verify(cameraUploadRepository).stopCameraUploadsAndBackupHeartbeat()
             verify(disableCameraUploadsUseCase).invoke()
         }
 }

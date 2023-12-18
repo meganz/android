@@ -584,7 +584,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         workerGateway.scheduleCameraUploads()
     }
 
-    override suspend fun stopCameraUploadSyncHeartbeatWorkers() = withContext(ioDispatcher) {
+    override suspend fun stopCameraUploadsAndBackupHeartbeat() = withContext(ioDispatcher) {
         workerGateway.cancelCameraUploadAndHeartbeatWorkRequest()
     }
 

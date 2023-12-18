@@ -73,7 +73,6 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -115,7 +114,6 @@ import javax.inject.Inject
  * @property setupSecondaryFolderUseCase Sets up the Secondary Folder of Camera Uploads
  * @property startCameraUploadUseCase Start the camera upload
  * @property stopCameraUploadsUseCase Stop the camera upload
- * @property stopCameraUploadAndHeartbeatUseCase Stop the camera upload and heartbeat
  * @property broadcastBusinessAccountExpiredUseCase broadcast business account expired
  */
 @HiltViewModel
@@ -154,7 +152,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
-    private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -781,7 +778,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private suspend fun stopAndDisableCameraUploads() {
         setCameraUploadsEnabled(isEnabled = false)
         stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable)
-        stopCameraUploadAndHeartbeatUseCase()
     }
 
     /**

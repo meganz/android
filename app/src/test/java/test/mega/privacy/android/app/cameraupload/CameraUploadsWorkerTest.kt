@@ -56,7 +56,6 @@ import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
-import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DoesCameraUploadsRecordExistsInTargetNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
@@ -173,7 +172,6 @@ class CameraUploadsWorkerTest {
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase =
         mock()
     private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase = mock()
-    private val disableCameraUploadsUseCase: DisableCameraUploadsUseCase = mock()
     private val compressVideos: CompressVideos = mock()
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps = mock()
     private val disableMediaUploadSettings: DisableMediaUploadSettings = mock()
@@ -298,7 +296,6 @@ class CameraUploadsWorkerTest {
             setupSecondaryFolderUseCase = setupSecondaryFolderUseCase,
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             resetTotalUploadsUseCase = resetTotalUploadsUseCase,
-            disableCameraUploadsUseCase = disableCameraUploadsUseCase,
             compressVideos = compressVideos,
             resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
             disableMediaUploadSettings = disableMediaUploadSettings,

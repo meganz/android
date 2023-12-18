@@ -31,6 +31,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
@@ -47,7 +48,7 @@ import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUs
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -93,7 +94,7 @@ class TimelineViewModelTest {
 
     private val monitorCameraUploadProgress = mock<MonitorCameraUploadProgress>()
 
-    private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
+    private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
@@ -147,7 +148,7 @@ class TimelineViewModelTest {
             defaultDispatcher = UnconfinedTestDispatcher(),
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             monitorCameraUploadProgress = monitorCameraUploadProgress,
-            stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
+            stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
@@ -393,11 +394,11 @@ class TimelineViewModelTest {
     @Test
     fun `test that when stopCameraUploadAndHeartbeat is called, stopCameraUploadAndHeartbeatUseCase is called`() =
         runTest {
-            underTest.stopCameraUploadAndHeartbeat()
+            underTest.stopCameraUploads()
 
             advanceUntilIdle()
 
-            verify(stopCameraUploadAndHeartbeatUseCase).invoke()
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
         }
 
     @Test

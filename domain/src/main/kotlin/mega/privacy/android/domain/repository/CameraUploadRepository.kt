@@ -517,11 +517,11 @@ interface CameraUploadRepository {
     suspend fun scheduleCameraUploads()
 
     /**
-     * Stop the camera upload work by tag.
-     * Stop regular camera upload sync heartbeat work by tag.
+     * Stop the camera uploads work by tag.
+     * Stop regular camera uploads sync heartbeat work by tag.
      *
      */
-    suspend fun stopCameraUploadSyncHeartbeatWorkers()
+    suspend fun stopCameraUploadsAndBackupHeartbeat()
 
     /**
      * compress videos
