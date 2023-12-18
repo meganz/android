@@ -1183,7 +1183,7 @@
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
     <string name="general_allow">Разрешить</string>
     <!-- Dialog to confirm the action of enabling logs -->
-    <string name="enable_log_text_dialog">Журнал может содержать информацию о вашем аккаунте</string>
+    <string name="enable_log_text_dialog">Логи могут содержать информацию о вашем аккаунте</string>
     <!-- Dialog to confirm the reconnect action -->
     <string name="confirmation_to_reconnect">Соединение восстановлено. Подключиться к MEGA?</string>
     <!-- Error when a message cannot be edited -->
@@ -1438,9 +1438,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Переместить в Корзину?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Вы действительно хотите переместить эту папку в Корзину? Будет автоматически создана новая папка для «Загрузок из камеры».</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Вы действительно хотите переместить эту папку в Корзину? Будет автоматически создана новая папка для «Загрузок медиа».</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Переместить в Корзину?</string>
     <!-- confirmation message before removing a file -->
@@ -2914,10 +2914,6 @@
     <string name="label_time_in_minutes">%d&#160;мин</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d&#160;с</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Не проверены</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Проверены</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Подлинность учётных данных</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -5488,8 +5484,6 @@
     <string name="contact_approve_credentials_secure_share_description">Мы защищаем ваши данные с помощью шифрования с нулевым разглашением, поэтому вся информация, которую вы храните, делитесь и получаете в MEGA, находится в безопасности. Чтобы обеспечить дополнительную безопасность, мы просим вас подтвердить контакты, с которыми вы делитесь информацией или от которых получаете данные.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Чтобы подтвердить контакт, убедитесь, что учётные данные, которые вы видите выше, соответствуют его учётным данным. Вы можете попросить его поделиться с вами своими учётными данными.</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Подтвердить</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">Подтвердите учётные данные</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -5513,10 +5507,6 @@
     <string name="general_app_update_action_restart">Перезапустить</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Разрешите доступ к аудиофайлам</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Проверены</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Не проверены</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Увеличить</string>
     <!-- Photos action menu zoom out -->
@@ -5564,13 +5554,6 @@
     <string name="photos_album_deleted_message_singular">Удалён альбом «%s»</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s ждёт подключения к звонку «%2$s».</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="one">%1$d участник присоединился к звонку</item>
-        <item quantity="few">%1$d участника присоединились к звонку</item>
-        <item quantity="many">%1$d участников присоединились к звонку</item>
-        <item quantity="other">%1$d участника присоединились к звонку</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="one">%1$d участник ждёт подключения к звонку «%2$s».</item>
@@ -5637,7 +5620,7 @@
         <item quantity="other">Загрузка из камеры завершена, загружено %1$d файла</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA имеет ограниченный доступ к библиотеке фотографий и не может создавать резервные копии всех ваших фотографий.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Нажмите, чтобы изменить разрешения.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->

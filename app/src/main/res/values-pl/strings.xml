@@ -1438,9 +1438,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Przenieść do Kosza?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Czy chcesz przenieść ten katalog do kosza? Automatycznie zostanie utworzony nowy katalog dla przesłanych plików z kamery.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Czy chcesz przenieść ten katalog do kosza? Automatycznie zostanie utworzony nowy katalog dla przesyłanych multimediów.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Przenieść do Kosza?</string>
     <!-- confirmation message before removing a file -->
@@ -2914,10 +2914,6 @@
     <string name="label_time_in_minutes">%dm</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%ds</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Nie zweryfikowany</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Zweryfikowany</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Poświadczenia autentyczności</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -5488,8 +5484,6 @@
     <string name="contact_approve_credentials_secure_share_description">Chronimy Twoje dane za pomocą szyfrowania bez wiedzy, dzięki czemu wszystkie informacje, które przechowujesz, udostępniasz i otrzymujesz w MEGA, są bezpieczne. Aby zapewnić dodatkowe bezpieczeństwo, prosimy o weryfikację kontaktów, którym udostępniasz informacje lub od których otrzymujesz dane.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Aby zweryfikować kontakt, upewnij się, że dane uwierzytelniające, które widzisz powyżej, odpowiadają danym uwierzytelniającym ich konta. Możesz poprosić ich o udostępnienie swoich danych uwierzytelniających.</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Weryfikacja</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">Weryfikacja uprawnień</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -5513,10 +5507,6 @@
     <string name="general_app_update_action_restart">Zrestartuj</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Zezwalaj na dostęp do plików audio</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Zweryfikowany</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Nie zweryfikowany</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Zmniejsz</string>
     <!-- Photos action menu zoom out -->
@@ -5564,13 +5554,6 @@
     <string name="photos_album_deleted_message_singular">“%s” usunięty</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s oczekuje na dołączenie do \“%2$s\“.</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="one">Uczestnik %1$d dołączył do połączenia</item>
-        <item quantity="few">%1$d uczestników dołączyło do połączenia</item>
-        <item quantity="many">%1$d uczestników dołączyło do połączenia</item>
-        <item quantity="other">%1$d uczestników dołączyło do połączenia</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="one">Uczestnik %1$d oczekuje na dołączenie do \“%2$s\“.</item>
@@ -5637,7 +5620,7 @@
         <item quantity="other">Przesyłanie kamery zakończone, przesłano %1$d plików</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA ma ograniczony dostęp do biblioteki zdjęć i nie może utworzyć kopii zapasowej wszystkich zdjęć.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Wybierz, aby zmienić uprawnienia.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->

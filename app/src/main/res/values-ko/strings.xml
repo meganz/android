@@ -746,7 +746,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">계정을 삭제하는 마지막 단계입니다. 클라우드에 저장된 모든 데이터를 잃게 됩니다. 아래에 암호를 입력하세요.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Email address verification</string>
+    <string name="email_verification_title">이메일 주소 인증</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">진행하려면 이메일을 확인하세요.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1345,9 +1345,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">휴지통으로 옮길까요?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">이 폴더를 휴지통에 버리시겠습니까? 카메라 업로드를 위한 새 폴더가 자동으로 생성될 것입니다.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">이 폴더를 휴지통에 버리시겠습니까? 미디어 업로드를 위한 새 폴더가 자동으로 생성될 것입니다.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">휴지통으로 옮길까요?</string>
     <!-- confirmation message before removing a file -->
@@ -1391,7 +1391,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">초대를 발송하였습니다</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Email address is malformed</string>
+    <string name="invalid_email_to_invite">이메일 주소 형식이 이상합니다</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">MEGA 데스크톱 앱을 설치하면 %1$s의 무료 저장 공간을 받게 되며, 365일간 이용 가능합니다. MEGA 데스크톱 앱은 Windows, macOS 그리고 대부분의 Linux 배포판에서 이용 가능합니다.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1960,7 +1960,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">계정 전체에 대한 파일 버전 관리를 활성화하거나 비활성화 합니다.\n파일 버전 관리를 해제하는 것이 연락처가 공유된 폴더에 새로운 버전을 만드는 것을 막을 수 없습니다.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Tap, enter name or email address</string>
+    <string name="type_mail">탭하고, 이름 또는 이메일 주소를 입력하세요</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">%s을/를 연락처에 추가할까요?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2701,10 +2701,6 @@
     <string name="label_time_in_minutes">%d분</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d초</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Not verified</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Verified</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">진위 증명</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -2922,9 +2918,9 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">쿠키 설정</string>
     <!-- Title for Cookie dialog, visible for new users. -->
-    <string name="dialog_cookie_alert_title">Manage cookies</string>
+    <string name="dialog_cookie_alert_title">쿠키 관리</string>
     <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We use cookies and similar technologies to help us improve our services. Learn more in our [A]Cookie Policy[/A].</string>
+    <string name="dialog_cookie_alert_message">우리는 우리의 서비스를 제공하고 향상시키기 위해 쿠키 그리고 이와 유사한 기술을 이용합니다. 우리의 [A]쿠키 정책[/A]에서 더 알아보세요.</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">쿠키 설정이 저장되지 않았습니다.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -4807,8 +4803,6 @@
     <string name="contact_approve_credentials_secure_share_description">우리는 당신이 MEGA에 저장, 공유, 수신하는 모든 정보가 안전하도록 영지식 암호화로 당신의 데이터를 보호합니다. 추가적인 보안을 적용하려면, 우리는 당신이 정보를 공유하거나 데이터를 받는 연락처를 인증할 것을 요청합니다.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">연락처를 인증하려면, 위에 보이는 자격 증명이 연락처의 계정 자격 증명과 일치하는지 확인하세요. 연락처에게 자격 증명을 공유해달라고 요청하세요.</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">인증</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">자격 증명 인증 중</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -4829,10 +4823,6 @@
     <string name="general_app_update_action_restart">재시작</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">오디오 파일에 접근 허용</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Verified</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Not verified</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">확대</string>
     <!-- Photos action menu zoom out -->
@@ -4877,10 +4867,6 @@
     <string name="photos_album_deleted_message_singular">“%s” 삭제됨</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s 님이 “%2$s”에 참여하려고 대기 중입니다.</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="other">%1$d명의 참여자가 통화에 참여했습니다</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="other">%1$d명의 참여자가 “%2$s”에 참여하려고 대기 중입니다</item>
@@ -4938,7 +4924,7 @@
         <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA가 사진 라이브러리에 제한된 접근 권한을 가지고 있어서 모든 사진을 백업할 수 없습니다.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">권한을 변경하려면 탭하세요.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5002,9 +4988,9 @@
     <!-- Preference screen item title for Ads Cookie -->
     <string name="settings_cookies_settings_ads_title">광고 쿠키</string>
     <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">Used by our approved advertising partners to collect data about your browsing activities and customise the ads you see on our services and on other websites. Not accepting these cookies means you will still see ads but they won’t be personalised.</string>
+    <string name="settings_cookies_settings_ads_summary">당신의 브라우징 활동과 관련한 데이터를 수집하고 당신이 우리 서비스와 다른 웹사이트에서 보는 광고를 개인화하기 위해 우리의 승인된 광고 파트너들에 의해 쓰입니다. 이러한 쿠키를 허용하지 않는 것은 당신은 여전히 광고를 보게 되지만 개인화 되지 않는다는 것을 뜻합니다.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
-    <string name="dialog_ads_cookie_alert_message">We use cookies and similar technologies to help us improve our services and for advertising purposes. By continuing to use MEGA you agree with the terms of our updated [A]Cookie Policy[/A].</string>
+    <string name="dialog_ads_cookie_alert_message">우리는 우리의 서비스를 향상시키고 광고를 하기 위한 목적으로 쿠키 그리고 이와 유사한 기술을 이용합니다. MEGA를 계속 이용함으로써 당신은 우리의 개정된 [A]쿠키 정책[/A]에 동의함을 뜻합니다.</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">동기화</string>
 </resources>

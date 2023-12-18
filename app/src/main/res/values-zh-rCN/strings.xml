@@ -2701,10 +2701,6 @@
     <string name="label_time_in_minutes">%d分钟</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d秒</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">未验证</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">已验证</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">真实凭证</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -4807,8 +4803,6 @@
     <string name="contact_approve_credentials_secure_share_description">我们采用零知识加密技术来保护您的数据，因此您在MEGA上存储、共享和接收的所有信息都是安全的。为了确保额外的安全，我们要求您验证与您共享信息或接收数据的联系人。</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">为了验证您的联系人，请确保您在上面看到的凭证与他们的账户凭证相符。您可以要求他们与您分享他们的凭证。</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">验证</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">验证凭证</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -4829,10 +4823,6 @@
     <string name="general_app_update_action_restart">重启</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">允许访问音频文件</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">已验证</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">未验证</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">放大</string>
     <!-- Photos action menu zoom out -->
@@ -4877,10 +4867,6 @@
     <string name="photos_album_deleted_message_singular">“%s”已删除</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s正在等待加入“%2$s”。</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="other">%1$d位参与者加入了通话</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="other">%1$d位参与者正在等待加入“%2$s”。</item>

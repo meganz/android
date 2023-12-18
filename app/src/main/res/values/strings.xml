@@ -523,9 +523,9 @@
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Advanced</string>
     <!-- Settings preference title for cache -->
-    <string name="settings_advanced_features_cache">Clear Cache</string>
+    <string name="settings_advanced_features_cache">Clear cache</string>
     <!-- Settings preference title for offline files -->
-    <string name="settings_advanced_features_offline">Clear Offline Files</string>
+    <string name="settings_advanced_features_offline">Clear Offline files</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Delete account</string>
     <!-- Size of files in offline or cache folders -->
@@ -2772,10 +2772,6 @@
     <string name="label_time_in_minutes">%dm</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%ds</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Not verified</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Verified</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Authenticity Credentials</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -5040,8 +5036,6 @@
     <string name="contact_approve_credentials_secure_share_description">We protect your data with zero-knowledge encryption so all the information you store, share, and receive on MEGA is secure. To ensure extra security, we ask you to verify the contacts you share information with or receive data from.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Verify</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">Verify credentials</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -5063,10 +5057,6 @@
     <string name="general_app_update_action_restart">Restart</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Allow access to audio files</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Verified</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Not verified</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Zoom in</string>
     <!-- Photos action menu zoom out -->
@@ -5112,11 +5102,6 @@
     <string name="photos_album_deleted_message_singular">“%s” deleted</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s is waiting to join “%2$s”.</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="one">%1$d participant joined the call</item>
-        <item quantity="other">%1$d participants joined the call</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="one">%1$d participant is waiting to join “%2$s”.</item>

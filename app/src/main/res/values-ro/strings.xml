@@ -806,7 +806,7 @@
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Această adresă de e-mail este deja în uz. Te rugăm să folosești o altă adresă de e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
-    <string name="mail_changed_confirm_requested">Ai solicitat deja un link de confirmare pentru acea adresă de e-mail.</string>
+    <string name="mail_changed_confirm_requested">Ați solicitat deja un link de confirmare pentru acea adresă de e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">Aceasta este adresa ta de e-mail existentă.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
@@ -1407,9 +1407,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Muți în Coșul de gunoi?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Doriți să mutați acest folder în Coșul de gunoi? Un nou folder va fi creat automat pentru încărcările camere.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Doriți să mutați acest folder în Coșul de gunoi? Un nou folder va fi creat automat pentru încărcările media.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Muți în Coșul de gunoi?</string>
     <!-- confirmation message before removing a file -->
@@ -1968,7 +1968,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Nu s-a răspuns la apel[/A]</string>
     <!-- When it tries to add a contact in a list an is already added -->
-    <string name="contact_not_added">Ai adăugat deja acest contact.</string>
+    <string name="contact_not_added">Ați adăugat deja acest contact.</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_invalid_format">Format nevalid al mesajului</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2054,9 +2054,9 @@
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Adaugi pe %s la contacte?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
-    <string name="confirmation_not_invite_contact">Ai adăugat deja contactul %s.</string>
+    <string name="confirmation_not_invite_contact">Ați adăugat deja contactul %s.</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
-    <string name="confirmation_invite_contact_already_added">Ai adăugat deja contactul %s.</string>
+    <string name="confirmation_invite_contact_already_added">Ați adăugat deja contactul %s.</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_share_contact">Partajezi cu %s?</string>
     <!-- Text button for init a group chat -->
@@ -2752,7 +2752,7 @@
     <!-- Label of a button which action is resend an email -->
     <string name="resend_email_label">Retrimite e-mailul</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
-    <string name="resend_email_error">E-mail trimis deja. Te rugăm să aștepți câteva minute înainte de a încerca din nou.</string>
+    <string name="resend_email_error">E-mail deja trimis. Vă rugăm să așteptați câteva minute înainte de a încerca din nou.</string>
     <!-- Title of a helping view about locked accounts -->
     <string name="locked_accounts_label">Conturi blocate</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
@@ -2843,10 +2843,6 @@
     <string name="label_time_in_minutes">%dm</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%ds</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Neverificate</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Verificat</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Acreditări de autenticitate</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -3458,7 +3454,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Această locație nu mai există.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">Ai invitat deja pe %1$s</string>
+    <string name="contact_already_invited">Ați invitat deja pe %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Invitație trimisă. Vezi Cererile trimise.</string>
     <!-- Message when file available offline. -->
@@ -3538,11 +3534,11 @@
     <!-- Text of buy new subscription button -->
     <string name="button_buy_new_subscription">Cumpără un nou abonament</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">Ai deja un abonament. Dacă cumperi altul, vei fi taxat de două ori. Pentru a evita acest lucru, anulează abonamentul actual prin %1$s. Vizitează-ne Centrul de ajutor pentru mai multe informații.</string>
+    <string name="message_subscription_from_android_platform">Aveți deja un abonament. Dacă cumpărați altul, veți fi taxat de două ori. Pentru a evita acest lucru, anulați abonamentul curent prin %1$s. Vizitați Centrul nostru de ajutor pentru mai multe informații.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
     <string name="message_subscription_from_itunes">Aveți deja un abonament. Dacă cumpărați altul, veți fi taxat de două ori. Pentru a evita acest lucru, anulați abonamentul curent din contul dvs. Apple. Vizitați Centrul nostru de ajutor pentru mai multe informații.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">Ai deja un abonament. Dacă cumperi altul, vei fi taxat de două ori. Pentru a evita acest lucru, anulează abonamentul actual accesând MEGA într-un browser web desktop sau mobil. Vizitează-ne Centrul de ajutor pentru mai multe informații.</string>
+    <string name="message_subscription_from_other_platform">Aveți deja un abonament. Dacă cumpărați altul, veți fi taxat de două ori. Pentru a evita acest lucru, anulați abonamentul curent accesând MEGA într-un browser web desktop sau mobil. Vizitați Centrul nostru de ajutor pentru mai multe informații.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Mergi la Setări pentru a-i acorda lui MEGA permisiunea de a accesa dispozitivele din apropiere folosind Bluetooth.</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
@@ -3952,7 +3948,7 @@
     <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_title">Toate contactele au fost adăugate</string>
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
-    <string name="chat_add_participants_no_contacts_left_to_add_message">Ai adăugat deja toate contactele tale în acest chat. Dacă vrei să adaugi mai mulți participanți, invită-i mai întâi în lista de contacte.</string>
+    <string name="chat_add_participants_no_contacts_left_to_add_message">Ați adăugat deja toate contactele dvs. la acest chat. Dacă doriți să adăugați mai mulți participanți, invitați-i mai întâi la lista dvs. de contacte.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">Imagine salvată în galeria dispozitivului</string>
     <!-- Album creation dialog title -->
@@ -5261,8 +5257,6 @@
     <string name="contact_approve_credentials_secure_share_description">Vă protejăm datele cu criptare tip zero, astfel încât toate informațiile pe care le stocați, partajați și primiți pe MEGA să fie sigure. Pentru a asigura un plus de securitate, vă rugăm să confirmați contactele cu care partajați informații sau de la care primiți date.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Pentru a vă confirma contactul, asigurați-vă că acreditările pe care le vedeți mai sus corespund cu acreditările contului lor. Le puteți cere să vă împărtășească acreditările.</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Verifică</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">Verifică acreditările</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -5285,10 +5279,6 @@
     <string name="general_app_update_action_restart">Repornește</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Permite accesul la fișierele audio</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Verificat</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Neverificate</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Zoom in</string>
     <!-- Photos action menu zoom out -->
@@ -5335,12 +5325,6 @@
     <string name="photos_album_deleted_message_singular">„%s” a fost ștearsă</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s așteaptă să se alăture la „%2$s”</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="one">%1$d participant s-a alăturat apelului</item>
-        <item quantity="few">%1$d de participanți s-au alăturat apelului</item>
-        <item quantity="other">%1$d de participanți s-au alăturat apelului</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="one">%1$d participant așteaptă să se alăture „%2$s1”</item>
@@ -5404,7 +5388,7 @@
         <item quantity="other">Încărcări cameră complete, %1$d de fișiere încărcate</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA are acces limitat la biblioteca foto și nu poate face copii de rezervă pentru toate fotografiile.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Atinge pentru a modifica permisiunile.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->

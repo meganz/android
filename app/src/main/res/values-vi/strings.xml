@@ -2701,10 +2701,6 @@
     <string name="label_time_in_minutes">%dph</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d giây</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Chưa có xác thực</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Đã xác thực</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Công nhận chứng thực</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -4807,8 +4803,6 @@
     <string name="contact_approve_credentials_secure_share_description">Chúng&#160;tôi bảo&#160;vệ dữ&#160;liệu của bạn bằng mô&#160;hình mã&#160;hóa vô&#160;kiến&#160;thức nên tất&#160;cả thông&#160;tin bạn lưu&#160;trữ, chia&#160;sẻ và nhận được trên MEGA đều bảo&#160;vệ an&#160;toàn. Để đảm&#160;bảo tính bảo&#160;mật cao hơn, chúng&#160;tôi có yêu&#160;cầu bạn xác&#160;thực các tên liên&#160;lạc mà bạn có chia&#160;sẻ thông&#160;tin hoặc nhận dữ&#160;liệu từ họ.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Để xác&#160;thực tên liên&#160;lạc, đảm&#160;bảo rằng chứng&#160;chỉ bạn thấy dưới đây trùng&#160;khớp với chứng&#160;chỉ tài&#160;khoản của họ. Bạn có thể hỏi người đó chia&#160;sẻ chứng&#160;chỉ cho bạn.</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Xác thực</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">Xác thực chứng thực</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -4829,10 +4823,6 @@
     <string name="general_app_update_action_restart">Khởi động lại</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Cho phép truy&#160;cập vào các tệp&#160;tin âm&#160;thanh</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Đã xác thực</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Chưa có xác thực</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Phóng ra</string>
     <!-- Photos action menu zoom out -->
@@ -4877,10 +4867,6 @@
     <string name="photos_album_deleted_message_singular">Đã xóa “%s”</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s đang chờ để tham&#160;gia “%2$s”.</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="other">%1$d thành&#160;viên đã tham&#160;gia vào cuộc gọi</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="other">%1$d thành&#160;viên đang chờ để tham&#160;gia “%2$s”.</item>

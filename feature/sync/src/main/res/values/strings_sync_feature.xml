@@ -123,7 +123,7 @@
     <!-- Sync stalled issue reason is delete or move scanning-->
     <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move waiting on scanning</string>
     <!-- Sync stalled issue reason is delete or move-->
-    <string name="sync_stalled_issue_delete_or_move">Can\’t delete yet</string>
+    <string name="sync_stalled_issue_delete_or_move">Can’t delete yet</string>
     <!-- Sync stalled issue reason is upload issue-->
     <string name="sync_stalled_issue_upload_issue">Upload issue</string>
     <!-- Sync stalled issue reason is download issue-->

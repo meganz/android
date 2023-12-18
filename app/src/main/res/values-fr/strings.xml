@@ -1407,9 +1407,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Déplacer vers la Corbeille ?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Voulez-vous déplacer ce dossier vers la Corbeille ? Un nouveau dossier sera automatiquement créé pour les téléversements de l’appareil photo.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Voulez-vous déplacer ce dossier vers la Corbeille ? Un nouveau dossier sera automatiquement créé pour les téléversements des médias.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Déplacer vers la Corbeille ?</string>
     <!-- confirmation message before removing a file -->
@@ -2843,10 +2843,6 @@
     <string name="label_time_in_minutes">%d m</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d s</string>
-    <!-- Label to indicate that contact’s credentials are not verified. -->
-    <string name="label_not_verified">Non confirmé</string>
-    <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Confirmé</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Numéro d’identification</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -5261,8 +5257,6 @@
     <string name="contact_approve_credentials_secure_share_description">Nous protégeons vos données par un chiffrement à divulgation nulle de connaissance afin que tout ce que vous stockez, partagez et recevez sur MEGA soit sécurisé. Pour garantir une sécurité accrue, nous vous demandons de confirmer les contacts avec lesquels vous partagez ou dont vous recevez des données.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Pour confirmer un contact, assurez-vous que le numéro d’identification que vous voyez ci-dessus correspond au numéro d’identification de leur compte. Vous pouvez demander à votre contact de partager son numéro d’identification avec vous.</string>
-    <!-- Approve button text in approve credentials screen -->
-    <string name="contact_approve_credentials_button_text">Confirmer</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">Confirmer le numéro d’identification</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
@@ -5285,10 +5279,6 @@
     <string name="general_app_update_action_restart">Redémarrer</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Autoriser l’accès aux fichiers son</string>
-    <!-- Approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_approved_text">Confirmé</string>
-    <!-- Not approved text under Approve credentials from contact info screen-->
-    <string name="contact_approve_credentials_not_approved_text">Non confirmé</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Zoomer avant</string>
     <!-- Photos action menu zoom out -->
@@ -5335,12 +5325,6 @@
     <string name="photos_album_deleted_message_singular">«&#160;%s&#160;» a été supprimé</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s attend de se joindre à «&#160;%2$s&#160;»</string>
-    <!-- Success message when participants was added to the call from waiting room -->
-    <plurals name="meetings_waiting_room_snackbar_adding_participants_to_call_success">
-        <item quantity="one">%1$d&#160;participant s’est joint à l’appel</item>
-        <item quantity="many">%1$d de participants se sont joints à l’appel</item>
-        <item quantity="other">%1$d&#160;participants se sont joints à l’appel</item>
-    </plurals>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
         <item quantity="one">%1$d&#160;participant attend de se joindre à «&#160;%2$s&#160;»</item>
@@ -5404,7 +5388,7 @@
         <item quantity="other">Téléversements de l’appareil photo terminés, %1$d&#160;fichiers téléversés</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA a un accès limité à la photothèque et ne peut pas sauvegarder toutes vos photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Toucher pour changer les autorisations.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
