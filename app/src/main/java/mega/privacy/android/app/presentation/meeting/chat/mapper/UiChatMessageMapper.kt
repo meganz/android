@@ -9,8 +9,10 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatRichLinkU
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.InvalidUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.TextUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.UiChatMessage
-import mega.privacy.android.domain.entity.chat.messages.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
+import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
+import mega.privacy.android.domain.entity.chat.messages.invalid.SignatureInvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.AlterParticipantsMessage
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
@@ -69,12 +71,8 @@ class UiChatMessageMapper @Inject constructor() {
                 showDate = showDate,
             )
 
-            is InvalidMessage -> InvalidUiMessage(
-                message = message,
-                showAvatar = showAvatar,
-                showTime = showTime,
-                showDate = showDate
-            )
+
+            is InvalidMessage -> mapInvalidMessage(message, showAvatar, showTime, showDate)
 
             else -> object : UiChatMessage {
                 override val contentComposable: @Composable (RowScope.() -> Unit) = {
@@ -90,6 +88,36 @@ class UiChatMessageMapper @Inject constructor() {
 
                 override val showDate: Boolean = showDate
             }
+        }
+    }
+
+    private fun mapInvalidMessage(
+        message: InvalidMessage,
+        showAvatar: Boolean,
+        showTime: Boolean,
+        showDate: Boolean,
+    ): InvalidUiMessage {
+        return when (message) {
+            is SignatureInvalidMessage -> InvalidUiMessage.SignatureInvalidUiMessage(
+                message = message,
+                showAvatar = showAvatar,
+                showTime = showTime,
+                showDate = showDate
+            )
+
+            is FormatInvalidMessage -> InvalidUiMessage.FormatInvalidUiMessage(
+                message = message,
+                showAvatar = showAvatar,
+                showTime = showTime,
+                showDate = showDate
+            )
+
+            else -> InvalidUiMessage.UnrecognizableInvalidUiMessage(
+                message = message,
+                showAvatar = showAvatar,
+                showTime = showTime,
+                showDate = showDate
+            )
         }
     }
 }

@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_U
 import mega.privacy.android.core.ui.controls.appbar.TEST_TAG_APP_BAR
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.messages.InvalidMessage
+import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import org.junit.Rule
 import org.junit.Test
