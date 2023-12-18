@@ -427,9 +427,13 @@ class ManagerViewModel @Inject constructor(
                 .collect { isRecordingConsentAccepted ->
                     _state.update {
                         it.copy(
+                            isSessionOnRecording = true,
                             showRecordingConsentDialog = false,
                             isRecordingConsentAccepted = isRecordingConsentAccepted
                         )
+                    }
+                    if (!isRecordingConsentAccepted) {
+                        hangChatCall(state.value.callInProgressChatId)
                     }
                 }
         }

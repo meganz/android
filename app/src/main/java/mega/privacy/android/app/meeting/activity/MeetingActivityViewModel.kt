@@ -1305,19 +1305,20 @@ class MeetingActivityViewModel @Inject constructor(
                 call?.let {
                     call.sessionByClientId.forEach {
                         it.value.let { session ->
-                            _state.value.usersInCall.find { participant -> participant.peerId == session.peerId }
-                                ?.let { participant ->
-                                    if (session.isRecording) {
-                                        _state.update { state ->
-                                            state.copy(
-                                                isSessionOnRecording = true,
-                                                showRecordingConsentDialog = !state.isRecordingConsentAccepted,
-                                                startOrStopRecordingParticipantName = participant.name
-                                            )
+                            if (session.isRecording) {
+                                _state.update { state ->
+                                    state.copy(
+                                        isSessionOnRecording = true,
+                                        showRecordingConsentDialog = !state.isRecordingConsentAccepted,
+                                        startOrStopRecordingParticipantName = if (state.callType == CallType.OneToOne) {
+                                            state.title
+                                        } else {
+                                            state.usersInCall.find { participant -> participant.peerId == session.peerId }?.name.orEmpty()
                                         }
-                                        return@forEach
-                                    }
+                                    )
                                 }
+                                return@forEach
+                            }
                         }
                     }
                 }
