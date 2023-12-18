@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message.title
+package mega.privacy.android.app.presentation.meeting.chat.view.message
 
 import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -15,25 +15,19 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.message.ChatManagementMessageView
-import mega.privacy.android.app.presentation.meeting.chat.view.message.ManagementMessageViewModel
 import mega.privacy.android.core.ui.model.MegaSpanStyle
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.tokens.TextColor
-import mega.privacy.android.domain.entity.chat.messages.management.TitleChangeMessage
+import mega.privacy.android.domain.entity.chat.messages.management.TruncateHistoryMessage
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
- * Title change message view
- *
- * @param message The message
- * @param modifier Modifier
- * @param viewModel The view model
+ * Truncate history message view.
  */
 @Composable
-fun TitleChangeMessageView(
-    message: TitleChangeMessage,
+fun ChatTruncateHistoryMessageView(
+    message: TruncateHistoryMessage,
     modifier: Modifier = Modifier,
     viewModel: ManagementMessageViewModel = hiltViewModel(),
 ) {
@@ -50,27 +44,24 @@ fun TitleChangeMessageView(
         }?.let { ownerActionFullName = it }
     }
 
-    TitleChangeMessageView(
-        newTitle = message.content,
+    ChatTruncateHistoryMessageView(
         ownerActionFullName = ownerActionFullName,
         modifier = modifier
     )
 }
 
 /**
- * Title change message view
+ * Truncate history message view.
  *
- * @param newTitle
- * @param ownerActionFullName
- * @param modifier
+ * @param ownerActionFullName The owner action full name
+ * @param modifier Modifier
  */
 @Composable
-internal fun TitleChangeMessageView(
-    newTitle: String,
+internal fun ChatTruncateHistoryMessageView(
     ownerActionFullName: String,
     modifier: Modifier = Modifier,
 ) = ChatManagementMessageView(
-    text = stringResource(id = R.string.change_title_messages, ownerActionFullName, newTitle),
+    text = stringResource(id = R.string.history_cleared_by, ownerActionFullName),
     modifier = modifier,
     styles = mapOf(
         SpanIndicator('A') to MegaSpanStyle(
@@ -83,22 +74,15 @@ internal fun TitleChangeMessageView(
             SpanStyle(),
             color = TextColor.Secondary
         ),
-        SpanIndicator('C') to MegaSpanStyle(
-            SpanStyle(
-                fontWeight = FontWeight.Bold,
-            ),
-            color = TextColor.Primary
-        ),
     )
 )
 
 @CombinedThemePreviews
 @Composable
-private fun TitleChangeMessageViewPreview() {
+private fun ChatInvalidMessagePreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-        TitleChangeMessageView(
-            newTitle = "New title",
-            ownerActionFullName = "My name"
+        ChatTruncateHistoryMessageView(
+            ownerActionFullName = "Name"
         )
     }
 }

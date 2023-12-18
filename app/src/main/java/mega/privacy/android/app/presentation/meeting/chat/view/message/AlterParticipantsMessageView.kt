@@ -35,25 +35,26 @@ fun AlterParticipantsMessageView(
     modifier: Modifier = Modifier,
     viewModel: ManagementMessageViewModel = hiltViewModel(),
 ) {
-    var ownerActionFullName by remember { mutableStateOf("") }
-    var targetActionFullName by remember { mutableStateOf("") }
     val context: Context = LocalContext.current
+    var ownerActionFullName by remember {
+        mutableStateOf(context.getString(R.string.unknown_name_label))
+    }
+    var targetActionFullName by remember {
+        mutableStateOf(context.getString(R.string.unknown_name_label))
+    }
+
     LaunchedEffect(Unit) {
-        val myUserHandle = viewModel.getMyUserHandle()
-        ownerActionFullName = if (message.isMine) {
+        if (message.isMine) {
             viewModel.getMyFullName()
         } else {
             viewModel.getParticipantFullName(message.userHandle)
-        } ?: context.getString(R.string.unknown_name_label)
-        targetActionFullName = if (message.userHandle == message.handleOfAction) {
-            ownerActionFullName
-        } else {
-            if (message.handleOfAction == myUserHandle) {
-                viewModel.getMyFullName()
-            } else {
-                viewModel.getParticipantFullName(message.handleOfAction)
-            } ?: context.getString(R.string.unknown_name_label)
-        }
+        }?.let { ownerActionFullName = it }
+
+        when {
+            message.userHandle == message.handleOfAction -> ownerActionFullName
+            message.handleOfAction == viewModel.getMyUserHandle() -> viewModel.getMyFullName()
+            else -> viewModel.getParticipantFullName(message.handleOfAction)
+        }?.let { targetActionFullName = it }
     }
 
     AlterParticipantsMessageView(
@@ -73,7 +74,7 @@ fun AlterParticipantsMessageView(
  * @param modifier
  */
 @Composable
-fun AlterParticipantsMessageView(
+internal fun AlterParticipantsMessageView(
     message: AlterParticipantsMessage,
     ownerActionFullName: String?,
     targetActionFullName: String?,
