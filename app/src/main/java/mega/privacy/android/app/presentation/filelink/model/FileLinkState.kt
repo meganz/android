@@ -5,6 +5,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.PublicNodeException
@@ -30,6 +31,7 @@ import nz.mega.sdk.MegaNode
  * @property jobInProgressState     indicates if there are any job in progress that needs to be notified
  * @property openFile               State to handle file opening
  * @property downloadFile           State to download file
+ * @property downloadEvent          Event to download file with DownloadsWorker
  * @property errorMessage           State to show error message
  * @property overQuotaError         State to show over quota error
  * @property foreignNodeError       State to show foreign node error
@@ -52,6 +54,7 @@ data class FileLinkState(
     val jobInProgressState: FileLinkJobInProgressState? = FileLinkJobInProgressState.InitialLoading,
     val openFile: StateEventWithContent<Intent> = consumed(),
     val downloadFile: StateEventWithContent<MegaNode> = consumed(),
+    val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val errorMessage: StateEventWithContent<Int> = consumed(),
     val overQuotaError: StateEventWithContent<StorageState> = consumed(),
     val foreignNodeError: StateEvent = consumed,

@@ -16,21 +16,26 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -38,6 +43,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUse
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -56,6 +62,8 @@ class FileLinkViewModel @Inject constructor(
     private val httpServerStart: MegaApiHttpServerStartUseCase,
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
     private val getFileUrlByPublicLinkUseCase: GetFileUrlByPublicLinkUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -259,9 +267,21 @@ class FileLinkViewModel @Inject constructor(
      */
     fun handleSaveFile() {
         viewModelScope.launch {
-            MegaNode.unserialize(state.value.serializedData)?.let { publicNode ->
-                _state.update { it.copy(downloadFile = triggered(publicNode)) }
-            } ?: Timber.e("PublicNode is NULL")
+            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                val linkNodes = listOfNotNull(
+                    (_state.value.fileNode as? UnTypedNode)?.let {
+                        mapNodeToPublicLinkUseCase(it, null) as? TypedNode
+                    })
+                _state.update {
+                    it.copy(
+                        downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
+                    )
+                }
+            } else {
+                MegaNode.unserialize(state.value.serializedData)?.let { publicNode ->
+                    _state.update { it.copy(downloadFile = triggered(publicNode)) }
+                } ?: Timber.e("PublicNode is NULL")
+            }
         }
     }
 
@@ -405,7 +425,12 @@ class FileLinkViewModel @Inject constructor(
     /**
      * Reset and notify that downloadFile event is consumed
      */
-    fun resetDownloadFile() = _state.update { it.copy(downloadFile = consumed()) }
+    fun resetDownloadFile() = _state.update {
+        it.copy(
+            downloadFile = consumed(),
+            downloadEvent = consumed(),
+        )
+    }
 
     /**
      * Set and notify that errorMessage event is triggered

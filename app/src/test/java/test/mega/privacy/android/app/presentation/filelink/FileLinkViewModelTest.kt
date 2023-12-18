@@ -2,9 +2,9 @@ package test.mega.privacy.android.app.presentation.filelink
 
 import android.content.Intent
 import android.net.Uri
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
@@ -13,15 +13,18 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -29,18 +32,22 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUse
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import nz.mega.sdk.MegaNode
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TestRule
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FileLinkViewModelTest {
 
     private lateinit var underTest: FileLinkViewModel
@@ -53,6 +60,9 @@ class FileLinkViewModelTest {
     private val httpServerStart = mock<MegaApiHttpServerStartUseCase>()
     private val httpServerIsRunning = mock<MegaApiHttpServerIsRunningUseCase>()
     private val getFileUrlByPublicLinkUseCase = mock<GetFileUrlByPublicLinkUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase>()
+
 
     private val url = "https://mega.co.nz/abc"
     private val filePreviewPath = "data/cache/xyz.jpg"
@@ -61,18 +71,32 @@ class FileLinkViewModelTest {
     private val serializedString = "serializedString"
     private val parentNodeHandle = 123L
 
-    @get:Rule
-    var rule: TestRule = InstantTaskExecutorRule()
-
-    @Before
+    @BeforeAll
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        initViewModel()
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            isConnectedToInternetUseCase,
+            hasCredentials,
+            rootNodeExistsUseCase,
+            getPublicNodeUseCase,
+            copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase,
+            httpServerStart,
+            httpServerIsRunning,
+            getFileUrlByPublicLinkUseCase,
+            getFeatureFlagValueUseCase,
+            mapNodeToPublicLinkUseCase
+        )
+        initViewModel()
     }
 
     private fun initViewModel() {
@@ -86,6 +110,8 @@ class FileLinkViewModelTest {
             httpServerStart = httpServerStart,
             httpServerIsRunning = httpServerIsRunning,
             getFileUrlByPublicLinkUseCase = getFileUrlByPublicLinkUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            mapNodeToPublicLinkUseCase = mapNodeToPublicLinkUseCase,
         )
     }
 
@@ -140,13 +166,7 @@ class FileLinkViewModelTest {
 
     @Test
     fun `test that on getting valid public node correct values are set`() = runTest {
-        val publicNode = mock<TypedFileNode> {
-            on { this.previewPath }.thenReturn(filePreviewPath)
-            on { this.name }.thenReturn(title)
-            on { this.size }.thenReturn(fileSize)
-            on { this.serializedData }.thenReturn(serializedString)
-        }
-
+        val publicNode = mockFileNode()
         whenever(getPublicNodeUseCase(any())).thenReturn(publicNode)
         underTest.state.test {
             underTest.getPublicNode(url)
@@ -369,4 +389,30 @@ class FileLinkViewModelTest {
             assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
         }
     }
+
+    @Test
+    fun `test that downloadEvent is updated to trigger event when handle save file and download worker feature flag is true`() =
+        runTest {
+            val fileNode = mockFileNode()
+            val publicNode = mock<PublicLinkFile>()
+            whenever(getPublicNodeUseCase(any())).thenReturn(fileNode)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
+            whenever(mapNodeToPublicLinkUseCase(any(), anyOrNull())).thenReturn(publicNode)
+            underTest.state.test {
+                underTest.getPublicNode(url)
+                underTest.handleSaveFile()
+                val result = expectMostRecentItem()
+                assertThat(result.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((result.downloadEvent as StateEventWithContentTriggered).content.nodes)
+                    .containsExactly(publicNode)
+            }
+        }
+
+    private fun mockFileNode() =
+        mock<TypedFileNode> {
+            on { this.previewPath }.thenReturn(filePreviewPath)
+            on { this.name }.thenReturn(title)
+            on { this.size }.thenReturn(fileSize)
+            on { this.serializedData }.thenReturn(serializedString)
+        }
 }

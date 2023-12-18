@@ -79,6 +79,8 @@ fun ScaffoldWithCollapsibleHeader(
     header: @Composable BoxScope.() -> Unit,
     modifier: Modifier = Modifier,
     headerIncludingSystemBar: @Composable (BoxScope.() -> Unit)? = null,
+    bottomBar: @Composable () -> Unit = {},
+    floatingActionButton: @Composable () -> Unit = {},
     titleDisplacementFactor: Float = 0.5f,
     headerBelowTopBar: Boolean = false,
     snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
@@ -252,6 +254,8 @@ fun ScaffoldWithCollapsibleHeader(
                     topBar()
                 }
             },
+            bottomBar = bottomBar,
+            floatingActionButton = floatingActionButton,
             snackbarHost = snackbarHost,
         ) { innerPadding ->
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {

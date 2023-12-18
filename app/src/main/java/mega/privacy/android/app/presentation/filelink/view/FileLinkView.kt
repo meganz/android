@@ -11,13 +11,10 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
@@ -25,7 +22,6 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -47,7 +43,6 @@ import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
@@ -57,6 +52,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * View to render the File Link Screen, including toolbar, content, etc.
@@ -68,6 +64,7 @@ internal const val SAVE_BUTTON_TAG = "file_link_view:button_save"
 @Composable
 internal fun FileLinkView(
     viewState: FileLinkState,
+    snackBarHostState: SnackbarHostState,
     transferState: TransferManagementUiState,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
@@ -85,7 +82,6 @@ internal fun FileLinkView(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val snackBarHostState = remember { SnackbarHostState() }
     val showQuotaExceededDialog = remember { mutableStateOf<StorageState?>(null) }
     val showForeignNodeErrorDialog = remember { mutableStateOf(false) }
 
@@ -104,78 +100,77 @@ internal fun FileLinkView(
         showForeignNodeErrorDialog.value = true
     }
 
-    Box(modifier = modifier.navigationBarsPadding().fillMaxSize()) {
-        ScaffoldWithCollapsibleHeader(
-            topBar = {
-                FileLinkTopBar(
-                    title = viewState.title,
-                    onBackPressed = onBackPressed,
-                    onShareClicked = onShareClicked,
-                )
-            },
-            header = {
-                FileInfoHeader(
-                    title = viewState.title,
-                    iconResource = viewState.iconResource,
-                    accessPermissionDescription = null,
-                )
-            },
-            headerIncludingSystemBar = viewState.previewPath
-                ?.let { previewUri ->
-                    {
-                        PreviewWithShadow(
-                            previewUri = previewUri,
-                        )
-                    }
-                },
-            snackbarHost = {
-                SnackbarHost(hostState = snackBarHostState) { data ->
-                    MegaSnackbar(snackbarData = data)
+    ScaffoldWithCollapsibleHeader(
+        topBar = {
+            FileLinkTopBar(
+                title = viewState.title,
+                onBackPressed = onBackPressed,
+                onShareClicked = onShareClicked,
+            )
+        },
+        header = {
+            FileInfoHeader(
+                title = viewState.title,
+                iconResource = viewState.iconResource,
+                accessPermissionDescription = null,
+            )
+        },
+        headerIncludingSystemBar = viewState.previewPath
+            ?.let { previewUri ->
+                {
+                    PreviewWithShadow(
+                        previewUri = previewUri,
+                    )
                 }
             },
-        ) {
-            FileLinkContent(
-                viewState = viewState,
-                onPreviewClick = onPreviewClick,
-            )
-        }
-
-        Column(modifier = Modifier.align(Alignment.BottomEnd)) {
-            ImportDownloadView(
-                Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .background(MaterialTheme.colors.grey_020_grey_700),
-                hasDbCredentials = viewState.hasDbCredentials,
-                onImportClicked = onImportClicked,
-                onSaveToDeviceClicked = onSaveToDeviceClicked
-            )
-            if (adsUiState.showAdsView) {
-                AdsBannerView(
-                    uiState = adsUiState,
-                    onAdClicked = onAdClicked,
-                    onAdsWebpageLoaded = {},
-                    onAdDismissed = onAdDismissed
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState) { data ->
+                MegaSnackbar(snackbarData = data)
+            }
+        },
+        bottomBar = {
+            Column {
+                ImportDownloadView(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .background(MaterialTheme.colors.grey_020_grey_700),
+                    hasDbCredentials = viewState.hasDbCredentials,
+                    onImportClicked = onImportClicked,
+                    onSaveToDeviceClicked = onSaveToDeviceClicked
+                )
+                if (adsUiState.showAdsView) {
+                    AdsBannerView(
+                        uiState = adsUiState,
+                        onAdClicked = onAdClicked,
+                        onAdsWebpageLoaded = {},
+                        onAdDismissed = onAdDismissed
+                    )
+                }
+            }
+        },
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = transferState.widgetVisible,
+                enter = scaleIn(animationSpecs, initialScale = animationScale) +
+                        fadeIn(animationSpecs),
+                exit = scaleOut(animationSpecs, targetScale = animationScale) +
+                        fadeOut(animationSpecs),
+            ) {
+                TransfersWidgetView(
+                    transfersData = transferState.transfersInfo,
+                    onClick = onTransferWidgetClick,
                 )
             }
-        }
-
-        AnimatedVisibility(
-            visible = transferState.widgetVisible,
-            enter = scaleIn(animationSpecs, initialScale = animationScale) +
-                    fadeIn(animationSpecs),
-            exit = scaleOut(animationSpecs, targetScale = animationScale) +
-                    fadeOut(animationSpecs),
-            modifier = Modifier
-                .padding(bottom = 48.dp, end = 8.dp)
-                .align(Alignment.BottomEnd)
-        ) {
-            TransfersWidgetView(
-                transfersData = transferState.transfersInfo,
-                onClick = onTransferWidgetClick,
-            )
-        }
+        },
+        modifier = modifier,
+    ) {
+        FileLinkContent(
+            viewState = viewState,
+            onPreviewClick = onPreviewClick,
+        )
     }
+
     viewState.jobInProgressState?.progressMessage?.let {
         LoadingDialog(text = stringResource(id = it))
     }
@@ -279,6 +274,7 @@ private fun PreviewFileLinkView() {
             FileLinkState(hasDbCredentials = true, title = "Title", sizeInBytes = 10000L)
         FileLinkView(
             viewState = viewState,
+            snackBarHostState = remember { SnackbarHostState() },
             transferState = TransferManagementUiState(),
             onBackPressed = {},
             onShareClicked = {},

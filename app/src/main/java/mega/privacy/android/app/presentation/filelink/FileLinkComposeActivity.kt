@@ -10,7 +10,9 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -38,14 +40,15 @@ import mega.privacy.android.app.presentation.filelink.view.FileLinkView
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadTransferComponent
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -112,9 +115,11 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                 action = ::downloadFile
             )
 
+            val snackBarHostState = remember { SnackbarHostState() }
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 FileLinkView(
                     viewState = uiState,
+                    snackBarHostState = snackBarHostState,
                     transferState = transferState,
                     onBackPressed = { onBackPressedDispatcher.onBackPressed() },
                     onShareClicked = ::onShareClicked,
@@ -141,6 +146,11 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                         adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
                     },
                     onAdDismissed = adsViewModel::onAdConsumed
+                )
+                StartDownloadTransferComponent(
+                    event = uiState.downloadEvent,
+                    onConsumeEvent = viewModel::resetDownloadFile,
+                    snackBarHostState = snackBarHostState
                 )
             }
         }
