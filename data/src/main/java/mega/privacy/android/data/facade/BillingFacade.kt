@@ -105,9 +105,8 @@ internal class BillingFacade @Inject constructor(
 
     private val billingClientRef: AtomicReference<BillingClient?> = AtomicReference(null)
 
-    private val obfuscatedAccountId by lazy {
-        verifyPurchaseGateway.generateObfuscatedAccountId()
-    }
+    private val obfuscatedAccountId: String?
+        get() = verifyPurchaseGateway.generateObfuscatedAccountId()
 
     private suspend fun disconnect() {
         mutex.withLock {
@@ -182,8 +181,12 @@ internal class BillingFacade @Inject constructor(
             ) {
                 val client = ensureConnect()
                 val validPurchases = processPurchase(client, purchases.orEmpty())
-                billingEvent.emit(BillingEvent.OnPurchaseUpdate(validPurchases,
-                    activeSubscription.get()))
+                billingEvent.emit(
+                    BillingEvent.OnPurchaseUpdate(
+                        validPurchases,
+                        activeSubscription.get()
+                    )
+                )
             } else {
                 Timber.w("onPurchasesUpdated failed, with result code: %s", result.responseCode)
             }
@@ -206,8 +209,10 @@ internal class BillingFacade @Inject constructor(
 
         val result = client.queryProductDetails(params)
         if (result.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-            Timber.w("Failed to get SkuDetails, error code is %s",
-                result.billingResult.responseCode)
+            Timber.w(
+                "Failed to get SkuDetails, error code is %s",
+                result.billingResult.responseCode
+            )
         }
         val productsDetails = result.productDetailsList.orEmpty()
         productDetailsListCache.set(productsDetails)
@@ -225,11 +230,13 @@ internal class BillingFacade @Inject constructor(
         ensureActive()
         val inAppPurchaseResult = client.queryPurchasesAsync(
             QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP)
-                .build())
+                .build()
+        )
         val purchases = if (areSubscriptionsSupported(client)) {
             val subscriptionPurchaseResult = client.queryPurchasesAsync(
                 QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS)
-                    .build())
+                    .build()
+            )
             inAppPurchaseResult.purchasesList + subscriptionPurchaseResult.purchasesList
         } else {
             inAppPurchaseResult.purchasesList
@@ -279,8 +286,10 @@ internal class BillingFacade @Inject constructor(
     private fun areSubscriptionsSupported(client: BillingClient): Boolean {
         val responseCode: Int =
             client.isFeatureSupported(BillingClient.FeatureType.SUBSCRIPTIONS).responseCode
-        Timber.d("areSubscriptionsSupported %s",
-            responseCode == BillingClient.BillingResponseCode.OK)
+        Timber.d(
+            "areSubscriptionsSupported %s",
+            responseCode == BillingClient.BillingResponseCode.OK
+        )
         return responseCode == BillingClient.BillingResponseCode.OK
     }
 
@@ -305,10 +314,14 @@ internal class BillingFacade @Inject constructor(
                                 continuation.resumeWith(Result.success(newClient))
                         } else {
                             if (continuation.isActive)
-                                continuation.resumeWith(Result.failure(
-                                    ConnectBillingServiceException(
-                                        result.responseCode,
-                                        result.debugMessage)))
+                                continuation.resumeWith(
+                                    Result.failure(
+                                        ConnectBillingServiceException(
+                                            result.responseCode,
+                                            result.debugMessage
+                                        )
+                                    )
+                                )
                         }
                     }
                 }
@@ -319,8 +332,10 @@ internal class BillingFacade @Inject constructor(
 
     private fun verifyValidSignature(signedData: String, signature: String): Boolean {
         return runCatching {
-            verifyPurchaseGateway.verifyPurchase(signedData,
-                signature)
+            verifyPurchaseGateway.verifyPurchase(
+                signedData,
+                signature
+            )
         }.getOrElse { false }
     }
 
