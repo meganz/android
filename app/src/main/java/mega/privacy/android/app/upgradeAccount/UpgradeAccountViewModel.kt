@@ -167,8 +167,6 @@ class UpgradeAccountViewModel @Inject constructor(
                         )
                     )
                 }
-            } ?: run {
-                upgradeClick.value = upgradeType
             }
         }
     }

@@ -107,13 +107,15 @@ internal const val BUY_BUTTON_TAG = "upgrade_account_screen:button_buy_pro_plan_
 fun UpgradeAccountView(
     modifier: Modifier = Modifier,
     state: UpgradeAccountState,
-    onBackPressed: () -> Unit = {},
-    onBuyClicked: () -> Unit = {},
-    onTOSClicked: () -> Unit = {},
-    onPricingPageClicked: (String) -> Unit = {},
-    onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit = {},
-    onChoosingPlanType: (chosenPlan: AccountType) -> Unit = {},
-    hideBillingWarning: () -> Unit = {},
+    onBackPressed: () -> Unit,
+    onBuyClicked: () -> Unit,
+    onTOSClicked: () -> Unit,
+    onPricingPageClicked: (String) -> Unit,
+    onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit,
+    onChoosingPlanType: (chosenPlan: AccountType) -> Unit,
+    hideBillingWarning: () -> Unit,
+    onDialogConfirmButtonClicked: (Int) -> Unit,
+    onDialogDismissButtonClicked: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -275,6 +277,14 @@ fun UpgradeAccountView(
                 )
             }
         }
+    }
+    if (state.showBuyNewSubscriptionDialog) {
+        BuyNewSubscriptionDialog(
+            upgradeTypeInt = state.currentPayment.upgradeType,
+            paymentMethod = state.currentPayment.currentPayment ?: return,
+            onDialogPositiveButtonClicked = onDialogConfirmButtonClicked,
+            onDialogDismissButtonClicked = { onDialogDismissButtonClicked() }
+        )
     }
 }
 
@@ -594,7 +604,16 @@ fun PreviewUpgradeAccountView(
 ) {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         UpgradeAccountView(
-            state = state
+            state = state,
+            onBackPressed = {},
+            onBuyClicked = {},
+            onTOSClicked = {},
+            onPricingPageClicked = {},
+            onChoosingMonthlyYearlyPlan = {},
+            onChoosingPlanType = {},
+            hideBillingWarning = {},
+            onDialogConfirmButtonClicked = {},
+            onDialogDismissButtonClicked = {},
         )
     }
 }

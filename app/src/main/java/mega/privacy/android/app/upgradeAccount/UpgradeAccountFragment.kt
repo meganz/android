@@ -23,6 +23,7 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
+import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.upgradeAccount.payment.PaymentActivity
 import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -97,13 +98,11 @@ class UpgradeAccountFragment : Fragment() {
                 state = uiState,
                 onBackPressed = upgradeAccountActivity.onBackPressedDispatcher::onBackPressed,
                 onBuyClicked = {
-                    billingViewModel.startPurchase(
-                        upgradeAccountActivity,
-                        upgradeAccountViewModel.getProductId(
-                            uiState.isMonthlySelected,
-                            convertAccountTypeToInt(uiState.chosenPlan)
-                        )
-                    )
+                    val chosenPlan = convertAccountTypeToInt(uiState.chosenPlan)
+                    upgradeAccountViewModel.currentPaymentCheck(chosenPlan)
+                    if (uiState.currentPayment == UpgradePayment()) {
+                        startPurchase(uiState.isMonthlySelected, chosenPlan)
+                    }
                 },
                 onTOSClicked = this::redirectToTOSPage,
                 onPricingPageClicked = this::redirectToPricingPage,
@@ -119,6 +118,20 @@ class UpgradeAccountFragment : Fragment() {
                     }
                 },
                 hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
+                onDialogConfirmButtonClicked = {
+                    upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
+                        showBuyNewSubscriptionDialog = false
+                    )
+                    startPurchase(
+                        uiState.isMonthlySelected,
+                        convertAccountTypeToInt(uiState.chosenPlan)
+                    )
+                },
+                onDialogDismissButtonClicked = {
+                    upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
+                        showBuyNewSubscriptionDialog = false
+                    )
+                },
             )
         }
     }
@@ -155,6 +168,19 @@ class UpgradeAccountFragment : Fragment() {
             requireContext(),
             megaApi.myEmail,
             accountTypeInt
+        )
+    }
+
+    private fun startPurchase(
+        isMonthlySelected: Boolean,
+        chosenPlan: Int,
+    ) {
+        billingViewModel.startPurchase(
+            upgradeAccountActivity,
+            upgradeAccountViewModel.getProductId(
+                isMonthlySelected,
+                chosenPlan
+            )
         )
     }
 

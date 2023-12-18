@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
@@ -22,6 +23,7 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceString
 import mega.privacy.android.app.upgradeAccount.view.BILLING_WARNING_CLOSE_BUTTON_TAG
 import mega.privacy.android.app.upgradeAccount.view.BILLING_WARNING_TAG
 import mega.privacy.android.app.upgradeAccount.view.BUY_BUTTON_TAG
+import mega.privacy.android.app.upgradeAccount.view.BuyNewSubscriptionDialog
 import mega.privacy.android.app.upgradeAccount.view.EMPTY_CARD_TAG
 import mega.privacy.android.app.upgradeAccount.view.PRICING_PAGE_LINK_TAG
 import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_CARD_TAG
@@ -35,12 +37,14 @@ import mega.privacy.android.app.upgradeAccount.view.components.YEARLY_CHECK_ICON
 import mega.privacy.android.app.upgradeAccount.view.components.YEARLY_TAB_TAG
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
+import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class UpgradeAccountViewTest {
@@ -127,6 +131,15 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag("$UPGRADE_ACCOUNT_SCREEN_TAG$MONTHLY_TAB_TAG").performClick()
@@ -152,6 +165,15 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag("$UPGRADE_ACCOUNT_SCREEN_TAG$YEARLY_TAB_TAG").performClick()
@@ -176,6 +198,15 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag(
@@ -194,6 +225,15 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag(
@@ -212,6 +252,15 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag("$BUY_BUTTON_TAG${UIAccountType.PRO_II.ordinal}")
@@ -227,6 +276,15 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag("$PRO_PLAN_CARD_TAG${UIAccountType.PRO_LITE.ordinal}")
@@ -247,6 +305,14 @@ class UpgradeAccountViewTest {
                     isPaymentMethodAvailable = true
                 ),
                 onBuyClicked = onBuyClicked,
+                onBackPressed = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag("$PRO_PLAN_CARD_TAG${UIAccountType.PRO_LITE.ordinal}")
@@ -267,6 +333,15 @@ class UpgradeAccountViewTest {
                     showBillingWarning = true,
                     isPaymentMethodAvailable = false
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag(BILLING_WARNING_TAG).assertIsDisplayed()
@@ -283,6 +358,14 @@ class UpgradeAccountViewTest {
                     isPaymentMethodAvailable = false
                 ),
                 hideBillingWarning = hideBillingWarning,
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag(BILLING_WARNING_CLOSE_BUTTON_TAG).performClick()
@@ -298,6 +381,15 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag(PRICING_PAGE_LINK_TAG).assertExists()
@@ -312,6 +404,15 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag(PRICING_PAGE_LINK_TAG).assertDoesNotExist()
@@ -327,6 +428,15 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onAllNodesWithTag(EMPTY_CARD_TAG).assertCountEquals(4)
@@ -342,6 +452,15 @@ class UpgradeAccountViewTest {
                     isPaymentMethodAvailable = true,
                     userSubscription = UserSubscription.MONTHLY_SUBSCRIBED
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag("$UPGRADE_ACCOUNT_SCREEN_TAG$YEARLY_TAB_TAG").performClick()
@@ -364,6 +483,15 @@ class UpgradeAccountViewTest {
                     isPaymentMethodAvailable = true,
                     userSubscription = UserSubscription.MONTHLY_SUBSCRIBED
                 ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
             )
         }
         composeRule.onNodeWithTag(
@@ -378,6 +506,42 @@ class UpgradeAccountViewTest {
             .assert(hasAnyChild(hasTestTag("$PRO_PLAN_CARD_TAG$CURRENT_PLAN_TAG")))
         composeRule.onNodeWithTag("$UPGRADE_ACCOUNT_SCREEN_TAG$YEARLY_TAB_TAG").performClick()
         composeRule.onNodeWithTag("$PRO_PLAN_CARD_TAG$CURRENT_PLAN_TAG").assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that clicking the positive dialog button calls the correct function`() {
+        val onDialogPositiveButtonClicked = org.mockito.kotlin.mock<(Int) -> Unit>()
+
+        composeRule.setContent {
+            BuyNewSubscriptionDialog(
+                upgradeTypeInt = 2,
+                paymentMethod = PaymentMethod.GOOGLE_WALLET,
+                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
+                onDialogDismissButtonClicked = org.mockito.kotlin.mock(),
+            )
+        }
+
+        composeRule.onNodeWithText(R.string.button_buy_new_subscription).performClick()
+
+        org.mockito.kotlin.verify(onDialogPositiveButtonClicked).invoke(2)
+    }
+
+    @Test
+    fun `test that clicking the dismiss dialog button calls the correct function`() {
+        val onDialogDismissButtonClicked = org.mockito.kotlin.mock<() -> Unit>()
+
+        composeRule.setContent {
+            BuyNewSubscriptionDialog(
+                upgradeTypeInt = 2,
+                paymentMethod = PaymentMethod.GOOGLE_WALLET,
+                onDialogPositiveButtonClicked = org.mockito.kotlin.mock(),
+                onDialogDismissButtonClicked = onDialogDismissButtonClicked,
+            )
+        }
+
+        composeRule.onNodeWithText(R.string.general_dismiss).performClick()
+
+        org.mockito.kotlin.verify(onDialogDismissButtonClicked).invoke()
     }
 
     private fun getUpgradeAccountState(
