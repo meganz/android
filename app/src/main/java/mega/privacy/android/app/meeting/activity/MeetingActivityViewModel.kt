@@ -524,7 +524,11 @@ class MeetingActivityViewModel @Inject constructor(
                                     state.copy(
                                         isSessionOnRecording = session.isRecording,
                                         showRecordingConsentDialog = if (!state.isRecordingConsentAccepted) session.isRecording else false,
-                                        startOrStopRecordingParticipantName = state.usersInCall.find { participant -> participant.peerId == session.peerId }?.name.orEmpty()
+                                        startOrStopRecordingParticipantName = if (state.callType == CallType.OneToOne) {
+                                            state.title
+                                        } else {
+                                            state.usersInCall.find { participant -> participant.peerId == session.peerId }?.name.orEmpty()
+                                        }
                                     )
                                 }
                             }
