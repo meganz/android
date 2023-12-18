@@ -44,6 +44,7 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     private var analyticsCookiesPreference: SwitchPreferenceCompat? = null
     private var adsCookiesPreference: SwitchPreferenceCompat? = null
     private var policiesPreference: TwoButtonsPreference? = null
+    private var isAdsFeatureEnabled = false
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_cookie)
@@ -57,7 +58,7 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         checkForInAppAdvertisement()
         return super.onCreateView(inflater, container, savedInstanceState)
@@ -73,6 +74,7 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         lifecycleScope.launch {
             runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement).let {
+                    isAdsFeatureEnabled = it
                     adsCookiesPreference?.isVisible = it
                 }
             }.onFailure {
@@ -114,8 +116,12 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     private fun showCookies(cookies: Set<CookieType>) {
         analyticsCookiesPreference?.isChecked = cookies.contains(ANALYTICS) == true
         adsCookiesPreference?.isChecked = cookies.contains(ADVERTISEMENT) == true
-        acceptCookiesPreference?.isChecked = analyticsCookiesPreference?.isChecked ?: false ||
-                adsCookiesPreference?.isChecked ?: false
+        if (isAdsFeatureEnabled) {
+            acceptCookiesPreference?.isChecked = analyticsCookiesPreference?.isChecked ?: false ||
+                    adsCookiesPreference?.isChecked ?: false
+        } else {
+            acceptCookiesPreference?.isChecked = analyticsCookiesPreference?.isChecked ?: false
+        }
     }
 
     /**
