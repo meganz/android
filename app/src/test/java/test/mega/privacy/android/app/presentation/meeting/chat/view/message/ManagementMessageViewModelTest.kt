@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.meeting.chat.view.message.AlterParticipantsMessageViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.message.ManagementMessageViewModel
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFullNameUseCase
@@ -22,8 +22,8 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class AlterParticipantsMessageViewModelTest {
-    private lateinit var underTest: AlterParticipantsMessageViewModel
+internal class ManagementMessageViewModelTest {
+    private lateinit var underTest: ManagementMessageViewModel
     private val getParticipantFullNameUseCase: GetParticipantFullNameUseCase = mock()
     private val getMyFullNameUseCase: GetMyFullNameUseCase = mock()
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase = mock()
@@ -31,7 +31,7 @@ internal class AlterParticipantsMessageViewModelTest {
     @BeforeAll
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = AlterParticipantsMessageViewModel(
+        underTest = ManagementMessageViewModel(
             getParticipantFullNameUseCase,
             getMyFullNameUseCase,
             getMyUserHandleUseCase,

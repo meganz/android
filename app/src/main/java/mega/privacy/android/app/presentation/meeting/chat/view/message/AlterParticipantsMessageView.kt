@@ -33,7 +33,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 fun AlterParticipantsMessageView(
     message: AlterParticipantsMessage,
     modifier: Modifier = Modifier,
-    viewModel: AlterParticipantsMessageViewModel = hiltViewModel(),
+    viewModel: ManagementMessageViewModel = hiltViewModel(),
 ) {
     var ownerActionFullName by remember { mutableStateOf("") }
     var targetActionFullName by remember { mutableStateOf("") }

@@ -13,7 +13,7 @@ import javax.inject.Inject
  *
  */
 @HiltViewModel
-class AlterParticipantsMessageViewModel @Inject constructor(
+class ManagementMessageViewModel @Inject constructor(
     private val getParticipantFullNameUseCase: GetParticipantFullNameUseCase,
     private val getMyFullNameUseCase: GetMyFullNameUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,

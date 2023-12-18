@@ -11,6 +11,7 @@ internal class CreateTitleChangeMessageUseCase @Inject constructor() : CreateTyp
         msgId = message.msgId,
         time = message.timestamp,
         isMine = isMine,
-        userHandle = message.userHandle
+        userHandle = message.userHandle,
+        content = message.content.orEmpty()
     )
 }
