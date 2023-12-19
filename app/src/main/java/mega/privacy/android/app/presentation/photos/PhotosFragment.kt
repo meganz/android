@@ -18,7 +18,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -52,7 +51,6 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActionModeCallback
@@ -61,7 +59,6 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.compose.main.PhotosScreen
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
@@ -625,7 +622,7 @@ class PhotosFragment : Fragment() {
             state.currentUIAlbum ?: state.findUIAlbum(AlbumId(albumId))
         } ?: return
 
-        openAlbum(uiAlbum, resetMessage = false)
+        openAlbum(uiAlbum)
     }
 
 
@@ -754,26 +751,13 @@ class PhotosFragment : Fragment() {
         handleMenuIcons(!timelineViewModel.state.value.enableCameraUploadPageShowing)
     }
 
-    fun openAlbum(album: UIAlbum, resetMessage: Boolean = true) {
-        resetAlbumContentState(album = album, resetMessage = resetMessage)
+    fun openAlbum(album: UIAlbum) {
         viewLifecycleOwner.lifecycleScope.launch {
             Handler(Looper.getMainLooper()).post {
-                val fragment = if (!albumsViewModel.isReworkAlbum) {
-                    AlbumDynamicContentFragment.getInstance(doesAccountHavePhotos())
-                } else {
-                    Toast.makeText(requireContext(), "Rework album", Toast.LENGTH_SHORT).show()
-                    AlbumContentFragment.getInstance(album.id)
-                }
+                val fragment = AlbumContentFragment.getInstance(album.id)
                 managerActivity.skipToAlbumContentFragment(fragment)
             }
         }
-    }
-
-    private fun resetAlbumContentState(album: UIAlbum, resetMessage: Boolean = true) {
-        albumsViewModel.setCurrentAlbum(album.id)
-        albumsViewModel.setCurrentSort(Sort.DEFAULT)
-        albumsViewModel.setCurrentMediaType(FilterMediaType.DEFAULT)
-        if (resetMessage) albumsViewModel.setSnackBarMessage("")
     }
 
     fun openAlbumGetLinkScreen() {

@@ -9,7 +9,6 @@ data class AlbumContentState(
     val isLoading: Boolean = true,
     val isAddingPhotos: Boolean = false,
     val totalAddedPhotos: Int = 0,
-    /** A temporary field to support compatibility between view and compose architecture. */
     val isDeleteAlbum: Boolean = false,
     val isRemovingPhotos: Boolean = false,
     val totalRemovedPhotos: Int = 0,

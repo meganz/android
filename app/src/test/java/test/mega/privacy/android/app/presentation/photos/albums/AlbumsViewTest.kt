@@ -34,8 +34,6 @@ class AlbumsViewTest {
     @get:Rule
     var ruleChain: RuleChain = RuleChain.outerRule(AnalyticsTestRule()).around(composeRule)
 
-    private val isUserAlbumsEnabled = { true }
-
     @Test
     fun `test that clicking create album fab opens the dialog`() {
         val onDialogPositiveButtonClicked = mock<(String) -> Unit>()
@@ -50,7 +48,6 @@ class AlbumsViewTest {
                 downloadPhoto = mock(),
                 setShowCreateAlbumDialog = setShowCreateAlbumDialog,
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
-                isUserAlbumsEnabled = isUserAlbumsEnabled,
             )
         }
 
@@ -77,7 +74,6 @@ class AlbumsViewTest {
                 downloadPhoto = mock(),
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 setDialogInputPlaceholder = setDialogInputPlaceholder,
-                isUserAlbumsEnabled = isUserAlbumsEnabled,
             )
         }
 
@@ -99,7 +95,6 @@ class AlbumsViewTest {
                 downloadPhoto = mock(),
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 setDialogInputPlaceholder = setDialogInputPlaceholder,
-                isUserAlbumsEnabled = isUserAlbumsEnabled,
                 allPhotos = emptyList(),
                 openPhotosSelectionActivity = openPhotosSelectionActivity,
             )
@@ -125,7 +120,6 @@ class AlbumsViewTest {
                 downloadPhoto = mock(),
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 setDialogInputPlaceholder = setDialogInputPlaceholder,
-                isUserAlbumsEnabled = isUserAlbumsEnabled,
                 allPhotos = listOf<Photo.Image>(mock()),
                 openPhotosSelectionActivity = openPhotosSelectionActivity,
             )

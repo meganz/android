@@ -27,9 +27,3 @@ data class UIAlbum(
     val photos: List<Photo>,
     val isLoadingDone: Boolean = false,
 )
-
-/**
- * Get Album Photos
- */
-fun List<UIAlbum>.getAlbumPhotos(id: Album): List<Photo> =
-    this.first { it.id == id }.photos

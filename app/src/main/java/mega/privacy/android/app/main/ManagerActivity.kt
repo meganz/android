@@ -196,7 +196,6 @@ import mega.privacy.android.app.presentation.offline.OfflineFragment
 import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineFragmentCompose
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
-import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
 import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
@@ -3010,11 +3009,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             DrawerItem.PHOTOS -> {
                 supportActionBar?.subtitle = null
                 if (isInAlbumContent) {
-                    if (albumContentFragment is AlbumDynamicContentFragment) {
-                        val title = (albumContentFragment as? AlbumDynamicContentFragment)
-                            ?.getCurrentAlbumTitle()
-                        supportActionBar?.setTitle(title)
-                    } else if (albumContentFragment is AlbumContentFragment) {
+                    if (albumContentFragment is AlbumContentFragment) {
                         val title = (albumContentFragment as? AlbumContentFragment)
                             ?.getCurrentAlbumTitle()
                         supportActionBar?.setTitle(title)

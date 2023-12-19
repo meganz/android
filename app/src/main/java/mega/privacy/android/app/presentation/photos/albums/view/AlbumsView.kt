@@ -119,16 +119,11 @@ fun AlbumsView(
     onRemoveLinkDialogConfirmClick: () -> Unit = {},
     onRemoveLinkDialogCancelClick: () -> Unit = {},
     resetRemovedLinksCount: () -> Unit = {},
-    isUserAlbumsEnabled: suspend () -> Boolean,
     isAlbumSharingEnabled: suspend () -> Boolean = { false },
 ) {
     val isLight = MaterialTheme.colors.isLight
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val grids = 3.takeIf { isPortrait } ?: 4
-
-    val displayFAB by produceState(initialValue = false) {
-        value = isUserAlbumsEnabled()
-    }
 
     val displayLinkIcon by produceState(initialValue = false) {
         value = isAlbumSharingEnabled()
@@ -191,7 +186,7 @@ fun AlbumsView(
             )
         },
         floatingActionButton = {
-            if (displayFAB && albumsViewState.selectedAlbumIds.isEmpty()) {
+            if (albumsViewState.selectedAlbumIds.isEmpty()) {
                 val placeholderText =
                     stringResource(id = R.string.photos_album_creation_dialog_input_placeholder)
                 val scrollNotInProgress by remember {
@@ -383,7 +378,7 @@ fun AlbumsView(
         }
     }
 
-    if (displayFAB && albumsViewState.selectedAlbumIds.isEmpty()) {
+    if (albumsViewState.selectedAlbumIds.isEmpty()) {
         if (albumsViewState.showCreateAlbumDialog) {
             CreateNewAlbumDialog(
                 titleResID = R.string.photos_album_creation_dialog_title,

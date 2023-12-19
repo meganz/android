@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.photos.albums.albumcontent
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
@@ -20,9 +23,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -37,14 +42,8 @@ import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDi
 import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.albums.view.RemoveLinksConfirmationDialog
-import mega.privacy.android.app.presentation.photos.compose.albumcontent.AddFabButton
-import mega.privacy.android.app.presentation.photos.compose.albumcontent.Back
-import mega.privacy.android.app.presentation.photos.compose.albumcontent.FilterFabButton
-import mega.privacy.android.app.presentation.photos.compose.albumcontent.SnackBar
-import mega.privacy.android.app.presentation.photos.compose.albumcontent.applyFilter
-import mega.privacy.android.app.presentation.photos.compose.albumcontent.applySortBy
-import mega.privacy.android.app.presentation.photos.compose.albumcontent.isFilterable
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
+import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.timeline.view.AlbumContentSkeletonView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
@@ -52,19 +51,19 @@ import mega.privacy.android.app.presentation.photos.view.RemovePhotosFromAlbumDi
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.dark_grey
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.photos.Album.FavouriteAlbum
 import mega.privacy.android.domain.entity.photos.Album.GifAlbum
 import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun AlbumContentScreen(
     photoDownloaderViewModel: PhotoDownloaderViewModel,
@@ -266,12 +265,19 @@ internal fun AlbumContentScreen(
             }
 
             if (albumContentState.snackBarMessage.isNotEmpty()) {
-                SnackBar(
-                    message = albumContentState.snackBarMessage,
+                Snackbar(
                     modifier = Modifier
-                        .align(Alignment.CenterHorizontally),
-                    onResetMessage = { albumContentViewModel.setSnackBarMessage("") },
-                )
+                        .align(Alignment.CenterHorizontally)
+                        .padding(8.dp),
+                    backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
+                ) {
+                    Text(text = albumContentState.snackBarMessage)
+                }
+
+                LaunchedEffect(albumContentState.snackBarMessage) {
+                    delay(3000L)
+                    albumContentViewModel.setSnackBarMessage("")
+                }
             }
 
             val scrollNotInProgress by remember {
@@ -381,3 +387,87 @@ internal fun AlbumContentScreen(
         }
     }
 }
+
+@Composable
+private fun AddFabButton(
+    modifier: Modifier,
+    onNavigatePhotosSelection: () -> Unit,
+) {
+    FloatingActionButton(
+        onClick = onNavigatePhotosSelection,
+        modifier = modifier
+            .size(56.dp)
+    ) {
+        Icon(
+            painter = painterResource(
+                id = if (MaterialTheme.colors.isLight) {
+                    R.drawable.ic_add_white
+                } else {
+                    R.drawable.ic_add
+                }
+            ),
+            contentDescription = "Add",
+            tint = if (!MaterialTheme.colors.isLight) {
+                Color.Black
+            } else {
+                Color.White
+            }
+        )
+    }
+}
+
+@Composable
+private fun FilterFabButton(
+    modifier: Modifier,
+    onFilterClick: () -> Unit,
+) {
+    FloatingActionButton(
+        onClick = onFilterClick,
+        modifier = modifier
+            .size(40.dp),
+        backgroundColor = if (MaterialTheme.colors.isLight) {
+            Color.White
+        } else {
+            dark_grey
+        }
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_filter_light),
+            contentDescription = "Filter",
+            tint = if (MaterialTheme.colors.isLight) {
+                Color.Black
+            } else {
+                Color.White
+            }
+        )
+    }
+}
+
+@Composable
+private fun Back() {
+    val onBackPressedDispatcher =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    LaunchedEffect(key1 = true) {
+        onBackPressedDispatcher?.onBackPressed()
+    }
+}
+
+private fun List<Photo>.isFilterable(): Boolean {
+    val imageCount = this.count { it is Photo.Image }
+    val videoCount = this.size - imageCount
+    return imageCount > 0 && videoCount > 0
+}
+
+private fun List<Photo>.applyFilter(currentMediaType: FilterMediaType) =
+    when (currentMediaType) {
+        FilterMediaType.ALL_MEDIA -> this
+        FilterMediaType.IMAGES -> this.filterIsInstance<Photo.Image>()
+        FilterMediaType.VIDEOS -> this.filterIsInstance<Photo.Video>()
+    }
+
+private fun List<Photo>.applySortBy(currentSort: Sort) =
+    if (currentSort == Sort.NEWEST) {
+        this.sortedByDescending { it.modificationTime }
+    } else {
+        this.sortedBy { it.modificationTime }
+    }

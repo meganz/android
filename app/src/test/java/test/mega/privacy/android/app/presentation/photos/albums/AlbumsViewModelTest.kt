@@ -4,24 +4,16 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.usecase.GetNodeListByIds
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
-import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
-import mega.privacy.android.app.presentation.photos.albums.model.mapper.LegacyUIAlbumMapper
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
@@ -29,53 +21,38 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
-import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbums
-import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
-import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
-import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 @ExperimentalCoroutinesApi
 class AlbumsViewModelTest {
     private lateinit var underTest: AlbumsViewModel
 
     private val getDefaultAlbumPhotos = mock<GetDefaultAlbumPhotos>()
-    private val uiAlbumMapper = mock<LegacyUIAlbumMapper>()
-    private val newUiAlbumMapper = mock<UIAlbumMapper>()
+    private val uiAlbumMapper = UIAlbumMapper()
     private val getUserAlbums = mock<GetUserAlbums>()
     private val getAlbumPhotos = mock<GetAlbumPhotos>()
-    private val getFeatureFlagUseCase =
-        mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(true) }
     private val getDefaultAlbumsMapUseCase = mock<GetDefaultAlbumsMapUseCase>()
     private val getProscribedAlbumNamesUseCase = mock<GetProscribedAlbumNamesUseCase>()
-    private val removeFavouritesUseCase = mock<RemoveFavouritesUseCase>()
-    private val getNodeListByIds = mock<GetNodeListByIds>()
     private val createAlbumUseCase = mock<CreateAlbumUseCase>()
     private val removeAlbumsUseCase = mock<RemoveAlbumsUseCase>()
-    private val removePhotosFromAlbumUseCase = mock<RemovePhotosFromAlbumUseCase>()
-    private val updateAlbumNameUseCase = mock<UpdateAlbumNameUseCase>()
     private val disableExportAlbumsUseCase: DisableExportAlbumsUseCase = mock()
     private val proscribedStrings =
         listOf("My albums", "Shared albums", "Favourites", "RAW", "GIFs")
@@ -84,7 +61,6 @@ class AlbumsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf()))
-        runBlocking { whenever(getFeatureFlagUseCase(AppFeatures.ReworkAlbum)).thenReturn(false) }
 
         underTest = AlbumsViewModel(
             getDefaultAlbumPhotos = getDefaultAlbumPhotos,
@@ -92,15 +68,9 @@ class AlbumsViewModelTest {
             getUserAlbums = getUserAlbums,
             getAlbumPhotos = getAlbumPhotos,
             getProscribedAlbumNamesUseCase = getProscribedAlbumNamesUseCase,
-            uiAlbumMapper = newUiAlbumMapper,
-            legacyUIAlbumMapper = uiAlbumMapper,
-            getFeatureFlagValueUseCase = getFeatureFlagUseCase,
-            removeFavouritesUseCase = removeFavouritesUseCase,
-            getNodeListByIds = getNodeListByIds,
+            uiAlbumMapper = uiAlbumMapper,
             createAlbumUseCase = createAlbumUseCase,
             removeAlbumsUseCase = removeAlbumsUseCase,
-            removePhotosFromAlbumUseCase = removePhotosFromAlbumUseCase,
-            updateAlbumNameUseCase = updateAlbumNameUseCase,
             disableExportAlbumsUseCase = disableExportAlbumsUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             getNextDefaultAlbumNameUseCase = GetNextDefaultAlbumNameUseCase(),
@@ -138,42 +108,7 @@ class AlbumsViewModelTest {
                 Album.RawAlbum to { true },
             )
 
-            whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
-                UIAlbum(
-                    title = AlbumTitle.StringTitle("Favourite"),
-                    count = 0,
-                    imageCount = 0,
-                    videoCount = 0,
-                    coverPhoto = null,
-                    photos = emptyList(),
-                    id = Album.FavouriteAlbum,
-                )
-            )
-            whenever(uiAlbumMapper(any(), eq(Album.GifAlbum), any())).thenReturn(
-                UIAlbum(
-                    title = AlbumTitle.StringTitle("GIFs"),
-                    count = 0,
-                    imageCount = 0,
-                    videoCount = 0,
-                    coverPhoto = null,
-                    photos = emptyList(),
-                    id = Album.GifAlbum,
-                )
-            )
-            whenever(uiAlbumMapper(any(), eq(Album.RawAlbum), any())).thenReturn(
-                UIAlbum(
-                    title = AlbumTitle.StringTitle("RAW"),
-                    count = 0,
-                    imageCount = 0,
-                    videoCount = 0,
-                    coverPhoto = null,
-                    photos = emptyList(),
-                    id = Album.RawAlbum,
-                )
-            )
-
             whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-
             whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf(createImage())))
 
             underTest.state.drop(1).test {
@@ -189,31 +124,7 @@ class AlbumsViewModelTest {
             Album.RawAlbum to { false },
         )
 
-        whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
-            UIAlbum(
-                title = AlbumTitle.StringTitle("Favourites"),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = null,
-                photos = emptyList(),
-                id = Album.FavouriteAlbum,
-            )
-        )
-        whenever(uiAlbumMapper(any(), eq(Album.GifAlbum), any())).thenReturn(
-            UIAlbum(
-                title = AlbumTitle.StringTitle("GIFs"),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = null,
-                photos = emptyList(),
-                id = Album.GifAlbum,
-            )
-        )
-
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf(createImage())))
 
         underTest.state.drop(1).test {
@@ -230,20 +141,7 @@ class AlbumsViewModelTest {
             Album.RawAlbum to { false },
         )
 
-        whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
-            UIAlbum(
-                title = AlbumTitle.StringTitle("Favourites"),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = null,
-                photos = emptyList(),
-                id = Album.FavouriteAlbum,
-            )
-        )
-
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
         underTest.state.drop(1).test {
@@ -260,44 +158,7 @@ class AlbumsViewModelTest {
             Album.RawAlbum to { true },
         )
 
-        whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
-            UIAlbum(
-                title = AlbumTitle.StringTitle("Favourites"),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = null,
-                photos = emptyList(),
-                id = Album.FavouriteAlbum,
-            )
-        )
-        whenever(uiAlbumMapper(any(), eq(Album.GifAlbum), any())).thenReturn(
-            UIAlbum(
-                title = AlbumTitle.StringTitle("GIFs"),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = null,
-                photos = emptyList(),
-                id = Album.GifAlbum,
-            )
-        )
-        whenever(uiAlbumMapper(any(), eq(Album.RawAlbum), any())).thenReturn(
-            UIAlbum(
-                title = AlbumTitle.StringTitle("RAW"),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = null,
-                photos = emptyList(),
-                id = Album.RawAlbum,
-            )
-        )
-
-        whenever(getFeatureFlagUseCase(any())).thenReturn(false)
-
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
         underTest.state.drop(1).test {
@@ -322,20 +183,7 @@ class AlbumsViewModelTest {
             createImage(id = 2L, modificationTime = LocalDateTime.MIN)
         )
 
-        whenever(uiAlbumMapper(eq(testPhotosList), eq(Album.FavouriteAlbum), any())).thenReturn(
-            UIAlbum(
-                title = AlbumTitle.StringTitle("Favourites"),
-                count = testPhotosList.size,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = createImage(id = 1L, modificationTime = LocalDateTime.MAX),
-                photos = testPhotosList,
-                id = Album.FavouriteAlbum,
-            )
-        )
-
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(testPhotosList))
 
         underTest.state.drop(1).test {
@@ -351,42 +199,6 @@ class AlbumsViewModelTest {
             createUserAlbum(id = AlbumId(2L), title = "Album 2", creationTime = 200L)
         val newAlbum3 =
             createUserAlbum(id = AlbumId(3L), title = "Album 3", creationTime = 300L)
-
-        whenever(uiAlbumMapper(any(), eq(newAlbum1), any())).thenReturn(
-            UIAlbum(
-                title = AlbumTitle.StringTitle(newAlbum1.title),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = newAlbum1.cover,
-                photos = emptyList(),
-                id = newAlbum1,
-            )
-        )
-
-        whenever(uiAlbumMapper(any(), eq(newAlbum2), any())).thenReturn(
-            UIAlbum(
-                title = AlbumTitle.StringTitle(newAlbum2.title),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = newAlbum2.cover,
-                photos = emptyList(),
-                id = newAlbum2,
-            )
-        )
-
-        whenever(uiAlbumMapper(any(), eq(newAlbum3), any())).thenReturn(
-            UIAlbum(
-                title = AlbumTitle.StringTitle(newAlbum3.title),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = newAlbum3.cover,
-                photos = emptyList(),
-                id = newAlbum3,
-            )
-        )
 
         whenever(getUserAlbums()).thenReturn(
             flowOf(
@@ -457,17 +269,6 @@ class AlbumsViewModelTest {
         runTest {
             val expectedName = "New album (1)"
             val newUserAlbum = createUserAlbum(title = "New album")
-            whenever(uiAlbumMapper(any(), eq(newUserAlbum), any())).thenReturn(
-                UIAlbum(
-                    title = AlbumTitle.StringTitle(newUserAlbum.title),
-                    count = 0,
-                    imageCount = 0,
-                    videoCount = 0,
-                    coverPhoto = newUserAlbum.cover,
-                    photos = emptyList(),
-                    id = newUserAlbum,
-                )
-            )
             whenever(getUserAlbums()).thenReturn(
                 flowOf(
                     listOf(
@@ -476,7 +277,6 @@ class AlbumsViewModelTest {
                 )
             )
             whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
-
 
             underTest.state.drop(1).test {
                 awaitItem()
@@ -495,30 +295,6 @@ class AlbumsViewModelTest {
             val newAlbum2 =
                 createUserAlbum(id = AlbumId(2L), title = "New album (1)", modificationTime = 2L)
 
-            whenever(uiAlbumMapper(any(), eq(newAlbum1), any())).thenReturn(
-                UIAlbum(
-                    title = AlbumTitle.StringTitle(newAlbum1.title),
-                    count = 0,
-                    imageCount = 0,
-                    videoCount = 0,
-                    coverPhoto = newAlbum1.cover,
-                    photos = emptyList(),
-                    id = newAlbum1,
-                )
-            )
-
-            whenever(uiAlbumMapper(any(), eq(newAlbum2), any())).thenReturn(
-                UIAlbum(
-                    title = AlbumTitle.StringTitle(newAlbum2.title),
-                    count = 0,
-                    imageCount = 0,
-                    videoCount = 0,
-                    coverPhoto = newAlbum2.cover,
-                    photos = emptyList(),
-                    id = newAlbum2,
-                )
-            )
-
             whenever(getUserAlbums()).thenReturn(
                 flowOf(
                     listOf(
@@ -528,7 +304,6 @@ class AlbumsViewModelTest {
                 )
             )
             whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
-
 
             underTest.state.drop(1).test {
                 awaitItem()
@@ -548,18 +323,6 @@ class AlbumsViewModelTest {
             )
 
             whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
-            whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
-                UIAlbum(
-                    title = AlbumTitle.StringTitle("Favourites"),
-                    count = 0,
-                    imageCount = 0,
-                    videoCount = 0,
-                    coverPhoto = null,
-                    photos = emptyList(),
-                    id = Album.FavouriteAlbum,
-                )
-            )
-
             whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
             whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
@@ -586,17 +349,6 @@ class AlbumsViewModelTest {
                 Album.RawAlbum to { false },
             )
 
-            whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
-                UIAlbum(
-                    title = AlbumTitle.StringTitle("Favourites"),
-                    count = 0,
-                    imageCount = 0,
-                    videoCount = 0,
-                    coverPhoto = null,
-                    photos = emptyList(),
-                    id = Album.FavouriteAlbum,
-                )
-            )
             whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
             whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
             whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
@@ -640,18 +392,6 @@ class AlbumsViewModelTest {
             val newAlbum1 = createUserAlbum(title = testAlbumName)
 
             whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
-            whenever(uiAlbumMapper(any(), eq(newAlbum1), any())).thenReturn(
-                UIAlbum(
-                    title = AlbumTitle.StringTitle(newAlbum1.title),
-                    count = 0,
-                    imageCount = 0,
-                    videoCount = 0,
-                    coverPhoto = newAlbum1.cover,
-                    photos = emptyList(),
-                    id = newAlbum1,
-                )
-            )
-
             whenever(getUserAlbums()).thenReturn(flowOf(listOf(newAlbum1)))
             whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
 
@@ -810,23 +550,6 @@ class AlbumsViewModelTest {
         underTest.state.test {
             val selectedAlbumIds = awaitItem().selectedAlbumIds
             assertThat(selectedAlbumIds.isEmpty()).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that exception when update album name is not propagated`() = runTest {
-        whenever(getProscribedAlbumNamesUseCase()).thenReturn(mock())
-        whenever(updateAlbumNameUseCase(AlbumId(-1), "new name"))
-            .thenAnswer { throw MegaException(1, "It's broken") }
-
-        with(underTest) {
-            state.map { it.showRenameDialog }.distinctUntilChanged().test {
-                assertFalse(awaitItem())
-                showRenameDialog(true)
-                assertTrue(awaitItem())
-                updateAlbumName("new name")
-                assertFalse(awaitItem())
-            }
         }
     }
 

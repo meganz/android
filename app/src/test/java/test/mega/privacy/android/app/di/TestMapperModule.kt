@@ -11,7 +11,6 @@ import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toHeader
-import mega.privacy.android.app.presentation.photos.albums.model.mapper.LegacyUIAlbumMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import org.mockito.kotlin.mock
 
@@ -29,9 +28,6 @@ object TestMapperModule {
 
     @Provides
     fun provideRepeatToggleModeMapper(): ExoPlayerRepeatModeMapper = mock()
-
-    @Provides
-    fun provideUIAlbumMapper(): LegacyUIAlbumMapper = mock()
 
     @Provides
     fun providePlaylistItemMapper(): PlaylistItemMapper = mock()
