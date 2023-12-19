@@ -210,7 +210,7 @@ interface FileSystemRepository {
      *
      * @return a pair with latitude and longitude coordinates
      */
-    suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float>
+    suspend fun getVideoGPSCoordinates(filePath: String): Pair<Double, Double>?
 
     /**
      * Get GPS coordinates from photo file
@@ -219,7 +219,7 @@ interface FileSystemRepository {
      *
      * @return a pair with latitude and longitude coordinates
      */
-    suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float>
+    suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Double, Double>?
 
     /**
      * Make a name suitable for a file name in the local filesystem

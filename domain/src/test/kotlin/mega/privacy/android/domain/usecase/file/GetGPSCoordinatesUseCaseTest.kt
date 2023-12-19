@@ -35,7 +35,7 @@ class GetGPSCoordinatesUseCaseTest {
     @Test
     fun `test that the GPS coordinates of file type video are retrieved`() =
         runTest {
-            val result = Pair(6F, 9F)
+            val result = Pair(6.0, 9.0)
             whenever(fileSystemRepository.getVideoGPSCoordinates(any())).thenReturn(result)
             Truth.assertThat(underTest("", true)).isEqualTo(result)
         }
@@ -43,7 +43,7 @@ class GetGPSCoordinatesUseCaseTest {
     @Test
     fun `test that the GPS coordinates of file type photo are retrieved`() =
         runTest {
-            val result = Pair(6F, 9F)
+            val result = Pair(6.0, 9.0)
             whenever(fileSystemRepository.getPhotoGPSCoordinates(any())).thenReturn(result)
             Truth.assertThat(underTest("", false)).isEqualTo(result)
         }

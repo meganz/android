@@ -3,63 +3,50 @@ package mega.privacy.android.data.facade
 import android.media.MediaMetadataRetriever
 import androidx.exifinterface.media.ExifInterface
 import mega.privacy.android.data.gateway.FileAttributeGateway
+import mega.privacy.android.data.mapper.ISO6709LocationMapper
 import timber.log.Timber
 import javax.inject.Inject
+
 
 /**
  * File Attributes Facade implements [FileAttributeGateway]
  */
-internal class FileAttributeFacade @Inject constructor() : FileAttributeGateway {
+internal class FileAttributeFacade @Inject constructor(
+    private val locationMapper: ISO6709LocationMapper,
+) : FileAttributeGateway {
 
-    override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float> {
-        var coordinates = Pair(0F, 0F)
-        try {
-            val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(filePath)
-            val location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
-            if (location != null) {
-                var secondTry = false
-                try {
-                    val mid = location.length / 2
-                    val latitude = location.substring(0, mid)
-                    val longitude = location.substring(mid)
-                    coordinates = Pair(latitude.toFloat(), longitude.toFloat())
-                } catch (ex: Exception) {
-                    secondTry = true
-                    Timber.e(ex)
-                }
-                if (secondTry) {
-                    try {
-                        val latitude = location.substring(0, 7)
-                        val longitude = location.substring(8, 17)
-                        coordinates = Pair(latitude.toFloat(), longitude.toFloat())
-                    } catch (ex: Exception) {
-                        Timber.e(ex)
-                    }
-                }
-            } else {
-                Timber.w("No Video GPS coordinates found")
-            }
-            retriever.release()
-        } catch (ex: Exception) {
-            Timber.e(ex)
+    override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Double, Double>? {
+        val retriever = MediaMetadataRetriever()
+        retriever.setDataSource(filePath)
+        val location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
+        //MediaMetadataRetriever directly cannot access GPS coordinates.
+        // You need to look for dedicated methods or utilize additional libraries
+        // based on the file format's specifications.
+        // For advanced needs, you can explore lower-level APIs like MediaCodec and MediaExtractor
+        // to access raw data and extract specific information through custom parsing techniques.
+        //some video formats may store location data in custom boxes not accessible by MediaMetadataRetriever.
+        // Consider specialized parsers or tools based on the file format.
+        retriever.release()
+        return location?.let {
+            locationMapper(it)
+        } ?: run {
+            Timber.w("No Video GPS coordinates found")
+            null
         }
-        return coordinates
     }
 
-    override suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float> {
-        var coordinates = Pair(0F, 0F)
-        try {
+    override suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Double, Double>? {
+        return runCatching {
             val exif = ExifInterface(filePath)
             val latLong = exif.latLong
-            if (latLong != null) {
-                coordinates = Pair(latLong[0].toFloat(), latLong[1].toFloat())
-            } else {
+            return latLong?.let {
+                Pair(latLong[0], latLong[1])
+            } ?: run {
                 Timber.w("No Photo GPS coordinates found")
+                null
             }
-        } catch (ex: Exception) {
-            Timber.e(ex)
-        }
-        return coordinates
+        }.onFailure {
+            Timber.e("getPhotoGPSCoordinates Exception $it")
+        }.getOrNull()
     }
 }

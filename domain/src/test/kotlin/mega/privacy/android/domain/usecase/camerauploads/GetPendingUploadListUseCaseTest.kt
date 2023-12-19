@@ -54,8 +54,8 @@ class GetPendingUploadListUseCaseTest {
         null,
         0,
         File("").name,
-        1F,
-        0F,
+        1.0,
+        0.0,
         SyncStatus.STATUS_PENDING.value,
         SyncRecordType.TYPE_PHOTO,
         null,
@@ -71,8 +71,8 @@ class GetPendingUploadListUseCaseTest {
         null,
         0,
         File("").name,
-        1F,
-        0F,
+        1.0,
+        0.0,
         SyncStatus.STATUS_PENDING.value,
         SyncRecordType.TYPE_PHOTO,
         null,
@@ -88,8 +88,8 @@ class GetPendingUploadListUseCaseTest {
         null,
         0,
         File("").name,
-        1F,
-        0F,
+        1.0,
+        0.0,
         SyncStatus.STATUS_TO_COMPRESS.value,
         SyncRecordType.TYPE_VIDEO,
         null,
@@ -105,8 +105,8 @@ class GetPendingUploadListUseCaseTest {
         null,
         0,
         File("").name,
-        1F,
-        0F,
+        1.0,
+        0.0,
         SyncStatus.STATUS_PENDING.value,
         SyncRecordType.TYPE_VIDEO,
         null,
@@ -155,7 +155,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(shouldCompressVideo()).thenReturn(false)
             whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(null)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
-            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
+            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0.0, 1.0))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
             val queue = LinkedList<CameraUploadsMedia>()
             queue.add(uploadMedia)
@@ -180,7 +180,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(null)
             whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
-            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
+            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0.0, 1.0))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
             val queue = LinkedList<CameraUploadsMedia>()
             queue.add(uploadMedia)
@@ -205,7 +205,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(null)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
-            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
+            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0.0, 1.0))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
             val queue = LinkedList<CameraUploadsMedia>()
             queue.add(uploadMedia)
@@ -225,7 +225,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(shouldCompressVideo()).thenReturn(false)
             whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(null)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
-            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
+            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0.0, 1.0))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
             val queue = LinkedList<CameraUploadsMedia>()
             queue.add(uploadMedia)
@@ -250,7 +250,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(node)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
-            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
+            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0.0, 1.0))
             whenever(isNodeInRubbishBin(any())).thenReturn(false)
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
             val queue = LinkedList<CameraUploadsMedia>()
@@ -273,7 +273,7 @@ class GetPendingUploadListUseCaseTest {
             whenever(getNodeFromCloudUseCase("", null, NodeId(1L))).thenReturn(node)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
-            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0F, 1F))
+            whenever(getGPSCoordinatesUseCase(any(), any())).thenReturn(Pair(0.0, 1.0))
             whenever(getNodeGPSCoordinatesUseCase(NodeId(1L))).thenReturn(Pair(0.0, 0.0))
             whenever(isNodeInRubbishBin(any())).thenReturn(true)
             val queue = LinkedList<CameraUploadsMedia>()

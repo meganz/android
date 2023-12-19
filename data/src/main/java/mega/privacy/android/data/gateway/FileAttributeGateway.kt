@@ -12,7 +12,7 @@ interface FileAttributeGateway {
      *
      * @return a pair with latitude and longitude coordinates
      */
-    suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float>
+    suspend fun getVideoGPSCoordinates(filePath: String): Pair<Double, Double>?
 
     /**
      * Get GPS coordinates from photo file
@@ -21,5 +21,5 @@ interface FileAttributeGateway {
      *
      * @return a pair with latitude and longitude coordinates
      */
-    suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float>
+    suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Double, Double>?
 }

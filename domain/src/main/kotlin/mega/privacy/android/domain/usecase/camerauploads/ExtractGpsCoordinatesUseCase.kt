@@ -35,9 +35,9 @@ class ExtractGpsCoordinatesUseCase @Inject constructor(
                         getGPSCoordinatesUseCase(
                             record.filePath,
                             record.type == SyncRecordType.TYPE_VIDEO,
-                        ).let { (latitude, longitude) ->
+                        )?.let { (latitude, longitude) ->
                             record.copy(latitude = latitude, longitude = longitude)
-                        }
+                        } ?: record
                     }.getOrDefault(record)
                 } else record
             }

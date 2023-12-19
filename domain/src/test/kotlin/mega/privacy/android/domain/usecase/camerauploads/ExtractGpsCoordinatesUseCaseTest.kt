@@ -59,7 +59,7 @@ class ExtractGpsCoordinatesUseCaseTest {
     fun `test that the gps coordinates are set to the record when the record has an existingNodeId`(
         hasExistingNodeId: Boolean
     ) = runTest {
-        val expected = Pair(0.0F, 0.0F)
+        val expected = Pair(0.0, 0.0)
         val record1 = record.copy(
             existingNodeId = if (hasExistingNodeId) mock() else null
         )
@@ -96,7 +96,7 @@ class ExtractGpsCoordinatesUseCaseTest {
                         list[i].filePath,
                         list[i].type == SyncRecordType.TYPE_VIDEO,
                     )
-                ).thenReturn(Pair(0.0F, 0.0F))
+                ).thenReturn(Pair(0.0, 0.0))
             }
             assertThat(underTest(list).size).isEqualTo(expected)
         }

@@ -59,24 +59,19 @@ class SetNodeCoordinatesUseCaseTest {
     ) = runTest {
         val path = "path"
         val nodeHandle = 1L
-        val coordinates = mock<Pair<Float, Float>> {
-            on { first }.thenReturn(123F)
-            on { second }.thenReturn(6345F)
-        }
+        val coordinates = Pair(123.0, 6345.0)
         whenever(isVideoFileUseCase(path)).thenReturn(isVideoFile)
         whenever(isImageFileUseCase(path)).thenReturn(isImageFile)
         whenever(getGPSCoordinatesUseCase.invoke(path, isVideoFile)).thenReturn(coordinates)
-        whenever(
-            nodeRepository.setNodeCoordinates(
-                NodeId(nodeHandle),
-                coordinates.first.toDouble(),
-                coordinates.second.toDouble()
-            )
-        ).thenReturn(Unit)
         underTest.invoke(path, nodeHandle)
 
         if (isInvoked) {
             verify(getGPSCoordinatesUseCase).invoke(path, isVideoFile)
+            nodeRepository.setNodeCoordinates(
+                NodeId(nodeHandle),
+                coordinates.first,
+                coordinates.second,
+            )
         } else {
             verifyNoInteractions(getGPSCoordinatesUseCase)
         }

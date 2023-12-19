@@ -97,8 +97,8 @@ class UploadCameraUploadsRecordsUseCaseTest {
         originalFingerprint = "originalFingerprint",
         generatedFingerprint = null,
         tempFilePath = "tempFilePath",
-        latitude = 0.0F,
-        longitude = 0.0F,
+        latitude = 0.0,
+        longitude = 0.0,
     )
 
     private val existingNodeId = mock<NodeId>()

@@ -332,12 +332,12 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             URLConnection.guessContentTypeFromName(localPath)
         }
 
-    override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float> =
+    override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Double, Double>? =
         withContext(ioDispatcher) {
             fileAttributeGateway.getVideoGPSCoordinates(filePath)
         }
 
-    override suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float> =
+    override suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Double, Double>? =
         withContext(ioDispatcher) {
             fileAttributeGateway.getPhotoGPSCoordinates(filePath)
         }

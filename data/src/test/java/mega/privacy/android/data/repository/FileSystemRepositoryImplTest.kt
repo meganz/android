@@ -324,7 +324,7 @@ internal class FileSystemRepositoryImplTest {
     inner class GPSCoordinatesTest {
         @Test
         fun `test that the video GPS coordinates are retrieved`() = runTest {
-            val testCoordinates = Pair(6F, 9F)
+            val testCoordinates = Pair(6.0, 9.0)
 
             whenever(fileAttributeGateway.getVideoGPSCoordinates(any())).thenReturn(testCoordinates)
             assertThat(underTest.getVideoGPSCoordinates("")).isEqualTo(testCoordinates)
@@ -333,7 +333,7 @@ internal class FileSystemRepositoryImplTest {
         @Test
         fun `test that the photo GPS coordinates are retrieved`() {
             runTest {
-                val testCoordinates = Pair(6F, 9F)
+                val testCoordinates = Pair(6.0, 9.0)
 
                 whenever(fileAttributeGateway.getPhotoGPSCoordinates(any())).thenReturn(
                     testCoordinates

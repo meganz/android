@@ -34,8 +34,8 @@ data class CameraUploadsRecord(
     val originalFingerprint: String,
     val generatedFingerprint: String?,
     val tempFilePath: String,
-    val latitude: Float? = null,
-    val longitude: Float? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
     val existsInTargetNode: Boolean? = null,
     val existingNodeId: NodeId? = null,
 )

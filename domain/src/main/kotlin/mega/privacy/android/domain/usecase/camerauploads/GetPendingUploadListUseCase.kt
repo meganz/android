@@ -95,8 +95,8 @@ class GetPendingUploadListUseCase @Inject constructor(
                                 newFingerprint = nodeExists.fingerprint,
                                 timestamp = media.timestamp,
                                 fileName = sourceFile.name,
-                                latitude = latitude.toFloat(),
-                                longitude = longitude.toFloat(),
+                                latitude = latitude,
+                                longitude = longitude,
                                 status = SyncStatus.STATUS_PENDING.value,
                                 type = type,
                                 nodeHandle = nodeExists.id.longValue,
@@ -117,8 +117,8 @@ class GetPendingUploadListUseCase @Inject constructor(
                             newFingerprint = null,
                             timestamp = media.timestamp,
                             fileName = sourceFile.name,
-                            latitude = gpsData.first,
-                            longitude = gpsData.second,
+                            latitude = gpsData?.first,
+                            longitude = gpsData?.second,
                             status =
                             if (shouldCompressVideo() && type == SyncRecordType.TYPE_VIDEO)
                                 SyncStatus.STATUS_TO_COMPRESS.value

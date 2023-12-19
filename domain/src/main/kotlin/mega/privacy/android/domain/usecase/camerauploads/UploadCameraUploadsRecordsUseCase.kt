@@ -613,7 +613,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     ): Pair<Double, Double>? =
         record.latitude?.let { latitude ->
             record.longitude?.let { longitude ->
-                Pair(latitude.toDouble(), longitude.toDouble())
+                Pair(latitude, longitude)
             }
         }
 
