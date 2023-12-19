@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatLinkRemov
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatRichLinkUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.InvalidUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.PermissionChangeUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.ui.ScheduledMeetingUpdateUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.TextUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.TitleChangeUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.TruncateHistoryUiMessage
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkCreatedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkRemovedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.PermissionChangeMessage
+import mega.privacy.android.domain.entity.chat.messages.management.ScheduledMeetingUpdatedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.TitleChangeMessage
 import mega.privacy.android.domain.entity.chat.messages.management.TruncateHistoryMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
@@ -102,6 +104,11 @@ class UiChatMessageMapper @Inject constructor() {
             )
 
             is ChatLinkRemovedMessage -> ChatLinkRemovedUiMessage(
+                message = message,
+                showDate = showDate
+            )
+
+            is ScheduledMeetingUpdatedMessage -> ScheduledMeetingUpdateUiMessage(
                 message = message,
                 showDate = showDate
             )
