@@ -69,9 +69,10 @@ class AudioSectionViewModel @Inject constructor(
 
     internal fun refreshWhenOrderChanged() =
         viewModelScope.launch {
+            val sortOrder = getCloudSortOrder()
             _state.update {
                 it.copy(
-                    sortOrder = getCloudSortOrder(),
+                    sortOrder = sortOrder,
                     progressBarShowing = true
                 )
             }
