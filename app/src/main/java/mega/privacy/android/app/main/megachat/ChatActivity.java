@@ -5767,7 +5767,17 @@ public class ChatActivity extends PasscodeActivity
         } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
             manageTextFileIntent(this, msgId, idChat);
         } else {
-            onNodeTapped(this, node, this::saveNodeByTap, this, this, false);
+            onNodeTapped(this, node, (megaNode) -> {
+                nodeOptionsDownloadViewModel.downloadChatNodesOnlyIfFeatureFlagIsTrue(
+                        idChat,
+                        List.of(msgId),
+                        () -> {
+                            saveNodeByTap(megaNode);
+                            return Unit.INSTANCE;
+                        }
+                );
+                return null;
+            }, this, this, false);
         }
     }
 
@@ -6784,10 +6794,9 @@ public class ChatActivity extends PasscodeActivity
      *
      * @param node Node to be downloaded.
      */
-    public Unit saveNodeByTap(MegaNode node) {
+    public void saveNodeByTap(MegaNode node) {
         PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, true, true);
-        return null;
     }
 
     @Override

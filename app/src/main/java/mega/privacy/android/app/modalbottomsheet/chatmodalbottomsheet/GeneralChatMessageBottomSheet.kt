@@ -294,7 +294,13 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                         requireActivity(),
                         node
                     ) { megaNode: MegaNode? ->
-                        (requireActivity() as ChatActivity).saveNodeByTap(megaNode)
+                        lifecycleScope.launch {
+                            if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                                nodeOptionsDownloadViewModel.onDownloadClicked(chatId, messageId)
+                            } else {
+                                (requireActivity() as ChatActivity).saveNodeByTap(megaNode)
+                            }
+                        }
                     }
                 }
             }
@@ -362,7 +368,15 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
             cannotOpenFileDialog = this.openWith(
                 requireActivity(),
                 node
-            ) { node: MegaNode? -> (requireActivity() as ChatActivity).saveNodeByTap(node) }
+            ) { node: MegaNode? ->
+                lifecycleScope.launch {
+                    if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                        nodeOptionsDownloadViewModel.onDownloadClicked(chatId, messageId)
+                    } else {
+                        (requireActivity() as ChatActivity).saveNodeByTap(node)
+                    }
+                }
+            }
             return
         } else if (id == R.id.forward_layout) {
             (requireActivity() as ChatActivity).forwardMessages(messagesSelected)
