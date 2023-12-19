@@ -60,6 +60,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
@@ -117,6 +118,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
@@ -250,6 +252,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val uploadCameraUploadsRecordsUseCase: UploadCameraUploadsRecordsUseCase,
     private val initializeBackupsUseCase: InitializeBackupsUseCase,
     private val areCameraUploadsFoldersInRubbishBinUseCase: AreCameraUploadsFoldersInRubbishBinUseCase,
+    private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
     private val fileSystemRepository: FileSystemRepository,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
@@ -782,7 +785,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         records: List<CameraUploadsRecord>,
         primaryUploadNodeId: NodeId,
         secondaryUploadNodeId: NodeId,
-        tempRoot: String
+        tempRoot: String,
     ) = coroutineScope {
         startHeartbeat()
         uploadCameraUploadsRecords(
@@ -817,17 +820,21 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @return a list of [CameraUploadsRecord]
      */
     private suspend fun filterCameraUploadsRecords(records: List<CameraUploadsRecord>): List<CameraUploadsRecord> {
-        val videoRecords =
-            records.filter { it.type == SyncRecordType.TYPE_VIDEO }
-        totalVideoSize = getTotalVideoSizeInMB(videoRecords.map { it.filePath })
-        Timber.d("Total videos count are ${videoRecords.size}, $totalVideoSize MB to Conversion")
-
-        return if (shouldStartVideoCompression(totalVideoSize)) {
+        val videoQuality = getUploadVideoQualityUseCase()
+        return if (videoQuality == VideoQuality.ORIGINAL) {
             records
         } else {
-            Timber.d("Compression queue bigger than setting, show notification to user.")
-            showVideoCompressionErrorStatus()
-            records.filter { it.type == SyncRecordType.TYPE_PHOTO }
+            val videoRecords =
+                records.filter { it.type == SyncRecordType.TYPE_VIDEO }
+            totalVideoSize = getTotalVideoSizeInMB(videoRecords.map { it.filePath })
+            Timber.d("Total videos count are ${videoRecords.size}, $totalVideoSize MB to Conversion")
+            if (shouldStartVideoCompression(totalVideoSize)) {
+                records
+            } else {
+                Timber.d("Compression queue bigger than setting, show notification to user.")
+                showVideoCompressionErrorStatus()
+                records.filter { it.type == SyncRecordType.TYPE_PHOTO }
+            }
         }
     }
 

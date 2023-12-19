@@ -63,6 +63,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
@@ -217,6 +218,7 @@ class CameraUploadsWorkerTest {
     private val initializeBackupsUseCase: InitializeBackupsUseCase = mock()
     private val areCameraUploadsFoldersInRubbishBinUseCase: AreCameraUploadsFoldersInRubbishBinUseCase =
         mock()
+    private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase = mock()
 
 
     @Before
@@ -332,6 +334,7 @@ class CameraUploadsWorkerTest {
             fileSystemRepository = fileSystemRepository,
             initializeBackupsUseCase = initializeBackupsUseCase,
             areCameraUploadsFoldersInRubbishBinUseCase = areCameraUploadsFoldersInRubbishBinUseCase,
+            getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
         )
     }
 
