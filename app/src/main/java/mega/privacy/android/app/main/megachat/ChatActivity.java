@@ -9293,9 +9293,7 @@ public class ChatActivity extends PasscodeActivity
                     break;
                 }
         }
-
-        returnCallOnHoldButton.setVisibility(View.GONE);
-
+        
         Timber.d("Call Status in this chatRoom: %s", callStatusToString(callStatus));
         switch (callStatus) {
             case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
