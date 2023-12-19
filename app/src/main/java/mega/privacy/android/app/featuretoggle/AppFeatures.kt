@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables new audio section flag
+     */
+    NewAudioSection(
+        "Enable new audio section flag",
+        false
+    ),
+
+    /**
      * Enables new video section flag
      */
     NewVideoSection(

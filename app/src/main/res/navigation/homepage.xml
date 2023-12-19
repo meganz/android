@@ -25,6 +25,9 @@
             android:id="@+id/action_homepageFragment_to_audioFragment"
             app:destination="@id/audioFragment" />
         <action
+            android:id="@+id/action_homepageFragment_to_audioSectionFragment"
+            app:destination="@id/audioSectionFragment" />
+        <action
             android:id="@+id/action_homepage_to_recentBucket"
             app:destination="@id/recentBucketFragment" />
         <action
@@ -99,6 +102,17 @@
         android:id="@+id/audioFragment"
         android:name="mega.privacy.android.app.fragments.homepage.audio.AudioFragment"
         android:label="AudioFragment">
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
+            app:destination="@id/offlineFragmentCompose" />
+    </fragment>
+    <fragment
+        android:id="@+id/audioSectionFragment"
+        android:name="mega.privacy.android.app.presentation.audiosection.AudioSectionFragment"
+        android:label="AudioSectionFragment">
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />

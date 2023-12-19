@@ -47,10 +47,12 @@ class AudioSectionViewModel @Inject constructor(
                 .catch {
                     Timber.e(it)
                 }.collect {
-                    refreshNodes()
+                    setPendingRefreshNodes()
                 }
         }
     }
+
+    private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
     internal fun refreshNodes() = viewModelScope.launch {
         val audioList = getUIAudioList()
@@ -60,12 +62,15 @@ class AudioSectionViewModel @Inject constructor(
                 allAudios = audioList,
                 sortOrder = sortOrder,
                 progressBarShowing = false,
-                scrollToTop = false
+                scrollToTop = false,
+                isPendingRefresh = false
             )
         }
     }
 
     private fun getUIAudioList() = getAllAudioUseCase().map { uiAudioMapper(it) }
+
+    internal fun markHandledPendingRefresh() = _state.update { it.copy(isPendingRefresh = false) }
 
     internal fun refreshWhenOrderChanged() =
         viewModelScope.launch {

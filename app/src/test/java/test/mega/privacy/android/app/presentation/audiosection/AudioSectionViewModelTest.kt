@@ -27,14 +27,17 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import test.mega.privacy.android.app.TimberJUnit5Extension
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(TimberJUnit5Extension::class)
 class AudioSectionViewModelTest {
     private lateinit var underTest: AudioSectionViewModel
 
@@ -113,46 +116,27 @@ class AudioSectionViewModelTest {
     }
 
     @Test
-    fun `test that the audios are retrieved when the monitorOfflineNodeUpdatesUseCase is triggered`() =
+    fun `test that isPendingRefresh is correctly updated when monitorOfflineNodeUpdatesUseCase is triggered`() =
         runTest {
-            val expectedAudio: UIAudio = mock {
-                on { name }.thenReturn("audio name")
-            }
-
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-            whenever(getAllAudioUseCase()).thenReturn(listOf(mock(), mock()))
-            whenever(uiAudioMapper(any())).thenReturn(expectedAudio)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
 
             underTest.state.drop(1).test {
-                val actual = awaitItem()
-                assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
-                assertThat(actual.allAudios.size).isEqualTo(2)
-                assertThat(actual.progressBarShowing).isEqualTo(false)
+                assertThat(awaitItem().isPendingRefresh).isTrue()
+                underTest.markHandledPendingRefresh()
+                assertThat(awaitItem().isPendingRefresh).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that the audios are retrieved when the monitorOffline is triggered`() =
+    fun `test that isPendingRefresh is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
         runTest {
-            val expectedAudio: UIAudio = mock {
-                on { name }.thenReturn("audio name")
-            }
-
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-
-            whenever(getAllAudioUseCase()).thenReturn(
-                listOf(mock(), mock())
-            )
-            whenever(uiAudioMapper(any())).thenReturn(expectedAudio)
             whenever(monitorNodeUpdatesUseCase()).thenReturn(flowOf(NodeUpdate(emptyMap())))
 
             underTest.state.drop(1).test {
-                val actual = awaitItem()
-                assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
-                assertThat(actual.allAudios.size).isEqualTo(2)
-                assertThat(actual.progressBarShowing).isEqualTo(false)
+                assertThat(awaitItem().isPendingRefresh).isTrue()
+                underTest.markHandledPendingRefresh()
+                assertThat(awaitItem().isPendingRefresh).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
         }

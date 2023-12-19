@@ -153,11 +153,6 @@ class HomepageFragment : Fragment() {
                     HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
                 }
 
-                categoryAudio -> {
-                    Analytics.tracker.trackEvent(HomeScreenAudioTilePressedEvent)
-                    HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
-                }
-
                 else -> return@with
             }
 
@@ -511,7 +506,11 @@ class HomepageFragment : Fragment() {
     private fun setupCategories() {
         viewDataBinding.category.categoryFavourites.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryDocument.setOnClickListener(categoryClickListener)
-        viewDataBinding.category.categoryAudio.setOnClickListener(categoryClickListener)
+        viewDataBinding.category.categoryAudio.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                clickAudioSectionTileAndAnalysis()
+            }
+        }
         viewDataBinding.category.categoryVideo.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
                 clickVideoSectionTileAndAnalysis()
@@ -528,6 +527,21 @@ class HomepageFragment : Fragment() {
                         HomepageFragmentDirections.actionHomepageFragmentToVideoSectionFragment()
                     } else {
                         HomepageFragmentDirections.actionHomepageFragmentToVideoFragment()
+                    }
+                navigate(destination)
+            }
+        }
+    }
+
+    private suspend fun clickAudioSectionTileAndAnalysis() {
+        Analytics.tracker.trackEvent(HomeScreenAudioTilePressedEvent)
+        findNavController().run {
+            if (currentDestination?.id == R.id.homepageFragment) {
+                val destination =
+                    if (getFeatureFlagValueUseCase(AppFeatures.NewAudioSection)) {
+                        HomepageFragmentDirections.actionHomepageFragmentToAudioSectionFragment()
+                    } else {
+                        HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
                     }
                 navigate(destination)
             }
