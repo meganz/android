@@ -77,8 +77,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun doPreferencesExist(): Boolean = dbHandler.preferences != null
 
-    override suspend fun shouldClearSyncRecords(): Boolean = dbHandler.shouldClearCamsyncRecords()
-
     override suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo? =
         dbHandler.findNonContactByHandle(userHandle.toString())
 
@@ -128,10 +126,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getAttributes(): MegaAttributes? =
         dbHandler.attributes
-
-    override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) {
-        dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
-    }
 
     override suspend fun getChatFilesFolderHandle() = dbHandler.myChatFilesFolderHandle
 

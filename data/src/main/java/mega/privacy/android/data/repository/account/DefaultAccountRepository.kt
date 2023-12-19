@@ -665,7 +665,6 @@ internal class DefaultAccountRepository @Inject constructor(
             clearChatSettings()
         }
         megaLocalRoomGateway.deleteAllBackups()
-        megaLocalRoomGateway.deleteAllSyncRecordsTypeAny()
         megaLocalRoomGateway.deleteAllCompletedTransfers()
         megaLocalRoomGateway.clearOffline()
         callsPreferencesGateway.clearPreferences()

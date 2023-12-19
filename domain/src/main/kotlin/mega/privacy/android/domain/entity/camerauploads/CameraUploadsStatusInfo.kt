@@ -28,15 +28,11 @@ sealed interface CameraUploadsStatusInfo {
      *  @property progress
      *  @property currentFileIndex
      *  @property totalCount
-     *  @property useCameraUploadsRecords temporary flag to determine if we use camera uploads records
-     *                                    This property should be removed when fully migrating to
-     *                                    the new upload process
      */
     data class VideoCompressionProgress(
         val progress: Int,
         val currentFileIndex: Int,
         val totalCount: Int,
-        val useCameraUploadsRecords: Boolean = false,
     ) : CameraUploadsStatusInfo
 
 

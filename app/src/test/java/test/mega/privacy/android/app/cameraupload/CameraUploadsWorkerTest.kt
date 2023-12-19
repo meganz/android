@@ -26,33 +26,19 @@ import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
-import mega.privacy.android.domain.usecase.ClearSyncRecords
-import mega.privacy.android.domain.usecase.CompressVideos
-import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
-import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
-import mega.privacy.android.domain.usecase.DeleteSyncRecord
-import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
-import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
-import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
-import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
-import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
-import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
@@ -71,11 +57,8 @@ import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathVali
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
-import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
@@ -83,24 +66,15 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUse
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
-import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.After
 import org.junit.Before
@@ -135,21 +109,9 @@ class CameraUploadsWorkerTest {
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled = mock()
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase = mock()
     private val isWifiNotSatisfiedUseCase: IsWifiNotSatisfiedUseCase = mock()
-    private val deleteSyncRecord: DeleteSyncRecord = mock()
-    private val deleteSyncRecordByLocalPath: DeleteSyncRecordByLocalPath = mock()
-    private val deleteSyncRecordByFingerprint: DeleteSyncRecordByFingerprint = mock()
     private val setPrimaryFolderLocalPathUseCase: SetPrimaryFolderLocalPathUseCase = mock()
-    private val shouldCompressVideo: ShouldCompressVideo = mock()
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase = mock()
-    private val clearSyncRecords: ClearSyncRecords = mock()
-    private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase = mock()
-    private val getPendingSyncRecords: GetPendingSyncRecords = mock()
-    private val compressedVideoPending: CompressedVideoPending = mock()
-    private val getVideoSyncRecordsByStatus: GetVideoSyncRecordsByStatus = mock()
-    private val setSyncRecordPendingByPath: SetSyncRecordPendingByPath = mock()
     private val isChargingRequired: IsChargingRequired = mock()
-    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
-    private val processMediaForUploadUseCase: ProcessMediaForUploadUseCase = mock()
     private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase = mock()
     private val setPrimarySyncHandle: SetPrimarySyncHandle = mock()
     private val setSecondarySyncHandle: SetSecondarySyncHandle = mock()
@@ -162,19 +124,13 @@ class CameraUploadsWorkerTest {
     private val monitorChargingStoppedState: MonitorChargingStoppedState = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase = mock()
-    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase = mock()
     private val cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase = mock()
-    private val copyNodeUseCase: CopyNodeUseCase = mock()
-    private val setOriginalFingerprintUseCase: SetOriginalFingerprintUseCase = mock()
-    private val startUploadUseCase: StartUploadUseCase = mock()
     private val createCameraUploadFolder: CreateCameraUploadFolder = mock()
     private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase = mock()
     private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase = mock()
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase =
         mock()
     private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase = mock()
-    private val compressVideos: CompressVideos = mock()
-    private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps = mock()
     private val disableMediaUploadSettings: DisableMediaUploadSettings = mock()
     private val createCameraUploadTemporaryRootDirectoryUseCase: CreateCameraUploadTemporaryRootDirectoryUseCase =
         mock()
@@ -182,23 +138,15 @@ class CameraUploadsWorkerTest {
         mock()
     private val broadcastCameraUploadProgress: BroadcastCameraUploadProgress = mock()
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase = mock()
-    private val createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase =
-        mock()
+
     private val updateCameraUploadsBackupStatesUseCase: UpdateCameraUploadsBackupStatesUseCase =
         mock()
     private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase = mock()
     private val updateCameraUploadsBackupHeartbeatStatusUseCase: UpdateCameraUploadsBackupHeartbeatStatusUseCase =
         mock()
-    private val addCompletedTransferUseCase: AddCompletedTransferUseCase = mock()
-    private val setCoordinatesUseCase: SetCoordinatesUseCase = mock()
     private val isChargingUseCase: IsChargingUseCase = mock()
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase = mock()
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase = mock()
-    private val createImageOrVideoPreviewUseCase: CreateImageOrVideoPreviewUseCase = mock()
-    private val createImageOrVideoThumbnailUseCase: CreateImageOrVideoThumbnailUseCase = mock()
-    private val deletePreviewUseCase: DeletePreviewUseCase = mock()
-    private val deleteThumbnailUseCase: DeleteThumbnailUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper =
         mock()
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase = mock()
@@ -260,21 +208,9 @@ class CameraUploadsWorkerTest {
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             isWifiNotSatisfiedUseCase = isWifiNotSatisfiedUseCase,
-            deleteSyncRecord = deleteSyncRecord,
-            deleteSyncRecordByLocalPath = deleteSyncRecordByLocalPath,
-            deleteSyncRecordByFingerprint = deleteSyncRecordByFingerprint,
             setPrimaryFolderLocalPathUseCase = setPrimaryFolderLocalPathUseCase,
-            shouldCompressVideo = shouldCompressVideo,
             setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
-            clearSyncRecords = clearSyncRecords,
-            areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
-            getPendingSyncRecords = getPendingSyncRecords,
-            compressedVideoPending = compressedVideoPending,
-            getVideoSyncRecordsByStatus = getVideoSyncRecordsByStatus,
-            setSyncRecordPendingByPath = setSyncRecordPendingByPath,
             isChargingRequired = isChargingRequired,
-            getNodeByIdUseCase = getNodeByIdUseCase,
-            processMediaForUploadUseCase = processMediaForUploadUseCase,
             getUploadFolderHandleUseCase = getUploadFolderHandleUseCase,
             setPrimarySyncHandle = setPrimarySyncHandle,
             setSecondarySyncHandle = setSecondarySyncHandle,
@@ -288,37 +224,23 @@ class CameraUploadsWorkerTest {
             monitorChargingStoppedState = monitorChargingStoppedState,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             handleLocalIpChangeUseCase = handleLocalIpChangeUseCase,
-            cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             cancelAllUploadTransfersUseCase = cancelAllUploadTransfersUseCase,
-            copyNodeUseCase = copyNodeUseCase,
-            setOriginalFingerprintUseCase = setOriginalFingerprintUseCase,
-            startUploadUseCase = startUploadUseCase,
             createCameraUploadFolder = createCameraUploadFolder,
             setupPrimaryFolderUseCase = setupPrimaryFolderUseCase,
             setupSecondaryFolderUseCase = setupSecondaryFolderUseCase,
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             resetTotalUploadsUseCase = resetTotalUploadsUseCase,
-            compressVideos = compressVideos,
-            resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
             disableMediaUploadSettings = disableMediaUploadSettings,
             createCameraUploadTemporaryRootDirectoryUseCase = createCameraUploadTemporaryRootDirectoryUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
             broadcastCameraUploadProgress = broadcastCameraUploadProgress,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
-            createTempFileAndRemoveCoordinatesUseCase = createTempFileAndRemoveCoordinatesUseCase,
             updateCameraUploadsBackupStatesUseCase = updateCameraUploadsBackupStatesUseCase,
             sendBackupHeartBeatSyncUseCase = sendBackupHeartBeatSyncUseCase,
             updateCameraUploadsBackupHeartbeatStatusUseCase = updateCameraUploadsBackupHeartbeatStatusUseCase,
-            addCompletedTransferUseCase = addCompletedTransferUseCase,
-            setCoordinatesUseCase = setCoordinatesUseCase,
             isChargingUseCase = isChargingUseCase,
             monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase,
             broadcastStorageOverQuotaUseCase = broadcastStorageOverQuotaUseCase,
-            createImageOrVideoPreviewUseCase = createImageOrVideoPreviewUseCase,
-            createImageOrVideoThumbnailUseCase = createImageOrVideoThumbnailUseCase,
-            deletePreviewUseCase = deletePreviewUseCase,
-            deleteThumbnailUseCase = deleteThumbnailUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             cameraUploadsNotificationManagerWrapper = cameraUploadsNotificationManagerWrapper,
             cookieEnabledCheckWrapper = cookieEnabledCheckWrapper,

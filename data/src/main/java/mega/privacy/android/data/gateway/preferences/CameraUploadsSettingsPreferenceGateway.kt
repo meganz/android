@@ -159,46 +159,6 @@ interface CameraUploadsSettingsPreferenceGateway {
     suspend fun setFileUploadOption(uploadOption: Int)
 
     /**
-     * Get photo time stamp
-     */
-    suspend fun getPhotoTimeStamp(): Long?
-
-    /**
-     * Set photo time stamp
-     */
-    suspend fun setPhotoTimeStamp(timeStamp: Long)
-
-    /**
-     * Get video time stamp
-     */
-    suspend fun getVideoTimeStamp(): Long?
-
-    /**
-     * Set video time stamp
-     */
-    suspend fun setVideoTimeStamp(timeStamp: Long)
-
-    /**
-     * Get media uploads photo time stamp
-     */
-    suspend fun getMediaUploadsPhotoTimeStamp(): Long?
-
-    /**
-     * Set secondary photo time stamp
-     */
-    suspend fun setMediaUploadsPhotoTimeStamp(timeStamp: Long)
-
-    /**
-     * Get Media Uploads video time stamp
-     */
-    suspend fun getMediaUploadsVideoTimeStamp(): Long?
-
-    /**
-     * Set Media Uploads video time stamp
-     */
-    suspend fun setMediaUploadsVideoTimeStamp(timeStamp: Long)
-
-    /**
      * Checks if content in Camera Uploads should be uploaded through Wi-Fi only,
      * or through Wi-Fi or Mobile Data
      *

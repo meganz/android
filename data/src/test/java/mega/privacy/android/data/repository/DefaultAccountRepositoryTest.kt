@@ -973,7 +973,6 @@ class DefaultAccountRepositoryTest {
             verify(localStorageGateway).clearNonContacts()
             verify(localStorageGateway).clearChatItems()
             verify(localStorageGateway).clearAttributes()
-            verify(megaLocalRoomGateway).deleteAllSyncRecordsTypeAny()
             verify(megaLocalRoomGateway).deleteAllCompletedTransfers()
             verify(localStorageGateway).clearChatSettings()
             verify(megaLocalRoomGateway).deleteAllBackups()

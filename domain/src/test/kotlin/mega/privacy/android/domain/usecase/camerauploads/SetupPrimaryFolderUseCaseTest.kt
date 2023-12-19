@@ -4,7 +4,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import org.junit.Assert
 import org.junit.jupiter.api.BeforeAll
@@ -25,14 +24,12 @@ class SetupPrimaryFolderUseCaseTest {
     private val invalidHandle = -1L
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
-    private val resetPrimaryTimeline = mock<ResetPrimaryTimeline>()
     private val setPrimarySyncHandle = mock<SetPrimarySyncHandle>()
 
     @BeforeAll
     fun setUp() {
         underTest = SetupPrimaryFolderUseCase(
             cameraUploadRepository = cameraUploadRepository,
-            resetPrimaryTimeline = resetPrimaryTimeline,
             setPrimarySyncHandle = setPrimarySyncHandle
         )
     }
@@ -41,7 +38,6 @@ class SetupPrimaryFolderUseCaseTest {
     fun resetMocks() {
         reset(
             cameraUploadRepository,
-            resetPrimaryTimeline,
             setPrimarySyncHandle,
         )
     }
@@ -53,7 +49,6 @@ class SetupPrimaryFolderUseCaseTest {
             whenever(cameraUploadRepository.setupPrimaryFolder(any())).thenReturn(69L)
             whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
             underTest(any())
-            verify(resetPrimaryTimeline).invoke()
             verify(setPrimarySyncHandle).invoke(result)
         }
 

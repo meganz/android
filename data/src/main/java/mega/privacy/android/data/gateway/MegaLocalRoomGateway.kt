@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SdTransfer
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -193,125 +192,6 @@ interface MegaLocalRoomGateway {
      * Delete an active transfer by its tag
      */
     suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>)
-
-    /**
-     * Save sync record
-     */
-    suspend fun saveSyncRecord(record: SyncRecord)
-
-    /**
-     * Save sync records
-     */
-    suspend fun saveSyncRecords(records: List<SyncRecord>)
-
-    /**
-     * Sets the new Video Sync Status for Camera Uploads
-     *
-     * @param syncStatus The new Video Sync Status, represented as an [Int]
-     */
-    suspend fun setUploadVideoSyncStatus(syncStatus: Int)
-
-    /**
-     * Does file name exist
-     */
-    suspend fun doesFileNameExist(
-        fileName: String,
-        isSecondary: Boolean,
-    ): Boolean
-
-    /**
-     * Does local path exist
-     */
-    suspend fun doesLocalPathExist(
-        fileName: String,
-        isSecondary: Boolean,
-    ): Boolean
-
-    /**
-     * Get sync record by fingerprint
-     * @return sync record
-     */
-    suspend fun getSyncRecordByFingerprint(
-        fingerprint: String?,
-        isSecondary: Boolean,
-        isCopy: Boolean,
-    ): SyncRecord?
-
-    /**
-     * Get all pending sync records
-     * @return pending sync records
-     */
-    suspend fun getPendingSyncRecords(): List<SyncRecord>
-
-    /**
-     * Get video sync record with status type
-     */
-    suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord>
-
-    /**
-     * Delete sync records by type
-     */
-    suspend fun deleteAllSyncRecords(syncRecordType: Int)
-
-    /**
-     * Deletes sync records.
-     */
-    suspend fun deleteAllSyncRecordsTypeAny()
-
-    /**
-     * Delete all Secondary Sync Records
-     */
-    suspend fun deleteAllSecondarySyncRecords()
-
-    /**
-     * Delete all Primary Sync Records
-     */
-    suspend fun deleteAllPrimarySyncRecords()
-
-    /**
-     * Get sync record by local path
-     * @return sync record
-     */
-    suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord?
-
-    /**
-     * Delete sync records by path
-     */
-    suspend fun deleteSyncRecordByPath(path: String?, isSecondary: Boolean)
-
-    /**
-     * Delete sync records by local path
-     */
-    suspend fun deleteSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean)
-
-    /**
-     * Delete sync records by fingerprint
-     */
-    suspend fun deleteSyncRecordByFingerPrint(
-        originalPrint: String,
-        newPrint: String,
-        isSecondary: Boolean,
-    )
-
-    /**
-     * Update sync record status by local path
-     */
-    suspend fun updateSyncRecordStatusByLocalPath(
-        syncStatusType: Int,
-        localPath: String?,
-        isSecondary: Boolean,
-    )
-
-    /**
-     * Get sync record by new path
-     * @return sync record
-     */
-    suspend fun getSyncRecordByNewPath(path: String): SyncRecord?
-
-    /**
-     * Get all syncRecord timestamps
-     */
-    suspend fun getAllTimestampsOfSyncRecord(isSecondary: Boolean, syncRecordType: Int): List<Long>
 
     /**
      * Get all sd transfers

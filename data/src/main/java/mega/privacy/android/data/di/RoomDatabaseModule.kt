@@ -24,7 +24,6 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
-import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import net.sqlcipher.database.SupportFactory
@@ -87,11 +86,6 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideActiveTransferDao(database: MegaDatabase): ActiveTransferDao =
         database.activeTransfersDao()
-
-    @Provides
-    @Singleton
-    internal fun provideSyncRecordDao(database: MegaDatabase): SyncRecordDao =
-        database.syncRecordDao()
 
     @Provides
     @Singleton

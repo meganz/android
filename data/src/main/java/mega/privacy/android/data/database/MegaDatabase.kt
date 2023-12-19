@@ -12,7 +12,6 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
-import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
@@ -22,10 +21,10 @@ import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
-import mega.privacy.android.data.database.entity.SyncRecordEntity
 import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
+import mega.privacy.android.data.database.spec.AutoMigrationSpec81to82
 import timber.log.Timber
 
 @Database(
@@ -33,7 +32,6 @@ import timber.log.Timber
         ContactEntity::class,
         CompletedTransferEntity::class,
         ActiveTransferEntity::class,
-        SyncRecordEntity::class,
         SdTransferEntity::class,
         BackupEntity::class,
         OfflineEntity::class,
@@ -50,6 +48,7 @@ import timber.log.Timber
         AutoMigration(78, 79),
         AutoMigration(79, 80),
         AutoMigration(80, 81),
+        AutoMigration(81, 82, spec = AutoMigrationSpec81to82::class),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -58,8 +57,6 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun completedTransferDao(): CompletedTransferDao
 
     abstract fun activeTransfersDao(): ActiveTransferDao
-
-    abstract fun syncRecordDao(): SyncRecordDao
 
     abstract fun sdTransferDao(): SdTransferDao
 

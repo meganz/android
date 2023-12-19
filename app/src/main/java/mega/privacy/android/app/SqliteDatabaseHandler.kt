@@ -77,37 +77,6 @@ class SqliteDatabaseHandler @Inject constructor(
         writableDatabase.insert(TABLE_CREDENTIALS, SQLiteDatabase.CONFLICT_REPLACE, values)
     }
 
-    override fun shouldClearCamsyncRecords(): Boolean {
-        val selectQuery =
-            "SELECT $KEY_SHOULD_CLEAR_CAMSYNC_RECORDS FROM $TABLE_PREFERENCES"
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    var should = cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                            KEY_SHOULD_CLEAR_CAMSYNC_RECORDS
-                        )
-                    )
-                    should = decrypt(should)
-                    return if (should.isNullOrEmpty()) {
-                        false
-                    } else {
-                        java.lang.Boolean.valueOf(should)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return false
-    }
-
-    override fun saveShouldClearCamsyncRecords(should: Boolean) {
-        val sql =
-            "UPDATE $TABLE_PREFERENCES SET $KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = '${encrypt(should.toString())}'"
-        writableDatabase.execSQL(sql)
-    }
-
     override fun saveMyEmail(email: String?) {
         Timber.d("saveEmail: %s", email)
         val selectQuery = "SELECT * FROM $TABLE_CREDENTIALS"
@@ -368,14 +337,6 @@ class SqliteDatabaseHandler @Inject constructor(
                     )
                     val chargingOnSize =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_CHARGING_ON_SIZE)))
-                    val shouldClearCameraSyncRecords = decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                KEY_SHOULD_CLEAR_CAMSYNC_RECORDS
-                            )
-                        )
-                    )
                     val camVideoSyncTimeStamp = decrypt(
                         cursor.getString(
                             getColumnIndex(
@@ -480,7 +441,6 @@ class SqliteDatabaseHandler @Inject constructor(
                         uploadVideoQuality,
                         conversionOnCharging,
                         chargingOnSize,
-                        shouldClearCameraSyncRecords,
                         camVideoSyncTimeStamp,
                         secVideoSyncTimeStamp,
                         isAutoPlayEnabled,
@@ -2864,7 +2824,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val TABLE_COMPLETED_TRANSFERS = "completedtransfers"
         const val TABLE_EPHEMERAL = "ephemeral"
         const val TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle"
-        const val TABLE_SYNC_RECORDS = "syncrecords"
         const val KEY_ID = "id"
         const val KEY_EMAIL = "email"
         const val KEY_PASSWORD = "password"
@@ -2975,36 +2934,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_AUTO_PLAY = "autoplay"
         const val KEY_ID_CHAT = "idchat"
 
-        //columns for table sync records
-        const val KEY_SYNC_FILEPATH_ORI = "sync_filepath_origin"
-        const val KEY_SYNC_FILEPATH_NEW = "sync_filepath_new"
-        const val KEY_SYNC_FP_ORI = "sync_fingerprint_origin"
-        const val KEY_SYNC_FP_NEW = "sync_fingerprint_new"
-        const val KEY_SYNC_TIMESTAMP = "sync_timestamp"
-        const val KEY_SYNC_STATE = "sync_state"
-        const val KEY_SYNC_FILENAME = "sync_filename"
-        const val KEY_SYNC_HANDLE = "sync_handle"
-        const val KEY_SYNC_COPYONLY = "sync_copyonly"
-        const val KEY_SYNC_SECONDARY = "sync_secondary"
-        const val KEY_SYNC_TYPE = "sync_type"
-        const val KEY_SYNC_LONGITUDE = "sync_longitude"
-        const val KEY_SYNC_LATITUDE = "sync_latitude"
-        const val CREATE_SYNC_RECORDS_TABLE =
-            "CREATE TABLE IF NOT EXISTS $TABLE_SYNC_RECORDS(" +
-                    "$KEY_ID INTEGER PRIMARY KEY, " +
-                    "$KEY_SYNC_FILEPATH_ORI TEXT," +
-                    "$KEY_SYNC_FILEPATH_NEW TEXT," +
-                    "$KEY_SYNC_FP_ORI TEXT," +
-                    "$KEY_SYNC_FP_NEW TEXT," +
-                    "$KEY_SYNC_TIMESTAMP TEXT," +
-                    "$KEY_SYNC_FILENAME TEXT," +
-                    "$KEY_SYNC_LONGITUDE TEXT," +
-                    "$KEY_SYNC_LATITUDE TEXT," +
-                    "$KEY_SYNC_STATE INTEGER," +
-                    "$KEY_SYNC_TYPE INTEGER," +
-                    "$KEY_SYNC_HANDLE TEXT," +
-                    "$KEY_SYNC_COPYONLY BOOLEAN," +
-                    "$KEY_SYNC_SECONDARY BOOLEAN)"
         const val KEY_LAST_PUBLIC_HANDLE = "lastpublichandle"
         const val KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = "lastpublichandletimestamp"
         const val KEY_LAST_PUBLIC_HANDLE_TYPE = "lastpublichandletype"

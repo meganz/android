@@ -106,7 +106,6 @@ class CameraUploadsNotificationManager @Inject constructor(
                 progress = cameraUploadsStatusInfo.progress,
                 currentFileIndex = cameraUploadsStatusInfo.currentFileIndex,
                 totalCount = cameraUploadsStatusInfo.totalCount,
-                useCameraUploadsRecords = cameraUploadsStatusInfo.useCameraUploadsRecords,
             )
         }
     }
@@ -183,7 +182,6 @@ class CameraUploadsNotificationManager @Inject constructor(
         progress: Int,
         currentFileIndex: Int,
         totalCount: Int,
-        useCameraUploadsRecords: Boolean,
     ) {
         val content = context.getString(
             R.string.title_compress_video,
@@ -199,10 +197,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             isOngoing = true,
             progress = progress,
         )
-        notificationManager.notify(
-            if (useCameraUploadsRecords) COMPRESSION_NOTIFICATION_ID else NOTIFICATION_ID,
-            notification
-        )
+        notificationManager.notify(COMPRESSION_NOTIFICATION_ID, notification)
     }
 
     /**

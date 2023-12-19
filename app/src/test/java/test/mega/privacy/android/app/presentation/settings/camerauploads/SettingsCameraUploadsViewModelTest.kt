@@ -13,8 +13,6 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
-import mega.privacy.android.domain.entity.SyncStatus
-import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -27,11 +25,6 @@ import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
-import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
-import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
-import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
-import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
-import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
@@ -59,7 +52,6 @@ import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocal
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSyncHandleUseCase
@@ -113,10 +105,6 @@ class SettingsCameraUploadsViewModelTest {
         mock<IsChargingRequiredForVideoCompressionUseCase>()
     private val isPrimaryFolderPathValidUseCase = mock<IsPrimaryFolderPathValidUseCase>()
     private val preparePrimaryFolderPathUseCase = mock<PreparePrimaryFolderPathUseCase>()
-    private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
-    private val resetMediaUploadTimeStamps = mock<ResetMediaUploadTimeStamps>()
-    private val restorePrimaryTimestamps = mock<RestorePrimaryTimestamps>()
-    private val restoreSecondaryTimestamps = mock<RestoreSecondaryTimestamps>()
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
     private val setChargingRequiredForVideoCompressionUseCase =
         mock<SetChargingRequiredForVideoCompressionUseCase>()
@@ -126,7 +114,6 @@ class SettingsCameraUploadsViewModelTest {
     private val setUploadFileNamesKeptUseCase = mock<SetUploadFileNamesKeptUseCase>()
     private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
-    private val setUploadVideoSyncStatusUseCase = mock<SetUploadVideoSyncStatusUseCase>()
     private val setVideoCompressionSizeLimitUseCase = mock<SetVideoCompressionSizeLimitUseCase>()
     private val setupDefaultSecondaryFolderUseCase = mock<SetupDefaultSecondaryFolderUseCase>()
     private val setupPrimaryFolderUseCase = mock<SetupPrimaryFolderUseCase>()
@@ -151,7 +138,6 @@ class SettingsCameraUploadsViewModelTest {
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase = mock()
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase = mock()
     private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase = mock()
-    private val updateCameraUploadTimeStamp: UpdateCameraUploadTimeStamp = mock()
 
     @BeforeAll
     fun setUp() {
@@ -180,10 +166,6 @@ class SettingsCameraUploadsViewModelTest {
             isChargingRequiredForVideoCompressionUseCase,
             isPrimaryFolderPathValidUseCase,
             preparePrimaryFolderPathUseCase,
-            resetCameraUploadTimeStamps,
-            resetMediaUploadTimeStamps,
-            restorePrimaryTimestamps,
-            restoreSecondaryTimestamps,
             setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase,
             setDefaultPrimaryFolderPathUseCase,
@@ -192,7 +174,6 @@ class SettingsCameraUploadsViewModelTest {
             setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase,
             setUploadVideoQualityUseCase,
-            setUploadVideoSyncStatusUseCase,
             setVideoCompressionSizeLimitUseCase,
             setupDefaultSecondaryFolderUseCase,
             setupPrimaryFolderUseCase,
@@ -215,7 +196,6 @@ class SettingsCameraUploadsViewModelTest {
             isSecondaryFolderPathValidUseCase,
             setSecondaryFolderLocalPathUseCase,
             clearCameraUploadsRecordUseCase,
-            updateCameraUploadTimeStamp,
         )
     }
 
@@ -240,10 +220,6 @@ class SettingsCameraUploadsViewModelTest {
             isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
             monitorConnectivityUseCase = mock(),
             preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
-            resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
-            resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
-            restorePrimaryTimestamps = restorePrimaryTimestamps,
-            restoreSecondaryTimestamps = restoreSecondaryTimestamps,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
             setDefaultPrimaryFolderPathUseCase = setDefaultPrimaryFolderPathUseCase,
@@ -252,7 +228,6 @@ class SettingsCameraUploadsViewModelTest {
             setUploadFileNamesKeptUseCase = setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase = setUploadOptionUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
-            setUploadVideoSyncStatusUseCase = setUploadVideoSyncStatusUseCase,
             setVideoCompressionSizeLimitUseCase = setVideoCompressionSizeLimitUseCase,
             setupDefaultSecondaryFolderUseCase = setupDefaultSecondaryFolderUseCase,
             setupPrimaryFolderUseCase = setupPrimaryFolderUseCase,
@@ -277,7 +252,6 @@ class SettingsCameraUploadsViewModelTest {
             isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
             setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
             clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
-            updateCameraUploadTimeStamp = updateCameraUploadTimeStamp
         )
     }
 
@@ -464,7 +438,6 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.changeUploadOption(uploadOption)
 
-            verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
             verify(clearCacheDirectory).invoke()
             verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             underTest.state.test {
@@ -508,27 +481,8 @@ class SettingsCameraUploadsViewModelTest {
             underTest.changeUploadVideoQuality(4)
             verifyNoInteractions(
                 setUploadVideoQualityUseCase,
-                setUploadVideoSyncStatusUseCase,
             )
         }
-
-    @ParameterizedTest(name = "invoked with {0}, video sync status is {1}")
-    @MethodSource("provideSyncStatusParams")
-    fun `test that when changeUploadVideoQuality is`(
-        value: Int,
-        expectedVideoSyncStatus: SyncStatus,
-    ) = runTest {
-        setupUnderTest()
-        underTest.changeUploadVideoQuality(value)
-        verify(setUploadVideoSyncStatusUseCase).invoke(expectedVideoSyncStatus)
-    }
-
-    private fun provideSyncStatusParams() = Stream.of(
-        Arguments.of(0, SyncStatus.STATUS_TO_COMPRESS),
-        Arguments.of(1, SyncStatus.STATUS_TO_COMPRESS),
-        Arguments.of(2, SyncStatus.STATUS_TO_COMPRESS),
-        Arguments.of(3, SyncStatus.STATUS_PENDING)
-    )
 
     @ParameterizedTest(name = "invoked with {0}, device is needed to charge {0}")
     @ValueSource(booleans = [true, false])
@@ -584,7 +538,6 @@ class SettingsCameraUploadsViewModelTest {
         verify(setPrimaryFolderPathUseCase).invoke(
             newFolderPath = testPath,
         )
-        verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
         verify(clearCacheDirectory).invoke()
         verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
         underTest.state.test {
@@ -625,16 +578,6 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that restorePrimaryTimestamps is invoked when calling restorePrimaryTimestampsAndSyncRecordProcess`() =
-        runTest {
-            setupUnderTest()
-
-            underTest.restorePrimaryTimestampsAndSyncRecordProcess()
-
-            verify(restorePrimaryTimestamps).invoke()
-        }
-
-    @Test
     fun `test that setupPrimaryFolder is invoked when calling setupPrimaryCameraUploadFolder`() =
         runTest {
             setupUnderTest()
@@ -667,7 +610,6 @@ class SettingsCameraUploadsViewModelTest {
             underTest.toggleMediaUploads()
             // disable media upload
             underTest.toggleMediaUploads()
-            verify(resetMediaUploadTimeStamps).invoke()
             verify(disableMediaUploadSettings).invoke()
         }
 
@@ -729,7 +671,6 @@ class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
             underTest.onCameraUploadsEnabled()
-            verify(restorePrimaryTimestamps).invoke()
             verify(setupCameraUploadsSettingUseCase).invoke(true)
             testScheduler.advanceUntilIdle()
             underTest.state.test {
@@ -747,7 +688,6 @@ class SettingsCameraUploadsViewModelTest {
             // enable
             underTest.toggleMediaUploads()
             verify(setupDefaultSecondaryFolderUseCase).invoke()
-            verify(restoreSecondaryTimestamps).invoke()
             verify(setupMediaUploadsSettingUseCase).invoke(true)
         }
 
@@ -759,7 +699,6 @@ class SettingsCameraUploadsViewModelTest {
             whenever(isSecondaryFolderPathValidUseCase(mediaUploadsFolderPath)).thenReturn(true)
             underTest.updateMediaUploadsLocalFolder(mediaUploadsFolderPath)
             verify(setSecondaryFolderLocalPathUseCase).invoke(mediaUploadsFolderPath)
-            verify(restoreSecondaryTimestamps).invoke()
             verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
         }
 
@@ -872,8 +811,6 @@ class SettingsCameraUploadsViewModelTest {
             whenever(hasMediaPermissionUseCase()).thenReturn(!isEnabled)
             whenever(checkEnableCameraUploadsStatus()).thenReturn(EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
             underTest.toggleCameraUploadsSettings()
-            verify(updateCameraUploadTimeStamp).invoke(0L, SyncTimeStamp.PRIMARY_PHOTO)
-            verify(updateCameraUploadTimeStamp).invoke(0L, SyncTimeStamp.PRIMARY_VIDEO)
             if (isEnabled) {
                 verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
             } else {

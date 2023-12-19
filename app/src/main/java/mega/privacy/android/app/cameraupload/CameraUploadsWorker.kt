@@ -22,14 +22,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
@@ -51,15 +47,10 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
-import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.USE_CAMERA_UPLOADS_RECORDS
-import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BackupState
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
-import mega.privacy.android.domain.entity.SyncStatus
-import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -68,12 +59,8 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAct
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.Transfer
-import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -81,33 +68,19 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
-import mega.privacy.android.domain.usecase.ClearSyncRecords
-import mega.privacy.android.domain.usecase.CompressVideos
-import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
-import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
-import mega.privacy.android.domain.usecase.DeleteSyncRecord
-import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
-import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
-import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
-import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
-import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
-import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
@@ -126,11 +99,8 @@ import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathVali
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
-import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
@@ -138,33 +108,22 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUse
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
-import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
-import java.io.FileNotFoundException
 import java.time.Instant
 import java.util.Hashtable
 import java.util.concurrent.CancellationException
-import java.util.concurrent.TimeUnit
 
 /**
  * Worker to run Camera Uploads
@@ -180,21 +139,9 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val isWifiNotSatisfiedUseCase: IsWifiNotSatisfiedUseCase,
-    private val deleteSyncRecord: DeleteSyncRecord,
-    private val deleteSyncRecordByLocalPath: DeleteSyncRecordByLocalPath,
-    private val deleteSyncRecordByFingerprint: DeleteSyncRecordByFingerprint,
     private val setPrimaryFolderLocalPathUseCase: SetPrimaryFolderLocalPathUseCase,
-    private val shouldCompressVideo: ShouldCompressVideo,
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
-    private val clearSyncRecords: ClearSyncRecords,
-    private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
-    private val getPendingSyncRecords: GetPendingSyncRecords,
-    private val compressedVideoPending: CompressedVideoPending,
-    private val getVideoSyncRecordsByStatus: GetVideoSyncRecordsByStatus,
-    private val setSyncRecordPendingByPath: SetSyncRecordPendingByPath,
     private val isChargingRequired: IsChargingRequired,
-    private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    private val processMediaForUploadUseCase: ProcessMediaForUploadUseCase,
     private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase,
     private val setPrimarySyncHandle: SetPrimarySyncHandle,
     private val setSecondarySyncHandle: SetSecondarySyncHandle,
@@ -208,37 +155,23 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val monitorChargingStoppedState: MonitorChargingStoppedState,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase,
-    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase,
-    private val copyNodeUseCase: CopyNodeUseCase,
-    private val setOriginalFingerprintUseCase: SetOriginalFingerprintUseCase,
-    private val startUploadUseCase: StartUploadUseCase,
     private val createCameraUploadFolder: CreateCameraUploadFolder,
     private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase,
     private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase,
-    private val compressVideos: CompressVideos,
-    private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
     private val createCameraUploadTemporaryRootDirectoryUseCase: CreateCameraUploadTemporaryRootDirectoryUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
     private val broadcastCameraUploadProgress: BroadcastCameraUploadProgress,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
-    private val createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase,
     private val updateCameraUploadsBackupStatesUseCase: UpdateCameraUploadsBackupStatesUseCase,
     private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase,
     private val updateCameraUploadsBackupHeartbeatStatusUseCase: UpdateCameraUploadsBackupHeartbeatStatusUseCase,
-    private val addCompletedTransferUseCase: AddCompletedTransferUseCase,
-    private val setCoordinatesUseCase: SetCoordinatesUseCase,
     private val isChargingUseCase: IsChargingUseCase,
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase,
-    private val createImageOrVideoThumbnailUseCase: CreateImageOrVideoThumbnailUseCase,
-    private val createImageOrVideoPreviewUseCase: CreateImageOrVideoPreviewUseCase,
-    private val deleteThumbnailUseCase: DeleteThumbnailUseCase,
-    private val deletePreviewUseCase: DeletePreviewUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper,
@@ -260,9 +193,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     companion object {
         private const val LOW_BATTERY_LEVEL = 20
         private const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 1000
-        private const val CONCURRENT_UPLOADS_LIMIT = 16
 
-        private const val APP_DATA_CU = "CU_UPLOAD"
         private const val INVALID_NON_NULL_VALUE = "-1"
     }
 
@@ -353,17 +284,6 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private var monitorParentNodesDeletedJob: Job? = null
 
-    /**
-     * In order to not overload the memory of the app,
-     * limit the number of concurrent uploads to [CONCURRENT_UPLOADS_LIMIT]
-     */
-    private val semaphore = Semaphore(CONCURRENT_UPLOADS_LIMIT)
-
-    /**
-     * Flag to check if upload process with camera uploads records is enabled
-     */
-    private var useCameraUploadsRecordsEnabled: Boolean = false
-
     override suspend fun doWork() = coroutineScope {
         try {
             Timber.d("Start CU Worker")
@@ -373,38 +293,30 @@ class CameraUploadsWorker @AssistedInject constructor(
             setForegroundAsync(getForegroundInfo())
 
             withContext(ioDispatcher) {
-                useCameraUploadsRecordsEnabled =
-                    getFeatureFlagValueUseCase(DataFeatures.UseCameraUploadsRecords)
                 initService()
                 if (hasMediaPermissionUseCase() && isLoginSuccessful() && canRunCameraUploads()) {
                     Timber.d("Calling startWorker() successful. Starting Camera Uploads")
                     cameraUploadsNotificationManagerWrapper.cancelNotifications()
 
-                    if (useCameraUploadsRecordsEnabled) {
-                        scanFiles()
+                    scanFiles()
 
-                        val primaryUploadNodeId =
-                            NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
-                        val secondaryUploadNodeId =
-                            NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
+                    val primaryUploadNodeId =
+                        NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
+                    val secondaryUploadNodeId =
+                        NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
 
-                        getAndPrepareRecords(
+                    getAndPrepareRecords(
+                        primaryUploadNodeId,
+                        secondaryUploadNodeId
+                    ).let { records ->
+                        uploadFiles(
+                            records,
                             primaryUploadNodeId,
-                            secondaryUploadNodeId
-                        ).let { records ->
-                            uploadFiles(
-                                records,
-                                primaryUploadNodeId,
-                                secondaryUploadNodeId,
-                                tempRoot
-                            )
-                        }
-                    } else {
-                        checkUploadNodes()
-                        upload()
-                        compressVideos()
-                        uploadCompressedVideos()
+                            secondaryUploadNodeId,
+                            tempRoot
+                        )
                     }
+
                     endWork()
                     Result.success()
                 } else {
@@ -495,23 +407,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                 }
             }
         }
-    }
-
-
-    /**
-     * Cancels a pending [Transfer] through [CancelTransferByTagUseCase],
-     * and call [resetTotalUploadsUseCase] after every cancellation to reset the total uploads if
-     * there are no more pending uploads
-     *
-     * @param transfer the [Transfer] to be cancelled
-     */
-    private suspend fun cancelPendingTransfer(transfer: Transfer) {
-        runCatching { cancelTransferByTagUseCase(transfer.tag) }
-            .onSuccess {
-                Timber.d("Transfer cancellation successful")
-                resetTotalUploadsUseCase()
-            }
-            .onFailure { error -> Timber.e("Transfer cancellation error: $error") }
     }
 
     /**
@@ -1095,194 +990,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
-
-    //@Karma
-    private suspend fun checkUploadNodes() {
-        Timber.d("Get Pending Files from Media Store Database")
-        showCheckUploadStatus()
-
-        val primaryUploadNode =
-            getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
-        if (primaryUploadNode == null) {
-            abortWork(cancelMessage = "Primary Parent folder is null")
-            return
-        }
-        val secondaryUploadNode = if (isSecondaryFolderEnabled()) {
-            Timber.d("Secondary Upload is ENABLED")
-            getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)))
-        } else {
-            null
-        }
-        processMediaForUploadUseCase(
-            primaryUploadNode.id,
-            secondaryUploadNode?.id,
-            tempRoot
-        )
-    }
-
-    //@Karma
-    private suspend fun upload() {
-        val finalList = getPendingSyncRecords().also {
-            Timber.d("Total File to upload ${it.size}")
-        }
-        startHeartbeat()
-        if (finalList.isNotEmpty()) {
-            startParallelUpload(finalList, isCompressedVideo = false)
-        }
-    }
-
-    //@Karma
-    private suspend fun compressVideos() {
-        if (compressedVideoPending()) {
-            startVideoCompression()
-            cameraUploadsNotificationManagerWrapper.cancelCompressionNotification()
-        }
-    }
-
-    //@Karma
-    private suspend fun uploadCompressedVideos() {
-        val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
-        if (compressedList.isNotEmpty()) {
-            Timber.d("Start to upload ${compressedList.size} compressed videos.")
-            startParallelUpload(compressedList, isCompressedVideo = true)
-        }
-    }
-
-    private suspend fun startParallelUpload(
-        finalList: List<SyncRecord>,
-        isCompressedVideo: Boolean,
-    ) = coroutineScope {
-        val primaryUploadNode =
-            getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
-        val secondaryUploadNode =
-            getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)))
-
-        val uploadFileAsyncList = mutableListOf<Job>()
-        for (record in finalList) {
-            val parentNodeId =
-                (if (record.isSecondary) secondaryUploadNode?.id else primaryUploadNode?.id)
-                    ?: continue
-            val shouldBeSkipped = createTemporaryFileIfNeeded(record)
-            if (shouldBeSkipped) continue
-            if (record.isCopyOnly) {
-                uploadFileAsyncList.add(launch {
-                    semaphore.acquire()
-                    Timber.d("Copy from node, file timestamp is: ${record.timestamp}")
-                    updateToUploadCount(
-                        filePath = record.localPath,
-                        folderType = if (record.isSecondary) CameraUploadFolderType.Secondary
-                        else CameraUploadFolderType.Primary,
-                    )
-                    copyNode(
-                        record = record,
-                        parentNodeId = parentNodeId,
-                    )
-                    semaphore.release()
-                })
-            } else {
-                uploadFileAsyncList.add(launch {
-                    semaphore.acquire()
-                    getFileToUpload(record, isCompressedVideo)?.let {
-                        updateToUploadCount(
-                            filePath = record.newPath?.takeIf { path -> File(path).exists() }
-                                ?: record.localPath,
-                            folderType = if (record.isSecondary) CameraUploadFolderType.Secondary
-                            else CameraUploadFolderType.Primary,
-                        )
-                        val lastModified = getLastModifiedTime(record)
-                        startUploadUseCase(
-                            localPath = it.path,
-                            parentNodeId = parentNodeId,
-                            fileName = record.fileName,
-                            modificationTime = lastModified / 1000,
-                            appData = APP_DATA_CU,
-                            isSourceTemporary = false,
-                            shouldStartFirst = false,
-                        ).collect { globalTransfer ->
-                            onGlobalTransferUpdated(globalTransfer, record)
-
-                            if (globalTransfer is TransferEvent.TransferFinishEvent) {
-                                semaphore.release()
-                            }
-                        }
-                    } ?: run {
-                        Timber.d("Local file is unavailable, delete record from database.")
-                        deleteSyncRecord(record.localPath, record.isSecondary)
-                        semaphore.release()
-                    }
-                })
-            }
-        }
-        uploadFileAsyncList.joinAll()
-    }
-
-    private suspend fun getFileToUpload(record: SyncRecord, isCompressedVideo: Boolean): File? {
-        return if (isCompressedVideo || record.type == SyncRecordType.TYPE_PHOTO
-            || record.type == SyncRecordType.TYPE_VIDEO && shouldCompressVideo()
-        ) {
-            record.newPath?.let { File(it).takeIf { newFile -> newFile.exists() } }
-                ?: File(record.localPath).takeIf { localFile -> localFile.exists() }
-        } else {
-            File(record.localPath).takeIf { localFile -> localFile.exists() }
-        }
-    }
-
-    /**
-     * create Temporary File and Remove Coordinates based on the settings
-     * @param record [SyncRecord]
-     *
-     * @return [Boolean] indicates whether given [SyncRecord] should  be uploaded or not
-     */
-    private suspend fun createTemporaryFileIfNeeded(
-        record: SyncRecord,
-    ): Boolean {
-        var shouldBeSkipped = false
-        if (record.type == SyncRecordType.TYPE_PHOTO && !record.isCopyOnly) {
-            if (!areLocationTagsEnabledUseCase()) {
-                flow<String> {
-                    createTempFileAndRemoveCoordinatesUseCase(
-                        rootPath = tempRoot,
-                        filePath = record.localPath,
-                        destinationPath = record.newPath
-                            ?: throw IllegalArgumentException("Destination path doesn't exist"),
-                        timestamp = record.timestamp,
-                    )
-                }.retryWhen { cause, attempt ->
-                    if (cause is NotEnoughStorageException) {
-                        if (attempt >= 60) {
-                            if (state.value.totalPendingCount == 0) {
-                                showNotEnoughStorageStatus()
-                                abortWork(cancelMessage = "Not enough space to create temp file")
-                            } else {
-                                // we will not be retying again and skip the current record
-                                Timber.d("Stop retrying for $record")
-                                shouldBeSkipped = true
-                                return@retryWhen false
-                            }
-                        }
-                        Timber.d("Waiting for disk space to process for $record")
-                        // total delay (1 second times 60 attempts) = 60 seconds
-                        delay(TimeUnit.SECONDS.toMillis(1))
-                        return@retryWhen true
-                    } else {
-                        // not storage exception, no need to retry
-                        return@retryWhen false
-                    }
-                }.catch {
-                    Timber.e("Temporary File creation exception $it")
-                    if (it is FileNotFoundException) {
-                        deleteSyncRecord(record.localPath, isSecondary = record.isSecondary)
-                    }
-                    shouldBeSkipped = true
-                }.collect()
-            } else {
-                // Set as don't remove GPS
-                record.newPath = record.localPath
-            }
-        }
-        return shouldBeSkipped
-    }
-
     private suspend fun startHeartbeat() {
         updateBackupState(if (areTransfersPaused()) BackupState.PAUSE_UPLOADS else BackupState.ACTIVE)
 
@@ -1293,146 +1000,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                     .collect()
             }
     }
-
-    /**
-     * Handles the [TransferEvent] emitted by [StartUploadUseCase]
-     *
-     * @param globalTransfer The [TransferEvent] emitted from the Use Case
-     */
-    private suspend fun onGlobalTransferUpdated(globalTransfer: TransferEvent, record: SyncRecord) {
-        when (globalTransfer) {
-            is TransferEvent.TransferFinishEvent -> onTransferFinished(globalTransfer, record)
-            is TransferEvent.TransferUpdateEvent -> onTransferUpdated(
-                globalTransfer,
-                if (record.isSecondary) CameraUploadFolderType.Secondary
-                else CameraUploadFolderType.Primary,
-                record.id.toLong(),
-            )
-
-            is TransferEvent.TransferTemporaryErrorEvent -> onTransferTemporaryError(globalTransfer)
-            // No further action necessary for these Scenarios
-            is TransferEvent.TransferStartEvent,
-            is TransferEvent.TransferDataEvent,
-            is TransferEvent.TransferPaused,
-            -> Unit
-        }
-    }
-
-    /**
-     * Handle logic for when an upload has finished
-     *
-     * @param globalTransfer [TransferEvent.TransferFinishEvent]
-     */
-    private suspend fun onTransferFinished(
-        globalTransfer: TransferEvent.TransferFinishEvent,
-        record: SyncRecord,
-    ) {
-        val transfer = globalTransfer.transfer
-        val error = globalTransfer.error
-        try {
-            updateUploadedCountAfterTransfer(
-                folderType =
-                if (record.isSecondary) CameraUploadFolderType.Secondary
-                else CameraUploadFolderType.Primary,
-                id = record.id.toLong(),
-                transfer = transfer,
-            )
-            transferFinished(transfer, error, record)
-        } catch (th: Throwable) {
-            Timber.e(th)
-            th.printStackTrace()
-        }
-    }
-
-    /**
-     * Handle logic for when an upload has been updated
-     *
-     * @param globalTransfer [TransferEvent.TransferFinishEvent]
-     */
-    private suspend fun onTransferUpdated(
-        globalTransfer: TransferEvent.TransferUpdateEvent,
-        folderType: CameraUploadFolderType,
-        id: Long,
-    ) {
-        val transfer = globalTransfer.transfer
-        runCatching {
-            updateUploadedCountAfterTransfer(
-                folderType = folderType,
-                id = id,
-                transfer = transfer,
-            )
-        }.onFailure {
-            Timber.d("Cancelled Transfer Node: ${transfer.nodeHandle}")
-            cancelPendingTransfer(transfer)
-        }
-    }
-
-    /**
-     * Handle logic for when a temporary error has occurred during uploading
-     *
-     * @param globalTransfer [TransferEvent.TransferTemporaryErrorEvent]
-     */
-    private suspend fun onTransferTemporaryError(globalTransfer: TransferEvent.TransferTemporaryErrorEvent) {
-        val error = globalTransfer.error
-        Timber.e(error, "onTransferTemporaryError")
-        if (error is QuotaExceededMegaException) {
-            Timber.w("${if (error.value != 0L) "Transfer" else "Storage"} Over Quota Error: ${error.errorCode}")
-            broadcastStorageOverQuotaUseCase()
-        }
-    }
-
-    /**
-     * Perform a copy operation through [CopyNodeUseCase]
-     *
-     * @param record the [SyncRecord] associated to the node to copy
-     * @param parentNodeId the [NodeId] that the node will be moved to
-     */
-    private suspend fun copyNode(
-        record: SyncRecord,
-        parentNodeId: NodeId,
-    ) {
-        runCatching {
-            record.nodeHandle?.let { nodeHandle ->
-                getNodeByIdUseCase(NodeId(nodeHandle))?.let { nodeToCopy ->
-                    val nodeId = copyNodeUseCase(
-                        nodeToCopy = nodeToCopy.id,
-                        newNodeParent = parentNodeId,
-                        newNodeName = record.fileName,
-                    )
-                    (getNodeByIdUseCase(nodeId) as? TypedFileNode)?.let { retrievedNode ->
-                        val fingerprint = retrievedNode.fingerprint
-                        val isSecondary = retrievedNode.parentId == NodeId(
-                            getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
-                        )
-                        // Delete the Camera Uploads sync record by fingerprint
-                        fingerprint?.let {
-                            deleteSyncRecordByFingerprint(
-                                originalPrint = fingerprint,
-                                newPrint = fingerprint,
-                                isSecondary = isSecondary,
-                            )
-                        }
-                        updateUploadedCountAfterCopy(
-                            folderType =
-                            if (record.isSecondary) CameraUploadFolderType.Secondary
-                            else CameraUploadFolderType.Primary,
-                            filePath = record.localPath,
-                            id = record.id.toLong(),
-                            nodeId = nodeId,
-                        )
-
-                        Timber.d("Copy node successful")
-                    }
-                }
-            }
-        }.onFailure { error ->
-            Timber.e("Copy node error: $error")
-        }
-
-    }
-
-    private fun getLastModifiedTime(file: SyncRecord): Long =
-        File(file.localPath).lastModified()
 
     /**
      * Executes certain behavior when the Primary Folder is disabled
@@ -1455,7 +1022,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun handleSecondaryFolderDisabled() {
         showFolderUnavailableStatus(CameraUploadFolderType.Secondary)
         // Disable Media Uploads only
-        resetMediaUploadTimeStamps()
         disableMediaUploadSettings()
         // setting an invalid path
         setSecondaryFolderLocalPathUseCase(INVALID_NON_NULL_VALUE)
@@ -1532,8 +1098,6 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         // Reset properties
         lastUpdated = 0
-        // Clear sync records if needed
-        clearSyncRecords()
         // Create temp root folder
         runCatching { tempRoot = createCameraUploadTemporaryRootDirectoryUseCase() }
             .onFailure {
@@ -1631,87 +1195,6 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         // Update both Primary and Secondary Heartbeat Statuses to UP_TO_DATE
         updateBackupHeartbeatStatus(HeartbeatStatus.UP_TO_DATE)
-    }
-
-    private suspend fun transferFinished(
-        transfer: Transfer,
-        error: MegaException?,
-        record: SyncRecord,
-    ) {
-        try {
-            val path = transfer.localPath
-            if (transfer.state == TransferState.STATE_COMPLETED) {
-                addCompletedTransferUseCase(transfer, error)
-            }
-            error?.let {
-                Timber.d("Image Sync Finished, Error Code: ${it.errorCode}")
-                if (error is QuotaExceededMegaException) {
-                    Timber.w("Over quota error: ${error.errorCode}")
-                    showStorageOverQuotaStatus()
-                    broadcastStorageOverQuotaUseCase()
-                } else {
-                    Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, it.errorString)
-                }
-            } ?: run {
-                Timber.d(
-                    "Image Sync Finished" +
-                            "Image Handle: ${transfer.nodeHandle}, " +
-                            "Image Size: ${transfer.transferredBytes}"
-                )
-                val node = getNodeByIdUseCase(NodeId(transfer.nodeHandle)) as? TypedFileNode
-                node?.let { nonNullNode ->
-                    handleSetOriginalFingerprint(
-                        nodeId = nonNullNode.id,
-                        originalFingerprint = record.originFingerprint.orEmpty(),
-                    )
-                    record.latitude?.let { latitude ->
-                        record.longitude?.let { longitude ->
-                            setCoordinatesUseCase(
-                                nodeId = nonNullNode.id,
-                                latitude = latitude.toDouble(),
-                                longitude = longitude.toDouble(),
-                            )
-                        }
-                    }
-                    File(record.localPath).takeIf { it.exists() }?.let {
-                        if (deleteThumbnailUseCase(nonNullNode.id.longValue)) {
-                            createImageOrVideoThumbnailUseCase(nonNullNode.id.longValue, it)
-                        }
-                        if (deletePreviewUseCase(nonNullNode.id.longValue)) {
-                            createImageOrVideoPreviewUseCase(nonNullNode.id.longValue, it)
-                        }
-                    }
-                }
-                // delete database record
-                deleteSyncRecord(path, record.isSecondary)
-                // delete temp files
-                if (path.startsWith(tempRoot)) {
-                    val temp = File(path)
-                    if (temp.exists()) {
-                        temp.delete()
-                    }
-                }
-            }
-        } catch (exception: Exception) {
-            Timber.e(exception, "$transfer transferFinished error")
-        }
-    }
-
-    /**
-     * Sets the original fingerprint by calling [setOriginalFingerprintUseCase] and logs the result
-     *
-     * @param nodeId the [Node] to attach the [originalFingerprint] to
-     * @param originalFingerprint the fingerprint of the file before modification
-     */
-    private suspend fun handleSetOriginalFingerprint(nodeId: NodeId, originalFingerprint: String) {
-        runCatching {
-            setOriginalFingerprintUseCase(
-                nodeId = nodeId,
-                originalFingerprint = originalFingerprint,
-            )
-        }.onSuccess {
-            Timber.d("Set original fingerprint successful")
-        }.onFailure { error -> Timber.e("Set original fingerprint error: $error") }
     }
 
     /**
@@ -1814,65 +1297,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         broadcastCameraUploadProgress(progress, pending)
     }
 
-    private suspend fun startVideoCompression() = coroutineScope {
-        val fullList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS)
-        if (fullList.isNotEmpty()) {
-            resetTotalUploadsUseCase()
-            resetUploadsCounts()
-            totalVideoSize = getTotalVideoSizeInMB(fullList.map { it.localPath })
-            Timber.d("Total videos count are ${fullList.size}, $totalVideoSize MB to Conversion")
-            if (shouldStartVideoCompression(totalVideoSize)) {
-                videoCompressionJob = launch {
-                    Timber.d("Starting compressor")
-                    compressVideos(tempRoot, fullList)
-                        .catch {
-                            Timber.d("Video Compression fails $it")
-                        }
-                        .collect {
-                            when (it) {
-                                is VideoCompressionState.Failed -> {
-                                    onCompressFailed(fullList.first { record -> record.id.toLong() == it.id })
-                                }
-
-                                VideoCompressionState.Finished -> {
-                                    Timber.d("Video Compression Finished Successfully")
-                                }
-
-                                is VideoCompressionState.FinishedCompression -> {
-                                    Timber.d("Video compressed path: ${it.returnedFile} success:${it.isSuccess} ")
-                                }
-
-                                VideoCompressionState.Initial -> {
-                                    Timber.d("Video Compression Started")
-                                }
-
-                                VideoCompressionState.InsufficientStorage -> {
-                                    onInsufficientSpace(fullList)
-                                }
-
-                                is VideoCompressionState.Progress -> {
-                                    onCompressUpdateProgress(
-                                        progress = it.progress,
-                                        currentFileIndex = it.currentIndex,
-                                        totalCount = it.totalCount
-                                    )
-                                }
-
-                                is VideoCompressionState.Successful -> {
-                                    onCompressSuccessful(fullList.first { record -> record.id.toLong() == it.id })
-                                }
-                            }
-                        }
-                }
-                videoCompressionJob?.join()
-                videoCompressionJob = null
-            } else {
-                Timber.d("Compression queue bigger than setting, show notification to user.")
-                showVideoCompressionErrorStatus()
-            }
-        }
-    }
-
     private fun getTotalVideoSizeInMB(recordFilePathList: List<String>) =
         recordFilePathList.sumOf { File(it).length() } / (1024 * 1024)
 
@@ -1882,66 +1306,6 @@ class CameraUploadsWorker @AssistedInject constructor(
             return false
         }
         return true
-    }
-
-    /**
-     * Not enough space available
-     */
-    private suspend fun onInsufficientSpace(records: List<SyncRecord>) {
-        Timber.w("Insufficient space for video compression.")
-        records.forEach { setRecordPendingOrRemove(it) }
-        showVideoCompressionOutOfSpaceStatus()
-        abortWork(cancelMessage = "Not enough space to compress videos")
-    }
-
-    /**
-     * Update compression progress
-     */
-    private suspend fun onCompressUpdateProgress(
-        progress: Int,
-        currentFileIndex: Int,
-        totalCount: Int,
-    ) {
-        showVideoCompressionProgress(progress, currentFileIndex, totalCount)
-    }
-
-    /**
-     * Compression successful
-     */
-    private suspend fun onCompressSuccessful(record: SyncRecord) {
-        Timber.d("Compression successfully for file with timestamp: %s", record.timestamp)
-        setSyncRecordPendingByPath(record.localPath, record.isSecondary)
-    }
-
-    /**
-     * Compression failed
-     */
-    private suspend fun onCompressFailed(record: SyncRecord) {
-        setRecordPendingOrRemove(record)
-    }
-
-    private suspend fun setRecordPendingOrRemove(record: SyncRecord) {
-        val localPath = record.localPath
-        val isSecondary = record.isSecondary
-        Timber.w("Compression failed for file with timestamp: ${record.timestamp}")
-        val srcFile = File(localPath)
-        if (srcFile.exists()) {
-            try {
-                setSyncRecordPendingByPath(localPath, isSecondary)
-                Timber.d("Can not compress but got enough disk space, so should be un-supported format issue")
-                record.newPath?.let { newPath ->
-                    if (newPath.startsWith(tempRoot)) {
-                        File(newPath).takeIf { it.exists() }?.delete()
-                    }
-                }
-                // record will remain in DB and will be re-compressed next launch
-            } catch (ex: Exception) {
-                Timber.e(ex)
-            }
-        } else {
-            Timber.w("Compressed video not exists, remove from DB")
-            deleteSyncRecordByLocalPath(localPath, isSecondary)
-        }
     }
 
     private suspend fun displayUploadProgress() {
@@ -2023,7 +1387,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                 CURRENT_PROGRESS to progress,
                 CURRENT_FILE_INDEX to currentFileIndex,
                 TOTAL_COUNT to totalCount,
-                USE_CAMERA_UPLOADS_RECORDS to useCameraUploadsRecordsEnabled,
             )
         )
     }

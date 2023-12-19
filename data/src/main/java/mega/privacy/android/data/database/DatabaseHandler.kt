@@ -119,8 +119,6 @@ interface DatabaseHandler {
     var attributes: MegaAttributes?
 
     fun saveCredentials(userCredentials: UserCredentials)
-    fun shouldClearCamsyncRecords(): Boolean
-    fun saveShouldClearCamsyncRecords(should: Boolean)
     fun saveMyEmail(email: String?)
     fun saveMyFirstName(firstName: String?)
     fun saveMyLastName(lastName: String?)

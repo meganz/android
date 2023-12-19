@@ -59,10 +59,6 @@ class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
         verify(dataStore).setUploadFileNamesKept(false)
         verify(dataStore).setVideoCompressionSizeLimit(200)
         verify(dataStore).setFileUploadOption(1001)
-        verify(dataStore).setPhotoTimeStamp(0L)
-        verify(dataStore).setVideoTimeStamp(0L)
-        verify(dataStore).setMediaUploadsPhotoTimeStamp(0L)
-        verify(dataStore).setMediaUploadsVideoTimeStamp(0L)
         verify(dataStore).setUploadsByWifi(true)
     }
 
@@ -126,10 +122,6 @@ class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
         )
         verify(dataStore).setVideoCompressionSizeLimit(expectedVideoCompressionSizeLimit)
         verify(dataStore).setFileUploadOption(expectedFileUploadOption)
-        verify(dataStore).setPhotoTimeStamp(expectedPhotoTimeStamp)
-        verify(dataStore).setVideoTimeStamp(expectedVideoTimeStamp)
-        verify(dataStore).setMediaUploadsPhotoTimeStamp(expectedMediaUploadsPhotoTimeStamp)
-        verify(dataStore).setMediaUploadsVideoTimeStamp(expectedMediaUploadsVideoTimeStamp)
         verify(dataStore).setUploadsByWifi(expectedUploadsByWifi)
     }
 }

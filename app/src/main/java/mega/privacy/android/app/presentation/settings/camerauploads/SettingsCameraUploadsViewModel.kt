@@ -12,8 +12,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
-import mega.privacy.android.domain.entity.SyncStatus
-import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -26,11 +24,6 @@ import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
-import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
-import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
-import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
-import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
-import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.backup.MonitorBackupInfoTypeUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
@@ -60,7 +53,6 @@ import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocal
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSyncHandleUseCase
@@ -95,10 +87,6 @@ import javax.inject.Inject
  * @property isPrimaryFolderPathValidUseCase Checks whether the Primary Folder path is valid or not
  * @property monitorConnectivityUseCase Monitors the device online status
  * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
- * @property resetCameraUploadTimeStamps Resets the Primary and Secondary Timestamps
- * @property resetMediaUploadTimeStamps Resets the Secondary Timestamps
- * @property restorePrimaryTimestamps Restores the Primary Timestamps
- * @property restoreSecondaryTimestamps Restores the Secondary Timestamps
  * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
  * @property setChargingRequiredForVideoCompressionUseCase Sets whether compressing videos require the device to be charged or not
  * @property setDefaultPrimaryFolderPathUseCase Sets the default Primary Folder path
@@ -107,7 +95,6 @@ import javax.inject.Inject
  * @property setUploadFileNamesKeptUseCase Sets whether the File Names of files to be uploaded will be kept or not
  * @property setUploadOptionUseCase Sets the new upload option of Camera Uploads
  * @property setUploadVideoQualityUseCase Sets the new Video Quality of Videos to be uploaded
- * @property setUploadVideoSyncStatusUseCase Sets the new Sync Status of Videos to be uploaded
  * @property setVideoCompressionSizeLimitUseCase Sets the maximum video file size that can be compressed
  * @property setupDefaultSecondaryFolderUseCase Sets up a default Secondary Folder of Camera Uploads
  * @property setupPrimaryFolderUseCase Sets up the Primary Folder of Camera Uploads
@@ -133,10 +120,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
-    private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
-    private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
-    private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
-    private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setChargingRequiredForVideoCompressionUseCase: SetChargingRequiredForVideoCompressionUseCase,
     private val setDefaultPrimaryFolderPathUseCase: SetDefaultPrimaryFolderPathUseCase,
@@ -145,7 +128,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setUploadFileNamesKeptUseCase: SetUploadFileNamesKeptUseCase,
     private val setUploadOptionUseCase: SetUploadOptionUseCase,
     private val setUploadVideoQualityUseCase: SetUploadVideoQualityUseCase,
-    private val setUploadVideoSyncStatusUseCase: SetUploadVideoSyncStatusUseCase,
     private val setVideoCompressionSizeLimitUseCase: SetVideoCompressionSizeLimitUseCase,
     private val setupDefaultSecondaryFolderUseCase: SetupDefaultSecondaryFolderUseCase,
     private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase,
@@ -170,7 +152,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
     private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase,
-    private val updateCameraUploadTimeStamp: UpdateCameraUploadTimeStamp,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -252,16 +233,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
         _state.update { it.copy(shouldShowBusinessAccountPrompt = false) }
 
     /**
-     * If the handle matches the previous primary folder's handle, restore the time stamp from stamps
-     * if not clean the sync record from previous primary folder
-     */
-    fun restorePrimaryTimestampsAndSyncRecordProcess() {
-        viewModelScope.launch {
-            restorePrimaryTimestamps()
-        }
-    }
-
-    /**
      * on Enable MediaUpload
      */
     private suspend fun enableMediaUploads() {
@@ -276,9 +247,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             }
             // Sets up a Secondary Folder with a Media Uploads folder name
             setupDefaultSecondaryFolderUseCase()
-            //If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
-            //if not clean the sync record from previous primary folder
-            restoreSecondaryTimestamps()
             setupMediaUploadsSettingUseCase(isEnabled = true)
             stopCameraUploads()
             _state.update {
@@ -362,12 +330,10 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * Resets all Timestamps and cleans the Cache Directory
      */
     private suspend fun resetTimestampsAndCacheDirectory() {
-        resetCameraUploadTimeStamps(clearCamSyncRecords = true)
         clearCacheDirectory()
     }
 
     private suspend fun resetAndDisableMediaUploads() {
-        resetMediaUploadTimeStamps()
         disableMediaUploadSettings()
     }
 
@@ -377,7 +343,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun onCameraUploadsEnabled() {
         viewModelScope.launch {
             runCatching {
-                restorePrimaryTimestamps()
                 setupCameraUploadsSettingUseCase(isEnabled = true)
                 setCameraUploadsEnabled(true)
             }.onFailure {
@@ -465,13 +430,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 VideoQuality.values().find { it.value == value }?.let { videoQuality ->
                     setUploadVideoQualityUseCase(videoQuality)
-                    setUploadVideoSyncStatusUseCase(
-                        if (videoQuality == VideoQuality.ORIGINAL) {
-                            SyncStatus.STATUS_PENDING
-                        } else {
-                            SyncStatus.STATUS_TO_COMPRESS
-                        }
-                    )
                     refreshUploadVideoQuality()
                     stopCameraUploads()
                 }
@@ -821,7 +779,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     mediaUploadPath?.let {
                         setSecondaryFolderLocalPathUseCase(mediaUploadPath)
                     }
-                    restoreSecondaryTimestamps()
                     clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Secondary))
                     stopCameraUploads()
                     _state.update {
@@ -877,8 +834,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun toggleCameraUploadsSettings() {
         viewModelScope.launch {
             runCatching {
-                updateCameraUploadTimeStamp(timestamp = 0L, SyncTimeStamp.PRIMARY_PHOTO)
-                updateCameraUploadTimeStamp(timestamp = 0L, SyncTimeStamp.PRIMARY_VIDEO)
                 if (isCameraUploadsEnabledUseCase()) {
                     stopAndDisableCameraUploads()
                 } else {

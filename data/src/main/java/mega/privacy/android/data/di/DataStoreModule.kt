@@ -15,14 +15,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore.Companion.LAST_CAM_SYNC_TIMESTAMP_FILE
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore.Companion.REQUEST_PHONE_NUMBER_FILE
 import mega.privacy.android.data.preferences.cameraUploadsSettingsPreferenceDataStoreName
 import mega.privacy.android.data.preferences.migration.CameraUploadsSettingsPreferenceDataStoreMigration
 import mega.privacy.android.data.preferences.psa.psaPreferenceDataStoreName
 import mega.privacy.android.data.preferences.security.PasscodeDatastoreMigration
 import mega.privacy.android.data.preferences.security.passcodeDatastoreName
-import mega.privacy.android.data.qualifier.CameraTimestampsPreference
 import mega.privacy.android.data.qualifier.RequestPhoneNumberPreference
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Named
@@ -57,31 +55,6 @@ internal object DataStoreModule {
             ),
             scope = CoroutineScope(ioDispatcher),
             produceFile = { context.preferencesDataStoreFile(REQUEST_PHONE_NUMBER_FILE) }
-        )
-    }
-
-    /**
-     * provides DataStore<Preferences> for [LAST_CAM_SYNC_TIMESTAMP_FILE]
-     */
-    @Singleton
-    @Provides
-    @CameraTimestampsPreference
-    fun provideCameraPreferencesDataStore(
-        @ApplicationContext context: Context,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    ): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.create(
-            corruptionHandler = ReplaceFileCorruptionHandler(
-                produceNewData = { emptyPreferences() }
-            ),
-            migrations = listOf(
-                SharedPreferencesMigration(
-                    context,
-                    LAST_CAM_SYNC_TIMESTAMP_FILE
-                )
-            ),
-            scope = CoroutineScope(ioDispatcher),
-            produceFile = { context.preferencesDataStoreFile(LAST_CAM_SYNC_TIMESTAMP_FILE) }
         )
     }
 

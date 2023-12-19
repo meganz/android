@@ -87,11 +87,6 @@ interface MegaLocalStorageGateway {
     suspend fun doPreferencesExist(): Boolean
 
     /**
-     * Should clear sync records
-     */
-    suspend fun shouldClearSyncRecords(): Boolean
-
-    /**
      * Get non contact by handle
      *
      * @param userHandle
@@ -184,14 +179,6 @@ interface MegaLocalStorageGateway {
      * Gets attributes from DB
      */
     suspend fun getAttributes(): MegaAttributes?
-
-    /**
-     * This method is to clear Camera Sync Records from the Database
-     *
-     * @param clearCamSyncRecords the boolean setting whether to clean the cam record
-     */
-    suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean)
-
 
     /**
      * Get chat files folder handle

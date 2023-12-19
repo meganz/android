@@ -5,11 +5,7 @@ import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MediaStoreFileType
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
-import mega.privacy.android.domain.entity.SyncStatus
-import mega.privacy.android.domain.entity.SyncTimeStamp
-import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -85,20 +81,6 @@ interface CameraUploadRepository {
     suspend fun setCameraUploadsByWifi(wifiOnly: Boolean)
 
     /**
-     * Get camera upload sync timestamp
-     *
-     * @return sync timestamp
-     */
-    suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long?
-
-    /**
-     * Set camera upload sync timestamp
-     *
-     * @return
-     */
-    suspend fun setSyncTimeStamp(timeStamp: Long, type: SyncTimeStamp)
-
-    /**
      * Retrieves the upload option of Camera Uploads
      *
      * @return The corresponding [UploadOption]
@@ -111,111 +93,6 @@ interface CameraUploadRepository {
      * @param uploadOption The [UploadOption] to set
      */
     suspend fun setUploadOption(uploadOption: UploadOption)
-
-    /**
-     * Get all pending sync records to prepare for upload
-     *
-     * @return list of sync records
-     */
-    suspend fun getPendingSyncRecords(): List<SyncRecord>
-
-    /**
-     * Get sync record by fingerprint or null
-     *
-     * @return existing sync record
-     */
-    suspend fun getSyncRecordByFingerprint(
-        fingerprint: String?,
-        isSecondary: Boolean,
-        isCopy: Boolean,
-    ): SyncRecord?
-
-    /**
-     * Get sync record by new path or null
-     *
-     * @return existing sync record
-     */
-    suspend fun getSyncRecordByNewPath(path: String): SyncRecord?
-
-    /**
-     * Get sync record by local path or null
-     *
-     * @return existing sync record
-     */
-    suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord?
-
-    /**
-     * Delete all sync records
-     *
-     * @return
-     */
-    suspend fun deleteAllSyncRecords(syncRecordType: SyncRecordType)
-
-    /**
-     * Delete sync record by path
-     *
-     * @return
-     */
-    suspend fun deleteSyncRecord(path: String?, isSecondary: Boolean)
-
-    /**
-     * Save sync record
-     *
-     * @return
-     */
-    suspend fun saveSyncRecord(record: SyncRecord)
-
-    /**
-     * Save sync records
-     *
-     * @return
-     */
-    suspend fun saveSyncRecords(records: List<SyncRecord>)
-
-    /**
-     * Delete sync record by local path
-     *
-     * @return
-     */
-    suspend fun deleteSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean)
-
-    /**
-     * Delete sync record by fingerprint
-     *
-     * @return
-     */
-    suspend fun deleteSyncRecordByFingerprint(
-        originalPrint: String,
-        newPrint: String,
-        isSecondary: Boolean,
-    )
-
-    /**
-     * Should clear camera upload sync records
-     *
-     * @return true if camera upload sync records should be cleared
-     */
-    suspend fun shouldClearSyncRecords(): Boolean
-
-    /**
-     * Does file name exist in database
-     *
-     * @return true if file name exists
-     */
-    suspend fun doesFileNameExist(
-        fileName: String,
-        isSecondary: Boolean,
-    ): Boolean
-
-    /**
-     * Does local path exist
-     *
-     * @return true if local path exists
-     */
-    suspend fun doesLocalPathExist(
-        fileName: String,
-        isSecondary: Boolean,
-    ): Boolean
 
     /**
      * Do user credentials exist
@@ -317,13 +194,6 @@ interface CameraUploadRepository {
     suspend fun setUploadVideoQuality(videoQuality: VideoQuality)
 
     /**
-     * Sets the new Video Sync Status
-     *
-     * @param syncStatus The new [SyncStatus]
-     */
-    suspend fun setUploadVideoSyncStatus(syncStatus: SyncStatus)
-
-    /**
      * Checks whether the File Names are kept or not when uploading content
      *
      * @return true if the File Names should be left as is, and false if otherwise
@@ -343,20 +213,6 @@ interface CameraUploadRepository {
      * @return true if secondary media folder enabled
      */
     suspend fun isSecondaryMediaFolderEnabled(): Boolean?
-
-    /**
-     * Get maximum timestamp or null
-     *
-     * @return maximum timestamp
-     */
-    suspend fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: SyncRecordType): Long
-
-    /**
-     * Get video sync records by status
-     *
-     * @return list of video sync records
-     */
-    suspend fun getVideoSyncRecordsByStatus(syncStatusType: SyncStatus): List<SyncRecord>
 
     /**
      * Checks whether compressing videos require the device to be charged or not
@@ -408,37 +264,9 @@ interface CameraUploadRepository {
     ): List<CameraUploadsMedia>
 
     /**
-     * Update sync record status by local path
-     *
-     * @return
-     */
-    suspend fun updateSyncRecordStatusByLocalPath(
-        syncStatusType: Int,
-        localPath: String?,
-        isSecondary: Boolean,
-    )
-
-    /**
-     * This method is to clear Camera Sync Records from the Database
-     *
-     * @param clearCamSyncRecords the boolean setting whether to clean the cam record
-     */
-    suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean)
-
-    /**
      * clear all the contents of Internal cache directory
      */
     suspend fun clearCacheDirectory()
-
-    /**
-     * Delete all Primary Sync Records
-     */
-    suspend fun deleteAllPrimarySyncRecords()
-
-    /**
-     * Delete all Secondary Sync Records
-     */
-    suspend fun deleteAllSecondarySyncRecords()
 
     /**
      * Convert Base 64 string to handle
@@ -522,17 +350,6 @@ interface CameraUploadRepository {
      *
      */
     suspend fun stopCameraUploadsAndBackupHeartbeat()
-
-    /**
-     * compress videos
-     * @param records list of [SyncRecord]
-     * @return flow of [VideoCompressionState]
-     */
-    fun compressVideos(
-        root: String,
-        quality: VideoQuality,
-        records: List<SyncRecord>,
-    ): Flow<VideoCompressionState>
 
     /**
      * Listen to new media
@@ -636,13 +453,6 @@ interface CameraUploadRepository {
         latitude: Double,
         longitude: Double,
     )
-
-    /**
-     * @param currentTimeStamp
-     * @param localPath
-     * @return selection query
-     */
-    fun getSelectionQuery(currentTimeStamp: Long, localPath: String): String
 
     /**
      * isCharging

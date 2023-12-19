@@ -46,10 +46,6 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             isChargingRequiredForVideoCompression = true,
             videoCompressionSizeLimit = GetVideoCompressionSizeLimitUseCase.DEFAULT_SIZE,
             fileUploadOption = 1001,
-            photoTimeStamp = 0L,
-            videoTimeStamp = 0L,
-            mediaUploadsPhotoTimeStamp = 0L,
-            mediaUploadsVideoTimeStamp = 0L,
             isUploadsByWifi = true,
         )
     }
@@ -78,10 +74,6 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
                 ?: GetVideoCompressionSizeLimitUseCase.DEFAULT_SIZE,
             fileUploadOption = oldPreferences.camSyncFileUpload?.toIntOrNull()
                 ?: 1001,
-            photoTimeStamp = oldPreferences.camSyncTimeStamp?.toLongOrNull() ?: 0L,
-            videoTimeStamp = oldPreferences.camVideoSyncTimeStamp?.toLongOrNull() ?: 0L,
-            mediaUploadsPhotoTimeStamp = oldPreferences.secSyncTimeStamp?.toLongOrNull() ?: 0L,
-            mediaUploadsVideoTimeStamp = oldPreferences.secVideoSyncTimeStamp?.toLongOrNull() ?: 0L,
             isUploadsByWifi = oldPreferences.camSyncWifi?.toBooleanStrictOrNull() ?: true,
         )
     }
@@ -99,10 +91,6 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
         isChargingRequiredForVideoCompression: Boolean,
         videoCompressionSizeLimit: Int,
         fileUploadOption: Int,
-        photoTimeStamp: Long,
-        videoTimeStamp: Long,
-        mediaUploadsPhotoTimeStamp: Long,
-        mediaUploadsVideoTimeStamp: Long,
         isUploadsByWifi: Boolean,
     ) {
         with(this) {
@@ -118,10 +106,6 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             setChargingRequiredForVideoCompression(isChargingRequiredForVideoCompression)
             setVideoCompressionSizeLimit(videoCompressionSizeLimit)
             setFileUploadOption(fileUploadOption)
-            setPhotoTimeStamp(photoTimeStamp)
-            setVideoTimeStamp(videoTimeStamp)
-            setMediaUploadsPhotoTimeStamp(mediaUploadsPhotoTimeStamp)
-            setMediaUploadsVideoTimeStamp(mediaUploadsVideoTimeStamp)
             setUploadsByWifi(isUploadsByWifi)
         }
     }

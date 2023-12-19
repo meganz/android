@@ -234,7 +234,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                     "${SqliteDatabaseHandler.KEY_PENDING_MSG_STATE} INTEGER)"
         db.execSQL(CREATE_NEW_PENDING_MSG_TABLE)
 
-        db.execSQL(SqliteDatabaseHandler.CREATE_SYNC_RECORDS_TABLE)
         db.execSQL(SqliteDatabaseHandler.CREATE_SD_TRANSFERS_TABLE)
     }
 
@@ -669,7 +668,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             )
         }
         if (oldVersion <= 44) {
-            db.execSQL(SqliteDatabaseHandler.CREATE_SYNC_RECORDS_TABLE)
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_UPLOAD_VIDEO_QUALITY} TEXT;")
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_CONVERSION_ON_CHARGING} BOOLEAN;")
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_CHARGING_ON_SIZE} TEXT;")
@@ -1766,14 +1764,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                                 )
                             )
                         )
-                    val shouldClearCameraSyncRecords = SqliteDatabaseHandler.decrypt(
-                        cursor.getString(
-                            getColumnIndex(
-                                cursor,
-                                SqliteDatabaseHandler.KEY_SHOULD_CLEAR_CAMSYNC_RECORDS
-                            )
-                        )
-                    )
                     val camVideoSyncTimeStamp = SqliteDatabaseHandler.decrypt(
                         cursor.getString(
                             getColumnIndex(
@@ -1906,7 +1896,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                         uploadVideoQuality,
                         conversionOnCharging,
                         chargingOnSize,
-                        shouldClearCameraSyncRecords,
                         camVideoSyncTimeStamp,
                         secVideoSyncTimeStamp,
                         isAutoPlayEnabled,
@@ -2076,10 +2065,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
             put(
                 SqliteDatabaseHandler.KEY_CHARGING_ON_SIZE,
                 SqliteDatabaseHandler.encrypt(prefs.getChargingOnSize())
-            )
-            put(
-                SqliteDatabaseHandler.KEY_SHOULD_CLEAR_CAMSYNC_RECORDS,
-                SqliteDatabaseHandler.encrypt(prefs.getShouldClearCameraSyncRecords())
             )
             put(
                 SqliteDatabaseHandler.KEY_SHOW_INVITE_BANNER,

@@ -19,7 +19,6 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
-import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.USE_CAMERA_UPLOADS_RECORDS
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
@@ -69,7 +68,6 @@ class CameraUploadsStatusInfoMapper @Inject constructor() {
                         ),
                         totalCount = getInt(TOTAL_COUNT, 0),
                         progress = getInt(CURRENT_PROGRESS, 0),
-                        useCameraUploadsRecords = getBoolean(USE_CAMERA_UPLOADS_RECORDS, false),
                     )
                 }
             }

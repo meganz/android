@@ -12,7 +12,6 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
-import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
@@ -58,7 +57,6 @@ internal class DefaultSettingsRepositoryTest {
     private val fileGateway: FileGateway = mock()
     private val uiPreferencesGateway: UIPreferencesGateway = mock()
     private val startScreenMapper: StartScreenMapper = mock()
-    private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway = mock()
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway = mock()
 
     @BeforeAll
@@ -75,7 +73,6 @@ internal class DefaultSettingsRepositoryTest {
             fileGateway = fileGateway,
             uiPreferencesGateway = uiPreferencesGateway,
             startScreenMapper = startScreenMapper,
-            cameraTimestampsPreferenceGateway = cameraTimestampsPreferenceGateway,
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
         )
     }
@@ -93,7 +90,6 @@ internal class DefaultSettingsRepositoryTest {
             fileGateway,
             uiPreferencesGateway,
             startScreenMapper,
-            cameraTimestampsPreferenceGateway,
             fileManagementPreferencesGateway
         )
     }

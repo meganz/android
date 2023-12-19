@@ -42,11 +42,9 @@ import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.SubscriptionStatusMapper
-import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
-import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapperImpl
@@ -60,7 +58,6 @@ import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.data.mapper.storageStateToInt
-import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountSessionDetail
 import mega.privacy.android.data.mapper.toAccountStorageDetail
 import mega.privacy.android.data.mapper.toAccountTransferDetail
@@ -88,7 +85,6 @@ import mega.privacy.android.data.mapper.toSubscriptionStatus
 import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toVideo
-import mega.privacy.android.data.mapper.toVideoAttachment
 import mega.privacy.android.data.mapper.verification.SmsPermissionMapper
 import mega.privacy.android.data.mapper.verification.SmsPermissionMapperImpl
 import mega.privacy.android.data.mapper.viewtype.ViewTypeMapper
@@ -304,9 +300,6 @@ internal abstract class MapperModule {
         fun providePricingMapper(): PricingMapper = ::toPricing
 
         @Provides
-        fun provideSyncStatusIntMapper(): SyncStatusIntMapper = ::syncStatusToInt
-
-        @Provides
         fun provideMegaSkuMapper(): MegaSkuMapper = ::toMegaSku
 
         @Provides
@@ -349,12 +342,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideFileDurationMapper(): FileDurationMapper = ::toDuration
-
-        /**
-         * Provides VideoAttachment mapper
-         */
-        @Provides
-        fun provideVideoAttachmentMapper(): VideoAttachmentMapper = ::toVideoAttachment
 
         /**
          * Provide gson builder

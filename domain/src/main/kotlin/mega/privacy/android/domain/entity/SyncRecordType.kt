@@ -13,9 +13,4 @@ enum class SyncRecordType {
      * type video
      */
     TYPE_VIDEO,
-
-    /**
-     * type any media
-     */
-    TYPE_ANY
 }

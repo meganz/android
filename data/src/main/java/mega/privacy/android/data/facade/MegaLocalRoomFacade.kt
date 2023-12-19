@@ -11,17 +11,12 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
-import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
-import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.data.mapper.backup.BackupModelMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordEntityMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordModelMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordEntityMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordModelMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
@@ -34,9 +29,7 @@ import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SdTransfer
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
-import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -56,14 +49,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val completedTransferModelMapper: CompletedTransferModelMapper,
     private val completedTransferEntityMapper: CompletedTransferEntityMapper,
     private val activeTransferEntityMapper: ActiveTransferEntityMapper,
-    private val syncRecordDao: SyncRecordDao,
-    private val syncRecordModelMapper: SyncRecordModelMapper,
-    private val syncRecordEntityMapper: SyncRecordEntityMapper,
     private val sdTransferDao: SdTransferDao,
     private val sdTransferModelMapper: SdTransferModelMapper,
     private val sdTransferEntityMapper: SdTransferEntityMapper,
-    private val syncStatusIntMapper: SyncStatusIntMapper,
-    private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
     private val backupDao: BackupDao,
     private val backupEntityMapper: BackupEntityMapper,
     private val backupModelMapper: BackupModelMapper,
@@ -208,121 +196,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>) =
         activeTransferDao.setActiveTransferAsFinishedByTag(tags)
-
-    override suspend fun saveSyncRecord(record: SyncRecord) =
-        syncRecordDao.insertOrUpdateSyncRecord(syncRecordEntityMapper(record))
-
-    override suspend fun saveSyncRecords(records: List<SyncRecord>) {
-        syncRecordDao.insertOrUpdateSyncRecords(
-            records.map { record ->
-                syncRecordEntityMapper(record)
-            })
-    }
-
-    override suspend fun setUploadVideoSyncStatus(syncStatus: Int) =
-        syncRecordDao.updateVideoState(syncStatus)
-
-    override suspend fun doesFileNameExist(
-        fileName: String,
-        isSecondary: Boolean,
-    ) = syncRecordDao.getSyncRecordCountByFileName(
-        encryptData(fileName),
-        encryptData(isSecondary.toString()).toString(),
-    ) == 1
-
-    override suspend fun doesLocalPathExist(
-        fileName: String,
-        isSecondary: Boolean,
-    ) = syncRecordDao.getSyncRecordCountByOriginalPath(
-        encryptData(fileName),
-        encryptData(isSecondary.toString()).toString(),
-    ) == 1
-
-    override suspend fun getSyncRecordByFingerprint(
-        fingerprint: String?,
-        isSecondary: Boolean,
-        isCopy: Boolean,
-    ) = syncRecordDao.getSyncRecordByOriginalFingerprint(
-        encryptData(fingerprint).toString(),
-        encryptData(isSecondary.toString()).toString(),
-        encryptData(isCopy.toString()).toString(),
-    )?.let { syncRecordModelMapper(it) }
-
-    override suspend fun getPendingSyncRecords() =
-        syncRecordDao.getSyncRecordsBySyncState(syncStatusIntMapper(SyncStatus.STATUS_PENDING))
-            .map { syncRecordModelMapper(it) }
-
-    override suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int) =
-        syncRecordDao.getSyncRecordsBySyncStateAndType(
-            syncState = syncStatusType,
-            syncType = syncRecordTypeIntMapper(SyncRecordType.TYPE_VIDEO)
-        ).map { syncRecordModelMapper(it) }
-
-    override suspend fun deleteAllSyncRecords(syncRecordType: Int) =
-        syncRecordDao.deleteSyncRecordsByType(syncRecordType)
-
-    override suspend fun deleteAllSyncRecordsTypeAny() =
-        syncRecordDao.deleteSyncRecordsByType(syncRecordTypeIntMapper(SyncRecordType.TYPE_ANY))
-
-    override suspend fun deleteAllSecondarySyncRecords() =
-        syncRecordDao.deleteSyncRecordsByIsSecondary(encryptData("true").toString())
-
-    override suspend fun deleteAllPrimarySyncRecords() =
-        syncRecordDao.deleteSyncRecordsByIsSecondary(encryptData("false").toString())
-
-    override suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean) =
-        syncRecordDao.getSyncRecordByOriginalPathAndIsSecondary(
-            encryptData(path).toString(),
-            encryptData(isSecondary.toString()).toString()
-        )?.let { syncRecordModelMapper(it) }
-
-    override suspend fun deleteSyncRecordByPath(path: String?, isSecondary: Boolean) {
-        path?.let {
-            syncRecordDao.deleteSyncRecordByOriginalPathOrNewPathAndIsSecondary(
-                encryptData(it).toString(),
-                encryptData(isSecondary.toString()).toString()
-            )
-        }
-    }
-
-    override suspend fun deleteSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean) =
-        syncRecordDao.deleteSyncRecordByOriginalPathAndIsSecondary(
-            encryptData(localPath).toString(),
-            encryptData(isSecondary.toString()).toString()
-        )
-
-    override suspend fun deleteSyncRecordByFingerPrint(
-        originalPrint: String,
-        newPrint: String,
-        isSecondary: Boolean,
-    ) = syncRecordDao.deleteSyncRecordByFingerprintsAndIsSecondary(
-        encryptData(originalPrint),
-        encryptData(newPrint),
-        encryptData(isSecondary.toString()).toString()
-    )
-
-    override suspend fun updateSyncRecordStatusByLocalPath(
-        syncStatusType: Int,
-        localPath: String?,
-        isSecondary: Boolean,
-    ) = syncRecordDao.updateSyncRecordStateByOriginalPathAndIsSecondary(
-        syncStatusType,
-        encryptData(localPath).toString(),
-        encryptData(isSecondary.toString()).toString()
-    )
-
-    override suspend fun getSyncRecordByNewPath(path: String) =
-        syncRecordDao.getSyncRecordByNewPath(encryptData(path).toString())
-            ?.let { syncRecordModelMapper(it) }
-
-    override suspend fun getAllTimestampsOfSyncRecord(
-        isSecondary: Boolean,
-        syncRecordType: Int,
-    ): List<Long> =
-        syncRecordDao.getAllTimestampsByIsSecondaryAndSyncType(
-            encryptData(isSecondary.toString()).toString(),
-            syncRecordType
-        ).mapNotNull { decryptData(it)?.toLongOrNull() }
 
     override suspend fun getAllSdTransfers(): List<SdTransfer> {
         val entities = sdTransferDao.getAllSdTransfers().first()

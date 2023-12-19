@@ -38,7 +38,6 @@ public class MegaPreferences {
     String conversionOnCharging;
     private String removeGPS;
     String chargingOnSize;
-    String shouldClearCameraSyncRecords;
     String isAutoPlayEnabled;
     private String showInviteBanner;
     String sdCardUri;
@@ -66,7 +65,7 @@ public class MegaPreferences {
                     String cameraFolderExternalSDCard, String passcodeLockType,
                     String preferredSortCloud, String preferredSortOthers, String firstTimeChat,
                     String uploadVideoQuality, String conversionOnCharging,
-                    String chargingOnSize, String shouldClearCameraSyncRecords,
+                    String chargingOnSize,
                     String camVideoSyncTimeStamp, String secVideoSyncTimeStamp,
                     String isAutoPlayEnabled, String removeGPS, String showInviteBanner,
                     String preferredSortCameraUpload, String sdCardUri, String askForDisplayOver,
@@ -102,7 +101,6 @@ public class MegaPreferences {
         this.uploadVideoQuality = uploadVideoQuality;
         this.conversionOnCharging = conversionOnCharging;
         this.chargingOnSize = chargingOnSize;
-        this.shouldClearCameraSyncRecords = shouldClearCameraSyncRecords;
         this.camVideoSyncTimeStamp = camVideoSyncTimeStamp;
         this.secVideoSyncTimeStamp = secVideoSyncTimeStamp;
         this.isAutoPlayEnabled = isAutoPlayEnabled;
@@ -156,14 +154,6 @@ public class MegaPreferences {
 
     public void setCamSyncWifi(String camSyncWifi) {
         this.camSyncWifi = camSyncWifi;
-    }
-
-    public String getShouldClearCameraSyncRecords() {
-        return shouldClearCameraSyncRecords;
-    }
-
-    public void setShouldClearCameraSyncRecords(String shouldClearCameraSyncRecords) {
-        this.shouldClearCameraSyncRecords = shouldClearCameraSyncRecords;
     }
 
     public String getCamSyncFileUpload() {

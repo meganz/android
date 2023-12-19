@@ -66,12 +66,6 @@ internal class CameraUploadsSettingsPreferenceDataStore(
         stringPreferencesKey("videoCompressionSizeLimitKey")
     private val fileUploadOptionKey =
         stringPreferencesKey("fileUploadOptionKey")
-    private val photoTimeStampKey = stringPreferencesKey("photoTimeStampKey")
-    private val videoTimeStampKey = stringPreferencesKey("videoTimeStampKey")
-    private val mediaUploadsPhotoTimeStampKey =
-        stringPreferencesKey("mediaUploadsPhotoTimeStampKey")
-    private val mediaUploadsVideoTimeStampKey =
-        stringPreferencesKey("mediaUploadsVideoTimeStampKey")
     private val uploadByWifiKey = stringPreferencesKey("uploadByWifiKey")
 
 
@@ -263,70 +257,6 @@ internal class CameraUploadsSettingsPreferenceDataStore(
                 it.remove(fileUploadOptionKey)
             } else {
                 it[fileUploadOptionKey] = encryptedValue
-            }
-        }
-    }
-
-    override suspend fun getPhotoTimeStamp(): Long? {
-        return getPreferenceFlow().monitor(photoTimeStampKey)
-            .map { decryptData(it)?.toLongOrNull() }.firstOrNull()
-    }
-
-    override suspend fun setPhotoTimeStamp(timeStamp: Long) {
-        val encryptedValue = encryptData(timeStamp.toString())
-        editPreferences {
-            if (encryptedValue == null) {
-                it.remove(photoTimeStampKey)
-            } else {
-                it[photoTimeStampKey] = encryptedValue
-            }
-        }
-    }
-
-    override suspend fun getVideoTimeStamp(): Long? {
-        return getPreferenceFlow().monitor(videoTimeStampKey)
-            .map { decryptData(it)?.toLongOrNull() }.firstOrNull()
-    }
-
-    override suspend fun setVideoTimeStamp(timeStamp: Long) {
-        val encryptedValue = encryptData(timeStamp.toString())
-        editPreferences {
-            if (encryptedValue == null) {
-                it.remove(videoTimeStampKey)
-            } else {
-                it[videoTimeStampKey] = encryptedValue
-            }
-        }
-    }
-
-    override suspend fun getMediaUploadsPhotoTimeStamp(): Long? {
-        return getPreferenceFlow().monitor(mediaUploadsPhotoTimeStampKey)
-            .map { decryptData(it)?.toLongOrNull() }.firstOrNull()
-    }
-
-    override suspend fun setMediaUploadsPhotoTimeStamp(timeStamp: Long) {
-        val encryptedValue = encryptData(timeStamp.toString())
-        editPreferences {
-            if (encryptedValue == null) {
-                it.remove(mediaUploadsPhotoTimeStampKey)
-            } else {
-                it[mediaUploadsPhotoTimeStampKey] = encryptedValue
-            }
-        }
-    }
-
-    override suspend fun getMediaUploadsVideoTimeStamp(): Long? {
-        return getPreferenceFlow().monitor(mediaUploadsVideoTimeStampKey)
-            .map { decryptData(it)?.toLongOrNull() }.firstOrNull()
-    }
-
-    override suspend fun setMediaUploadsVideoTimeStamp(timeStamp: Long) {
-        val encryptedValue = encryptData(timeStamp.toString())
-        editPreferences {
-            if (encryptedValue == null) {
-                it.remove(mediaUploadsVideoTimeStampKey)
-            } else {
-                it[mediaUploadsVideoTimeStampKey] = encryptedValue
             }
         }
     }

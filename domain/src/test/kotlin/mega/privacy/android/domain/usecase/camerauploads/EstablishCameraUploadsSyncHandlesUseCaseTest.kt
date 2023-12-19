@@ -2,9 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
@@ -33,7 +31,6 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
     private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val getCameraUploadsSyncHandlesUseCase = mock<GetCameraUploadsSyncHandlesUseCase>()
     private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
-    private val resetCameraUploadTimelines = mock<ResetCameraUploadTimelines>()
     private val setPrimarySyncHandle = mock<SetPrimarySyncHandle>()
     private val setSecondarySyncHandle = mock<SetSecondarySyncHandle>()
 
@@ -43,7 +40,6 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
             cameraUploadRepository = cameraUploadRepository,
             getCameraUploadsSyncHandlesUseCase = getCameraUploadsSyncHandlesUseCase,
             isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
-            resetCameraUploadTimelines = resetCameraUploadTimelines,
             setPrimarySyncHandle = setPrimarySyncHandle,
             setSecondarySyncHandle = setSecondarySyncHandle,
         )
@@ -55,7 +51,6 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
             cameraUploadRepository,
             getCameraUploadsSyncHandlesUseCase,
             isNodeInRubbishOrDeletedUseCase,
-            resetCameraUploadTimelines,
             setPrimarySyncHandle,
             setSecondarySyncHandle,
         )
@@ -76,17 +71,9 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
         underTest()
 
         if (!primaryHandleDeleted) {
-            verify(resetCameraUploadTimelines).invoke(
-                handleInAttribute = testPair.first,
-                CameraUploadFolderType.Primary
-            )
             verify(setPrimarySyncHandle).invoke(testPair.first)
         }
         if (!secondaryHandleDeleted) {
-            verify(resetCameraUploadTimelines).invoke(
-                handleInAttribute = testPair.second,
-                CameraUploadFolderType.Secondary
-            )
             verify(setSecondarySyncHandle).invoke(testPair.second)
         }
     }

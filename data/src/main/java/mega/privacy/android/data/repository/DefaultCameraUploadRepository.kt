@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
-import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -17,17 +16,13 @@ import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadsMediaGateway
-import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
-import mega.privacy.android.data.mapper.SyncStatusIntMapper
-import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
@@ -35,18 +30,13 @@ import mega.privacy.android.data.mapper.camerauploads.BackupStateMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsStatusInfoMapper
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MediaStoreFileType
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
-import mega.privacy.android.domain.entity.SyncStatus
-import mega.privacy.android.domain.entity.SyncTimeStamp
-import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -68,44 +58,21 @@ import kotlin.coroutines.Continuation
 
 /**
  * Default implementation of [CameraUploadRepository]
- *
- * @property localStorageGateway [MegaLocalStorageGateway]
- * @property megaApiGateway [MegaApiGateway]
- * @property fileGateway [FileGateway]
- * @property cameraUploadsMediaGateway [CameraUploadsMediaGateway]
- * @property cacheGateway [CacheGateway]
- * @property syncRecordTypeIntMapper [SyncRecordTypeIntMapper]
- * @property heartbeatStatusIntMapper [HeartbeatStatusIntMapper]
- * @property mediaStoreFileTypeUriMapper [MediaStoreFileTypeUriMapper]
- * @property ioDispatcher [CoroutineDispatcher]
- * @property appEventGateway [AppEventGateway]
- * @property workerGateway [WorkerGateway]
- * @property videoQualityMapper [VideoQualityMapper]
- * @property syncStatusIntMapper [SyncStatusIntMapper]
- * @property backupStateIntMapper [BackupStateIntMapper]
- * @property cameraUploadsHandlesMapper [CameraUploadsHandlesMapper]
- * @property uploadOptionMapper [UploadOptionMapper]
- * @property uploadOptionIntMapper [UploadOptionIntMapper]
  */
 internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
-    private val fileGateway: FileGateway,
     private val cameraUploadsMediaGateway: CameraUploadsMediaGateway,
     private val cacheGateway: CacheGateway,
-    private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
     private val heartbeatStatusIntMapper: HeartbeatStatusIntMapper,
     private val mediaStoreFileTypeUriMapper: MediaStoreFileTypeUriMapper,
     private val appEventGateway: AppEventGateway,
     private val workerGateway: WorkerGateway,
     private val videoQualityIntMapper: VideoQualityIntMapper,
     private val videoQualityMapper: VideoQualityMapper,
-    private val syncStatusIntMapper: SyncStatusIntMapper,
     private val backupStateMapper: BackupStateMapper,
     private val backupStateIntMapper: BackupStateIntMapper,
     private val cameraUploadsHandlesMapper: CameraUploadsHandlesMapper,
-    private val videoCompressorGateway: VideoCompressorGateway,
-    private val videoAttachmentMapper: VideoAttachmentMapper,
     private val uploadOptionMapper: UploadOptionMapper,
     private val uploadOptionIntMapper: UploadOptionIntMapper,
     private val deviceGateway: AndroidDeviceGateway,
@@ -144,10 +111,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         cameraUploadsSettingsPreferenceGateway.setUploadsByWifi(wifiOnly)
     }
 
-    override suspend fun getPendingSyncRecords(): List<SyncRecord> = withContext(ioDispatcher) {
-        megaLocalRoomGateway.getPendingSyncRecords()
-    }
-
     override suspend fun getUploadOption() = withContext(ioDispatcher) {
         uploadOptionMapper(cameraUploadsSettingsPreferenceGateway.getFileUploadOption())
     }
@@ -159,108 +122,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             )
         )
     }
-
-    override suspend fun deleteAllSyncRecords(syncRecordType: SyncRecordType) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.deleteAllSyncRecords(syncRecordTypeIntMapper(syncRecordType))
-        }
-
-    override suspend fun deleteSyncRecord(path: String?, isSecondary: Boolean) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.deleteSyncRecordByPath(path, isSecondary)
-        }
-
-    override suspend fun deleteSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.deleteSyncRecordByLocalPath(localPath, isSecondary)
-        }
-
-    override suspend fun deleteSyncRecordByFingerprint(
-        originalPrint: String,
-        newPrint: String,
-        isSecondary: Boolean,
-    ) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.deleteSyncRecordByFingerPrint(
-                originalPrint,
-                newPrint,
-                isSecondary
-            )
-        }
-
-    override suspend fun getSyncRecordByFingerprint(
-        fingerprint: String?,
-        isSecondary: Boolean,
-        isCopy: Boolean,
-    ): SyncRecord? =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getSyncRecordByFingerprint(fingerprint, isSecondary, isCopy)
-        }
-
-    override suspend fun getSyncRecordByNewPath(path: String): SyncRecord? =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getSyncRecordByNewPath(path)
-        }
-
-    override suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord? =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getSyncRecordByLocalPath(path, isSecondary)
-        }
-
-    override suspend fun doesFileNameExist(
-        fileName: String,
-        isSecondary: Boolean,
-    ): Boolean = withContext(ioDispatcher) {
-        megaLocalRoomGateway.doesFileNameExist(fileName, isSecondary)
-    }
-
-    override suspend fun doesLocalPathExist(
-        fileName: String,
-        isSecondary: Boolean,
-    ): Boolean = withContext(ioDispatcher) {
-        megaLocalRoomGateway.doesLocalPathExist(fileName, isSecondary)
-    }
-
-    override suspend fun saveSyncRecord(record: SyncRecord) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.saveSyncRecord(record)
-    }
-
-    override suspend fun saveSyncRecords(records: List<SyncRecord>) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.saveSyncRecords(records)
-    }
-
-    override suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long? {
-        return withContext(ioDispatcher) {
-            with(cameraUploadsSettingsPreferenceGateway) {
-                when (type) {
-                    SyncTimeStamp.PRIMARY_PHOTO -> getPhotoTimeStamp()
-
-                    SyncTimeStamp.PRIMARY_VIDEO -> getVideoTimeStamp()
-
-                    SyncTimeStamp.SECONDARY_PHOTO -> getMediaUploadsPhotoTimeStamp()
-
-                    SyncTimeStamp.SECONDARY_VIDEO -> getMediaUploadsVideoTimeStamp()
-                }
-            }
-        }
-    }
-
-    override suspend fun setSyncTimeStamp(timeStamp: Long, type: SyncTimeStamp) =
-        withContext(ioDispatcher) {
-            with(cameraUploadsSettingsPreferenceGateway) {
-                when (type) {
-                    SyncTimeStamp.PRIMARY_PHOTO -> setPhotoTimeStamp(timeStamp)
-                    SyncTimeStamp.PRIMARY_VIDEO -> setVideoTimeStamp(timeStamp)
-                    SyncTimeStamp.SECONDARY_PHOTO -> setMediaUploadsPhotoTimeStamp(
-                        timeStamp
-                    )
-
-                    SyncTimeStamp.SECONDARY_VIDEO -> setMediaUploadsVideoTimeStamp(
-                        timeStamp
-                    )
-                }
-            }
-        }
 
     override suspend fun doCredentialsExist(): Boolean = withContext(ioDispatcher) {
         localStorageGateway.doCredentialsExist()
@@ -325,11 +186,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             )
         }
 
-    override suspend fun setUploadVideoSyncStatus(syncStatus: SyncStatus) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.setUploadVideoSyncStatus(syncStatusIntMapper(syncStatus))
-        }
-
     override suspend fun areUploadFileNamesKept(): Boolean? = withContext(ioDispatcher) {
         cameraUploadsSettingsPreferenceGateway.areUploadFileNamesKept()
     }
@@ -341,10 +197,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun isSecondaryMediaFolderEnabled() = withContext(ioDispatcher) {
         cameraUploadsSettingsPreferenceGateway.isMediaUploadsEnabled()
-    }
-
-    override suspend fun shouldClearSyncRecords() = withContext(ioDispatcher) {
-        localStorageGateway.shouldClearSyncRecords()
     }
 
     @Deprecated(
@@ -380,22 +232,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         queue
     }
 
-    override suspend fun getMaxTimestamp(
-        isSecondary: Boolean,
-        syncRecordType: SyncRecordType,
-    ): Long =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getAllTimestampsOfSyncRecord(
-                isSecondary,
-                syncRecordTypeIntMapper(syncRecordType)
-            ).maxOrNull() ?: 0L
-        }
-
-    override suspend fun getVideoSyncRecordsByStatus(syncStatusType: SyncStatus): List<SyncRecord> =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getVideoSyncRecordsByStatus(syncStatusIntMapper(syncStatusType))
-        }
-
     override suspend fun isChargingRequiredForVideoCompression() = withContext(ioDispatcher) {
         cameraUploadsSettingsPreferenceGateway.isChargingRequiredForVideoCompression()
     }
@@ -413,18 +249,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun setVideoCompressionSizeLimit(size: Int) = withContext(ioDispatcher) {
         cameraUploadsSettingsPreferenceGateway.setVideoCompressionSizeLimit(size)
-    }
-
-    override suspend fun updateSyncRecordStatusByLocalPath(
-        syncStatusType: Int,
-        localPath: String?,
-        isSecondary: Boolean,
-    ) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.updateSyncRecordStatusByLocalPath(
-            syncStatusType,
-            localPath,
-            isSecondary
-        )
     }
 
     override suspend fun setupPrimaryFolder(primaryHandle: Long) = withContext(ioDispatcher) {
@@ -520,21 +344,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         }
     }
 
-    override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) =
-        withContext(ioDispatcher) {
-            localStorageGateway.saveShouldClearCamSyncRecords(clearCamSyncRecords)
-        }
-
     override suspend fun clearCacheDirectory() = withContext(ioDispatcher) {
         cacheGateway.clearCacheDirectory()
-    }
-
-    override suspend fun deleteAllPrimarySyncRecords() = withContext(ioDispatcher) {
-        megaLocalRoomGateway.deleteAllPrimarySyncRecords()
-    }
-
-    override suspend fun deleteAllSecondarySyncRecords() = withContext(ioDispatcher) {
-        megaLocalRoomGateway.deleteAllSecondarySyncRecords()
     }
 
     override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {
@@ -586,19 +397,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun stopCameraUploadsAndBackupHeartbeat() = withContext(ioDispatcher) {
         workerGateway.cancelCameraUploadAndHeartbeatWorkRequest()
-    }
-
-    override fun compressVideos(
-        root: String,
-        quality: VideoQuality,
-        records: List<SyncRecord>,
-    ): Flow<VideoCompressionState> {
-        videoCompressorGateway.run {
-            setOutputRoot(root)
-            setVideoQuality(quality)
-            addItems(videoAttachmentMapper(records))
-        }
-        return videoCompressorGateway.start().flowOn(ioDispatcher)
     }
 
     override suspend fun listenToNewMedia() {
@@ -725,9 +523,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
                 }
             }
         }
-
-    override fun getSelectionQuery(currentTimeStamp: Long, localPath: String) =
-        """((${MediaStore.MediaColumns.DATE_MODIFIED}*1000) > $currentTimeStamp OR (${MediaStore.MediaColumns.DATE_ADDED}*1000) > $currentTimeStamp) AND ${MediaStore.MediaColumns.DATA} LIKE '${localPath}%'"""
 
     override suspend fun isCharging() = deviceGateway.isCharging().also {
         Timber.d("Is Device charging $it")

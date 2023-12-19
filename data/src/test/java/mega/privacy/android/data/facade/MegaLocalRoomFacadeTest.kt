@@ -14,21 +14,15 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
-import mega.privacy.android.data.database.dao.SyncRecordDao
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
-import mega.privacy.android.data.database.entity.SyncRecordEntity
-import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.data.mapper.backup.BackupModelMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordEntityMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordModelMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordEntityMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordModelMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
@@ -39,9 +33,7 @@ import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferMode
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
 import mega.privacy.android.domain.entity.SdTransfer
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
-import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -56,7 +48,6 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -79,11 +70,6 @@ internal class MegaLocalRoomFacadeTest {
     private val decryptData = mock<DecryptData>()
     private val activeTransferDao = mock<ActiveTransferDao>()
     private val activeTransferEntityMapper = mock<ActiveTransferEntityMapper>()
-    private val syncRecordDao: SyncRecordDao = mock()
-    private val syncRecordModelMapper: SyncRecordModelMapper = mock()
-    private val syncRecordEntityMapper: SyncRecordEntityMapper = mock()
-    private val syncStatusIntMapper: SyncStatusIntMapper = mock()
-    private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper = mock()
     private val completedTransferEntityMapper: CompletedTransferEntityMapper = mock()
     private val sdTransferDao: SdTransferDao = mock()
     private val sdTransferEntityMapper = mock<SdTransferEntityMapper>()
@@ -109,11 +95,6 @@ internal class MegaLocalRoomFacadeTest {
             activeTransferDao = activeTransferDao,
             completedTransferModelMapper = completedTransferModelMapper,
             activeTransferEntityMapper = activeTransferEntityMapper,
-            syncRecordDao = syncRecordDao,
-            syncRecordModelMapper = syncRecordModelMapper,
-            syncRecordEntityMapper = syncRecordEntityMapper,
-            syncStatusIntMapper = syncStatusIntMapper,
-            syncRecordTypeIntMapper = syncRecordTypeIntMapper,
             encryptData = encryptData,
             decryptData = decryptData,
             completedTransferEntityMapper = completedTransferEntityMapper,
@@ -144,11 +125,6 @@ internal class MegaLocalRoomFacadeTest {
             encryptData,
             activeTransferDao,
             activeTransferEntityMapper,
-            syncRecordDao,
-            syncRecordModelMapper,
-            syncRecordEntityMapper,
-            syncStatusIntMapper,
-            syncRecordTypeIntMapper,
             backupDao,
             backupEntityMapper,
             backupModelMapper,
@@ -228,236 +204,6 @@ internal class MegaLocalRoomFacadeTest {
             assertThat(underTest.getAllCompletedTransfers().single().size)
                 .isEqualTo(completedTransferEntities.size)
         }
-
-    @Test
-    fun `test that saveSyncRecord saves the corresponding item`() =
-        runTest {
-            val entity = mock<SyncRecordEntity>()
-            val record = mock<SyncRecord>()
-
-            whenever(syncRecordEntityMapper(record)).thenReturn(entity)
-            underTest.saveSyncRecord(record)
-            verify(syncRecordDao).insertOrUpdateSyncRecord(entity)
-        }
-
-    @Test
-    fun `test that setUploadVideoSyncStatus updates the corresponding item`() =
-        runTest {
-            val status = 1
-            underTest.setUploadVideoSyncStatus(status)
-            verify(syncRecordDao).updateVideoState(status)
-        }
-
-    @ParameterizedTest(name = "invoked with isSecondary {0} count {1}")
-    @MethodSource("provideDoesFileNameExistParameters")
-    fun `test that doesFileNameExist returns correctly`(
-        isSecondary: Boolean,
-        count: Int,
-        expected: Boolean,
-    ) =
-        runTest {
-            val fileName = "abcd.jpg"
-            whenever(encryptData(fileName)).thenReturn(fileName)
-            whenever(encryptData(isSecondary.toString())).thenReturn(isSecondary.toString())
-            whenever(
-                syncRecordDao.getSyncRecordCountByFileName(
-                    fileName,
-                    isSecondary.toString()
-                )
-            ).thenReturn(count)
-            assertThat(underTest.doesFileNameExist(fileName, isSecondary)).isEqualTo(expected)
-        }
-
-    @ParameterizedTest(name = "invoked with isSecondary {0} count {1}")
-    @MethodSource("provideDoesFileNameExistParameters")
-    fun `test that doesLocalPathExist returns correctly`(
-        isSecondary: Boolean,
-        count: Int,
-        expected: Boolean,
-    ) =
-        runTest {
-            val fileName = "abcd.jpg"
-            whenever(encryptData(fileName)).thenReturn(fileName)
-            whenever(encryptData(isSecondary.toString())).thenReturn(isSecondary.toString())
-            whenever(
-                syncRecordDao.getSyncRecordCountByOriginalPath(
-                    fileName,
-                    isSecondary.toString()
-                )
-            ).thenReturn(count)
-            assertThat(underTest.doesLocalPathExist(fileName, isSecondary)).isEqualTo(expected)
-        }
-
-    @Test
-    fun `test that getSyncRecordByFingerprint returns correctly`() = runTest {
-        val entity = mock<SyncRecordEntity>()
-        val record = mock<SyncRecord>()
-        val fingerprint = "abcd"
-        val isSecondary = true
-        val isCopyOnly = false
-        whenever(syncRecordModelMapper(entity)).thenReturn(record)
-        whenever(encryptData(fingerprint)).thenReturn(fingerprint)
-        whenever(encryptData(isSecondary.toString())).thenReturn(isSecondary.toString())
-        whenever(encryptData(isCopyOnly.toString())).thenReturn(isCopyOnly.toString())
-        whenever(
-            syncRecordDao.getSyncRecordByOriginalFingerprint(
-                fingerprint,
-                isSecondary.toString(),
-                isCopyOnly.toString()
-            )
-        ).thenReturn(entity)
-        assertThat(
-            underTest.getSyncRecordByFingerprint(
-                fingerprint,
-                isSecondary,
-                isCopyOnly
-            )
-        ).isEqualTo(record)
-    }
-
-    @Test
-    fun `test that getPendingSyncRecords returns correctly`() = runTest {
-        val entities = listOf<SyncRecordEntity>(mock(), mock())
-        val records = listOf<SyncRecord>(mock(), mock())
-        entities.forEachIndexed { index, entity ->
-            whenever(syncRecordModelMapper(entity)).thenReturn(records[index])
-        }
-        whenever(syncStatusIntMapper(SyncStatus.STATUS_PENDING)).thenReturn(0)
-        whenever(syncRecordDao.getSyncRecordsBySyncState(0)).thenReturn(entities)
-        assertThat(underTest.getPendingSyncRecords()).isEqualTo(records)
-    }
-
-    @Test
-    fun `test that getVideoSyncRecordsByStatus returns correctly`() = runTest {
-        val state = 0
-        val entities = listOf<SyncRecordEntity>(mock(), mock())
-        val records = listOf<SyncRecord>(mock(), mock())
-        entities.forEachIndexed { index, entity ->
-            whenever(syncRecordModelMapper(entity)).thenReturn(records[index])
-        }
-        whenever(syncRecordTypeIntMapper(SyncRecordType.TYPE_VIDEO)).thenReturn(2)
-        whenever(
-            syncRecordDao.getSyncRecordsBySyncStateAndType(
-                syncState = state,
-                syncType = 2
-            )
-        ).thenReturn(entities)
-        assertThat(underTest.getVideoSyncRecordsByStatus(state)).isEqualTo(records)
-    }
-
-    @Test
-    fun `test that deleteAllSyncRecords deletes correctly`() = runTest {
-        val syncType = 2
-        underTest.deleteAllSyncRecords(syncType)
-        verify(syncRecordDao).deleteSyncRecordsByType(syncType)
-    }
-
-    @Test
-    fun `test that deleteAllSyncRecordsTypeAny deletes correctly`() = runTest {
-        whenever(syncRecordTypeIntMapper(SyncRecordType.TYPE_ANY)).thenReturn(-1)
-        underTest.deleteAllSyncRecordsTypeAny()
-        verify(syncRecordDao).deleteSyncRecordsByType(-1)
-    }
-
-    @Test
-    fun `test that deleteAllSecondarySyncRecords deletes correctly`() = runTest {
-        val secondary = "true"
-        whenever(encryptData(secondary)).thenReturn(secondary)
-        underTest.deleteAllSecondarySyncRecords()
-        verify(syncRecordDao).deleteSyncRecordsByIsSecondary(secondary)
-    }
-
-    @Test
-    fun `test that deleteAllPrimarySyncRecords deletes correctly`() = runTest {
-        val secondary = "false"
-        whenever(encryptData(secondary)).thenReturn(secondary)
-        underTest.deleteAllPrimarySyncRecords()
-        verify(syncRecordDao).deleteSyncRecordsByIsSecondary(secondary)
-    }
-
-    @ParameterizedTest(name = "invoked with isSecondary = {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that getSyncRecordByLocalPath returns correctly`(isSecondary: Boolean) = runTest {
-        val originalPath = "path/to/original/a.jpg"
-        val entity = mock<SyncRecordEntity>()
-        val record = mock<SyncRecord>()
-        whenever(syncRecordModelMapper(entity)).thenReturn(record)
-        whenever(encryptData(originalPath)).thenReturn(originalPath)
-        whenever(encryptData(isSecondary.toString())).thenReturn(isSecondary.toString())
-        whenever(
-            syncRecordDao.getSyncRecordByOriginalPathAndIsSecondary(
-                originalPath,
-                isSecondary.toString()
-            )
-        ).thenReturn(entity)
-        assertThat(underTest.getSyncRecordByLocalPath(originalPath, isSecondary)).isEqualTo(record)
-    }
-
-    @ParameterizedTest(name = "invoked with isSecondary = {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that deleteSyncRecordByPath returns correctly`(isSecondary: Boolean) = runTest {
-        val originalPath = "path/to/original/a.jpg"
-        whenever(encryptData(originalPath)).thenReturn(originalPath)
-        whenever(encryptData(isSecondary.toString())).thenReturn(isSecondary.toString())
-        underTest.deleteSyncRecordByPath(originalPath, isSecondary)
-        verify(syncRecordDao).deleteSyncRecordByOriginalPathOrNewPathAndIsSecondary(
-            originalPath,
-            isSecondary.toString()
-        )
-    }
-
-    @ParameterizedTest(name = "invoked with isSecondary = {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that deleteSyncRecordByLocalPath returns correctly`(isSecondary: Boolean) = runTest {
-        val originalPath = "path/to/original/a.jpg"
-        whenever(encryptData(originalPath)).thenReturn(originalPath)
-        whenever(encryptData(isSecondary.toString())).thenReturn(isSecondary.toString())
-        underTest.deleteSyncRecordByLocalPath(originalPath, isSecondary)
-        verify(syncRecordDao).deleteSyncRecordByOriginalPathAndIsSecondary(
-            originalPath,
-            isSecondary.toString()
-        )
-    }
-
-    @ParameterizedTest(name = "invoked with isSecondary = {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that deleteSyncRecordByFingerPrint returns correctly`(isSecondary: Boolean) =
-        runTest {
-            val originalFingerPrint = "abcde"
-            val newFingerPrint = "efghijk"
-            whenever(encryptData(originalFingerPrint)).thenReturn(originalFingerPrint)
-            whenever(encryptData(newFingerPrint)).thenReturn(newFingerPrint)
-            whenever(encryptData(isSecondary.toString())).thenReturn(isSecondary.toString())
-            underTest.deleteSyncRecordByFingerPrint(
-                originalPrint = originalFingerPrint,
-                newPrint = newFingerPrint,
-                isSecondary
-            )
-            verify(syncRecordDao).deleteSyncRecordByFingerprintsAndIsSecondary(
-                originalFingerPrint,
-                newFingerPrint,
-                isSecondary.toString()
-            )
-        }
-
-    @Test
-    fun `test that getAllTimestampsOfSyncRecord returns correctly`() = runTest {
-        val secondary = false
-        val syncType = 2
-        val timeStamps = (1L..10L).map {
-            whenever(decryptData(it.toString())).thenReturn(it.toString())
-            it.toString()
-        }
-        whenever(encryptData(secondary.toString())).thenReturn(secondary.toString())
-        whenever(
-            syncRecordDao.getAllTimestampsByIsSecondaryAndSyncType(
-                secondary.toString(),
-                syncType
-            )
-        ).thenReturn(timeStamps)
-        val actual = underTest.getAllTimestampsOfSyncRecord(secondary, syncType)
-        assertThat(actual).isEqualTo((1L..10L).map { it })
-    }
 
     @Test
     fun `test that insertSdTransfer invokes correctly when call insertSdTransfer`() = runTest {
@@ -840,11 +586,4 @@ internal class MegaLocalRoomFacadeTest {
 
             assertThat(underTest.getAllCameraUploadsRecords()).isEqualTo(expected)
         }
-
-    private fun provideDoesFileNameExistParameters() = Stream.of(
-        Arguments.of(true, 1, true),
-        Arguments.of(false, 1, true),
-        Arguments.of(true, 2, false),
-        Arguments.of(false, 2, false),
-    )
 }

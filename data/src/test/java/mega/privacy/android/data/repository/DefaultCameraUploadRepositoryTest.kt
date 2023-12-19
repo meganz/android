@@ -6,7 +6,6 @@ import androidx.work.WorkInfo
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -31,17 +30,9 @@ import mega.privacy.android.data.mapper.camerauploads.BackupStateMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsStatusInfoMapper
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
-import mega.privacy.android.data.mapper.syncStatusToInt
-import mega.privacy.android.data.mapper.toVideoAttachment
 import mega.privacy.android.domain.entity.MediaStoreFileType
-import mega.privacy.android.domain.entity.SyncRecord
-import mega.privacy.android.domain.entity.SyncRecordType
-import mega.privacy.android.domain.entity.SyncStatus
-import mega.privacy.android.domain.entity.SyncTimeStamp
-import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
@@ -85,7 +76,6 @@ class DefaultCameraUploadRepositoryTest {
     private val fileGateway = mock<FileGateway>()
     private val cameraUploadsMediaGateway = mock<CameraUploadsMediaGateway>()
     private val workerGateway = mock<WorkerGateway>()
-    private val syncRecordTypeIntMapper = mock<SyncRecordTypeIntMapper>()
     private val heartbeatStatusIntMapper = mock<HeartbeatStatusIntMapper>()
     private val mediaStoreFileTypeUriWrapper = mock<MediaStoreFileTypeUriMapper>()
     private val cameraUploadsHandlesMapper = mock<CameraUploadsHandlesMapper>()
@@ -103,33 +93,14 @@ class DefaultCameraUploadRepositoryTest {
         mock()
     private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper = mock()
 
-    private val fakeRecord = SyncRecord(
-        id = 0,
-        localPath = "localPath",
-        newPath = null,
-        originFingerprint = null,
-        newFingerprint = null,
-        timestamp = 0L,
-        fileName = "fileName.jpg",
-        longitude = null,
-        latitude = null,
-        status = SyncStatus.STATUS_PENDING.value,
-        type = SyncRecordType.TYPE_ANY,
-        nodeHandle = null,
-        isCopyOnly = false,
-        isSecondary = false,
-    )
-
     @BeforeAll
     fun setUp() {
         underTest = DefaultCameraUploadRepository(
             localStorageGateway = localStorageGateway,
             megaApiGateway = megaApiGateway,
             cacheGateway = mock(),
-            fileGateway = fileGateway,
             cameraUploadsMediaGateway = cameraUploadsMediaGateway,
             workerGateway = workerGateway,
-            syncRecordTypeIntMapper = syncRecordTypeIntMapper,
             heartbeatStatusIntMapper = heartbeatStatusIntMapper,
             mediaStoreFileTypeUriMapper = mediaStoreFileTypeUriWrapper,
             cameraUploadsHandlesMapper = cameraUploadsHandlesMapper,
@@ -138,11 +109,8 @@ class DefaultCameraUploadRepositoryTest {
             deviceGateway = deviceGateway,
             videoQualityIntMapper = videoQualityIntMapper,
             videoQualityMapper = videoQualityMapper,
-            syncStatusIntMapper = ::syncStatusToInt,
             backupStateMapper = backupStateMapper,
             backupStateIntMapper = backupStateIntMapper,
-            videoCompressorGateway = videoCompressorGateway,
-            videoAttachmentMapper = ::toVideoAttachment,
             uploadOptionMapper = uploadOptionMapper,
             uploadOptionIntMapper = uploadOptionIntMapper,
             megaLocalRoomGateway = megaLocalRoomGateway,
@@ -160,7 +128,6 @@ class DefaultCameraUploadRepositoryTest {
             fileGateway,
             cameraUploadsMediaGateway,
             workerGateway,
-            syncRecordTypeIntMapper,
             heartbeatStatusIntMapper,
             mediaStoreFileTypeUriWrapper,
             cameraUploadsHandlesMapper,
@@ -303,118 +270,8 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Nested
-    @DisplayName("Video Sync Status")
-    inner class VideoSyncStatus {
-        @ParameterizedTest(name = "video sync status: {0}")
-        @EnumSource(SyncStatus::class)
-        fun `test that the upload video sync status is updated`(syncStatus: SyncStatus) = runTest {
-            underTest.setUploadVideoSyncStatus(syncStatus)
-            verify(megaLocalRoomGateway).setUploadVideoSyncStatus(syncStatus.value)
-        }
-    }
-
-    @Nested
     @DisplayName("Sync")
     inner class SyncTest {
-        @Test
-        fun `test that the camera uploads sync records are retrieved`() = runTest {
-            whenever(megaLocalRoomGateway.getPendingSyncRecords()).thenReturn(listOf(fakeRecord))
-            assertThat(underTest.getPendingSyncRecords()).isEqualTo(listOf(fakeRecord))
-        }
-
-        @Test
-        fun `test that camera uploads retrieves the sync record by fingerprint`() = runTest {
-            whenever(
-                megaLocalRoomGateway.getSyncRecordByFingerprint(
-                    fingerprint = anyOrNull(),
-                    isSecondary = any(),
-                    isCopy = any(),
-                )
-            ).thenReturn(null)
-            assertThat(
-                underTest.getSyncRecordByFingerprint(
-                    fingerprint = null,
-                    isSecondary = false,
-                    isCopy = false,
-                )
-            ).isEqualTo(null)
-        }
-
-        @Test
-        fun `test that camera uploads retrieves the sync record by new path`() = runTest {
-            whenever(megaLocalRoomGateway.getSyncRecordByNewPath(any())).thenReturn(null)
-            assertThat(underTest.getSyncRecordByNewPath("")).isEqualTo(null)
-        }
-
-        @Test
-        fun `test that camera uploads retrieves the sync record by local path`() = runTest {
-            whenever(
-                megaLocalRoomGateway.getSyncRecordByLocalPath(
-                    path = any(),
-                    isSecondary = any(),
-                )
-            ).thenReturn(null)
-            assertThat(
-                underTest.getSyncRecordByLocalPath(
-                    path = "",
-                    isSecondary = false,
-                )
-            ).isEqualTo(null)
-        }
-
-        @ParameterizedTest(name = "file name exists: {0}")
-        @ValueSource(booleans = [true, false])
-        fun `test that the file name exists or not`(fileNameExists: Boolean) = runTest {
-            whenever(
-                megaLocalRoomGateway.doesFileNameExist(
-                    fileName = any(),
-                    isSecondary = any(),
-                )
-            ).thenReturn(
-                fileNameExists
-            )
-            whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
-
-            assertThat(
-                underTest.doesFileNameExist(
-                    fileName = "",
-                    isSecondary = false,
-                )
-            ).isEqualTo(fileNameExists)
-        }
-
-        @ParameterizedTest(name = "local path exists: {0}")
-        @ValueSource(booleans = [true, false])
-        fun `test that the local path exists or not`(localPathExists: Boolean) = runTest {
-            whenever(
-                megaLocalRoomGateway.doesLocalPathExist(
-                    fileName = any(),
-                    isSecondary = any(),
-                )
-            ).thenReturn(
-                localPathExists
-            )
-            whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
-
-            assertThat(
-                underTest.doesLocalPathExist(
-                    fileName = "",
-                    isSecondary = false,
-                )
-            ).isEqualTo(localPathExists)
-        }
-
-        @Test
-        fun `test that the sync time stamp is retrieved`() = runTest {
-            val testTimeStamp = 150L
-
-            whenever(cameraUploadsSettingsPreferenceGateway.getPhotoTimeStamp()).thenReturn(
-                testTimeStamp
-            )
-            assertThat(underTest.getSyncTimeStamp(SyncTimeStamp.PRIMARY_PHOTO)).isEqualTo(
-                testTimeStamp
-            )
-        }
 
         @ParameterizedTest(name = "sync enabled: {0}")
         @ValueSource(booleans = [true, false])
@@ -423,70 +280,6 @@ class DefaultCameraUploadRepositoryTest {
                 syncEnabled
             )
             assertThat(underTest.isCameraUploadsEnabled()).isEqualTo(syncEnabled)
-        }
-
-        @ParameterizedTest(name = "clear all sync records: {0}")
-        @ValueSource(booleans = [true, false])
-        fun `test that the sync records should be cleared or not`(clearAllSyncRecords: Boolean) =
-            runTest {
-                whenever(localStorageGateway.shouldClearSyncRecords()).thenReturn(
-                    clearAllSyncRecords
-                )
-                assertThat(underTest.shouldClearSyncRecords()).isEqualTo(clearAllSyncRecords)
-            }
-
-        @Test
-        fun `test that the maximum time stamp is retrieved`() = runTest {
-            val testTimeStamps = listOf(1000L, 999L, 1L)
-
-            whenever(
-                megaLocalRoomGateway.getAllTimestampsOfSyncRecord(
-                    isSecondary = any(),
-                    syncRecordType = any(),
-                )
-            ).thenReturn(testTimeStamps)
-            whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
-
-            assertThat(
-                underTest.getMaxTimestamp(
-                    isSecondary = false,
-                    syncRecordType = SyncRecordType.TYPE_ANY,
-                )
-            ).isEqualTo(
-                1000L
-            )
-        }
-
-        @Test
-        fun `test that the zero is returned when time stamps are empty`() = runTest {
-            val testTimeStamps = emptyList<Long>()
-
-            whenever(
-                megaLocalRoomGateway.getAllTimestampsOfSyncRecord(
-                    isSecondary = any(),
-                    syncRecordType = any(),
-                )
-            ).thenReturn(testTimeStamps)
-            whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
-
-            assertThat(
-                underTest.getMaxTimestamp(
-                    isSecondary = false,
-                    syncRecordType = SyncRecordType.TYPE_ANY,
-                )
-            ).isEqualTo(
-                0L
-            )
-        }
-
-        @Test
-        fun `test that the video sync records are retrieved by status`() = runTest {
-            whenever(megaLocalRoomGateway.getVideoSyncRecordsByStatus(any())).thenReturn(
-                listOf(fakeRecord)
-            )
-            assertThat(underTest.getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)).isEqualTo(
-                listOf(fakeRecord)
-            )
         }
     }
 
@@ -799,52 +592,6 @@ class DefaultCameraUploadRepositoryTest {
             verify(cameraUploadsSettingsPreferenceGateway).setVideoCompressionSizeLimit(
                 testSizeLimit
             )
-        }
-
-        @Test
-        fun `test that starting video compression emits events in order`() {
-            runTest {
-                val list = listOf(25, 50, 57, 100)
-                val flow = flow {
-                    list.forEach {
-                        emit(
-                            VideoCompressionState.Progress(
-                                progress = it,
-                                currentIndex = 1,
-                                totalCount = 2,
-                                path = "",
-                            )
-                        )
-                    }
-                    emit(
-                        VideoCompressionState.FinishedCompression(
-                            returnedFile = "",
-                            isSuccess = true,
-                            messageId = 1,
-                        )
-                    )
-                    emit(VideoCompressionState.Finished)
-                }
-
-                whenever(videoCompressorGateway.start()).thenReturn(flow)
-                underTest.compressVideos(
-                    root = "",
-                    quality = VideoQuality.ORIGINAL,
-                    records = emptyList(),
-                ).test {
-                    list.forEach {
-                        val item = awaitItem()
-                        assertThat(item.javaClass).isEqualTo(VideoCompressionState.Progress::class.java)
-                        assertThat((item as VideoCompressionState.Progress).progress).isEqualTo(it)
-                    }
-                    val finishedCompressionItem = awaitItem()
-                    assertThat(finishedCompressionItem.javaClass).isEqualTo(VideoCompressionState.FinishedCompression::class.java)
-                    val finished = awaitItem()
-                    assertThat(finished.javaClass).isEqualTo(VideoCompressionState.Finished::class.java)
-
-                    cancelAndConsumeRemainingEvents()
-                }
-            }
         }
     }
 

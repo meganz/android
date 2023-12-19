@@ -11,46 +11,23 @@ import mega.privacy.android.app.utils.wrapper.CameraEnumeratorWrapper
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
-import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
-import mega.privacy.android.domain.usecase.ClearSyncRecords
-import mega.privacy.android.domain.usecase.CompressVideos
-import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
-import mega.privacy.android.domain.usecase.DeleteSyncRecord
-import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
-import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
-import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
-import mega.privacy.android.domain.usecase.GetSyncRecordByPath
-import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
-import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.RenamePrimaryFolder
 import mega.privacy.android.domain.usecase.RenameSecondaryFolder
-import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
-import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
-import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
-import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
-import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
-import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
-import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
-import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
-import mega.privacy.android.domain.usecase.ShouldCompressVideo
-import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.camerauploads.GetNodeByFingerprintUseCase
 import org.mockito.kotlin.mock
 
@@ -65,61 +42,10 @@ object TestCameraUploadUseCases {
     fun provideHasCredentials() = mock<HasCredentials>()
 
     @Provides
-    fun provideGetPendingSyncRecords() = mock<GetPendingSyncRecords>()
-
-    @Provides
-    fun provideMediaLocalPathExists() = mock<MediaLocalPathExists>()
-
-    @Provides
-    fun provideDeleteSyncRecord() = mock<DeleteSyncRecord>()
-
-    @Provides
-    fun provideDeleteSyncRecordByLocalPath() = mock<DeleteSyncRecordByLocalPath>()
-
-    @Provides
-    fun provideDeleteSyncRecordByFingerprint() = mock<DeleteSyncRecordByFingerprint>()
-
-    @Provides
-    fun provideFileNameExists() = mock<FileNameExists>()
-
-    @Provides
-    fun provideGetSyncRecordByFingerprint() = mock<GetSyncRecordByFingerprint>()
-
-    @Provides
-    fun provideSetSyncRecordPendingByPath() = mock<SetSyncRecordPendingByPath>()
-
-    @Provides
-    fun provideGetVideoSyncRecordsByStatus() = mock<GetVideoSyncRecordsByStatus>()
-
-    @Provides
     fun provideGetNodeByFingerprint() = mock<GetNodeByFingerprintUseCase>()
 
     @Provides
     fun provideGetParentMegaNode() = mock<GetParentMegaNode>()
-
-    @Provides
-    fun provideResetPrimaryTimeline() = mock<ResetPrimaryTimeline>()
-
-    @Provides
-    fun provideResetSecondaryTimeline() = mock<ResetSecondaryTimeline>()
-
-    @Provides
-    fun provideResetCameraUploadTimelines() = mock<ResetCameraUploadTimelines>()
-
-    @Provides
-    fun provideUpdateTimeStamp() = mock<UpdateCameraUploadTimeStamp>()
-
-    @Provides
-    fun provideShouldCompressVideo() = mock<ShouldCompressVideo>()
-
-    @Provides
-    fun provideGetSyncRecordByPath() = mock<GetSyncRecordByPath>()
-
-    @Provides
-    fun provideClearSyncRecords() = mock<ClearSyncRecords>()
-
-    @Provides
-    fun provideCompressedVideoPending() = mock<CompressedVideoPending>()
 
     @Provides
     fun provideIsChargingRequired() = mock<IsChargingRequired>()
@@ -140,12 +66,6 @@ object TestCameraUploadUseCases {
     fun provideCheckEnableCameraUploadsStatus() = mock<CheckEnableCameraUploadsStatus>()
 
     @Provides
-    fun provideResetCameraUploadTimeStamps() = mock<ResetCameraUploadTimeStamps>()
-
-    @Provides
-    fun provideResetMediaUploadTimeStamps() = mock<ResetMediaUploadTimeStamps>()
-
-    @Provides
     fun provideGetCameraUploadFolderName() = mock<GetCameraUploadFolderName>()
 
     @Provides
@@ -158,15 +78,6 @@ object TestCameraUploadUseCases {
     fun provideDisableMediaUploadSettings() = mock<DisableMediaUploadSettings>()
 
     @Provides
-    fun provideBackupTimeStampsAndFolderHandle() = mock<BackupTimeStampsAndFolderHandle>()
-
-    @Provides
-    fun provideRestorePrimaryTimestamps() = mock<RestorePrimaryTimestamps>()
-
-    @Provides
-    fun provideRestoreSecondaryTimestamps() = mock<RestoreSecondaryTimestamps>()
-
-    @Provides
     fun provideIsNotEnoughQuota() = mock<IsNotEnoughQuota>()
 
     @Provides
@@ -177,9 +88,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideCreateCameraUploadFolder() = mock<CreateCameraUploadFolder>()
-
-    @Provides
-    fun provideCompressVideos() = mock<CompressVideos>()
 
     @Provides
     fun provideBroadcastCameraUploadProgress() = mock<BroadcastCameraUploadProgress>()

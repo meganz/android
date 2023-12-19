@@ -2,8 +2,6 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.usecase.ClearSyncRecords
-import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,25 +18,19 @@ import org.mockito.kotlin.reset
 class DisableCameraUploadsUseCaseTest {
     private lateinit var underTest: DisableCameraUploadsUseCase
 
-    private val clearSyncRecords = mock<ClearSyncRecords>()
     private val disableCameraUploadsSettingsUseCase = mock<DisableCameraUploadsSettingsUseCase>()
-    private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
 
     @BeforeAll
     fun setUp() {
         underTest = DisableCameraUploadsUseCase(
-            clearSyncRecords = clearSyncRecords,
             disableCameraUploadsSettingsUseCase = disableCameraUploadsSettingsUseCase,
-            resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            clearSyncRecords,
             disableCameraUploadsSettingsUseCase,
-            resetCameraUploadTimeStamps,
         )
     }
 
@@ -49,13 +41,9 @@ class DisableCameraUploadsUseCaseTest {
 
             with(
                 inOrder(
-                    clearSyncRecords,
                     disableCameraUploadsSettingsUseCase,
-                    resetCameraUploadTimeStamps
                 )
             ) {
-                verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
-                verify(clearSyncRecords).invoke()
                 verify(disableCameraUploadsSettingsUseCase).invoke()
             }
         }

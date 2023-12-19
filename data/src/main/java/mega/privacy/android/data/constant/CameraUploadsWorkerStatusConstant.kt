@@ -95,9 +95,4 @@ object CameraUploadsWorkerStatusConstant {
      * TOTAL_COUNT key
      */
     const val FOLDER_TYPE = "folder_type"
-
-    /**
-     * USE_CAMERA_UPLOADS_RECORDS key
-     */
-    const val USE_CAMERA_UPLOADS_RECORDS = "use_camera_uploads_records"
 }

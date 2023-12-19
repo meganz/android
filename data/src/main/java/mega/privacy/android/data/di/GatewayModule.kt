@@ -61,7 +61,6 @@ import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
-import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
@@ -80,7 +79,6 @@ import mega.privacy.android.data.preferences.AccountPreferencesDataStore
 import mega.privacy.android.data.preferences.AppInfoPreferencesDatastore
 import mega.privacy.android.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.data.preferences.CallsPreferencesDataStore
-import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore
 import mega.privacy.android.data.preferences.CameraUploadsSettingsPreferenceDataStore
 import mega.privacy.android.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.data.preferences.EphemeralCredentialsDataStore
@@ -176,12 +174,6 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindFileGateway(implementation: FileFacade): FileGateway
-
-    /**
-     * Provide camera timestamps preference gateway implementation
-     */
-    @Binds
-    abstract fun bindCameraTimestampsPreferenceGateway(implementation: CameraTimestampsPreferenceDataStore): CameraTimestampsPreferenceGateway
 
     @Binds
     abstract fun bindMegaApiFolderGateway(implementation: MegaApiFolderFacade): MegaApiFolderGateway
