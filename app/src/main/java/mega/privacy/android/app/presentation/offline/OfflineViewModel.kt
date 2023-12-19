@@ -23,7 +23,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.fragments.homepage.Event
-import mega.privacy.android.app.monitoring.CrashReporter
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.app.presentation.offline.model.OfflineNode
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.BACK_PRESS_HANDLED

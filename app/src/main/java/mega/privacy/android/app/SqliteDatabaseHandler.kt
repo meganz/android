@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
-import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
@@ -41,6 +40,7 @@ import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_ON
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber

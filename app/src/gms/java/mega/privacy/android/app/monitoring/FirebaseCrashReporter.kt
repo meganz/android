@@ -2,7 +2,7 @@ package mega.privacy.android.app.monitoring
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import mega.privacy.android.app.BuildConfig
-import mega.privacy.android.app.monitoring.CrashReporter
+import mega.privacy.android.domain.monitoring.CrashReporter
 
 /**
  * Report logs to FirebaseCrashlytics

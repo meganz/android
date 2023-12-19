@@ -914,7 +914,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         registerViewModelObservers()
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         if (handleDuplicateLaunches()) return
-        lifecycle.addObserver(cookieDialogHandler)
         if (savedInstanceState != null) {
             //Do after view instantiation
             restoreFromSavedInstanceState(savedInstanceState)
@@ -2339,6 +2338,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         checkScrollElevation()
         checkTransferOverQuotaOnResume()
         checkForInAppUpdateInstallStatus()
+        cookieDialogHandler.onResume()
     }
 
     private fun checkForInAppUpdateInstallStatus() {
@@ -2783,6 +2783,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         dismissAlertDialogIfExists(processFileDialog)
         nodeSaver.destroy()
         viewModel.stopMonitorChatSessionUpdates()
+        cookieDialogHandler.onDestroy()
         super.onDestroy()
     }
 

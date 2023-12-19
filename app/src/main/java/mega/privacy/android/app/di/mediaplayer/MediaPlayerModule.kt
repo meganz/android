@@ -10,7 +10,7 @@ import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
 import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.app.mediaplayer.usecase.DefaultStopAudioService
-import mega.privacy.android.app.monitoring.CrashReporter
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.StopAudioService
 import javax.inject.Singleton
 

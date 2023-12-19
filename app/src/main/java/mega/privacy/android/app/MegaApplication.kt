@@ -30,7 +30,6 @@ import mega.privacy.android.app.fetcher.MegaAvatarFetcher
 import mega.privacy.android.app.fetcher.MegaAvatarKeyer
 import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
 import mega.privacy.android.app.fetcher.MegaThumbnailKeyer
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.GetCookieSettingsUseCaseRx
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
@@ -43,7 +42,6 @@ import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.CallSoundsController
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.MeetingListener
-import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
@@ -53,10 +51,11 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
-import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
-import mega.privacy.android.domain.usecase.monitoring.EnablePerformanceReporterUseCase
+import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
+import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -78,7 +77,7 @@ import javax.inject.Provider
  * @property myAccountInfo
  * @property passcodeManagement
  * @property crashReporter
- * @property enablePerformanceReporterUseCase
+ * @property updateCrashAndPerformanceReportersUseCase
  * @property getCallSoundsUseCase
  * @property themeModeState
  * @property transfersManagement
@@ -113,7 +112,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var dbH: LegacyDatabaseHandler
 
     @Inject
-    lateinit var getCookieSettingsUseCase: GetCookieSettingsUseCaseRx
+    lateinit var getCookieSettingsUseCase: GetCookieSettingsUseCase
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
@@ -125,7 +124,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var crashReporter: CrashReporter
 
     @Inject
-    lateinit var enablePerformanceReporterUseCase: EnablePerformanceReporterUseCase
+    lateinit var updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase
 
     @Inject
     lateinit var getCallSoundsUseCase: GetCallSoundsUseCase
@@ -368,17 +367,13 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
      * Check current enabled cookies and set the corresponding flags to true/false
      */
     fun checkEnabledCookies() {
-        getCookieSettingsUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { cookies: Set<CookieType> ->
-                    val analyticsCookiesEnabled = cookies.contains(CookieType.ANALYTICS)
-                    crashReporter.setEnabled(analyticsCookiesEnabled)
-                    enablePerformanceReporterUseCase(analyticsCookiesEnabled)
-                },
-                { throwable: Throwable -> Timber.e(throwable) }
-            )
+        applicationScope.launch {
+            runCatching {
+                updateCrashAndPerformanceReportersUseCase()
+            }.onFailure {
+                Timber.e("Failed to get cookie settings: $it")
+            }
+        }
     }
 
     /**

@@ -15,23 +15,20 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.GetCookieSettingsUseCaseRx
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
@@ -45,7 +42,6 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
@@ -57,7 +53,6 @@ import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.contact.GetIncomingContactRequestsNotificationListUseCase
-import mega.privacy.android.domain.usecase.monitoring.EnablePerformanceReporterUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -79,9 +74,6 @@ import javax.inject.Inject
 class GlobalListener @Inject constructor(
     private val dbH: DatabaseHandler,
     private val megaChatNotificationHandler: MegaChatNotificationHandler,
-    private val getCookieSettingsUseCase: GetCookieSettingsUseCaseRx,
-    private val crashReporter: CrashReporter,
-    private val enablePerformanceReporterUseCase: EnablePerformanceReporterUseCase,
     @ApplicationContext private val appContext: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val storageStateMapper: StorageStateMapper,
@@ -291,7 +283,7 @@ class GlobalListener @Inject constructor(
             }
 
             MegaEvent.EVENT_BUSINESS_STATUS -> sendBroadcastUpdateAccountDetails()
-            MegaEvent.EVENT_MISC_FLAGS_READY -> checkEnabledCookies()
+            MegaEvent.EVENT_MISC_FLAGS_READY -> getInstance().checkEnabledCookies()
             MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
             MegaEvent.EVENT_UPGRADE_SECURITY -> applicationScope.launch {
                 setSecurityUpgradeInApp(true)
@@ -407,23 +399,6 @@ class GlobalListener @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e)
         }
-    }
-
-    /**
-     * Check current enabled cookies and set the corresponding flags to true/false
-     */
-    private fun checkEnabledCookies() {
-        getCookieSettingsUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { cookies: Set<CookieType> ->
-                    val analyticsCookiesEnabled = cookies.contains(CookieType.ANALYTICS)
-                    crashReporter.setEnabled(analyticsCookiesEnabled)
-                    enablePerformanceReporterUseCase(analyticsCookiesEnabled)
-                },
-                { throwable: Throwable -> Timber.e(throwable) }
-            )
     }
 
     /**

@@ -23,8 +23,6 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        unregisterReceiver(cookieSettingsReceiver) // Don't need to show the confirmation snackbar here
-
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         setTitle(R.string.settings_about_cookie_settings)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)

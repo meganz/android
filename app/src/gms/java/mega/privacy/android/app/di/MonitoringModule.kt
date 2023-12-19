@@ -9,8 +9,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.monitoring.FirebaseCrashReporter
+import mega.privacy.android.domain.monitoring.CrashReporter
 import timber.log.Timber
 import javax.inject.Singleton
 

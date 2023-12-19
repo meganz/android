@@ -355,25 +355,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         }
     }
 
-    /**
-     * Broadcast to show a snackbar when the Cookie settings has been saved
-     */
-    @Deprecated("replaced with flow event _cookieSettings in AppEventGateway")
-    protected var cookieSettingsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (isActivityInBackground || intent == null) {
-                return
-            }
-            val view = window.decorView.findViewById<View>(android.R.id.content)
-            if (view != null) {
-                showSnackbar(
-                    view,
-                    getString(R.string.dialog_cookie_snackbar_saved)
-                )
-            }
-        }
-    }
-
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             handleGoBack()
@@ -444,11 +425,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         registerReceiver(
             resumeTransfersReceiver,
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS)
-        )
-
-        registerReceiver(
-            cookieSettingsReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED)
         )
 
         collectFlow(monitorCookieSettingsSavedUseCase()) {
@@ -615,7 +591,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         unregisterReceiver(takenDownFilesReceiver)
         unregisterReceiver(showSnackbarReceiver)
         unregisterReceiver(resumeTransfersReceiver)
-        unregisterReceiver(cookieSettingsReceiver)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(resumeTransfersWarning)

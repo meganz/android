@@ -42,7 +42,6 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
-import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
@@ -57,6 +56,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import androidx.core.app.NotificationCompat
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
+import mega.privacy.android.domain.monitoring.CrashReporter
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.monitoring.CrashReporter
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.zippreview.domain.FileType

@@ -5,36 +5,46 @@ import android.content.Intent
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.MegaApplication
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.CheckCookieBannerEnabledUseCaseRx
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.UpdateCookieSettingsUseCaseRx
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.GetCookieSettingsUseCaseRx
 import mega.privacy.android.app.utils.ContextUtils.isValid
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.domain.usecase.setting.CheckCookieBannerEnabledUseCase
+import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
+import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
+import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Cookie dialog handler class to manage Cookie Dialog visibility based on view's lifecycle.
+ * Class to handle cookie dialog.
+ * It will show cookie dialog when cookie banner enabled and cookie settings is empty.
+ * It will dismiss cookie dialog when cookie banner disabled or cookie settings is not empty.
+ *
+ * @property getCookieSettingsUseCase                       Get cookie settings use case.
+ * @property updateCookieSettingsUseCase                    Update cookie settings use case.
+ * @property checkCookieBannerEnabledUseCase                Check cookie banner enabled use case.
+ * @property updateCrashAndPerformanceReportersUseCase      Update crash and performance reporters use case.
  */
 class CookieDialogHandler @Inject constructor(
-    private val getCookieSettingsUseCase: GetCookieSettingsUseCaseRx,
-    private val updateCookieSettingsUseCaseRx: UpdateCookieSettingsUseCaseRx,
-    private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCaseRx,
-) : LifecycleEventObserver {
+    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
+    private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
+    private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCase,
+    private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+) {
 
-    private val rxSubscriptions = CompositeDisposable()
     private var dialog: AlertDialog? = null
 
     /**
@@ -56,25 +66,21 @@ class CookieDialogHandler @Inject constructor(
         }
     }
 
-    /**
-     * Check SDK flag and existing cookie settings.
-     *
-     * @param action    Action to be invoked with the Boolean result
-     */
     private fun checkDialogSettings(action: (Boolean) -> Unit) {
-        rxSubscriptions.clear()
-
-        checkCookieBannerEnabledUseCase.check()
-            .concatMap { getCookieSettingsUseCase.shouldShowDialog() }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { showDialog ->
+        applicationScope.launch(ioDispatcher) {
+            runCatching {
+                // Check cookieBannerEnabled SDK boolean flag
+                val isCookieBannerEnabled = checkCookieBannerEnabledUseCase()
+                // Check existing cookie settings
+                val cookieSettings = getCookieSettingsUseCase()
+                withContext(mainDispatcher) {
+                    val showDialog = isCookieBannerEnabled && cookieSettings.isEmpty()
                     action.invoke(showDialog)
-                },
-                onError = Timber::e
-            )
-            .addTo(rxSubscriptions)
+                }
+            }.onFailure {
+                Timber.e("failed to check cookie banner settings: $it")
+            }
+        }
     }
 
     private fun createDialog(context: Context) {
@@ -84,7 +90,7 @@ class CookieDialogHandler @Inject constructor(
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
             .setPositiveButton(context.getString(R.string.preference_cookies_accept)) { _, _ ->
-                acceptAllCookies(context)
+                acceptAllCookies()
             }
             .setNegativeButton(context.getString(R.string.settings_about_cookie_settings)) { _, _ ->
                 context.startActivity(Intent(context, CookiePreferencesActivity::class.java))
@@ -117,7 +123,7 @@ class CookieDialogHandler @Inject constructor(
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
             .setPositiveButton(context.getString(R.string.preference_cookies_accept)) { _, _ ->
-                acceptAllCookies(context)
+                acceptAllCookies()
             }
             .setNegativeButton(context.getString(R.string.settings_about_cookie_settings)) { _, _ ->
                 context.startActivity(Intent(context, CookiePreferencesActivity::class.java))
@@ -139,21 +145,18 @@ class CookieDialogHandler @Inject constructor(
             }.also { it.show() }
     }
 
-    private fun acceptAllCookies(context: Context) {
-        updateCookieSettingsUseCaseRx.acceptAll()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-                    if (context.isValid()) {
-                        (context.applicationContext as MegaApplication).checkEnabledCookies()
-                    }
-                },
-                onError = Timber::e
-            )
-            .addTo(rxSubscriptions)
+    private fun acceptAllCookies() {
+        applicationScope.launch {
+            runCatching {
+                updateCookieSettingsUseCase(CookieType.entries.toSet())
+                updateCrashAndPerformanceReportersUseCase()
+            }.onFailure { Timber.e("failed to accept all cookies: $it") }
+        }
     }
 
+    /**
+     * Show dialog when view is resumed.
+     */
     fun onResume() {
         if (dialog?.isShowing == true) {
             checkDialogSettings { showDialog ->
@@ -162,17 +165,11 @@ class CookieDialogHandler @Inject constructor(
         }
     }
 
+    /**
+     * Dismiss dialog when view is destroyed.
+     */
     fun onDestroy() {
-        rxSubscriptions.clear()
         dialog?.dismiss()
         dialog = null
-    }
-
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        when (event) {
-            Lifecycle.Event.ON_RESUME -> onResume()
-            Lifecycle.Event.ON_DESTROY -> onDestroy()
-            else -> return
-        }
     }
 }

@@ -42,7 +42,6 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.notifications.TransferOverQuotaNotification
 import mega.privacy.android.app.presentation.offline.OfflineFragment
@@ -109,6 +108,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.domain.monitoring.CrashReporter
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream

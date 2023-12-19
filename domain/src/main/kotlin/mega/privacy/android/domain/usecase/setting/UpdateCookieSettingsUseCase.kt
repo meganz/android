@@ -1,9 +1,7 @@
-package mega.privacy.android.app.fragments.settingsFragments.cookie.usecase
+package mega.privacy.android.domain.usecase.setting
 
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.setting.BroadcastCookieSettingsSavedUseCase
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -19,12 +17,10 @@ class UpdateCookieSettingsUseCase @Inject constructor(
      *
      * @param enabledCookieSettings Set of enabled cookie settings
      */
-    suspend operator fun invoke(enabledCookieSettings: Set<CookieType>) {
-        runCatching {
-            accountRepository.setCookieSettings(enabledCookieSettings)
-            broadcastCookieSettingsSavedUseCase(enabledCookieSettings)
-        }.onFailure {
-            Timber.e(it, "Error updating cookie settings")
-        }
+    suspend operator fun invoke(
+        enabledCookieSettings: Set<CookieType>,
+    ) {
+        accountRepository.setCookieSettings(enabledCookieSettings)
+        broadcastCookieSettingsSavedUseCase(enabledCookieSettings)
     }
 }

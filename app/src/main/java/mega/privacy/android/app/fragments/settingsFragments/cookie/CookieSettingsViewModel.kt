@@ -3,24 +3,23 @@ package mega.privacy.android.app.fragments.settingsFragments.cookie
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.MegaApplication
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.UpdateCookieSettingsUseCaseRx
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.rxjava.GetCookieSettingsUseCaseRx
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
+import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
+import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class CookieSettingsViewModel @Inject constructor(
-    private val getCookieSettingsUseCase: GetCookieSettingsUseCaseRx,
-    private val updateCookieSettingsUseCaseRx: UpdateCookieSettingsUseCaseRx,
+    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
+    private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
+    private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
 ) : BaseRxViewModel() {
 
     private val enabledCookies = MutableLiveData(mutableSetOf(CookieType.ESSENTIAL))
@@ -84,46 +83,39 @@ class CookieSettingsViewModel @Inject constructor(
      * Save cookie settings to SDK
      */
     fun saveCookieSettings() {
-        updateCookieSettingsUseCaseRx.update(enabledCookies.value)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
+        viewModelScope.launch {
+            enabledCookies.value?.let {
+                runCatching {
+                    updateCookieSettingsUseCase(it.toSet())
+                    updateCrashAndPerformanceReportersUseCase()
                     updateResult.value = true
-
-                    MegaApplication.getInstance().checkEnabledCookies()
-                },
-                onError = { error ->
-                    Timber.e(error)
+                }.onFailure {
+                    Timber.e(it)
                     updateResult.value = false
                     getCookieSettings()
                 }
-            ).addTo(composite)
+            }
+        }
     }
 
     /**
      * Retrieve current cookie settings from SDK
      */
     private fun getCookieSettings() {
-        getCookieSettingsUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { settings ->
-                    if (!settings.isNullOrEmpty()) {
-                        enabledCookies.value = settings.toMutableSet()
-                        savedCookiesSize.value = settings.size
-                    }
-
-                    updateResult.value = true
-                },
-                onError = { error ->
-                    Timber.e(error)
-                    updateResult.value = false
-                    resetCookies()
+        viewModelScope.launch {
+            runCatching {
+                val settings = getCookieSettingsUseCase()
+                if (settings.isNotEmpty()) {
+                    enabledCookies.value = settings.toMutableSet()
+                    savedCookiesSize.value = settings.size
                 }
-            )
-            .addTo(composite)
+                updateResult.value = true
+            }.onFailure {
+                Timber.e(it)
+                updateResult.value = false
+                resetCookies()
+            }
+        }
     }
 
     /**

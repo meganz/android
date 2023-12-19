@@ -1,5 +1,4 @@
-package mega.privacy.android.app.monitoring
-
+package mega.privacy.android.domain.monitoring
 /**
  * When uncaught exception occurs, upload related info to platform tools. For example, Firebase Crashlytics.
  */
