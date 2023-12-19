@@ -123,17 +123,12 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
             if (!node.isTakenDown() && (firstLevel || parentHandle == INVALID_HANDLE)) {
                 switch (accessLevel) {
-                    case MegaShare.ACCESS_FULL:
-                        nodeIcon.setImageResource(R.drawable.ic_shared_fullaccess);
-                        break;
-
-                    case MegaShare.ACCESS_READ:
-                        nodeIcon.setImageResource(R.drawable.ic_shared_read);
-                        break;
-
-                    case MegaShare.ACCESS_READWRITE:
-                        nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
-                        break;
+                    case MegaShare.ACCESS_FULL ->
+                            nodeIcon.setImageResource(R.drawable.ic_shared_fullaccess);
+                    case MegaShare.ACCESS_READ ->
+                            nodeIcon.setImageResource(R.drawable.ic_shared_read);
+                    case MegaShare.ACCESS_READWRITE ->
+                            nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
                 }
             } else {
                 optionLeave.setVisibility(View.GONE);
@@ -155,19 +150,17 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         }
 
         switch (accessLevel) {
-            case MegaShare.ACCESS_FULL:
+            case MegaShare.ACCESS_FULL -> {
                 if (firstLevel || parentHandle == INVALID_HANDLE) {
                     optionRubbish.setVisibility(View.GONE);
+                    optionMove.setVisibility(View.GONE);
                 }
-
-                break;
-
-            case MegaShare.ACCESS_READ:
-            case MegaShare.ACCESS_READWRITE:
+            }
+            case MegaShare.ACCESS_READ, MegaShare.ACCESS_READWRITE -> {
                 optionMove.setVisibility(View.GONE);
                 optionRename.setVisibility(View.GONE);
                 optionRubbish.setVisibility(View.GONE);
-                break;
+            }
         }
 
         if (node.isTakenDown()) {
