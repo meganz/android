@@ -1,5 +1,6 @@
 package mega.privacy.android.app.globalmanagement
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationChannel
@@ -55,7 +56,6 @@ import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUs
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.GetAllSdTransfersUseCase
-import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
@@ -332,7 +332,11 @@ class TransfersManagement @Inject constructor(
         if (areTransfersPausedUseCase()) {
             //Queue of transfers should be paused.
             applicationScope.launch {
-                pauseAllTransfersUseCase(true)
+                runCatching {
+                    pauseAllTransfersUseCase(true)
+                }.onFailure {
+                    Timber.e(it)
+                }
             }
         }
 

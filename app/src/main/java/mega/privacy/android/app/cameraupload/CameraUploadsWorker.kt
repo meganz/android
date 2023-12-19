@@ -1513,7 +1513,11 @@ class CameraUploadsWorker @AssistedInject constructor(
      *  @param backupState
      */
     private suspend fun updateBackupState(backupState: BackupState) {
-        updateCameraUploadsBackupStatesUseCase(backupState)
+        runCatching {
+            updateCameraUploadsBackupStatesUseCase(backupState)
+        }.onFailure {
+            Timber.e(it)
+        }
         updateLastTimestamp()
     }
 

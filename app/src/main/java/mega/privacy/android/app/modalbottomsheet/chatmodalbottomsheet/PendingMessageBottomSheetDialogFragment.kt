@@ -118,7 +118,11 @@ class PendingMessageBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
         if (id == R.id.msg_not_sent_retry_layout) {
             if (areTransfersPausedUseCase() && isUploadingMessage) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    pauseAllTransfersUseCase(false)
+                    runCatching {
+                        pauseAllTransfersUseCase(false)
+                    }.onFailure {
+                        Timber.e(it)
+                    }
                     (requireActivity() as ChatActivity).updatePausedUploadingMessages()
                 }
             } else {

@@ -351,7 +351,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             transfersManagement.hasResumeTransfersWarningAlreadyBeenShown = true
             showResumeTransfersWarning(this@BaseActivity) {
                 lifecycleScope.launch {
-                    pauseAllTransfersUseCase(false)
+                    runCatching {
+                        pauseAllTransfersUseCase(false)
+                    }.onFailure {
+                        Timber.e(it)
+                    }
                 }
             }
         }

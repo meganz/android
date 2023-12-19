@@ -61,6 +61,8 @@ internal class TransferPageViewModel @Inject constructor(
         pauseOrResumeJob = viewModelScope.launch {
             val result = runCatching {
                 pauseAllTransfersUseCase(isPause)
+            }.onFailure {
+                Timber.e(it)
             }
             _state.update { it.copy(pauseOrResultResult = result) }
         }
