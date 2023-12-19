@@ -74,7 +74,7 @@ fun MegaAlertDialog(
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
 ) = BaseMegaAlertDialog(
-    text = text,
+    content = text,
     confirmButtonText = confirmButtonText,
     cancelButtonText = cancelButtonText,
     onConfirm = onConfirm,
@@ -91,7 +91,7 @@ private fun MegaAlertDialogPreview(
     @PreviewParameter(PreviewAlertDialogParametersProvider::class) texts: PreviewStringParameters,
 ) {
     AndroidTheme {
-        PreviewBox {
+        DialogBox {
             MegaAlertDialog(
                 text = texts.text.getText(),
                 confirmButtonText = texts.confirmButtonText.getText(),
@@ -105,7 +105,7 @@ private fun MegaAlertDialogPreview(
 
 
 @Composable
-private fun PreviewBox(content: @Composable BoxScope.() -> Unit) = Box(
+private fun DialogBox(content: @Composable BoxScope.() -> Unit) = Box(
     modifier = Modifier.padding(horizontal = 240.dp, vertical = 120.dp),
     content = content
 )

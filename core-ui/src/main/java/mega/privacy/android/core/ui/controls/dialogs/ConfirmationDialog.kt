@@ -84,7 +84,7 @@ fun ConfirmationDialog(
     dismissOnBackPress: Boolean = true,
 ) = BaseMegaAlertDialog(
     modifier = modifier,
-    text = text,
+    content = text,
     title = title,
     confirmButtonText = confirmButtonText,
     cancelButtonText = cancelButtonText,

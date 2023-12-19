@@ -28,7 +28,7 @@ internal fun BaseMegaAlertDialog(
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
 ) = BaseMegaAlertDialog(
-    text = {
+    content = {
         Text(
             text = text,
             style = MaterialTheme.typography.subtitle1,
@@ -48,7 +48,7 @@ internal fun BaseMegaAlertDialog(
 
 @Composable
 internal fun BaseMegaAlertDialog(
-    text: @Composable (() -> Unit),
+    content: @Composable (() -> Unit),
     confirmButtonText: String,
     cancelButtonText: String?,
     onConfirm: () -> Unit,
@@ -59,7 +59,7 @@ internal fun BaseMegaAlertDialog(
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
 ) = BaseMegaAlertDialog(
-    text = text,
+    text = content,
     buttons = {
         AlertDialogFlowRow {
             cancelButtonText?.let {
