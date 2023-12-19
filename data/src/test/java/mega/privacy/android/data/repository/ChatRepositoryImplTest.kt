@@ -1,9 +1,12 @@
 package mega.privacy.android.data.repository
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -34,6 +37,7 @@ import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.RichPreviewMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
+import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.Contact
@@ -825,5 +829,19 @@ class ChatRepositoryImplTest {
         underTest.enableGeolocation()
         verify(megaApiGateway).enableGeolocation(any())
         verifyNoMoreInteractions(megaApiGateway)
+    }
+
+    @Test
+    fun `test that null messages are returned from monitor messages function`() = runTest {
+        whenever(megaChatApiGateway.openChatRoom(any())).thenReturn(flow {
+            emit(ChatRoomUpdate.OnMessageLoaded(mock()))
+            emit(ChatRoomUpdate.OnMessageLoaded(null))
+            awaitCancellation()
+        })
+
+        underTest.monitorOnMessageLoaded(123L).test {
+            assertThat(awaitItem()).isNotNull()
+            assertThat(awaitItem()).isNull()
+        }
     }
 }
