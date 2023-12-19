@@ -5,7 +5,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.message.meetingupdate.ScheduledMeetingUpdateMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ScheduledMeetingUpdateMessageView
 import mega.privacy.android.app.utils.TextUtil
 import org.junit.Rule
 import org.junit.Test

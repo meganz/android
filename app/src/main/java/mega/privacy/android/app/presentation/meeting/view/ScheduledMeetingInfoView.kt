@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -69,12 +70,11 @@ import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.extensions.title
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012
@@ -93,6 +93,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.legacy.core.ui.controls.text.MarqueeText
+import mega.privacy.android.shared.theme.MegaAppTheme
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -1155,11 +1156,9 @@ private fun ParticipantsPermissionView(participant: ChatParticipant) {
  */
 @Composable
 private fun ManageChatHistorySubtitle(seconds: Long) {
-    var text = formatRetentionTimeInSecondsToString(seconds)
-    if (text.isNotEmpty()) {
-        text =
-            stringResource(R.string.subtitle_properties_manage_chat) + " " + text
-    }
+    val text = getRetentionTimeString(LocalContext.current, seconds)?.let {
+        "${stringResource(R.string.subtitle_properties_manage_chat)} $it"
+    } ?: ""
 
     ActionSubtitleText(text)
 }
@@ -1178,64 +1177,6 @@ private fun ChatNotificationSubtitle(seconds: Long) {
     }
 
     ActionSubtitleText(text)
-}
-
-/**
- * Get appropriate String from the seconds of retention time.
- *
- * @param seconds  The retention time in seconds
- * @return         The formatted text
- */
-@Composable
-fun formatRetentionTimeInSecondsToString(seconds: Long): String {
-    if (seconds == Constants.DISABLED_RETENTION_TIME)
-        return ""
-
-    val years = seconds % Constants.SECONDS_IN_YEAR
-    if (years == 0L) {
-        return stringResource(R.string.subtitle_properties_manage_chat_label_year)
-    }
-
-    val months = seconds % Constants.SECONDS_IN_MONTH_30
-    if (months == 0L) {
-        val month = (seconds / Constants.SECONDS_IN_MONTH_30).toInt()
-        return pluralStringResource(
-            R.plurals.subtitle_properties_manage_chat_label_months,
-            month,
-            month
-        )
-    }
-
-    val weeks = seconds % Constants.SECONDS_IN_WEEK
-    if (weeks == 0L) {
-        val week = (seconds / Constants.SECONDS_IN_WEEK).toInt()
-        return pluralStringResource(
-            R.plurals.subtitle_properties_manage_chat_label_weeks,
-            week,
-            week
-        )
-    }
-
-    val days = seconds % Constants.SECONDS_IN_DAY
-    if (days == 0L) {
-        val day = (seconds / Constants.SECONDS_IN_DAY).toInt()
-        return pluralStringResource(
-            R.plurals.label_time_in_days_full,
-            day,
-            day
-        )
-    }
-
-    val hours = seconds % Constants.SECONDS_IN_HOUR
-    if (hours == 0L) {
-        val hour = (seconds / Constants.SECONDS_IN_HOUR).toInt()
-        return pluralStringResource(
-            R.plurals.subtitle_properties_manage_chat_label_hours,
-            hour,
-            hour
-        )
-    }
-    return ""
 }
 
 /**

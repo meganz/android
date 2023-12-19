@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.meeting.chat.view.message.management.permission
+package test.mega.privacy.android.app.presentation.meeting.chat.view.message.management
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule

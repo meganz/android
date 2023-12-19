@@ -1,16 +1,17 @@
 package test.mega.privacy.android.app.presentation.meeting
 
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
-import mega.privacy.android.app.presentation.meeting.view.formatRetentionTimeInSecondsToString
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import org.junit.Rule
@@ -23,7 +24,7 @@ import test.mega.privacy.android.app.onNodeWithText
 @RunWith(AndroidJUnit4::class)
 class ScheduledMeetingInfoViewTest {
     @get:Rule
-    var composeRule = createComposeRule()
+    var composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun `test that meeting link button is shown`() {
@@ -253,7 +254,7 @@ class ScheduledMeetingInfoViewTest {
         val seconds: Long = 0
         val expectedResult = ""
         composeRule.setContent {
-            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+            getRetentionTime(seconds = seconds).let {
                 Truth.assertThat(it).isEqualTo(expectedResult)
             }
         }
@@ -264,7 +265,7 @@ class ScheduledMeetingInfoViewTest {
         val seconds: Long = 60
         val expectedResult = ""
         composeRule.setContent {
-            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+            getRetentionTime(seconds = seconds).let {
                 Truth.assertThat(it).isEqualTo(expectedResult)
             }
         }
@@ -275,7 +276,7 @@ class ScheduledMeetingInfoViewTest {
         val seconds: Long = 3600
         val expectedResult = "1 hour"
         composeRule.setContent {
-            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+            getRetentionTime(seconds = seconds).let {
                 Truth.assertThat(it).isEqualTo(expectedResult)
             }
         }
@@ -286,7 +287,7 @@ class ScheduledMeetingInfoViewTest {
         val seconds: Long = 86400
         val expectedResult = "1 day"
         composeRule.setContent {
-            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+            getRetentionTime(seconds = seconds).let {
                 Truth.assertThat(it).isEqualTo(expectedResult)
             }
         }
@@ -297,7 +298,7 @@ class ScheduledMeetingInfoViewTest {
         val seconds: Long = 604800
         val expectedResult = "1 week"
         composeRule.setContent {
-            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+            getRetentionTime(seconds = seconds).let {
                 Truth.assertThat(it).isEqualTo(expectedResult)
             }
         }
@@ -308,7 +309,7 @@ class ScheduledMeetingInfoViewTest {
         val seconds: Long = 1209600
         val expectedResult = "2 weeks"
         composeRule.setContent {
-            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+            getRetentionTime(seconds = seconds).let {
                 Truth.assertThat(it).isEqualTo(expectedResult)
             }
         }
@@ -319,7 +320,7 @@ class ScheduledMeetingInfoViewTest {
         val seconds: Long = 2592000
         val expectedResult = "1 month"
         composeRule.setContent {
-            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+            getRetentionTime(seconds = seconds).let {
                 Truth.assertThat(it).isEqualTo(expectedResult)
             }
         }
@@ -330,11 +331,14 @@ class ScheduledMeetingInfoViewTest {
         val seconds: Long = 31536000
         val expectedResult = "1 year"
         composeRule.setContent {
-            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+            getRetentionTime(seconds = seconds).let {
                 Truth.assertThat(it).isEqualTo(expectedResult)
             }
         }
     }
+
+    private fun getRetentionTime(seconds: Long) =
+        getRetentionTimeString(composeRule.activity, timeInSeconds = seconds) ?: ""
 
     private fun getChatScheduledMeeting(): ChatScheduledMeeting =
         ChatScheduledMeeting(

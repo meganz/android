@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message.meetingupdate
+package mega.privacy.android.app.presentation.meeting.chat.view.message.management
 
 import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -15,8 +15,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatManagementMessageView
-import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ManagementMessageViewModel
 import mega.privacy.android.core.ui.model.MegaSpanStyle
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews

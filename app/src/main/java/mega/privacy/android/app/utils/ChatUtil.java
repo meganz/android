@@ -1478,7 +1478,9 @@ public class ChatUtil {
      *
      * @param seconds The retention time in seconds
      * @return The right text
+     * @deprecated Use RetentionTimeUpdatedMessageView.getRetentionTimeString instead.
      */
+    @Deprecated
     public static String transformSecondsInString(long seconds) {
         if (seconds == DISABLED_RETENTION_TIME)
             return "";
