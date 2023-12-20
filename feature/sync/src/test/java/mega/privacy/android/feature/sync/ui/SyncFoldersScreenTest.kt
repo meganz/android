@@ -34,21 +34,22 @@ class SyncFoldersScreenTest {
     @Test
     fun `test that folders list is displayed when there are folders`() {
         val folderName = "Folder name"
-        whenever(state.value).thenReturn(
-            SyncFoldersState(
-                listOf(
-                    SyncUiItem(
-                        id = 1L,
-                        folderPairName = folderName,
-                        status = SyncStatus.SYNCING,
-                        hasStalledIssues = false,
-                        deviceStoragePath = folderName,
-                        megaStoragePath = folderName,
-                        method = R.string.sync_two_way,
-                        expanded = false
-                    )
+        val syncFoldersState = SyncFoldersState(
+            listOf(
+                SyncUiItem(
+                    id = 1L,
+                    folderPairName = folderName,
+                    status = SyncStatus.SYNCING,
+                    hasStalledIssues = false,
+                    deviceStoragePath = folderName,
+                    megaStoragePath = folderName,
+                    method = R.string.sync_two_way,
+                    expanded = false
                 )
             )
+        )
+        whenever(state.value).thenReturn(
+            syncFoldersState
         )
         whenever(viewModel.state).thenReturn(state)
         composeTestRule.setContent {
@@ -56,6 +57,7 @@ class SyncFoldersScreenTest {
                 viewModel = viewModel,
                 addFolderClicked = {},
                 issuesInfoClicked = {},
+                state = syncFoldersState
             )
         }
 
@@ -72,6 +74,7 @@ class SyncFoldersScreenTest {
                 viewModel = viewModel,
                 addFolderClicked = {},
                 issuesInfoClicked = {},
+                state = SyncFoldersState(emptyList())
             )
         }
 

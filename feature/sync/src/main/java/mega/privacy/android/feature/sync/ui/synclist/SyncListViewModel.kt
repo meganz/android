@@ -52,8 +52,12 @@ internal class SyncListViewModel @Inject constructor(
     private fun monitorStalledIssue() {
         viewModelScope.launch {
             monitorSyncStalledIssuesUseCase().catch { Timber.e(it) }
-                .collectLatest { stalledIssues ->
-                    _state.update { SyncListState(stalledIssues.size) }
+                .collect { stalledIssues ->
+                    _state.update {
+                        it.copy(
+                            stalledIssuesCount = stalledIssues.size
+                        )
+                    }
                 }
         }
     }
@@ -95,7 +99,11 @@ internal class SyncListViewModel @Inject constructor(
                         action.selectedResolution, stalledIssueItemMapper(action.uiItem)
                     )
                 }
-                _state.update { SyncListState(snackbarMessage = R.string.sync_stalled_issue_conflict_resolved) }
+                _state.update {
+                    it.copy(
+                        snackbarMessage = R.string.sync_stalled_issue_conflict_resolved
+                    )
+                }
             }
 
             SyncListAction.SnackBarShown -> {

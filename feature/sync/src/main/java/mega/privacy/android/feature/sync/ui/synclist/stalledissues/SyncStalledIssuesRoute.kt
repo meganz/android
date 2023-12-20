@@ -11,8 +11,8 @@ import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 internal fun SyncStalledIssuesRoute(
     stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
+    viewModel: SyncStalledIssuesViewModel,
     modifier: Modifier = Modifier,
-    viewModel: SyncStalledIssuesViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val stalledIssues = state.stalledIssues

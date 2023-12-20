@@ -3,8 +3,8 @@ package mega.privacy.android.feature.sync.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -37,6 +37,8 @@ internal class SyncRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : SyncRepository {
+
+    private val _refreshShow = MutableSharedFlow<Unit>()
 
     override suspend fun setupFolderPair(
         name: String?,
@@ -87,7 +89,10 @@ internal class SyncRepositoryImpl @Inject constructor(
                     if (it is MegaSyncListenerEvent.OnSyncStatsUpdated) {
                         syncStatsCacheGateway.setSyncStats(it.syncStats)
                     }
-                }
+                },
+            _refreshShow.map {
+                MegaSyncListenerEvent.OnRefreshSyncState
+            }
         ).flowOn(ioDispatcher)
             .shareIn(appScope, SharingStarted.Eagerly)
     }
@@ -101,7 +106,6 @@ internal class SyncRepositoryImpl @Inject constructor(
         _syncChanges
             .map { getSyncStalledIssues() }
             .onStart { emit(getSyncStalledIssues()) }
-            .distinctUntilChanged()
             .flowOn(ioDispatcher)
             .shareIn(appScope, SharingStarted.Eagerly, replay = 1)
     }
@@ -112,10 +116,13 @@ internal class SyncRepositoryImpl @Inject constructor(
         _syncChanges
             .map { getFolderPairs() }
             .onStart { emit(getFolderPairs()) }
-            .distinctUntilChanged()
             .flowOn(ioDispatcher)
             .shareIn(appScope, SharingStarted.Eagerly, replay = 1)
     }
 
     override fun monitorFolderPairChanges() = _folderPair
+
+    override suspend fun refreshSync() {
+        _refreshShow.emit(Unit)
+    }
 }

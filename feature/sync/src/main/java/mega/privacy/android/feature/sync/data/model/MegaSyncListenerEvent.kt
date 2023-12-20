@@ -60,4 +60,14 @@ sealed interface MegaSyncListenerEvent {
      * of the synchronization engine.
      */
     data object OnGlobalSyncStateChanged : MegaSyncListenerEvent
+
+    /**
+     * OnRefreshSyncState
+     *
+     * @brief This function is called with the state of the synchronization engine has changed
+     *
+     * You can call MegaApi::isScanning and MegaApi::isWaiting to know the global state
+     * of the synchronization engine.
+     */
+    data object OnRefreshSyncState : MegaSyncListenerEvent
 }

@@ -20,6 +20,7 @@ import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.GetSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.PauseSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.RefreshSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetUserPausedSyncUseCase
@@ -48,6 +49,7 @@ class SyncFoldersViewModelTest {
     private val pauseSyncUseCase: PauseSyncUseCase = mock()
     private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase = mock()
     private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase = mock()
+    private val refreshSyncUseCase: RefreshSyncUseCase = mock()
 
     private lateinit var underTest: SyncFoldersViewModel
 
@@ -222,7 +224,8 @@ class SyncFoldersViewModelTest {
             resumeSyncUseCase,
             pauseSyncUseCase,
             getSyncStalledIssuesUseCase,
-            setUserPausedSyncsUseCase
+            setUserPausedSyncsUseCase,
+            refreshSyncUseCase
         )
     }
 }

@@ -6,7 +6,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -14,6 +13,7 @@ import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.GetSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.PauseSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.RefreshSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetUserPausedSyncUseCase
@@ -31,6 +31,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val pauseSyncUseCase: PauseSyncUseCase,
     private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase,
     private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase,
+    private val refreshSyncUseCase: RefreshSyncUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncFoldersState(emptyList()))
@@ -49,9 +50,12 @@ internal class SyncFoldersViewModel @Inject constructor(
                         })
                     }
                 }
-                .collectLatest { syncs ->
+                .collect { syncs ->
                     _state.update {
-                        SyncFoldersState(syncs)
+                        it.copy(
+                            syncUiItems = syncs,
+                            isRefreshing = false
+                        )
                     }
                 }
         }
@@ -93,6 +97,12 @@ internal class SyncFoldersViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun onSyncRefresh() {
+        viewModelScope.launch {
+            refreshSyncUseCase()
         }
     }
 }

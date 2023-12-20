@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -41,8 +41,13 @@ internal class SyncStalledIssuesViewModel @Inject constructor(
                             stalledIssueEntity = stalledIssue,
                         )
                     }
-                }.collectLatest { stalledIssues ->
-                    _state.update { SyncStalledIssuesState(stalledIssues) }
+                }
+                .collect { stalledIssues ->
+                    _state.update {
+                        it.copy(
+                            stalledIssues = stalledIssues
+                        )
+                    }
                 }
         }
     }

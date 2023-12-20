@@ -34,7 +34,10 @@ internal fun SyncFoldersScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        LazyColumn(state = rememberLazyListState(), modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            state = rememberLazyListState(), modifier = modifier
+                .fillMaxSize()
+        ) {
             if (syncUiItems.isEmpty()) {
                 item {
                     SyncListNoItemsPlaceHolder(
@@ -94,7 +97,7 @@ private fun SyncFoldersScreenSyncingPreview() {
         pauseRunClicked = {},
         removeFolderClicked = {},
         addFolderClicked = {},
-        issuesInfoClicked = {}
+        issuesInfoClicked = {},
     )
 }
 
@@ -118,6 +121,6 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview() {
         pauseRunClicked = {},
         removeFolderClicked = {},
         addFolderClicked = {},
-        issuesInfoClicked = {}
+        issuesInfoClicked = {},
     )
 }

@@ -10,12 +10,11 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.C
 
 @Composable
 internal fun SyncFoldersRoute(
-    viewModel: SyncFoldersViewModel = hiltViewModel(),
     addFolderClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
+    viewModel: SyncFoldersViewModel,
+    state: SyncFoldersState
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
     SyncFoldersScreen(
         syncUiItems = state.syncUiItems,
         cardExpanded = viewModel::handleAction,

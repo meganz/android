@@ -68,4 +68,8 @@ interface SyncRepository {
      */
     fun monitorFolderPairChanges(): Flow<List<FolderPair>>
 
+    /**
+     * Refreshes Sync list
+     */
+    suspend fun refreshSync()
 }

@@ -7,7 +7,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 internal fun SyncSolvedIssuesRoute(
-    viewModel: SyncSolvedIssuesViewModel = hiltViewModel(),
+    viewModel: SyncSolvedIssuesViewModel,
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
