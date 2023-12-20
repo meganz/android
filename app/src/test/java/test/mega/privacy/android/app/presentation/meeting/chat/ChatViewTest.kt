@@ -146,10 +146,10 @@ class ChatViewTest {
 
 
     @Test
-    fun `test that start meeting view shows correctly when chat room is meeting and available and user doesn't join`() {
+    fun `test that start meeting view shows correctly when chat room is pending meeting and available and user doesn't join`() {
         initComposeRuleContent(
             ChatUiState(
-                isMeeting = true,
+                schedIsPending = true,
                 isActive = true,
                 callInThisChat = ChatCall(
                     chatId = 1L,
@@ -166,10 +166,10 @@ class ChatViewTest {
     }
 
     @Test
-    fun `test that join meeting view shows correctly when chat room is meeting and available and user doesn't join`() {
+    fun `test that join meeting view shows correctly when chat room is pending meeting and available and user doesn't join`() {
         initComposeRuleContent(
             ChatUiState(
-                isMeeting = true,
+                schedIsPending = true,
                 isActive = true,
                 callInThisChat = ChatCall(
                     chatId = 1L,

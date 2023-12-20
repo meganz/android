@@ -11,11 +11,11 @@ import timber.log.Timber
 
 internal fun showGroupOrContactInfoActivity(context: Context, uiState: ChatUiState) {
     with(uiState) {
-        if (scheduledMeeting != null && schedIsPending && isMeeting && isActive) {
+        if (schedIsPending && isActive) {
             Timber.d("show scheduled meeting info")
             Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
-                putExtra(Constants.CHAT_ID, scheduledMeeting.chatId)
-                putExtra(Constants.SCHEDULED_MEETING_ID, scheduledMeeting.schedId)
+                putExtra(Constants.CHAT_ID, scheduledMeeting?.chatId)
+                putExtra(Constants.SCHEDULED_MEETING_ID, scheduledMeeting?.schedId)
             }.also {
                 context.startActivity(it)
             }

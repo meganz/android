@@ -400,7 +400,7 @@ internal fun ChatView(
                             )
                         }
                     }
-                    if (isMeeting && isActive && !isArchived) {
+                    if (schedIsPending && isActive && !isArchived) {
                         StartOrJoinMeeting(this@with, onStartOrJoinMeeting = {
                             callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
                         })
@@ -588,7 +588,7 @@ private fun ReturnToCallBanner(
                     }
                 })
 
-        !isMeeting && currentCall != null ->
+        !schedIsPending && currentCall != null ->
             ReturnToCallBanner(
                 text = stringResource(id = R.string.call_in_progress_layout),
                 onBannerClicked = { startMeetingActivity(context, currentCall.chatId) },
