@@ -189,7 +189,7 @@ class AlbumContentFragment : Fragment() {
     }
 
     private fun openPhotoPreview(anchorPhoto: Photo, photos: List<Photo>) {
-        albumsViewModel.state.value.currentAlbum?.let { currentAlbum ->
+        albumContentViewModel.state.value.uiAlbum?.id?.let { currentAlbum ->
             lifecycleScope.launch {
                 if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
                     val params = buildMap {

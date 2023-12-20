@@ -224,11 +224,11 @@ internal fun ImagePreviewScreen(
                         ) {
                             ImagePreviewTopBar(
                                 imageNode = imageNode,
-                                showSlideshowMenu = viewModel::isSlideshowOptionVisible,
-                                showSaveToDeviceMenu = viewModel::isSaveToDeviceOptionVisible,
-                                showManageLinkMenu = viewModel::isGetLinkOptionVisible,
-                                showSendToMenu = viewModel::isSendToOptionVisible,
-                                showMoreMenu = viewModel::isMoreOptionVisible,
+                                showSlideshowMenu = viewModel::isSlideshowMenuVisible,
+                                showSaveToDeviceMenu = viewModel::isSaveToDeviceMenuVisible,
+                                showManageLinkMenu = viewModel::isGetLinkMenuVisible,
+                                showSendToMenu = viewModel::isSendToChatMenuVisible,
+                                showMoreMenu = viewModel::isMoreMenuVisible,
                                 onClickBack = onClickBack,
                                 onClickSlideshow = onClickSlideshow,
                                 onClickSaveToDevice = { onClickSaveToDevice(imageNode) },
@@ -266,6 +266,21 @@ internal fun ImagePreviewScreen(
                     modalSheetState = modalSheetState,
                     imageNode = currentImageNode,
                     isAvailableOffline = isCurrentImageNodeAvailableOffline,
+                    showFavouriteMenu = viewModel::isFavouriteMenuVisible,
+                    showLabelMenu = viewModel::isLabelMenuVisible,
+                    showDisputeMenu = viewModel::isDisputeMenuVisible,
+                    showOpenWithMenu = viewModel::isOpenWithMenuVisible,
+                    showForwardMenu = viewModel::isForwardMenuVisible,
+                    showSaveToDeviceMenu = viewModel::isSaveToDeviceMenuVisible,
+                    showGetLinkMenu = viewModel::isGetLinkMenuVisible,
+                    showSendToChatMenu = viewModel::isSendToChatMenuVisible,
+                    showShareMenu = viewModel::isShareMenuVisible,
+                    showRenameMenu = viewModel::isRenameMenuVisible,
+                    showMoveMenu = viewModel::isMoveMenuVisible,
+                    showCopyMenu = viewModel::isCopyMenuVisible,
+                    showRestoreMenu = viewModel::isRestoreMenuVisible,
+                    showRemoveMenu = viewModel::isRemoveMenuVisible,
+                    showRemoveOfflineMenu = viewModel::isRemoveOfflineMenuVisible,
                     downloadImage = viewModel::monitorImageResult,
                     getImageThumbnailPath = viewModel::getLowestResolutionImagePath,
                     onClickInfo = {
@@ -277,10 +292,12 @@ internal fun ImagePreviewScreen(
                     onClickLabel = {
                         onClickLabel(currentImageNode)
                     },
+                    onClickDispute = {},
                     onClickOpenWith = {
                         onClickOpenWith(currentImageNode)
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
+                    onClickForward = {},
                     onClickSaveToDevice = {
                         onClickSaveToDevice(currentImageNode)
                         hideBottomSheet(coroutineScope, modalSheetState)
@@ -298,7 +315,7 @@ internal fun ImagePreviewScreen(
                         }
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
-                    onClickSendTo = {
+                    onClickSendToChat = {
                         onClickSendTo(currentImageNode)
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
@@ -314,6 +331,8 @@ internal fun ImagePreviewScreen(
                     onClickCopy = {
                         onClickCopy(currentImageNode)
                     },
+                    onClickRestore = {},
+                    onClickRemove = {},
                     onClickMoveToRubbishBin = {
                         onClickMoveToRubbishBin(currentImageNode)
                         hideBottomSheet(coroutineScope, modalSheetState)

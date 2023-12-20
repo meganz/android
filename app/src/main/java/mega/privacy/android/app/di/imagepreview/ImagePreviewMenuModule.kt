@@ -5,13 +5,13 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.multibindings.IntoMap
-import mega.privacy.android.app.presentation.imagepreview.menu.AlbumContentImagePreviewMenuOptions
-import mega.privacy.android.app.presentation.imagepreview.menu.AlbumSharingImagePreviewMenuOptions
-import mega.privacy.android.app.presentation.imagepreview.menu.CloudDriveImagePreviewMenuOptions
-import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenuOptions
-import mega.privacy.android.app.presentation.imagepreview.menu.MediaDiscoveryImagePreviewMenuOptions
-import mega.privacy.android.app.presentation.imagepreview.menu.OfflineImagePreviewMenuOptions
-import mega.privacy.android.app.presentation.imagepreview.menu.TimelineImagePreviewMenuOptions
+import mega.privacy.android.app.presentation.imagepreview.menu.AlbumContentImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.AlbumSharingImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.CloudDriveImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.MediaDiscoveryImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.OfflineImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.TimelineImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 
 @Module
@@ -20,30 +20,30 @@ internal interface ImagePreviewMenuModule {
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.TIMELINE)
-    fun TimelineImagePreviewMenuOptions.bindTimelineImagePreviewMenuOptions(): ImagePreviewMenuOptions
+    fun TimelineImagePreviewMenu.bindTimelineImagePreviewMenu(): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.ALBUM_CONTENT)
-    fun AlbumContentImagePreviewMenuOptions.bindAlbumContentImagePreviewMenuOptions(): ImagePreviewMenuOptions
+    fun AlbumContentImagePreviewMenu.bindAlbumContentImagePreviewMenu(): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.MEDIA_DISCOVERY)
-    fun MediaDiscoveryImagePreviewMenuOptions.bindMediaDiscoveryMenuOptions(): ImagePreviewMenuOptions
+    fun MediaDiscoveryImagePreviewMenu.bindMediaDiscoveryMenu(): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.CLOUD_DRIVE)
-    fun CloudDriveImagePreviewMenuOptions.bindCloudDriveMenuOptions(): ImagePreviewMenuOptions
+    fun CloudDriveImagePreviewMenu.bindCloudDriveMenu(): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.ALBUM_SHARING)
-    fun AlbumSharingImagePreviewMenuOptions.bindAlbumSharingMenuOptions(): ImagePreviewMenuOptions
+    fun AlbumSharingImagePreviewMenu.bindAlbumSharingMenu(): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.OFFLINE)
-    fun OfflineImagePreviewMenuOptions.bindOfflineMenuOptions(): ImagePreviewMenuOptions
+    fun OfflineImagePreviewMenu.bindOfflineMenu(): ImagePreviewMenu
 }

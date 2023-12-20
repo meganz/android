@@ -24,7 +24,7 @@ import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenuOptions
+import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
@@ -53,7 +53,7 @@ import javax.inject.Inject
 class ImagePreviewViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val imageNodeFetchers: Map<@JvmSuppressWildcards ImagePreviewFetcherSource, @JvmSuppressWildcards ImageNodeFetcher>,
-    private val imagePreviewMenuOptionsMap: Map<@JvmSuppressWildcards ImagePreviewMenuSource, @JvmSuppressWildcards ImagePreviewMenuOptions>,
+    private val imagePreviewMenuMap: Map<@JvmSuppressWildcards ImagePreviewMenuSource, @JvmSuppressWildcards ImagePreviewMenu>,
     private val addImageTypeUseCase: AddImageTypeUseCase,
     private val getImageUseCase: GetImageUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
@@ -88,8 +88,8 @@ class ImagePreviewViewModel @Inject constructor(
 
     val state: StateFlow<ImagePreviewState> = _state
 
-    private val menuOptions: ImagePreviewMenuOptions?
-        get() = imagePreviewMenuOptionsMap[imagePreviewMenuSource]
+    private val menu: ImagePreviewMenu?
+        get() = imagePreviewMenuMap[imagePreviewMenuSource]
 
     init {
         monitorImageNodes()
@@ -153,29 +153,72 @@ class ImagePreviewViewModel @Inject constructor(
         return targetImageNodeIndex to imageNodes.getOrNull(targetImageNodeIndex)
     }
 
-    suspend fun isSlideshowOptionVisible(imageNode: ImageNode): Boolean {
-        return menuOptions?.isSlideshowOptionVisible(imageNode) ?: false
-                && _state.value.imageNodes.size > 1
+    suspend fun isSlideshowMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isSlideshowMenuVisible(imageNode) ?: false && _state.value.imageNodes.size > 1
     }
 
-    suspend fun isGetLinkOptionVisible(imageNode: ImageNode): Boolean {
-        return menuOptions?.isGetLinkOptionVisible(imageNode) ?: false
+    suspend fun isFavouriteMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isFavouriteMenuVisible(imageNode) ?: false
     }
 
-    suspend fun isSaveToDeviceOptionVisible(imageNode: ImageNode): Boolean {
-        return menuOptions?.isSaveToDeviceOptionVisible(imageNode) ?: false
+    suspend fun isLabelMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isLabelMenuVisible(imageNode) ?: false
     }
 
-    suspend fun isForwardOptionVisible(imageNode: ImageNode): Boolean {
-        return menuOptions?.isForwardOptionVisible(imageNode) ?: false
+    suspend fun isDisputeMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isDisputeMenuVisible(imageNode) ?: false
     }
 
-    suspend fun isSendToOptionVisible(imageNode: ImageNode): Boolean {
-        return menuOptions?.isSendToOptionVisible(imageNode) ?: false
+    suspend fun isOpenWithMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isOpenWithMenuVisible(imageNode) ?: false
     }
 
-    suspend fun isMoreOptionVisible(imageNode: ImageNode): Boolean {
-        return menuOptions?.isMoreOptionVisible(imageNode) ?: false
+    suspend fun isForwardMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isForwardMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isSaveToDeviceMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isSaveToDeviceMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isGetLinkMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isGetLinkMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isSendToChatMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isSendToChatMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isShareMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isShareMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isRenameMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isRenameMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isMoveMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isCopyMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isCopyMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isRestoreMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isRestoreMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isRemoveMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isRemoveMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isRemoveOfflineMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isRemoveOfflineMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isMoreMenuVisible(imageNode: ImageNode): Boolean {
+        return menu?.isMoreMenuVisible(imageNode) ?: false
     }
 
     suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {
