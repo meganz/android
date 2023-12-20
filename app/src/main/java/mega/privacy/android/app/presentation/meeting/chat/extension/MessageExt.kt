@@ -23,6 +23,7 @@ val TypedMessage.isSelectable: Boolean
  */
 val TypedMessage.canForward: Boolean
     get() = when (this) {
-        is RichPreviewMessage, is GiphyMessage -> true  //add more types in next MR
+        is RichPreviewMessage, is GiphyMessage, is ContactAttachmentMessage,
+        -> true  //add more types in next MR
         else -> false
     }

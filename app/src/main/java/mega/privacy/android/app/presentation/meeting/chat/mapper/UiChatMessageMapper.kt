@@ -8,6 +8,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatGiphyUiMe
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatLinkCreatedUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatLinkRemovedUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatRichLinkUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.ui.ContactAttachmentUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.InvalidUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.PermissionChangeUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.RetentionTimeUpdatedUiMessage
@@ -17,6 +18,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ui.TextUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.TitleChangeUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.TruncateHistoryUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.ui.UiChatMessage
+import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
@@ -125,6 +127,13 @@ class UiChatMessageMapper @Inject constructor() {
             is RetentionTimeUpdatedMessage -> RetentionTimeUpdatedUiMessage(
                 message = message,
                 showDate = showDate
+            )
+
+            is ContactAttachmentMessage -> ContactAttachmentUiMessage(
+                message = message,
+                showDate = showDate,
+                showAvatar = showAvatar,
+                showTime = showTime
             )
 
             is InvalidMessage -> mapInvalidMessage(message, showAvatar, showTime, showDate)

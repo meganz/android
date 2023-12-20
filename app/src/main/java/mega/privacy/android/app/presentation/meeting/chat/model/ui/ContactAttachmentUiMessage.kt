@@ -1,0 +1,55 @@
+package mega.privacy.android.app.presentation.meeting.chat.model.ui
+
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
+import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.ContactAttachmentMessageView
+import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
+
+/**
+ * Contact attachment ui message
+ *
+ * @property message
+ * @property showDate
+ * @property showAvatar
+ * @property showTime
+ */
+data class ContactAttachmentUiMessage(
+    override val message: ContactAttachmentMessage,
+    override val showDate: Boolean,
+    override val showAvatar: Boolean,
+    override val showTime: Boolean,
+) : UiChatMessage {
+    override val contentComposable: @Composable (RowScope.() -> Unit) = {
+        ContactAttachmentMessageView(
+            message = message,
+            modifier = Modifier.weight(weight = 1f, fill = false),
+        )
+    }
+
+    override val avatarComposable: @Composable (RowScope.() -> Unit) = {
+        if (showAvatar) {
+            ChatAvatar(modifier = Modifier.align(Alignment.Bottom), handle = message.userHandle)
+        } else {
+            Spacer(modifier = Modifier.size(24.dp))
+        }
+    }
+
+    override val modifier: Modifier
+        get() = if (message.isMine) {
+            Modifier
+                .padding(start = 8.dp)
+                .fillMaxWidth()
+        } else {
+            Modifier
+                .padding(end = 8.dp)
+                .fillMaxWidth()
+        }
+}
