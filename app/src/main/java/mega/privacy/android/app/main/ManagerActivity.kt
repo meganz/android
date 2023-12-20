@@ -3683,9 +3683,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     selectDrawerItemCloudDrive()
                 } else {
                     val mediaHandle: Long = fileBrowserViewModel.getSafeBrowserParentHandle()
-                    val mediaDiscoveryFragment =
+                    var mediaDiscoveryFragment =
                         supportFragmentManager.findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.tag)
-                            ?: MediaDiscoveryFragment.getNewInstance(mediaHandle, false)
+
+                    if (mediaDiscoveryFragment != null) removeFragment(mediaDiscoveryFragment)
+                    mediaDiscoveryFragment =
+                        MediaDiscoveryFragment.getNewInstance(mediaHandle, false)
 
                     skipToMediaDiscoveryFragment(mediaDiscoveryFragment, mediaHandle)
                 }
