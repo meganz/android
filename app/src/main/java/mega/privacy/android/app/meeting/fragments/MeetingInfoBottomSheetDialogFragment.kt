@@ -94,23 +94,18 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
 
         viewLifecycleOwner.collectFlow(shareViewModel.state) { state: MeetingState ->
-            if (state.meetingLink.isNotEmpty()) {
-                binding.copyLink.isVisible = true
+            binding.copyLink.isVisible = state.meetingLink.isNotEmpty().apply {
                 binding.copyLink.text = state.meetingLink
                 chatLink = state.meetingLink
                 binding.copyLink.setOnClickListener { copyLink() }
             }
-        }
-        initAction()
-    }
 
-    /**
-     * Update views when the meeting is ready
-     */
-    fun updateView() {
-        binding.edit.isVisible = inMeetingViewModel.isModerator()
-        binding.shareLink.isVisible = inMeetingViewModel.isChatRoomPublic()
-        binding.invite.isVisible = inMeetingViewModel.isModerator()
+            binding.edit.isVisible = state.hasHostPermission
+            binding.invite.isVisible = state.hasHostPermission
+            binding.shareLink.isVisible = state.meetingLink.isNotEmpty()
+        }
+
+        initAction()
     }
 
     /**
