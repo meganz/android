@@ -115,6 +115,7 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
         listenAction(binding.invite) { (parentFragment as InMeetingFragment).onInviteParticipants() }
         listenAction(binding.copyLink) { copyLink() }
         listenAction(binding.edit) { showRenameGroupDialog() }
+        listenAction(binding.shareLink) { shareViewModel.queryMeetingLink(shouldShareMeetingLink = true) }
     }
 
     /**
