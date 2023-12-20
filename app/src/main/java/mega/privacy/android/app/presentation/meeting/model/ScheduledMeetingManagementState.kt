@@ -34,7 +34,7 @@ import java.time.ZonedDateTime
  * @property isCallInProgress                   True, if there is a call in progress. False, if not.
  * @constructor Create empty Scheduled meeting management state
  */
-data class ScheduledMeetingManagementState constructor(
+data class ScheduledMeetingManagementState(
     val finish: Boolean = false,
     val selectedOccurrence: ChatScheduledMeetingOccurr? = null,
     val isChatHistoryEmpty: Boolean? = null,
@@ -43,7 +43,7 @@ data class ScheduledMeetingManagementState constructor(
     val chatRoom: ChatRoom? = null,
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
     val displayDialog: Boolean = false,
-    val enabledMeetingLinkOption: Boolean = true,
+    val enabledMeetingLinkOption: Boolean = false,
     val meetingLink: String? = null,
     val cancelOccurrenceTapped: Boolean = false,
     val editOccurrenceTapped: Boolean = false,
