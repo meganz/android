@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message.meta.richlink
+package mega.privacy.android.app.presentation.meeting.chat.view.message.meta
 
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
@@ -12,7 +12,7 @@ import javax.inject.Inject
  *
  */
 @HiltViewModel
-class ChatRichLinkViewModel @Inject constructor(
+class MetaViewModel @Inject constructor(
     private val getBitmapFromStringUseCase: GetBitmapFromStringUseCase,
 ) : ViewModel() {
     /**

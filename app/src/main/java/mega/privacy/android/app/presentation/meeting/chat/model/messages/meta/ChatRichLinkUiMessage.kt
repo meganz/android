@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.model.ui
+package mega.privacy.android.app.presentation.meeting.chat.model.messages.meta
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -9,28 +9,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
-import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.ContactAttachmentMessageView
-import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
+import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.ChatRichLinkMessageView
+import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 
 /**
- * Contact attachment ui message
+ * Chat rich link ui message
  *
  * @property message
  * @property showDate
  * @property showAvatar
  * @property showTime
  */
-data class ContactAttachmentUiMessage(
-    override val message: ContactAttachmentMessage,
+data class ChatRichLinkUiMessage(
+    override val message: RichPreviewMessage,
     override val showDate: Boolean,
     override val showAvatar: Boolean,
     override val showTime: Boolean,
 ) : UiChatMessage {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
-        ContactAttachmentMessageView(
-            message = message,
-            modifier = Modifier.weight(weight = 1f, fill = false),
+        ChatRichLinkMessageView(
+            modifier = Modifier.weight(1f),
+            isMe = message.isMine,
+            preview = message.preview,
         )
     }
 

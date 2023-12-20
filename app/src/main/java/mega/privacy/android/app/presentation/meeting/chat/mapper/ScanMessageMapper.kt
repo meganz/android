@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.mapper
 
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.UiChatMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import java.util.Calendar
 import java.util.concurrent.TimeUnit

@@ -2,22 +2,23 @@ package mega.privacy.android.app.presentation.meeting.chat.mapper
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.AlterParticipantsUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.CallUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatGiphyUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatLinkCreatedUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatLinkRemovedUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.ChatRichLinkUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.ContactAttachmentUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.InvalidUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.PermissionChangeUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.RetentionTimeUpdatedUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.PrivateModeSetUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.ScheduledMeetingUpdateUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.TextUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.TitleChangeUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.TruncateHistoryUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.UiChatMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.ContactAttachmentUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.InvalidUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.AlterParticipantsUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.CallUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ChatLinkCreatedUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ChatLinkRemovedUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.PermissionChangeUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.PrivateModeSetUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.RetentionTimeUpdatedUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ScheduledMeetingUpdateUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.TitleChangeUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.TruncateHistoryUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.ChatGiphyUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.ChatRichLinkUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.LocationUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextUiMessage
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
@@ -28,12 +29,13 @@ import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkCreatedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkRemovedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.PermissionChangeMessage
-import mega.privacy.android.domain.entity.chat.messages.management.RetentionTimeUpdatedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.PrivateModeSetMessage
+import mega.privacy.android.domain.entity.chat.messages.management.RetentionTimeUpdatedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ScheduledMeetingUpdatedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.TitleChangeMessage
 import mega.privacy.android.domain.entity.chat.messages.management.TruncateHistoryMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
+import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import javax.inject.Inject
@@ -134,6 +136,13 @@ class UiChatMessageMapper @Inject constructor() {
                 showDate = showDate,
                 showAvatar = showAvatar,
                 showTime = showTime
+            )
+
+            is LocationMessage -> LocationUiMessage(
+                message = message,
+                showDate = showDate,
+                showTime = showTime,
+                showAvatar = showAvatar
             )
 
             is InvalidMessage -> mapInvalidMessage(message, showAvatar, showTime, showDate)

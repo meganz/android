@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.model.ui
+package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth

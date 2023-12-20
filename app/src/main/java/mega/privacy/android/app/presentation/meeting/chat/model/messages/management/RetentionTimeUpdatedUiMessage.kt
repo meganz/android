@@ -1,24 +1,26 @@
-package mega.privacy.android.app.presentation.meeting.chat.model.ui
+package mega.privacy.android.app.presentation.meeting.chat.model.messages.management
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatLinkRemovedView
-import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkRemovedMessage
-
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.RetentionTimeUpdatedMessageView
+import mega.privacy.android.domain.entity.chat.messages.management.RetentionTimeUpdatedMessage
 
 /**
- * Chat link removed UI message.
+ * Retention time updated ui message
+ *
+ * @property message
+ * @property showDate
  */
-data class ChatLinkRemovedUiMessage(
-    override val message: ChatLinkRemovedMessage,
+data class RetentionTimeUpdatedUiMessage(
+    override val message: RetentionTimeUpdatedMessage,
     override val showDate: Boolean,
 ) : UiChatMessage {
-
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
-        ChatLinkRemovedView(
+        RetentionTimeUpdatedMessageView(
             message = message,
             modifier = Modifier.padding(start = 32.dp)
         )

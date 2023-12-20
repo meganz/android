@@ -3,7 +3,7 @@ package test.mega.privacy.android.app.presentation.meeting.chat.mapper
 import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ScanMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
-import mega.privacy.android.app.presentation.meeting.chat.model.ui.UiChatMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test

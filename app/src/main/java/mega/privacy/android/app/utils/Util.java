@@ -1085,7 +1085,9 @@ public class Util {
      * @param latitude  latitude of the location to format
      * @param longitude longitude of the location to format
      * @return string with the location formatted in degrees, minutes and seconds
+     * @deprecated Use ChatLocationMessageView.getGPSCoordinates instead.
      */
+    @Deprecated
     public static String convertToDegrees(float latitude, float longitude) {
         StringBuilder builder = new StringBuilder();
 
@@ -1111,7 +1113,9 @@ public class Util {
      *
      * @param builder    StringBuilder where the string formatted it's going to be built
      * @param coordinate coordinate to format
+     * @deprecated Use ChatLocationMessageView.formatCoordinate instead.
      */
+    @Deprecated
     private static void formatCoordinate(StringBuilder builder, float coordinate) {
         String degrees = Location.convert(Math.abs(coordinate), Location.FORMAT_SECONDS);
         String[] degreesSplit = degrees.split(":");

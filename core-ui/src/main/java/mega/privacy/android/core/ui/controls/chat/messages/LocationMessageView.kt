@@ -14,6 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
@@ -32,15 +33,15 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  *
  * @param isMe whether the message is sent by me
  * @param title title of the message
- * @param latlon the string with latitude and longitude
+ * @param geolocation the string with latitude and longitude
  * @param map the map image
  */
 @Composable
 fun LocationMessageView(
     isMe: Boolean,
     title: String,
-    latlon: String,
-    map: ImageBitmap,
+    geolocation: String,
+    map: ImageBitmap?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -56,18 +57,21 @@ fun LocationMessageView(
                 shape = RoundedCornerShape(12.dp)
             )
     ) {
-        Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp)
-                .background(
-                    color = if (isMe) MegaTheme.colors.border.strong else MegaTheme.colors.background.surface2,
-                    shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
-                ),
-            bitmap = map,
-            contentScale = ContentScale.Crop,
-            contentDescription = "map",
-        )
+        map?.let {
+            Image(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .clip(shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                    .background(
+                        color = if (isMe) MegaTheme.colors.border.strong
+                        else MegaTheme.colors.background.surface2
+                    ),
+                bitmap = it,
+                contentScale = ContentScale.Crop,
+                contentDescription = "map",
+            )
+        }
         Text(
             modifier = Modifier.padding(bottom = 6.dp, top = 16.dp, start = 12.dp),
             text = title,
@@ -77,7 +81,7 @@ fun LocationMessageView(
         )
         Text(
             modifier = Modifier.padding(start = 12.dp),
-            text = latlon,
+            text = geolocation,
             style = MaterialTheme.typography.subtitle2,
             fontWeight = FontWeight.Normal,
             color = MegaTheme.colors.text.primary
@@ -94,7 +98,7 @@ private fun LocationMessagePreview(
         LocationMessageView(
             isMe = isMe,
             title = "Pinned location",
-            latlon = "41.1472° N, 8.6179° W",
+            geolocation = "41.1472° N, 8.6179° W",
             map = ImageBitmap.imageResource(R.drawable.ic_folder_incoming),
         )
     }

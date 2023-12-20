@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message.meta.richlink
+package mega.privacy.android.app.presentation.meeting.chat.view.message.meta
 
 import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
@@ -14,7 +14,7 @@ fun ChatRichLinkMessageView(
     isMe: Boolean,
     preview: RichPreview?,
     modifier: Modifier = Modifier,
-    viewModel: ChatRichLinkViewModel = hiltViewModel(),
+    viewModel: MetaViewModel = hiltViewModel(),
 ) {
     preview?.let {
         val image = produceState<Bitmap?>(initialValue = null) {

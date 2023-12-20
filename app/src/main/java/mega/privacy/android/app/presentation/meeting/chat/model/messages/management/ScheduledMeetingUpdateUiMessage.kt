@@ -1,25 +1,26 @@
-package mega.privacy.android.app.presentation.meeting.chat.model.ui
+package mega.privacy.android.app.presentation.meeting.chat.model.messages.management
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.meeting.chat.view.message.management.PrivateModeSetMessageView
-import mega.privacy.android.domain.entity.chat.messages.management.PrivateModeSetMessage
-
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ScheduledMeetingUpdateMessageView
+import mega.privacy.android.domain.entity.chat.messages.management.ScheduledMeetingUpdatedMessage
 
 /**
- * Private mode set ui message
+ * Scheduled meeting update ui message
  *
+ * @property message
+ * @property showDate
  */
-data class PrivateModeSetUiMessage(
-    override val message: PrivateModeSetMessage,
+data class ScheduledMeetingUpdateUiMessage(
+    override val message: ScheduledMeetingUpdatedMessage,
     override val showDate: Boolean,
 ) : UiChatMessage {
-
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
-        PrivateModeSetMessageView(
+        ScheduledMeetingUpdateMessageView(
             message = message,
             modifier = Modifier.padding(start = 32.dp)
         )

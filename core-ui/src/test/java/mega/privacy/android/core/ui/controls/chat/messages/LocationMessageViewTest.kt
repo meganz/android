@@ -16,34 +16,26 @@ class LocationMessageViewTest {
     @get:Rule
     var composeRule = createComposeRule()
 
+    private val title = "Title"
+    private val geolocation = "geolocation"
+
     @Test
     fun `test that title show correctly`() {
-        val title = "Title"
-        initComposeRuleContent(
-            title = title,
-            latlon = "latlon",
-        )
+        initComposeRuleContent()
         composeRule.onNodeWithText(title).assertExists()
     }
 
     @Test
-    fun `test that latlon show correctly`() {
-        val latlon = "latlon"
-        initComposeRuleContent(
-            title = "Title",
-            latlon = latlon,
-        )
-        composeRule.onNodeWithText(latlon).assertExists()
+    fun `test that geolocation show correctly`() {
+        initComposeRuleContent()
+        composeRule.onNodeWithText(geolocation).assertExists()
     }
 
-    private fun initComposeRuleContent(
-        title: String,
-        latlon: String,
-    ) {
+    private fun initComposeRuleContent() {
         composeRule.setContent {
             LocationMessageView(
                 title = title,
-                latlon = latlon,
+                geolocation = geolocation,
                 map = ImageBitmap.imageResource(R.drawable.ic_folder_incoming),
                 isMe = true,
                 modifier = Modifier,

@@ -1,7 +1,8 @@
-package mega.privacy.android.app.presentation.meeting.chat.model.ui
+package mega.privacy.android.app.presentation.meeting.chat.model.messages.management
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatCallMessageView
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 
