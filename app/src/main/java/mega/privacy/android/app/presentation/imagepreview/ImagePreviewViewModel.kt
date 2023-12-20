@@ -139,6 +139,11 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     private fun findCurrentImageNode(imageNodes: List<ImageNode>): Pair<Int, ImageNode?> {
+        val currentImageNodeIdValue = if (_state.value.isInitialized) {
+            _state.value.currentImageNode?.id?.longValue ?: currentImageNodeIdValue
+        } else {
+            currentImageNodeIdValue
+        }
         val index = imageNodes.indexOfFirst { currentImageNodeIdValue == it.id.longValue }
 
         if (index != -1) {

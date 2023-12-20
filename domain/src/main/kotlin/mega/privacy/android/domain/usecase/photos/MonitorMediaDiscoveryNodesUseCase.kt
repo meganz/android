@@ -76,9 +76,10 @@ class MonitorMediaDiscoveryNodesUseCase @Inject constructor(
 
         while (currentNodeId != null) {
             val parentId = nodeRepository.getParentNode(currentNodeId)?.id
-            if (parentId == targetParentId) break
 
             currentNodeId = parentId
+
+            if (parentId == targetParentId) break
         }
 
         return currentNodeId == targetParentId

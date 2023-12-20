@@ -69,12 +69,13 @@ import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
 import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.legacy.core.ui.controls.text.MiddleEllipsisText
+import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
 import mega.privacy.android.core.ui.theme.teal_200
 import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
@@ -141,7 +142,7 @@ internal fun ImagePreviewScreen(
 
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { page ->
-                imageNodes.getOrNull(page)?.let {
+                viewState.imageNodes.getOrNull(page)?.let {
                     viewModel.setCurrentImageNodeIndex(page)
                     viewModel.setCurrentImageNode(it)
                     viewModel.setCurrentImageNodeAvailableOffline(it)
@@ -206,7 +207,8 @@ internal fun ImagePreviewScreen(
                         .background(
                             color = Color.Black.takeIf { inFullScreenMode }
                                 ?: MaterialTheme.colors.surface,
-                        ).padding(innerPadding),
+                        )
+                        .padding(innerPadding),
                     pagerState = pagerState,
                     imageNodes = imageNodes,
                     currentImageNodeIndex = currentImageNodeIndex,
@@ -376,15 +378,15 @@ private fun ImagePreviewContent(
         ) { index ->
             val imageNode = imageNodes[index]
 
-            val imageResult by produceState<ImageResult?>(initialValue = null) {
+            val imageResultPair by produceState<Pair<ImageResult?, String?>>(
+                initialValue = Pair(null, null)
+            ) {
                 downloadImage(imageNode).collectLatest { imageResult ->
-                    value = imageResult
+                    value = Pair(imageResult, getImagePath(imageResult))
                 }
             }
 
-            val imagePath by produceState<String?>(initialValue = null, key1 = imageResult) {
-                value = getImagePath(imageResult)
-            }
+            val (imageResult, imagePath) = imageResultPair
 
             Box(modifier = Modifier.fillMaxSize()) {
                 val isVideo = imageNode.type is VideoFileTypeInfo
@@ -411,7 +413,7 @@ private fun ImagePreviewContent(
                 if (progress in 1 until 100) {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.BottomEnd),
-                        progress = progress.toFloat(),
+                        progress = progress.toFloat() / 100,
                         color = MaterialTheme.colors.secondary,
                         strokeWidth = 2.dp,
                     )
@@ -583,8 +585,14 @@ private fun ImagePreviewBottomBar(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            MiddleEllipsisText(imageName)
-            MiddleEllipsisText(imageIndex)
+            MiddleEllipsisText(
+                text = imageName,
+                color = TextColor.Secondary,
+            )
+            MiddleEllipsisText(
+                text = imageIndex,
+                color = TextColor.Secondary,
+            )
         }
     }
 }
