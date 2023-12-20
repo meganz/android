@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -15,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.audiosection.model.AudioSectionState
-import mega.privacy.android.app.presentation.videosection.model.UIVideo
+import mega.privacy.android.app.presentation.audiosection.model.UIAudio
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
@@ -27,15 +28,25 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 fun AudioSectionComposeView(
     uiState: AudioSectionState,
     onChangeViewTypeClick: () -> Unit = {},
-    onClick: (item: UIVideo, index: Int) -> Unit = { _, _ -> },
+    onClick: (item: UIAudio, index: Int) -> Unit = { _, _ -> },
     onSortOrderClick: () -> Unit = {},
-    onMenuClick: (UIVideo) -> Unit = {},
-    onLongClick: (item: UIVideo, index: Int) -> Unit = { _, _ -> },
+    onMenuClick: (UIAudio) -> Unit = {},
+    onLongClick: (item: UIAudio, index: Int) -> Unit = { _, _ -> },
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     val progressBarShowing = uiState.progressBarShowing
     val items = uiState.allAudios
+    val scrollToTop = uiState.scrollToTop
+
+    LaunchedEffect(items) {
+        if (scrollToTop) {
+            if (uiState.currentViewType == ViewType.LIST)
+                listState.scrollToItem(0)
+            else
+                gridState.scrollToItem(0)
+        }
+    }
 
     when {
         progressBarShowing -> {

@@ -11,15 +11,24 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.audiosection.AudioSectionViewModel
 import mega.privacy.android.app.presentation.audiosection.mapper.UIAudioMapper
 import mega.privacy.android.app.presentation.audiosection.model.UIAudio
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedAudioNode
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
@@ -46,6 +55,13 @@ class AudioSectionViewModelTest {
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
+    private val getNodeByHandle = mock<GetNodeByHandle>()
+    private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
+    private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
+    private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
+    private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
+    private val setViewType = mock<SetViewType>()
+    private val monitorViewType = mock<MonitorViewType>()
 
     @BeforeAll
     fun initialise() {
@@ -56,12 +72,20 @@ class AudioSectionViewModelTest {
     fun setUp() {
         wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorOfflineNodeUpdatesUseCase() }.thenReturn(emptyFlow())
+        wheneverBlocking { monitorViewType() }.thenReturn(emptyFlow())
         underTest = AudioSectionViewModel(
             getAllAudioUseCase = getAllAudioUseCase,
             uiAudioMapper = uiAudioMapper,
             getCloudSortOrder = getCloudSortOrder,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
+            getNodeByHandle = getNodeByHandle,
+            getFingerprintUseCase = getFingerprintUseCase,
+            megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
+            megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
+            getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
+            setViewType = setViewType,
+            monitorViewType = monitorViewType
         )
     }
 
@@ -72,7 +96,14 @@ class AudioSectionViewModelTest {
             uiAudioMapper,
             getCloudSortOrder,
             monitorNodeUpdatesUseCase,
-            monitorOfflineNodeUpdatesUseCase
+            monitorOfflineNodeUpdatesUseCase,
+            getNodeByHandle,
+            getFingerprintUseCase,
+            megaApiHttpServerIsRunningUseCase,
+            megaApiHttpServerStartUseCase,
+            getFileUrlByNodeHandleUseCase,
+            setViewType,
+            monitorViewType
         )
     }
 
@@ -152,4 +183,47 @@ class AudioSectionViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that the result returned correctly when search query is not empty`() = runTest {
+        val expectedTypedAudioNode = mock<TypedAudioNode> { on { name }.thenReturn("audio name") }
+        val audioNode = mock<TypedAudioNode> { on { name }.thenReturn("name") }
+        val expectedAudio = mock<UIAudio> { on { name }.thenReturn("audio name") }
+        val audio = mock<UIAudio> { on { name }.thenReturn("name") }
+
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+        whenever(getAllAudioUseCase()).thenReturn(listOf(expectedTypedAudioNode, audioNode))
+        whenever(uiAudioMapper(audioNode)).thenReturn(audio)
+        whenever(uiAudioMapper(expectedTypedAudioNode)).thenReturn(expectedAudio)
+        underTest.refreshNodes()
+        underTest.state.drop(1).test {
+            assertThat(awaitItem().allAudios.size).isEqualTo(2)
+            underTest.searchQuery("audio")
+            assertThat(awaitItem().allAudios.size).isEqualTo(1)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the searchMode is correctly updated`() = runTest {
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+        whenever(getAllAudioUseCase()).thenReturn(emptyList())
+        underTest.state.drop(1).test {
+            underTest.searchReady()
+            assertThat(awaitItem().searchMode).isTrue()
+            underTest.exitSearch()
+            assertThat(awaitItem().searchMode).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the currentViewType is correctly updated when monitorViewType is triggered`() =
+        runTest {
+            whenever(monitorViewType()).thenReturn(flowOf(ViewType.GRID))
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().currentViewType).isEqualTo(ViewType.GRID)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 }

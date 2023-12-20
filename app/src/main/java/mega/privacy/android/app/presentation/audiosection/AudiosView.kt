@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.audiosection.model.UIAudio
-import mega.privacy.android.app.presentation.videosection.model.UIVideo
 
 /**
  * The compose view for displaying audios
@@ -14,15 +13,15 @@ import mega.privacy.android.app.presentation.videosection.model.UIVideo
 fun AudiosView(
     items: List<UIAudio>,
     isListView: Boolean,
-    listState: LazyListState = LazyListState(),
-    gridState: LazyGridState = LazyGridState(),
     sortOrder: String,
     modifier: Modifier,
     onChangeViewTypeClick: () -> Unit,
-    onClick: (item: UIVideo, index: Int) -> Unit,
-    onMenuClick: (UIVideo) -> Unit,
+    onClick: (item: UIAudio, index: Int) -> Unit,
+    onMenuClick: (UIAudio) -> Unit,
     onSortOrderClick: () -> Unit,
-    onLongClick: ((item: UIVideo, index: Int) -> Unit) = { _, _ -> },
+    listState: LazyListState = LazyListState(),
+    gridState: LazyGridState = LazyGridState(),
+    onLongClick: ((item: UIAudio, index: Int) -> Unit) = { _, _ -> },
 ) {
     if (isListView) {
         AudioListView(
