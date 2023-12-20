@@ -612,8 +612,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     override fun monitorOnMessageLoaded(chatId: Long) = flow {
         getChatRoomUpdates(chatId)?.let { updates ->
             emitAll(updates.filterIsInstance<ChatRoomUpdate.OnMessageLoaded>()
-                .map { it.msg }
-                .map { message -> message?.let { chatMessageMapper(it) } }
+                .map { it.msg?.let { message -> chatMessageMapper(message) } }
                 .flowOn(ioDispatcher))
         }
     }
