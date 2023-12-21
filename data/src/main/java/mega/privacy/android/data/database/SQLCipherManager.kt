@@ -22,7 +22,7 @@ internal enum class DatabaseState {
 internal data class SQLCipherManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val passphraseFile: File,
-    private val passphraseEncryptedFile: EncryptedFile,
+    private val passphraseEncryptedFile: EncryptedFile?,
 ) {
 
     fun migrateToSecureDatabase(name: String, passphrase: ByteArray) {
@@ -119,7 +119,14 @@ internal data class SQLCipherManager @Inject constructor(
 
     fun getPassphrase(): ByteArray {
         return if (passphraseFile.exists()) {
-            passphraseEncryptedFile.openFileInput().use { it.readBytes() }
+            Timber.d("Passphrase file exists")
+            passphraseEncryptedFile?.let { encryptedFile ->
+                Timber.d("Reading passphrase from encrypted file")
+                encryptedFile.openFileInput().use { it.readBytes() }
+            } ?: run {
+                Timber.d("Reading passphrase from file")
+                passphraseFile.readBytes()
+            }
         } else {
             val random = SecureRandom.getInstanceStrong()
             val result = ByteArray(PASSPHRASE_LENGTH)
@@ -132,7 +139,14 @@ internal data class SQLCipherManager @Inject constructor(
                 Timber.d("Contains 0, generating again")
                 random.nextBytes(result)
             }
-            passphraseEncryptedFile.openFileOutput().use { it.write(result) }
+            Timber.d("Passphrase file does not exist")
+            passphraseEncryptedFile?.let { encryptedFile ->
+                Timber.d("Writing passphrase to encrypted file")
+                encryptedFile.openFileOutput().use { it.write(result) }
+            } ?: run {
+                Timber.d("Writing passphrase to file")
+                passphraseFile.writeBytes(result)
+            }
             result
         }
     }
