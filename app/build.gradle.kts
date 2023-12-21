@@ -337,6 +337,7 @@ dependencies {
     implementation(androidx.recyclerview.selection)
     implementation(androidx.viewpager2)
     implementation(androidx.work.ktx)
+    implementation(androidx.paging)
 
     // Compose
     implementation(platform(androidx.compose.bom))
@@ -347,6 +348,7 @@ dependencies {
     implementation(lib.coil.gif)
     implementation(lib.coil.svg)
     implementation(lib.coil.compose)
+    implementation(androidx.paging.compose)
 
     // Google
     implementation(google.gson)
