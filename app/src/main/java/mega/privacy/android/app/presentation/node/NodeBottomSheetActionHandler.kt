@@ -2,9 +2,12 @@ package mega.privacy.android.app.presentation.node
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.main.VersionsFileActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
+import mega.privacy.android.app.presentation.node.model.menuaction.DisputeTakeDownMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.GetLinkMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.InfoMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
@@ -53,6 +56,14 @@ class NodeBottomSheetActionHandler(private val activity: Activity) {
                 activity.startActivity(
                     Intent(activity, GetLinkActivity::class.java)
                         .putExtra(Constants.HANDLE, node.id.longValue)
+                )
+            }
+
+            is DisputeTakeDownMenuAction -> {
+                activity.startActivity(
+                    Intent(activity, WebViewActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        .setData(Uri.parse(Constants.DISPUTE_URL))
                 )
             }
 

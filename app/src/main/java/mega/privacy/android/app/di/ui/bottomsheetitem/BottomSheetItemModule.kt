@@ -7,7 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.AvailableOfflineBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.CopyBottomSheetMenuItem
-import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.DeleteBottomSheetMenuItem
+import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.DeletePermanentlyBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.DisputeTakeDownBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.DownloadBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.EditBottomSheetMenuItem
@@ -55,7 +55,7 @@ abstract class BottomSheetItemModule {
         fun provideCloudDriveBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
-            deleteMenuAction: DeleteBottomSheetMenuItem,
+            deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
             disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
             downloadMenuAction: DownloadBottomSheetMenuItem,
             editMenuAction: EditBottomSheetMenuItem,
@@ -85,7 +85,7 @@ abstract class BottomSheetItemModule {
             return setOf(
                 availableOfflineMenuAction,
                 copyMenuAction,
-                deleteMenuAction,
+                deletePermanentlyMenuAction,
                 disputeTakeDownMenuAction,
                 downloadMenuAction,
                 editMenuAction,

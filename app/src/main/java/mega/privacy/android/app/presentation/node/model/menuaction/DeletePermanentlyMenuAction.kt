@@ -10,7 +10,7 @@ import javax.inject.Inject
 /**
  * Delete bottom sheet menu action
  */
-class DeleteMenuAction @Inject constructor() : MenuActionWithIcon {
+class DeletePermanentlyMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() = painterResource(id = R.drawable.ic_remove)
 

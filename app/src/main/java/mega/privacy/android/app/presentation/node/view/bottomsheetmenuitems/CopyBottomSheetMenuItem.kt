@@ -19,7 +19,7 @@ class CopyBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
-    ) = true
+    ) = node.isTakenDown.not() && isNodeInRubbish.not()
 
     override val groupId = 8
 }

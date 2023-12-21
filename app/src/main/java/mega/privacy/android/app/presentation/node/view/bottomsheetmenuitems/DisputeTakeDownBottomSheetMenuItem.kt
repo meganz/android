@@ -19,7 +19,7 @@ class DisputeTakeDownBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
-    ) = true
+    ) = node.isTakenDown
 
 
     override val groupId = 4
