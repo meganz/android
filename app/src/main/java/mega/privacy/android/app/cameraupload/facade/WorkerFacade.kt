@@ -1,6 +1,7 @@
 package mega.privacy.android.app.cameraupload.facade
 
 import androidx.lifecycle.asFlow
+import androidx.work.BackoffPolicy
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
@@ -51,6 +52,11 @@ class WorkerFacade @Inject constructor(
                 CameraUploadsWorker::class.java
             )
                 .addTag(SINGLE_CAMERA_UPLOAD_TAG)
+                .setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
+                    10,
+                    TimeUnit.SECONDS
+                )
                 .build()
 
             workManager
