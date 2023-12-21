@@ -29,6 +29,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
                 text = menuAction.getDescription(),
                 icon = menuAction.getIconPainter(),
                 isDestructive = isDestructiveAction,
+                addSeparator = false,
                 onActionClicked = getOnClickFunction(
                     node = selectedNode,
                     onDismiss = onDismiss,

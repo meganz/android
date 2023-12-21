@@ -155,15 +155,15 @@ class SearchActivity : AppCompatActivity() {
                     updateSearchQuery = viewModel::updateSearchQuery,
                 )
                 handleClick(uiState.lastSelectedNode)
-            }
 
-            selectedNode?.let {
-                NodeOptionsBottomSheet(
-                    modalSheetState = modalSheetState,
-                    node = it,
-                    handler = NodeBottomSheetActionHandler(this),
-                ) {
-                    selectedNode = null
+                selectedNode?.let {
+                    NodeOptionsBottomSheet(
+                        modalSheetState = modalSheetState,
+                        node = it,
+                        handler = NodeBottomSheetActionHandler(this),
+                    ) {
+                        selectedNode = null
+                    }
                 }
             }
 

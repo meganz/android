@@ -45,7 +45,7 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
  * @param onMoreClicked On more clicked
  */
 @Composable
-fun NodeLisViewItem(
+fun NodeListViewItem(
     title: String,
     subtitle: String,
     @DrawableRes icon: Int,
@@ -191,7 +191,7 @@ private fun Circle(color: Color, modifier: Modifier = Modifier) {
 @Composable
 private fun PreviewGenericTwoLineListViewItemSimple() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        NodeLisViewItem(
+        NodeListViewItem(
             title = "Simple title",
             subtitle = "Simple sub title",
             icon = R.drawable.ic_folder_sync
@@ -203,7 +203,7 @@ private fun PreviewGenericTwoLineListViewItemSimple() {
 @Composable
 private fun PreviewGenericTwoLineListItemWithLongTitle() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        NodeLisViewItem(
+        NodeListViewItem(
             title = "Title very big for testing the middle ellipsis",
             subtitle = "Subtitle very big for testing the middle ellipsis",
             icon = R.drawable.ic_folder_incoming,
@@ -222,7 +222,7 @@ private fun PreviewGenericTwoLineListItemWithLongTitle() {
 @Composable
 private fun PreviewGenericTwoLineListItem() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        NodeLisViewItem(
+        NodeListViewItem(
             title = "Title",
             subtitle = "Subtitle",
             icon = R.drawable.ic_folder_outgoing,
@@ -242,7 +242,7 @@ private fun PreviewGenericTwoLineListItem() {
 @Composable
 private fun PreviewGenericTwoLineListItemWithoutMoreOption() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        NodeLisViewItem(
+        NodeListViewItem(
             title = "Title",
             subtitle = "Subtitle",
             icon = R.drawable.ic_folder_outgoing,

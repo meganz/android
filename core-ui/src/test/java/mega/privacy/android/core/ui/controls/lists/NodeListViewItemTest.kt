@@ -29,7 +29,7 @@ class NodeListViewItemTest {
         composeTestRule.setContent {
             Scaffold {
                 Text(text = "Empty screen", modifier = Modifier.padding(it))
-                NodeLisViewItem(title = "Title", subtitle = "Subtitle", icon = R.drawable.ic_info)
+                NodeListViewItem(title = "Title", subtitle = "Subtitle", icon = R.drawable.ic_info)
             }
         }
     }
@@ -38,7 +38,7 @@ class NodeListViewItemTest {
         composeTestRule.setContent {
             Scaffold {
                 Text(text = "Empty screen", modifier = Modifier.padding(it))
-                NodeLisViewItem(
+                NodeListViewItem(
                     title = "Title",
                     subtitle = "Subtitle",
                     icon = R.drawable.ic_info,

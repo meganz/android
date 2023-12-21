@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -14,11 +13,20 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
+import mega.privacy.android.app.presentation.view.extension.fileInfo
+import mega.privacy.android.app.presentation.view.extension.folderInfo
+import mega.privacy.android.app.presentation.view.extension.getIcon
+import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 
 
 /**
@@ -39,12 +47,23 @@ internal fun NodeOptionsBottomSheet(
     val state by viewModel.state.collectAsStateWithLifecycle()
     BottomSheet(
         modalSheetState = modalSheetState,
-        sheetHeader = { Text(text = state.name) },
+        sheetHeader = {
+            NodeListViewItem(
+                title = node.node.name,
+                subtitle = when (node.node) {
+                    is FileNode -> node.node.fileInfo()
+                    is FolderNode -> node.node.folderInfo()
+                    else -> ""
+                },
+                icon = node.node.let { node -> node as? TypedFolderNode }?.getIcon()
+                    ?: MimeTypeList.typeForName(node.node.name).iconResourceId,
+                thumbnailData = ThumbnailRequest(node.node.id),
+            )
+        },
         sheetBody = {
             LazyColumn {
-                state.actions.groupBy {
-                    it.group
-                }.toSortedMap()
+                state.actions.groupBy { it.group }
+                    .toSortedMap()
                     .mapValues { (_, list) ->
                         list.sortedBy { it.orderInGroup }
                     }

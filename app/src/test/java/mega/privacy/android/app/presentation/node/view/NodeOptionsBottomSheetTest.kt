@@ -7,9 +7,12 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.model.NodeBottomSheetState
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,6 +27,13 @@ class NodeOptionsBottomSheetTest {
 
     private val viewModel = mock<NodeOptionsBottomSheetViewModel>()
     private val nodeBottomSheetActionHandler = mock<NodeBottomSheetActionHandler>()
+    private val sampleNode = mock<TypedFolderNode> {
+        on { name }.thenReturn("name")
+    }
+    private val sampleNodeUiItem = mock<NodeUIItem<TypedNode>> {
+        on { name }.thenReturn("name")
+        on { node }.thenReturn(sampleNode)
+    }
 
     @Test
     fun `test that a single group has no dividers`() {
@@ -46,7 +56,7 @@ class NodeOptionsBottomSheetTest {
         composeTestRule.setContent {
             NodeOptionsBottomSheet(
                 modalSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Expanded),
-                node = mock(),
+                node = sampleNodeUiItem,
                 viewModel = viewModel,
                 handler = nodeBottomSheetActionHandler
             ) {}
@@ -81,7 +91,7 @@ class NodeOptionsBottomSheetTest {
         composeTestRule.setContent {
             NodeOptionsBottomSheet(
                 modalSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Expanded),
-                node = mock(),
+                node = sampleNodeUiItem,
                 viewModel = viewModel,
                 handler = nodeBottomSheetActionHandler,
             ) {}
