@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.FileProvider
@@ -31,6 +33,7 @@ import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.presentation.audiosection.model.UIAudio
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -43,6 +46,7 @@ import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -60,8 +64,16 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    /**
+     * Mapper to get options for Action Bar
+     */
+    @Inject
+    lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
+
     private var _binding: FragmentAudioSectionBinding? = null
     private val binding get() = _binding!!
+
+    private var actionMode: ActionMode? = null
 
     /**
      * onCreateView
@@ -120,17 +132,26 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
                         onChangeViewTypeClick = audioSectionViewModel::onChangeViewTypeClicked,
                         onSortOrderClick = { showSortByPanel() },
                         onClick = { item, index ->
-                            openAudioFile(
-                                activity = requireActivity(),
-                                item = item,
-                                index = index
-                            )
+                            if (uiState.isInSelection) {
+                                audioSectionViewModel.onItemClicked(item, index)
+                            } else {
+                                openAudioFile(
+                                    activity = requireActivity(),
+                                    item = item,
+                                    index = index
+                                )
+                            }
+                        },
+                        onLongClick = { item, index ->
+                            audioSectionViewModel.onItemLongClicked(item, index)
+                            activateActionMode()
                         },
                         onMenuClick = { item ->
                             showOptionsMenuForItem(item)
                         }
                     )
                 }
+                updateActionModeTitle(count = uiState.selectedAudioHandles.size)
             }
         }
     }
@@ -191,6 +212,38 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
             sortByHeaderViewModel.cloudSortOrder.value
         )
         addFlags(FLAG_ACTIVITY_SINGLE_TOP)
+    }
+
+    private fun activateActionMode() {
+        if (actionMode == null) {
+            actionMode =
+                (requireActivity() as? AppCompatActivity)?.startSupportActionMode(
+                    AudioSectionActionModeCallback(
+                        managerActivity = requireActivity() as ManagerActivity,
+                        childFragmentManager = childFragmentManager,
+                        audioSectionViewModel = audioSectionViewModel,
+                        getOptionsForToolbarMapper = getOptionsForToolbarMapper
+                    ) {
+                        disableSelectMode()
+                    }
+                )
+        }
+    }
+
+    private fun disableSelectMode() {
+        actionMode = null
+        audioSectionViewModel.clearAllSelectedAudios()
+    }
+
+    private fun updateActionModeTitle(count: Int) {
+        if (count == 0) actionMode?.finish()
+        actionMode?.title = count.toString()
+
+        runCatching {
+            actionMode?.invalidate()
+        }.onFailure {
+            Timber.e(it, "Invalidate error")
+        }
     }
 
     private fun showOptionsMenuForItem(item: UIAudio) {

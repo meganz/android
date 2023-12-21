@@ -23,9 +23,12 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -33,6 +36,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUse
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -52,6 +56,7 @@ class AudioSectionViewModel @Inject constructor(
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
 ) : ViewModel() {
@@ -190,6 +195,74 @@ class AudioSectionViewModel @Inject constructor(
         return intent
     }
 
+    internal fun clearAllSelectedAudios() {
+        val audios = clearAudiosSelected()
+        _state.update {
+            it.copy(
+                allAudios = audios,
+                selectedAudioHandles = emptyList(),
+                isInSelection = false
+            )
+        }
+    }
+
+    private fun clearAudiosSelected() = _state.value.allAudios.map {
+        it.copy(isSelected = false)
+    }
+
+    internal fun selectAllNodes() {
+        val audios = _state.value.allAudios.map { item ->
+            item.copy(isSelected = true)
+        }
+        val selectedHandles = _state.value.allAudios.map { item ->
+            item.id.longValue
+        }
+        _state.update {
+            it.copy(
+                allAudios = audios,
+                selectedAudioHandles = selectedHandles,
+                isInSelection = true
+            )
+        }
+    }
+
+    internal fun onItemClicked(item: UIAudio, index: Int) {
+        updateAudioItemInSelectionState(item = item, index = index)
+    }
+
+    internal fun onItemLongClicked(item: UIAudio, index: Int) =
+        updateAudioItemInSelectionState(item = item, index = index)
+
+    private fun updateAudioItemInSelectionState(item: UIAudio, index: Int) {
+        val isSelected = !item.isSelected
+        val selectedHandles = updateSelectedAudioHandles(item, isSelected)
+        val audios = _state.value.allAudios.updateItemSelectedState(index, isSelected)
+        _state.update {
+            it.copy(
+                allAudios = audios,
+                selectedAudioHandles = selectedHandles,
+                isInSelection = selectedHandles.isNotEmpty()
+            )
+        }
+    }
+
+    private fun List<UIAudio>.updateItemSelectedState(index: Int, isSelected: Boolean) =
+        if (index in indices) {
+            toMutableList().also { list ->
+                list[index] = list[index].copy(isSelected = isSelected)
+            }
+        } else this
+
+
+    private fun updateSelectedAudioHandles(item: UIAudio, isSelected: Boolean) =
+        _state.value.selectedAudioHandles.toMutableList().also { selectedHandles ->
+            if (isSelected) {
+                selectedHandles.add(item.id.longValue)
+            } else {
+                selectedHandles.remove(item.id.longValue)
+            }
+        }
+
     internal fun shouldShowSearchMenu() = _state.value.allAudios.isNotEmpty()
 
     internal fun searchReady() {
@@ -215,13 +288,28 @@ class AudioSectionViewModel @Inject constructor(
     }
 
     private fun searchNodeByQueryString() {
+        val audios = originalData.filter { audio ->
+            audio.name.contains(searchQuery, true)
+        }
         _state.update {
             it.copy(
-                allAudios = originalData.filter { audio ->
-                    audio.name.contains(searchQuery, true)
-                },
+                allAudios = audios,
                 scrollToTop = true
             )
         }
     }
+
+    internal suspend fun getSelectedNodes(): List<TypedNode> =
+        _state.value.selectedAudioHandles.mapNotNull {
+            runCatching {
+                getNodeByIdUseCase(NodeId(it))
+            }.getOrNull()
+        }
+
+    internal suspend fun getSelectedMegaNode(): List<MegaNode> =
+        _state.value.selectedAudioHandles.mapNotNull {
+            runCatching {
+                getNodeByHandle(it)
+            }.getOrNull()
+        }
 }

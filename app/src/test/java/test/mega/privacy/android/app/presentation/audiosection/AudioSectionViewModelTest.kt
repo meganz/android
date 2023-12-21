@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -60,8 +61,11 @@ class AudioSectionViewModelTest {
     private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
     private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
     private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val setViewType = mock<SetViewType>()
     private val monitorViewType = mock<MonitorViewType>()
+
+    private val expectedAudio: UIAudio = mock { on { name }.thenReturn("audio name") }
 
     @BeforeAll
     fun initialise() {
@@ -84,6 +88,7 @@ class AudioSectionViewModelTest {
             megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
             megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
             getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
             setViewType = setViewType,
             monitorViewType = monitorViewType
         )
@@ -102,6 +107,7 @@ class AudioSectionViewModelTest {
             megaApiHttpServerIsRunningUseCase,
             megaApiHttpServerStartUseCase,
             getFileUrlByNodeHandleUseCase,
+            getNodeByIdUseCase,
             setViewType,
             monitorViewType
         )
@@ -126,14 +132,7 @@ class AudioSectionViewModelTest {
 
     @Test
     fun `test that the audios are retrieved when the nodes are refreshed`() = runTest {
-        val expectedAudio: UIAudio = mock {
-            on { name }.thenReturn("audio name")
-        }
-
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-
-        whenever(getAllAudioUseCase()).thenReturn(listOf(mock(), mock()))
-        whenever(uiAudioMapper(any())).thenReturn(expectedAudio)
+        initAudiosReturned()
 
         underTest.refreshNodes()
 
@@ -146,6 +145,12 @@ class AudioSectionViewModelTest {
         }
     }
 
+    private suspend fun initAudiosReturned() {
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+        whenever(getAllAudioUseCase()).thenReturn(listOf(mock(), mock()))
+        whenever(uiAudioMapper(any())).thenReturn(expectedAudio)
+    }
+
     @Test
     fun `test that isPendingRefresh is correctly updated when monitorOfflineNodeUpdatesUseCase is triggered`() =
         runTest {
@@ -153,6 +158,7 @@ class AudioSectionViewModelTest {
 
             underTest.state.drop(1).test {
                 assertThat(awaitItem().isPendingRefresh).isTrue()
+
                 underTest.markHandledPendingRefresh()
                 assertThat(awaitItem().isPendingRefresh).isFalse()
                 cancelAndIgnoreRemainingEvents()
@@ -166,6 +172,7 @@ class AudioSectionViewModelTest {
 
             underTest.state.drop(1).test {
                 assertThat(awaitItem().isPendingRefresh).isTrue()
+
                 underTest.markHandledPendingRefresh()
                 assertThat(awaitItem().isPendingRefresh).isFalse()
                 cancelAndIgnoreRemainingEvents()
@@ -175,9 +182,10 @@ class AudioSectionViewModelTest {
     @Test
     fun `test that the sortOrder is updated when order is changed`() = runTest {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-
         whenever(getAllAudioUseCase()).thenReturn(emptyList())
+
         underTest.refreshWhenOrderChanged()
+
         underTest.state.drop(1).test {
             assertThat(awaitItem().sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
             cancelAndIgnoreRemainingEvents()
@@ -195,9 +203,12 @@ class AudioSectionViewModelTest {
         whenever(getAllAudioUseCase()).thenReturn(listOf(expectedTypedAudioNode, audioNode))
         whenever(uiAudioMapper(audioNode)).thenReturn(audio)
         whenever(uiAudioMapper(expectedTypedAudioNode)).thenReturn(expectedAudio)
+
         underTest.refreshNodes()
+
         underTest.state.drop(1).test {
             assertThat(awaitItem().allAudios.size).isEqualTo(2)
+
             underTest.searchQuery("audio")
             assertThat(awaitItem().allAudios.size).isEqualTo(1)
             cancelAndIgnoreRemainingEvents()
@@ -208,9 +219,11 @@ class AudioSectionViewModelTest {
     fun `test that the searchMode is correctly updated`() = runTest {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
         whenever(getAllAudioUseCase()).thenReturn(emptyList())
+
         underTest.state.drop(1).test {
             underTest.searchReady()
             assertThat(awaitItem().searchMode).isTrue()
+
             underTest.exitSearch()
             assertThat(awaitItem().searchMode).isFalse()
             cancelAndIgnoreRemainingEvents()
@@ -221,8 +234,76 @@ class AudioSectionViewModelTest {
     fun `test that the currentViewType is correctly updated when monitorViewType is triggered`() =
         runTest {
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.GRID))
+
             underTest.state.drop(1).test {
                 assertThat(awaitItem().currentViewType).isEqualTo(ViewType.GRID)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the selected item is updated by 1 when long clicked`() =
+        runTest {
+            initAudiosReturned()
+
+            underTest.state.drop(1).test {
+                underTest.refreshNodes()
+                assertThat(awaitItem().allAudios.size).isEqualTo(2)
+
+                underTest.onItemLongClicked(expectedAudio, 0)
+                assertThat(awaitItem().selectedAudioHandles.size).isEqualTo(1)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the checked index is incremented by 1 when the selected item gets clicked`() =
+        runTest {
+            initAudiosReturned()
+
+            underTest.state.drop(1).test {
+                underTest.refreshNodes()
+                assertThat(awaitItem().allAudios.size).isEqualTo(2)
+
+                underTest.onItemLongClicked(expectedAudio, 0)
+                assertThat(awaitItem().selectedAudioHandles.size).isEqualTo(1)
+
+                underTest.onItemClicked(expectedAudio, 1)
+                assertThat(awaitItem().selectedAudioHandles.size).isEqualTo(2)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that after selected all audios, size of audio items equals to size of selected audios`() =
+        runTest {
+            initAudiosReturned()
+
+            underTest.state.drop(1).test {
+                underTest.refreshNodes()
+                assertThat(awaitItem().allAudios.size).isEqualTo(2)
+
+                underTest.selectAllNodes()
+                awaitItem().let { state ->
+                    assertThat(state.selectedAudioHandles.size).isEqualTo(state.allAudios.size)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isInSelection is correctly updated when selecting and clearing all nodes`() =
+        runTest {
+            initAudiosReturned()
+
+            underTest.state.drop(1).test {
+                underTest.refreshNodes()
+
+                underTest.selectAllNodes()
+                assertThat(awaitItem().isInSelection).isTrue()
+
+                underTest.clearAllSelectedAudios()
+                assertThat(awaitItem().isInSelection).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
         }
