@@ -1292,13 +1292,13 @@ class InMeetingViewModel @Inject constructor(
         val listWithChanges = mutableSetOf<Participant>()
         participants.value?.forEach {
             when {
-                it.isSpeaker && (it.peerId != newSpeakerPeerId || it.clientId != newSpeakerClientId) -> {
+                it.isSpeaker && !it.isScreenShared && (it.peerId != newSpeakerPeerId || it.clientId != newSpeakerClientId) -> {
                     Timber.d("The previous speaker ${it.clientId}, now has isSpeaker false")
                     it.isSpeaker = false
                     listWithChanges.add(it)
                 }
 
-                !it.isSpeaker && it.peerId == newSpeakerPeerId && it.clientId == newSpeakerClientId -> {
+                !it.isSpeaker && !it.isScreenShared && it.peerId == newSpeakerPeerId && it.clientId == newSpeakerClientId -> {
                     Timber.d("New speaker selected found ${it.clientId}")
                     it.isSpeaker = true
                     addSpeaker(it)
@@ -1326,11 +1326,15 @@ class InMeetingViewModel @Inject constructor(
 
             _state.update { state -> state.copy(addScreensSharedParticipantsList = addScreensSharedParticipantsList.toMutableList()) }
         }
+
         val removeScreensSharedParticipantsList = mutableSetOf<Participant>()
-        participants.value?.filter { it.isSpeaker }?.forEach {
+        participants.value?.forEach {
             getSession(it.clientId)?.apply {
-                if (hasScreenShare() && participantHasScreenSharedParticipant(it)) {
-                    removeScreensSharedParticipantsList.add(it)
+                if (participantHasScreenSharedParticipant(it) && ((it.isSpeaker && hasScreenShare()) || (!it.isSpeaker && !hasScreenShare()) || (!it.isSpeaker && hasScreenShare() && !hasCamera()))) {
+                    getScreenShared(it.peerId, it.clientId)?.let { screenShared ->
+                        removeScreensSharedParticipantsList.add(screenShared)
+
+                    }
                 }
             }
         }
@@ -1344,25 +1348,24 @@ class InMeetingViewModel @Inject constructor(
      * @param list  List of [Participant]
      * @param context   Context
      */
-    fun removeScreenShareParticipant(list: List<Participant>?, context: Context): Int? {
+    fun removeScreenShareParticipant(list: List<Participant>?, context: Context): Int {
         _state.update { state -> state.copy(removeScreensSharedParticipantsList = null) }
         list?.forEach { user ->
-            getSession(user.clientId)?.let { session ->
-                participants.value?.indexOf(user)?.let { position ->
-                    if (position != INVALID_POSITION) {
-                        participants.value?.get(position)?.let { participant ->
-                            if (participant.isVideoOn) {
-                                participant.videoListener?.let { listener ->
-                                    removeResolutionAndListener(participant, listener)
-                                }
-                                participant.videoListener = null
+            participants.value?.indexOf(user)?.let { position ->
+                if (position != INVALID_POSITION) {
+                    participants.value?.get(position)?.let { participant ->
+                        if (participant.isVideoOn) {
+                            participant.videoListener?.let { listener ->
+                                removeResolutionAndListener(participant, listener)
                             }
+                            participant.videoListener = null
                         }
-                        participants.value?.removeAt(position)
-                        Timber.d("Removing participant")
-                        updateParticipantsList(context)
-                        return position
                     }
+
+                    participants.value?.removeAt(position)
+                    Timber.d("Removing participant")
+                    updateParticipantsList(context)
+                    return position
                 }
             }
         }
@@ -1378,6 +1381,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun addScreenShareParticipant(list: List<Participant>?, context: Context): Int? {
         _state.update { state -> state.copy(addScreensSharedParticipantsList = null) }
+
         list?.forEach { participant ->
             createParticipant(
                 isScreenShared = true,
@@ -1403,20 +1407,20 @@ class InMeetingViewModel @Inject constructor(
     private fun createParticipant(isScreenShared: Boolean, clientId: Long): Participant? {
         _state.value.call?.apply {
             inMeetingRepository.getMegaChatSession(this.chatId, clientId)?.let { session ->
+
                 when {
                     isScreenShared ->
                         participants.value?.filter { it.peerId == session.peerid && it.clientId == session.clientid && it.isScreenShared }
-                            ?.let {
-                                if (it.isNotEmpty()) {
-                                    Timber.d("Screen shared already shown")
+                            ?.apply {
+                                if (!session.hasCamera() || isNotEmpty()) {
                                     return null
                                 }
                             }
 
                     else ->
                         participants.value?.filter { it.peerId == session.peerid && it.clientId == session.clientid }
-                            ?.let {
-                                if (it.isNotEmpty()) {
+                            ?.apply {
+                                if (isNotEmpty()) {
                                     Timber.d("Participants already shown")
                                     return null
                                 }
@@ -1441,7 +1445,6 @@ class InMeetingViewModel @Inject constructor(
                 val isSpeaker = getCurrentSpeakerParticipant()?.let { participant ->
                     participant.clientId == session.clientid && participant.peerId == session.peerid && participant.isSpeaker
                 } ?: false
-
 
                 return Participant(
                     peerId = session.peerid,
@@ -1474,25 +1477,26 @@ class InMeetingViewModel @Inject constructor(
      * @param participant The participant who is to be a speaker
      * @return speaker participant
      */
-    private fun createSpeakerParticipant(participant: Participant): Participant = Participant(
-        participant.peerId,
-        participant.clientId,
-        participant.name,
-        participant.avatar,
-        isMe = participant.isMe,
-        isModerator = participant.isModerator,
-        isAudioOn = participant.isAudioOn,
-        isVideoOn = participant.isVideoOn,
-        isAudioDetected = participant.isAudioDetected,
-        isContact = participant.isContact,
-        isSpeaker = true,
-        hasHiRes = true,
-        videoListener = null,
-        participant.isChosenForAssign,
-        participant.isGuest,
-        isPresenting = participant.isPresenting,
-        isScreenShared = false
-    )
+    private fun createSpeakerParticipant(participant: Participant): Participant =
+        Participant(
+            participant.peerId,
+            participant.clientId,
+            participant.name,
+            participant.avatar,
+            isMe = participant.isMe,
+            isModerator = participant.isModerator,
+            isAudioOn = participant.isAudioOn,
+            isVideoOn = participant.isVideoOn,
+            isAudioDetected = participant.isAudioDetected,
+            isContact = participant.isContact,
+            isSpeaker = true,
+            hasHiRes = true,
+            videoListener = null,
+            participant.isChosenForAssign,
+            participant.isGuest,
+            isPresenting = participant.isPresenting,
+            isScreenShared = false
+        )
 
     /**
      * Method to update the current participants list
@@ -1548,16 +1552,6 @@ class InMeetingViewModel @Inject constructor(
             participants.value?.add(participantCreated)
             updateParticipantsList(context)
 
-            val currentSpeaker = getCurrentSpeakerParticipant()
-            if (currentSpeaker == null) {
-                getFirstParticipant(
-                    MEGACHAT_INVALID_HANDLE,
-                    MEGACHAT_INVALID_HANDLE
-                )?.apply {
-                    updatePeerSelected(peerId, clientId)
-                }
-            }
-
             return participants.value?.indexOf(participantCreated)
         }
 
@@ -1596,6 +1590,7 @@ class InMeetingViewModel @Inject constructor(
                         val position = participants.value?.indexOf(participant)
                         val clientId = participant.clientId
                         val isSpeaker = participant.isSpeaker
+
                         participant.isSpeaker = false
 
                         if (position != null && position != INVALID_POSITION) {
@@ -1634,13 +1629,18 @@ class InMeetingViewModel @Inject constructor(
         if (participant.videoListener == null) return
 
         getSession(participant.clientId)?.let {
-            if (participant.hasHiRes && it.canRecvVideoHiRes()) {
-                Timber.d("Stop HiResolution and remove listener, clientId = ${participant.clientId}")
-                stopHiResVideo(it, _state.value.currentChatId)
+            when {
+                participant.hasHiRes && it.canRecvVideoHiRes() -> {
+                    Timber.d("Stop HiResolution and remove listener, clientId = ${participant.clientId}")
+                    stopHiResVideo(it, _state.value.currentChatId)
+                }
 
-            } else if (!participant.hasHiRes && it.canRecvVideoLowRes()) {
-                Timber.d("Stop LowResolution and remove listener, clientId = ${participant.clientId}")
-                stopLowResVideo(it, _state.value.currentChatId)
+                !participant.hasHiRes && it.canRecvVideoLowRes() -> {
+                    Timber.d("Stop LowResolution and remove listener, clientId = ${participant.clientId}")
+                    stopLowResVideo(it, _state.value.currentChatId)
+                }
+
+                else -> {}
             }
         }
     }
@@ -1772,14 +1772,10 @@ class InMeetingViewModel @Inject constructor(
             if (participantsList.isEmpty()) return null
 
             when {
-                peerId == -1L && clientId == -1L ->
-                    participantsList.filter { it.isPresenting }.apply {
-                        if (isNotEmpty()) {
-                            return first()
-                        }
-
-                        return participantsList.first()
-                    }
+                peerId == -1L && clientId == -1L -> {
+                    participants.value?.sortByDescending { it.isPresenting }
+                    return participants.value?.first()
+                }
 
                 else -> participantsList.filter { it.peerId != peerId || it.clientId != clientId }
                     .forEach {
@@ -1799,15 +1795,42 @@ class InMeetingViewModel @Inject constructor(
      * @param clientId client ID of a participant
      */
     fun getParticipant(peerId: Long, clientId: Long): Participant? {
-        participants.value?.let { list ->
-            val participants = list.filter {
-                it.peerId == peerId && it.clientId == clientId && !it.isScreenShared
+        participants.value?.filter { it.peerId == peerId && it.clientId == clientId && !it.isScreenShared }
+            ?.apply {
+                return if (isNotEmpty()) first() else null
             }
 
-            if (participants.isNotEmpty()) {
-                return participants[0]
+        return null
+    }
+
+    /**
+     * Get speaker participant
+     *
+     * @param peerId    Peer Id
+     * @param clientId  Client Id
+     * @return [Participant]
+     */
+    fun getSpeaker(peerId: Long, clientId: Long): Participant? {
+        speakerParticipants.value?.filter { it.peerId == peerId && it.clientId == clientId }
+            ?.apply {
+                return if (isNotEmpty()) first() else null
             }
-        }
+
+        return null
+    }
+
+    /**
+     * Get screen shared participant
+     *
+     * @param peerId    Peer Id
+     * @param clientId  Client Id
+     * @return [Participant]
+     */
+    fun getScreenShared(peerId: Long, clientId: Long): Participant? {
+        participants.value?.filter { it.peerId == peerId && it.clientId == clientId && it.isScreenShared }
+            ?.apply {
+                return if (isNotEmpty()) first() else null
+            }
 
         return null
     }
@@ -1853,14 +1876,14 @@ class InMeetingViewModel @Inject constructor(
      */
     fun changesInScreenSharing(session: MegaChatSession): Boolean {
         var hasChanged = false
-        var participantToUpdate: Participant? = null
+        var participantSharingScreen: Participant? = null
+
         participants.value = participants.value?.map { participant ->
             return@map when {
                 participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isPresenting != session.hasScreenShare() -> {
                     hasChanged = true
                     if (session.hasScreenShare()) {
-                        participantToUpdate = participant
-
+                        participantSharingScreen = participant
                     }
 
                     participant.copy(isPresenting = session.hasScreenShare())
@@ -1871,9 +1894,13 @@ class InMeetingViewModel @Inject constructor(
             }
         }?.toMutableList()
 
-        participantToUpdate?.let {
-            _pinItemEvent.value = Event(it)
+        participantSharingScreen?.let {
+            if (_state.value.callUIStatus == CallUIStatusType.SpeakerView) {
+                _pinItemEvent.value = Event(it)
+                sortParticipantsListForSpeakerView()
+            }
         } ?: {
+
             speakerParticipants.value = speakerParticipants.value?.map { participant ->
                 return@map when {
                     participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isPresenting != session.hasScreenShare() -> {
@@ -1885,7 +1912,10 @@ class InMeetingViewModel @Inject constructor(
                     else -> participant
                 }
             }?.toMutableList()
+
         }
+
+        checkScreensShared()
         return hasChanged
     }
 
@@ -2048,18 +2078,16 @@ class InMeetingViewModel @Inject constructor(
     fun requestHiResVideo(
         session: MegaChatSession?,
         chatId: Long,
-    ) {
-        session?.apply {
-            if (!canRecvVideoHiRes() && isHiResVideo) {
-                Timber.d("Adding HiRes for remote video, clientId ${clientid}")
-                viewModelScope.launch {
-                    runCatching {
-                        requestHighResolutionVideoUseCase(chatId, clientid)
-                    }.onFailure { exception ->
-                        Timber.e(exception)
-                    }.onSuccess { request ->
-                        Timber.d("Request high res video: chatId = ${request.chatHandle}, hires? ${request.flag}, clientId = ${request.userHandle}")
-                    }
+    ) = session?.apply {
+        if (!canRecvVideoHiRes() && isHiResVideo) {
+            viewModelScope.launch {
+                runCatching {
+                    Timber.d("Request HiRes for remote video, clientId $clientid")
+                    requestHighResolutionVideoUseCase(chatId, clientid)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }.onSuccess { request ->
+                    Timber.d("Request high res video: chatId = ${request.chatHandle}, hires? ${request.flag}, clientId = ${request.userHandle}")
                 }
             }
         }
@@ -2074,18 +2102,16 @@ class InMeetingViewModel @Inject constructor(
     fun stopHiResVideo(
         session: MegaChatSession?,
         chatId: Long,
-    ) {
-        session?.let { sessionParticipant ->
-            if (sessionParticipant.canRecvVideoHiRes()) {
-                Timber.d("Removing HiRes for remote video, clientId ${sessionParticipant.clientid}")
-                viewModelScope.launch {
-                    runCatching {
-                        stopHighResolutionVideoUseCase(chatId, sessionParticipant.clientid)
-                    }.onFailure { exception ->
-                        Timber.e(exception)
-                    }.onSuccess { request ->
-                        Timber.d("Stop high res video: chatId = ${request.chatHandle}, hires? ${request.flag}, clientId = ${request.userHandle}")
-                    }
+    ) = session?.apply {
+        if (canRecvVideoHiRes()) {
+            viewModelScope.launch {
+                runCatching {
+                    Timber.d("Stop HiRes for remote video, clientId $clientid")
+                    stopHighResolutionVideoUseCase(chatId, clientid)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }.onSuccess { request ->
+                    Timber.d("Stop high res video: chatId = ${request.chatHandle}, hires? ${request.flag}, clientId = ${request.userHandle}")
                 }
             }
         }
@@ -2100,18 +2126,16 @@ class InMeetingViewModel @Inject constructor(
     fun requestLowResVideo(
         session: MegaChatSession?,
         chatId: Long,
-    ) {
-        session?.let { sessionParticipant ->
-            if (!sessionParticipant.canRecvVideoLowRes() && sessionParticipant.isLowResVideo) {
-                Timber.d("Adding LowRes for remote video, clientId ${sessionParticipant.clientid}")
-                viewModelScope.launch {
-                    runCatching {
-                        requestLowResolutionVideoUseCase(chatId, sessionParticipant.clientid)
-                    }.onFailure { exception ->
-                        Timber.e(exception)
-                    }.onSuccess { request ->
-                        Timber.d("Request low res video: chatId = ${request.chatHandle}, lowRes? ${request.flag}, clientId = ${request.userHandle}")
-                    }
+    ) = session?.apply {
+        if (!canRecvVideoLowRes() && isLowResVideo) {
+            viewModelScope.launch {
+                runCatching {
+                    Timber.d("Request LowRes for remote video, clientId $clientid")
+                    requestLowResolutionVideoUseCase(chatId, clientid)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }.onSuccess { request ->
+                    Timber.d("Request low res video: chatId = ${request.chatHandle}, lowRes? ${request.flag}, clientId = ${request.userHandle}")
                 }
             }
         }
@@ -2126,18 +2150,16 @@ class InMeetingViewModel @Inject constructor(
     private fun stopLowResVideo(
         session: MegaChatSession?,
         chatId: Long,
-    ) {
-        session?.let { sessionParticipant ->
-            if (sessionParticipant.canRecvVideoLowRes()) {
-                Timber.d("Removing LowRes for remote video, clientId ${sessionParticipant.clientid}")
-                viewModelScope.launch {
-                    runCatching {
-                        stopLowResolutionVideoUseCase(chatId, sessionParticipant.clientid)
-                    }.onFailure { exception ->
-                        Timber.e(exception)
-                    }.onSuccess { request ->
-                        Timber.d("Stop low res video: chatId = ${request.chatHandle}, lowRes? ${request.flag}, clientId = ${request.userHandle}")
-                    }
+    ) = session?.apply {
+        if (canRecvVideoLowRes()) {
+            viewModelScope.launch {
+                runCatching {
+                    Timber.d("Stop LowRes for remote video, clientId $clientid")
+                    stopLowResolutionVideoUseCase(chatId, clientid)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }.onSuccess { request ->
+                    Timber.d("Stop low res video: chatId = ${request.chatHandle}, lowRes? ${request.flag}, clientId = ${request.userHandle}")
                 }
             }
         }
@@ -2555,26 +2577,16 @@ class InMeetingViewModel @Inject constructor(
      * Method to remove the current speaker
      */
     private fun removeCurrentSpeaker() {
-        speakerParticipants.value?.let { listSpeakerParticipants ->
-            val listFound = listSpeakerParticipants.filter { speaker ->
-                speaker.isSpeaker
+        speakerParticipants.value?.filter { it.isSpeaker }?.forEach { participant ->
+            participant.videoListener?.let {
+                removeResolutionAndListener(participant, it)
+                participant.videoListener = null
             }
-
-            if (listFound.isNotEmpty()) {
-                val iterator = listFound.iterator()
-                iterator.forEach { participant ->
-                    if (participant.videoListener != null) {
-                        removeResolutionAndListener(
-                            participant, participant.videoListener ?: return@forEach
-                        )
-                        participant.videoListener = null
-                    }
-                    val position = listSpeakerParticipants.indexOf(participant)
-                    if (position != INVALID_POSITION) {
-                        speakerParticipants.value?.removeAt(position)
-                        Timber.d("Num of speaker participants: ${speakerParticipants.value?.size}")
-                        speakerParticipants.value = speakerParticipants.value
-                    }
+            speakerParticipants.value?.indexOf(participant)?.let { position ->
+                if (position != INVALID_POSITION) {
+                    speakerParticipants.value?.removeAt(position)
+                    Timber.d("Num of speaker participants: ${speakerParticipants.value?.size}")
+                    speakerParticipants.value = speakerParticipants.value
                 }
             }
         }
@@ -2584,27 +2596,16 @@ class InMeetingViewModel @Inject constructor(
      * Method to eliminate which are no longer speakers
      */
     fun removePreviousSpeakers() {
-        speakerParticipants.value?.let { listSpeakerParticipants ->
-            val listFound = listSpeakerParticipants.filter { speaker ->
-                !speaker.isSpeaker
+        speakerParticipants.value?.filter { !it.isSpeaker }?.forEach { participant ->
+            participant.videoListener?.let {
+                removeResolutionAndListener(participant, it)
+                participant.videoListener = null
             }
-
-            if (listFound.isNotEmpty()) {
-                val iterator = listFound.iterator()
-                iterator.forEach { participant ->
-                    if (participant.videoListener != null) {
-                        removeResolutionAndListener(
-                            participant,
-                            participant.videoListener ?: return@forEach
-                        )
-                        participant.videoListener = null
-                    }
-                    val position = listSpeakerParticipants.indexOf(participant)
-                    if (position != INVALID_POSITION) {
-                        speakerParticipants.value?.removeAt(position)
-                        Timber.d("Num of speaker participants: ${speakerParticipants.value?.size}")
-                        speakerParticipants.value = speakerParticipants.value
-                    }
+            speakerParticipants.value?.indexOf(participant)?.let { position ->
+                if (position != INVALID_POSITION) {
+                    speakerParticipants.value?.removeAt(position)
+                    Timber.d("Num of speaker participants: ${speakerParticipants.value?.size}")
+                    speakerParticipants.value = speakerParticipants.value
                 }
             }
         }
@@ -2701,16 +2702,9 @@ class InMeetingViewModel @Inject constructor(
     private fun shouldParticipantsOptionBeVisible(
         participantIsMe: Boolean,
         participantIsGuest: Boolean,
-    ): Boolean {
-        if ((!amIAModerator() && participantIsGuest) ||
+    ): Boolean = !((!amIAModerator() && participantIsGuest) ||
             (amIAGuest() && participantIsMe) ||
-            (!amIAModerator() && amIAGuest() && !participantIsMe)
-        ) {
-            return false
-        }
-
-        return true
-    }
+            (!amIAModerator() && amIAGuest() && !participantIsMe))
 
     /**
      * End for all specified call
@@ -2850,10 +2844,17 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
+     * On update list consumed
+     */
+    fun onUpdateListConsumed() =
+        _state.update { it.copy(updateListUi = false) }
+
+    /**
      * Sort participants list for speaker view
      */
     private fun sortParticipantsListForSpeakerView() {
         participants.value?.sortByDescending { it.isPresenting }
+        _state.update { it.copy(updateListUi = true) }
     }
 
     /**

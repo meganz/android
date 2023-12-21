@@ -116,7 +116,6 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
-import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import mega.privacy.android.data.qualifier.MegaApi
@@ -474,53 +473,52 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val sessionLowResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             if (inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.isOneToOneCall()) {
-                inMeetingViewModel.getParticipant(
-                    callAndSession.second.peerid,
-                    callAndSession.second.clientid
-                )?.let { participant ->
+                callAndSession.second?.let { session ->
+                    inMeetingViewModel.getParticipant(
+                        session.peerid,
+                        session.clientid
+                    )?.let { participant ->
+                        val canRecvVideoLowRes = session.canRecvVideoLowRes()
+                        val sessionIsLowResVideo = session.isLowResVideo
+                        val sessionHasVideo =
+                            inMeetingViewModel.sessionHasVideo(participant.clientId)
+                        val participantHasLowRes = !participant.hasHiRes
 
-                    val canRecvVideoLowRes = callAndSession.second.canRecvVideoLowRes()
-                    val sessionisLowResVideo = callAndSession.second.isLowResVideo
-                    val sessionHasVideo = inMeetingViewModel.sessionHasVideo(participant.clientId)
-                    val participantHasLowRes = !participant.hasHiRes
-
-                    if (canRecvVideoLowRes && sessionisLowResVideo) {
                         if (participantHasLowRes) {
-                            if (sessionHasVideo) {
-                                Timber.d("Check if participant's listener should be added")
-                                checkVideoListener(
-                                    participant,
-                                    shouldAddListener = true,
-                                    isHiRes = false
-                                )
-                            }
-                        }
-                    } else if (participantHasLowRes) {
-                        Timber.d("Check if participant's listener should be removed")
-                        checkVideoListener(
-                            participant,
-                            shouldAddListener = false,
-                            isHiRes = false
-                        )
+                            when {
+                                canRecvVideoLowRes && sessionIsLowResVideo -> {
+                                    Timber.d("Add participant listener")
+                                    //Can receive Low res. Add listener
+                                    checkVideoListener(
+                                        participant,
+                                        shouldAddListener = true,
+                                        isHiRes = false
+                                    )
+                                }
 
-                        //I have stopped receiving LowResolution. I have to verify that I no longer need it.
-                        if (callAndSession.second.hasVideo() && !inMeetingViewModel.isCallOrSessionOnHold(
-                                callAndSession.second.clientid
-                            )
-                        ) {
-                            inMeetingViewModel.getSession(callAndSession.second.clientid)
-                                ?.let { session ->
-                                    if (session.status == MegaChatSession.SESSION_STATUS_IN_PROGRESS && inMeetingViewModel.isParticipantVisible(
+                                else -> {
+                                    Timber.d("Remove participant listener")
+                                    //Cannot receive Low res. Remove listener
+                                    checkVideoListener(
+                                        participant,
+                                        shouldAddListener = false,
+                                        isHiRes = false
+                                    )
+
+                                    //I have stopped receiving LowResolution. I have to verify that I no longer need it.
+                                    if (sessionHasVideo && inMeetingViewModel.isParticipantVisible(
                                             participant
                                         )
                                     ) {
                                         Timber.d("Ask for low-resolution video")
                                         inMeetingViewModel.requestLowResVideo(
-                                            session,
+                                            inMeetingViewModel.getSession(session.clientid),
                                             inMeetingViewModel.getChatId()
                                         )
+
                                     }
                                 }
+                            }
                         }
                     }
                 }
@@ -530,78 +528,120 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val sessionHiResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             if (inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.isOneToOneCall()) {
-                inMeetingViewModel.getParticipant(
-                    callAndSession.second.peerid,
-                    callAndSession.second.clientid
-                )?.let { participant ->
-                    val sessionCanReciveHiRes = callAndSession.second.canRecvVideoHiRes()
-                    val sessionHasVideo = inMeetingViewModel.sessionHasVideo(participant.clientId)
-                    val sessionIsHiResVideo = callAndSession.second.isHiResVideo
-                    val sessionHasScreenShare = callAndSession.second.hasScreenShare()
-                    val sessionIsHiResScreenShare = callAndSession.second.isHiResScreenShare
-                    val participantHasHiRes = participant.hasHiRes
+                callAndSession.second?.let { session ->
+                    inMeetingViewModel.getParticipant(
+                        session.peerid,
+                        session.clientid
+                    )?.let { participant ->
+                        val sessionCanReceiveHiRes = session.canRecvVideoHiRes()
+                        val sessionHasVideoWithHiRes = session.isHiResVideo
+                        val participantHasHiRes = participant.hasHiRes
 
-                    if (sessionCanReciveHiRes && sessionIsHiResVideo) {
-                        if (participantHasHiRes) {
-                            if (sessionHasVideo) {
-                                Timber.d("Check if participant's listener should be added")
-                                checkVideoListener(
-                                    participant,
-                                    shouldAddListener = true,
-                                    isHiRes = true
-                                )
-                            }
-                        } else {
-                            if (sessionHasVideo) {
-                                Timber.d("Check if speaker's listener should be added")
-                                checkSpeakerVideoListener(
-                                    callAndSession.second.peerid, callAndSession.second.clientid,
-                                    shouldAddListener = true
-                                )
-                            }
-                        }
-                    } else if (participantHasHiRes) {
-                        Timber.d("Check if participant's listener should be removed")
-                        checkVideoListener(
-                            participant,
-                            shouldAddListener = false,
-                            isHiRes = true
+                        val existSpeaker =
+                            if (participant.isSpeaker && !participant.hasHiRes) inMeetingViewModel.getSpeaker(
+                                participant.peerId,
+                                participant.clientId
+                            )
+                                ?.let {
+                                    true
+                                } ?: false else false
+
+                        val screenSharedParticipant = inMeetingViewModel.getScreenShared(
+                            participant.peerId,
+                            participant.clientId
                         )
 
-                        //I have stopped receiving HiResolution. I have to verify that I no longer need it.
-                        if (callAndSession.second.hasVideo() && !inMeetingViewModel.isCallOrSessionOnHold(
-                                callAndSession.second.clientid
-                            )
-                        ) {
-                            inMeetingViewModel.getSession(callAndSession.second.clientid)
-                                ?.let { session ->
-                                    if (session.status == MegaChatSession.SESSION_STATUS_IN_PROGRESS && inMeetingViewModel.isParticipantVisible(
-                                            participant
-                                        )
-                                    ) {
-                                        Timber.d("Ask for high-resolution video")
-                                        inMeetingViewModel.requestHiResVideo(
-                                            session,
-                                            inMeetingViewModel.getChatId()
+                        val existScreenShared = if (participant.isPresenting)
+                            screenSharedParticipant
+                                ?.let {
+                                    true
+                                } ?: false else false
+
+                        if (sessionCanReceiveHiRes && sessionHasVideoWithHiRes) {
+                            //Can receive Hi res. Add listener.
+                            when {
+                                existSpeaker -> {
+                                    //Speaker listener
+                                    Timber.d("Add speaker listener")
+                                    checkSpeakerVideoListener(
+                                        session.peerid,
+                                        session.clientid,
+                                        shouldAddListener = true
+                                    )
+                                }
+
+                                existScreenShared -> {
+                                    //Screen shared listener
+                                    Timber.d("Add screen shared listener")
+                                    screenSharedParticipant?.let {
+                                        checkVideoListener(
+                                            it,
+                                            shouldAddListener = true,
+                                            isHiRes = true
                                         )
                                     }
                                 }
-                        }
-                    } else {
-                        Timber.d("Check if speaker's listener should be removed")
-                        if (sessionHasScreenShare && sessionIsHiResScreenShare) {
-                            if (!inMeetingViewModel.isCallOrSessionOnHold(callAndSession.second.clientid) && callAndSession.second.status == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
-                                Timber.d("Ask for high-resolution video")
+
+                                else -> {
+                                    //Participant listener
+                                    Timber.d("Add participant listener")
+                                    checkVideoListener(
+                                        participant,
+                                        shouldAddListener = true,
+                                        isHiRes = true
+                                    )
+                                }
+                            }
+
+                        } else if (!participantHasHiRes) {
+                            if ((existScreenShared || existSpeaker) && inMeetingViewModel.isParticipantVisible(
+                                    participant
+                                )
+                            ) {
+                                Timber.d("Ask for hig-resolution video")
                                 inMeetingViewModel.requestHiResVideo(
-                                    callAndSession.second,
+                                    inMeetingViewModel.getSession(session.clientid),
                                     inMeetingViewModel.getChatId()
                                 )
+
+                            } else {
+
                             }
                         } else {
-                            checkSpeakerVideoListener(
-                                callAndSession.second.peerid, callAndSession.second.clientid,
-                                shouldAddListener = false
-                            )
+                            //Cannot receive Hi res. Remove listener.
+                            when {
+                                existSpeaker -> {
+                                    //Speaker listener
+                                    Timber.d("Remove speaker listener")
+                                    checkSpeakerVideoListener(
+                                        session.peerid,
+                                        session.clientid,
+                                        shouldAddListener = false
+                                    )
+                                }
+
+                                existScreenShared -> {
+                                    //Screen shared listener
+                                    Timber.d("Remove screen shared listener")
+                                    screenSharedParticipant?.let {
+                                        checkVideoListener(
+                                            it,
+                                            shouldAddListener = false,
+                                            isHiRes = true
+                                        )
+                                    }
+                                }
+
+                                else -> {
+                                    //Participant listener
+                                    Timber.d("Remove participant listener")
+                                    checkVideoListener(
+                                        participant,
+                                        shouldAddListener = false,
+                                        isHiRes = true
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -959,6 +999,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
             if (state.error != null) {
                 sharedModel.showSnackBar(getString(state.error))
+            }
+            if (state.updateListUi) {
+                inMeetingViewModel.onUpdateListConsumed()
+                speakerViewCallFragment?.let {
+                    if (it.isAdded) {
+                        it.updateFullList()
+                    }
+                }
             }
 
             if (state.chatTitle.isNotEmpty()) {

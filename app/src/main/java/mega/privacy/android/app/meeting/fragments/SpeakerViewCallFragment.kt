@@ -92,20 +92,14 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     private val speakerParticipantsObserver = Observer<MutableList<Participant>> {
         val newSpeaker = inMeetingViewModel.getCurrentSpeakerParticipant()
         if (newSpeaker == null) {
-            val firstParticipant = inMeetingViewModel.getFirstParticipant(
+            inMeetingViewModel.getFirstParticipant(
                 MEGACHAT_INVALID_HANDLE,
                 MEGACHAT_INVALID_HANDLE
-            )
-
-            if (firstParticipant == null) {
-                speakerAvatar.isVisible = false
-                speakerOnHoldIcon.isVisible = false
-                speakerMuteIcon.isVisible = false
-                surfaceContainer.isVisible = false
-            } else {
-                selectSpeaker(firstParticipant.peerId, firstParticipant.clientId)
-                updateSpeakerTextViewName(firstParticipant.name, firstParticipant.isPresenting)
+            )?.apply {
+                selectSpeaker(peerId, clientId)
+                updateSpeakerTextViewName(name, isPresenting)
             }
+
         } else {
             inMeetingViewModel.getSession(newSpeaker.clientId)?.apply {
                 if (!hasVideo() || inMeetingViewModel.isSessionOnHold(newSpeaker.clientId)) {
@@ -157,6 +151,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val lm = LinearLayoutManager(context)
         lm.orientation = LinearLayoutManager.HORIZONTAL
 
@@ -210,7 +205,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             textViewName.text = name
         }
     }
-
 
     private fun initLiveEventBus() {
         LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AUDIO_LEVEL_CHANGE)
@@ -281,12 +275,12 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * Monitor changes when updating the speaker participant
      */
     private fun updateSpeakerUser() {
+
         inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
             speaker.avatar?.let { bitmap ->
                 speakerAvatar.setImageBitmap(bitmap)
             }
             updateAudioIcon(speaker)
-
             inMeetingViewModel.getSession(speaker.clientId)?.let {
                 if (it.hasVideo()) {
                     checkVideoOn(speaker)
@@ -578,7 +572,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         isAdded: Boolean,
         position: Int,
     ) {
-
         listView.recycledViewPool.clear()
         adapter.submitList(participants) {
             Timber.d("List updated ${adapter.currentList.size}")
@@ -594,6 +587,17 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 adapter.notifyItemRemoved(position)
                 adapter.notifyItemRangeChanged(position, adapter.currentList.size)
             }
+        }
+    }
+
+    /**
+     * Update full list when the list is sorted
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateFullList() {
+        listView.recycledViewPool.clear()
+        adapter.submitList(participants) {
+            adapter.notifyDataSetChanged()
         }
     }
 

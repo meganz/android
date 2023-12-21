@@ -510,9 +510,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
                         inMeetingViewModel.requestHiResVideo(it, this.chatId)
                     } else {
                         Timber.d("I am already receiving the HiRes video")
-                        if (inMeetingViewModel.sessionHasVideo(it.clientid)) {
-                            Timber.d("Session has video")
-                            addListener(it.clientid)
+                        when {
+                            inMeetingViewModel.sessionHasVideo(it.clientid) -> {
+                                Timber.d("Session has video")
+                                addListener(it.clientid)
+                            }
+
+                            else -> {}
                         }
                     }
                 }

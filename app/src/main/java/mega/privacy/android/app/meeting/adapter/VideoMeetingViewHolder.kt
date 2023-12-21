@@ -225,15 +225,22 @@ class VideoMeetingViewHolder(
             createListener(participant)
 
             inMeetingViewModel.getSession(participant.clientId)?.let {
-                if (participant.hasHiRes && !it.canRecvVideoHiRes() && it.isHiResVideo) {
-                    Timber.d("Asking for HiRes video, clientId ${participant.clientId}")
-                    inMeetingViewModel.requestHiResVideo(it, inMeetingViewModel.getChatId())
-                } else if (!participant.hasHiRes && !it.canRecvVideoLowRes() && it.isLowResVideo) {
-                    Timber.d("Asking for LowRes video, clientId ${participant.clientId}")
-                    inMeetingViewModel.requestLowResVideo(it, inMeetingViewModel.getChatId())
-                } else {
-                    Timber.d("Already have LowRes/HiRes video, clientId ${participant.clientId}")
-                    updateListener(participant, true, participant.hasHiRes)
+                when {
+                    participant.hasHiRes && !it.canRecvVideoHiRes() && it.isHiResVideo -> {
+                        Timber.d("Asking for HiRes video, clientId ${participant.clientId}")
+                        inMeetingViewModel.requestHiResVideo(it, inMeetingViewModel.getChatId())
+                    }
+
+                    !participant.hasHiRes && !it.canRecvVideoLowRes() && it.isLowResVideo -> {
+                        Timber.d("Asking for LowRes video, clientId ${participant.clientId}")
+                        inMeetingViewModel.requestLowResVideo(it, inMeetingViewModel.getChatId())
+                    }
+
+                    !participant.hasHiRes -> {
+                        updateListener(participant, true, false)
+                    }
+
+                    else -> {}
                 }
             }
         } else {
@@ -320,6 +327,7 @@ class VideoMeetingViewHolder(
         if (isInvalid(participant)) return
 
         Timber.d("Close video of ${participant.clientId}")
+
         inMeetingViewModel.removeRemoteVideoResolution(participant)
         binding.parentTextureView.isVisible = false
     }
@@ -331,7 +339,6 @@ class VideoMeetingViewHolder(
      */
     private fun createListener(participant: Participant) {
         if (isInvalid(participant)) return
-
         participant.videoListener =
             inMeetingViewModel.createVideoListener(participant, AVATAR_VIDEO_VISIBLE, ROTATION)
         participant.videoListener?.let { listener ->
@@ -468,13 +475,25 @@ class VideoMeetingViewHolder(
     fun checkVideoOn(participant: Participant) {
         if (isInvalid(participant)) return
 
-        if (inMeetingViewModel.getSession(participant.clientId)
-                ?.hasVideo() == true && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)
-        ) {
-            Timber.d("Video should be on")
-            videoOnUI(participant)
-            return
+        if (!isGrid) {
+            if (inMeetingViewModel.getSession(participant.clientId)
+                    ?.hasVideo() == true && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)
+            ) {
+                Timber.d("Video should be on")
+                videoOnUI(participant)
+                return
+            }
+        } else {
+            if (inMeetingViewModel.getSession(participant.clientId)
+                    ?.hasCamera() == true && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)
+            ) {
+                Timber.d("Video should be on")
+                videoOnUI(participant)
+                return
+            }
         }
+
+
 
         Timber.d("Video should be off")
         videoOffUI(participant)

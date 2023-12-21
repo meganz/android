@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property addScreensSharedParticipantsList       List of [Participant] to add the screen shared in the carousel
  * @property removeScreensSharedParticipantsList    List of [Participant] to remove the screen shared in the carousel
  * @property isMeeting                              True if it's meetings. False, if not.
+ * @property updateListUi                           True, List was sorted and need to be updated. False, if not.
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -60,4 +61,5 @@ data class InMeetingUiState(
     val addScreensSharedParticipantsList: List<Participant>? = null,
     val removeScreensSharedParticipantsList: List<Participant>? = null,
     val isMeeting: Boolean = false,
+    val updateListUi: Boolean = false,
 )
