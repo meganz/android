@@ -784,7 +784,6 @@ class InMeetingViewModel @Inject constructor(
                 currentChatId = newChatId,
             )
         }
-        chatManagement.openChatRoom(newChatId)
         getChatRoom()
         getChatCall(context)
         enableAudioLevelMonitor(_state.value.currentChatId)

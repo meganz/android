@@ -8981,6 +8981,8 @@ public class ChatActivity extends PasscodeActivity
         if (adapter != null) {
             adapter.pausePlaybackInProgress();
         }
+
+        megaChatApi.closeChatRoom(idChat, this);
         hideKeyboard();
         activityVisible = false;
         MegaApplication.setOpenChatId(-1);
