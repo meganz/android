@@ -10,9 +10,22 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
+import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.views.SyncOptionsDialog
+import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncChooseLocalFileEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncChooseRemoteFileEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncClearResolvedIssuesEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncMergeFoldersEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesAndRemoveRestEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncRenameAllItemsEvent
+import mega.privacy.mobile.analytics.event.SyncOptionSelected
+import mega.privacy.mobile.analytics.event.SyncOptionSelectedEvent
 
 @Composable
 internal fun SyncListRoute(
@@ -34,6 +47,39 @@ internal fun SyncListRoute(
         stalledIssuesCount = state.stalledIssuesCount,
         addFolderClicked = addFolderClicked,
         actionSelected = { item, selectedAction ->
+            when (selectedAction.resolutionActionType) {
+                StalledIssueResolutionActionType.RENAME_ALL_ITEMS -> {
+                    Analytics.tracker.trackEvent(AndroidSyncRenameAllItemsEvent)
+                }
+
+                StalledIssueResolutionActionType.REMOVE_DUPLICATES -> {
+                    Analytics.tracker.trackEvent(AndroidSyncRemoveDuplicatesEvent)
+                }
+
+                StalledIssueResolutionActionType.MERGE_FOLDERS -> {
+                    Analytics.tracker.trackEvent(AndroidSyncMergeFoldersEvent)
+                }
+
+                StalledIssueResolutionActionType.REMOVE_DUPLICATES_AND_REMOVE_THE_REST -> {
+                    Analytics.tracker.trackEvent(AndroidSyncRemoveDuplicatesAndRemoveRestEvent)
+                }
+
+                StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE -> {
+                    Analytics.tracker.trackEvent(AndroidSyncChooseLocalFileEvent)
+                }
+
+                StalledIssueResolutionActionType.CHOOSE_REMOTE_FILE -> {
+                    Analytics.tracker.trackEvent(AndroidSyncChooseRemoteFileEvent)
+                }
+
+                StalledIssueResolutionActionType.CHOOSE_LATEST_MODIFIED_TIME -> {
+                    Analytics.tracker.trackEvent(AndroidSyncChooseLatestModifiedTimeEvent)
+                }
+
+                else -> {
+
+                }
+            }
             viewModel.handleAction(
                 SyncListAction.ResolveStalledIssue(item, selectedAction)
             )
@@ -44,6 +90,7 @@ internal fun SyncListRoute(
         onActionPressed = {
             when (it) {
                 is SyncListMenuAction.ClearSyncOptions -> {
+                    Analytics.tracker.trackEvent(AndroidSyncClearResolvedIssuesEvent)
                     viewModel.onClearSyncOptionsPressed()
                 }
 
@@ -61,6 +108,20 @@ internal fun SyncListRoute(
             },
             selectedOption = state.selectedSyncOption,
             onSyncOptionsClicked = {
+                when (it) {
+                    SyncOption.WI_FI_OR_MOBILE_DATA -> {
+                        Analytics.tracker.trackEvent(
+                            SyncOptionSelectedEvent(SyncOptionSelected.SelectionType.SyncOptionWifiAndMobileSelected)
+                        )
+                    }
+
+                    SyncOption.WI_FI_ONLY -> {
+                        Analytics.tracker.trackEvent(
+                            SyncOptionSelectedEvent(SyncOptionSelected.SelectionType.SyncOptionWifiOnlySelected)
+                        )
+                    }
+                }
+
                 viewModel.handleAction(SyncListAction.SyncOptionsSelected(it))
                 showSyncOptionsDialog = false
             },

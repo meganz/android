@@ -21,6 +21,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.contacts.ContactsActivity
@@ -47,6 +48,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.mobile.analytics.event.AndroidSyncNavigationItemEvent
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -200,7 +202,9 @@ internal class ManagerDrawerFragment : Fragment() {
         binding.notificationsSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.NOTIFICATIONS) }
         binding.deviceCenterSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.DEVICE_CENTER) }
         binding.transfersSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.TRANSFERS) }
-        binding.syncSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.SYNC) }
+        binding.syncSection.setOnClickListener {
+            Analytics.tracker.trackEvent(AndroidSyncNavigationItemEvent)
+            drawerManager.drawerItemClicked(DrawerItem.SYNC) }
         binding.rubbishBinSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.RUBBISH_BIN) }
         binding.rubbishBinSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.RUBBISH_BIN) }
         binding.offlineSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.OFFLINE) }

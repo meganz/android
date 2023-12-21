@@ -85,9 +85,11 @@ dependencies {
     implementation(project(":shared:theme"))
     implementation(project(":legacy-core-ui"))
     implementation(project(":icon-pack"))
+    implementation(project(":analytics"))
 
     implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)
+    implementation(lib.mega.analytics)
 
     implementation(google.hilt.android)
     implementation(google.gson)

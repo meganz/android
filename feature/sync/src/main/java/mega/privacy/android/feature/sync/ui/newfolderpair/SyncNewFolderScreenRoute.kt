@@ -10,10 +10,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.LocalFolderSelected
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.FolderNameChanged
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.NextClicked
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.mobile.analytics.event.AndroidSyncStartSyncButtonEvent
 
 @Composable
 internal fun SyncNewFolderScreenRoute(
@@ -54,6 +56,7 @@ internal fun SyncNewFolderScreenRoute(
         folderNameChanged = { viewModel.handleAction(FolderNameChanged(it)) },
         selectMegaFolderClicked = openSelectMegaFolderScreen,
         syncClicked = {
+            Analytics.tracker.trackEvent(AndroidSyncStartSyncButtonEvent)
             viewModel.handleAction(NextClicked)
             openNextScreen(state.value)
         },
