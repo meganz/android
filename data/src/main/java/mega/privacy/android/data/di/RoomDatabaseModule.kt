@@ -127,13 +127,17 @@ internal object RoomDatabaseModule {
     internal fun providePassphraseEncryptedFile(
         @ApplicationContext context: Context,
         passphraseFile: File,
-    ): EncryptedFile {
-        return EncryptedFile.Builder(
-            passphraseFile,
-            context,
-            MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
-            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-        ).build()
+    ): EncryptedFile? {
+        return runCatching {
+            EncryptedFile.Builder(
+                passphraseFile,
+                context,
+                MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+                EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+            ).build()
+        }.onFailure {
+            Timber.e(it)
+        }.getOrNull()
     }
 
     @Provides
