@@ -39,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -216,6 +217,7 @@ internal fun ImagePreviewScreen(
                     photoState = photoState,
                     downloadImage = viewModel::monitorImageResult,
                     getImagePath = viewModel::getHighestResolutionImagePath,
+                    getErrorImagePath = viewModel::getFallbackImagePath,
                     onImageTap = { viewModel.switchFullScreenMode() },
                     onClickVideoPlay = onClickVideoPlay,
                     topAppBar = { imageNode ->
@@ -367,6 +369,7 @@ private fun ImagePreviewContent(
     bottomAppBar: @Composable (ImageNode, Int) -> Unit,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
     getImagePath: suspend (ImageResult?) -> String?,
+    getErrorImagePath: suspend (ImageResult?) -> String?,
     onClickVideoPlay: (ImageNode) -> Unit,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -378,20 +381,25 @@ private fun ImagePreviewContent(
         ) { index ->
             val imageNode = imageNodes[index]
 
-            val imageResultPair by produceState<Pair<ImageResult?, String?>>(
-                initialValue = Pair(null, null)
+            val imageResultTriple by produceState<Triple<ImageResult?, String?, String?>>(
+                initialValue = Triple(null, null, null)
             ) {
                 downloadImage(imageNode).collectLatest { imageResult ->
-                    value = Pair(imageResult, getImagePath(imageResult))
+                    value = Triple(
+                        imageResult,
+                        getImagePath(imageResult),
+                        getErrorImagePath(imageResult)
+                    )
                 }
             }
 
-            val (imageResult, imagePath) = imageResultPair
+            val (imageResult, imagePath, errorImagePath) = imageResultTriple
 
             Box(modifier = Modifier.fillMaxSize()) {
                 val isVideo = imageNode.type is VideoFileTypeInfo
                 ImageContent(
                     fullSizePath = imagePath,
+                    errorImagePath = errorImagePath,
                     photoState = photoState,
                     onImageTap = onImageTap,
                     enableZoom = !isVideo
@@ -442,6 +450,7 @@ private fun ImagePreviewContent(
 @Composable
 private fun ImageContent(
     fullSizePath: String?,
+    errorImagePath: String?,
     photoState: PhotoState,
     onImageTap: () -> Unit,
     enableZoom: Boolean,
@@ -454,11 +463,23 @@ private fun ImageContent(
             onImageTap()
         }
     ) {
+        var imagePath by remember(fullSizePath) {
+            mutableStateOf(fullSizePath)
+        }
+
+        val request = ImageRequest.Builder(LocalContext.current)
+            .data(imagePath)
+            .listener(
+                onError = { _, _ ->
+                    // when some image full size picture decoder throw exception, use preview/thumbnail instead
+                    // detail see package coil.decode [BitmapFactoryDecoder] 79 line
+                    imagePath = errorImagePath
+                }
+            )
+            .crossfade(true)
+            .build()
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(fullSizePath)
-                .crossfade(true)
-                .build(),
+            model = request,
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxWidth()

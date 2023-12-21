@@ -28,7 +28,7 @@ class MonitorOfflineImageNodesUseCase @Inject constructor(
                 null
             } else {
                 it.handle.toLongOrNull()?.let { handle ->
-                    photosRepository.fetchImageNode(nodeId = NodeId(handle))
+                    photosRepository.fetchImageNode(nodeId = NodeId(handle), filterSvg = false)
                 }
             }
         }

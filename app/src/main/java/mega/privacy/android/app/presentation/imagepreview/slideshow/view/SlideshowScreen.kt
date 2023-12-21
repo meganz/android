@@ -22,7 +22,10 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +46,7 @@ import kotlinx.coroutines.yield
 import mega.privacy.android.app.R.drawable
 import mega.privacy.android.app.R.string
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowViewModel
-import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.*
+import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.SettingOptionsMenuAction
 import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
 import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
@@ -106,6 +109,8 @@ fun SlideshowScreen(
                 pagerState = pagerState,
                 imageNodes = imageNodes,
                 downloadImage = viewModel::monitorImageResult,
+                getImagePath = viewModel::getHighestResolutionImagePath,
+                getErrorImagePath = viewModel::getFallbackImagePath,
                 photoState = photoState,
                 onTapImage = { viewModel.updateIsPlaying(false) },
             ) {
@@ -220,6 +225,8 @@ private fun SlideShowContent(
     photoState: PhotoState,
     imageNodes: List<ImageNode>,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
+    getImagePath: suspend (ImageResult?) -> String?,
+    getErrorImagePath: suspend (ImageResult?) -> String?,
     onTapImage: () -> Unit,
     handleEffectComposable: @Composable () -> Unit,
 ) {
@@ -233,29 +240,64 @@ private fun SlideShowContent(
         ) { index ->
 
             val imageNode = imageNodes[index]
-            val imageResult by produceState<ImageResult?>(initialValue = null) {
+            val imageResultPair by produceState<Pair<String?, String?>>(
+                initialValue = Pair(null, null)
+            ) {
                 downloadImage(imageNode).collectLatest { imageResult ->
-                    value = imageResult
+                    value = Pair(
+                        getImagePath(imageResult),
+                        getErrorImagePath(imageResult)
+                    )
                 }
             }
 
-            PhotoBox(
-                modifier = Modifier.fillMaxSize(),
-                state = photoState,
-                onTap = { onTapImage() }
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(imageResult?.getHighestResolutionAvailableUri())
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            val (fullSizePath, errorImagePath) = imageResultPair
+
+            ImageContent(
+                photoState = photoState,
+                onTapImage = onTapImage,
+                fullSizePath = fullSizePath,
+                errorImagePath = errorImagePath
+            )
 
             handleEffectComposable()
         }
+    }
+}
+
+@Composable
+private fun ImageContent(
+    photoState: PhotoState,
+    onTapImage: () -> Unit,
+    fullSizePath: String?,
+    errorImagePath: String?,
+) {
+    PhotoBox(
+        modifier = Modifier.fillMaxSize(),
+        state = photoState,
+        onTap = { onTapImage() }
+    ) {
+        var imagePath by remember(fullSizePath) {
+            mutableStateOf(fullSizePath)
+        }
+
+        val request = ImageRequest.Builder(LocalContext.current)
+            .data(imagePath)
+            .listener(
+                onError = { _, _ ->
+                    // when some image full size picture decoder throw exception, use preview/thumbnail instead
+                    // detail see package coil.decode [BitmapFactoryDecoder] 79 line
+                    imagePath = errorImagePath
+                }
+            )
+            .crossfade(true)
+            .build()
+
+        AsyncImage(
+            model = request,
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }

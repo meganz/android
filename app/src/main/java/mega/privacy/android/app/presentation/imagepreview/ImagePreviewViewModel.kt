@@ -461,6 +461,12 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
+    suspend fun getFallbackImagePath(imageResult: ImageResult?): String? {
+        return imageResult?.run {
+            checkUri(previewUri) ?: checkUri(thumbnailUri)
+        }
+    }
+
     suspend fun getHighestResolutionImagePath(imageResult: ImageResult?): String? {
         return imageResult?.run {
             checkUri(fullSizeUri) ?: checkUri(previewUri) ?: checkUri(thumbnailUri)
