@@ -31,6 +31,7 @@ internal class TransferMapper @Inject constructor(
             fileName = transfer.fileName.orEmpty(),
             stage = transfer.stage.toTransferStage(),
             tag = transfer.tag,
+            folderTransferTag = transfer.folderTransferTag.takeIf { it > 0 },
             speed = transfer.speed,
             isForeignOverQuota = transfer.isForeignOverquota,
             isStreamingTransfer = transfer.isStreamingTransfer,

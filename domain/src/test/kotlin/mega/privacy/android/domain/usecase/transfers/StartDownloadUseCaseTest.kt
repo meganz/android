@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -14,6 +15,7 @@ import kotlinx.coroutines.yield
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
@@ -26,10 +28,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 import java.util.concurrent.CancellationException
 
 @ExperimentalCoroutinesApi
@@ -58,7 +62,7 @@ class StartDownloadUseCaseTest {
     }
 
     @BeforeEach
-    fun resetMocks() {
+    fun resetMocks() = runTest {
         reset(
             doesPathHaveSufficientSpaceForNodesUseCase,
             downloadNodesUseCase,
@@ -66,13 +70,14 @@ class StartDownloadUseCaseTest {
             fileSystemRepository,
             startDownloadWorkerUseCase,
         )
+        whenever(fileSystemRepository.isSDCardPath(any())).thenReturn(false)
     }
 
     @Test
     fun `test that file system create destination folder is launched`() = runTest {
         whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(false)
         val nodes = nodeIds.map { mock<TypedFileNode>() }
-        underTest(nodes, DESTINATION_PATH_FOLDER, null, false).test {
+        underTest(nodes, DESTINATION_PATH_FOLDER, false).test {
             cancelAndIgnoreRemainingEvents()
         }
         verify(fileSystemRepository).createDirectory(DESTINATION_PATH_FOLDER)
@@ -82,7 +87,7 @@ class StartDownloadUseCaseTest {
     fun `test that not sufficient space event is emitted when there is no sufficient space`() =
         runTest {
             whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(false)
-            underTest(mockNodes(), DESTINATION_PATH_FOLDER, null, false).test {
+            underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
                 Truth.assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.NotSufficientSpace)
                 awaitComplete()
             }
@@ -96,7 +101,7 @@ class StartDownloadUseCaseTest {
                 DownloadNodesEvent.FinishProcessingTransfers,
             )
         )
-        underTest(mockNodes(), DESTINATION_PATH_FOLDER, null, false).test {
+        underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
             Truth.assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.FinishProcessingTransfers)
             awaitComplete()
         }
@@ -110,7 +115,7 @@ class StartDownloadUseCaseTest {
                 mock<DownloadNodesEvent.SingleTransferEvent>(),
             )
         )
-        underTest(mockNodes(), DESTINATION_PATH_FOLDER, null, false).test {
+        underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
             Truth.assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.FinishProcessingTransfers)
             awaitComplete()
         }
@@ -123,7 +128,7 @@ class StartDownloadUseCaseTest {
                 DownloadNodesEvent.FinishProcessingTransfers,
             )
         )
-        underTest(mockNodes(), DESTINATION_PATH_FOLDER, null, false).collect()
+        underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).collect()
         verify(startDownloadWorkerUseCase).invoke()
     }
 
@@ -137,7 +142,7 @@ class StartDownloadUseCaseTest {
         )
         val job =
             this.launch {
-                underTest(mockNodes(), DESTINATION_PATH_FOLDER, null, false).collect()
+                underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).collect()
             }
         yield() // to be sure that the job is started.
         job.cancel(CancellationException())
@@ -152,7 +157,7 @@ class StartDownloadUseCaseTest {
                 throw (RuntimeException())
             }
         )
-        underTest(mockNodes(), DESTINATION_PATH_FOLDER, null, false).test {
+        underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
             awaitError()
         }
     }
@@ -164,10 +169,43 @@ class StartDownloadUseCaseTest {
                 throw (RuntimeException())
             }
         )
-        underTest(mockNodes(), DESTINATION_PATH_FOLDER, null, false).test {
+        underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
             cancelAndIgnoreRemainingEvents()
         }
         verify(cancelCancelTokenUseCase).invoke()
+    }
+
+    @Test
+    fun `test that destination is set to cache path when download points to sd`() = runTest {
+        val cachePath = "cachePath"
+        whenever(
+            downloadNodesUseCase(any(), any(), anyOrNull(), any())
+        ).thenAnswer { emptyFlow<DownloadNodesEvent>() }
+        whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)
+        whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
+        whenever(fileSystemRepository.getOrCreateSDCardCacheFolder()).thenReturn(File(cachePath))
+        underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
+            awaitComplete()
+        }
+        verify(downloadNodesUseCase)
+            .invoke(any(), eq(cachePath.plus(File.separator)), anyOrNull(), any())
+    }
+
+    @Test
+    fun `test that app data is set with original path when download points to sd`() = runTest {
+        val cachePath = "cachePath"
+        val expectedAppData = TransferAppData.SdCardDownload(DESTINATION_PATH_FOLDER, null)
+        whenever(
+            downloadNodesUseCase(any(), any(), anyOrNull(), any())
+        ).thenAnswer { emptyFlow<DownloadNodesEvent>() }
+        whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)
+        whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
+        whenever(fileSystemRepository.getOrCreateSDCardCacheFolder()).thenReturn(File(cachePath))
+        underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
+            awaitComplete()
+        }
+        verify(downloadNodesUseCase)
+            .invoke(any(), anyOrNull(), eq(expectedAppData), any())
     }
 
     private fun mockNodes() = nodeIds.map { mock<TypedFileNode>() }

@@ -138,7 +138,7 @@ class StartDownloadTransfersViewModelTest {
             whenever(getOfflinePathForNodeUseCase(any())).thenReturn(destination)
         }
         underTest.startDownload(startEvent)
-        verify(startDownloadUseCase).invoke(nodes, destination, null, false)
+        verify(startDownloadUseCase).invoke(nodes, destination, false)
     }
 
     @Test
@@ -298,7 +298,6 @@ class StartDownloadTransfersViewModelTest {
                 anyOrNull(),
                 anyOrNull(),
                 anyOrNull(),
-                anyOrNull()
             )
         ).thenReturn(flow)
     }

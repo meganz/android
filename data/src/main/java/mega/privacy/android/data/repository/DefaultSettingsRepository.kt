@@ -451,4 +451,8 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun getIsFirstLaunch() = withContext(ioDispatcher) {
         megaLocalStorageGateway.getFirstTime()
     }
+
+    override suspend fun getDownloadToSdCardUri() = withContext(ioDispatcher) {
+        databaseHandler.sdCardUri
+    }
 }

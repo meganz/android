@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -149,4 +150,14 @@ internal class DefaultSettingsRepositoryTest {
             whenever(megaLocalStorageGateway.isAskBeforeLargeDownloads()).thenReturn(expected)
             assertThat(underTest.isAskBeforeLargeDownloads()).isEqualTo(expected)
         }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["sd:cardUri"])
+    @NullSource
+    fun `test that database value is returned when get download to Sd card uri is invoked`(
+        expected: String?,
+    ) = runTest {
+        whenever(databaseHandler.sdCardUri).thenReturn(expected)
+        assertThat(underTest.getDownloadToSdCardUri()).isEqualTo(expected)
+    }
 }

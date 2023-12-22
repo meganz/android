@@ -37,6 +37,7 @@ internal class MonitorTransfersSizeUseCaseTest {
         fileName = "fileName",
         stage = TransferStage.STAGE_SCANNING,
         tag = 1,
+        folderTransferTag = 2,
         speed = 1L,
         isForeignOverQuota = false,
         isStreamingTransfer = false,

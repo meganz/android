@@ -15,9 +15,11 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
+import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -39,7 +41,6 @@ class StartDownloadUseCase @Inject constructor(
      * Invoke
      * @param nodes The desired nodes to download
      * @param destinationPath Full destination path of the node, including file name if it's a file node. If this path does not exist it will try to create it
-     * @param appData Custom app data to save in the MegaTransfer object.
      * @param isHighPriority Puts the transfer on top of the download queue.
      *
      * @return a flow of [DownloadNodesEvent]s to monitor the download state and progress
@@ -47,20 +48,38 @@ class StartDownloadUseCase @Inject constructor(
     operator fun invoke(
         nodes: List<TypedNode>,
         destinationPath: String,
-        appData: TransferAppData?,
         isHighPriority: Boolean,
     ): Flow<DownloadNodesEvent> {
         if (destinationPath.isEmpty()) {
             return nodes.asFlow().map { DownloadNodesEvent.TransferNotStarted(it.id, null) }
         }
-        //wrap the startDownloadFlow to be able to create the directory since it's a suspending function
+        //wrap the startDownloadFlow to be able to execute suspended functions
         return flow {
-            fileSystemRepository.createDirectory(destinationPath)
+            val appData: TransferAppData?
+            val finalDestinationPath = if (fileSystemRepository.isSDCardPath(destinationPath)) {
+                appData = TransferAppData.SdCardDownload(destinationPath, null)
+                fileSystemRepository.getOrCreateSDCardCacheFolder()?.path?.plus(File.separator)
+                    ?: run {
+                        nodes.forEach {
+                            emit(
+                                DownloadNodesEvent.TransferNotStarted(
+                                    it.id,
+                                    LocalStorageException(null, null)
+                                )
+                            )
+                        }
+                        return@flow
+                    }
+            } else {
+                appData = null
+                destinationPath
+            }
+            fileSystemRepository.createDirectory(finalDestinationPath)
             val startDownloadFlow =
-                if (doesPathHaveSufficientSpaceForNodesUseCase(destinationPath, nodes)) {
+                if (doesPathHaveSufficientSpaceForNodesUseCase(finalDestinationPath, nodes)) {
                     downloadNodesUseCase(
                         nodes,
-                        destinationPath,
+                        finalDestinationPath,
                         appData = appData,
                         isHighPriority = isHighPriority
                     ).filter {

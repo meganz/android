@@ -1,6 +1,10 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import android.net.Uri
+import android.provider.DocumentsContract
+import android.webkit.MimeTypeMap
+import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
@@ -9,9 +13,12 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
+import mega.privacy.android.data.extensions.dropRepeated
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getAllFolders
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
@@ -45,6 +52,7 @@ import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.net.URI
 import java.net.URLConnection
 import javax.inject.Inject
@@ -92,6 +100,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val sdCardGateway: SDCardGateway,
     private val fileAttributeGateway: FileAttributeGateway,
+    private val androidDeviceGateway: AndroidDeviceGateway,
 ) : FileSystemRepository {
 
     override val localDCIMFolderPath: String
@@ -386,4 +395,76 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                 null
             }
         }
+
+    override suspend fun isSDCardPath(localPath: String) = withContext(ioDispatcher) {
+        sdCardGateway.doesFolderExists(localPath)
+    }
+
+    override suspend fun isSDCardCachePath(localPath: String) = withContext(ioDispatcher) {
+        sdCardGateway.isSDCardCachePath(localPath)
+    }
+
+    override suspend fun getOrCreateSDCardCacheFolder() =
+        withContext(ioDispatcher) {
+            sdCardGateway.getOrCreateCacheFolder(
+                androidDeviceGateway.getCurrentTimeInMillis().toString()
+            )
+        }
+
+    override suspend fun moveFileToSd(file: File, targetPath: String, sdCardUriString: String) =
+        withContext(ioDispatcher) {
+            val sourceDocument = DocumentFile.fromFile(file)
+            val sdCardUri = Uri.parse(sdCardUriString)
+            val targetSubFolders =
+                targetPath.removePrefix(sdCardGateway.getRootSDCardPath(targetPath)).getAllFolders()
+            val destinationRootSubFolders = sdCardUri.getSubFolders()
+            val extraSubFolders = targetSubFolders.dropRepeated(destinationRootSubFolders)
+            val destDocument = getSdDocumentFile(
+                sdCardUri,
+                extraSubFolders,
+                file.name,
+                MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension)
+                    ?: "application/octet-stream"
+            )
+
+
+            try {
+                if (destDocument != null) {
+                    val inputStream =
+                        context.contentResolver.openInputStream(sourceDocument.uri)
+                    val outputStream =
+                        context.contentResolver.openOutputStream(destDocument.uri)
+
+                    inputStream?.use { input ->
+                        outputStream?.use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    file.delete()
+                    return@withContext true
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+            return@withContext false
+        }
+
+    private fun Uri.getSubFolders() =
+        DocumentsContract.getTreeDocumentId(this).split(':').getOrNull(1)?.split(File.separator)
+            ?.filter { it.isNotBlank() } ?: emptyList()
+
+    private fun getSdDocumentFile(
+        sdCardUri: Uri,
+        extraSubFolders: List<String>,
+        fileName: String,
+        mimeType: String,
+    ): DocumentFile? {
+        var folderDocument = DocumentFile.fromTreeUri(context, sdCardUri)
+        extraSubFolders.forEach { folder ->
+            folderDocument =
+                folderDocument?.findFile(folder) ?: folderDocument?.createDirectory(folder)
+        }
+        folderDocument?.findFile(fileName)?.delete()
+        return folderDocument?.createFile(mimeType, fileName)
+    }
 }

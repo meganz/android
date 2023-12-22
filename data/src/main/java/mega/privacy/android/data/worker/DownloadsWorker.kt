@@ -38,6 +38,7 @@ import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfe
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import timber.log.Timber
 
 /**
@@ -61,6 +62,7 @@ class DownloadsWorker @AssistedInject constructor(
     private val areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase,
     private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
+    private val handleSDCardEventUseCase: HandleSDCardEventUseCase,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork() = coroutineScope {
@@ -124,8 +126,9 @@ class DownloadsWorker @AssistedInject constructor(
         scope.launch(ioDispatcher) {
             monitorTransferEventsUseCase()
                 .filter { it.transfer.transferType == TransferType.DOWNLOAD }
-                .collect {
-                    addOrUpdateActiveTransferUseCase(it)
+                .collect { transferEvent ->
+                    handleSDCardEventUseCase(transferEvent)
+                    addOrUpdateActiveTransferUseCase(transferEvent)
                 }
         }
 

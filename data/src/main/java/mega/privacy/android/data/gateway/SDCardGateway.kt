@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway
 
 import androidx.documentfile.provider.DocumentFile
+import java.io.File
 
 /**
  * Gateway class that provides SD Card-related implementations
@@ -37,6 +38,11 @@ interface SDCardGateway {
     suspend fun doesFolderExists(localPath: String): Boolean
 
     /**
+     * @return true if the [localPath] points to a SD card cache
+     */
+    suspend fun isSDCardCachePath(localPath: String): Boolean
+
+    /**
      * Retrieves the Root SD Card path
      *
      * @see mega.privacy.android.app.utils.SDCardUtils.getSDCardRoot
@@ -45,4 +51,14 @@ interface SDCardGateway {
      * @return the Root SD Card path
      */
     suspend fun getRootSDCardPath(path: String): String
+
+    /**
+     * Get a folder in cache in external sd card folder and returns the file
+     * Create the folder if it does not exist
+     *
+     * @param folderName
+     * @return the File corresponding to the folder in cache
+     *         Return null if the folder cannot be created
+     */
+    suspend fun getOrCreateCacheFolder(folderName: String): File?
 }

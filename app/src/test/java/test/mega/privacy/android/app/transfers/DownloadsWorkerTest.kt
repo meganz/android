@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfe
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -69,6 +70,7 @@ class DownloadsWorkerTest {
 
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val addOrUpdateActiveTransferUseCase = mock<AddOrUpdateActiveTransferUseCase>()
+    private val handleSDCardEventUseCase = mock<HandleSDCardEventUseCase>()
     private val monitorOngoingActiveTransfersUseCase =
         mock<MonitorOngoingActiveTransfersUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
@@ -126,7 +128,8 @@ class DownloadsWorkerTest {
             notificationManager = mock(),
             correctActiveTransfersUseCase = correctActiveTransfersUseCase,
             clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
-            transfersFinishedNotificationMapper = transfersFinishedNotificationMapper
+            transfersFinishedNotificationMapper = transfersFinishedNotificationMapper,
+            handleSDCardEventUseCase = handleSDCardEventUseCase
         )
     }
 

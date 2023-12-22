@@ -29,6 +29,7 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -59,6 +60,7 @@ class DownloadNodesUseCaseTest {
     private val fileSystemRepository: FileSystemRepository = mock()
     private val transfer: Transfer = mock()
     private val addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase = mock()
+    private val handleSDCardEventUseCase: HandleSDCardEventUseCase = mock()
 
     private lateinit var underTest: DownloadNodesUseCase
 
@@ -71,6 +73,7 @@ class DownloadNodesUseCaseTest {
                 addOrUpdateActiveTransferUseCase = addOrUpdateActiveTransferUseCase,
                 transferRepository = transferRepository,
                 fileSystemRepository = fileSystemRepository,
+                handleSDCardEventUseCase = handleSDCardEventUseCase
             )
     }
 
@@ -79,7 +82,7 @@ class DownloadNodesUseCaseTest {
         reset(
             transferRepository, cancelTokenRepository, fileSystemRepository,
             addOrUpdateActiveTransferUseCase, fileNode, folderNode, invalidateCancelTokenUseCase,
-            cancelCancelTokenUseCase, transfer,
+            cancelCancelTokenUseCase, transfer, handleSDCardEventUseCase
         )
     }
 
@@ -261,6 +264,36 @@ class DownloadNodesUseCaseTest {
             }
             verify(
                 addOrUpdateActiveTransferUseCase,
+                Times(nodeIds.size * flow.count())
+            ).invoke(any())
+        }
+
+    @Test
+    fun `test that handleSDCardEventUseCase is invoked when each transfer is updated`() =
+        runTest {
+            whenever(transfer.isFolderTransfer).thenReturn(false)
+            val flow = flowOf(
+                mock<TransferEvent.TransferStartEvent> { on { it.transfer }.thenReturn(transfer) },
+                mock<TransferEvent.TransferUpdateEvent> { on { it.transfer }.thenReturn(transfer) },
+                mock<TransferEvent.TransferFinishEvent> { on { it.transfer }.thenReturn(transfer) },
+            )
+            fileNodes.forEach {
+                whenever(
+                    transferRepository.startDownload(
+                        it, DESTINATION_PATH_FOLDER, null, false,
+                    )
+                ).thenReturn(flow)
+            }
+            underTest(
+                fileNodes,
+                DESTINATION_PATH_FOLDER,
+                null,
+                false
+            ).filterIsInstance<DownloadNodesEvent.SingleTransferEvent>().test {
+                cancelAndConsumeRemainingEvents()
+            }
+            verify(
+                handleSDCardEventUseCase,
                 Times(nodeIds.size * flow.count())
             ).invoke(any())
         }

@@ -282,4 +282,31 @@ interface FileSystemRepository {
      * Check if file is exists
      */
     suspend fun checkFileExistsByUriPath(uriPath: String?): String?
+
+    /**
+     * @return true if the [localPath] points to a SD card
+     */
+    suspend fun isSDCardPath(localPath: String): Boolean
+
+    /**
+     * @return true if the [localPath] points to a SD card cache
+     */
+    suspend fun isSDCardCachePath(localPath: String): Boolean
+
+    /**
+     * Get or create a folder with current timestamp name in the cache of SD Card if any
+     *
+     * @return the File corresponding to the folder in cache in the SD
+     *         Return null if the folder cannot be created or there's no SD card
+     */
+    suspend fun getOrCreateSDCardCacheFolder(): File?
+
+    /**
+     * Moves a [file] to a [targetPath] on the sd. It first copies the file to the [targetPath] and then deletes the original one
+     *
+     * @param file the file to be moved
+     * @param targetPath the target path where the file will be moved (excluding the name of the file itself)
+     * @param sdCardUriString an uri pointing to the Sd card for permission reasons. It should point the same path than [targetPath] or an ancestor in its folder hierarchy. In android we can't access the Sd card directly (except cache folder)
+     */
+    suspend fun moveFileToSd(file: File, targetPath: String, sdCardUriString: String): Boolean
 }

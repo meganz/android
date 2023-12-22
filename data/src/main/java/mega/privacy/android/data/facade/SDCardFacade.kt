@@ -5,6 +5,7 @@ import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -47,5 +48,12 @@ class SDCardFacade @Inject constructor(
             if (count == 3) break
         }
         return path.substring(0, maxIndex)
+    }
+
+    override suspend fun getOrCreateCacheFolder(folderName: String): File? =
+        File(context.externalCacheDir, folderName).takeIf { it.exists() || it.mkdir() }
+
+    override suspend fun isSDCardCachePath(localPath: String): Boolean {
+        return localPath.startsWith(context.externalCacheDir?.path ?: return false)
     }
 }

@@ -181,7 +181,6 @@ class StartDownloadTransfersViewModel @Inject constructor(
                 startDownloadUseCase(
                     destinationPath = path,
                     nodes = nodes,
-                    appData = null,
                     isHighPriority = false
                 ).catch {
                     lastError = it

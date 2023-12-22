@@ -428,4 +428,9 @@ interface SettingsRepository {
      * @return first launch value, or null if not set
      */
     suspend fun getIsFirstLaunch(): Boolean?
+
+    /**
+     * @return the uri string that points to the sd card folder configured by the user, if any
+     */
+    suspend fun getDownloadToSdCardUri(): String?
 }

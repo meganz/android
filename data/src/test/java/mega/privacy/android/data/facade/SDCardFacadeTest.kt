@@ -138,6 +138,19 @@ class SDCardFacadeTest {
         assertThat(expectedRootSDCardPath).isEqualTo(rootSDCardPath)
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that is SD Card Cache Path returns true if corresponds`(
+        isSdPath: Boolean,
+    ) = runTest {
+        val cachePath = "cacheRoot"
+        val cache = File(cachePath)
+        whenever(context.externalCacheDir).thenReturn(cache)
+        val path =
+            if (isSdPath) "$cache${File.separator}somethingElse" else "noCacheRoot${File.separator}somethingElse"
+        assertThat(underTest.isSDCardCachePath(path)).isEqualTo(isSdPath)
+    }
+
     private fun provideRootSDCardPathTestParameters() =
         Stream.of(
             Arguments.of("/storage/sdcard0/DCIM/DCIM2/DCIM3", 17),

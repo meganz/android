@@ -26,6 +26,7 @@ import java.math.BigInteger
  *                     In that case,this property is the destination name.
  * @property stage [TransferStage]
  * @property tag An integer that identifies this transfer.
+ * @property folderTransferTag tag of the initial folder transfer that initiated this transfer
  * @property speed The average speed of this transfer.
  * @property isForeignOverQuota True if the transfer has failed with MEGAErrorTypeApiEOverquota
  *                              and the target is foreign, false otherwise.
@@ -50,6 +51,7 @@ data class Transfer(
     val fileName: String,
     val stage: TransferStage,
     override val tag: Int,
+    val folderTransferTag: Int?,
     val speed: Long,
     val isForeignOverQuota: Boolean,
     val isStreamingTransfer: Boolean,
@@ -65,4 +67,9 @@ data class Transfer(
      * Gets paused state from [state]
      */
     override val isPaused get() = state == TransferState.STATE_PAUSED
+
+    /**
+     * true if represents a transfer initiated by the app false if the transfer was initiated by the sdk for children nodes of a folder transfer
+     */
+    val isRootTransfer = folderTransferTag == null
 }

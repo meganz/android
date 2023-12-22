@@ -16,9 +16,9 @@ class GetDownloadLocationForNodeUseCase @Inject constructor(
     private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase,
 ) {
     /**
-     * * Get the default path where nodes should be downloaded given its parent folder
-     * @param node the parent folder of the nodes that will be downloaded
-     * @return a string
+     * Get the default path where node should be downloaded
+     * @param node the node that will be downloaded
+     * @return a string representing the destination path
      */
     suspend operator fun invoke(node: Node): String? {
         val location = getOrCreateStorageDownloadLocationUseCase() ?: return null
