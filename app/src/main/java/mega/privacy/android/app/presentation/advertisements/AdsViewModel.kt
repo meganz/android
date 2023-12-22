@@ -54,6 +54,17 @@ class AdsViewModel @Inject constructor(
     }
 
     /**
+     * Disable the ads feature
+     */
+    fun disableAdsFeature() {
+        cancelFetchingAds()
+        isAdsFeatureEnabled = false
+        _uiState.update { state ->
+            state.copy(showAdsView = false, slotId = "", adsBannerUrl = "")
+        }
+    }
+
+    /**
      * Mark the ad slot as consumed
      */
     fun onAdConsumed() {
@@ -156,7 +167,7 @@ class AdsViewModel @Inject constructor(
                     val url = fetchAdDetailUseCase(fetchAdDetailRequest)?.url
                     _uiState.update { state ->
                         state.copy(
-                            showAdsView = url != null && isPortrait,
+                            showAdsView = url != null && isPortrait && canConsumeAdSlot(slotId),
                             slotId = slotId,
                             adsBannerUrl = url.orEmpty()
                         )

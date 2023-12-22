@@ -25,6 +25,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.extensions.isPortrait
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.DecryptAlertDialog
@@ -64,7 +65,6 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val viewModel: FileLinkViewModel by viewModels()
-    private val adsViewModel: AdsViewModel by viewModels()
 
     private var mKey: String? = null
 
@@ -161,16 +161,18 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement).let {
-                    if (it) {
-                        if (this@FileLinkComposeActivity.isPortrait()) {
-                            adsViewModel.enableAdsFeature()
-                            adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
-                        }
+                val isInAppAdvertisementEnabled =
+                    getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement)
+                val isAdsEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads)
+
+                if (isInAppAdvertisementEnabled && isAdsEnabled) {
+                    if (this@FileLinkComposeActivity.isPortrait()) {
+                        adsViewModel.enableAdsFeature()
+                        adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
                     }
                 }
             }.onFailure {
-                Timber.e("Failed to fetch feature flag with error: ${it.message}")
+                Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
             }
         }
     }

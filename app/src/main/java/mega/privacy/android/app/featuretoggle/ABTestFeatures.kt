@@ -39,11 +39,21 @@ enum class ABTestFeatures(
 
     /**
      * To use remote feature flag 'ab_nsf' from API
-     * this flag is part of real experiment related to Upgrade account screen
+     * this flag is part of real experiment related to Search screen
      * DO NOT USE this flag anywhere else, except the Search screen
      */
     nsf(
         "Real experiment flag to show filters on search",
+        false
+    ),
+
+    /**
+     * To use remote feature flag 'ab_ads' from API
+     * this flag is part of real experiment related to Ads
+     * DO NOT USE this flag anywhere else, except the Ads related files
+     */
+    ads(
+        "Real experiment flag to show ads",
         false
     );
 

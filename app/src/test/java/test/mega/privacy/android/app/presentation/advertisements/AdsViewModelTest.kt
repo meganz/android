@@ -205,4 +205,26 @@ class AdsViewModelTest {
                 assertThat(state.showAdsView).isFalse()
             }
         }
+
+    @Test
+    fun `test that showAdsView is false when the Ads feature is disabled`() =
+        runTest {
+            whenever(isAccountNewUseCase()).thenReturn(false)
+            initTestClass()
+            whenever(fetchAdDetailUseCase(FetchAdDetailRequest(slotId, null))).thenReturn(
+                fetchedAdDetail
+            )
+            underTest.enableAdsFeature()
+            underTest.fetchNewAd(slotId)
+            testScheduler.advanceUntilIdle()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.showAdsView).isTrue()
+            }
+            underTest.disableAdsFeature()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.showAdsView).isFalse()
+            }
+        }
 }

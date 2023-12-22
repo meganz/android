@@ -45,7 +45,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.TransferOverquotaLayoutBinding
-import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -57,6 +56,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
@@ -121,6 +121,7 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.mobile.analytics.event.TransferOverQuotaDialogEvent
@@ -211,6 +212,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     @JvmField
     var nameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollision>>? = null
     protected val billingViewModel by viewModels<BillingViewModel>()
+    protected val adsViewModel: AdsViewModel by viewModels()
     private val viewModel by viewModels<BaseViewModel>()
 
     @JvmField
@@ -377,6 +379,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             if (it is BillingEvent.OnPurchaseUpdate) {
                 onPurchasesUpdated(it.purchases, it.activeSubscription)
                 billingViewModel.markHandleBillingEvent()
+                adsViewModel.disableAdsFeature()
             }
         }
 

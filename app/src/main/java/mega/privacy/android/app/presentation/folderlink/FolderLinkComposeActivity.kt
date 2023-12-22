@@ -34,6 +34,7 @@ import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.extensions.isPortrait
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.DecryptAlertDialog
@@ -85,7 +86,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
     private lateinit var binding: ActivityFolderLinkComposeBinding
 
     private val viewModel: FolderLinkViewModel by viewModels()
-    private val adsViewModel: AdsViewModel by viewModels()
 
     private var mKey: String? = null
     private var statusDialog: AlertDialog? = null
@@ -170,16 +170,18 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement).let {
-                    if (it) {
-                        if (this@FolderLinkComposeActivity.isPortrait()) {
-                            adsViewModel.enableAdsFeature()
-                            adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
-                        }
+                val isInAppAdvertisementEnabled =
+                    getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement)
+                val isAdsEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads)
+
+                if (isInAppAdvertisementEnabled && isAdsEnabled) {
+                    if (this@FolderLinkComposeActivity.isPortrait()) {
+                        adsViewModel.enableAdsFeature()
+                        adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
                     }
                 }
             }.onFailure {
-                Timber.e("Failed to fetch feature flag with error: ${it.message}")
+                Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
             }
         }
     }

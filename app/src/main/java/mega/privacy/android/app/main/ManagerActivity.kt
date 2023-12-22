@@ -112,6 +112,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_C
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.isPortrait
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
@@ -381,7 +382,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val userInfoViewModel: UserInfoViewModel by viewModels()
     private val transferPageViewModel: TransferPageViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
-    private val adsViewModel: AdsViewModel by viewModels()
     private val nodeOptionsDownloadViewModel: NodeOptionsDownloadViewModel by viewModels()
     private val searchResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -1021,19 +1021,21 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement).let {
-                    if (it) {
-                        if (this@ManagerActivity.isPortrait()) {
-                            setupAdsView()
-                        } else {
-                            hideAdsView()
-                        }
-                        adsViewModel.enableAdsFeature()
-                        adsViewModel.getDefaultStartScreen()
+                val isInAppAdvertisementEnabled =
+                    getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement)
+                val isAdsEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads)
+
+                if (isInAppAdvertisementEnabled && isAdsEnabled) {
+                    if (this@ManagerActivity.isPortrait()) {
+                        setupAdsView()
+                    } else {
+                        hideAdsView()
                     }
+                    adsViewModel.enableAdsFeature()
+                    adsViewModel.getDefaultStartScreen()
                 }
             }.onFailure {
-                Timber.e("Failed to fetch feature flag with error: ${it.message}")
+                Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
             }
         }
     }
