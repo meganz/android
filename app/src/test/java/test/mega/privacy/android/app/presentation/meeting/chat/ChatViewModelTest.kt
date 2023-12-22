@@ -58,6 +58,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUse
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorMessageLoadedUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
@@ -194,6 +195,7 @@ internal class ChatViewModelTest {
     private val startMeetingInWaitingRoomChatUseCase = mock<StartMeetingInWaitingRoomChatUseCase>()
     private val isGeolocationEnabledUseCase = mock<IsGeolocationEnabledUseCase>()
     private val enableGeolocationUseCase = mock<EnableGeolocationUseCase>()
+    private val sendTextMessageUseCase = mock<SendTextMessageUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -238,6 +240,7 @@ internal class ChatViewModelTest {
             startMeetingInWaitingRoomChatUseCase,
             isGeolocationEnabledUseCase,
             enableGeolocationUseCase,
+            sendTextMessageUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -304,6 +307,7 @@ internal class ChatViewModelTest {
             startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
             isGeolocationEnabledUseCase = isGeolocationEnabledUseCase,
             enableGeolocationUseCase = enableGeolocationUseCase,
+            sendTextMessageUseCase = sendTextMessageUseCase,
         )
     }
 

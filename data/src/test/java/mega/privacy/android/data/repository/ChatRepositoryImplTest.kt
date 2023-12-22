@@ -844,4 +844,13 @@ class ChatRepositoryImplTest {
             assertThat(awaitItem()).isNull()
         }
     }
+
+    @Test
+    fun `test that send message invokes mega chat api`() = runTest {
+        val chatId = 123L
+        val message = "Message"
+        whenever(megaChatApiGateway.sendMessage(chatId, message)).thenReturn(mock())
+        underTest.sendMessage(chatId, message)
+        verify(megaChatApiGateway).sendMessage(chatId, message)
+    }
 }

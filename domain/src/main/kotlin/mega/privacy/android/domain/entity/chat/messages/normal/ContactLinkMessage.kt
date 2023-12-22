@@ -8,4 +8,5 @@ data class ContactLinkMessage(
     override val time: Long,
     override val isMine: Boolean,
     override val userHandle: Long,
+    override val tempId: Long
 ) : NormalMessage

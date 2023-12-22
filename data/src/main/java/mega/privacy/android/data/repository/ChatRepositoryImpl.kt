@@ -1045,4 +1045,8 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getMyFullName(): String? = withContext(ioDispatcher) {
         megaChatApiGateway.getMyFullname()
     }
+
+    override suspend fun sendMessage(chatId: Long, message: String) = withContext(ioDispatcher) {
+        chatMessageMapper(megaChatApiGateway.sendMessage(chatId, message))
+    }
 }

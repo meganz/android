@@ -112,6 +112,7 @@ internal fun ChatView(
         onStartOrJoinMeeting = viewModel::onStartOrJoinMeeting,
         onAnswerCall = viewModel::onAnswerCall,
         onEnableGeolocation = viewModel::onEnableGeolocation,
+        onSendClick = viewModel::sendMessage,
     )
 }
 
@@ -149,6 +150,7 @@ internal fun ChatView(
             uiState = uiState
         )
     },
+    onSendClick: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -358,6 +360,7 @@ internal fun ChatView(
                             R.string.type_message_hint_with_customized_title,
                             uiState.title.orEmpty()
                         ),
+                        onSendClick = onSendClick
                     )
                 }
             )

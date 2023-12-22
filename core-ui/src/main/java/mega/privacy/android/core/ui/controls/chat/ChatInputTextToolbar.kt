@@ -1,11 +1,11 @@
 package mega.privacy.android.core.ui.controls.chat
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,17 +28,24 @@ import mega.privacy.android.core.ui.theme.MegaTheme
 const val TEST_TAG_ATTACHMENT_ICON = "chat_input_text_toolbar:attachment_icon"
 
 /**
+ * Send icon test tag.
+ */
+const val TEST_TAG_SEND_ICON = "chat_input_text_toolbar:send_icon"
+
+/**
  * Chat input text toolbar
  *
  * @param modifier modifier
  * @param onAttachmentClick click listener for attachment icon
+ * @param onSendClick click listener for send icon
  */
 @Composable
 fun ChatInputTextToolbar(
     text: String,
     placeholder: String,
-    modifier: Modifier = Modifier,
     onAttachmentClick: () -> Unit,
+    onSendClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var input by rememberSaveable(text) {
         mutableStateOf(text)
@@ -51,7 +58,6 @@ fun ChatInputTextToolbar(
     ) {
         Icon(
             modifier = Modifier
-                .size(24.dp)
                 .padding(end = 8.dp)
                 .testTag(TEST_TAG_ATTACHMENT_ICON)
                 .clickable(onClick = onAttachmentClick),
@@ -64,7 +70,24 @@ fun ChatInputTextToolbar(
             text = input,
             placeholder = placeholder,
             onTextChange = { input = it },
+            modifier = Modifier.weight(1f),
         )
+
+        AnimatedVisibility(visible = input.isNotEmpty()) {
+            Icon(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp)
+                    .testTag(TEST_TAG_SEND_ICON)
+                    .clickable(onClick = {
+                        onSendClick(input)
+                        input = ""
+                    }),
+                painter = painterResource(id = R.drawable.ic_send),
+                contentDescription = "Send icon",
+                tint = MegaTheme.colors.icon.accent
+            )
+        }
     }
 }
 
@@ -72,6 +95,6 @@ fun ChatInputTextToolbar(
 @Composable
 private fun ChatInputTextToolbarPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        ChatInputTextToolbar("", "Message") {}
+        ChatInputTextToolbar("Typing...", "Message", {}, {})
     }
 }

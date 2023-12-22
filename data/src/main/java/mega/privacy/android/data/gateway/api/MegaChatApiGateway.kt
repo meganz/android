@@ -1318,4 +1318,29 @@ interface MegaChatApiGateway {
      * @param listener MegaChatRequestListener to track this request
      */
     fun endChatCall(callId: Long, listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Sends a new message to the specified chatroom
+     *
+     * The MegaChatMessage object returned by this function includes a message transaction id,
+     * That id is not the definitive id, which will be assigned by the server. You can obtain the
+     * temporal id with MegaChatMessage::getTempId()
+     *
+     * When the server confirms the reception of the message, the MegaChatRoomListener::onMessageUpdate
+     * is called, including the definitive id and the new status: MegaChatMessage::STATUS_SERVER_RECEIVED.
+     * At this point, the app should refresh the message identified by the temporal id and move it to
+     * the final position in the history, based on the reported index in the callback.
+     *
+     * If the message is rejected by the server, the message will keep its temporal id and will have its
+     * a message id set to INVALID_HANDLE.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param message Content of the message
+     * application-specific type like link, share, picture etc.) @see MegaChatMessage::Type.
+     *
+     * @return MegaChatMessage that will be sent. The message id is not definitive, but temporal.
+     */
+    fun sendMessage(chatId: Long, message: String): MegaChatMessage
 }

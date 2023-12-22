@@ -48,6 +48,8 @@ import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCa
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
+import mega.privacy.android.domain.usecase.chat.message.MonitorMessageLoadedUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
@@ -121,6 +123,7 @@ internal class ChatViewModel @Inject constructor(
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     private val isGeolocationEnabledUseCase: IsGeolocationEnabledUseCase,
     private val enableGeolocationUseCase: EnableGeolocationUseCase,
+    private val sendTextMessageUseCase: SendTextMessageUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -829,6 +832,14 @@ internal class ChatViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e(it)
                 }
+        }
+    }
+
+    fun sendMessage(message: String) {
+        viewModelScope.launch {
+            chatId?.let {
+                val tempMessage = sendTextMessageUseCase(it, message)
+            }
         }
     }
 
