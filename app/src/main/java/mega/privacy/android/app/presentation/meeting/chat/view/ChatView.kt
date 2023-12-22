@@ -8,15 +8,12 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
@@ -25,7 +22,6 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,8 +61,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EndCallFor
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.MutePushNotificationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactToAddDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
-import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
-import mega.privacy.android.app.presentation.meeting.chat.view.message.MessageRow
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAddContactActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openLocationPicker
@@ -82,12 +76,10 @@ import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.ChatMeetingButton
 import mega.privacy.android.core.ui.controls.chat.ReturnToCallBanner
-import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
@@ -114,7 +106,6 @@ internal fun ChatView(
         startCall = viewModel::startCall,
         onCallStarted = viewModel::onCallStarted,
         onWaitingRoomOpened = viewModel::onWaitingRoomOpened,
-        onRequestMoreMessages = viewModel::requestMessages,
         onMutePushNotificationSelected = viewModel::mutePushNotification,
         onShowMutePushNotificationDialog = viewModel::showMutePushNotificationDialog,
         onShowMutePushNotificationDialogConsumed = viewModel::onShowMutePushNotificationDialogConsumed,
@@ -146,13 +137,18 @@ internal fun ChatView(
     startCall: (Boolean) -> Unit = {},
     onCallStarted: () -> Unit = {},
     onWaitingRoomOpened: () -> Unit = {},
-    onRequestMoreMessages: () -> Unit = {},
     onMutePushNotificationSelected: (ChatPushNotificationMuteOption) -> Unit = {},
     onShowMutePushNotificationDialog: () -> Unit = {},
     onShowMutePushNotificationDialogConsumed: () -> Unit = {},
     onStartOrJoinMeeting: (isStarted: Boolean) -> Unit = {},
     onAnswerCall: () -> Unit = {},
     onEnableGeolocation: () -> Unit = {},
+    messageListView: @Composable (LazyListState) -> Unit = { listState ->
+        MessageListView(
+            scrollState = listState,
+            uiState = uiState
+        )
+    },
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -202,11 +198,7 @@ internal fun ChatView(
             fileModalSheetState.hide()
         }
     }
-    LaunchedEffect(uiState.messages.size) {
-        if (uiState.messages.isNotEmpty()) {
-            scrollState.scrollToItem(uiState.messages.size - 1)
-        }
-    }
+
 
     val callPermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -375,31 +367,7 @@ internal fun ChatView(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        state = scrollState
-                    ) {
-                        item("header") {
-                            AnimatedVisibility(visible = chatHistoryLoadStatus == ChatHistoryLoadStatus.NONE) {
-                                FirstMessageHeader(uiState)
-                            }
-                            AnimatedVisibility(visible = chatHistoryLoadStatus != ChatHistoryLoadStatus.NONE) {
-                                LoadingMessagesHeader()
-                            }
-                        }
-                        items(
-                            items = messages,
-                            key = {
-                                "${it.message.msgId}_${it.showAvatar}_${it.showTime}_${it.showDate}"
-                            },
-                        ) { uiChatMessage ->
-                            MessageRow(
-                                uiChatMessage = uiChatMessage,
-                                modifier = uiChatMessage.modifier,
-                            )
-                        }
-                    }
+                    messageListView(scrollState)
                     if (schedIsPending && isActive && !isArchived) {
                         StartOrJoinMeeting(this@with, onStartOrJoinMeeting = {
                             callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())

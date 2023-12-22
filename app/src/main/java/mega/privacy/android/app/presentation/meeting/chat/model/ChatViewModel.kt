@@ -21,12 +21,10 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
-import mega.privacy.android.app.presentation.meeting.chat.mapper.ScanMessageMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
-import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
@@ -50,7 +48,6 @@ import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCa
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
-import mega.privacy.android.domain.usecase.chat.message.MonitorMessageLoadedUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
@@ -61,8 +58,6 @@ import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
-import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
-import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion.NUMBER_MESSAGES_TO_LOAD
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
@@ -118,15 +113,12 @@ internal class ChatViewModel @Inject constructor(
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val startCallUseCase: StartCallUseCase,
     private val chatManagement: ChatManagement,
-    private val loadMessagesUseCase: LoadMessagesUseCase,
-    private val monitorMessageLoadedUseCase: MonitorMessageLoadedUseCase,
     private val getChatMuteOptionListUseCase: GetChatMuteOptionListUseCase,
     private val muteChatNotificationForChatRoomsUseCase: MuteChatNotificationForChatRoomsUseCase,
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
-    private val scanMessageMapper: ScanMessageMapper,
     private val isGeolocationEnabledUseCase: IsGeolocationEnabledUseCase,
     private val enableGeolocationUseCase: EnableGeolocationUseCase,
     savedStateHandle: SavedStateHandle,
@@ -162,62 +154,6 @@ internal class ChatViewModel @Inject constructor(
             monitorNotificationMute(it)
             monitorChatConnectionState(it)
             monitorNetworkConnectivity(it)
-            monitorMessageLoaded(it)
-        }
-    }
-
-    private fun checkIfMoreMessagesShouldBeRequested() = with(state.value) {
-        when {
-            chatHistoryLoadStatus == ChatHistoryLoadStatus.NONE -> {
-                Timber.d("Whole history already loaded. No more messages to request.")
-                false
-            }
-
-            pendingMessagesToLoad > 0 && chatHistoryLoadStatus == ChatHistoryLoadStatus.REMOTE -> {
-                Timber.d("Waiting for messages to load. No more can be requested. Previous history status $chatHistoryLoadStatus")
-                false
-            }
-
-            else -> {
-                Timber.d("Requesting more messages. Previous history status $chatHistoryLoadStatus")
-                _state.update { state -> state.copy(pendingMessagesToLoad = NUMBER_MESSAGES_TO_LOAD) }
-                true
-            }
-        }
-    }
-
-    /**
-     * Request messages.
-     * Must be called only if the first messages in the history are shown in the screen.
-     */
-    fun requestMessages() {
-        if (checkIfMoreMessagesShouldBeRequested() && chatId != null) {
-            viewModelScope.launch {
-                val newHistoryLoadStatus = loadMessagesUseCase(chatId)
-                Timber.d("New history status $newHistoryLoadStatus")
-                _state.update { state -> state.copy(chatHistoryLoadStatus = newHistoryLoadStatus) }
-            }
-        }
-    }
-
-    private fun monitorMessageLoaded(chatId: Long) {
-        viewModelScope.launch {
-            monitorMessageLoadedUseCase(chatId).collect { loadedMessage ->
-                Timber.d("New message: ${loadedMessage.msgId}")
-                val state = state.value
-                val newMessages = scanMessageMapper(
-                    isOneToOne = !state.isGroup && !state.isMeeting,
-                    currentItems = state.messages,
-                    newMessage = loadedMessage
-                )
-                val pendingMessagesToLoad = state.pendingMessagesToLoad - 1
-                _state.update { state ->
-                    state.copy(
-                        messages = newMessages,
-                        pendingMessagesToLoad = pendingMessagesToLoad
-                    )
-                }
-            }
         }
     }
 
@@ -320,7 +256,6 @@ internal class ChatViewModel @Inject constructor(
             runCatching {
                 getChatRoomUseCase(chatId)
             }.onSuccess { chatRoom ->
-                requestMessages()
                 chatRoom?.let {
                     with(chatRoom) {
                         checkCustomTitle()

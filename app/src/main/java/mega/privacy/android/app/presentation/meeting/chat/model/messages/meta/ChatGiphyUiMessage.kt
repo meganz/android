@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.GiphyMessageView
@@ -14,7 +15,7 @@ import mega.privacy.android.app.utils.GiphyUtil
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 
 class ChatGiphyUiMessage(
-    override val message: GiphyMessage,
+    val message: GiphyMessage,
     override val showDate: Boolean,
     override val showAvatar: Boolean,
     override val showTime: Boolean,
@@ -37,4 +38,9 @@ class ChatGiphyUiMessage(
             Spacer(modifier = Modifier.size(24.dp))
         }
     }
+    override val displayAsMine = message.isMine
+    override val canForward = message.canForward
+    override val timeSent = message.time
+    override val userHandle = message.userHandle
+    override val id = message.msgId
 }

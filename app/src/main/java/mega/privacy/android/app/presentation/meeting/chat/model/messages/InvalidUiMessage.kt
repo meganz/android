@@ -9,14 +9,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.core.ui.controls.chat.messages.ChatErrorBubble
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 
 /**
- * Invalid ui chat message
+ * Invalid ui message
+ *
+ * @property message
  */
 sealed class InvalidUiMessage : UiChatMessage {
+    internal abstract val message: TypedMessage
 
     /**
      * Get error message
@@ -37,6 +42,19 @@ sealed class InvalidUiMessage : UiChatMessage {
             Spacer(modifier = Modifier.size(24.dp))
         }
     }
+
+    override val displayAsMine: Boolean
+        get() = message.isMine
+    override val canForward: Boolean
+        get() = message.canForward
+    override val timeSent: Long
+        get() = message.time
+
+    override val userHandle: Long
+        get() = message.userHandle
+
+    override val id: Long
+        get() = message.msgId
 
     /**
      * Format invalid ui message
@@ -86,7 +104,7 @@ sealed class InvalidUiMessage : UiChatMessage {
      * @property showDate
      */
     data class UnrecognizableInvalidUiMessage(
-        override val message: InvalidMessage,
+        override val message: TypedMessage,
         override val showAvatar: Boolean,
         override val showTime: Boolean,
         override val showDate: Boolean,

@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.mapper
 
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.ContactAttachmentUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.InvalidUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
@@ -49,11 +47,9 @@ class UiChatMessageMapper @Inject constructor() {
      * Invoke
      *
      * @param message
-     * @param isOneToOne
      */
     operator fun invoke(
         message: TypedMessage,
-        isOneToOne: Boolean,
         showAvatar: Boolean,
         showTime: Boolean,
         showDate: Boolean,
@@ -68,7 +64,6 @@ class UiChatMessageMapper @Inject constructor() {
 
             is CallMessage -> CallUiMessage(
                 message = message,
-                isOneToOneChat = isOneToOne,
                 showDate = showDate
             )
 
@@ -147,20 +142,12 @@ class UiChatMessageMapper @Inject constructor() {
 
             is InvalidMessage -> mapInvalidMessage(message, showAvatar, showTime, showDate)
 
-            else -> object : UiChatMessage {
-                override val contentComposable: @Composable (RowScope.() -> Unit) = {
-
-                }
-                override val avatarComposable: @Composable (RowScope.() -> Unit)? = null
-
-                override val message: TypedMessage = message
-
-                override val showAvatar: Boolean = false
-
-                override val showTime: Boolean = true
-
-                override val showDate: Boolean = showDate
-            }
+            else -> InvalidUiMessage.UnrecognizableInvalidUiMessage(
+                message = message,
+                showAvatar = showAvatar,
+                showTime = showTime,
+                showDate = showDate,
+            )
         }
     }
 

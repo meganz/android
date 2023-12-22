@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.ContactAttachmentMessageView
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
@@ -22,7 +23,7 @@ import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
  * @property showTime
  */
 data class ContactAttachmentUiMessage(
-    override val message: ContactAttachmentMessage,
+    val message: ContactAttachmentMessage,
     override val showDate: Boolean,
     override val showAvatar: Boolean,
     override val showTime: Boolean,
@@ -52,4 +53,10 @@ data class ContactAttachmentUiMessage(
                 .padding(end = 8.dp)
                 .fillMaxWidth()
         }
+
+    override val displayAsMine = message.isMine
+    override val canForward = message.canForward
+    override val timeSent = message.time
+    override val userHandle = message.userHandle
+    override val id = message.msgId
 }

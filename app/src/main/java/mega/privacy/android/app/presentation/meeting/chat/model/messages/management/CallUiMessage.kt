@@ -1,9 +1,15 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.management
 
+import android.content.Context
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatCallMessageView
+import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 
 /**
@@ -15,15 +21,44 @@ import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 data class CallUiMessage(
     override val message: CallMessage,
     override val showDate: Boolean,
-    val isOneToOneChat: Boolean,
-) : UiChatMessage {
+) : ManagementUiChatMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
-        ChatCallMessageView(message = message, isOneToOneChat = isOneToOneChat)
+
     }
 
-    override val avatarComposable: @Composable (RowScope.() -> Unit)? = null
+    @Composable
+    override fun MessageListItem(uiState: ChatUiState, context: Context) {
+        ChatMessageContainer(
+            modifier = Modifier.fillMaxWidth(),
+            isMine = displayAsMine,
+            showForwardIcon = canForward,
+            time = getTimeOrNull(this),
+            date = getDateOrNull(this, context),
+            avatarOrIcon = avatarComposable,
+            content = {
+                ChatCallMessageView(
+                    message = message,
+                    isOneToOneChat = !uiState.isGroup && !uiState.isMeeting
+                )
+            },
+        )
+    }
 
-    override val showAvatar: Boolean = false
+    private fun getTimeOrNull(uiChatMessage: UiChatMessage) =
+        if (uiChatMessage.showTime) uiChatMessage.timeSent?.let {
+            TimeUtils.formatTime(
+                it,
+            )
+        } else null
 
-    override val showTime: Boolean = true
+    private fun getDateOrNull(
+        uiChatMessage: UiChatMessage,
+        context: Context,
+    ) = if (uiChatMessage.showDate) uiChatMessage.timeSent?.let {
+        TimeUtils.formatDate(
+            it,
+            TimeUtils.DATE_SHORT_FORMAT,
+            context,
+        )
+    } else null
 }

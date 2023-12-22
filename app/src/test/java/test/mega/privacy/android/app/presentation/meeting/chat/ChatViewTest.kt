@@ -17,14 +17,11 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_ENABLE_GEOLOCATION_DIALOG
-import mega.privacy.android.app.presentation.meeting.chat.view.message.TEST_TAG_FIRST_MESSAGE_HEADER
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_LOCATION
 import mega.privacy.android.core.ui.controls.chat.TEST_TAG_ATTACHMENT_ICON
-import mega.privacy.android.core.ui.controls.chat.messages.TEST_TAG_LOADING_MESSAGES
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import org.junit.Rule
 import org.junit.Test
@@ -231,29 +228,6 @@ class ChatViewTest {
         composeTestRule.onNodeWithTag(TEST_TAG_ENABLE_GEOLOCATION_DIALOG).assertIsDisplayed()
     }
 
-    @Test
-    fun `test that first message header is shown if there is no more chat history to load`() {
-        initComposeRuleContent(
-            ChatUiState(
-                chatHistoryLoadStatus = ChatHistoryLoadStatus.NONE
-            )
-        )
-        composeTestRule.onNodeWithTag(TEST_TAG_FIRST_MESSAGE_HEADER).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_LOADING_MESSAGES).assertDoesNotExist()
-
-    }
-
-    @Test
-    fun `test that loading messages header is shown if there is more chat history to load`() {
-        initComposeRuleContent(
-            ChatUiState(
-                chatHistoryLoadStatus = ChatHistoryLoadStatus.LOCAL
-            )
-        )
-        composeTestRule.onNodeWithTag(TEST_TAG_FIRST_MESSAGE_HEADER).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(TEST_TAG_LOADING_MESSAGES).assertIsDisplayed()
-
-    }
 
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
@@ -261,6 +235,7 @@ class ChatViewTest {
                 uiState = state,
                 onBackPressed = {},
                 onMenuActionPressed = actionPressed,
+                messageListView = {}
             )
         }
     }

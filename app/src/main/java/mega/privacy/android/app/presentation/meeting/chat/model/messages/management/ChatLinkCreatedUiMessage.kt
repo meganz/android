@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatLinkCreatedView
 import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkCreatedMessage
 
@@ -16,7 +15,7 @@ import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkCreat
 data class ChatLinkCreatedUiMessage(
     override val message: ChatLinkCreatedMessage,
     override val showDate: Boolean,
-) : UiChatMessage {
+) : ManagementUiChatMessage() {
 
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         ChatLinkCreatedView(
@@ -24,10 +23,4 @@ data class ChatLinkCreatedUiMessage(
             modifier = Modifier.padding(start = 32.dp)
         )
     }
-
-    override val avatarComposable: @Composable (RowScope.() -> Unit)? = null
-
-    override val showAvatar: Boolean = false
-
-    override val showTime: Boolean = true
 }

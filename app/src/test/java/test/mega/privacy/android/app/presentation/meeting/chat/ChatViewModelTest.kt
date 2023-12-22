@@ -9,9 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
@@ -22,11 +20,9 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
-import mega.privacy.android.app.presentation.meeting.chat.mapper.ScanMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -36,12 +32,10 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
-import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
@@ -98,7 +92,6 @@ import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -198,7 +191,6 @@ internal class ChatViewModelTest {
     private val startChatCallNoRingingUseCase = mock<StartChatCallNoRingingUseCase>()
     private val answerChatCallUseCase = mock<AnswerChatCallUseCase>()
     private val rtcAudioManagerGateway = mock<RTCAudioManagerGateway>()
-    private val scanMessageMapper = mock<ScanMessageMapper>()
     private val startMeetingInWaitingRoomChatUseCase = mock<StartMeetingInWaitingRoomChatUseCase>()
     private val isGeolocationEnabledUseCase = mock<IsGeolocationEnabledUseCase>()
     private val enableGeolocationUseCase = mock<EnableGeolocationUseCase>()
@@ -243,7 +235,6 @@ internal class ChatViewModelTest {
             startChatCallNoRingingUseCase,
             answerChatCallUseCase,
             rtcAudioManagerGateway,
-            scanMessageMapper,
             startMeetingInWaitingRoomChatUseCase,
             isGeolocationEnabledUseCase,
             enableGeolocationUseCase,
@@ -306,13 +297,10 @@ internal class ChatViewModelTest {
             startCallUseCase = startCallUseCase,
             startChatCallNoRingingUseCase = startChatCallNoRingingUseCase,
             chatManagement = chatManagement,
-            loadMessagesUseCase = loadMessagesUseCase,
-            monitorMessageLoadedUseCase = monitorMessageLoadedUseCase,
             getChatMuteOptionListUseCase = getChatMuteOptionListUseCase,
             muteChatNotificationForChatRoomsUseCase = muteChatNotificationForChatRoomsUseCase,
             answerChatCallUseCase = answerChatCallUseCase,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
-            scanMessageMapper = scanMessageMapper,
             startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
             isGeolocationEnabledUseCase = isGeolocationEnabledUseCase,
             enableGeolocationUseCase = enableGeolocationUseCase,
@@ -1925,91 +1913,6 @@ internal class ChatViewModelTest {
         initTestClass()
         underTest.onStartOrJoinMeeting(true)
         verify(answerChatCallUseCase).invoke(chatId = chatId, video = false, audio = true)
-    }
-
-    @ParameterizedTest(name = " when history status is {0}")
-    @EnumSource(ChatHistoryLoadStatus::class)
-    fun `test that request messages behaves correctly`(
-        historyStatus: ChatHistoryLoadStatus,
-    ) = runTest {
-        val chatRoom = mock<ChatRoom> {
-            on { ownPrivilege } doReturn ChatRoomPermission.Moderator
-        }
-        val updatedHistoryStatus =
-            when (historyStatus) {
-                ChatHistoryLoadStatus.ERROR -> ChatHistoryLoadStatus.LOCAL
-                ChatHistoryLoadStatus.NONE -> ChatHistoryLoadStatus.NONE
-                ChatHistoryLoadStatus.LOCAL -> ChatHistoryLoadStatus.REMOTE
-                ChatHistoryLoadStatus.REMOTE -> ChatHistoryLoadStatus.NONE
-            }
-        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
-        whenever(loadMessagesUseCase(chatId)).thenReturn(historyStatus, updatedHistoryStatus)
-        initTestClass()
-        testScheduler.advanceUntilIdle()
-        underTest.state.map { it.chatHistoryLoadStatus }.distinctUntilChanged().test {
-            verify(loadMessagesUseCase).invoke(chatId)
-            assertThat(awaitItem()).isEqualTo(historyStatus)
-            underTest.requestMessages()
-            testScheduler.advanceUntilIdle()
-            if (historyStatus == ChatHistoryLoadStatus.NONE || historyStatus == ChatHistoryLoadStatus.REMOTE) {
-                verifyNoMoreInteractions(loadMessagesUseCase)
-            } else {
-                assertThat(awaitItem()).isEqualTo(updatedHistoryStatus)
-            }
-        }
-    }
-
-    @Test
-    fun `test that monitor message loaded behaves correctly`() = runTest {
-        val flow = MutableSharedFlow<TypedMessage>()
-        val pendingMessagesToLoad = LoadMessagesUseCase.NUMBER_MESSAGES_TO_LOAD
-        val message1 = mock<TypedMessage>()
-        val message2 = mock<TypedMessage>()
-        val message3 = mock<TypedMessage>()
-        val message4 = mock<TypedMessage>()
-        val uiMessage1 = mock<UiChatMessage>()
-        val uiMessage2 = mock<UiChatMessage>()
-        val uiMessage3 = mock<UiChatMessage>()
-        val uiMessage4 = mock<UiChatMessage>()
-        whenever(monitorMessageLoadedUseCase(chatId)).thenReturn(flow)
-        whenever(scanMessageMapper(any(), eq(emptyList()), eq(message1)))
-            .thenReturn(listOf(uiMessage1))
-        whenever(scanMessageMapper(any(), eq(listOf(uiMessage1)), eq(message2)))
-            .thenReturn(listOf(uiMessage2, uiMessage1))
-        whenever(scanMessageMapper(any(), eq(listOf(uiMessage2, uiMessage1)), eq(message3)))
-            .thenReturn(listOf(uiMessage3, uiMessage2, uiMessage1))
-        whenever(scanMessageMapper(any(), eq(listOf(uiMessage3, uiMessage2, uiMessage1)), eq(message4)))
-            .thenReturn(listOf(uiMessage4, uiMessage3, uiMessage2, uiMessage1))
-        initTestClass()
-        testScheduler.advanceUntilIdle()
-        underTest.state.test {
-            val actual = awaitItem()
-            assertThat(actual.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad)
-            assertThat(actual.messages).isEqualTo(emptyList<UiChatMessage>())
-            flow.emit(message1)
-            val actual1 = awaitItem()
-            assertThat(actual1.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 1)
-            assertThat(actual1.messages).isEqualTo(listOf(uiMessage1))
-            flow.emit(message2)
-            val actual2 = awaitItem()
-            assertThat(actual2.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 2)
-            assertThat(actual2.messages).isEqualTo(listOf(uiMessage2, uiMessage1))
-            flow.emit(message3)
-            val actual3 = awaitItem()
-            assertThat(actual3.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 3)
-            assertThat(actual3.messages).isEqualTo(listOf(uiMessage3, uiMessage2, uiMessage1))
-            flow.emit(message4)
-            val actual4 = awaitItem()
-            assertThat(actual4.pendingMessagesToLoad).isEqualTo(pendingMessagesToLoad - 4)
-            assertThat(actual4.messages).isEqualTo(
-                listOf(
-                    uiMessage4,
-                    uiMessage3,
-                    uiMessage2,
-                    uiMessage1
-                )
-            )
-        }
     }
 
     @Test

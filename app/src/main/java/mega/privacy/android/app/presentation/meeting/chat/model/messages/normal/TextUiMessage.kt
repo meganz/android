@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.app.presentation.meeting.chat.view.message.normal.ChatMessageTextView
@@ -18,7 +19,7 @@ import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
  * @property message Text message
  */
 data class TextUiMessage(
-    override val message: TextMessage,
+    val message: TextMessage,
     override val showAvatar: Boolean,
     override val showTime: Boolean,
     override val showDate: Boolean,
@@ -34,4 +35,10 @@ data class TextUiMessage(
             Spacer(modifier = Modifier.size(24.dp))
         }
     }
+
+    override val displayAsMine = message.isMine
+    override val canForward = message.canForward
+    override val timeSent = message.time
+    override val userHandle = message.userHandle
+    override val id = message.msgId
 }

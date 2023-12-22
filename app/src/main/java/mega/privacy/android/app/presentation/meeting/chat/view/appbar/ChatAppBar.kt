@@ -28,17 +28,16 @@ import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
-import mega.privacy.android.app.presentation.meeting.chat.extension.isSelectable
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 internal const val TEST_TAG_USER_CHAT_STATE = "chat_app_bar:icon_user_chat_status"
 internal const val TEST_TAG_NOTIFICATION_MUTE = "chat_app_bar:icon_chat_notification_mute"
@@ -197,10 +196,6 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
             } else {
                 add(ChatRoomMenuAction.Mute)
             }
-        }
-
-        if (!isPreviewMode && uiState.messages.any { it.message.isSelectable }) {
-            add(ChatRoomMenuAction.Select)
         }
     }
 }
