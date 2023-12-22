@@ -66,6 +66,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             val currentSpeaker = inMeetingViewModel.getCurrentSpeakerParticipant()
             if (currentSpeaker == null || currentSpeaker.peerId != session.peerid || currentSpeaker.clientId != session.clientid) {
                 Timber.d("Received remote audio level with clientId ${session.clientid}")
+
                 selectSpeaker(
                     session.peerid,
                     session.clientid
@@ -91,6 +92,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
     private val speakerParticipantsObserver = Observer<MutableList<Participant>> {
         val newSpeaker = inMeetingViewModel.getCurrentSpeakerParticipant()
+
         if (newSpeaker == null) {
             inMeetingViewModel.getFirstParticipant(
                 MEGACHAT_INVALID_HANDLE,
@@ -180,7 +182,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
         inMeetingViewModel.getCurrentSpeakerParticipant()?.let { currentSpeaker ->
             updateSpeakerTextViewName(currentSpeaker.name, currentSpeaker.isPresenting)
-        } ?: {
+        } ?: run {
             inMeetingViewModel.getFirstParticipant(MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE)
                 ?.apply {
                     selectSpeaker(peerId, clientId)
@@ -246,6 +248,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                     }
 
                 Timber.d("New speaker selected with clientId ${participantClicked.clientId}")
+
                 selectSpeaker(participantClicked.peerId, participantClicked.clientId)
                 updateSpeakerTextViewName(
                     participantClicked.name,

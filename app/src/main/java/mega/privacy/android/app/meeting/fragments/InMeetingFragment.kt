@@ -541,10 +541,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             if (participant.isSpeaker && !participant.hasHiRes) inMeetingViewModel.getSpeaker(
                                 participant.peerId,
                                 participant.clientId
-                            )
-                                ?.let {
+                            )?.let {
                                     true
-                                } ?: false else false
+                                } ?: run { false } else false
 
                         val screenSharedParticipant = inMeetingViewModel.getScreenShared(
                             participant.peerId,
@@ -555,7 +554,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             screenSharedParticipant
                                 ?.let {
                                     true
-                                } ?: false else false
+                                } ?: run { false } else false
 
                         if (sessionCanReceiveHiRes && sessionHasVideoWithHiRes) {
                             //Can receive Hi res. Add listener.

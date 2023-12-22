@@ -682,15 +682,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Method to know if this chat is public
-     *
-     * @return True, if it's public. False, otherwise
-     */
-    fun isChatRoomPublic(): Boolean =
-        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let { return it.isPublic }
-            ?: false
-
-    /**
      * Method to know if it is the same chat
      *
      * @param chatId chat ID
@@ -706,7 +697,7 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if it is the same. False, otherwise
      */
     fun isSameCall(callId: Long): Boolean =
-        _callLiveData.value?.let { it.callId == callId } ?: false
+        _callLiveData.value?.let { it.callId == callId } ?: run { false }
 
     /**
      * Method to set a call
@@ -815,7 +806,7 @@ class InMeetingViewModel @Inject constructor(
      *  @return True, if it is a one-to-one chat call. False, otherwise
      */
     fun isOneToOneCall(): Boolean = inMeetingRepository.getChatRoom(_state.value.currentChatId)
-        ?.let { (!it.isGroup && !it.isMeeting) } ?: false
+        ?.let { (!it.isGroup && !it.isMeeting) } ?: run { false }
 
     /**
      * Set speaker selection automatic or manual
@@ -878,7 +869,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isCallEstablished(): Boolean =
         _callLiveData.value?.let { (it.status == CALL_STATUS_IN_PROGRESS) }
-            ?: false
+            ?: run { false }
 
     /**
      * Method to know if a call is on hold
@@ -1157,7 +1148,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isNecessaryToShowSwapCameraOption(): Boolean =
         _callLiveData.value?.let { it.status != CALL_STATUS_CONNECTING && it.hasLocalVideo() && !it.isOnHold }
-            ?: false
+            ?: run { false }
 
 
     /**
@@ -1247,7 +1238,7 @@ class InMeetingViewModel @Inject constructor(
         else
             inMeetingRepository.getChatRoom(_state.value.currentChatId)
                 ?.let { it.getPeerPrivilegeByHandle(peerId) == PRIV_MODERATOR }
-                ?: false
+                ?: run { false }
 
     /**
      * Method to know if the participant is my contact
@@ -1333,7 +1324,6 @@ class InMeetingViewModel @Inject constructor(
                 if (participantHasScreenSharedParticipant(it) && ((it.isSpeaker && hasScreenShare()) || (!it.isSpeaker && !hasScreenShare()) || (!it.isSpeaker && hasScreenShare() && !hasCamera()))) {
                     getScreenShared(it.peerId, it.clientId)?.let { screenShared ->
                         removeScreensSharedParticipantsList.add(screenShared)
-
                     }
                 }
             }
@@ -1444,7 +1434,7 @@ class InMeetingViewModel @Inject constructor(
 
                 val isSpeaker = getCurrentSpeakerParticipant()?.let { participant ->
                     participant.clientId == session.clientid && participant.peerId == session.peerid && participant.isSpeaker
-                } ?: false
+                } ?: run { false }
 
                 return Participant(
                     peerId = session.peerid,
@@ -1713,7 +1703,7 @@ class InMeetingViewModel @Inject constructor(
      */
     private fun needHiRes(): Boolean =
         participants.value?.let { state.value.callUIStatus != CallUIStatusType.SpeakerView }
-            ?: false
+            ?: run { false }
 
     /**
      * Method to know if the session has video on and is not on hold
@@ -1723,7 +1713,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun sessionHasVideo(clientId: Long): Boolean =
         getSession(clientId)?.let { it.hasVideo() && !isCallOrSessionOnHold(it.clientid) && it.status == MegaChatSession.SESSION_STATUS_IN_PROGRESS }
-            ?: false
+            ?: run { false }
 
     /**
      * Method for get the participant name
@@ -1865,6 +1855,10 @@ class InMeetingViewModel @Inject constructor(
             }
         }?.toMutableList()
 
+        if (hasChanged) {
+            checkScreensShared()
+        }
+
         return hasChanged
     }
 
@@ -1877,6 +1871,7 @@ class InMeetingViewModel @Inject constructor(
     fun changesInScreenSharing(session: MegaChatSession): Boolean {
         var hasChanged = false
         var participantSharingScreen: Participant? = null
+        var participantSharingScreenForSpeaker: Participant? = null
 
         participants.value = participants.value?.map { participant ->
             return@map when {
@@ -1899,24 +1894,52 @@ class InMeetingViewModel @Inject constructor(
                 _pinItemEvent.value = Event(it)
                 sortParticipantsListForSpeakerView()
             }
-        } ?: {
-
-            speakerParticipants.value = speakerParticipants.value?.map { participant ->
+        } ?: run {
+            speakerParticipants.value = speakerParticipants.value?.map { speakerParticipant ->
                 return@map when {
-                    participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isPresenting != session.hasScreenShare() -> {
-                        hasChanged = true
-                        participant.copy(isPresenting = session.hasScreenShare())
+                    speakerParticipant.peerId == session.peerid && speakerParticipant.clientId == session.clientid && speakerParticipant.isPresenting != session.hasScreenShare() -> {
+                        if (!session.hasScreenShare()) {
+                            getAnotherParticipantWhoIsPresenting(speakerParticipant)?.let { newSpeaker ->
+                                participantSharingScreenForSpeaker = newSpeaker
+                            }
+                        }
 
+                        hasChanged = true
+                        speakerParticipant.copy(isPresenting = session.hasScreenShare())
                     }
 
-                    else -> participant
+                    else -> speakerParticipant
                 }
             }?.toMutableList()
-
         }
 
-        checkScreensShared()
+        participantSharingScreenForSpeaker?.let {
+            if (_state.value.callUIStatus == CallUIStatusType.SpeakerView) {
+                _pinItemEvent.value = Event(it)
+                sortParticipantsListForSpeakerView()
+            }
+        }
+
+        if (hasChanged) {
+            checkScreensShared()
+        }
+
         return hasChanged
+    }
+
+    /**
+     * Get another participant who is presenting
+     *
+     * @param currentSpeaker    [Participant]
+     * @return  [Participant]
+     */
+    private fun getAnotherParticipantWhoIsPresenting(currentSpeaker: Participant): Participant? {
+        participants.value?.filter { it.isPresenting && (it.peerId != currentSpeaker.peerId || it.clientId != currentSpeaker.clientId) }
+            ?.apply {
+                return if (isNotEmpty()) first() else null
+            }
+
+        return null
     }
 
     /**
@@ -2431,7 +2454,8 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isStandardUser(peerId: Long): Boolean =
         inMeetingRepository.getChatRoom(_state.value.currentChatId)
-            ?.let { it.getPeerPrivilegeByHandle(peerId) == MegaChatRoom.PRIV_STANDARD } ?: false
+            ?.let { it.getPeerPrivilegeByHandle(peerId) == MegaChatRoom.PRIV_STANDARD }
+            ?: run { false }
 
     /**
      * Determine if I am a moderator
@@ -2556,18 +2580,8 @@ class InMeetingViewModel @Inject constructor(
      * @return The speaker
      */
     fun getCurrentSpeakerParticipant(): Participant? {
-        if (speakerParticipants.value.isNullOrEmpty()) {
-            return null
-        }
-
-        speakerParticipants.value?.let { listSpeakerParticipants ->
-            val listFound = listSpeakerParticipants.filter { participant ->
-                participant.isSpeaker
-            }
-
-            if (listFound.isNotEmpty()) {
-                return listFound[0]
-            }
+        speakerParticipants.value?.filter { it.isSpeaker }?.apply {
+            return if(isNotEmpty()) first() else null
         }
 
         return null
@@ -2648,7 +2662,6 @@ class InMeetingViewModel @Inject constructor(
     private fun createSpeaker(participant: Participant) {
         createSpeakerParticipant(participant).let { speakerParticipantCreated ->
             speakerParticipants.value?.add(speakerParticipantCreated)
-            Timber.d("Num of speaker participants: ${speakerParticipants.value?.size}")
             speakerParticipants.value = speakerParticipants.value
         }
     }
