@@ -1153,8 +1153,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     )
                 }
 
-                if (isParticipantSharingScreen && !inMeetingViewModel.isOneToOneCall()) {
-                    changeToSpeakerView()
+                if (!inMeetingViewModel.isOneToOneCall()) {
+                    when (isParticipantSharingScreen) {
+                        true -> changeToSpeakerView()
+                        false -> changeToGridView()
+                    }
                 }
             }
 
@@ -1206,6 +1209,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun changeToSpeakerView() {
         isManualModeView = true
         initSpeakerViewMode()
+    }
+
+    /**
+     * Force change to grid view
+     */
+    private fun changeToGridView() {
+        isManualModeView = true
+        initGridViewMode()
     }
 
     /**
@@ -2030,12 +2041,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                 inMeetingViewModel.state.value.callUIStatus == CallUIStatusType.SpeakerView -> {
                     Timber.d("Manual mode - Speaker view")
-                    initSpeakerViewMode()
+                    changeToSpeakerView()
                 }
 
                 else -> {
                     Timber.d("Manual mode - Grid view")
-                    initGridViewMode()
+                    changeToGridView()
                 }
             }
         }
@@ -2160,8 +2171,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             R.id.grid_view -> {
                 Timber.d("Change to grid view.")
-                isManualModeView = true
-                initGridViewMode()
+                changeToGridView()
                 true
             }
 

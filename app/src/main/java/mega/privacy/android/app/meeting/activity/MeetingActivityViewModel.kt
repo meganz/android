@@ -404,17 +404,21 @@ class MeetingActivityViewModel @Inject constructor(
      *
      * @param call  [ChatCall]
      */
-    private fun checkIfPresenting(call: ChatCall) =
+    private fun checkIfPresenting(call: ChatCall) {
+        var isParticipantSharingScreen = false
         call.sessionByClientId.forEach { (_, value) ->
             if (value.hasScreenShare) {
-                _state.update { state ->
-                    state.copy(
-                        isParticipantSharingScreen = true
-                    )
-                }
-                return@forEach
+                isParticipantSharingScreen = true
             }
         }
+
+        _state.update { state ->
+            state.copy(
+                isParticipantSharingScreen = isParticipantSharingScreen
+            )
+        }
+    }
+
 
     /**
      * Check ephemeral account and waiting room
@@ -517,7 +521,15 @@ class MeetingActivityViewModel @Inject constructor(
                     result.session?.let { session ->
                         session.changes?.apply {
                             if (contains(ChatSessionChanges.RemoteAvFlags)) {
-                                _state.update { it.copy(isParticipantSharingScreen = session.hasScreenShare) }
+                                if (session.hasScreenShare) {
+                                    _state.update { it.copy(isParticipantSharingScreen = true) }
+                                } else {
+                                    getChatCallUseCase(_state.value.chatId)?.let {
+                                        it?.let {
+                                            checkIfPresenting(it)
+                                        }
+                                    }
+                                }
                             }
                             if (contains(ChatSessionChanges.SessionOnRecording)) {
                                 _state.update { state ->
