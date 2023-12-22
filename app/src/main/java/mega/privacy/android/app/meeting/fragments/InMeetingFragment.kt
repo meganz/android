@@ -487,7 +487,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         if (participantHasLowRes) {
                             when {
                                 canRecvVideoLowRes && sessionIsLowResVideo -> {
-                                    Timber.d("Add participant listener")
+                                    Timber.d("Add participant listener for ${participant.clientId}")
                                     //Can receive Low res. Add listener
                                     checkVideoListener(
                                         participant,
@@ -497,7 +497,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 }
 
                                 else -> {
-                                    Timber.d("Remove participant listener")
+                                    Timber.d("Remove participant listener for ${participant.clientId}")
                                     //Cannot receive Low res. Remove listener
                                     checkVideoListener(
                                         participant,
@@ -510,12 +510,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                             participant
                                         )
                                     ) {
-                                        Timber.d("Ask for low-resolution video")
+                                        Timber.d("Ask for low-resolution video for ${participant.clientId}")
                                         inMeetingViewModel.requestLowResVideo(
                                             inMeetingViewModel.getSession(session.clientid),
                                             inMeetingViewModel.getChatId()
                                         )
 
+                                    } else {
+                                        Timber.d("it is not necessary to ask for a low-resolution for ${participant.clientId}")
                                     }
                                 }
                             }
@@ -542,8 +544,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 participant.peerId,
                                 participant.clientId
                             )?.let {
-                                    true
-                                } ?: run { false } else false
+                                true
+                            } ?: run { false } else false
 
                         val screenSharedParticipant = inMeetingViewModel.getScreenShared(
                             participant.peerId,
@@ -561,7 +563,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             when {
                                 existSpeaker -> {
                                     //Speaker listener
-                                    Timber.d("Add speaker listener")
+                                    Timber.d("Add speaker listener for ${participant.clientId}")
                                     checkSpeakerVideoListener(
                                         session.peerid,
                                         session.clientid,
@@ -571,7 +573,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                                 existScreenShared -> {
                                     //Screen shared listener
-                                    Timber.d("Add screen shared listener")
+                                    Timber.d("Add screen shared listener for ${participant.clientId}")
                                     screenSharedParticipant?.let {
                                         checkVideoListener(
                                             it,
@@ -583,7 +585,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                                 else -> {
                                     //Participant listener
-                                    Timber.d("Add participant listener")
+                                    Timber.d("Add participant listener for ${participant.clientId}")
                                     checkVideoListener(
                                         participant,
                                         shouldAddListener = true,
@@ -593,25 +595,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             }
 
                         } else if (!participantHasHiRes) {
-                            if ((existScreenShared || existSpeaker) && inMeetingViewModel.isParticipantVisible(
-                                    participant
-                                )
-                            ) {
-                                Timber.d("Ask for hig-resolution video")
+                            val isParticipantVisible =
+                                inMeetingViewModel.isParticipantVisible(participant)
+                            if ((existScreenShared && isParticipantVisible) || existSpeaker) {
+                                Timber.d("Ask for high-resolution video for ${participant.clientId}")
                                 inMeetingViewModel.requestHiResVideo(
                                     inMeetingViewModel.getSession(session.clientid),
                                     inMeetingViewModel.getChatId()
                                 )
 
                             } else {
-
+                                Timber.d("it is not necessary to ask for a high-resolution for ${participant.clientId}")
                             }
                         } else {
                             //Cannot receive Hi res. Remove listener.
                             when {
                                 existSpeaker -> {
                                     //Speaker listener
-                                    Timber.d("Remove speaker listener")
+                                    Timber.d("Remove speaker listener for ${participant.clientId}")
                                     checkSpeakerVideoListener(
                                         session.peerid,
                                         session.clientid,
@@ -621,7 +622,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                                 existScreenShared -> {
                                     //Screen shared listener
-                                    Timber.d("Remove screen shared listener")
+                                    Timber.d("Remove screen shared listener for ${participant.clientId}")
                                     screenSharedParticipant?.let {
                                         checkVideoListener(
                                             it,
@@ -633,7 +634,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                                 else -> {
                                     //Participant listener
-                                    Timber.d("Remove participant listener")
+                                    Timber.d("Remove participant listener for ${participant.clientId}")
                                     checkVideoListener(
                                         participant,
                                         shouldAddListener = false,

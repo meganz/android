@@ -65,9 +65,9 @@ class VideoMeetingViewHolder(
             return
         }
 
+
         peerId = participant.peerId
         clientId = participant.clientId
-
         if (isGrid) {
             avatarSize = BIG_AVATAR
 
@@ -236,11 +236,9 @@ class VideoMeetingViewHolder(
                         inMeetingViewModel.requestLowResVideo(it, inMeetingViewModel.getChatId())
                     }
 
-                    !participant.hasHiRes -> {
-                        updateListener(participant, true, false)
+                    else -> {
+                        updateListener(participant, true, participant.hasHiRes)
                     }
-
-                    else -> {}
                 }
             }
         } else {
