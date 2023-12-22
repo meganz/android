@@ -43,7 +43,9 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
+import timber.log.Timber
 import java.io.File
+import java.net.URI
 import java.net.URLConnection
 import javax.inject.Inject
 
@@ -370,4 +372,18 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun getDirSize(dir: File?): Long =
         withContext(ioDispatcher) { fileGateway.getDirSize(dir) }
+
+    override suspend fun checkFileExistsByUriPath(uriPath: String?): String? =
+        withContext(ioDispatcher) {
+            try {
+                if (File(URI.create(uriPath).path).exists()) {
+                    uriPath
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                Timber.e(e)
+                null
+            }
+        }
 }

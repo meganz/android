@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
@@ -36,6 +35,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
+import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -44,9 +44,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
-import java.io.File
 import java.lang.ref.WeakReference
-import java.net.URI
 import javax.inject.Inject
 
 @HiltViewModel
@@ -68,6 +66,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val disableExportNodesUseCase: DisableExportNodesUseCase,
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper,
+    private val checkUri: CheckFileUriUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
@@ -476,18 +475,6 @@ class ImagePreviewViewModel @Inject constructor(
     suspend fun getLowestResolutionImagePath(imageResult: ImageResult?): String? {
         return imageResult?.run {
             checkUri(thumbnailUri) ?: checkUri(previewUri) ?: checkUri(fullSizeUri)
-        }
-    }
-
-    private suspend fun checkUri(uriPath: String?): String? = withContext(ioDispatcher) {
-        try {
-            if (File(URI.create(uriPath).path).exists()) {
-                uriPath
-            } else {
-                null
-            }
-        } catch (_: Exception) {
-            null
         }
     }
 

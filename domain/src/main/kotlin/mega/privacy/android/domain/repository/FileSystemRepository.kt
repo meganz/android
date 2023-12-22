@@ -277,4 +277,9 @@ interface FileSystemRepository {
      * Get dir size
      */
     suspend fun getDirSize(dir: File?): Long
+
+    /**
+     * Check if file is exists
+     */
+    suspend fun checkFileExistsByUriPath(uriPath: String?): String?
 }

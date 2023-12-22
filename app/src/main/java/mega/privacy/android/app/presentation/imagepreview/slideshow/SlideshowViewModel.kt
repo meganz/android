@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -30,11 +29,10 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
+import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import timber.log.Timber
-import java.io.File
-import java.net.URI
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,6 +44,7 @@ class SlideshowViewModel @Inject constructor(
     private val monitorSlideshowOrderSettingUseCase: MonitorSlideshowOrderSettingUseCase,
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase,
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase,
+    private val checkUri: CheckFileUriUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
@@ -143,18 +142,6 @@ class SlideshowViewModel @Inject constructor(
     suspend fun getHighestResolutionImagePath(imageResult: ImageResult?): String? {
         return imageResult?.run {
             checkUri(fullSizeUri) ?: checkUri(previewUri) ?: checkUri(thumbnailUri)
-        }
-    }
-
-    private suspend fun checkUri(uriPath: String?): String? = withContext(ioDispatcher) {
-        try {
-            if (File(URI.create(uriPath).path).exists()) {
-                uriPath
-            } else {
-                null
-            }
-        } catch (_: Exception) {
-            null
         }
     }
 
