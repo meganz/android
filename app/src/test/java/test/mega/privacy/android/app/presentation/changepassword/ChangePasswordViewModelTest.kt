@@ -175,6 +175,7 @@ internal class ChangePasswordViewModelTest {
     fun `test that network connection status should return correct value when isConnectedToNetwork called`() =
         runTest {
             val isConnected = Random.nextBoolean()
+            whenever(monitorConnectivityUseCase()).thenReturn(flowOf(isConnected))
             initTestClass()
             underTest.uiState.test {
                 assertThat(awaitItem().isConnectedToNetwork).isEqualTo(isConnected)
