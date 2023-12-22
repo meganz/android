@@ -1309,9 +1309,10 @@ interface MegaApiGateway {
      * Create a new MegaSet item
      *
      * @param name the name of the set
+     * @param type the type of the set
      * @param listener [MegaRequestListenerInterface]
      */
-    fun createSet(name: String, listener: MegaRequestListenerInterface)
+    fun createSet(name: String, type: Int, listener: MegaRequestListenerInterface)
 
     /**
      * Create a new element for the set

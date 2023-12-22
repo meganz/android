@@ -801,8 +801,8 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getOutShares(megaNode: MegaNode): List<MegaShare> =
         megaApi.getOutShares(megaNode)
 
-    override fun createSet(name: String, listener: MegaRequestListenerInterface) =
-        megaApi.createSet(name, listener)
+    override fun createSet(name: String, type: Int, listener: MegaRequestListenerInterface) =
+        megaApi.createSet(name, type, listener)
 
     override fun createSetElement(sid: Long, node: Long, listener: MegaRequestListenerInterface) =
         megaApi.createSetElement(sid, node, "", listener)

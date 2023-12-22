@@ -128,6 +128,7 @@ internal class DefaultAlbumRepository @Inject constructor(
         suspendCoroutine { continuation ->
             megaApiGateway.createSet(
                 name,
+                MegaSet.SET_TYPE_ALBUM,
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request, error ->
                         if (error.errorCode == MegaError.API_OK) {

@@ -84,8 +84,8 @@ class DefaultAlbumRepositoryTest {
             on { errorCode }.thenReturn(MegaError.API_OK)
         }
 
-        whenever(megaApiGateway.createSet(any(), any())).thenAnswer {
-            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+        whenever(megaApiGateway.createSet(any(), any(), any())).thenAnswer {
+            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
                 api,
                 request,
                 error
