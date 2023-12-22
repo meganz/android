@@ -27,7 +27,7 @@ data class ContactAttachmentUiMessage(
     override val showDate: Boolean,
     override val showAvatar: Boolean,
     override val showTime: Boolean,
-) : UiChatMessage {
+) : AvatarMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         ContactAttachmentMessageView(
             message = message,

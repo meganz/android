@@ -22,6 +22,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
+import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
 import timber.log.Timber
 
@@ -68,21 +69,12 @@ internal fun MessageListView(
             }
         }
         when {
-
             pagingItems.loadState.refresh is LoadState.Error -> {
 //                Error view
             }
 
-            pagingItems.loadState.prepend is LoadState.Loading -> {
-//                item {
-//                    LoadingMessagesHeader()
-//                }
-            }
-
             pagingItems.loadState.prepend is LoadState.Error -> {
-//                item {
-//                    // Loading new messages failed
-//                }
+                // Loading previous messages failed
             }
 
             pagingItems.loadState.prepend is LoadState.NotLoading
@@ -94,10 +86,12 @@ internal fun MessageListView(
 
         items(
             count = pagingItems.itemCount,
-            key = pagingItems.itemKey { "${it.id}_${it.showAvatar}_${it.showTime}_${it.showDate}" },
+            key = pagingItems.itemKey { it.key() },
             contentType = pagingItems.itemContentType()
         ) { index ->
-            pagingItems[index]?.MessageListItem(uiState = uiState, context = context)
+            pagingItems[index]?.MessageListItem(uiState = uiState,
+                timeFormatter = TimeUtils::formatTime,
+                dateFormatter = { TimeUtils.formatDate(it, TimeUtils.DATE_SHORT_FORMAT, context) })
         }
     }
 }

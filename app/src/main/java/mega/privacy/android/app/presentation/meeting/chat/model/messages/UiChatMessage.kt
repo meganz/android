@@ -1,13 +1,9 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
-import android.content.Context
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
-import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
 
 /**
  * UI chat message
@@ -21,50 +17,38 @@ interface UiChatMessage {
     val id: Long
 
     /**
-     * Content composable
-     */
-    val contentComposable: @Composable RowScope.() -> Unit
-
-    /**
-     * Avatar composable
-     */
-    val avatarComposable: (@Composable RowScope.() -> Unit)?
-
-    /**
-     * Render message ui
+     * Message list item
      *
      * @param uiState
-     * @param context
+     * @param timeFormatter
+     * @param dateFormatter
      */
     @Composable
-    fun MessageListItem(uiState: ChatUiState, context: Context) {
-        ChatMessageContainer(
-            modifier = Modifier.fillMaxWidth(),
-            isMine = displayAsMine,
-            showForwardIcon = canForward,
-            time = getTimeOrNull(this),
-            date = getDateOrNull(this, context),
-            avatarOrIcon = avatarComposable,
-            content = contentComposable,
-        )
-    }
+    fun MessageListItem(
+        uiState: ChatUiState,
+        timeFormatter: (Long) -> String,
+        dateFormatter: (Long) -> String,
+    )
 
-    private fun getTimeOrNull(uiChatMessage: UiChatMessage) =
-        if (uiChatMessage.showTime) uiChatMessage.timeSent?.let {
-            TimeUtils.formatTime(
-                it,
-            )
+    /**
+     * Get time or null
+     *
+     * @param timeFormatter
+     */
+    fun getTimeOrNull(timeFormatter: (Long) -> String) =
+        if (showTime) timeSent?.let {
+            timeFormatter(it)
         } else null
 
-    private fun getDateOrNull(
-        uiChatMessage: UiChatMessage,
-        context: Context,
-    ) = if (uiChatMessage.showDate) uiChatMessage.timeSent?.let {
-        TimeUtils.formatDate(
-            it,
-            TimeUtils.DATE_SHORT_FORMAT,
-            context,
-        )
+    /**
+     * Get date or null
+     *
+     * @param dateFormatter
+     */
+    fun getDateOrNull(
+        dateFormatter: (Long) -> String,
+    ) = if (showDate) timeSent?.let {
+        dateFormatter(it)
     } else null
 
     /**
@@ -94,11 +78,6 @@ interface UiChatMessage {
     val userHandle: Long?
 
     /**
-     * Show avatar
-     */
-    val showAvatar: Boolean
-
-    /**
      * Show time
      */
     val showTime: Boolean
@@ -107,4 +86,9 @@ interface UiChatMessage {
      * Show date
      */
     val showDate: Boolean
+
+    /**
+     * Key
+     */
+    fun key(): String = "${id}_${showTime}_${showDate}"
 }

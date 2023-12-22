@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.GiphyMessageView
 import mega.privacy.android.app.utils.GiphyUtil
@@ -19,7 +19,7 @@ class ChatGiphyUiMessage(
     override val showDate: Boolean,
     override val showAvatar: Boolean,
     override val showTime: Boolean,
-) : UiChatMessage {
+) : AvatarMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         message.giphy?.let { giphy ->
             GiphyMessageView(

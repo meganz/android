@@ -1,32 +1,27 @@
-package mega.privacy.android.app.presentation.meeting.chat.model.messages.management
+package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatCallMessageView
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
-import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
+import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 
 /**
- * Management ui chat message
+ * Call ui chat message
+ *
+ * @property message
  */
-abstract class ManagementUiChatMessage : UiChatMessage {
-    /**
-     * Message
-     */
-    abstract val message: ManagementMessage
+data class CallUiMessage(
+    private val message: CallMessage,
+    override val showDate: Boolean,
+) : UiChatMessage {
 
     override val showTime: Boolean = true
 
     override val displayAsMine = false
-
-    /**
-     * Content composable
-     */
-    abstract val contentComposable: @Composable() (RowScope.() -> Unit)
 
     @Composable
     override fun MessageListItem(
@@ -40,7 +35,12 @@ abstract class ManagementUiChatMessage : UiChatMessage {
             showForwardIcon = canForward,
             time = getTimeOrNull(timeFormatter),
             date = getDateOrNull(dateFormatter),
-            content = contentComposable,
+            content = {
+                ChatCallMessageView(
+                    message = message,
+                    isOneToOneChat = !uiState.isGroup && !uiState.isMeeting
+                )
+            },
         )
     }
 
@@ -50,7 +50,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
     override val timeSent: Long
         get() = message.time
 
-    override val userHandle: Long?
+    override val userHandle: Long
         get() = message.userHandle
 
     override val id: Long

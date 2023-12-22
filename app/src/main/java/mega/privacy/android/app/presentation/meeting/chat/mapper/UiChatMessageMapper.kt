@@ -1,10 +1,10 @@
 package mega.privacy.android.app.presentation.meeting.chat.mapper
 
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.CallUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.ContactAttachmentUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.InvalidUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.AlterParticipantsUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.CallUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ChatLinkCreatedUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ChatLinkRemovedUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.PermissionChangeUiMessage
