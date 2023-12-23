@@ -2918,9 +2918,9 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Thiết đặt cookie</string>
     <!-- Title for Cookie dialog, visible for new users. -->
-    <string name="dialog_cookie_alert_title">Manage cookies</string>
+    <string name="dialog_cookie_alert_title">Quản&#160;lý cookies</string>
     <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We use cookies and similar technologies to help us improve our services. Learn more in our [A]Cookie Policy[/A].</string>
+    <string name="dialog_cookie_alert_message">Chúng&#160;tôi sử&#160;dụng cookies và các công&#160;nghệ tương&#160;tự để giúp chúng&#160;tôi cải&#160;thiện dịch&#160;vụ của mình. Tìm&#160;hiểu thêm về [A]Chính Sách Cookie[/A] của chúng&#160;tôi.</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cài Đặt Cookie chưa được lưu lại.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -4988,9 +4988,11 @@
     <!-- Preference screen item title for Ads Cookie -->
     <string name="settings_cookies_settings_ads_title">Cookies Quảng Cáo</string>
     <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">Used by our approved advertising partners to collect data about your browsing activities and customise the ads you see on our services and on other websites. Not accepting these cookies means you will still see ads but they won’t be personalised.</string>
+    <string name="settings_cookies_settings_ads_summary">Được sử&#160;dụng bởi các đối&#160;tác quảng&#160;cáo đã được phê&#160;duyệt của chúng&#160;tôi để thu&#160;thập dữ&#160;liệu về các hoạt&#160;động duyệt web của bạn và tùy&#160;chỉnh quảng&#160;cáo bạn thấy trên các dịch&#160;vụ của chúng&#160;tôi và trên các trang web khác. Không chấp&#160;nhận các cookies này có nghĩa là bạn vẫn sẽ thấy quảng&#160;cáo nhưng nội&#160;dung sẽ không liên&#160;quan.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
-    <string name="dialog_ads_cookie_alert_message">We use cookies and similar technologies to help us improve our services and for advertising purposes. By continuing to use MEGA you agree with the terms of our updated [A]Cookie Policy[/A].</string>
+    <string name="dialog_ads_cookie_alert_message">Chúng&#160;tôi sử dụng cookies và các công&#160;nghệ tương&#160;tự để giúp chúng&#160;tôi cải&#160;thiện dịch&#160;vụ của mình và cho mục&#160;đích quảng&#160;cáo. Với việc tiếp&#160;tục sử&#160;dụng MEGA là bạn đồng&#160;ý với các điều&#160;khoản được cập&#160;nhật nêu trong [A]Chính&#160;Sách Cookie[/A]</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Đồng bộ</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad free</string>
 </resources>

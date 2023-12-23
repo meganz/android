@@ -4993,4 +4993,6 @@
     <string name="dialog_ads_cookie_alert_message">我們使用cookie和類似技術來幫助我們改善服務和廣告目的。繼續使用MEGA即表示您同意我們更新過的[A]Cookie政策[/A]條款。</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">同步</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad free</string>
 </resources>

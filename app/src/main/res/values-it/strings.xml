@@ -2778,7 +2778,7 @@
     <!-- Text shown for the action create new file -->
     <string name="create_new_file_action">Crea un nuovo file</string>
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
-    <string name="permissions_error_label">Errori di permesso</string>
+    <string name="permissions_error_label">Errore di autorizzazione</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">Non hai i permessi per correggere questo file. Vuoi creare un nuovo file?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
@@ -4080,9 +4080,9 @@
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_content_media_permissions_denied">Hai negato l\’accesso all\’archivio del tuo dispositivo e ai media a MEGA. Se desideri continuare a condividere, dai a MEGA questo permesso.</string>
     <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
-    <string name="dialog_positive_button_allow_permission">Dai permesso</string>
+    <string name="dialog_positive_button_allow_permission">Dai l\’autorizzazione</string>
     <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
-    <string name="dialog_negative_button_do_not_allow">Nega il permesso</string>
+    <string name="dialog_negative_button_do_not_allow">Nega l\’autorizzazione</string>
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">Ricorrenze</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
@@ -5461,4 +5461,6 @@
     <string name="dialog_ads_cookie_alert_message">Utilizziamo cookie e tecnologie simili per aiutarci a migliorare i nostri servizi e per motivi pubblicitari. Continuando ad utilizzare MEGA accetti i termini della nostra [A]Politica dei Cookie[/A] aggiornata.</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sincronizza</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Senza pubblicità</string>
 </resources>
