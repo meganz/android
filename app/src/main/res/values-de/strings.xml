@@ -1328,7 +1328,7 @@
     <!-- header of a status field for what content a user has shared to you -->
     <string name="file_properties_info_content">Enthält</string>
     <!--  -->
-    <string name="file_properties_shared_folder_public_link_name">Verlinken</string>
+    <string name="file_properties_shared_folder_public_link_name">Link</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="file_properties_shared_folder_full_access">Vollzugriff</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1376,9 +1376,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">In den Papierkorb verschieben?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Möchten Sie diesen Ordner in den Papierkorb verschieben? Ein neuer Ordner für Kamera-Uploads wird automatisch erstellt.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Möchten Sie diesen Ordner in den Papierkorb verschieben? Ein neuer Ordner für Medien-Uploads wird automatisch erstellt.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">In den Papierkorb verschieben?</string>
     <!-- confirmation message before removing a file -->
@@ -5156,7 +5156,7 @@
         <item quantity="other">Kamera-Uploads abgeschlossen, %1$d Dateien hochgeladen</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA hat nur eingeschränkten Zugriff auf die Fotobibliothek und kann nicht alle Ihre Fotos sichern.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Antippen, um die Berechtigungen zu ändern.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5227,4 +5227,6 @@
     <string name="dialog_ads_cookie_alert_message">Wir verwenden Cookies und verwandte Technologien zur Verbesserung unserer Dienste und zu Werbezwecken. Durch die weitere Nutzung von MEGA erklären Sie sich mit den Bedingungen unserer aktualisierten [A]Cookie-Richtlinien[/A] einverstanden.</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Synchronisierung</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Werbefrei</string>
 </resources>

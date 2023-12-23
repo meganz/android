@@ -4993,4 +4993,6 @@
     <string name="dialog_ads_cookie_alert_message">当社では、サービスの向上および広告目的としてクッキー（Cookie）および同様のテクノロジーを使用しています。MEGAのご使用を続けることで、当社の更新された[A]クッキーポリシー[/A]の条件に同意されたことになります。</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">同期</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;広告なし</string>
 </resources>

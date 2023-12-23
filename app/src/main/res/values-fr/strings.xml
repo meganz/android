@@ -5461,4 +5461,6 @@
     <string name="dialog_ads_cookie_alert_message">Nous utilisons des témoins et des technologies semblables pour nous aider à améliorer nos services, ainsi qu’à des fins publicitaires. En continuant à utiliser MEGA, vous acceptez les conditions de notre [A]Politique d’utilisation des Témoins[/A] mise à jour.</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Synchronisations</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Sans publicité</string>
 </resources>

@@ -1375,7 +1375,7 @@
     <!--  -->
     <string name="attachment_uploading_state_error">Eroare. Nu a fost trimis.</string>
     <!--  -->
-    <string name="contact_is_me">Nicio opțiune disponibilă, te-ai selectat pe tine</string>
+    <string name="contact_is_me">Nu există opțiuni disponibile, v-ați selectat singur</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">Elimini atașamentul?</string>
     <!-- Menu option -->
@@ -2132,7 +2132,7 @@
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
     <string name="settings_rb_scheduler_enable_title">Planificator de golire a Coșului de gunoi</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">Coșul de gunoi este golit automat pentru tine.</string>
+    <string name="settings_rb_scheduler_enable_subtitle">Coșul de gunoi este golit automat pentru dvs.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">Perioada minimă este de 7 zile.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2552,7 +2552,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Fotografiile tale în cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Încărcări cameră este o caracteristică esențială pentru orice dispozitiv mobil și te-am ocupat de tine. Creează-ți contul acum.</string>
+    <string name="content_tour_four">Încărcările camerelor sunt o caracteristică esențială pentru orice dispozitiv mobil și vă asigurăm. Creează-ți contul acum.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Introduceți parola dvs.</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -3760,7 +3760,7 @@
     <!-- Error message when submit issue failed-->
     <string name="settings_help_report_issue_error">Ceva a mers prost. Te rugăm să încerci din nou mai târziu. Dacă tot nu poți trimite problema, contactează %s pentru asistență.</string>
     <!-- Success message when submit issue succeeded-->
-    <string name="settings_help_report_issue_success">Am primit raportul tău. Vom analiza problema și vom reveni la tine.</string>
+    <string name="settings_help_report_issue_success">Am primit raportul dvs.. Vom analiza problema și vom reveni la dvs.</string>
     <!-- Message shown during log file upload-->
     <string name="settings_help_report_issue_uploading_log_file">Se încarcă fișierul log</string>
     <!-- Message shown if user tries to leave report screen without submitting their report-->
@@ -4024,7 +4024,7 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[folder nedecriptat]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">Pentru a accesa folderul partajat, persoana care l-a partajat cu tine ar trebui să te verifice și pe tine.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Pentru a accesa folderul partajat, persoana care l-a partajat cu dvs. ar trebui să vă verifice și pe dvs.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Verifică pe %s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
@@ -4950,7 +4950,7 @@
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Audio</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_title_choose_right_plan">Alege planul potrivit pentru tine</string>
+    <string name="account_upgrade_account_title_choose_right_plan">Alegeți planul potrivit pentru dvs.</string>
     <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_tab_monthly">Lunară</string>
     <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -5461,4 +5461,6 @@
     <string name="dialog_ads_cookie_alert_message">Folosim cookie-uri și tehnologii similare pentru a ne ajuta să ne îmbunătățim serviciile și în scopuri publicitare. Continuând să folosiți MEGA sunteți de acord cu termenii actualizați [A]Politica privind cookie-urile[/A].</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sincronizează</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226; &#160;Fără reclame</string>
 </resources>

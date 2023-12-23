@@ -1345,9 +1345,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">要移至回收站吗？</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">您想要把这个文件夹移到回收站吗？将自动为相机上传创建一个新文件夹。</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">您想要把这个文件夹移到回收站吗？将自动为媒体上传创建一个新文件夹。</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">要移至回收站吗？</string>
     <!-- confirmation message before removing a file -->
@@ -4924,7 +4924,7 @@
         <item quantity="other">相机上传完成，%1$d个文件已上传</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA对照片库的访问权限有限，无法备份您的所有照片。</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">点按以更改权限。</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -4993,4 +4993,6 @@
     <string name="dialog_ads_cookie_alert_message">我们使用cookies和类似技术来帮助我们改善服务并用于广告目的。继续使用MEGA即表示您同意我们更新后的[A]Cookie政策[/A]条款。</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">同步</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;无广告</string>
 </resources>

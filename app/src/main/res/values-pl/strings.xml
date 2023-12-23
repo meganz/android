@@ -5695,4 +5695,6 @@
     <string name="dialog_ads_cookie_alert_message">Używamy plików cookie i podobnych technologii, aby pomóc nam ulepszyć nasze usługi i do celów reklamowych. Kontynuując korzystanie z MEGA, zgadzasz się z warunkami naszej zaktualizowanej [A]Polityki plików cookie[/A].</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sync</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
+    <string name="account_upgrade_account_description_feature_advertisement">-&#160;Bez reklam</string>
 </resources>

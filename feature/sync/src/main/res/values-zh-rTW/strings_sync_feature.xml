@@ -89,7 +89,7 @@
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">Device folder</string>
     <!-- Sync permission title for mega storage -->
-    <string name="sync_folders_mega_storage">MEGA folder</string>
+    <string name="sync_folders_mega_storage">MEGA資料夾</string>
     <!-- Sync while syncing title for Issues info -->
     <string name="sync_card_sync_issues_info">Issues info</string>
     <!-- Sync Pause -->
@@ -151,7 +151,7 @@
     <!-- Sync start sync button -->
     <string name="sync_start_sync">Start sync</string>
     <!-- Text that indicates that a folder is currently empty -->
-    <string name="sync_file_browser_empty_folder">Empty folder</string>
+    <string name="sync_file_browser_empty_folder">空資料夾</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select_to_download">選擇資料夾</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
