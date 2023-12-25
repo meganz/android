@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
@@ -349,19 +350,25 @@ internal fun ChatView(
                     }
                 },
                 bottomBar = {
-                    ChatInputTextToolbar(
-                        onAttachmentClick = {
-                            coroutineScope.launch {
-                                toolbarModalSheetState.show()
-                            }
-                        },
-                        text = uiState.sendingText,
-                        placeholder = stringResource(
-                            R.string.type_message_hint_with_customized_title,
-                            uiState.title.orEmpty()
-                        ),
-                        onSendClick = onSendClick
-                    )
+                    Column {
+                        UserTypingView(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            usersTyping = uiState.usersTyping,
+                        )
+                        ChatInputTextToolbar(
+                            onAttachmentClick = {
+                                coroutineScope.launch {
+                                    toolbarModalSheetState.show()
+                                }
+                            },
+                            text = uiState.sendingText,
+                            placeholder = stringResource(
+                                R.string.type_message_hint_with_customized_title,
+                                uiState.title.orEmpty()
+                            ),
+                            onSendClick = onSendClick
+                        )
+                    }
                 }
             )
             { paddingValues ->
