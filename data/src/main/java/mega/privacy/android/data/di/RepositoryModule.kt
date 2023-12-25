@@ -27,7 +27,6 @@ import mega.privacy.android.data.repository.DefaultLoginRepository
 import mega.privacy.android.data.repository.DefaultMediaPlayerRepository
 import mega.privacy.android.data.repository.DefaultNetworkRepository
 import mega.privacy.android.data.repository.DefaultNotificationsRepository
-import mega.privacy.android.data.repository.photos.DefaultPhotosRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
 import mega.privacy.android.data.repository.DefaultQRCodeRepository
 import mega.privacy.android.data.repository.DefaultRecentActionsRepository
@@ -51,6 +50,7 @@ import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
 import mega.privacy.android.data.repository.PermissionRepositoryImpl
+import mega.privacy.android.data.repository.RegexRepositoryImpl
 import mega.privacy.android.data.repository.RemotePreferencesRepositoryImpl
 import mega.privacy.android.data.repository.SearchRepositoryImpl
 import mega.privacy.android.data.repository.SlideshowRepositoryImpl
@@ -64,6 +64,7 @@ import mega.privacy.android.data.repository.apiserver.ApiServerRepositoryImpl
 import mega.privacy.android.data.repository.filemanagement.ShareRepositoryImpl
 import mega.privacy.android.data.repository.files.PdfRepositoryImpl
 import mega.privacy.android.data.repository.monitoring.PerformanceReporterRepositoryImpl
+import mega.privacy.android.data.repository.photos.DefaultPhotosRepository
 import mega.privacy.android.data.repository.psa.PsaRepositoryImpl
 import mega.privacy.android.data.repository.security.PasscodeRepositoryImpl
 import mega.privacy.android.data.repository.thumbnailpreview.ThumbnailPreviewRepositoryImpl
@@ -102,6 +103,7 @@ import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
+import mega.privacy.android.domain.repository.RegexRepository
 import mega.privacy.android.domain.repository.RemotePreferencesRepository
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -332,4 +334,8 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindAudioSectionRepository(implementation: AudioSectionRepositoryImpl): AudioSectionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRegexRepository(implementation: RegexRepositoryImpl): RegexRepository
 }

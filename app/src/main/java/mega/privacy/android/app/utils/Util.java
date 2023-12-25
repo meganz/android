@@ -1193,9 +1193,11 @@ public class Util {
 
     /**
      * This method decodes a url and formats it before its treatment
+     * Use [DecodeLinkUseCase] instead.
      *
      * @param url the passed url to be decoded
      */
+    @Deprecated
     public static String decodeURL(String url) {
         try {
             url = URLDecoder.decode(url, "UTF-8");
