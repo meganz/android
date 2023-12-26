@@ -164,14 +164,6 @@ object CacheFolderManager {
         cacheFolderGateway.getCacheFileAsync(folderName, fileName)
 
     /**
-     * Get Cache Size
-     */
-    @JvmStatic
-    fun getCacheSize(): Long {
-        return cacheFolderGateway.getCacheSize()
-    }
-
-    /**
      * Clear Cache
      */
     @JvmStatic

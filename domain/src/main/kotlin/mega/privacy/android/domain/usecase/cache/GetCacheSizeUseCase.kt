@@ -12,5 +12,5 @@ class GetCacheSizeUseCase @Inject constructor(
     /**
      * Invoke
      */
-    suspend operator fun invoke() = cacheRepository.getCacheSize()
+    suspend operator fun invoke() = cacheRepository.getCacheSize().coerceAtLeast(0L)
 }

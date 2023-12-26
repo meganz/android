@@ -60,7 +60,7 @@ interface CacheFolderGateway {
     /**
      * Calculates and returns the cache size for the app files in bytes
      */
-    fun getCacheSize(): Long
+    suspend fun getCacheSize(): Long
 
     /**
      * Clears the cache folder of app

@@ -83,15 +83,14 @@ internal class CacheFolderFacade @Inject constructor(
             }
         }
 
-    override fun getCacheSize(): Long = runBlocking {
+    override suspend fun getCacheSize(): Long = withContext(ioDispatcher) {
         Timber.d("getCacheSize")
         val cacheIntDir = context.cacheDir
         val cacheExtDir = context.externalCacheDir
         cacheIntDir?.let {
             Timber.d("Path to check internal: ${it.absolutePath}")
         }
-        return@runBlocking fileGateway.getDirSize(cacheIntDir)
-            .plus(fileGateway.getDirSize(cacheExtDir))
+        fileGateway.getDirSize(cacheIntDir).plus(fileGateway.getDirSize(cacheExtDir))
     }
 
     override suspend fun clearCache() {
