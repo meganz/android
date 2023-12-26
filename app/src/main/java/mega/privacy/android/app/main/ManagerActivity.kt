@@ -557,8 +557,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var fileBrowserComposeFragment: FileBrowserComposeFragment? = null
     private var rubbishBinComposeFragment: RubbishBinComposeFragment? = null
     private var syncFragment: SyncFragment? = null
-    private var deviceCenterFragment: DeviceCenterFragment? = null
-    private var backupsFragment: BackupsFragment? = null
     private var incomingSharesFragment: MegaNodeBaseFragment? = null
     private var outgoingSharesFragment: MegaNodeBaseFragment? = null
     private var linksFragment: MegaNodeBaseFragment? = null
@@ -3622,7 +3620,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             setTabsVisibility()
         } else {
             drawerItem = item
-            selectDrawerItem(item)
+            selectDrawerItem(item = item, alwaysInitializeDrawerItem = true)
         }
     }
 
@@ -3637,8 +3635,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * set to -1 by default
      * @param backupsHandle The Backups Node Handle used to load its contents in the Backups feature.
      * The value is set to -1 by default if no other Backups Node Handle is passed
-     * @param isCalledFromBackNavigation True if this function is called as a result of a Back
-     * Navigation event, and false if otherwise
+     * @param alwaysInitializeDrawerItem True if the specified Drawer Item must always be
+     * initialized, and false if otherwise
      */
     @SuppressLint("NewApi")
     @JvmOverloads
@@ -3647,7 +3645,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         chatId: Long? = null,
         cloudDriveNodeHandle: Long = -1L,
         backupsHandle: Long = -1L,
-        isCalledFromBackNavigation: Boolean = false,
+        alwaysInitializeDrawerItem: Boolean = false,
     ) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         if (!this::drawerLayout.isInitialized) {
@@ -3755,12 +3753,19 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showFabButton()
                 hideAdsView()
 
-                if (!isCalledFromBackNavigation || deviceCenterFragment == null) {
-                    deviceCenterFragment = DeviceCenterFragment.newInstance()
-                }
-                deviceCenterFragment?.let {
-                    replaceFragment(it, FragmentTag.DEVICE_CENTER.tag)
-                }
+                val fragmentTransaction = supportFragmentManager.beginTransaction()
+                fragmentTransaction.replace(
+                    R.id.fragment_container,
+                    if (alwaysInitializeDrawerItem) {
+                        DeviceCenterFragment.newInstance()
+                    } else {
+                        deviceCenterFragment ?: DeviceCenterFragment.newInstance()
+                    },
+                    FragmentTag.DEVICE_CENTER.tag,
+                )
+                fragmentTransaction.addToBackStack(DeviceCenterFragment::class.java.name)
+                fragmentTransaction.commit()
+                supportFragmentManager.executePendingTransactions()
             }
 
             DrawerItem.SYNC -> {
@@ -3837,15 +3842,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showFabButton()
                 hideAdsView()
 
-                // Default to the User's Root Backups Folder handle if no Backups Handle is passed
-                backupsFragment = BackupsFragment.newInstance(
-                    backupsHandle = if (backupsHandle == -1L) {
-                        viewModel.state().userRootBackupsFolderHandle.longValue
-                    } else backupsHandle
+                replaceFragment(
+                    fragment = if (alwaysInitializeDrawerItem) {
+                        createBackupsFragment(backupsHandle)
+                    } else {
+                        backupsFragment ?: createBackupsFragment(backupsHandle)
+                    },
+                    fragmentTag = FragmentTag.BACKUPS.tag,
                 )
-                backupsFragment?.let {
-                    replaceFragment(it, FragmentTag.BACKUPS.tag)
-                }
             }
 
             DrawerItem.SHARED_ITEMS -> {
@@ -4135,6 +4139,19 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     private val transferPageFragment: TransferPageFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.TRANSFERS_PAGE.tag) as? TransferPageFragment
+
+    private val deviceCenterFragment: DeviceCenterFragment?
+        get() = supportFragmentManager.findFragmentByTag(FragmentTag.DEVICE_CENTER.tag) as? DeviceCenterFragment
+
+    private val backupsFragment: BackupsFragment?
+        get() = supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
+
+    private fun createBackupsFragment(backupsHandle: Long) = BackupsFragment.newInstance(
+        // Default to the User's Root Backups Folder handle if no Backups Handle is passed
+        backupsHandle = if (backupsHandle == -1L) {
+            viewModel.state().userRootBackupsFolderHandle.longValue
+        } else backupsHandle
+    )
 
     override val isOnFileManagementManagerSection: Boolean
         get() = drawerItem !== DrawerItem.TRANSFERS
@@ -5082,10 +5099,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val isDeviceCenterFeatureFlagEnabled =
             viewModel.state.value.enabledFlags.contains(AppFeatures.DeviceCenter)
         if (isDeviceCenterFeatureFlagEnabled) {
-            selectDrawerItem(
-                item = DrawerItem.DEVICE_CENTER,
-                isCalledFromBackNavigation = true,
-            )
+            selectDrawerItem(DrawerItem.DEVICE_CENTER)
         } else {
             backToDrawerItem(bottomNavigationCurrentItem)
         }

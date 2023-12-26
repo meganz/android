@@ -22,6 +22,7 @@ internal interface AppNavigatorImpl : AppNavigator {
             activity.selectDrawerItem(
                 item = DrawerItem.BACKUPS,
                 backupsHandle = backupsHandle,
+                alwaysInitializeDrawerItem = true,
             )
         }
     }
