@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,10 +19,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.controls.chat.ChatStatusIcon
 import mega.privacy.android.core.ui.controls.chat.UiChatStatus
+import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 /**
  * Contact attachment message view
@@ -63,15 +64,15 @@ fun ContactAttachmentMessageView(
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(
+                MegaText(
                     text = userName,
                     style = MaterialTheme.typography.subtitle1,
-                    color = if (isMe) MegaTheme.colors.text.inverse else MegaTheme.colors.text.primary,
+                    textColor = if (isMe) TextColor.Inverse else TextColor.Primary,
                 )
-                Text(
+                MegaText(
                     text = email,
                     style = MaterialTheme.typography.subtitle2,
-                    color = if (isMe) MegaTheme.colors.text.inverse else MegaTheme.colors.text.primary,
+                    textColor = if (isMe) TextColor.Inverse else TextColor.Primary,
                 )
             }
         }
