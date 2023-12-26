@@ -18,7 +18,6 @@ import mega.privacy.android.domain.usecase.chat.message.CreateNormalChatMessageU
 import mega.privacy.android.domain.usecase.chat.message.CreatePermissionChangeMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CreatePrivateModeSetMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CreateRetentionTimeUpdatedMessageUseCase
-import mega.privacy.android.domain.usecase.chat.message.CreateRevokeNodeAttachmentMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CreateScheduledMeetingUpdatedMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CreateTitleChangeMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CreateTruncateHistoryMessageUseCase
@@ -88,11 +87,6 @@ internal abstract class ChatMessageCreationModule {
     @IntoMap
     @ChatMessageTypeKey(ChatMessageType.SET_RETENTION_TIME)
     abstract fun bindCreateRetentionTimeUpdatedMessageUseCase(creator: CreateRetentionTimeUpdatedMessageUseCase): CreateTypedMessageUseCase
-
-    @Binds
-    @IntoMap
-    @ChatMessageTypeKey(ChatMessageType.REVOKE_NODE_ATTACHMENT)
-    abstract fun bindCreateRevokeNodeAttachmentMessageUseCase(creator: CreateRevokeNodeAttachmentMessageUseCase): CreateTypedMessageUseCase
 
     @Binds
     @IntoMap
