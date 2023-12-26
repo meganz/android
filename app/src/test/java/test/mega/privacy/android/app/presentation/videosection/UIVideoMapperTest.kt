@@ -37,7 +37,7 @@ class UIVideoMapperTest {
             on { isFavourite }.thenReturn(false)
             on { isAvailableOffline }.thenReturn(expectedAvailableOffline)
             on { duration }.thenReturn(100)
-            on { thumbnailFilePath }.thenReturn(expectedThumbnail)
+            on { thumbnailPath }.thenReturn(expectedThumbnail)
         }
 
         underTest(typedVideoNode = expectedTypedVideoNode).let {

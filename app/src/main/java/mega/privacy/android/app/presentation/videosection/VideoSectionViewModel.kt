@@ -8,13 +8,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
@@ -33,8 +33,10 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -77,19 +79,24 @@ class VideoSectionViewModel @Inject constructor(
             merge(
                 monitorNodeUpdatesUseCase(),
                 monitorOfflineNodeUpdatesUseCase()
-            ).collectLatest {
-                setPendingRefreshNodes()
-            }
+            ).conflate()
+                .catch {
+                    Timber.e(it)
+                }.collect {
+                    setPendingRefreshNodes()
+                }
         }
     }
 
     private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
     internal fun refreshNodes() = viewModelScope.launch {
+        val videoList = getUIVideoList().updateOriginalData().filterVideosBySearchQuery()
+        val sortOrder = getCloudSortOrder()
         _state.update {
             it.copy(
-                allVideos = getUIVideoList().updateOriginalData().filterVideosBySearchQuery(),
-                sortOrder = getCloudSortOrder(),
+                allVideos = videoList,
+                sortOrder = sortOrder,
                 progressBarShowing = false,
                 scrollToTop = false
             )
@@ -118,9 +125,10 @@ class VideoSectionViewModel @Inject constructor(
 
     internal fun refreshWhenOrderChanged() =
         viewModelScope.launch {
+            val sortOrder = getCloudSortOrder()
             _state.update {
                 it.copy(
-                    sortOrder = getCloudSortOrder(),
+                    sortOrder = sortOrder,
                     progressBarShowing = true
                 )
             }
@@ -152,11 +160,12 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private fun searchNodeByQueryString() {
+        val videos = originalData.filter { video ->
+            video.name.contains(searchQuery, true)
+        }
         _state.update {
             it.copy(
-                allVideos = originalData.filter { video ->
-                    video.name.contains(searchQuery, true)
-                },
+                allVideos = videos,
                 scrollToTop = true
             )
         }
@@ -212,9 +221,10 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     internal fun clearAllSelectedVideos() {
+        val videos = clearVideosSelected()
         _state.update {
             it.copy(
-                allVideos = clearVideosSelected(),
+                allVideos = videos,
                 selectedVideoHandles = emptyList(),
                 isInSelection = false
             )
@@ -226,14 +236,16 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     internal fun selectAllNodes() {
+        val videos = _state.value.allVideos.map { item ->
+            item.copy(isSelected = true)
+        }
+        val selectedHandles = _state.value.allVideos.map { item ->
+            item.id.longValue
+        }
         _state.update {
             it.copy(
-                allVideos = _state.value.allVideos.map { item ->
-                    item.copy(isSelected = true)
-                },
-                selectedVideoHandles = _state.value.allVideos.map { item ->
-                    item.id.longValue
-                },
+                allVideos = videos,
+                selectedVideoHandles = selectedHandles,
                 isInSelection = true
             )
         }
@@ -249,9 +261,10 @@ class VideoSectionViewModel @Inject constructor(
     private fun updateVideoItemInSelectionState(item: UIVideo, index: Int) {
         val isSelected = !item.isSelected
         val selectedHandles = updateSelectedVideoHandles(item, isSelected)
+        val videos = _state.value.allVideos.updateItemSelectedState(index, isSelected)
         _state.update {
             it.copy(
-                allVideos = _state.value.allVideos.updateItemSelectedState(index, isSelected),
+                allVideos = videos,
                 selectedVideoHandles = selectedHandles,
                 isInSelection = selectedHandles.isNotEmpty()
             )

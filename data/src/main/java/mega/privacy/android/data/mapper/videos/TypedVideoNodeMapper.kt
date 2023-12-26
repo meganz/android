@@ -8,10 +8,8 @@ internal class TypedVideoNodeMapper @Inject constructor() {
     operator fun invoke(
         fileNode: FileNode,
         duration: Int,
-        thumbnailFilePath: String?
     ) = TypedVideoNode(
         fileNode = fileNode,
-        duration = duration,
-        thumbnailFilePath = thumbnailFilePath
+        duration = duration
     )
 }

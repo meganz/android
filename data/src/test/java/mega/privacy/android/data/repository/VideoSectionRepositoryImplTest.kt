@@ -6,8 +6,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.constant.CacheFolderConstant
-import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -36,7 +34,6 @@ class VideoSectionRepositoryImplTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val sortOrderIntMapper = mock<SortOrderIntMapper>()
     private val fileNodeMapper = mock<FileNodeMapper>()
-    private val cacheGateway = mock<CacheGateway>()
     private val typedVideoNodeMapper = mock<TypedVideoNodeMapper>()
     private val cancelTokenProvider = mock<CancelTokenProvider>()
     private val megaCancelToken = mock<MegaCancelToken>()
@@ -48,7 +45,6 @@ class VideoSectionRepositoryImplTest {
             megaApiGateway = megaApiGateway,
             sortOrderIntMapper = sortOrderIntMapper,
             fileNodeMapper = fileNodeMapper,
-            cacheGateway = cacheGateway,
             typedVideoNodeMapper = typedVideoNodeMapper,
             cancelTokenProvider = cancelTokenProvider,
             megaLocalRoomGateway = megaLocalRoomGateway,
@@ -62,7 +58,6 @@ class VideoSectionRepositoryImplTest {
             megaApiGateway,
             sortOrderIntMapper,
             fileNodeMapper,
-            cacheGateway,
             typedVideoNodeMapper,
             megaLocalRoomGateway
         )
@@ -76,19 +71,12 @@ class VideoSectionRepositoryImplTest {
     @Test
     fun `test that get all videos returns successfully`() = runTest {
         whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(megaCancelToken)
-
         whenever(sortOrderIntMapper(SortOrder.ORDER_MODIFICATION_DESC))
             .thenReturn(ORDER_DEFAULT_DESC)
-
         whenever(megaApiGateway.searchByType(any(), any(), any(), any()))
             .thenReturn(listOf(mock(), mock()))
-
-        whenever(cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER))
-            .thenReturn(mock())
-
         whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
-
-        whenever(typedVideoNodeMapper(any(), any(), any())).thenReturn(mock())
+        whenever(typedVideoNodeMapper(any(), any())).thenReturn(mock())
 
         val actual = underTest.getAllVideos(SortOrder.ORDER_MODIFICATION_DESC)
         assertThat(actual.isNotEmpty()).isTrue()

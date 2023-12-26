@@ -4,24 +4,28 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -52,6 +56,8 @@ class VideoSectionViewModelTest {
     private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
     private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+
+    private val expectedVideo = mock<UIVideo> { on { name }.thenReturn("video name") }
 
     @BeforeAll
     fun initialise() {
@@ -101,7 +107,7 @@ class VideoSectionViewModelTest {
 
     @Test
     fun `test that the initial state is returned`() = runTest {
-        underTest.state.test(200) {
+        underTest.state.test {
             val initial = awaitItem()
             assertThat(initial.allVideos).isEmpty()
             assertThat(initial.isPendingRefresh).isFalse()
@@ -113,25 +119,11 @@ class VideoSectionViewModelTest {
 
     @Test
     fun `test that the videos are retrieved when the nodes are refreshed`() = runTest {
-        val expectedVideo: UIVideo = mock {
-            on { name }.thenReturn("video name")
-        }
+        initVideosReturned()
 
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+        underTest.refreshNodes()
 
-        whenever(getAllVideosUseCase()).thenReturn(
-            listOf(mock(), mock())
-        )
-        whenever(uiVideoMapper(any())).thenReturn(expectedVideo)
-
-        underTest.state.test(200) {
-            val initial = awaitItem()
-            assertThat(initial.allVideos).isEmpty()
-            assertThat(initial.progressBarShowing).isEqualTo(true)
-            assertThat(initial.scrollToTop).isEqualTo(false)
-
-            underTest.refreshNodes()
-
+        underTest.state.drop(1).test {
             val actual = awaitItem()
             assertThat(actual.allVideos).isNotEmpty()
             assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
@@ -141,37 +133,100 @@ class VideoSectionViewModelTest {
         }
     }
 
+    private suspend fun initVideosReturned() {
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+        whenever(getAllVideosUseCase()).thenReturn(listOf(mock(), mock()))
+        whenever(uiVideoMapper(any())).thenReturn(expectedVideo)
+    }
+
+    @Test
+    fun `test that isPendingRefresh is correctly updated when monitorOfflineNodeUpdatesUseCase is triggered`() =
+        runTest {
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().isPendingRefresh).isTrue()
+
+                underTest.markHandledPendingRefresh()
+                assertThat(awaitItem().isPendingRefresh).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isPendingRefresh is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
+        runTest {
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(flowOf(NodeUpdate(emptyMap())))
+
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().isPendingRefresh).isTrue()
+
+                underTest.markHandledPendingRefresh()
+                assertThat(awaitItem().isPendingRefresh).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     @Test
     fun `test that the sortOrder is updated when order is changed`() = runTest {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-
         whenever(getAllVideosUseCase()).thenReturn(emptyList())
+
         underTest.refreshWhenOrderChanged()
-        underTest.state.test(200) {
-            assertThat(awaitItem().sortOrder).isEqualTo(SortOrder.ORDER_NONE)
+
+        underTest.state.drop(1).test {
             assertThat(awaitItem().sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test when when item is long clicked, then it updates selected item by 1`() =
+    fun `test that the result returned correctly when search query is not empty`() = runTest {
+        val expectedTypedVideoNode = mock<TypedVideoNode> { on { name }.thenReturn("video name") }
+        val videoNode = mock<TypedVideoNode> { on { name }.thenReturn("name") }
+        val expectedVideo = mock<UIVideo> { on { name }.thenReturn("video name") }
+        val video = mock<UIVideo> { on { name }.thenReturn("name") }
+
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+        whenever(getAllVideosUseCase()).thenReturn(listOf(expectedTypedVideoNode, videoNode))
+        whenever(uiVideoMapper(expectedTypedVideoNode)).thenReturn(expectedVideo)
+        whenever(uiVideoMapper(videoNode)).thenReturn(video)
+
+        underTest.refreshNodes()
+
+        underTest.state.drop(1).test {
+            assertThat(awaitItem().allVideos.size).isEqualTo(2)
+
+            underTest.searchQuery("video")
+            assertThat(awaitItem().allVideos.size).isEqualTo(1)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the searchMode is correctly updated`() = runTest {
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+        whenever(getAllVideosUseCase()).thenReturn(emptyList())
+
+        underTest.state.drop(1).test {
+            underTest.searchReady()
+            assertThat(awaitItem().searchMode).isTrue()
+
+            underTest.exitSearch()
+            assertThat(awaitItem().searchMode).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the selected item is updated by 1 when long clicked`() =
         runTest {
-            val expectedVideo: UIVideo = mock {
-                on { name }.thenReturn("video name")
-            }
+            initVideosReturned()
 
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-
-            whenever(getAllVideosUseCase()).thenReturn(
-                listOf(mock(), mock())
-            )
-            whenever(uiVideoMapper(any())).thenReturn(expectedVideo)
-
-            underTest.state.test(200) {
-                assertThat(awaitItem().allVideos).isEmpty()
+            underTest.state.drop(1).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
+
                 underTest.onLongItemClicked(expectedVideo, 0)
                 assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
                 cancelAndIgnoreRemainingEvents()
@@ -179,25 +234,17 @@ class VideoSectionViewModelTest {
         }
 
     @Test
-    fun `test that when selected item gets clicked then checked index gets incremented by 1`() =
+    fun `test that the checked index is incremented by 1 when the selected item gets clicked`() =
         runTest {
-            val expectedVideo: UIVideo = mock {
-                on { name }.thenReturn("video name")
-            }
+            initVideosReturned()
 
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-
-            whenever(getAllVideosUseCase()).thenReturn(
-                listOf(mock(), mock())
-            )
-            whenever(uiVideoMapper(any())).thenReturn(expectedVideo)
-
-            underTest.state.test(200) {
-                assertThat(awaitItem().allVideos).isEmpty()
+            underTest.state.drop(1).test {
                 underTest.refreshNodes()
-                assertThat(awaitItem().allVideos).isNotEmpty()
+                assertThat(awaitItem().allVideos.size).isEqualTo(2)
+
                 underTest.onLongItemClicked(expectedVideo, 0)
                 assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
+
                 underTest.onItemClicked(expectedVideo, 1)
                 assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(2)
                 cancelAndIgnoreRemainingEvents()
@@ -205,50 +252,35 @@ class VideoSectionViewModelTest {
         }
 
     @Test
-    fun `test that when select all videos clicked size of video items and equal to size of selected videos`() =
+    fun `test that the selected videos size equals the videos size when selecting all videos`() =
         runTest {
-            val expectedVideo: UIVideo = mock {
-                on { name }.thenReturn("video name")
-            }
+            initVideosReturned()
 
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-
-            whenever(getAllVideosUseCase()).thenReturn(
-                listOf(mock(), mock())
-            )
-            whenever(uiVideoMapper(any())).thenReturn(expectedVideo)
-
-            underTest.state.test(200) {
-                assertThat(awaitItem().allVideos).isEmpty()
+            underTest.state.drop(1).test {
                 underTest.refreshNodes()
-                assertThat(awaitItem().allVideos).isNotEmpty()
+                assertThat(awaitItem().allVideos.size).isEqualTo(2)
+
                 underTest.selectAllNodes()
-                val actual = awaitItem()
-                assertThat(actual.selectedVideoHandles.size).isEqualTo(actual.selectedVideoHandles.size)
+                awaitItem().let { state ->
+                    assertThat(state.selectedVideoHandles.size).isEqualTo(state.allVideos.size)
+                }
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that when clear all videos clicked, size of selected videos is empty`() =
+    fun `test that isInSelection is correctly updated when selecting and clearing all nodes`() =
         runTest {
-            val expectedVideo: UIVideo = mock {
-                on { name }.thenReturn("video name")
-            }
+            initVideosReturned()
 
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-
-            whenever(getAllVideosUseCase()).thenReturn(
-                listOf(mock(), mock())
-            )
-            whenever(uiVideoMapper(any())).thenReturn(expectedVideo)
-
-            underTest.state.test(200) {
-                assertThat(awaitItem().allVideos).isEmpty()
+            underTest.state.drop(1).test {
                 underTest.refreshNodes()
-                assertThat(awaitItem().allVideos).isNotEmpty()
+
+                underTest.selectAllNodes()
+                assertThat(awaitItem().isInSelection).isTrue()
+
                 underTest.clearAllSelectedVideos()
-                assertThat(awaitItem().selectedVideoHandles.isEmpty()).isTrue()
+                assertThat(awaitItem().isInSelection).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
         }

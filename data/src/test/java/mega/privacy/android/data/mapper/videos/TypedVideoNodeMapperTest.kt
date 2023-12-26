@@ -22,15 +22,12 @@ class TypedVideoNodeMapperTest @Inject constructor() {
     fun `test that VideoNodeMapper can be mapped correctly`() {
         val expectedDuration = 1000
         val expectedFileNode = mock<FileNode>()
-        val expectedThumbnailFilePath = "thumbnail file path testing"
 
         underTest(
             fileNode = expectedFileNode,
             duration = expectedDuration,
-            thumbnailFilePath = expectedThumbnailFilePath
         ).let {
             assertThat(it.duration).isEqualTo(expectedDuration)
-            assertThat(it.thumbnailFilePath).isEqualTo(expectedThumbnailFilePath)
         }
     }
 }

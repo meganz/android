@@ -7,7 +7,7 @@ import java.io.File
 import javax.inject.Inject
 
 /**
- * The mapper class to convert the VideoNode to UIVideo
+ * The mapper class to convert the TypedVideoNode to UIVideo
  */
 class UIVideoMapper @Inject constructor() {
     /**
@@ -20,7 +20,7 @@ class UIVideoMapper @Inject constructor() {
         name = typedVideoNode.name,
         size = typedVideoNode.size,
         duration = TimeUtils.getVideoDuration(typedVideoNode.duration),
-        thumbnail = typedVideoNode.thumbnailFilePath?.let { File(it) },
+        thumbnail = typedVideoNode.thumbnailPath?.let { File(it) },
         isFavourite = typedVideoNode.isFavourite,
         nodeAvailableOffline = typedVideoNode.isAvailableOffline
     )
