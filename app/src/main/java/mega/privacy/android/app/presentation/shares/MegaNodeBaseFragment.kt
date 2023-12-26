@@ -633,7 +633,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
          */
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             Timber.d("onActionItemClicked")
-
+            if (!isAdded) return false
             val handleList = ArrayList<Long>().apply { addAll(selected.map { it.handle }) }
 
             val nC = NodeController(requireActivity())
