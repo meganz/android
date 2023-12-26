@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
@@ -176,7 +177,7 @@ private fun SyncListScreenContent(
     syncPermissionsManager: SyncPermissionsManager,
     syncFoldersViewModel: SyncFoldersViewModel = hiltViewModel(),
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel = hiltViewModel(),
-    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel = hiltViewModel()
+    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel = hiltViewModel(),
 ) {
     var checkedChip by rememberSaveable { mutableStateOf(SYNC_FOLDERS) }
 
@@ -196,7 +197,11 @@ private fun SyncListScreenContent(
             selectedChip = checkedChip,
             stalledIssuesCount = stalledIssuesCount,
             onChipSelected = { checkedChip = it })
-        Box(modifier = Modifier.pullRefresh(pullToRefreshState)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(pullToRefreshState)
+        ) {
             SelectedChipScreen(
                 addFolderClicked = addFolderClicked,
                 stalledIssueDetailsClicked = stalledIssuesDetailsClicked,
@@ -259,7 +264,7 @@ private fun SelectedChipScreen(
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
-    syncFoldersState: SyncFoldersState
+    syncFoldersState: SyncFoldersState,
 ) {
     when (checkedChip) {
         SYNC_FOLDERS -> {
