@@ -25,12 +25,12 @@ import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
@@ -42,7 +42,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.TEST_USER_ACCOUNT
 import java.io.File
@@ -82,7 +84,9 @@ class MyAccountHomeViewModelTest {
     private val monitorUserUpdates: MonitorUserUpdates = mock {
         onBlocking { invoke() }.thenReturn(userUpdatesFlow)
     }
-    private val getVisibleContactsUseCase: GetVisibleContactsUseCase = mock()
+    private val getVisibleContactsUseCase: GetVisibleContactsUseCase = mock {
+        onBlocking { invoke() }.thenReturn(emptyList())
+    }
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
     private val getInSharesUseCase: GetInSharesUseCase = mock()
@@ -93,6 +97,13 @@ class MyAccountHomeViewModelTest {
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
+        initViewModel()
+    }
+
+    private fun initViewModel(accountDetailsValue: UserAccount = TEST_USER_ACCOUNT) {
+        getAccountDetailsUseCase.stub {
+            onBlocking { invoke(any()) }.thenReturn(accountDetailsValue)
+        }
 
         underTest = MyAccountHomeViewModel(
             getAccountDetailsUseCase,
@@ -255,7 +266,7 @@ class MyAccountHomeViewModelTest {
                 accountTypeIdentifier = AccountType.BUSINESS,
                 accountTypeString = "business"
             )
-            whenever(getAccountDetailsUseCase(false)).thenReturn(expected)
+            initViewModel(accountDetailsValue = expected)
             whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
 
             advanceUntilIdle()
@@ -272,7 +283,7 @@ class MyAccountHomeViewModelTest {
     @MethodSource("provideInactiveBusinessAccountType")
     fun `test inactive business account status`(expected: BusinessAccountStatus) =
         runTest {
-            whenever(getAccountDetailsUseCase(false)).thenReturn(TEST_USER_ACCOUNT)
+            initViewModel()
             whenever(getBusinessStatusUseCase()).thenReturn(expected)
 
             advanceUntilIdle()
