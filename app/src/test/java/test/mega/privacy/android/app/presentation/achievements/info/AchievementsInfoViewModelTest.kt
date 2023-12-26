@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -40,7 +41,7 @@ class AchievementsInfoViewModelTest {
         mock<GetAccountAchievementsOverviewUseCase>()
 
     @BeforeAll
-    fun setup() {
+    fun initialise() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
@@ -50,11 +51,23 @@ class AchievementsInfoViewModelTest {
     }
 
     @BeforeEach
-    fun resetMocks() {
+    fun setup() {
         reset(deviceGateway, getAccountAchievementsOverviewUseCase)
     }
 
-    private fun initTestClass() {
+    private fun initViewModel(
+        achievementsOverview: AchievementsOverview = AchievementsOverview(
+            allAchievements = emptyList(),
+            awardedAchievements = emptyList(),
+            currentStorageInBytes = 0,
+            achievedStorageFromReferralsInBytes = 0,
+            achievedTransferFromReferralsInBytes = 0,
+        ),
+    ) {
+        getAccountAchievementsOverviewUseCase.stub {
+            onBlocking { invoke() }.thenReturn(achievementsOverview)
+        }
+
         underTest = AchievementsInfoViewModel(
             savedStateHandle = savedStateHandle,
             getAccountAchievementsOverviewUseCase = getAccountAchievementsOverviewUseCase,
@@ -68,7 +81,7 @@ class AchievementsInfoViewModelTest {
             val expectedAchievement = AchievementType.MEGA_ACHIEVEMENT_WELCOME
             savedStateHandle[achievementTypeIdArg] = expectedAchievement.classValue
 
-            initTestClass()
+            initViewModel()
 
             underTest.uiState.test {
                 assertThat(awaitItem().achievementType).isEqualTo(expectedAchievement)
@@ -90,7 +103,8 @@ class AchievementsInfoViewModelTest {
             savedStateHandle[achievementTypeIdArg] = expectedAchievementType.classValue
 
             whenever(deviceGateway.now).thenReturn(startTime.timeInMillis)
-            whenever(getAccountAchievementsOverviewUseCase()).thenReturn(
+            initViewModel(
+                achievementsOverview =
                 AchievementsOverview(
                     allAchievements = emptyList(),
                     awardedAchievements = listOf(
@@ -108,8 +122,6 @@ class AchievementsInfoViewModelTest {
                 )
             )
 
-            initTestClass()
-
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.awardId).isEqualTo(expectedAwardId)
@@ -124,7 +136,8 @@ class AchievementsInfoViewModelTest {
             val expectedGrantedStorage = 126312783L
 
             savedStateHandle[achievementTypeIdArg] = expectedAchievementType.classValue
-            whenever(getAccountAchievementsOverviewUseCase()).thenReturn(
+            initViewModel(
+                achievementsOverview =
                 AchievementsOverview(
                     allAchievements = listOf(
                         Achievement(
@@ -148,8 +161,6 @@ class AchievementsInfoViewModelTest {
                     achievedTransferFromReferralsInBytes = 0
                 )
             )
-
-            initTestClass()
 
             underTest.uiState.test {
                 val state = awaitItem()
@@ -165,7 +176,8 @@ class AchievementsInfoViewModelTest {
             val expectedGrantedStorage = 126312783L
 
             savedStateHandle[achievementTypeIdArg] = expectedAchievementType.classValue
-            whenever(getAccountAchievementsOverviewUseCase()).thenReturn(
+            initViewModel(
+                achievementsOverview =
                 AchievementsOverview(
                     allAchievements = listOf(
                         Achievement(
@@ -189,8 +201,6 @@ class AchievementsInfoViewModelTest {
                     achievedTransferFromReferralsInBytes = 0
                 )
             )
-
-            initTestClass()
 
             underTest.uiState.test {
                 val state = awaitItem()
@@ -207,7 +217,8 @@ class AchievementsInfoViewModelTest {
             val expectedAwardId = Random.nextInt(from = 1, until = 1000)
 
             savedStateHandle[achievementTypeIdArg] = expectedAchievementType.classValue
-            whenever(getAccountAchievementsOverviewUseCase()).thenReturn(
+            initViewModel(
+                achievementsOverview =
                 AchievementsOverview(
                     allAchievements = emptyList(),
                     awardedAchievements = listOf(
@@ -224,8 +235,6 @@ class AchievementsInfoViewModelTest {
                     achievedTransferFromReferralsInBytes = 0
                 )
             )
-
-            initTestClass()
 
             underTest.uiState.test {
                 val state = awaitItem()
