@@ -4,4 +4,5 @@
     <string name="password_text">Password</string>
     <string name="back_up_recovery_key">Back up Recovery key</string>
     <string name="backup_recovery_key_subtitle">Do you remember your password?\nMEGA cannot reset your password if you forget it.</string>
+    <string name="manual_retry_alert">Message not sent. Tap for options</string>
 </resources>
