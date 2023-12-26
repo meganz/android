@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist.stalledissues
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -30,7 +31,7 @@ private fun StalledIssuesScreenContent(
     issueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
 ) {
-    LazyColumn(state = LazyListState(), modifier = modifier) {
+    LazyColumn(state = LazyListState(), modifier = modifier.fillMaxSize()) {
         if (stalledIssues.isEmpty()) {
             item {
                 SyncListNoItemsPlaceHolder(

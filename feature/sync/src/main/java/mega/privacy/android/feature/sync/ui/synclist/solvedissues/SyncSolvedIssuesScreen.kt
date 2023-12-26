@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.synclist.solvedissues
 import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,34 +24,37 @@ import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWi
 
 @Composable
 internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
-    LazyColumn(content = {
-        if (solvedIssues.isEmpty()) {
-            item {
-                SyncListNoItemsPlaceHolder(
-                    placeholderText = stringResource(id = R.string.sync_solved_issues_empty_message),
-                    placeholderIcon = R.drawable.ic_no_solved_issues,
-                    modifier = Modifier
-                        .fillParentMaxHeight(0.8f)
-                        .fillParentMaxWidth()
-                )
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        content = {
+            if (solvedIssues.isEmpty()) {
+                item {
+                    SyncListNoItemsPlaceHolder(
+                        placeholderText = stringResource(id = R.string.sync_solved_issues_empty_message),
+                        placeholderIcon = R.drawable.ic_no_solved_issues,
+                        modifier = Modifier
+                            .fillParentMaxHeight(0.8f)
+                            .fillParentMaxWidth()
+                    )
+                }
+            } else {
+                items(solvedIssues) { solvedIssue ->
+                    MenuActionNodeHeaderWithBody(
+                        title = solvedIssue.nodeNames.firstOrNull()
+                            ?: solvedIssue.localPaths.first(),
+                        body = solvedIssue.resolutionExplanation,
+                        nodeIcon = solvedIssue.icon,
+                        bodyIcon = CoreUiR.drawable.ic_check_circle,
+                        bodyIconColor = MaterialTheme.colors.secondary
+                    )
+                    Divider(
+                        Modifier
+                            .padding(start = 72.dp)
+                            .testTag(SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY)
+                    )
+                }
             }
-        } else {
-            items(solvedIssues) { solvedIssue ->
-                MenuActionNodeHeaderWithBody(
-                    title = solvedIssue.nodeNames.firstOrNull() ?: solvedIssue.localPaths.first(),
-                    body = solvedIssue.resolutionExplanation,
-                    nodeIcon = solvedIssue.icon,
-                    bodyIcon = CoreUiR.drawable.ic_check_circle,
-                    bodyIconColor = MaterialTheme.colors.secondary
-                )
-                Divider(
-                    Modifier
-                        .padding(start = 72.dp)
-                        .testTag(SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY)
-                )
-            }
-        }
-    })
+        })
 }
 
 @CombinedThemePreviews
