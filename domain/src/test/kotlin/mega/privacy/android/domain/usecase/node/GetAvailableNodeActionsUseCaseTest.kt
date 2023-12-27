@@ -20,10 +20,12 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
-
+/**
+ * Test class for [GetAvailableNodeActionsUseCase]
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetAvailableNodeActionsUseCaseTest {
+internal class GetAvailableNodeActionsUseCaseTest {
 
     private val fileNode = mock<TypedFileNode>()
     private val folderNode = mock<TypedFolderNode>()
@@ -34,10 +36,12 @@ class GetAvailableNodeActionsUseCaseTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val isNodeInRubbish = mock<IsNodeInRubbish>()
+    private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val underTest = GetAvailableNodeActionsUseCase(
-        getNodeByIdUseCase,
-        isNodeInRubbish,
-        getNodeAccessPermission,
+        getNodeByIdUseCase = getNodeByIdUseCase,
+        isNodeInRubbish = isNodeInRubbish,
+        getNodeAccessPermission = getNodeAccessPermission,
+        isNodeInBackupsUseCase = isNodeInBackupsUseCase,
     )
 
     @BeforeEach
@@ -46,12 +50,19 @@ class GetAvailableNodeActionsUseCaseTest {
     }
 
     private fun resetMocks() {
-        reset(fileNode, folderNode, getNodeByIdUseCase, getNodeAccessPermission, isNodeInRubbish)
+        reset(
+            fileNode,
+            folderNode,
+            getNodeByIdUseCase,
+            getNodeAccessPermission,
+            isNodeInRubbish,
+            isNodeInBackupsUseCase,
+        )
     }
 
 
     @TestFactory
-    fun `test that Delete action is returned if and only if node is in rubbish bin`() =
+    fun `test that Delete action is returned if the node is in rubbish bin`() =
         listOf(true, false).flatMap { inRubbish ->
             mockedNodes.map { (name, mockNode) ->
                 dynamicTest("node: $name, in rubbish bin: $inRubbish") {
@@ -71,7 +82,7 @@ class GetAvailableNodeActionsUseCaseTest {
 
 
     @TestFactory
-    fun `test that Send to chat action is returned if and only if nodes is a file and not taken down`() =
+    fun `test that Send to chat action is returned if the node is a file and not taken down`() =
         listOf(true, false).flatMap { takenDown ->
             mockedNodes.map { (name, mockNode) ->
                 val isFile = mockNode.isFile()
@@ -92,7 +103,7 @@ class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Download action is returned if and only if node is not taken down`() =
+    fun `test that Download action is returned if the node is not taken down`() =
         listOf(true, false).flatMap { takenDown ->
             mockedNodes.map { (name, mockNode) ->
                 dynamicTest("node: $name, takeDown: $takenDown") {
@@ -112,7 +123,7 @@ class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Copy action is returned if and only if node is not taken down`() =
+    fun `test that Copy action is returned if the node is not taken down`() =
         listOf(true, false).flatMap { takenDown ->
             mockedNodes.map { (name, mockNode) ->
                 dynamicTest("node: $name, takeDown: $takenDown") {
@@ -132,7 +143,7 @@ class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Leave action is returned if and only if node is not taken down and is in shared root node`() =
+    fun `test that Leave action is returned if the node is not taken down and is a shared root node`() =
         listOf(true, false).flatMap { takenDown ->
             mockedNodes.map { (name, mockNode) ->
                 val root = mockNode.isRootInShared()
@@ -153,7 +164,7 @@ class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Rename action is returned if and only if is not in shared node or has owner permission`() =
+    fun `test that Rename action is returned if the non backup node is not a shared node, or is a shared node and has owner permission`() =
         listOf(true, false).flatMap { owner ->
             mockedNodes.map { (name, mockNode) ->
                 val shared = mockNode.isInShared()
@@ -161,6 +172,7 @@ class GetAvailableNodeActionsUseCaseTest {
                     runTest {
                         val node = mockNode()
                         whenever(getNodeAccessPermission(node.id)).thenReturn(if (owner) AccessPermission.OWNER else AccessPermission.READ)
+                        whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
                         val result = underTest(node)
 
                         if (owner || !shared) {
@@ -174,7 +186,7 @@ class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Move to rubbish action is returned if and only if the node is not in shared node or has owner permission and is shared rood node`() =
+    fun `test that Move to rubbish action is returned if the non backup node is not a shared node, or is a shared root node and has owner permission`() =
         listOf(true, false).flatMap { owner ->
             mockedNodes.map { (name, mockNode) ->
                 val shared = mockNode.isInShared()
@@ -183,6 +195,7 @@ class GetAvailableNodeActionsUseCaseTest {
                     runTest {
                         val node = mockNode()
                         whenever(getNodeAccessPermission(node.id)).thenReturn(if (owner) AccessPermission.OWNER else AccessPermission.READ)
+                        whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
 
                         val result = underTest(node)
 
@@ -197,7 +210,7 @@ class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Move action is returned if and only if the node is not in shared node`() =
+    fun `test that Move action is returned if the non backup node is not a shared node`() =
         listOf(true, false).flatMap { takenDown ->
             mockedNodes.map { (name, mockNode) ->
                 val shared = mockNode.isInShared()
@@ -205,6 +218,7 @@ class GetAvailableNodeActionsUseCaseTest {
                     runTest {
                         val node = mockNode()
                         whenever(node.isTakenDown).thenReturn(takenDown)
+                        whenever(isNodeInBackupsUseCase(node.id.longValue)).thenReturn(false)
 
                         val result = underTest(node)
 
@@ -219,7 +233,7 @@ class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that share folder action is returned if and only if the node is a folder and not taken down and not an in shared folder`() =
+    fun `test that share folder action is returned if the node is a folder, not taken down, and not a shared folder`() =
         listOf(true, false).flatMap { takenDown ->
             mockedNodes.map { (name, mockNode) ->
                 val inShared = mockNode.isInShared()
@@ -241,7 +255,7 @@ class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Manage link action is returned if and only if the nodes is exported not taken down and not an in shared node`() =
+    fun `test that Manage link action is returned if the node is exported, not taken down, and not a shared node`() =
         listOf(true, false).flatMap { takenDown ->
             listOf(true, false).flatMap { exported ->
                 mockedNodes.map { (name, mockNode) ->
@@ -265,7 +279,7 @@ class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Remove link action is returned if and only if the nodes is exported not taken down and not an in shared node`() =
+    fun `test that Remove link action is returned if the node is exported, not taken down, and not a shared node`() =
         listOf(true, false).flatMap { takenDown ->
             listOf(true, false).flatMap { exported ->
                 mockedNodes.map { (name, mockNode) ->
@@ -289,7 +303,7 @@ class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Get link action is returned if and only if the nodes is not exported not taken down and not an in shared node`() =
+    fun `test that Get link action is returned if the node is not exported, not taken down, and not a shared node`() =
         listOf(true, false).flatMap { takenDown ->
             listOf(true, false).flatMap { exported ->
                 mockedNodes.map { (name, mockNode) ->
@@ -313,7 +327,7 @@ class GetAvailableNodeActionsUseCaseTest {
         }
 
     @TestFactory
-    fun `test that Dispute taken down action is returned if and only if the nodes is taken down and not an in shared node`() =
+    fun `test that Dispute taken down action is returned if the node is taken down and not a shared node`() =
         listOf(true, false).flatMap { takenDown ->
             mockedNodes.map { (name, mockNode) ->
                 val inShared = mockNode.isInShared()
@@ -349,6 +363,7 @@ class GetAvailableNodeActionsUseCaseTest {
         whenever(isNodeInRubbish(nodeId.longValue)).thenReturn(false)
         whenever(folderNode.isIncomingShare).thenReturn(false)
         whenever(folderNode.parentId).thenReturn(invalidNode)
+        whenever(isNodeInBackupsUseCase(nodeId.longValue)).thenReturn(false)
         return folderNode
     }
 
@@ -359,6 +374,7 @@ class GetAvailableNodeActionsUseCaseTest {
         whenever(isNodeInRubbish(nodeId.longValue)).thenReturn(false)
         whenever(fileNode.isIncomingShare).thenReturn(false)
         whenever(fileNode.parentId).thenReturn(invalidNode)
+        whenever(isNodeInBackupsUseCase(nodeId.longValue)).thenReturn(false)
         return fileNode
     }
 
@@ -367,6 +383,7 @@ class GetAvailableNodeActionsUseCaseTest {
         whenever(fileNode.isIncomingShare).thenReturn(true)
         whenever(fileNode.parentId).thenReturn(parentId)
         whenever(getNodeByIdUseCase(parentId)).thenReturn(parentNode)
+        whenever(isNodeInBackupsUseCase(nodeId.longValue)).thenReturn(false)
         return fileNode
     }
 
@@ -375,18 +392,21 @@ class GetAvailableNodeActionsUseCaseTest {
         whenever(folderNode.isIncomingShare).thenReturn(true)
         whenever(folderNode.parentId).thenReturn(parentId)
         whenever(getNodeByIdUseCase(parentId)).thenReturn(parentNode)
+        whenever(isNodeInBackupsUseCase(nodeId.longValue)).thenReturn(false)
         return folderNode
     }
 
     private suspend fun mockInShareRootFile(): TypedNode {
         mockFile()
         whenever(fileNode.isIncomingShare).thenReturn(true)
+        whenever(isNodeInBackupsUseCase(nodeId.longValue)).thenReturn(false)
         return fileNode
     }
 
     private suspend fun mockInShareRootFolder(): TypedNode {
         mockFolder()
         whenever(folderNode.isIncomingShare).thenReturn(true)
+        whenever(isNodeInBackupsUseCase(nodeId.longValue)).thenReturn(false)
         return folderNode
     }
 

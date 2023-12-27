@@ -16,9 +16,13 @@ class GetAvailableNodeActionsUseCase @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val getNodeAccessPermission: GetNodeAccessPermission,
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
 ) {
     /**
-     * @return a list of available [NodeAction]s for the given node
+     * Invocation function
+     *
+     * @param typedNode A [TypedNode] used to retrieve all available Node Actions
+     * @return a list of available [NodeAction]s for the specified [TypedNode]
      */
     suspend operator fun invoke(
         typedNode: TypedNode,
@@ -39,7 +43,7 @@ class GetAvailableNodeActionsUseCase @Inject constructor(
                 }
             }
             val accessPermission = getNodeAccessPermission(typedNode.id)
-            if (accessPermission == AccessPermission.OWNER || accessPermission == AccessPermission.FULL) {
+            if (!isNodeInBackupsUseCase(typedNode.id.longValue) && (accessPermission == AccessPermission.OWNER || accessPermission == AccessPermission.FULL)) {
                 add(NodeAction.Rename)
                 if (incomingShareFirstLevel) {
                     add(NodeAction.MoveToRubbishBin)
@@ -61,9 +65,11 @@ class GetAvailableNodeActionsUseCase @Inject constructor(
             } else {
                 add(NodeAction.DisputeTakedown)
             }
-            add(NodeAction.MoveToRubbishBin)
-            add(NodeAction.Rename)
-            add(NodeAction.Move)
+            if (!isNodeInBackupsUseCase(typedNode.id.longValue)) {
+                add(NodeAction.MoveToRubbishBin)
+                add(NodeAction.Rename)
+                add(NodeAction.Move)
+            }
         }
     }
 
