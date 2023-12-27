@@ -20,6 +20,7 @@ class VersionsBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = node is TypedFileNode
             && node.hasVersion
             && node.isTakenDown.not()

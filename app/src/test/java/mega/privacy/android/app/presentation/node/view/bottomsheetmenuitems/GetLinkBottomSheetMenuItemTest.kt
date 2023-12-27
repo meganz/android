@@ -31,7 +31,8 @@ class GetLinkBottomSheetMenuItemTest {
             isNodeInRubbish,
             accessPermission,
             isInBackups,
-            node
+            node,
+            true
         )
         assertEquals(expected, result)
     }

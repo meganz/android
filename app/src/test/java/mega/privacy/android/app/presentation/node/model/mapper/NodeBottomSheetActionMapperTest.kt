@@ -29,7 +29,7 @@ class NodeBottomSheetActionMapperTest {
             on { menuAction }.thenReturn(getMenuAction(10))
             on { groupId }.thenReturn(expectedGroup)
             on { buildComposeControl(any()) }.thenReturn { _, _ -> }
-            on { shouldDisplay(any(), any(), any(), any()) }.thenReturn(true)
+            on { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
         }
         val actual = underTest(
             toolbarOptions = setOf(
@@ -39,6 +39,7 @@ class NodeBottomSheetActionMapperTest {
             isNodeInRubbish = false,
             accessPermission = AccessPermission.OWNER,
             isInBackUps = false,
+            isConnected = true
         )
 
         assertThat(actual.first().group).isEqualTo(expectedGroup)
@@ -51,7 +52,7 @@ class NodeBottomSheetActionMapperTest {
             on { menuAction }.thenReturn(getMenuAction(expectedOrderInGroup))
             on { groupId }.thenReturn(10)
             on { buildComposeControl(any()) }.thenReturn { _, _ -> }
-            on { shouldDisplay(any(), any(), any(), any()) }.thenReturn(true)
+            on { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
         }
         val actual = underTest(
             toolbarOptions = setOf(
@@ -61,6 +62,7 @@ class NodeBottomSheetActionMapperTest {
             isNodeInRubbish = false,
             accessPermission = AccessPermission.OWNER,
             isInBackUps = false,
+            isConnected = true
         )
 
         assertThat(actual.first().orderInGroup).isEqualTo(expectedOrderInGroup)
@@ -72,7 +74,7 @@ class NodeBottomSheetActionMapperTest {
             on { menuAction }.thenReturn(getMenuAction(10))
             on { groupId }.thenReturn(10)
             on { buildComposeControl(any()) }.thenReturn { _, _ -> }
-            on { shouldDisplay(any(), any(), any(), any()) }.thenReturn(true)
+            on { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
         }
         val selectedNode = mock<TypedFileNode>()
         underTest(
@@ -83,6 +85,7 @@ class NodeBottomSheetActionMapperTest {
             isNodeInRubbish = false,
             accessPermission = AccessPermission.OWNER,
             isInBackUps = false,
+            isConnected = true
         )
 
         verify(bottomSheetMenuItem).buildComposeControl(selectedNode)

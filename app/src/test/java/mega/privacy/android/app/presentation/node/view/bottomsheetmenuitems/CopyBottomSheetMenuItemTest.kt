@@ -26,7 +26,8 @@ class CopyBottomSheetMenuItemTest {
             isNodeInRubbish = false,
             accessPermission = null,
             isInBackups = false,
-            node = node
+            node = node,
+            isConnected = true
         )
 
         Truth.assertThat(result).isTrue()
@@ -41,7 +42,8 @@ class CopyBottomSheetMenuItemTest {
             isNodeInRubbish = false,
             accessPermission = null,
             isInBackups = false,
-            node = node
+            node = node,
+            isConnected = true
         )
 
         Truth.assertThat(result).isFalse()
@@ -53,7 +55,8 @@ class CopyBottomSheetMenuItemTest {
             isNodeInRubbish = true,
             accessPermission = null,
             isInBackups = false,
-            node = node
+            node = node,
+            isConnected = true
         )
 
         Truth.assertThat(result).isFalse()
@@ -65,7 +68,8 @@ class CopyBottomSheetMenuItemTest {
             isNodeInRubbish = false,
             accessPermission = null,
             isInBackups = true,
-            node = node
+            node = node,
+            isConnected = true
         )
 
         Truth.assertThat(result).isTrue()

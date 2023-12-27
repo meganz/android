@@ -40,8 +40,9 @@ class NodeOptionsBottomSheetTest {
         viewModel.stub {
             on { state }.thenReturn(MutableStateFlow(
                 NodeBottomSheetState(
-                    "",
-                    listOf(
+                    name = "",
+                    isOnline = true,
+                    actions = listOf(
                         BottomSheetMenuItem(
                             group = 1,
                             orderInGroup = 1,
@@ -71,6 +72,7 @@ class NodeOptionsBottomSheetTest {
             on { state }.thenReturn(MutableStateFlow(
                 NodeBottomSheetState(
                     name = "",
+                    isOnline = true,
                     actions = listOf(
                         BottomSheetMenuItem(
                             group = 1,

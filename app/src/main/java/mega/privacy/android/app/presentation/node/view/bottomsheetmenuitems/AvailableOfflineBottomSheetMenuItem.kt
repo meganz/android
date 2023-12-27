@@ -53,6 +53,7 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = isNodeInRubbish.not() && node.isTakenDown.not()
 
     override fun getOnClickFunction(

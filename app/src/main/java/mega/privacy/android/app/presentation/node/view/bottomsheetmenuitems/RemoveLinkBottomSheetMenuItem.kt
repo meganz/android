@@ -16,6 +16,7 @@ class RemoveLinkBottomSheetMenuItem @Inject constructor() :
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = node.isTakenDown.not()
             && node.exportedData?.publicLink != null
             && isNodeInRubbish.not()

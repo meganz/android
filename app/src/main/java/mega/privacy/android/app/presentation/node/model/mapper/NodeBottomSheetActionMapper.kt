@@ -25,12 +25,14 @@ class NodeBottomSheetActionMapper @Inject constructor() {
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackUps: Boolean,
+        isConnected: Boolean,
     ) = toolbarOptions.filter {
         it.shouldDisplay(
             isNodeInRubbish = isNodeInRubbish,
             accessPermission = accessPermission,
             isInBackups = isInBackUps,
-            node = selectedNode
+            node = selectedNode,
+            isConnected = isConnected,
         )
     }.map {
         BottomSheetMenuItem(

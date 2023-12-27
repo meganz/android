@@ -19,7 +19,8 @@ class TrashBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
-    ) = true
+        isConnected: Boolean,
+    ) = false
 
     override val groupId = 9
 }

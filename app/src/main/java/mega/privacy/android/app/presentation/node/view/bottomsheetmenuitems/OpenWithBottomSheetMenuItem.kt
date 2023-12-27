@@ -20,6 +20,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = node is TypedFileNode
             && node.isTakenDown.not()
             && isNodeInRubbish.not()

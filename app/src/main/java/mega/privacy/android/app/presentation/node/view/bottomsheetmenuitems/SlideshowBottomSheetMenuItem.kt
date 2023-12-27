@@ -19,6 +19,7 @@ class SlideshowBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = false //Due to requirement change, now just hide slideshow entry in node context menu
 
     override val groupId = 5

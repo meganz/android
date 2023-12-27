@@ -27,6 +27,7 @@ class FavouriteBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = node.isTakenDown.not()
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER

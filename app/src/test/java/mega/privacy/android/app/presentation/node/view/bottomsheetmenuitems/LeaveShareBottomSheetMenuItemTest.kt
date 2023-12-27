@@ -31,7 +31,8 @@ class LeaveShareBottomSheetMenuItemTest {
             isNodeInRubbish,
             accessPermission,
             isInBackups,
-            node
+            node,
+            true
         )
         assertEquals(expected, result)
     }

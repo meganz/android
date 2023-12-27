@@ -19,7 +19,8 @@ class LabelBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
-    ) = true
+        isConnected: Boolean,
+    ) = false
 
     override val groupId: Int
         get() = 3

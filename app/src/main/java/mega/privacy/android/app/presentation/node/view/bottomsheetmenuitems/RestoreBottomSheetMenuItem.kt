@@ -19,6 +19,7 @@ class RestoreBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = true
 
     override val groupId = 8

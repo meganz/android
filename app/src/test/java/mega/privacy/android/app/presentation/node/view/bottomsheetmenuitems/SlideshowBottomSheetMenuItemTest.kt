@@ -22,7 +22,8 @@ class SlideshowBottomSheetMenuItemTest {
             isNodeInRubbish = false,
             accessPermission = null,
             isInBackups = false,
-            node = node
+            node = node,
+            true
         )
         Truth.assertThat(result).isFalse()
     }
@@ -36,7 +37,8 @@ class SlideshowBottomSheetMenuItemTest {
             isNodeInRubbish = false,
             accessPermission = null,
             isInBackups = false,
-            node = node
+            node = node,
+            true
         )
         Truth.assertThat(result).isFalse()
     }

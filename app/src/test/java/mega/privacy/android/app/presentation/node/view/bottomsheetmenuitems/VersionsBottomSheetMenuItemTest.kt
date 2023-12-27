@@ -32,7 +32,8 @@ class VersionsBottomSheetMenuItemTest {
             isNodeInRubbish,
             accessPermission,
             isInBackups,
-            node
+            node,
+            true
         )
         assertEquals(expected, result)
     }

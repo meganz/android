@@ -31,7 +31,8 @@ class OpenWithBottomSheetMenuItemTest {
             isNodeInRubbish,
             accessPermission,
             isInBackups,
-            node
+            node,
+            true
         )
         assertEquals(expected, result)
     }

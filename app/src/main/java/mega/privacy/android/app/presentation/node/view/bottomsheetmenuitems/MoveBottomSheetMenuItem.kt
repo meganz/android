@@ -19,6 +19,7 @@ class MoveBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = isInBackups.not()
             && isNodeInRubbish.not()
             && node.isIncomingShare.not()

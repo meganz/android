@@ -16,6 +16,7 @@ class RemoveShareBottomSheetMenuItem @Inject constructor() :
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = true
 
     override val menuAction = RemoveShareMenuAction(210)

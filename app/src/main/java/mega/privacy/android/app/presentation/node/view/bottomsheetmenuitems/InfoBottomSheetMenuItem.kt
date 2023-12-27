@@ -19,6 +19,7 @@ class InfoBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = true
 
     override val groupId: Int

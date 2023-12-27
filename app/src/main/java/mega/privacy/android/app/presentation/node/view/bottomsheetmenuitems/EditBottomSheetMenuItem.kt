@@ -24,6 +24,7 @@ class EditBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = !isNodeInRubbish
             && isInBackups.not()
             && node.isTakenDown.not()

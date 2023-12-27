@@ -49,6 +49,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ): Boolean
 
 

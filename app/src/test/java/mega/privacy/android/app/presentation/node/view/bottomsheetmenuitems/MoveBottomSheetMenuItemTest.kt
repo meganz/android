@@ -32,7 +32,8 @@ class MoveBottomSheetMenuItemTest {
             isNodeInRubbish,
             accessPermission,
             isInBackups,
-            node
+            node,
+            true,
         )
         assertEquals(expected, result)
     }

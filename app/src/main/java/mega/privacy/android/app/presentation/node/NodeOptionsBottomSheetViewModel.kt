@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.Node
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import javax.inject.Inject
@@ -35,6 +36,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
 
     /**
@@ -46,6 +48,16 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
      * public UI State
      */
     val state: StateFlow<NodeBottomSheetState> = _state
+
+    init {
+        viewModelScope.launch {
+            monitorConnectivityUseCase().collect { isConnected ->
+                _state.update {
+                    it.copy(isOnline = isConnected)
+                }
+            }
+        }
+    }
 
     /**
      * Get bottom sheet options
@@ -63,7 +75,8 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
             selectedNode = nodeUIItem.node,
             isNodeInRubbish = isNodeInRubbish.await(),
             accessPermission = accessPermission.await(),
-            isInBackUps = isInBackUps.await()
+            isInBackUps = isInBackUps.await(),
+            isConnected = state.value.isOnline,
         )
         _state.update {
             it.copy(

@@ -19,6 +19,7 @@ class GetLinkBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
     ) = node.isTakenDown.not()
             && node.exportedData?.publicLink.isNullOrEmpty()
             && isNodeInRubbish.not()
