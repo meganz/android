@@ -42,6 +42,9 @@ import javax.inject.Inject
  * @property dbHandler                  Database handler needed to retrieve timeline nodes
  * @property sortOrderIntMapper         SortOrderIntMapper
  */
+@Deprecated(
+    "In favour of the new image preview rendering this usecase unused, it was agreed to mark this usecase as deprecated instead"
+)
 class GetImageHandlesUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
