@@ -42,8 +42,8 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -165,6 +165,14 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         setupObservers()
         viewModel.checkLoginRequired()
         checkForInAppAdvertisement()
+        setupMiniAudioPlayer()
+    }
+
+    private fun setupMiniAudioPlayer() {
+        val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
+            shouldVisible = true
+        }
+        lifecycle.addObserver(audioPlayerController)
     }
 
     private fun checkForInAppAdvertisement() {
