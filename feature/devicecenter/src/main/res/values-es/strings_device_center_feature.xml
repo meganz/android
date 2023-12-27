@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- Title of the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_title">Rename device</string>
+    <string name="device_center_rename_device_dialog_title">Renombrar dispositivo</string>
     <!-- The name of the Positive Button for the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_positive_button">Renombrar</string>
     <!-- The name of the Negative Button for the Rename Device Dialog -->
@@ -11,7 +11,7 @@
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
     <string name="device_center_list_view_item_header_other_devices">Otros dispositivos</string>
     <!-- The name of the Device or Folder Status when no matching Status is found-->
-    <string name="device_center_list_view_item_status_unknown_status">Unknown status</string>
+    <string name="device_center_list_view_item_status_unknown_status">Estado desconocido</string>
     <!-- The name of the Device if the SDK cannot retrieve the name for that Device -->
     <string name="device_center_list_view_item_title_unknown_device">Dispositivo desconocido</string>
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
@@ -23,7 +23,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
     <string name="device_center_list_view_item_status_updating">Actualizando&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
-    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% Updating&#8230;</string>
+    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% Actualizando...</string>
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
     <string name="device_center_list_view_item_status_no_camera_uploads">No hay subidas de la cámara</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
@@ -137,15 +137,15 @@
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">La carpeta no se puede sincronizar porque ya está dentro de una carpeta sincronizada.</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
-    <string name="device_center_list_view_item_status_camera_uploads_disabled">Camera uploads disabled</string>
+    <string name="device_center_list_view_item_status_camera_uploads_disabled">Subidas de la cámara desactivadas</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
-    <string name="device_center_rename_device_dialog_error_message_empty_device_name">Enter a device name.</string>
+    <string name="device_center_rename_device_dialog_error_message_empty_device_name">Introducir el nombre del dispositivo.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->
-    <string name="device_center_rename_device_dialog_error_message_name_already_exists">A device with this name already exists. Enter a different name.</string>
+    <string name="device_center_rename_device_dialog_error_message_name_already_exists">Ya existe un dispositivo con este nombre. Introduce un nombre diferente.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name with invalid characters -->
     <string name="device_center_rename_device_dialog_error_message_invalid_characters">Los siguientes caracteres no están permitidos: %1$s</string>
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
-    <string name="device_center_snackbar_message_rename_device_successful">Device renamed</string>
+    <string name="device_center_snackbar_message_rename_device_successful">Dispositivo renombrado</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
-    <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">Maximum 32 characters</string>
+    <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">Máximo 32 caracteres</string>
 </resources>

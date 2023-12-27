@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Change log of Android App 10.0 . Keep the dash character (-) and line breaks to keep the list format. -->
-    <string name="android_change_log_v10_0">- 사진첩 공유가 이제 출시되었습니다.\n- 버그 수정과 성능 향상.</string>
-</resources>

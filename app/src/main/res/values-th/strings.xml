@@ -746,7 +746,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">นี่เป็นขั้นตอนสุดท้ายในการลบบัญชีของคุณ คุณจะสูญเสียข้อมูลทั้งหมดที่เก็บไว้ในคลาวด์อย่างถาวร กรุณากรอกรหัสผ่านของคุณด้านล่าง</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Email address verification</string>
+    <string name="email_verification_title">การยืนยันที่อยู่อีเมล</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">โปรดตรวจสอบอีเมลของคุณเพื่อดำเนินการต่อ</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1345,9 +1345,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">ย้ายไปถังขยะหรือไม่</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">ย้ายโฟลเดอร์นี้ไปที่ถังขยะหรือไม่ ระบบจะสร้างโฟลเดอร์อัปโหลดจากกล้องให้ใหม่โดยอัตโนมัติ</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">ย้ายโฟลเดอร์นี้ไปที่ถังขยะหรือไม่ ระบบจะสร้างโฟลเดอร์อัปโหลดสื่อให้ใหม่โดยอัตโนมัติ</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">ย้ายไปถังขยะหรือไม่</string>
     <!-- confirmation message before removing a file -->
@@ -1391,7 +1391,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">ส่งคำเชิญแล้ว</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Email address is malformed</string>
+    <string name="invalid_email_to_invite">ที่อยู่อีเมลมีรูปแบบไม่ถูกต้อง</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">เมื่อคุณติดตั้งแอป MEGA บนเดสก์ท็อป คุณจะได้รับพื้นที่เก็บข้อมูลฟรี %1$s มีอายุใช้งาน 365 วัน แอป MEGA บนเดสก์ท็อปสามารถใช้ได้ทั้ง Windows, macOS และ Linux distros เป็นส่วนใหญ่</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1960,7 +1960,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">เปิดหรือปิดใช้งานการกำหนดเวอร์ชันไฟล์สำหรับทั้งบัญชีของคุณ\nการปิดใช้งานการกำหนดเวอร์ชันไฟล์ ไม่ได้มีการป้องกันผู้ติดต่อของคุณเพื่อสร้างเวอร์ชันใหม่ในโฟลเดอร์ที่แชร์</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Tap, enter name or email address</string>
+    <string name="type_mail">แตะ เพื่อกรอกชื่อหรืออีเมล</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">เพิ่ม %s ในรายชื่อติดต่อของคุณหรือไม่</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -4924,7 +4924,7 @@
         <item quantity="other">การอัปโหลดจากกล้องเสร็จสมบูรณ์ มี %1$d ไฟล์ที่อัปโหลดแล้ว</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA ถูกจำกัดการเข้าถึงไลบรารีรูปภาพของคุณและไม่สามารถสำรองรูปภาพทั้งหมดของคุณได้</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">แตะเพื่อเปลี่ยนการอนุญาต</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -4994,5 +4994,5 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">ซิงค์</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;ไม่มีโฆษณา</string>
 </resources>

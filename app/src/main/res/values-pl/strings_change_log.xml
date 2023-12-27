@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Change log of Android App 10.0 . Keep the dash character (-) and line breaks to keep the list format. -->
-    <string name="android_change_log_v10_0">a- Udostępnianie albumów zostało już udostępnione.\n- Poprawki błędów i ulepszenia wydajności.</string>
-</resources>

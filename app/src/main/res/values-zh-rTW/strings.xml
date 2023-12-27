@@ -4380,7 +4380,7 @@
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_send_calendar_invite_label">發送行事曆邀請</string>
     <!-- Title of option to add description in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_add_description_label">加入描述</string>
+    <string name="meetings_schedule_meeting_add_description_label">加入說明</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">會議名稱為必填</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
@@ -4988,7 +4988,7 @@
     <!-- Preference screen item title for Ads Cookie -->
     <string name="settings_cookies_settings_ads_title">廣告Cookies</string>
     <!-- Preference screen item summary for Ads Cookie-->
-    <string name="settings_cookies_settings_ads_summary">由我們認可的廣告合作伙伴用於收集有關您的瀏覽活動的資料，並自訂您在我們的服務和其它網站上看到的廣告。不接受這些cookie意味著您仍然會看到廣告，但它們不會個人化。</string>
+    <string name="settings_cookies_settings_ads_summary">由我們認可的廣告合作伙伴用於收集有關您的瀏覽活動的資料，並自訂您在我們的服務和其它網站上看到的廣告。不接受這些cookie意味著您仍然會看到廣告，但它們不會是個人化的。</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">我們使用cookie和類似技術來幫助我們改善服務和廣告目的。繼續使用MEGA即表示您同意我們更新過的[A]Cookie政策[/A]條款。</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
