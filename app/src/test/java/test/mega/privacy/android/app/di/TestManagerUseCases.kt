@@ -16,7 +16,6 @@ import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
-import mega.privacy.android.app.domain.usecase.GetRubbishBinFolderUseCase
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -37,11 +36,6 @@ object TestManagerUseCases {
 
     @Provides
     fun provideGetRootFolder() = mock<GetRootFolder> {
-        on { runBlocking { invoke() } }.thenReturn(MegaNode())
-    }
-
-    @Provides
-    fun provideGetRubbishBinFolder() = mock<GetRubbishBinFolderUseCase> {
         on { runBlocking { invoke() } }.thenReturn(MegaNode())
     }
 

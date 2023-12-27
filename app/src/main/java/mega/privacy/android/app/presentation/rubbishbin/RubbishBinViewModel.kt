@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
-import mega.privacy.android.app.domain.usecase.GetRubbishBinFolderUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -139,7 +139,7 @@ class RubbishBinViewModel @Inject constructor(
                     nodeList = nodeList,
                     sortOrder = getCloudSortOrder(),
                     isRubbishBinEmpty = INVALID_HANDLE == _state.value.rubbishBinHandle ||
-                            getRubbishBinFolderUseCase()?.handle == _state.value.rubbishBinHandle
+                            getRubbishBinFolderUseCase()?.id?.longValue == _state.value.rubbishBinHandle
                 )
             }
         }
