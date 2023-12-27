@@ -16,7 +16,10 @@ class RemoveLinkBottomSheetMenuItem @Inject constructor() :
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
-    ) = true
+    ) = node.isTakenDown.not()
+            && node.exportedData?.publicLink != null
+            && isNodeInRubbish.not()
+            && accessPermission == AccessPermission.OWNER
 
     override val menuAction = RemoveLinkMenuAction(170)
     override val groupId = 7

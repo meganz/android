@@ -19,7 +19,7 @@ class ViewInFolderBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
-    ) = true
+    ) = false
 
 
     override val groupId = 3

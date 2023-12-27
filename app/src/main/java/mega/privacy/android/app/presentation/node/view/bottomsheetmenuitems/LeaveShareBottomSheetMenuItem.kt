@@ -19,7 +19,8 @@ class LeaveShareBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
-    ) = true
+    ) = node.isTakenDown.not()
+            && node.isIncomingShare
 
     override val groupId: Int
         get() = 9

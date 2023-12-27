@@ -19,7 +19,10 @@ class MoveBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
-    ) = true
+    ) = isInBackups.not()
+            && isNodeInRubbish.not()
+            && node.isIncomingShare.not()
+            && node.isTakenDown.not()
 
 
     override val groupId: Int

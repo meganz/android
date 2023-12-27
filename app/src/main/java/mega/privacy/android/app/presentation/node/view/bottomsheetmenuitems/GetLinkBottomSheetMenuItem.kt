@@ -19,7 +19,10 @@ class GetLinkBottomSheetMenuItem @Inject constructor(
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
-    ) = true
+    ) = node.isTakenDown.not()
+            && node.exportedData?.publicLink.isNullOrEmpty()
+            && isNodeInRubbish.not()
+            && accessPermission == AccessPermission.OWNER
 
     override val groupId: Int
         get() = 7
