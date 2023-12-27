@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
@@ -60,7 +60,7 @@ class RubbishBinViewModelTest {
     private val getIntentToOpenFileMapper = mock<GetIntentToOpenFileMapper>()
     private val getRubbishBinFolderUseCase = mock<GetRubbishBinFolderUseCase>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
-    private val getRubbishBinChildren = mock<GetRubbishBinChildren>()
+    private val getRubbishBinNodeChildrenUseCase = mock<GetRubbishBinNodeChildrenUseCase>()
     private val fileDurationMapper: FileDurationMapper = mock()
 
     @BeforeEach
@@ -76,7 +76,7 @@ class RubbishBinViewModelTest {
         underTest = RubbishBinViewModel(
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getRubbishBinParentNodeHandle = getRubbishBinParentNodeHandle,
-            getRubbishBinChildren = getRubbishBinChildren,
+            getRubbishBinNodeChildrenUseCase = getRubbishBinNodeChildrenUseCase,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
             setViewType = setViewType,
             monitorViewType = monitorViewType,
@@ -125,7 +125,7 @@ class RubbishBinViewModelTest {
     fun `test that on setting rubbish bin handle rubbish bin node returns empty list`() =
         runTest {
             val newValue = 123456789L
-            whenever(getRubbishBinChildren.invoke(newValue)).thenReturn(ArrayList())
+            whenever(getRubbishBinNodeChildrenUseCase.invoke(newValue)).thenReturn(ArrayList())
             monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
             underTest.setRubbishBinHandle(newValue)
             Truth.assertThat(underTest.state.value.nodeList.size).isEqualTo(0)
@@ -134,10 +134,10 @@ class RubbishBinViewModelTest {
     @Test
     fun `test that on setting rubbish bin handle rubbish bin node returns null`() = runTest {
         val newValue = 123456789L
-        whenever(getRubbishBinChildren(newValue)).thenReturn(emptyList())
+        whenever(getRubbishBinNodeChildrenUseCase(newValue)).thenReturn(emptyList())
         underTest.setRubbishBinHandle(newValue)
         Truth.assertThat(underTest.state.value.nodeList.size).isEqualTo(0)
-        verify(getRubbishBinChildren, times(1)).invoke(newValue)
+        verify(getRubbishBinNodeChildrenUseCase, times(1)).invoke(newValue)
     }
 
     @Test
@@ -145,7 +145,7 @@ class RubbishBinViewModelTest {
         runTest {
             val newValue = 123456789L
             underTest.onBackPressed()
-            verify(getRubbishBinChildren, times(0)).invoke(newValue)
+            verify(getRubbishBinNodeChildrenUseCase, times(0)).invoke(newValue)
         }
 
     @Test
@@ -153,10 +153,10 @@ class RubbishBinViewModelTest {
         runTest {
             val newValue = 123456789L
             // to update handles rubbishBinHandle
-            whenever(getRubbishBinChildren(newValue)).thenReturn(emptyList())
+            whenever(getRubbishBinNodeChildrenUseCase(newValue)).thenReturn(emptyList())
             underTest.setRubbishBinHandle(newValue)
             underTest.onBackPressed()
-            verify(getRubbishBinChildren, times(1)).invoke(newValue)
+            verify(getRubbishBinNodeChildrenUseCase, times(1)).invoke(newValue)
         }
 
     @Test
@@ -166,7 +166,7 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -193,7 +193,7 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -228,7 +228,7 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFolderNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -270,7 +270,7 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -292,7 +292,7 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -315,7 +315,7 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -345,7 +345,7 @@ class RubbishBinViewModelTest {
             whenever(megaNode1.handle).thenReturn(1L)
             whenever(megaNode2.handle).thenReturn(2L)
 
-            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -375,7 +375,7 @@ class RubbishBinViewModelTest {
             whenever(megaNode1.handle).thenReturn(1L)
             whenever(megaNode2.handle).thenReturn(2L)
 
-            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -405,7 +405,7 @@ class RubbishBinViewModelTest {
             whenever(megaNode2.handle).thenReturn(2L)
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -434,7 +434,7 @@ class RubbishBinViewModelTest {
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorViewType()).thenReturn(emptyFlow())
-        whenever(getRubbishBinChildren(any())).thenReturn(emptyList())
+        whenever(getRubbishBinNodeChildrenUseCase(any())).thenReturn(emptyList())
         whenever(getRubbishBinParentNodeHandle(any())).thenReturn(null)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(getRubbishBinFolderUseCase()).thenReturn(null)
@@ -454,7 +454,7 @@ class RubbishBinViewModelTest {
             getIntentToOpenFileMapper,
             getRubbishBinFolderUseCase,
             getNodeByHandle,
-            getRubbishBinChildren,
+            getRubbishBinNodeChildrenUseCase,
             fileDurationMapper
         )
     }

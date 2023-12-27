@@ -15,7 +15,7 @@ import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetRootFolder
-import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -82,6 +82,4 @@ object TestManagerUseCases {
         onBlocking { invoke() }.thenReturn(MegaNode())
     }
 
-    @Provides
-    fun provideGetRubbishBinChildren() = mock<GetRubbishBinChildren> {}
 }

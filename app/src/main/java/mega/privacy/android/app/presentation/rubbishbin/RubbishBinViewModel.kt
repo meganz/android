@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
@@ -44,7 +44,7 @@ import javax.inject.Inject
  *
  * @param monitorNodeUpdatesUseCase Monitor node updates
  * @param getRubbishBinParentNodeHandle [GetParentNodeHandle] Fetch parent handle
- * @param getRubbishBinChildren [GetRubbishBinChildren] Fetch Rubbish Bin [Node]
+ * @param getRubbishBinNodeChildrenUseCase [GetRubbishBinNodeChildrenUseCase] Fetch list of Rubbish Bin [Node]
  * @param isNodeDeletedFromBackupsUseCase Checks whether the deleted Node came from Backups or not
  * @param setViewType [SetViewType] to set view type
  * @param monitorViewType [MonitorViewType] check view type
@@ -56,7 +56,7 @@ import javax.inject.Inject
 class RubbishBinViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getRubbishBinParentNodeHandle: GetParentNodeHandle,
-    private val getRubbishBinChildren: GetRubbishBinChildren,
+    private val getRubbishBinNodeChildrenUseCase: GetRubbishBinNodeChildrenUseCase,
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
@@ -125,14 +125,14 @@ class RubbishBinViewModel @Inject constructor(
 
     /**
      * Retrieves the list of Nodes
-     * Call the Use Case [getRubbishBinChildren] to retrieve and return the list of Nodes
+     * Call the Use Case [getRubbishBinNodeChildrenUseCase] to retrieve and return the list of Nodes
      *
      * @return a List of Rubbish Bin Nodes
      */
     fun refreshNodes() {
         viewModelScope.launch {
             val nodeList =
-                getNodeUiItems(getRubbishBinChildren(_state.value.rubbishBinHandle))
+                getNodeUiItems(getRubbishBinNodeChildrenUseCase(_state.value.rubbishBinHandle))
             _state.update {
                 it.copy(
                     parentHandle = getRubbishBinParentNodeHandle(_state.value.rubbishBinHandle),
