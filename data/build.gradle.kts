@@ -110,10 +110,9 @@ dependencies {
 
         kapt(google.hilt.android.compiler)
         kapt(androidx.hilt.compiler)
-
-        implementation(google.autovalue.annotations)
-        "kapt"(google.autovalue)
+        kapt(google.autovalue)
     }
+    implementation(google.autovalue.annotations)
 
     "gmsImplementation"(lib.billing.client.ktx)
 
