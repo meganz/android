@@ -2,11 +2,13 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.combine
@@ -315,7 +317,9 @@ internal class DefaultTransfersRepository @Inject constructor(
                     getTransferByTag(event.request.transferTag)
                 }
             },
-        ).flowOn(ioDispatcher)
+        )
+            .buffer(capacity = Channel.UNLIMITED)
+            .flowOn(ioDispatcher)
 
     override suspend fun cancelTransferByTag(transferTag: Int) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
