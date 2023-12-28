@@ -8,6 +8,10 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -23,6 +27,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,6 +83,7 @@ import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.ChatMeetingButton
 import mega.privacy.android.core.ui.controls.chat.ReturnToCallBanner
+import mega.privacy.android.core.ui.controls.chat.ScrollToBottomFab
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
@@ -192,6 +198,12 @@ internal fun ChatView(
         }
     }
     val scrollState = rememberLazyListState()
+    val showScrollToBottomFab by remember {
+        derivedStateOf {
+            scrollState.layoutInfo.totalItemsCount > 0
+                    && scrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index != scrollState.layoutInfo.totalItemsCount - 1
+        }
+    }
     BackHandler(enabled = toolbarModalSheetState.isVisible) {
         coroutineScope.launch {
             toolbarModalSheetState.hide()
@@ -377,6 +389,19 @@ internal fun ChatView(
                             ),
                             onSendClick = onSendClick
                         )
+                    }
+                },
+                floatingActionButton = {
+                    AnimatedVisibility(
+                        visible = showScrollToBottomFab,
+                        enter = fadeIn() + scaleIn(),
+                        exit = fadeOut(),
+                    ) {
+                        ScrollToBottomFab {
+                            coroutineScope.launch {
+                                scrollState.animateScrollToItem(scrollState.layoutInfo.totalItemsCount - 1)
+                            }
+                        }
                     }
                 }
             )
