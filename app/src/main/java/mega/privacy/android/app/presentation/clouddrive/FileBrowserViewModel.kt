@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
-import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
+import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
@@ -57,7 +57,7 @@ import javax.inject.Inject
  * @param monitorNodeUpdatesUseCase Monitor node updates
  * @param getFileBrowserParentNodeHandle To get parent handle of current node
  * @param getIsNodeInRubbish To get current node is in rubbish
- * @param getFileBrowserChildrenUseCase [GetFileBrowserChildrenUseCase]
+ * @param getFileBrowserNodeChildrenUseCase [GetFileBrowserNodeChildrenUseCase]
  * @param getCloudSortOrder [GetCloudSortOrder]
  * @param monitorViewType [MonitorViewType] check view type
  * @param setViewType [SetViewType] to set view type
@@ -75,7 +75,7 @@ class FileBrowserViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getFileBrowserParentNodeHandle: GetParentNodeHandle,
     private val getIsNodeInRubbish: IsNodeInRubbish,
-    private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase,
+    private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorViewType: MonitorViewType,
     private val setViewType: SetViewType,
@@ -259,7 +259,7 @@ class FileBrowserViewModel @Inject constructor(
         parentHandle: Long,
         mediaDiscoveryViewSettings: Int,
     ): Boolean =
-        getFileBrowserChildrenUseCase(parentHandle).let { nodes ->
+        getFileBrowserNodeChildrenUseCase(parentHandle).let { nodes ->
             if (nodes.isEmpty() || mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.DISABLED.ordinal) {
                 false
             } else {
@@ -284,7 +284,7 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     private suspend fun refreshNodesState() {
-        val typedNodeList = getFileBrowserChildrenUseCase(_state.value.fileBrowserHandle)
+        val typedNodeList = getFileBrowserNodeChildrenUseCase(_state.value.fileBrowserHandle)
         val nodeList = getNodeUiItems(typedNodeList)
         val hasMediaFile: Boolean = containsMediaItemUseCase(typedNodeList)
         val isRootNode = getRootFolder()?.handle == _state.value.fileBrowserHandle

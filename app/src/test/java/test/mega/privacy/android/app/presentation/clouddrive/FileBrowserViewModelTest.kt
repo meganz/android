@@ -18,7 +18,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
-import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
+import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -76,7 +76,7 @@ class FileBrowserViewModelTest {
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val getFileBrowserParentNodeHandle = mock<GetParentNodeHandle>()
-    private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase = mock()
+    private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val handleOptionClickMapper: HandleOptionClickMapper = mock()
     private val monitorViewType: MonitorViewType = mock()
@@ -105,7 +105,7 @@ class FileBrowserViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getFileBrowserParentNodeHandle = getFileBrowserParentNodeHandle,
             getIsNodeInRubbish = isNodeInRubbish,
-            getFileBrowserChildrenUseCase = getFileBrowserChildrenUseCase,
+            getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
             getCloudSortOrder = getCloudSortOrder,
             setViewType = setViewType,
             monitorViewType = monitorViewType,
@@ -166,7 +166,7 @@ class FileBrowserViewModelTest {
     fun `test that on setting Browser Parent Handle, handle File Browser node returns some items in list`() =
         runTest {
             val newValue = 123456789L
-            whenever(getFileBrowserChildrenUseCase(newValue)).thenReturn(
+            whenever(getFileBrowserNodeChildrenUseCase(newValue)).thenReturn(
                 listOf<TypedFolderNode>(mock(), mock())
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -183,16 +183,16 @@ class FileBrowserViewModelTest {
     fun `test that on setting Browser Parent Handle, handle File Browser node returns null`() =
         runTest {
             val newValue = 123456789L
-            whenever(getFileBrowserChildrenUseCase.invoke(newValue)).thenReturn(emptyList())
+            whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(emptyList())
             underTest.setBrowserParentHandle(newValue)
             Truth.assertThat(underTest.state.value.nodesList.size).isEqualTo(0)
-            verify(getFileBrowserChildrenUseCase).invoke(newValue)
+            verify(getFileBrowserNodeChildrenUseCase).invoke(newValue)
         }
 
     @Test
     fun `test that when nodes are empty then Enter in MD mode will return false`() = runTest {
         val newValue = 123456789L
-        whenever(getFileBrowserChildrenUseCase.invoke(newValue)).thenReturn(emptyList())
+        whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(emptyList())
         underTest.setBrowserParentHandle(newValue)
 
         val shouldEnter =
@@ -208,7 +208,7 @@ class FileBrowserViewModelTest {
         runTest {
             val newValue = 123456789L
             val list = listOf<TypedFileNode>(mock(), mock())
-            whenever(getFileBrowserChildrenUseCase(newValue)).thenReturn(list)
+            whenever(getFileBrowserNodeChildrenUseCase(newValue)).thenReturn(list)
             underTest.setBrowserParentHandle(newValue)
 
             val shouldEnter =
@@ -224,7 +224,7 @@ class FileBrowserViewModelTest {
         runTest {
             val newValue = 123456789L
             val folderNode = mock<TypedFolderNode>()
-            whenever(getFileBrowserChildrenUseCase.invoke(newValue)).thenReturn(listOf(folderNode))
+            whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(listOf(folderNode))
 
             underTest.setBrowserParentHandle(newValue)
 
@@ -241,7 +241,7 @@ class FileBrowserViewModelTest {
         runTest {
             val newValue = 123456789L
             underTest.onBackPressed()
-            verify(getFileBrowserChildrenUseCase, times(0)).invoke(newValue)
+            verify(getFileBrowserNodeChildrenUseCase, times(0)).invoke(newValue)
         }
 
     @Test
@@ -249,12 +249,12 @@ class FileBrowserViewModelTest {
         runTest {
             val newValue = 123456789L
             // to update handles fileBrowserHandle
-            whenever(getFileBrowserChildrenUseCase.invoke(newValue)).thenReturn(
+            whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(
                 listOf<TypedFolderNode>(mock(), mock())
             )
             underTest.setBrowserParentHandle(newValue)
             underTest.onBackPressed()
-            verify(getFileBrowserChildrenUseCase).invoke(newValue)
+            verify(getFileBrowserNodeChildrenUseCase).invoke(newValue)
         }
 
     @Test
@@ -264,7 +264,7 @@ class FileBrowserViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getFileBrowserChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
+            whenever(getFileBrowserNodeChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -291,7 +291,7 @@ class FileBrowserViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getFileBrowserChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
+            whenever(getFileBrowserNodeChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -327,7 +327,7 @@ class FileBrowserViewModelTest {
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
 
-            whenever(getFileBrowserChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
+            whenever(getFileBrowserNodeChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -364,7 +364,7 @@ class FileBrowserViewModelTest {
     @Test
     fun `test that when select all nodes clicked size of node items and equal to size of selected nodes`() =
         runTest {
-            whenever(getFileBrowserChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
+            whenever(getFileBrowserNodeChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
                 listOf<TypedFolderNode>(mock(), mock())
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -460,7 +460,7 @@ class FileBrowserViewModelTest {
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorViewType()).thenReturn(emptyFlow())
-        whenever(getFileBrowserChildrenUseCase(any())).thenReturn(emptyList())
+        whenever(getFileBrowserNodeChildrenUseCase(any())).thenReturn(emptyList())
         whenever(getFileBrowserParentNodeHandle(any())).thenReturn(null)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
@@ -476,7 +476,7 @@ class FileBrowserViewModelTest {
         reset(
             monitorNodeUpdatesUseCase,
             getFileBrowserParentNodeHandle,
-            getFileBrowserChildrenUseCase,
+            getFileBrowserNodeChildrenUseCase,
             getCloudSortOrder,
             handleOptionClickMapper,
             monitorViewType,
