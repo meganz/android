@@ -304,12 +304,12 @@ class AlbumContentFragment : Fragment() {
         when (item.itemId) {
             R.id.action_menu_get_link -> {
                 Analytics.tracker.trackEvent(AlbumContentShareLinkMenuToolbarEvent)
-                openAlbumGetLinkScreen(isNewLink = true)
+                openAlbumGetLinkScreen()
             }
 
             R.id.action_menu_manage_link -> {
                 Analytics.tracker.trackEvent(AlbumContentShareLinkMenuToolbarEvent)
-                openAlbumGetLinkScreen(isNewLink = false)
+                openAlbumGetLinkScreen()
             }
 
             R.id.action_menu_remove_link -> {
@@ -389,12 +389,11 @@ class AlbumContentFragment : Fragment() {
         albumContentViewModel.updatePhotosRemovingProgressCompleted(albumId = album.id)
     }
 
-    private fun openAlbumGetLinkScreen(isNewLink: Boolean) {
+    private fun openAlbumGetLinkScreen() {
         val album = albumContentViewModel.state.value.uiAlbum?.id as? UserAlbum ?: return
         val intent = AlbumScreenWrapperActivity.createAlbumGetLinkScreen(
             context = requireContext(),
             albumId = album.id,
-            isNewLink = isNewLink,
         )
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)

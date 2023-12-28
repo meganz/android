@@ -19,7 +19,6 @@ import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumC
 import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
-import mega.privacy.android.app.presentation.photos.albums.importdeeplink.AlbumImportDeeplinkScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportPreviewProvider
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
@@ -44,7 +43,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
         AlbumGetLinkScreen,
         AlbumGetMultipleLinksScreen,
         AlbumDecryptionKeyScreen,
-        AlbumImportDeeplinkScreen,
         AlbumImportScreen,
     }
 
@@ -53,10 +51,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
     private val albumScreen: AlbumScreen? by lazy(LazyThreadSafetyMode.NONE) {
         AlbumScreen.valueOf(intent.getStringExtra(ALBUM_SCREEN) ?: "")
-    }
-
-    private val isAlbumNewLink: Boolean by lazy(LazyThreadSafetyMode.NONE) {
-        intent.getBooleanExtra(ALBUM_NEW_LINK, true)
     }
 
     @Inject
@@ -101,15 +95,15 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
                     AlbumScreen.AlbumGetLinkScreen -> {
                         AlbumGetLinkScreen(
-                            isAlbumNewLink = isAlbumNewLink,
                             onBack = ::finish,
                             onLearnMore = {
                                 val intent = createAlbumDecryptionKeyScreen(this)
                                 startActivity(intent)
                             },
-                            onShareLink = { link ->
+                            onShareLink = { album, link ->
                                 val intent = Intent(Intent.ACTION_SEND).apply {
                                     type = "text/plain"
+                                    putExtra(Intent.EXTRA_SUBJECT, album?.title.orEmpty())
                                     putExtra(Intent.EXTRA_TEXT, link)
                                 }
                                 val shareIntent = Intent.createChooser(
@@ -144,19 +138,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                     AlbumScreen.AlbumDecryptionKeyScreen -> {
                         AlbumDecryptionKeyScreen(
                             onBack = ::finish,
-                        )
-                    }
-
-                    AlbumScreen.AlbumImportDeeplinkScreen -> {
-                        AlbumImportDeeplinkScreen(
-                            onApply = {
-                                val intent = createAlbumImportScreen(
-                                    context = this,
-                                    albumLink = AlbumLink(it),
-                                )
-                                startActivity(intent)
-                                finish()
-                            },
                         )
                     }
 
@@ -285,8 +266,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
         const val ALBUM_FLOW: String = "album_flow"
 
-        const val ALBUM_NEW_LINK: String = "album_new_link"
-
         const val ALBUM_LINK: String = "album_link"
 
         const val NUM_PHOTOS: String = "num_photos"
@@ -314,11 +293,9 @@ class AlbumScreenWrapperActivity : BaseActivity() {
         fun createAlbumGetLinkScreen(
             context: Context,
             albumId: AlbumId,
-            isNewLink: Boolean,
         ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
             putExtra(ALBUM_SCREEN, AlbumScreen.AlbumGetLinkScreen.name)
             putExtra(ALBUM_ID, albumId.id)
-            putExtra(ALBUM_NEW_LINK, isNewLink)
         }
 
         fun createAlbumGetMultipleLinksScreen(
@@ -335,12 +312,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
             context: Context,
         ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
             putExtra(ALBUM_SCREEN, AlbumScreen.AlbumDecryptionKeyScreen.name)
-        }
-
-        fun createAlbumImportDeeplinkScreen(
-            context: Context,
-        ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
-            putExtra(ALBUM_SCREEN, AlbumScreen.AlbumImportDeeplinkScreen.name)
         }
 
         fun createAlbumImportScreen(

@@ -74,6 +74,7 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.mobile.analytics.event.SingleAlbumLinkScreenEvent
@@ -83,10 +84,9 @@ private typealias ImageDownloader = (photo: Photo, callback: (Boolean) -> Unit) 
 @Composable
 internal fun AlbumGetLinkScreen(
     albumGetLinkViewModel: AlbumGetLinkViewModel = viewModel(),
-    isAlbumNewLink: Boolean,
     onBack: () -> Unit,
     onLearnMore: () -> Unit,
-    onShareLink: (String) -> Unit,
+    onShareLink: (Album.UserAlbum?, String) -> Unit,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -128,17 +128,18 @@ internal fun AlbumGetLinkScreen(
     if (showShareKeyConfirmation) {
         val keylessLink = LinksUtil.getLinkWithoutKey(state.link)
         val key = LinksUtil.getKeyLink(state.link)
+        val album = state.albumSummary?.album
 
         ShareKeyConfirmationDialog(
             onDismiss = {
                 val link = context.getString(R.string.share_link_with_key, keylessLink, key)
-                onShareLink(link)
+                onShareLink(album, link)
 
                 showShareKeyConfirmation = false
             },
             onShareKey = {
                 val link = keylessLink
-                onShareLink(link)
+                onShareLink(album, link)
 
                 showShareKeyConfirmation = false
             },
@@ -149,14 +150,13 @@ internal fun AlbumGetLinkScreen(
         scaffoldState = scaffoldState,
         topBar = {
             AlbumGetLinkTopBar(
-                isAlbumNewLink = isAlbumNewLink,
                 link = state.link,
                 onBack = onBack,
                 onShareLink = {
                     if (state.isSeparateKeyEnabled) {
                         showShareKeyConfirmation = true
                     } else {
-                        onShareLink(state.link)
+                        onShareLink(state.albumSummary?.album, state.link)
                     }
                 },
             )
@@ -210,7 +210,6 @@ internal fun AlbumGetLinkScreen(
 @Composable
 private fun AlbumGetLinkTopBar(
     modifier: Modifier = Modifier,
-    isAlbumNewLink: Boolean,
     link: String,
     onBack: () -> Unit,
     onShareLink: () -> Unit,
