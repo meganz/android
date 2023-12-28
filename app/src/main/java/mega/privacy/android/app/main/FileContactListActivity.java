@@ -504,11 +504,10 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     private void handleShareFolder() {
         int nodeType = checkBackupNodeTypeByHandle(megaApi, node);
         if (nodeType != BACKUP_NONE) {
-            fileBackupManager.shareBackupFolder(
+            fileBackupManager.shareBackupsFolder(
                     nodeController,
                     node,
                     nodeType,
-                    ACTION_BACKUP_SHARE_FOLDER,
                     fileBackupManager.getDefaultActionBackupNodeCallback()
             );
         } else {

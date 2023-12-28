@@ -62,7 +62,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo
@@ -1484,10 +1483,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 startActivity(intent)
             } else {
                 if (nodeType != BACKUP_NONE) {
-                    (requireActivity() as ManagerActivity).showWarningDialogOfShare(
-                        it,
-                        nodeType,
-                        ACTION_BACKUP_SHARE_FOLDER
+                    (requireActivity() as ManagerActivity).showShareBackupsFolderWarningDialog(
+                        node = it,
+                        nodeType = nodeType,
                     )
                 } else {
                     nodeController.selectContactToShareFolder(node)

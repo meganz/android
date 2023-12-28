@@ -437,8 +437,8 @@ class FileBrowserComposeFragment : Fragment() {
                             val nC = NodeController(requireActivity())
                             fileBackupManager?.let { backupManager ->
                                 val handleList = ArrayList(handles)
-                                if (!backupManager.shareBackupFolderInMenu(
-                                        nC = nC,
+                                if (!backupManager.hasBackupsNodes(
+                                        nodeController = nC,
                                         handleList = handleList,
                                         actionBackupNodeCallback = backupManager.actionBackupNodeCallback,
                                     )

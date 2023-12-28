@@ -8,8 +8,6 @@ import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -20,8 +18,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -59,9 +55,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
-import timber.log.Timber
 import java.util.Locale
-import java.util.Objects
 
 object MegaNodeDialogUtil {
     private const val TYPE_RENAME = 0
@@ -92,11 +86,8 @@ object MegaNodeDialogUtil {
     const val BACKUP_FOLDER_CHILD = 3 // All backups underneath BACKUP_FOLDER
 
     // For backup node actions
-    const val ACTION_BACKUP_NONE = -1
-    const val ACTION_BACKUP_FAB = 2
     const val ACTION_BACKUP_SHARE_FOLDER = 6
     const val ACTION_MENU_BACKUP_SHARE_FOLDER = 7
-    const val ACTION_BACKUP_SHARE = 9
 
     /**
      * Creates and shows a TYPE_RENAME dialog to rename a node.
@@ -160,58 +151,6 @@ object MegaNodeDialogUtil {
         }
 
         return dialog
-    }
-
-    /**
-     * Creates and shows a TYPE_NEW_FILE dialog to create a new file.
-     *
-     * @param context Current context.
-     * @param parent  A valid node. Specifically the parent in which the folder will be created.
-     * @param data    Valid data. Specifically the content of the new file.
-     * @return The create new file dialog.
-     */
-    @JvmStatic
-    fun showNewFileDialog(context: Context, parent: MegaNode, data: String): AlertDialog {
-        val newFileDialogBuilder = MaterialAlertDialogBuilder(context)
-
-        newFileDialogBuilder
-            .setTitle(R.string.context_new_file_name)
-            .setPositiveButton(R.string.general_ok, null)
-            .setNegativeButton(R.string.general_cancel, null)
-
-        return setFinalValuesAndShowDialog(
-            context, parent, null, null,
-            data, null, false, newFileDialogBuilder, TYPE_NEW_FILE
-        )
-    }
-
-    /**
-     * Creates and shows a TYPE_NEW_URL_FILE dialog to create a new URL file.
-     *
-     * @param context        Current context.
-     * @param parent         A valid node. Specifically the parent in which the folder will be created.
-     * @param data           Valid data. Specifically the content of the new URL file.
-     * @param defaultURLName Default name of the URL if has, null otherwise.
-     * @return The create new URL file dialog.
-     */
-    @JvmStatic
-    fun showNewURLFileDialog(
-        context: Context,
-        parent: MegaNode,
-        data: String,
-        defaultURLName: String?,
-    ): AlertDialog {
-        val newURLFileDialogBuilder = MaterialAlertDialogBuilder(context)
-
-        newURLFileDialogBuilder
-            .setTitle(R.string.dialog_title_new_link)
-            .setPositiveButton(R.string.general_ok, null)
-            .setNegativeButton(R.string.general_cancel, null)
-
-        return setFinalValuesAndShowDialog(
-            context, parent, null, null,
-            data, defaultURLName, false, newURLFileDialogBuilder, TYPE_NEW_URL_FILE
-        )
     }
 
     /**
@@ -306,12 +245,15 @@ object MegaNodeDialogUtil {
                                 setSelection(0, getCursorPositionOfName(node.isFile, node.name))
                             }
                         }
+
                         TYPE_NEW_FOLDER -> {
                             setHint(R.string.context_new_folder_name)
                         }
+
                         TYPE_NEW_FILE -> {
                             setHint(R.string.context_new_file_name_hint)
                         }
+
                         TYPE_NEW_URL_FILE -> {
                             if (isTextEmpty(defaultURLName)) setHint(R.string.context_new_link_name)
                             else {
@@ -319,6 +261,7 @@ object MegaNodeDialogUtil {
                                 setSelection(0, getCursorPositionOfName(false, defaultURLName))
                             }
                         }
+
                         TYPE_NEW_TXT_FILE -> {
                             setHint(R.string.context_new_file_name)
                             setText(TXT_EXTENSION)
@@ -402,6 +345,7 @@ object MegaNodeDialogUtil {
                     context.getString(R.string.invalid_string)
                 )
             }
+
             NODE_NAME_REGEX.matcher(typedString).find() -> {
                 showDialogError(
                     typeText,
@@ -409,6 +353,7 @@ object MegaNodeDialogUtil {
                     context.getString(R.string.invalid_characters_defined, INVALID_CHARACTERS)
                 )
             }
+
             nameAlreadyExists(typedString, dialogType == TYPE_RENAME, node) -> {
                 showDialogError(
                     typeText,
@@ -419,6 +364,7 @@ object MegaNodeDialogUtil {
                     )
                 )
             }
+
             else -> {
                 when (dialogType) {
                     TYPE_RENAME -> {
@@ -456,6 +402,7 @@ object MegaNodeDialogUtil {
 
                                     return
                                 }
+
                                 ERROR_DIFFERENT_EXTENSION -> {
                                     typeText?.hideKeyboard()
 
@@ -467,6 +414,7 @@ object MegaNodeDialogUtil {
                                         actionNodeCallback
                                     )
                                 }
+
                                 NO_ERROR -> {
                                     confirmRenameAction(
                                         node,
@@ -478,19 +426,23 @@ object MegaNodeDialogUtil {
                             }
                         }
                     }
+
                     TYPE_NEW_FOLDER -> {
                         actionNodeCallback?.createFolder(typedString)
                     }
+
                     TYPE_NEW_FILE -> {
                         if (context is FileExplorerActivity) {
                             context.createFile(typedString, data, node, false)
                         }
                     }
+
                     TYPE_NEW_URL_FILE -> {
                         if (context is FileExplorerActivity) {
                             context.createFile(typedString, data, node, true)
                         }
                     }
+
                     TYPE_NEW_TXT_FILE -> {
                         val textFileEditor = Intent(context, TextEditorActivity::class.java)
                             .putExtra(MODE, CREATE_MODE)
@@ -510,7 +462,6 @@ object MegaNodeDialogUtil {
     /**
      * Confirms the rename action.
      *
-     * @param context            Current context.
      * @param node               A valid node if needed to confirm the action, null otherwise.
      * @param typedString        Typed name.
      * @param snackbarShower     Interface to show snackbar.
@@ -766,261 +717,85 @@ object MegaNodeDialogUtil {
     }
 
     /**
-     * Show the warning dialog when moving or deleting folders with "My backup" folder
-     * @param handleList handle list of the nodes that selected
-     * @param pNodeBackup Can not be null, for the actions:
-
-     * ACTION_MENU_BACKUP_SHARE_FOLDER  - The root of backup node
-     * ACTION_BACKUP_SHARE_FOLDER       - The node that select for share.
-     * ACTION_BACKUP_FAB                - if the folder is empty, pNodeBackup is the parent node of empty folder,
-     *                                    otherwise one of the node in handleList.
-     * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
-     * @param actionType Indicates the action to backup folder or file:
-     *                                  - ACTION_MENU_BACKUP_SHARE_FOLDER
-     *                                  - ACTION_BACKUP_SHARE_FOLDER
-     *                                  - ACTION_BACKUP_FAB
+     * Creates an [AlertDialog], warning Users that sharing Backups Folders can only be in read-only mode
+     *
+     * @param activity The Activity reference
+     * @param actionBackupNodeCallback The [ActionBackupNodeCallback]
+     * @param handleList The list of selected Node Handles
+     * @param megaNode The Backup Node to be shared
+     * @param nodeType The Backup Node type - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
+     * @param actionType Indicates the Backup Node action type - ACTION_MENU_BACKUP_SHARE_FOLDER / ACTION_BACKUP_SHARE_FOLDER
+     *
+     * @return The [AlertDialog]
      */
     @JvmStatic
-    fun showTipDialogWithBackup(
+    fun createBackupsWarningDialog(
         activity: Activity,
         actionBackupNodeCallback: ActionBackupNodeCallback,
         handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode?,
+        megaNode: MegaNode?,
         nodeType: Int,
         actionType: Int,
     ): AlertDialog {
-
-        Timber.d("MyBackup + actWithBackupTips nodeType = $nodeType")
-        Timber.d("MyBackup + actWithBackupTips actionType = $actionType")
-        if (handleList != null) {
-            Timber.d("MyBackup + handleList.size = " + handleList.size)
-        }
-
         val dialogClickListener =
-            DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
-                when (which) {
+            DialogInterface.OnClickListener { dialog: DialogInterface?, buttonType: Int ->
+                when (buttonType) {
                     BUTTON_POSITIVE -> {
-                        if (actionType == ACTION_BACKUP_SHARE_FOLDER
-                            || actionType == ACTION_MENU_BACKUP_SHARE_FOLDER
-                            || actionType == ACTION_BACKUP_SHARE
-                            || (actionType == ACTION_BACKUP_FAB && nodeType != BACKUP_FOLDER_CHILD)
-                        ) {
-                            Timber.d("MyBackup + showTipDialogWithBackup / actionExecute")
-                            actionBackupNodeCallback.actionExecute(
-                                handleList,
-                                pNodeBackup,
-                                nodeType,
-                                actionType
-                            )
-                        } else {
-                            Timber.d("MyBackup + showTipDialogWithBackup / actionConfirmed")
-                            actionBackupNodeCallback.actionConfirmed(
-                                handleList,
-                                pNodeBackup,
-                                nodeType,
-                                actionType
-                            )
-                        }
+                        actionBackupNodeCallback.actionExecute(
+                            handleList = handleList,
+                            megaNode = megaNode,
+                            nodeType = nodeType,
+                            actionType = actionType,
+                        )
                     }
-                    BUTTON_NEGATIVE -> {
-                        Timber.d("MyBackup + showTipDialogWithBackup / actionCancel")
-                        actionBackupNodeCallback.actionCancel(dialog, actionType)
-                    }
+
+                    BUTTON_NEGATIVE -> actionBackupNodeCallback.actionCancel(dialog, actionType)
                 }
             }
         val layout: LayoutInflater = activity.layoutInflater
         val view = layout.inflate(R.layout.dialog_backup_operate_tip, null)
         val tvTitle = view.findViewById<TextView>(R.id.title)
         val tvContent = view.findViewById<TextView>(R.id.backup_tip_content)
-        val nodeName = pNodeBackup?.name
 
-        when (actionType) {
-            ACTION_BACKUP_FAB -> {
-                if (nodeType == BACKUP_DEVICE) {
-                    tvTitle.text = activity.getString(R.string.backup_add_item_title)
-                    tvContent.setText(R.string.backup_add_item_to_root_text)
+        tvTitle.setText(R.string.backup_share_permission_title)
+        tvContent.setText(R.string.backup_share_permission_text)
+        handleList?.let { nonNullHandleList ->
+            tvContent.setText(
+                if (nonNullHandleList.size > 1) {
+                    R.string.backup_share_with_root_permission_text
                 } else {
-                    val displayName =
-                        activity.getString(R.string.backup_add_confirm_title, nodeName)
-                    tvTitle.text = displayName
-                    tvContent.setText(R.string.backup_add_item_text)
+                    R.string.backup_multi_share_permission_text
                 }
-            }
-            ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER, ACTION_MENU_BACKUP_SHARE_FOLDER -> {
-                tvTitle.setText(R.string.backup_share_permission_title)
-                tvContent.setText(R.string.backup_share_permission_text)
-                handleList?.let {
-                    val nodeSize = it.size
-                    if (nodeSize > 1) {
-                        when (nodeType) {
-                            BACKUP_ROOT -> {
-                                tvContent.setText(R.string.backup_share_with_root_permission_text)
-                            }
-                            else -> tvContent.setText(R.string.backup_multi_share_permission_text)
-                        }
-                    }
-                }
-            }
+            )
         }
         val builder = MaterialAlertDialogBuilder(activity)
             .setView(view)
-        when (actionType) {
-            ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER, ACTION_MENU_BACKUP_SHARE_FOLDER -> {
-                if (handleList != null) {
-                    val nodeSize = handleList.size
-                    if (nodeSize > 1 && nodeType == BACKUP_ROOT) {
-                        builder.setPositiveButton(
-                            activity.getString(R.string.general_positive_button),
-                            dialogClickListener
-                        )
-                        builder.setNegativeButton(
-                            activity.getString(R.string.general_cancel),
-                            dialogClickListener
-                        )
-                    } else {
-                        builder.setPositiveButton(
-                            activity.getString(R.string.button_permission_info),
-                            dialogClickListener
-                        )
-                    }
-                } else {
-                    builder.setPositiveButton(
-                        activity.getString(R.string.button_permission_info),
-                        dialogClickListener
-                    )
-                }
-            }
-            else -> {
+        if (handleList != null) {
+            if (handleList.size > 1 && nodeType == BACKUP_ROOT) {
                 builder.setPositiveButton(
-                    activity.getString(R.string.button_continue),
+                    activity.getString(R.string.general_positive_button),
                     dialogClickListener
                 )
                 builder.setNegativeButton(
                     activity.getString(R.string.general_cancel),
                     dialogClickListener
                 )
+            } else {
+                builder.setPositiveButton(
+                    activity.getString(R.string.button_permission_info),
+                    dialogClickListener
+                )
             }
+        } else {
+            builder.setPositiveButton(
+                activity.getString(R.string.button_permission_info),
+                dialogClickListener
+            )
         }
         val dialog = builder.show()
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
         return dialog
-    }
-
-    /**
-     * Show the confirm dialog when moving or deleting folders with "My backup" folder
-     * @param handleList handle list of the nodes that selected
-     * @param pNodeBackup Can not be null, for the actions:
-
-
-     * ACTION_MENU_BACKUP_SHARE_FOLDER  - The root of backup node
-     * ACTION_BACKUP_SHARE_FOLDER       - The node that select for share.
-     * ACTION_BACKUP_FAB                - if the folder is empty, pNodeBackup is the parent node of empty folder,
-     *                                    otherwise one of the node in handleList.
-     * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
-     * @param actionType Indicates the action to backup folder or file:
-     *                                  - ACTION_MENU_BACKUP_SHARE_FOLDER
-     *                                  - ACTION_BACKUP_SHARE_FOLDER
-     *                                  - ACTION_BACKUP_FAB
-     */
-    @JvmStatic
-    fun showConfirmDialogWithBackup(
-        activity: Activity,
-        actionBackupNodeCallback: ActionBackupNodeCallback,
-        handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode?,
-        nodeType: Int,
-        actionType: Int,
-    ): AlertDialog {
-        val layout: LayoutInflater = activity.layoutInflater
-        val view = layout.inflate(R.layout.dialog_backup_action_confirm, null)
-        val tvTitle = view.findViewById<TextView>(R.id.title)
-        val tvConfirmString = view.findViewById<TextView>(R.id.confirm_string)
-        val editTextLayout: TextInputLayout = view.findViewById(R.id.confirm_text_layout)
-        val editText: TextInputEditText = view.findViewById(R.id.confirm_text)
-        editText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) =
-                Unit
-
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) = Unit
-            override fun afterTextChanged(editable: Editable) {
-                editTextLayout.error = null
-                editTextLayout.setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint)
-            }
-        })
-
-        var checkStr = activity.getString(R.string.backup_disable_confirm)
-        var confirmInfo = activity.getString(R.string.backup_action_confirm, checkStr)
-        tvConfirmString.text = confirmInfo
-
-
-        val nodeName = pNodeBackup?.name
-
-        when (actionType) {
-            ACTION_BACKUP_FAB -> {
-                // Add
-                tvTitle.text = activity.getString(R.string.backup_add_confirm_title, nodeName)
-            }
-        }
-
-        val builder = MaterialAlertDialogBuilder(activity)
-            .setView(view)
-            .setPositiveButton(activity.getString(R.string.general_move), null)
-            .setNegativeButton(activity.getString(R.string.general_cancel), null)
-
-        if (handleList == null) {
-            builder.setPositiveButton(activity.getString(R.string.general_add), null)
-        } else {
-            builder.setPositiveButton(activity.getString(R.string.general_move), null)
-        }
-        val dialog = builder.create()
-        dialog.setOnShowListener {
-            val button =
-                dialog.getButton(BUTTON_POSITIVE)
-            button.setOnClickListener {
-                val strEditText =
-                    Objects.requireNonNull(editText.text)
-                        .toString()
-
-                if (activity.getString(R.string.backup_disable_confirm) == strEditText) {
-                    Timber.d("MyBackup + showConfirmDialogWithBackup / actionExecute")
-                    actionBackupNodeCallback.actionExecute(
-                        handleList,
-                        pNodeBackup,
-                        nodeType,
-                        actionType
-                    )
-                    //Dismiss once everything is OK.
-                    dialog.dismiss()
-                } else {
-                    showErrorInfo(editText, editTextLayout, activity)
-                }
-            }
-
-            val buttonCancel =
-                dialog.getButton(BUTTON_NEGATIVE)
-            buttonCancel.setOnClickListener {
-                Timber.d("MyBackup + showConfirmDialogWithBackup / actionCancel")
-                actionBackupNodeCallback.actionCancel(dialog, actionType)
-                dialog.dismiss()
-            }
-
-        }
-        dialog.show()
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
-        return dialog
-    }
-
-    private fun showErrorInfo(
-        editText: TextInputEditText,
-        editTextLayout: TextInputLayout,
-        context: Context,
-    ) {
-        editText.requestFocus()
-        editTextLayout.error =
-            context.getString(R.string.error_backup_confirm_dont_match)
-        editTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
     }
 
     /**

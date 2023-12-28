@@ -9,29 +9,20 @@ import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_CANCEL
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.MegaNodeDialogUtil
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_MENU_BACKUP_SHARE_FOLDER
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER_CHILD
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.showConfirmDialogWithBackup
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.showTipDialogWithBackup
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.createBackupsWarningDialog
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle
 import mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeInList
 import mega.privacy.android.app.utils.MegaNodeUtil.getBackupRootNodeByHandle
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import java.util.*
 
 /**
  * Manager class used to process actions related to Backup nodes.
@@ -44,13 +35,11 @@ class FileBackupManager(
     object BackupDialogState {
         const val BACKUP_DIALOG_SHOW_NONE = -1
         const val BACKUP_DIALOG_SHOW_WARNING = 0
-        const val BACKUP_DIALOG_SHOW_CONFIRM = 1
     }
 
     object OperationType {
         const val OPERATION_NONE = -1
         const val OPERATION_CANCEL = 0
-        const val OPERATION_CONFIRMED = 1
         const val OPERATION_EXECUTE = 2
     }
 
@@ -92,20 +81,13 @@ class FileBackupManager(
 
         override fun actionExecute(
             handleList: ArrayList<Long>?,
-            pNodeBackup: MegaNode?,
+            megaNode: MegaNode?,
             nodeType: Int,
             actionType: Int,
         ) {
             initBackupWarningState()
             actionBackupListener?.actionBackupResult(actionType, OPERATION_EXECUTE)
         }
-
-        override fun actionConfirmed(
-            handleList: ArrayList<Long>?,
-            pNodeBackup: MegaNode?,
-            nodeType: Int,
-            actionType: Int,
-        ) = Unit
     }
 
     /**
@@ -119,49 +101,27 @@ class FileBackupManager(
 
         override fun actionExecute(
             handleList: ArrayList<Long>?,
-            pNodeBackup: MegaNode?,
+            megaNode: MegaNode?,
             nodeType: Int,
             actionType: Int,
         ) {
             initBackupWarningState()
             when (actionType) {
-                MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER -> if (MegaNodeUtil.isOutShare(
-                        pNodeBackup)
-                ) {
+                ACTION_BACKUP_SHARE_FOLDER -> if (MegaNodeUtil.isOutShare(megaNode)) {
                     val i = Intent(
                         activity,
                         FileContactListActivity::class.java
                     )
-                    i.putExtra(Constants.NAME, pNodeBackup?.handle)
+                    i.putExtra(Constants.NAME, megaNode?.handle)
                     activity.startActivity(i)
                 } else {
-                    nodeController?.selectContactToShareFolder(pNodeBackup)
+                    nodeController?.selectContactToShareFolder(megaNode)
                 }
 
                 ACTION_MENU_BACKUP_SHARE_FOLDER -> nodeController?.selectContactToShareFolders(
                     handleList
                 )
-
-                ACTION_BACKUP_FAB -> {
-                    actionBackupListener?.actionBackupResult(ACTION_BACKUP_FAB,
-                        OPERATION_EXECUTE)
-                }
             }
-        }
-
-        override fun actionConfirmed(
-            handleList: ArrayList<Long>?,
-            pNodeBackup: MegaNode?,
-            nodeType: Int,
-            actionType: Int,
-        ) {
-            confirmationActionForBackup(
-                handleList = handleList,
-                pNodeBackup = pNodeBackup,
-                nodeType = nodeType,
-                actionType = actionType,
-                actionBackupNodeCallback = defaultActionBackupNodeCallback,
-            )
         }
     }
 
@@ -195,151 +155,65 @@ class FileBackupManager(
     }
 
     /**
-     * Check the type of the node in Backup folder (include empty folder).
-     * @param megaNodes The nodes in the folder
-     * @param currentParentHandle The parent node
-     * @return The type of node
-     */
-    fun checkSubBackupNode(megaNodes: List<MegaNode?>?, currentParentHandle: MegaNode?): Int {
-        if (megaNodes == null) return BACKUP_NONE
-
-        if (megaNodes.isNotEmpty()) {
-            val handleList = megaNodes.mapNotNull { it?.handle }
-            return checkBackupNodeTypeInList(megaApi, handleList)
-        } else {
-            // for empty folder
-            return if (currentParentHandle != null) {
-                val nodeType = checkBackupNodeTypeByHandle(megaApi, currentParentHandle)
-                Timber.d("nodeType = $nodeType")
-                return when (nodeType) {
-                    BACKUP_ROOT -> BACKUP_DEVICE
-                    BACKUP_DEVICE -> BACKUP_FOLDER
-                    BACKUP_FOLDER, BACKUP_FOLDER_CHILD -> BACKUP_FOLDER_CHILD
-                    else -> BACKUP_NONE
-                }
-            } else BACKUP_NONE
-        }
-    }
-
-    /**
-     * Get the parent node in Backup folder (include empty folder).
-     * @param megaNodes The nodes in the folder
-     * @param currentParentHandle The parent node of empty folder
-     * @return The parent node or null
-     */
-    fun getSubBackupParentNode(
-        megaNodes: List<MegaNode?>?,
-        currentParentHandle: MegaNode?,
-    ): MegaNode? = megaNodes?.firstNotNullOfOrNull { it?.let { megaApi.getParentNode(it) } }
-        ?: currentParentHandle
-
-
-    /**
-     * Show the warning dialog when performing an action with "My backups" folder
+     * Displays a Warning Dialog when attempting to share a Backups folder
      *
-     * @param handleList The handles list of the nodes that selected
-     * @param pNodeBackup Can not be null, for the actions:
-
-     * ACTION_MENU_BACKUP_SHARE_FOLDER  - The root of backup node
-     * ACTION_BACKUP_SHARE_FOLDER       - The node that select for share.
-     * ACTION_BACKUP_FAB                - if the folder is empty, pNodeBackup is the parent node of empty folder,
-     *                                    otherwise one of the node in handleList.
-     *
-     * @param nodeType The type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
-     * @param actionType Indicates the action to backup folder or file:
-     *                                  - ACTION_MENU_BACKUP_SHARE_FOLDER
-     *                                  - ACTION_BACKUP_SHARE_FOLDER
-     *                                  - ACTION_BACKUP_FAB
-     * @param actionBackupNodeCallback Callback for Backup Node Actions.
+     * @param handleList The list of Node Handles
+     * @param megaNode The Backup Node
+     * @param nodeType The Backup Node Type - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
+     * @param actionType Indicates the action to backup folder or file - ACTION_MENU_BACKUP_SHARE_FOLDER / ACTION_BACKUP_SHARE_FOLDER
+     * @param actionBackupNodeCallback The callback for Backup Node Actions
      */
-    fun actWithBackupTips(
+    fun showBackupsWarningDialog(
         handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode?,
+        megaNode: MegaNode?,
         nodeType: Int,
         actionType: Int,
         actionBackupNodeCallback: ActionBackupNodeCallback,
     ) {
         backupHandleList = handleList
-        backupNodeHandle = pNodeBackup?.handle
+        backupNodeHandle = megaNode?.handle
         backupNodeType = nodeType
         backupActionType = actionType
         backupDialogType = BACKUP_DIALOG_SHOW_WARNING
 
-        backupWarningDialog = showTipDialogWithBackup(
-            activity,
-            actionBackupNodeCallback,
-            handleList,
-            pNodeBackup,
-            nodeType,
-            actionType
+        backupWarningDialog = createBackupsWarningDialog(
+            activity = activity,
+            actionBackupNodeCallback = actionBackupNodeCallback,
+            handleList = handleList,
+            megaNode = megaNode,
+            nodeType = nodeType,
+            actionType = actionType,
         )
     }
 
     /**
-     * Show the confirm dialog when performing an action with "My backups" folder
-     * @param handleList handle list of the nodes that selected
-     * @param pNodeBackup Can not be null, for the actions:
-
-     * ACTION_MENU_BACKUP_SHARE_FOLDER  - The root of backup node
-     * ACTION_BACKUP_SHARE_FOLDER       - The node that select for share.
-     * ACTION_BACKUP_FAB                - if the folder is empty, pNodeBackup is the parent node of empty folder,
-     *                                    otherwise one of the node in handleList.
-     * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
-     * @param actionType Indicates the action to backup folder or file:
-     *                                  - ACTION_MENU_BACKUP_SHARE_FOLDER
-     *                                  - ACTION_BACKUP_SHARE_FOLDER
-     *                                  - ACTION_BACKUP_FAB
-     * @param actionBackupNodeCallback Callback for Backup Node Actions.
-     */
-    fun confirmationActionForBackup(
-        handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode?,
-        nodeType: Int,
-        actionType: Int,
-        actionBackupNodeCallback: ActionBackupNodeCallback,
-    ) {
-        backupHandleList = handleList
-        backupNodeHandle = pNodeBackup?.handle
-        backupNodeType = nodeType
-        backupActionType = actionType
-        backupDialogType = BACKUP_DIALOG_SHOW_CONFIRM
-
-        backupWarningDialog = showConfirmDialogWithBackup(
-            activity,
-            actionBackupNodeCallback,
-            handleList,
-            pNodeBackup,
-            nodeType,
-            actionType
-        )
-    }
-
-    /**
-     * Response to the menu item to share the backup folder or folders under the backup
-     * @param nC The instance of NodeController
-     * @param handleList List of the nodes that selected
-     * @param actionBackupNodeCallback Callback for Backup Node actions
+     * Checks the list of Node Handles if there are Backup Nodes or not
      *
-     * @return true if the backup node in the list, otherwise return false.
+     * @param nodeController The [NodeController]
+     * @param handleList The list of Node Handles
+     * @param actionBackupNodeCallback The callback for Backup Node actions
+     *
+     * @return true if there is at least one Backup Node from the list of Node Handles, and false
+     * if otherwise
      */
-    fun shareBackupFolderInMenu(
-        nC: NodeController,
+    fun hasBackupsNodes(
+        nodeController: NodeController,
         handleList: ArrayList<Long>,
         actionBackupNodeCallback: ActionBackupNodeCallback,
     ): Boolean {
-        val pNode = getBackupRootNodeByHandle(megaApi, handleList)
-        val nodeType = checkBackupNodeTypeInList(megaApi, handleList)
+        val backupRootNode = getBackupRootNodeByHandle(megaApi, handleList)
+        val backupNodeType = checkBackupNodeTypeInList(megaApi, handleList)
 
-        if (nodeType == BACKUP_NONE && pNode == null) {
+        if (backupNodeType == BACKUP_NONE && backupRootNode == null) {
             // No backup node in the selected nodes
             return false
-        } else if (pNode != null) {
+        } else if (backupRootNode != null) {
             // Show the warning dialog if the list including Backup node
-            nodeController = nC
-            actWithBackupTips(
+            this.nodeController = nodeController
+            showBackupsWarningDialog(
                 handleList = handleList,
-                pNodeBackup = pNode,
-                nodeType = nodeType,
+                megaNode = backupRootNode,
+                nodeType = backupNodeType,
                 actionType = ACTION_MENU_BACKUP_SHARE_FOLDER,
                 actionBackupNodeCallback = actionBackupNodeCallback,
             )
@@ -349,63 +223,26 @@ class FileBackupManager(
     }
 
     /**
-     * Share the folder of backup folder or folder under the backup
-     * @param nC The instance of NodeController
-     * @param p The nodes that selected
-     * @param nodeType The type of the node [p]
-     * @param actionType Indicates the action to backup folder or file
-     * @param actionBackupNodeCallback Callback for Backup Node actions
+     * Share the specific Backups Folder
      *
-     * @return true if the node belongs to the backup folder, else return false.
+     * @param nodeController The [NodeController]
+     * @param megaNode The Backup Node to be shared
+     * @param nodeType The Backup Node type
+     * @param actionBackupNodeCallback The callback for Backup Node actions
      */
-    fun shareBackupFolder(
-        nC: NodeController,
-        p: MegaNode,
+    fun shareBackupsFolder(
+        nodeController: NodeController,
+        megaNode: MegaNode,
         nodeType: Int,
-        actionType: Int,
         actionBackupNodeCallback: ActionBackupNodeCallback,
     ) {
-        nodeController = nC
-        actWithBackupTips(
+        this.nodeController = nodeController
+        showBackupsWarningDialog(
             handleList = null,
-            pNodeBackup = p,
+            megaNode = megaNode,
             nodeType = nodeType,
-            actionType = actionType,
+            actionType = ACTION_BACKUP_SHARE_FOLDER,
             actionBackupNodeCallback = actionBackupNodeCallback,
         )
-    }
-
-    /**
-     * Share the folder of backup folder or folder under the backup
-     * @param nodeList The node list in the current folder
-     * @param currentParentHandle The parent handle of the current node list
-     * @param actionType Indicates the action to backup folder or file
-     * @param actionBackupNodeCallback Callback for Backup Node actions
-     *
-     * @return true if the node belongs to the backup folder, else return false.
-     */
-    fun fabForBackup(
-        nodeList: List<MegaNode?>,
-        currentParentHandle: MegaNode?,
-        actionType: Int,
-        actionBackupNodeCallback: ActionBackupNodeCallback,
-    ): Boolean {
-        // isInBackup Indicates if the current node is under "My backup"
-        val nodeType: Int = checkSubBackupNode(nodeList, currentParentHandle)
-
-        if (nodeType != BACKUP_ROOT && nodeType != BACKUP_NONE) {
-            val parentNode: MegaNode? = getSubBackupParentNode(nodeList, currentParentHandle)
-            if (parentNode != null) {
-                actWithBackupTips(
-                    handleList = null,
-                    pNodeBackup = parentNode,
-                    nodeType = nodeType,
-                    actionType = actionType,
-                    actionBackupNodeCallback = actionBackupNodeCallback,
-                )
-                return true
-            }
-        }
-        return false
     }
 }

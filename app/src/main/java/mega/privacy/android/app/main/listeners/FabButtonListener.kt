@@ -8,7 +8,6 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB
 import mega.privacy.android.app.utils.Util
 import timber.log.Timber
 

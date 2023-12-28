@@ -43,7 +43,6 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent.*
 import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -52,6 +51,7 @@ import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
@@ -274,7 +274,7 @@ class FileInfoActivity : BaseActivity() {
                     result: MoveRequestResult?,
                     handle: Long,
                 ) {
-                    if (actionType == MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER && operationType == FileBackupManager.OperationType.OPERATION_EXECUTE) {
+                    if (actionType == ACTION_BACKUP_SHARE_FOLDER && operationType == FileBackupManager.OperationType.OPERATION_EXECUTE) {
                         navigateToShare(NodeId(handle))
                     }
                 }
@@ -445,12 +445,11 @@ class FileInfoActivity : BaseActivity() {
             // Display a warning dialog when sharing a Backup folder and limit folder
             // access to read-only
             fileBackupManager?.defaultActionBackupNodeCallback?.let {
-                fileBackupManager?.shareBackupFolder(
-                    nodeController,
-                    viewModel.node,
-                    nodeType,
-                    MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER,
-                    it
+                fileBackupManager?.shareBackupsFolder(
+                    nodeController = nodeController,
+                    megaNode = viewModel.node,
+                    nodeType = nodeType,
+                    actionBackupNodeCallback = it,
                 )
             }
         } else {

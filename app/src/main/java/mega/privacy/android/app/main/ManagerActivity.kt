@@ -155,7 +155,6 @@ import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetD
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
-import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_HOME_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
@@ -239,10 +238,8 @@ import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
-import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
-import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
@@ -261,8 +258,6 @@ import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ACTION_TYPE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DIALOG_WARN
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_ITEM
@@ -971,30 +966,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         uploadBottomSheetDialogActionHandler.onRestoreInstanceState(savedInstanceState)
         Timber.d("END onCreate")
         RatingHandlerImpl(this).showRatingBaseOnTransaction()
-        when (backupDialogType) {
-            BACKUP_DIALOG_SHOW_WARNING -> {
-                fileBackupManager.actWithBackupTips(
-                    backupHandleList,
-                    megaApi.getNodeByHandle(backupNodeHandle),
-                    backupNodeType,
-                    backupActionType,
-                    fileBackupManager.actionBackupNodeCallback
-                )
-            }
-
-            BACKUP_DIALOG_SHOW_CONFIRM -> {
-                fileBackupManager.confirmationActionForBackup(
-                    backupHandleList,
-                    megaApi.getNodeByHandle(backupNodeHandle),
-                    backupNodeType,
-                    backupActionType,
-                    fileBackupManager.defaultActionBackupNodeCallback
-                )
-            }
-
-            else -> {
-                Timber.d("Backup warning dialog is not show")
-            }
+        if (backupDialogType == BACKUP_DIALOG_SHOW_WARNING) {
+            fileBackupManager.showBackupsWarningDialog(
+                handleList = backupHandleList,
+                megaNode = megaApi.getNodeByHandle(backupNodeHandle),
+                nodeType = backupNodeType,
+                actionType = backupActionType,
+                actionBackupNodeCallback = fileBackupManager.actionBackupNodeCallback,
+            )
+        } else {
+            Timber.d("Backup warning dialog is not shown")
         }
         checkForInAppUpdate()
         checkForInAppAdvertisement()
@@ -5305,17 +5286,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }, 50)
     }
 
-    fun showWarningDialogOfShare(node: MegaNode, nodeType: Int, actionType: Int) {
-        Timber.d("showWarningDialogOfShareFolder")
-        if (actionType == ACTION_BACKUP_SHARE_FOLDER) {
-            fileBackupManager.shareBackupFolder(
-                nodeController,
-                node,
-                nodeType,
-                actionType,
-                fileBackupManager.actionBackupNodeCallback
-            )
-        }
+    fun showShareBackupsFolderWarningDialog(node: MegaNode, nodeType: Int) {
+        fileBackupManager.shareBackupsFolder(
+            nodeController = nodeController,
+            megaNode = node,
+            nodeType = nodeType,
+            actionBackupNodeCallback = fileBackupManager.actionBackupNodeCallback,
+        )
     }
 
     /**
@@ -8159,22 +8136,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 operationType: Int,
                 result: MoveRequestResult?,
                 handle: Long,
-            ) {
-                if (actionType == ACTION_BACKUP_FAB) {
-                    if (operationType == OPERATION_EXECUTE) {
-                        if (bottomSheetDialogFragment?.isBottomSheetDialogShown() == true) return
-                        bottomSheetDialogFragment = UploadBottomSheetDialogFragment.newInstance(
-                            UploadBottomSheetDialogFragment.GENERAL_UPLOAD
-                        )
-                        bottomSheetDialogFragment?.show(
-                            supportFragmentManager,
-                            bottomSheetDialogFragment?.tag
-                        )
-                    }
-                } else {
-                    Timber.d("Nothing to do for actionType = %s", actionType)
-                }
-            }
+            ) = Unit
         })
 
     /**
