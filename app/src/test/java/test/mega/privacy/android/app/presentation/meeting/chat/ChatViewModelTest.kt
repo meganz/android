@@ -22,6 +22,8 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
+import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRequest
@@ -39,6 +41,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
+import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -51,6 +54,7 @@ import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
+import mega.privacy.android.domain.usecase.chat.JoinChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
@@ -196,6 +200,7 @@ internal class ChatViewModelTest {
     private val isGeolocationEnabledUseCase = mock<IsGeolocationEnabledUseCase>()
     private val enableGeolocationUseCase = mock<EnableGeolocationUseCase>()
     private val sendTextMessageUseCase = mock<SendTextMessageUseCase>()
+    private val joinChatLinkUseCase = mock<JoinChatLinkUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -240,7 +245,8 @@ internal class ChatViewModelTest {
             startMeetingInWaitingRoomChatUseCase,
             isGeolocationEnabledUseCase,
             enableGeolocationUseCase,
-            sendTextMessageUseCase
+            sendTextMessageUseCase,
+            joinChatLinkUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
@@ -308,6 +314,7 @@ internal class ChatViewModelTest {
             isGeolocationEnabledUseCase = isGeolocationEnabledUseCase,
             enableGeolocationUseCase = enableGeolocationUseCase,
             sendTextMessageUseCase = sendTextMessageUseCase,
+            joinChatLinkUseCase = joinChatLinkUseCase
         )
     }
 
@@ -2017,6 +2024,57 @@ internal class ChatViewModelTest {
             assertThat(awaitItem().isGeolocationEnabled).isEqualTo(success)
         }
     }
+
+    @Test
+    fun `test that join chat successfully when open by chat link`() = runTest {
+        val chatLink = "https://mega.nz/chat/123456789"
+        val action = "action"
+        whenever(savedStateHandle.get<Long?>(Constants.CHAT_ID)).thenReturn(null)
+        whenever(savedStateHandle.get<String?>(EXTRA_LINK)).thenReturn(chatLink)
+        whenever(savedStateHandle.get<String?>(EXTRA_ACTION)).thenReturn(action)
+        whenever(joinChatLinkUseCase(chatLink, false)).thenReturn(chatId)
+        whenever(savedStateHandle.get<Long?>(Constants.CHAT_ID)).thenReturn(chatId)
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().chatId).isEqualTo(chatId)
+        }
+        verify(savedStateHandle).set(Constants.CHAT_ID, chatId)
+    }
+
+    @Test
+    fun `test that join chat failed with general exception when open by chat link`() = runTest {
+        val chatLink = "https://mega.nz/chat/123456789"
+        val action = "action"
+        whenever(savedStateHandle.get<Long?>(Constants.CHAT_ID)).thenReturn(null)
+        whenever(savedStateHandle.get<String?>(EXTRA_LINK)).thenReturn(chatLink)
+        whenever(savedStateHandle.get<String?>(EXTRA_ACTION)).thenReturn(action)
+        whenever(joinChatLinkUseCase(chatLink, false)).thenThrow(RuntimeException())
+        initTestClass()
+        underTest.state.test {
+            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content?.stringId
+            assertThat(result).isEqualTo(R.string.error_general_nodes)
+        }
+    }
+
+    @Test
+    fun `test that join chat failed with resource not found exception when open by chat link`() =
+        runTest {
+            val chatLink = "https://mega.nz/chat/123456789"
+            val action = "action"
+            whenever(savedStateHandle.get<Long?>(Constants.CHAT_ID)).thenReturn(null)
+            whenever(savedStateHandle.get<String?>(EXTRA_LINK)).thenReturn(chatLink)
+            whenever(savedStateHandle.get<String?>(EXTRA_ACTION)).thenReturn(action)
+            whenever(joinChatLinkUseCase(chatLink, false)).thenThrow(
+                ResourceDoesNotExistChatException()
+            )
+            initTestClass()
+            underTest.state.test {
+                val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                    .content?.stringId
+                assertThat(result).isEqualTo(R.string.invalid_chat_link)
+            }
+        }
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

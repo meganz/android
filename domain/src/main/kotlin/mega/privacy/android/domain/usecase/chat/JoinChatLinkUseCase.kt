@@ -11,7 +11,7 @@ import javax.inject.Inject
  * @property chatRepository     [ChatRepository]
  * @property getChatRoom        [GetChatRoom]
  */
-class JoinChatCallUseCase @Inject constructor(
+class JoinChatLinkUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
     private val getChatRoom: GetChatRoom,
 ) {
@@ -22,9 +22,10 @@ class JoinChatCallUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         chatLink: String,
-    ) {
+        isAutoJoin: Boolean = true,
+    ): Long {
         val chatRequest = chatRepository.openChatPreview(chatLink).request
-        val chatId = chatRequest.chatHandle ?: error("Invalid Chat")
+        val chatId = chatRequest.chatHandle
         val chatPublicHandle = chatRequest.userHandle
 
         val chatRoom = getChatRoom(chatId) ?: throw ChatRoomDoesNotExistException()
@@ -37,9 +38,12 @@ class JoinChatCallUseCase @Inject constructor(
                 chatRepository.autorejoinPublicChat(chatId, chatPublicHandle)
             }
 
-            else -> {
+            isAutoJoin -> {
                 chatRepository.autojoinPublicChat(chatId)
             }
+
         }
+        chatRepository.setLastPublicHandle(chatId)
+        return chatId
     }
 }

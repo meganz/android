@@ -32,7 +32,6 @@ internal fun MessageListView(
     uiState: ChatUiState,
     viewModel: MessageListViewModel = hiltViewModel(),
 ) {
-
     val pagingItems = viewModel.pagedMessages.collectAsLazyPagingItems()
     Timber.d("Paging pagingItems load state ${pagingItems.loadState}")
     Timber.d("Paging pagingItems count ${pagingItems.itemCount}")
@@ -45,6 +44,10 @@ internal fun MessageListView(
                     pagingItems.loadState.refresh is LoadState.NotLoading &&
                     pagingItems.itemCount > 0
         }
+    }
+
+    LaunchedEffect(uiState.chatId) {
+        viewModel.updateChatId(uiState.chatId)
     }
 
     LaunchedEffect(key1 = derivedScrollToBottom) {

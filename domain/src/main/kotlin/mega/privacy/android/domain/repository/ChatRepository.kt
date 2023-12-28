@@ -800,4 +800,11 @@ interface ChatRepository {
      * @return ChatMessage that will be sent. The message id is not definitive, but temporal.
      */
     suspend fun sendMessage(chatId: Long, message: String): ChatMessage
+
+    /**
+     * Set last public handle
+     *
+     * @param handle
+     */
+    suspend fun setLastPublicHandle(handle: Long)
 }

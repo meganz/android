@@ -30,6 +30,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
+import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -42,13 +43,13 @@ import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
+import mega.privacy.android.domain.usecase.chat.JoinChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
-import mega.privacy.android.domain.usecase.chat.message.MonitorMessageLoadedUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
@@ -70,6 +71,16 @@ import timber.log.Timber
 import java.util.Collections
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+/**
+ * Extra Action
+ */
+const val EXTRA_ACTION = "ACTION"
+
+/**
+ * Extra Link
+ */
+const val EXTRA_LINK = "LINK"
 
 /**
  * Chat view model.
@@ -124,12 +135,16 @@ internal class ChatViewModel @Inject constructor(
     private val isGeolocationEnabledUseCase: IsGeolocationEnabledUseCase,
     private val enableGeolocationUseCase: EnableGeolocationUseCase,
     private val sendTextMessageUseCase: SendTextMessageUseCase,
-    savedStateHandle: SavedStateHandle,
+    private val joinChatLinkUseCase: JoinChatLinkUseCase,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
 
-    private val chatId = savedStateHandle.get<Long>(Constants.CHAT_ID)
+    private val chatId: Long?
+        get() = savedStateHandle.get(Constants.CHAT_ID)
+    private val chatLink: String
+        get() = savedStateHandle.get<String>(EXTRA_LINK).orEmpty()
     private val usersTyping = Collections.synchronizedMap(mutableMapOf<Long, String?>())
     private val jobs = mutableMapOf<Long, Job>()
 
@@ -146,6 +161,37 @@ internal class ChatViewModel @Inject constructor(
         checkGeolocation()
         monitorParticipatingInACall()
         monitorStorageStateEvent()
+        loadChatRoom()
+        joinChatCallIfNeeded()
+    }
+
+    private fun joinChatCallIfNeeded() {
+        if (chatLink.isNotEmpty()) {
+            viewModelScope.launch {
+                val action = savedStateHandle.get<String>(EXTRA_ACTION).orEmpty()
+                val isAutoJoin = action == Constants.ACTION_JOIN_OPEN_CHAT_LINK
+                runCatching {
+                    joinChatLinkUseCase(
+                        chatLink = chatLink,
+                        isAutoJoin = isAutoJoin
+                    )
+                }.onSuccess { chatId ->
+                    savedStateHandle[Constants.CHAT_ID] = chatId
+                    loadChatRoom()
+                }.onFailure {
+                    Timber.e(it)
+                    val infoToShow = if (it is ResourceDoesNotExistChatException) {
+                        InfoToShow(stringId = R.string.invalid_chat_link)
+                    } else {
+                        InfoToShow(stringId = R.string.error_general_nodes)
+                    }
+                    _state.update { state -> state.copy(infoToShowEvent = triggered(infoToShow)) }
+                }
+            }
+        }
+    }
+
+    private fun loadChatRoom() {
         chatId?.let {
             updateChatId(it)
             getChatRoom(it)
@@ -558,7 +604,7 @@ internal class ChatViewModel @Inject constructor(
      * Show the dialog of selecting chat mute options
      */
     fun showMutePushNotificationDialog() {
-        chatId?.let {
+        chatId?.let { chatId ->
             viewModelScope.launch {
                 val muteOptionList = getChatMuteOptionListUseCase(listOf(chatId))
                 _state.update {
@@ -644,7 +690,7 @@ internal class ChatViewModel @Inject constructor(
     }
 
     fun endCall() {
-        chatId?.let {
+        chatId?.let { chatId ->
             viewModelScope.launch {
                 runCatching {
                     endCallUseCase(chatId)
@@ -795,7 +841,7 @@ internal class ChatViewModel @Inject constructor(
 
     fun onAnswerCall() {
         viewModelScope.launch {
-            chatId?.let {
+            chatId?.let { chatId ->
                 chatManagement.addJoiningCallChatId(chatId)
                 runCatching {
                     answerChatCallUseCase(chatId = chatId, video = false, audio = true)

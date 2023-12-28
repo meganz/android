@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.chat
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRequestType
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -14,22 +15,23 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.whenever
 
-class JoinChatCallUseCaseTest {
+@OptIn(ExperimentalCoroutinesApi::class)
+class JoinChatLinkUseCaseTest {
     private val chatRepository: ChatRepository = Mockito.mock()
     private val getChatRoom: GetChatRoom = Mockito.mock()
 
-    private lateinit var underTest: JoinChatCallUseCase
+    private lateinit var underTest: JoinChatLinkUseCase
 
     @Before
     fun setup() {
-        underTest = JoinChatCallUseCase(
+        underTest = JoinChatLinkUseCase(
             chatRepository,
             getChatRoom
         )
     }
 
     @Test
-    fun `test that all methods are called in correct order`() = runBlocking {
+    fun `test that all methods are called in correct order`() = runTest {
         val chatLink = "chatLink"
         val chatId = 1L
         val chatPublicHandle = 2L
@@ -87,11 +89,12 @@ class JoinChatCallUseCaseTest {
 
         Mockito.verify(chatRepository).openChatPreview(chatLink)
         Mockito.verify(getChatRoom).invoke(chatId)
+        Mockito.verify(chatRepository).setLastPublicHandle(chatId)
         Mockito.verifyNoMoreInteractions(chatRepository)
     }
 
     @Test(expected = ChatRoomDoesNotExistException::class)
-    fun `test that exception is thrown when chat room does not exist`() = runBlocking {
+    fun `test that exception is thrown when chat room does not exist`() = runTest {
         val chatLink = "chatLink"
         val chatId = 1L
         val chatPublicHandle = 2L
@@ -124,7 +127,7 @@ class JoinChatCallUseCaseTest {
 
     @Test
     fun `test that autorejoinPublicChat is called when chat room is not active and public handle is not null`() =
-        runBlocking {
+        runTest {
             val chatLink = "chatLink"
             val chatId = 1L
             val chatPublicHandle = 2L
@@ -187,7 +190,7 @@ class JoinChatCallUseCaseTest {
 
     @Test
     fun `test that autorejoinPublicChat is called when chat room is active`() =
-        runBlocking {
+        runTest {
             val chatLink = "chatLink"
             val chatId = 1L
             val chatRoom = ChatRoom(

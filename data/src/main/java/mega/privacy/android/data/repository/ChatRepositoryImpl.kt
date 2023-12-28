@@ -57,6 +57,7 @@ import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
+import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
@@ -74,6 +75,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -123,6 +125,7 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     private var chatRoomUpdates: HashMap<Long, Flow<ChatRoomUpdate>> = hashMapOf()
     private val chatRoomUpdatesMutex = Mutex()
+    private val joiningIds = mutableSetOf<Long>()
 
     override suspend fun getChatInitState(): ChatInitState = withContext(ioDispatcher) {
         chatInitStateMapper(megaChatApiGateway.initState)
@@ -419,10 +422,18 @@ internal class ChatRepositoryImpl @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaChatRequestListenerInterface(
                 onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
-                    if (error.errorCode == MegaChatError.ERROR_OK || error.errorCode == MegaChatError.ERROR_EXIST) {
-                        continuation.resume(chatPreviewMapper(request, error.errorCode))
-                    } else {
-                        continuation.failWithError(error, "openChatPreview")
+                    when (error.errorCode) {
+                        MegaChatError.ERROR_OK, MegaChatError.ERROR_EXIST -> {
+                            continuation.resume(chatPreviewMapper(request, error.errorCode))
+                        }
+
+                        MegaChatError.ERROR_NOENT -> {
+                            continuation.resumeWithException(ResourceDoesNotExistChatException())
+                        }
+
+                        else -> {
+                            continuation.failWithError(error, "openChatPreview")
+                        }
                     }
                 }
             )
@@ -463,30 +474,43 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
 
     override suspend fun autojoinPublicChat(chatId: Long) = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getChatRequestListener("autojoinPublicChat") {}
+        if (joiningIds.contains(chatId)) return@withContext
+        joiningIds.add(chatId)
+        runCatching {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getChatRequestListener("autojoinPublicChat") {}
 
-            megaChatApiGateway.autojoinPublicChat(chatId, listener)
+                megaChatApiGateway.autojoinPublicChat(chatId, listener)
 
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeRequestListener(listener)
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(listener)
+                }
             }
-        }
+        }.also {
+            joiningIds.remove(chatId)
+        }.getOrThrow()
     }
 
     override suspend fun autorejoinPublicChat(
         chatId: Long,
         publicHandle: Long,
     ) = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getChatRequestListener("autorejoinPublicChat") {}
+        if (joiningIds.contains(chatId) && joiningIds.contains(publicHandle)) return@withContext
+        joiningIds.add(chatId)
+        joiningIds.add(publicHandle)
+        runCatching {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getChatRequestListener("autorejoinPublicChat") {}
 
-            megaChatApiGateway.autorejoinPublicChat(chatId, publicHandle, listener)
+                megaChatApiGateway.autorejoinPublicChat(chatId, publicHandle, listener)
 
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeRequestListener(listener)
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(listener)
+                }
             }
-        }
+        }.also {
+            joiningIds.remove(chatId)
+        }.getOrThrow()
     }
 
     override suspend fun hasWaitingRoomChatOptions(chatOptionsBitMask: Int): Boolean =
@@ -1048,5 +1072,10 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun sendMessage(chatId: Long, message: String) = withContext(ioDispatcher) {
         chatMessageMapper(megaChatApiGateway.sendMessage(chatId, message))
+    }
+
+    override suspend fun setLastPublicHandle(handle: Long) {
+        localStorageGateway.setLastPublicHandle(handle)
+        localStorageGateway.setLastPublicHandleTimeStamp()
     }
 }

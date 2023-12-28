@@ -853,4 +853,41 @@ class ChatRepositoryImplTest {
         underTest.sendMessage(chatId, message)
         verify(megaChatApiGateway).sendMessage(chatId, message)
     }
+
+    @Test
+    fun `test that set last handle invokes correctly`() = runTest {
+        val chatId = 123L
+        underTest.setLastPublicHandle(chatId)
+        verify(localStorageGateway).setLastPublicHandle(chatId)
+        verify(localStorageGateway).setLastPublicHandleTimeStamp()
+    }
+
+    @Test
+    fun `test that auto join public chat invokes correctly`() = runTest {
+        val chatId = 123L
+        whenever(megaChatApiGateway.autojoinPublicChat(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                megaChatErrorSuccess,
+            )
+        }
+        underTest.autojoinPublicChat(chatId)
+        verify(megaChatApiGateway).autojoinPublicChat(eq(chatId), any())
+    }
+
+    @Test
+    fun `test that autorejoin public chat invokes correctly`() = runTest {
+        val chatId = 123L
+        val chatPublicHandle = 456L
+        whenever(megaChatApiGateway.autorejoinPublicChat(any(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                megaChatErrorSuccess,
+            )
+        }
+        underTest.autorejoinPublicChat(chatId, chatPublicHandle)
+        verify(megaChatApiGateway).autorejoinPublicChat(eq(chatId), eq(chatPublicHandle), any())
+    }
 }

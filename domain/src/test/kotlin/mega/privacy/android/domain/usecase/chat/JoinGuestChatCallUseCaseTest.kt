@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.chat
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import org.junit.Before
 import org.junit.Test
@@ -11,7 +11,7 @@ import org.mockito.kotlin.whenever
 class JoinGuestChatCallUseCaseTest {
     private val createEphemeralAccountUseCase: CreateEphemeralAccountUseCase = mock()
     private val initGuestChatSessionUseCase: InitGuestChatSessionUseCase = mock()
-    private val joinChatCallUseCase: JoinChatCallUseCase = mock()
+    private val joinChatLinkUseCase: JoinChatLinkUseCase = mock()
 
     private lateinit var underTest: JoinGuestChatCallUseCase
 
@@ -20,12 +20,12 @@ class JoinGuestChatCallUseCaseTest {
         underTest = JoinGuestChatCallUseCase(
             createEphemeralAccountUseCase,
             initGuestChatSessionUseCase,
-            joinChatCallUseCase
+            joinChatLinkUseCase
         )
     }
 
     @Test
-    fun `test that all methods are called in correct order`() = runBlocking {
+    fun `test that all methods are called in correct order`() = runTest {
         val chatLink = "chatLink"
         val firstName = "firstName"
         val lastName = "lastName"
@@ -34,16 +34,16 @@ class JoinGuestChatCallUseCaseTest {
 
         verify(initGuestChatSessionUseCase).invoke(false)
         verify(createEphemeralAccountUseCase).invoke(firstName, lastName)
-        verify(joinChatCallUseCase).invoke(chatLink)
+        verify(joinChatLinkUseCase).invoke(chatLink)
     }
 
     @Test(expected = ChatRoomDoesNotExistException::class)
-    fun `test that exception is thrown when chat room does not exist`() = runBlocking {
+    fun `test that exception is thrown when chat room does not exist`() = runTest {
         val chatLink = "chatLink"
         val firstName = "firstName"
         val lastName = "lastName"
 
-        whenever(joinChatCallUseCase.invoke(chatLink)).thenThrow(ChatRoomDoesNotExistException())
+        whenever(joinChatLinkUseCase.invoke(chatLink)).thenThrow(ChatRoomDoesNotExistException())
 
         underTest.invoke(chatLink, firstName, lastName)
     }

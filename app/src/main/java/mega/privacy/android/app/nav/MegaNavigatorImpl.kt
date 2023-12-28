@@ -12,6 +12,8 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
+import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
+import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -47,7 +49,11 @@ internal class MegaNavigatorImpl @Inject constructor(
                 Intent(context, ChatActivity::class.java)
             }.apply {
                 this.action = action
-                link?.let { this.data = Uri.parse(link) }
+                putExtra(EXTRA_ACTION, action)
+                link?.let {
+                    this.data = Uri.parse(link) // support legacy chat screen
+                    putExtra(EXTRA_LINK, link) // support new chat screen
+                }
                 text?.let { putExtra(Constants.SHOW_SNACKBAR, text) }
                 chatId?.let { putExtra(Constants.CHAT_ID, chatId) }
                 messageId?.let { putExtra("ID_MSG", messageId) }
