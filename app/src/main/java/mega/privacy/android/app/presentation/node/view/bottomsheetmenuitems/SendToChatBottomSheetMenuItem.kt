@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
@@ -20,7 +21,10 @@ class SendToChatBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
-    ) = false
+    ) = isConnected
+            && node is TypedFileNode
+            && node.isTakenDown.not()
+            && isNodeInRubbish.not()
 
     override val groupId = 7
 }

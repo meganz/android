@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
-import mega.privacy.android.app.presentation.node.model.menuaction.OpenWithMenuAction
-import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -15,19 +13,20 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OpenWithBottomSheetMenuItemTest {
-    private val underTest = OpenWithBottomSheetMenuItem(OpenWithMenuAction())
+class RenameBottomSheetMenuItemTest {
+
+    private val renameBottomSheetMenuItem = RenameBottomSheetMenuItem()
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - expected {4}")
     @MethodSource("provideTestParameters")
-    fun `test that open with bottom sheet menu item visibility is correct`(
+    fun `test that rename bottom sheet menu item visibility is correct`(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
         expected: Boolean,
     ) {
-        val result = underTest.shouldDisplay(
+        val result = renameBottomSheetMenuItem.shouldDisplay(
             isNodeInRubbish,
             accessPermission,
             isInBackups,
@@ -39,45 +38,38 @@ class OpenWithBottomSheetMenuItemTest {
 
     private fun provideTestParameters() = Stream.of(
         Arguments.of(
-            false,
+            true,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn true },
+            mock<TypedFolderNode> { on { isTakenDown } doReturn true },
             false
-        ),
-        Arguments.of(
-            false,
-            AccessPermission.OWNER,
-            false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
-            true
         ),
         Arguments.of(
             false,
             AccessPermission.READWRITE,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
-            true
-        ),
-        Arguments.of(
-            true,
-            AccessPermission.OWNER,
-            false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
+            mock<TypedFolderNode> { on { isTakenDown } doReturn true },
             false
         ),
         Arguments.of(
             false,
+            AccessPermission.FULL,
+            false,
+            mock<TypedFolderNode> { on { isTakenDown } doReturn true },
+            true
+        ),
+        Arguments.of(
+            false,
             AccessPermission.OWNER,
-            true,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
+            false,
+            mock<TypedFolderNode> { on { isTakenDown } doReturn true },
             true
         ),
         Arguments.of(
             false,
             AccessPermission.OWNER,
             true,
-            mock<TypedFolderNode> { on { isTakenDown } doReturn false },
+            mock<TypedFolderNode> { on { isTakenDown } doReturn true },
             false
         ),
     )

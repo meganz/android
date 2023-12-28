@@ -17,7 +17,9 @@ class RenameBottomSheetMenuItem @Inject constructor() :
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
-    ) = true
+    ) = isNodeInRubbish.not()
+            && accessPermission in listOf(AccessPermission.OWNER, AccessPermission.FULL)
+            && isInBackups.not()
 
     override val menuAction = RenameMenuAction(220)
     override val groupId = 8

@@ -20,7 +20,9 @@ class ShareBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
-    ) = false
+    ) = node.isTakenDown.not()
+            && accessPermission == AccessPermission.OWNER
+            && isNodeInRubbish.not()
 
     override val groupId = 7
 }

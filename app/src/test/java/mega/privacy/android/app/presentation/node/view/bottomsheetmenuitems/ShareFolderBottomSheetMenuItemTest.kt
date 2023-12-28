@@ -1,11 +1,10 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
-import mega.privacy.android.app.presentation.node.model.menuaction.OpenWithMenuAction
-import mega.privacy.android.domain.entity.node.TypedFileNode
+import com.google.common.truth.Truth
+import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -15,70 +14,70 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OpenWithBottomSheetMenuItemTest {
-    private val underTest = OpenWithBottomSheetMenuItem(OpenWithMenuAction())
+class ShareFolderBottomSheetMenuItemTest {
 
-    @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - expected {4}")
+    private val shareFolderBottomSheetMenuItem = ShareFolderBottomSheetMenuItem(
+        ShareFolderMenuAction()
+    )
+
+    @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - isConnected {4} - expected {5}")
     @MethodSource("provideTestParameters")
-    fun `test that open with bottom sheet menu item visibility is correct`(
+    fun `test that share folder bottom sheet menu item visibility is correct`(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
         node: TypedNode,
+        isConnected: Boolean,
         expected: Boolean,
     ) {
-        val result = underTest.shouldDisplay(
+        val result = shareFolderBottomSheetMenuItem.shouldDisplay(
             isNodeInRubbish,
             accessPermission,
             isInBackups,
             node,
-            true
+            isConnected,
         )
-        assertEquals(expected, result)
+        Truth.assertThat(result).isEqualTo(expected)
     }
 
     private fun provideTestParameters() = Stream.of(
         Arguments.of(
-            false,
+            true,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn true },
-            false
-        ),
-        Arguments.of(
+            mock<TypedFolderNode> { on { isTakenDown } doReturn true },
             false,
-            AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
-            true
-        ),
-        Arguments.of(
-            false,
-            AccessPermission.READWRITE,
-            false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
-            true
         ),
         Arguments.of(
             true,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
-            false
-        ),
-        Arguments.of(
-            false,
-            AccessPermission.OWNER,
-            true,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
-            true
-        ),
-        Arguments.of(
-            false,
-            AccessPermission.OWNER,
-            true,
             mock<TypedFolderNode> { on { isTakenDown } doReturn false },
-            false
+            false,
+            false,
+        ),
+        Arguments.of(
+            true,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isPendingShare } doReturn true
+            },
+            false,
+            false,
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isPendingShare } doReturn true
+            },
+            false,
+            true,
         ),
     )
 }

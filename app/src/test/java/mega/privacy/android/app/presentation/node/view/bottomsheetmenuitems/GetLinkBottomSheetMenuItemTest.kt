@@ -20,7 +20,7 @@ class GetLinkBottomSheetMenuItemTest {
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - expected {4}")
     @MethodSource("provideTestParameters")
-    fun shouldDisplay(
+    fun `test that get link bottom sheet menu item visibility is correct`(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
