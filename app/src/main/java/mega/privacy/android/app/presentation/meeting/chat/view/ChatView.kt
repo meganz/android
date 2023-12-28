@@ -74,6 +74,7 @@ import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
+import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.ChatMeetingButton
 import mega.privacy.android.core.ui.controls.chat.ReturnToCallBanner
@@ -302,46 +303,54 @@ internal fun ChatView(
                             },
                         )
                     } else {
-                        ChatAppBar(
-                            uiState = uiState,
-                            snackBarHostState = snackBarHostState,
-                            onBackPressed = onBackPressed,
-                            onMenuActionPressed = onMenuActionPressed,
-                            showParticipatingInACallDialog = {
-                                showParticipatingInACallDialog = true
-                            },
-                            showAllContactsParticipateInChat = {
-                                showAllContactsParticipateInChat = true
-                            },
-                            showGroupOrContactInfoActivity = {
-                                showGroupOrContactInfoActivity(context, uiState)
-                            },
-                            showNoContactToAddDialog = {
-                                showNoContactToAddDialog = true
-                            },
-                            onStartCall = { isVideoCall ->
-                                startCall(isVideoCall)
-                            },
-                            openAddContactActivity = {
-                                openAddContactActivity(
-                                    context = context,
-                                    chatId = chatId,
-                                    addContactLauncher = addContactLauncher
-                                )
-                            },
-                            showClearChatConfirmationDialog = {
-                                showClearChat = true
-                            },
-                            archiveChat = archiveChat,
-                            unarchiveChat = unarchiveChat,
-                            showEndCallForAllDialog = {
-                                showEndCallForAllDialog = true
-                            },
-                            showMutePushNotificationDialog = { onShowMutePushNotificationDialog() },
-                            enableSelectMode = {
-                                isSelectMode = true
-                            },
-                        )
+                        Column {
+                            ChatAppBar(
+                                uiState = uiState,
+                                snackBarHostState = snackBarHostState,
+                                onBackPressed = onBackPressed,
+                                onMenuActionPressed = onMenuActionPressed,
+                                showParticipatingInACallDialog = {
+                                    showParticipatingInACallDialog = true
+                                },
+                                showAllContactsParticipateInChat = {
+                                    showAllContactsParticipateInChat = true
+                                },
+                                showGroupOrContactInfoActivity = {
+                                    showGroupOrContactInfoActivity(context, uiState)
+                                },
+                                showNoContactToAddDialog = {
+                                    showNoContactToAddDialog = true
+                                },
+                                onStartCall = { isVideoCall ->
+                                    startCall(isVideoCall)
+                                },
+                                openAddContactActivity = {
+                                    openAddContactActivity(
+                                        context = context,
+                                        chatId = chatId,
+                                        addContactLauncher = addContactLauncher
+                                    )
+                                },
+                                showClearChatConfirmationDialog = {
+                                    showClearChat = true
+                                },
+                                archiveChat = archiveChat,
+                                unarchiveChat = unarchiveChat,
+                                showEndCallForAllDialog = {
+                                    showEndCallForAllDialog = true
+                                },
+                                showMutePushNotificationDialog = { onShowMutePushNotificationDialog() },
+                                enableSelectMode = {
+                                    isSelectMode = true
+                                },
+                            )
+                            ReturnToCallBanner(
+                                uiState = uiState,
+                                context = context,
+                                isAudioPermissionGranted = audioPermissionState.status.isGranted,
+                                onAnswerCall = onAnswerCall
+                            )
+                        }
                     }
                 },
                 snackbarHost = {
@@ -383,12 +392,29 @@ internal fun ChatView(
                             callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
                         })
                     }
-                    ReturnToCallBanner(
-                        uiState = uiState,
-                        context = context,
-                        isAudioPermissionGranted = audioPermissionState.status.isGranted,
-                        onAnswerCall = onAnswerCall
-                    )
+                    if (callInOtherChat != null && callInThisChat?.isOnHold == true) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            println("call on hold")
+                            OutlinedMegaButton(
+                                textId = R.string.call_on_hold,
+                                onClick = {
+                                    enablePasscodeCheck()
+                                    startMeetingActivity(context, chatId)
+                                },
+                                rounded = true,
+                                modifier = Modifier.padding(
+                                    start = 24.dp,
+                                    top = 2.dp,
+                                    end = 24.dp,
+                                    bottom = 16.dp
+                                ),
+                                iconId = R.drawable.ic_pause_thin
+                            )
+                        }
+                    }
                 }
 
                 if (showParticipatingInACallDialog) {
@@ -397,7 +423,7 @@ internal fun ChatView(
                         onConfirm = {
                             showParticipatingInACallDialog = false
                             // return to active call
-                            currentCall?.let {
+                            callInOtherChat?.let {
                                 enablePasscodeCheck()
                                 startMeetingActivity(context, it.chatId)
                             }
@@ -555,7 +581,8 @@ private fun ReturnToCallBanner(
                 || callInThisChat?.status == ChatCallStatus.UserNoPresent
 
     when {
-        !isGroup && hasACallInThisChat && callInThisChatNotAnswered ->
+        !isGroup && callInThisChatNotAnswered && callInOtherChat == null ->
+            // Only one call in this chat, and it is not answered
             ReturnToCallBanner(
                 text = stringResource(id = R.string.join_call_layout),
                 onBannerClicked = {
@@ -566,11 +593,20 @@ private fun ReturnToCallBanner(
                     }
                 })
 
-        !schedIsPending && currentCall != null ->
+        !schedIsPending && (callInThisChat != null || callInOtherChat != null) ->
+            // At least one call in which I am participating
             ReturnToCallBanner(
                 text = stringResource(id = R.string.call_in_progress_layout),
-                onBannerClicked = { startMeetingActivity(context, currentCall.chatId) },
-                duration = currentCall.duration
+                onBannerClicked = {
+                    (if (callInThisChatNotAnswered || callInThisChat?.isOnHold == true) {
+                        callInOtherChat?.chatId ?: chatId
+                    } else {
+                        chatId
+                    }).let {
+                        startMeetingActivity(context, it)
+                    }
+                },
+                duration = callInOtherChat?.duration ?: callInThisChat?.duration
             )
 
         else -> null

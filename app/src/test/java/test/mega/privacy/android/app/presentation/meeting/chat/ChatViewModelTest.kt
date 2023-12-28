@@ -57,7 +57,7 @@ import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.JoinChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
@@ -134,8 +134,8 @@ internal class ChatViewModelTest {
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase = mock {
         onBlocking { invoke(any()) } doReturn emptyFlow()
     }
-    private val monitorParticipatingInACallUseCase: MonitorParticipatingInACallUseCase = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+    private val monitorParticipatingInACallInOtherChatUseCase: MonitorParticipatingInACallInOtherChatUseCase = mock {
+        onBlocking { invoke(any()) } doReturn emptyFlow()
     }
     private val monitorCallInChatUseCase: MonitorCallInChatUseCase = mock {
         onBlocking { invoke(any()) } doReturn emptyFlow()
@@ -267,7 +267,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorUserLastGreenUpdatesUseCase(userHandle) } doReturn emptyFlow()
         wheneverBlocking { monitorHasAnyContactUseCase() } doReturn emptyFlow()
         wheneverBlocking { monitorCallInChatUseCase(any()) } doReturn emptyFlow()
-        wheneverBlocking { monitorParticipatingInACallUseCase() } doReturn emptyFlow()
+        wheneverBlocking { monitorParticipatingInACallInOtherChatUseCase(any()) } doReturn emptyFlow()
         whenever(monitorAllContactParticipantsInChatUseCase(any())) doReturn emptyFlow()
         wheneverBlocking { (monitorMessageLoadedUseCase(chatId)) } doReturn emptyFlow()
     }
@@ -280,7 +280,7 @@ internal class ChatViewModelTest {
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
             monitorUserChatStatusByHandleUseCase = monitorUserChatStatusByHandleUseCase,
-            monitorParticipatingInACallUseCase = monitorParticipatingInACallUseCase,
+            monitorParticipatingInACallInOtherChatUseCase = monitorParticipatingInACallInOtherChatUseCase,
             monitorCallInChatUseCase = monitorCallInChatUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
@@ -557,7 +557,7 @@ internal class ChatViewModelTest {
         isParticipatingInChatCall: Long?,
     ) = runTest {
         val flow = MutableSharedFlow<ChatCall?>()
-        whenever(monitorParticipatingInACallUseCase()).thenReturn(flow)
+        whenever(monitorParticipatingInACallInOtherChatUseCase(any())).thenReturn(flow)
         initTestClass()
         val expected = isParticipatingInChatCall?.let {
             mock<ChatCall> {
@@ -566,7 +566,7 @@ internal class ChatViewModelTest {
         }
         flow.emit(expected)
         underTest.state.test {
-            assertThat(awaitItem().currentCall).isEqualTo(expected)
+            assertThat(awaitItem().callInOtherChat).isEqualTo(expected)
         }
     }
 

@@ -13,10 +13,10 @@ import mega.privacy.android.domain.usecase.meeting.GetCurrentChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -26,9 +26,9 @@ import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class MonitorParticipatingInACallUseCaseTest {
+internal class MonitorParticipatingInACallInOtherChatUseCaseTest {
 
-    private lateinit var underTest: MonitorParticipatingInACallUseCase
+    private lateinit var underTest: MonitorParticipatingInACallInOtherChatUseCase
 
     private val monitorChatCallUpdates: MonitorChatCallUpdatesUseCase = mock()
     private val getCurrentChatCallUseCase: GetCurrentChatCallUseCase = mock()
@@ -38,7 +38,7 @@ internal class MonitorParticipatingInACallUseCaseTest {
 
     @BeforeAll
     fun setup() {
-        underTest = MonitorParticipatingInACallUseCase(
+        underTest = MonitorParticipatingInACallInOtherChatUseCase(
             monitorChatCallUpdatesUseCase = monitorChatCallUpdates,
             getCurrentChatCallUseCase = getCurrentChatCallUseCase,
             getChatCallUseCase = getChatCallUseCase,
@@ -56,11 +56,12 @@ internal class MonitorParticipatingInACallUseCaseTest {
 
     @ParameterizedTest(name = "chat call status is {0} and getChatCallUseCase is {1}")
     @MethodSource("provideParameters")
-    fun `test that user is participating in a call when`(
+    fun `test that user is participating in a call in other chat when`(
         chatCallStatus: ChatCallStatus,
         currentChatCallStatus: ChatCallStatus?,
     ) = runTest {
         // GIVEN
+        val chatId = 1234L
         val currentCall = currentChatCallStatus?.let {
             mock<ChatCall> {
                 on { this.status } doReturn currentChatCallStatus
@@ -74,7 +75,7 @@ internal class MonitorParticipatingInACallUseCaseTest {
         }
         val call = mock<ChatCall> {
             on { this.status } doReturn chatCallStatus
-            on { this.chatId } doReturn (1234L)
+            on { this.chatId } doReturn (chatId)
         }
         whenever(monitorChatCallUpdates()).thenReturn(hotFlow(call))
         val lastUpdateExpected =
@@ -90,25 +91,22 @@ internal class MonitorParticipatingInACallUseCaseTest {
             } else {
                 null
             }
-        underTest.invoke().test {
+        underTest.invoke(234L).test {
             assertThat(awaitItem()).isEqualTo(firstUpdateExpected)
             assertThat(awaitItem()).isEqualTo(lastUpdateExpected)
         }
     }
 
-    @ParameterizedTest(name = "test that {0} status returns no events")
-    @EnumSource(
-        value = ChatCallStatus::class,
-        names = ["UserNoPresent", "Connecting", "Joining", "InProgress", "Unknown"]
-    )
-    fun `test that non monitored status returns no value`(status: ChatCallStatus) = runTest {
+    @Test
+    fun `test that non monitored chat returns no value`() = runTest {
         val flow = MutableSharedFlow<ChatCall>()
         whenever(getCurrentChatCallUseCase()).thenReturn(null)
         whenever(monitorChatCallUpdates()).thenReturn(flow)
-        underTest().test {
+        underTest(chatId).test {
             assertThat(awaitItem()).isNull()
             val call = mock<ChatCall> {
-                on { this.status } doReturn status
+                on { this.status } doReturn ChatCallStatus.Connecting
+                on { this.chatId } doReturn chatId
             }
             flow.emit(call)
             assertThat(cancelAndConsumeRemainingEvents()).isEmpty()

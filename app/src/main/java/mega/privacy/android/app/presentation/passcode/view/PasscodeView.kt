@@ -53,13 +53,13 @@ import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.textfields.PasscodeField
 import mega.privacy.android.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_100_alpha_060_dark_grey
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
@@ -267,6 +267,7 @@ private fun PasscodeContent(
                 },
                 textId = R.string.action_logout,
                 modifier = Modifier.testTag(LOGOUT_BUTTON_TAG),
+                rounded = false,
             )
             Spacer(modifier = Modifier.height(20.dp))
             TextMegaButton(

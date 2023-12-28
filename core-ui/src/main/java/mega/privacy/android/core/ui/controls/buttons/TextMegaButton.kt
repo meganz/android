@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -31,7 +33,12 @@ fun TextMegaButton(
     modifier = modifier,
     onClick = onClick,
     enabled = enabled,
-    colors = MegaTheme.colors.buttonsColors,
+    colors = ButtonDefaults.buttonColors(
+        backgroundColor = Color.Transparent,
+        contentColor = MegaTheme.colors.text.accent,
+        disabledBackgroundColor = Color.Transparent,
+        disabledContentColor = MegaTheme.colors.text.disabled,
+    ),
     contentPadding = contentPadding
 ) {
     Text(

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -64,7 +65,8 @@ internal fun MessageListView(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        state = scrollState
+        state = scrollState,
+        contentPadding = PaddingValues(bottom = 68.dp)
     ) {
         item("header") {
             AnimatedVisibility(visible = pagingItems.loadState.refresh is LoadState.Loading) {

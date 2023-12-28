@@ -104,7 +104,7 @@ internal fun ChatAppBar(
             when (it) {
                 is ChatRoomMenuAction.AudioCall, is ChatRoomMenuAction.VideoCall -> {
                     isVideoCall = it is ChatRoomMenuAction.VideoCall
-                    if (uiState.currentCall != null) {
+                    if (uiState.callInOtherChat != null) {
                         showParticipatingInACallDialog()
                         return@onActionPressed
                     }

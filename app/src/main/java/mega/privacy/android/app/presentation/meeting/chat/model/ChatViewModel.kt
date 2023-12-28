@@ -46,7 +46,7 @@ import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.JoinChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
@@ -102,7 +102,7 @@ internal class ChatViewModel @Inject constructor(
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase,
-    private val monitorParticipatingInACallUseCase: MonitorParticipatingInACallUseCase,
+    private val monitorParticipatingInACallInOtherChatUseCase: MonitorParticipatingInACallInOtherChatUseCase,
     private val monitorCallInChatUseCase: MonitorCallInChatUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
@@ -159,7 +159,6 @@ internal class ChatViewModel @Inject constructor(
 
     init {
         checkGeolocation()
-        monitorParticipatingInACall()
         monitorStorageStateEvent()
         loadChatRoom()
         joinChatCallIfNeeded()
@@ -199,6 +198,7 @@ internal class ChatViewModel @Inject constructor(
             getChatConnectionState(it)
             getScheduledMeeting(it)
             monitorACallInThisChat(it)
+            monitorParticipatingInACall(it)
             monitorChatRoom(it)
             monitorNotificationMute(it)
             monitorChatConnectionState(it)
@@ -519,13 +519,13 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun monitorParticipatingInACall() {
+    private fun monitorParticipatingInACall(chatId: Long) {
         viewModelScope.launch {
-            monitorParticipatingInACallUseCase()
+            monitorParticipatingInACallInOtherChatUseCase(chatId)
                 .catch { Timber.e(it) }
                 .collect {
                     Timber.d("Monitor call in progress returned chat id: $it")
-                    _state.update { state -> state.copy(currentCall = it) }
+                    _state.update { state -> state.copy(callInOtherChat = it) }
                 }
         }
     }

@@ -22,11 +22,14 @@ class MonitorCallInChatUseCase @Inject constructor(
      */
     operator fun invoke(chatId: Long) = monitorChatCallUpdatesUseCase()
         .filter { it.chatId == chatId }
-        .map {
-            if (it.status == ChatCallStatus.Destroyed || it.status == ChatCallStatus.Unknown) {
-                null
-            } else {
-                callRepository.getChatCall(chatId)
+        .map { call ->
+            when (call.status) {
+                ChatCallStatus.TerminatingUserParticipation,
+                ChatCallStatus.Destroyed,
+                ChatCallStatus.Unknown,
+                -> null
+
+                else -> callRepository.getChatCall(chatId)
             }
         }
         .onStart { emit(callRepository.getChatCall(chatId)) }

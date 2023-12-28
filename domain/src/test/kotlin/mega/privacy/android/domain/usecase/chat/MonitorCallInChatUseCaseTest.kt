@@ -71,7 +71,10 @@ internal class MonitorCallInChatUseCaseTest {
             on { this.status } doReturn finalCallStatus
         }
         val finalCall =
-            if (finalCallStatus != ChatCallStatus.Destroyed && finalCallStatus != ChatCallStatus.Unknown) {
+            if (finalCallStatus != ChatCallStatus.Destroyed
+                && finalCallStatus != ChatCallStatus.Unknown
+                && finalCallStatus != ChatCallStatus.TerminatingUserParticipation
+            ) {
                 updatedCall
             } else {
                 null

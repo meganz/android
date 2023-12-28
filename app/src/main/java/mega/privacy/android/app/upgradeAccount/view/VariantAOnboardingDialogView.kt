@@ -35,7 +35,6 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.view.components.FeatureRow
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -46,6 +45,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.shared.theme.MegaAppTheme
 import java.util.Locale
 
 internal const val IMAGE_TAG = "onboarding_screen_variant_a:image"
@@ -215,6 +215,7 @@ fun ButtonsRow(
             modifier = Modifier
                 .padding(end = 8.dp)
                 .testTag(SKIP_BUTTON),
+            rounded = false,
         )
         RaisedDefaultMegaButton(
             textId = R.string.dialog_onboarding_button_view_pro_plan,

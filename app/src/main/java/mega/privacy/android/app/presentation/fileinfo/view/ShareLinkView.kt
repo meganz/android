@@ -16,12 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.theme.MegaAppTheme
 import java.time.Instant.now
 
 /**
@@ -59,7 +59,8 @@ internal fun ShareLinkView(
             .widthIn(min = 100.dp)
             .testTag(TEST_SHARE_LINK_COPY),
         textId = R.string.context_copy,
-        onClick = onCopyLinkClick
+        onClick = onCopyLinkClick,
+        rounded = false,
     )
     Spacer(modifier = Modifier.height(verticalSpace.dp))
 }
