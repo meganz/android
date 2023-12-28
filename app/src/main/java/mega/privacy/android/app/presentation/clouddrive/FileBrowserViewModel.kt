@@ -15,7 +15,6 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
-import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
@@ -37,6 +36,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
@@ -52,7 +52,7 @@ import javax.inject.Inject
 /**
  * ViewModel associated to FileBrowserFragment
  *
- * @param getRootFolder Fetch the root node
+ * @param getRootNodeUseCase Fetch the root node
  * @param monitorMediaDiscoveryView Monitor media discovery view settings
  * @param monitorNodeUpdatesUseCase Monitor node updates
  * @param getFileBrowserParentNodeHandle To get parent handle of current node
@@ -70,7 +70,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
-    private val getRootFolder: GetRootFolder,
+    private val getRootNodeUseCase: GetRootNodeUseCase,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getFileBrowserParentNodeHandle: GetParentNodeHandle,
@@ -225,7 +225,8 @@ class FileBrowserViewModel @Inject constructor(
     suspend fun handleBackFromMD() {
         handleStack.pop()
         val currentParent =
-            _state.value.parentHandle ?: getRootFolder()?.handle ?: MegaApiJava.INVALID_HANDLE
+            _state.value.parentHandle ?: getRootNodeUseCase()?.id?.longValue
+            ?: MegaApiJava.INVALID_HANDLE
         _state.update {
             it.copy(
                 fileBrowserHandle = currentParent,
@@ -243,7 +244,9 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun getSafeBrowserParentHandle(): Long = runBlocking {
         if (_state.value.fileBrowserHandle == -1L) {
-            setBrowserParentHandle(getRootFolder()?.handle ?: MegaApiJava.INVALID_HANDLE)
+            setBrowserParentHandle(
+                getRootNodeUseCase()?.id?.longValue ?: MegaApiJava.INVALID_HANDLE
+            )
         }
         return@runBlocking _state.value.fileBrowserHandle
     }
@@ -287,7 +290,7 @@ class FileBrowserViewModel @Inject constructor(
         val typedNodeList = getFileBrowserNodeChildrenUseCase(_state.value.fileBrowserHandle)
         val nodeList = getNodeUiItems(typedNodeList)
         val hasMediaFile: Boolean = containsMediaItemUseCase(typedNodeList)
-        val isRootNode = getRootFolder()?.handle == _state.value.fileBrowserHandle
+        val isRootNode = getRootNodeUseCase()?.id?.longValue == _state.value.fileBrowserHandle
         _state.update {
             it.copy(
                 showMediaDiscoveryIcon = !isRootNode && hasMediaFile,
@@ -295,7 +298,7 @@ class FileBrowserViewModel @Inject constructor(
                 nodesList = nodeList,
                 sortOrder = getCloudSortOrder(),
                 isFileBrowserEmpty = MegaApiJava.INVALID_HANDLE == _state.value.fileBrowserHandle ||
-                        getRootFolder()?.handle == _state.value.fileBrowserHandle
+                        getRootNodeUseCase()?.id?.longValue == _state.value.fileBrowserHandle
             )
         }
     }

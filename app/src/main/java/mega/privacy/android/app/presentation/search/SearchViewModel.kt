@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -51,7 +51,7 @@ class SearchViewModel @Inject constructor(
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
-    private val getRootFolder: GetRootFolder,
+    private val getRootNodeUseCase: GetRootNodeUseCase,
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getSearchParentNodeHandle: GetParentNodeHandle,
@@ -94,7 +94,7 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update {
                 it.copy(
-                    rootNodeHandle = getRootFolder()?.handle ?: INVALID_HANDLE
+                    rootNodeHandle = getRootNodeUseCase()?.id?.longValue ?: INVALID_HANDLE
                 )
             }
         }
@@ -316,7 +316,7 @@ class SearchViewModel @Inject constructor(
 
             DrawerItem.RUBBISH_BIN -> rubbishBinParentHandle
             DrawerItem.BACKUPS -> backupsParentHandle
-            else -> getRootFolder()?.handle ?: INVALID_HANDLE
+            else -> getRootNodeUseCase()?.id?.longValue ?: INVALID_HANDLE
         }
     }
 

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
-import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.app.utils.Constants
@@ -20,6 +19,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePasswordUseCase
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.ResetPasswordUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
@@ -35,7 +35,7 @@ internal class ChangePasswordViewModel @Inject constructor(
     private val getPasswordStrengthUseCase: GetPasswordStrengthUseCase,
     private val changePasswordUseCase: ChangePasswordUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
-    private val getRootFolder: GetRootFolder,
+    private val getRootNodeUseCase: GetRootNodeUseCase,
     private val multiFactorAuthSetting: FetchMultiFactorAuthSettingUseCase,
     private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
@@ -70,7 +70,7 @@ internal class ChangePasswordViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _uiState.update { it.copy(isUserLoggedIn = getRootFolder() != null) }
+            _uiState.update { it.copy(isUserLoggedIn = getRootNodeUseCase() != null) }
 
             monitorConnectivityUseCase().collect { isConnected ->
                 _uiState.update { it.copy(isConnectedToNetwork = isConnected) }

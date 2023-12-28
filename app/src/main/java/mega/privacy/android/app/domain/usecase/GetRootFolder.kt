@@ -5,6 +5,10 @@ import nz.mega.sdk.MegaNode
 /**
  * Get the root node
  */
+@Deprecated(
+    "It will be removed after refactoring UploadService",
+    ReplaceWith("GetRootNodeUseCase")
+)
 fun interface GetRootFolder {
     /**
      * Get the root node

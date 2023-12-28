@@ -19,7 +19,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
-import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -40,6 +39,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
@@ -66,7 +66,7 @@ import org.mockito.kotlin.whenever
 class FileBrowserViewModelTest {
     private lateinit var underTest: FileBrowserViewModel
 
-    private val getRootFolder = mock<GetRootFolder>()
+    private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val isNodeInRubbish = mock<IsNodeInRubbish>()
     private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView> {
         on { invoke() }.thenReturn(
@@ -100,7 +100,7 @@ class FileBrowserViewModelTest {
 
     private fun initViewModel() {
         underTest = FileBrowserViewModel(
-            getRootFolder = getRootFolder,
+            getRootNodeUseCase = getRootNodeUseCase,
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getFileBrowserParentNodeHandle = getFileBrowserParentNodeHandle,
@@ -149,7 +149,7 @@ class FileBrowserViewModelTest {
     @Test
     fun `test that get safe browser handle returns INVALID_HANDLE if not set and root folder fails`() =
         runTest {
-            whenever(getRootFolder()).thenReturn(null)
+            whenever(getRootNodeUseCase()).thenReturn(null)
             Truth.assertThat(underTest.getSafeBrowserParentHandle())
                 .isEqualTo(MegaApiJava.INVALID_HANDLE)
         }
@@ -224,7 +224,11 @@ class FileBrowserViewModelTest {
         runTest {
             val newValue = 123456789L
             val folderNode = mock<TypedFolderNode>()
-            whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(listOf(folderNode))
+            whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(
+                listOf(
+                    folderNode
+                )
+            )
 
             underTest.setBrowserParentHandle(newValue)
 
@@ -355,7 +359,7 @@ class FileBrowserViewModelTest {
         }
 
     @Test
-    fun `test that on clicking on change view type to Grid it calls setViewType atleast once`() =
+    fun `test that on clicking on change view type to Grid it calls setViewType at least once`() =
         runTest {
             underTest.onChangeViewTypeClicked()
             verify(setViewType).invoke(ViewType.GRID)

@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
-import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity.Companion.KEY_ACTION
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity.Companion.KEY_LINK_TO_RESET
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordViewModel
@@ -22,6 +21,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePasswordUseCase
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.ResetPasswordUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
@@ -51,7 +51,7 @@ internal class ChangePasswordViewModelTest {
     private val isCurrentPasswordUseCase = mock<IsCurrentPasswordUseCase>()
     private val resetPasswordUseCase = mock<ResetPasswordUseCase>()
     private val multiFactorAuthSetting = mock<FetchMultiFactorAuthSettingUseCase>()
-    private val getRootFolder = mock<GetRootFolder>()
+    private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val logoutUseCase = mock<LogoutUseCase>()
 
     @BeforeAll
@@ -67,7 +67,7 @@ internal class ChangePasswordViewModelTest {
             getPasswordStrengthUseCase = getPasswordStrengthUseCase,
             changePasswordUseCase = changePasswordUseCase,
             resetPasswordUseCase = resetPasswordUseCase,
-            getRootFolder = getRootFolder,
+            getRootNodeUseCase = getRootNodeUseCase,
             multiFactorAuthSetting = multiFactorAuthSetting,
             logoutUseCase = logoutUseCase,
         )
@@ -81,7 +81,7 @@ internal class ChangePasswordViewModelTest {
             getPasswordStrengthUseCase,
             changePasswordUseCase,
             resetPasswordUseCase,
-            getRootFolder,
+            getRootNodeUseCase,
             multiFactorAuthSetting,
             logoutUseCase,
         )
