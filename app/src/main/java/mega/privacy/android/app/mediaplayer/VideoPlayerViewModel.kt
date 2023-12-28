@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -9,11 +10,12 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.view.PixelCopy
 import android.view.SurfaceView
 import android.view.View
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -140,11 +142,9 @@ import mega.privacy.android.domain.usecase.mediaplayer.DeletePlaybackInformation
 import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MonitorVideoRepeatModeUseCase
@@ -160,7 +160,6 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import timber.log.Timber
 import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.Date
@@ -234,7 +233,7 @@ class VideoPlayerViewModel @Inject constructor(
     /**
      * SelectState for updating the background color of add subtitle dialog options
      */
-    internal var selectOptionState by mutableStateOf(SUBTITLE_SELECTED_STATE_OFF)
+    internal var selectOptionState by mutableIntStateOf(SUBTITLE_SELECTED_STATE_OFF)
         private set
 
     private val _screenLockState = MutableStateFlow(false)
@@ -574,26 +573,18 @@ class VideoPlayerViewModel @Inject constructor(
     /**
      * Capture the screenshot when video playing
      *
-     * @param rootFolderPath the root folder path of screenshots
      * @param captureView the view that will be captured
      * @param successCallback the callback after the screenshot is saved successfully
      *
      */
     @SuppressLint("SimpleDateFormat")
     internal fun screenshotWhenVideoPlaying(
-        rootFolderPath: String,
         captureView: View,
         successCallback: (bitmap: Bitmap) -> Unit,
     ) {
-        File(rootFolderPath).apply {
-            if (exists().not()) {
-                mkdirs()
-            }
-        }
         val screenshotFileName =
             SimpleDateFormat(DATE_FORMAT_PATTERN).format(Date(System.currentTimeMillis()))
-        val filePath =
-            "$rootFolderPath${SCREENSHOT_NAME_PREFIX}$screenshotFileName${SCREENSHOT_NAME_SUFFIX}"
+        val fileName = "${SCREENSHOT_NAME_PREFIX}$screenshotFileName${SCREENSHOT_NAME_SUFFIX}"
         // Using video size for the capture size to ensure the screenshot is complete.
         val (captureWidth, captureHeight) = currentPlayingVideoSize?.let { (width, height) ->
             width to height
@@ -611,7 +602,7 @@ class VideoPlayerViewModel @Inject constructor(
                 { copyResult ->
                     if (copyResult == PixelCopy.SUCCESS) {
                         viewModelScope.launch {
-                            saveBitmap(filePath, screenshotBitmap, successCallback)
+                            saveBitmap(fileName, screenshotBitmap, successCallback)
                         }
                     }
                 },
@@ -1842,21 +1833,33 @@ class VideoPlayerViewModel @Inject constructor(
         }
 
     private suspend fun saveBitmap(
-        filePath: String,
+        fileName: String,
         bitmap: Bitmap,
         successCallback: (bitmap: Bitmap) -> Unit,
     ) =
         withContext(ioDispatcher) {
-            val screenshotFile = File(filePath)
-            try {
-                val outputStream = FileOutputStream(screenshotFile)
-                bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY_SCREENSHOT, outputStream)
-                outputStream.flush()
-                outputStream.close()
-                successCallback(bitmap)
-            } catch (e: Exception) {
-                Timber.e("Bitmap is saved error: ${e.message}")
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                put(MediaStore.Images.Media.RELATIVE_PATH, MEGA_SCREENSHOTS_FOLDER_NAME)
             }
+
+            val contentResolver = context.contentResolver
+            contentResolver?.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                ?.let { uri ->
+                    contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        try {
+                            bitmap.compress(
+                                Bitmap.CompressFormat.JPEG,
+                                QUALITY_SCREENSHOT,
+                                outputStream
+                            )
+                            successCallback(bitmap)
+                        } catch (e: Exception) {
+                            Timber.e("Bitmap is saved error: ${e.message}")
+                        }
+                    }
+                }
         }
 
     /**
@@ -1981,6 +1984,9 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
+    /**
+     * onCleared
+     */
     override fun onCleared() {
         super.onCleared()
         cancelSearch()
@@ -1988,6 +1994,7 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     companion object {
+        private const val MEGA_SCREENSHOTS_FOLDER_NAME = "DCIM/MEGA Screenshots/"
         private const val QUALITY_SCREENSHOT = 100
         private const val DATE_FORMAT_PATTERN = "yyyyMMdd-HHmmss"
         private const val SCREENSHOT_NAME_PREFIX = "Screenshot_"

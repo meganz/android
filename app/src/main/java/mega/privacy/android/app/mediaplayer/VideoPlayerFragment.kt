@@ -6,8 +6,6 @@ import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Environment
-import android.os.Environment.getExternalStoragePublicDirectory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -58,7 +56,6 @@ import mega.privacy.android.app.utils.getScreenHeight
 import mega.privacy.android.app.utils.getScreenWidth
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
-import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
 import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
@@ -69,7 +66,6 @@ import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
 import org.jetbrains.anko.configuration
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -138,6 +134,9 @@ class VideoPlayerFragment : Fragment() {
             }
         }
 
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -149,12 +148,18 @@ class VideoPlayerFragment : Fragment() {
     }
 
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         videoPlayerActivity?.updateToolbarTitleBasedOnOrientation(viewModel.metadataState.value)
         observeFlow()
     }
 
+    /**
+     * onResume
+     */
     override fun onResume() {
         super.onResume()
         setupPlayer()
@@ -175,11 +180,17 @@ class VideoPlayerFragment : Fragment() {
         videoPlayerActivity?.setDraggable(!viewModel.screenLockState.value)
     }
 
+    /**
+     * onPause
+     */
     override fun onPause() {
         super.onPause()
         viewModel.updateAddSubtitleState()
     }
 
+    /**
+     * onDestroyView
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         playlistObserved = false
@@ -383,16 +394,8 @@ class VideoPlayerFragment : Fragment() {
     }
 
     private fun screenshotButtonClicked() {
-        val rootPath =
-            getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
-        val screenshotsFolderPath =
-            "${rootPath}${File.separator}${MEGA_SCREENSHOTS_FOLDER_NAME}${File.separator}"
-
         binding.playerView.videoSurfaceView?.let { view ->
-            viewModel.screenshotWhenVideoPlaying(
-                rootFolderPath = screenshotsFolderPath,
-                captureView = view
-            ) { bitmap ->
+            viewModel.screenshotWhenVideoPlaying(captureView = view) { bitmap ->
                 viewModel.sendSnapshotButtonClickedEvent()
                 Analytics.tracker.trackEvent(SnapshotButtonPressedEvent)
                 viewLifecycleOwner.lifecycleScope.launch {
@@ -776,7 +779,6 @@ class VideoPlayerFragment : Fragment() {
     }
 
     companion object {
-        private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots"
         private const val SCREENSHOT_SCALE_ORIGINAL: Float = 1F
         private const val SCREENSHOT_SCALE_PORTRAIT: Float = 0.4F
         private const val SCREENSHOT_SCALE_LANDSCAPE: Float = 0.3F
