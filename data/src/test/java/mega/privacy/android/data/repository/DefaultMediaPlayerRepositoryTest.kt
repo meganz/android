@@ -9,13 +9,16 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.MediaPlayerPreferencesGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.audios.TypedAudioNodeMapper
 import mega.privacy.android.data.mapper.mediaplayer.RepeatToggleModeMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
+import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
@@ -48,6 +51,9 @@ class DefaultMediaPlayerRepositoryTest {
     private val appPreferencesGateway = mock<AppPreferencesGateway>()
     private val subtitleFileInfoMapper = mock<SubtitleFileInfoMapper>()
     private val mediaPlayerPreferencesGateway = mock<MediaPlayerPreferencesGateway>()
+    private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
+    private val fileNodeMapper = mock<FileNodeMapper>()
+    private val typedAudioNodeMapper = mock<TypedAudioNodeMapper>()
 
     private val expectedHandle = 100L
     private val expectedMediaId: Long = 1234567
@@ -60,8 +66,11 @@ class DefaultMediaPlayerRepositoryTest {
         underTest = DefaultMediaPlayerRepository(
             megaApi = megaApi,
             megaApiFolder = megaApiFolder,
+            megaLocalRoomGateway = megaLocalRoomGateway,
             dbHandler = dbHandler,
             nodeMapper = nodeMapper,
+            fileNodeMapper = fileNodeMapper,
+            typedAudioNodeMapper = typedAudioNodeMapper,
             fileGateway = fileGateway,
             sortOrderIntMapper = sortOrderIntMapper,
             appPreferencesGateway = appPreferencesGateway,
@@ -82,7 +91,10 @@ class DefaultMediaPlayerRepositoryTest {
             sortOrderIntMapper,
             appPreferencesGateway,
             subtitleFileInfoMapper,
-            mediaPlayerPreferencesGateway
+            mediaPlayerPreferencesGateway,
+            fileNodeMapper,
+            typedAudioNodeMapper,
+            megaLocalRoomGateway
         )
     }
 

@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.mediaplayer
 
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.repository.MediaPlayerRepository
@@ -9,7 +9,6 @@ import javax.inject.Inject
  */
 class GetAudioNodesByParentHandleUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
-    private val addNodeType: AddNodeType,
 ) {
     /**
      * Get audio children by parent node handle
@@ -19,7 +18,5 @@ class GetAudioNodesByParentHandleUseCase @Inject constructor(
      * @return audio nodes
      */
     suspend operator fun invoke(parentHandle: Long, order: SortOrder) =
-        mediaPlayerRepository.getAudioNodesByParentHandle(parentHandle, order)?.map {
-            addNodeType(it)
-        }
+        mediaPlayerRepository.getAudioNodesByParentHandle(parentHandle, order)
 }

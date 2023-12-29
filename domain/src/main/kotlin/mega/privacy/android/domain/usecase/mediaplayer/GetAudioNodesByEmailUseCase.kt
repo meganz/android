@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.mediaplayer
 
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import javax.inject.Inject
@@ -8,7 +8,6 @@ import javax.inject.Inject
  */
 class GetAudioNodesByEmailUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
-    private val addNodeType: AddNodeType,
 ) {
     /**
      * Getting audio nodes by email
@@ -17,5 +16,5 @@ class GetAudioNodesByEmailUseCase @Inject constructor(
      * @return audio nodes
      */
     suspend operator fun invoke(email: String) =
-        mediaPlayerRepository.getAudioNodesByEmail(email)?.map { addNodeType(it) }
+        mediaPlayerRepository.getAudioNodesByEmail(email)
 }

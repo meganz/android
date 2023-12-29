@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.mediaplayer
 
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.repository.MediaPlayerRepository
@@ -9,7 +9,6 @@ import javax.inject.Inject
  */
 class GetAudioNodesFromOutSharesUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
-    private val addNodeType: AddNodeType,
 ) {
     /**
      * Getting audio nodes from out shares
@@ -18,5 +17,5 @@ class GetAudioNodesFromOutSharesUseCase @Inject constructor(
      * @return audio nodes
      */
     suspend operator fun invoke(lastHandle: Long, order: SortOrder) =
-        mediaPlayerRepository.getAudioNodesFromOutShares(lastHandle, order).map { addNodeType(it) }
+        mediaPlayerRepository.getAudioNodesFromOutShares(lastHandle, order)
 }

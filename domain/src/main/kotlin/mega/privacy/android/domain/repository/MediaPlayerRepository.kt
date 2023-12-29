@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.MegaException
@@ -44,7 +45,7 @@ interface MediaPlayerRepository {
      * @param order list order
      * @return audio nodes
      */
-    suspend fun getAudioNodes(order: SortOrder): List<UnTypedNode>
+    suspend fun getAudioNodes(order: SortOrder): List<TypedAudioNode>
 
     /**
      * Get all video nodes
@@ -84,12 +85,12 @@ interface MediaPlayerRepository {
      *
      * @param parentHandle parent node handle
      * @param order list order
-     * @return List<[UnTypedNode]>?
+     * @return List<[TypedAudioNode]>?
      */
     suspend fun getAudioNodesByParentHandle(
         parentHandle: Long,
         order: SortOrder,
-    ): List<UnTypedNode>?
+    ): List<TypedAudioNode>?
 
     /**
      * Get video children by parent node handle
@@ -108,12 +109,12 @@ interface MediaPlayerRepository {
      *
      * @param parentHandle parent node handle
      * @param order list order
-     * @return List<[UnTypedNode]>?
+     * @return List<[TypedAudioNode]>?
      */
     suspend fun getAudiosByParentHandleFromMegaApiFolder(
         parentHandle: Long,
         order: SortOrder,
-    ): List<UnTypedNode>?
+    ): List<TypedAudioNode>?
 
     /**
      * Get video children by parent handle from MegaApiFolder
@@ -130,9 +131,9 @@ interface MediaPlayerRepository {
     /**
      * Get audio nodes from public links
      * @param order list order
-     * @return List<[UnTypedNode]>
+     * @return List<[TypedAudioNode]>
      */
-    suspend fun getAudioNodesFromPublicLinks(order: SortOrder): List<UnTypedNode>
+    suspend fun getAudioNodesFromPublicLinks(order: SortOrder): List<TypedAudioNode>
 
     /**
      * Get video nodes from public links
@@ -144,9 +145,9 @@ interface MediaPlayerRepository {
     /**
      * Get audio nodes from InShares
      * @param order list order
-     * @return List<[UnTypedNode]>
+     * @return List<[TypedAudioNode]>
      */
-    suspend fun getAudioNodesFromInShares(order: SortOrder): List<UnTypedNode>
+    suspend fun getAudioNodesFromInShares(order: SortOrder): List<TypedAudioNode>
 
     /**
      * Get video nodes from InShares
@@ -158,9 +159,9 @@ interface MediaPlayerRepository {
     /**
      * Get audio nodes from OutShares
      * @param order list order
-     * @return List<[UnTypedNode]>
+     * @return List<[TypedAudioNode]>
      */
-    suspend fun getAudioNodesFromOutShares(lastHandle: Long, order: SortOrder): List<UnTypedNode>
+    suspend fun getAudioNodesFromOutShares(lastHandle: Long, order: SortOrder): List<TypedAudioNode>
 
     /**
      * Get video nodes from OutShares
@@ -173,9 +174,9 @@ interface MediaPlayerRepository {
      * Get audio nodes by email
      *
      * @param email email of account
-     * @return List<[UnTypedNode]>?
+     * @return List<[TypedAudioNode]>?
      */
-    suspend fun getAudioNodesByEmail(email: String): List<UnTypedNode>?
+    suspend fun getAudioNodesByEmail(email: String): List<TypedAudioNode>?
 
     /**
      * Get video nodes by email
@@ -368,4 +369,12 @@ interface MediaPlayerRepository {
         recursive: Boolean,
         order: SortOrder,
     ): List<UnTypedNode>?
+
+    /**
+     * Get audio nodes by handles
+     *
+     * @param handles handle list
+     * @return List<[TypedAudioNode]>
+     */
+    suspend fun getAudioNodesByHandles(handles: List<Long>): List<TypedAudioNode>
 }
