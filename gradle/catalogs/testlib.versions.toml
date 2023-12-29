@@ -2,7 +2,7 @@
 androidx-arch = "2.2.0"
 androidx-test = "1.5.0"
 androidx-test-monitor = "1.6.1"
-coroutines-test = "1.6.4"
+coroutines-test = "1.7.3"
 espresso = "3.5.1"
 hamcrest = "2.2"
 junit = "4.13.2"

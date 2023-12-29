@@ -4,9 +4,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -16,6 +15,7 @@ import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedVideoNode
@@ -48,8 +48,10 @@ class VideoSectionViewModelTest {
     private val getAllVideosUseCase = mock<GetAllVideosUseCase>()
     private val uiVideoMapper = mock<UIVideoMapper>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
+    private val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
+    private val fakeMonitorOfflineNodeUpdatesFlow = MutableSharedFlow<List<Offline>>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
     private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
@@ -66,8 +68,10 @@ class VideoSectionViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(emptyFlow())
-        wheneverBlocking { monitorOfflineNodeUpdatesUseCase() }.thenReturn(emptyFlow())
+        wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(fakeMonitorNodeUpdatesFlow)
+        wheneverBlocking { monitorOfflineNodeUpdatesUseCase() }.thenReturn(
+            fakeMonitorOfflineNodeUpdatesFlow
+        )
         underTest = VideoSectionViewModel(
             getAllVideosUseCase = getAllVideosUseCase,
             uiVideoMapper = uiVideoMapper,
@@ -89,14 +93,12 @@ class VideoSectionViewModelTest {
             getAllVideosUseCase,
             uiVideoMapper,
             getCloudSortOrder,
-            monitorNodeUpdatesUseCase,
-            monitorOfflineNodeUpdatesUseCase,
             getNodeByHandle,
             getFingerprintUseCase,
             megaApiHttpServerIsRunningUseCase,
             megaApiHttpServerStartUseCase,
             getFileUrlByNodeHandleUseCase,
-            getNodeByIdUseCase
+            getNodeByIdUseCase,
         )
     }
 
@@ -142,9 +144,10 @@ class VideoSectionViewModelTest {
     @Test
     fun `test that isPendingRefresh is correctly updated when monitorOfflineNodeUpdatesUseCase is triggered`() =
         runTest {
-            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            testScheduler.advanceUntilIdle()
 
             underTest.state.drop(1).test {
+                fakeMonitorOfflineNodeUpdatesFlow.emit(emptyList())
                 assertThat(awaitItem().isPendingRefresh).isTrue()
 
                 underTest.markHandledPendingRefresh()
@@ -156,9 +159,10 @@ class VideoSectionViewModelTest {
     @Test
     fun `test that isPendingRefresh is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
         runTest {
-            whenever(monitorNodeUpdatesUseCase()).thenReturn(flowOf(NodeUpdate(emptyMap())))
+            testScheduler.advanceUntilIdle()
 
             underTest.state.drop(1).test {
+                fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
                 assertThat(awaitItem().isPendingRefresh).isTrue()
 
                 underTest.markHandledPendingRefresh()

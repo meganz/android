@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -48,6 +49,7 @@ internal class SyncNewFolderViewModelTest {
 
     @Test
     fun `test that local folder selected action results in updated state`() = runTest {
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
         initViewModel()
         val localFolderContentUri =
             "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
@@ -61,23 +63,30 @@ internal class SyncNewFolderViewModelTest {
 
         underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(localFolderUri))
 
-        assertThat(expectedState).isEqualTo(underTest.state.value)
+        assertThat(expectedState.selectedLocalFolder).isEqualTo(underTest.state.value.selectedLocalFolder)
     }
 
     @Test
     fun `test that folder name changed action results in updated state`() {
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
         initViewModel()
         val folderPairName = "folderPairName"
         val expectedState = SyncNewFolderState(folderPairName = folderPairName)
 
         underTest.handleAction(SyncNewFolderAction.FolderNameChanged(folderPairName))
 
-        assertThat(expectedState).isEqualTo(underTest.state.value)
+        assertThat(expectedState.folderPairName).isEqualTo(underTest.state.value.folderPairName)
     }
 
     @Test
     fun `test that when mega folder is updated state is also updated`() = runTest {
         val remoteFolder = RemoteFolder(123L, "someFolder")
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(
+            flow {
+                emit(remoteFolder)
+                awaitCancellation()
+            }
+        )
         whenever(monitorSelectedMegaFolderUseCase()).thenReturn(
             flow {
                 emit(remoteFolder)

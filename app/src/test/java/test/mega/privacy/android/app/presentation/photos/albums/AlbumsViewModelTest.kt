@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -30,11 +29,15 @@ import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -42,6 +45,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AlbumsViewModelTest {
     private lateinit var underTest: AlbumsViewModel
 
@@ -54,14 +58,24 @@ class AlbumsViewModelTest {
     private val createAlbumUseCase = mock<CreateAlbumUseCase>()
     private val removeAlbumsUseCase = mock<RemoveAlbumsUseCase>()
     private val disableExportAlbumsUseCase: DisableExportAlbumsUseCase = mock()
+    private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase = mock()
     private val proscribedStrings =
         listOf("My albums", "Shared albums", "Favourites", "RAW", "GIFs")
 
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
-        whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf()))
+    private val dispatcher = StandardTestDispatcher()
 
+    @BeforeAll
+    fun initialise() {
+        Dispatchers.setMain(dispatcher)
+    }
+
+    @BeforeEach
+    fun setUp() {
+        whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf()))
+        initUnderTest()
+    }
+
+    private fun initUnderTest() {
         underTest = AlbumsViewModel(
             getDefaultAlbumPhotos = getDefaultAlbumPhotos,
             getDefaultAlbumsMapUseCase = getDefaultAlbumsMapUseCase,
@@ -72,12 +86,26 @@ class AlbumsViewModelTest {
             createAlbumUseCase = createAlbumUseCase,
             removeAlbumsUseCase = removeAlbumsUseCase,
             disableExportAlbumsUseCase = disableExportAlbumsUseCase,
-            defaultDispatcher = UnconfinedTestDispatcher(),
-            getNextDefaultAlbumNameUseCase = GetNextDefaultAlbumNameUseCase(),
+            defaultDispatcher = dispatcher,
+            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
         )
     }
 
-    @After
+    @AfterEach
+    fun resetMocks() {
+        reset(
+            getDefaultAlbumPhotos,
+            getDefaultAlbumsMapUseCase,
+            getUserAlbums,
+            getAlbumPhotos,
+            getProscribedAlbumNamesUseCase,
+            createAlbumUseCase,
+            removeAlbumsUseCase,
+            disableExportAlbumsUseCase,
+        )
+    }
+
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -110,6 +138,7 @@ class AlbumsViewModelTest {
 
             whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
             whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf(createImage())))
+            initUnderTest()
 
             underTest.state.drop(1).test {
                 assertThat(awaitItem().albums.map { it.id }).containsExactlyElementsIn(defaultAlbums.keys)
@@ -126,6 +155,8 @@ class AlbumsViewModelTest {
 
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf(createImage())))
+
+        initUnderTest()
 
         underTest.state.drop(1).test {
             assertThat(awaitItem().albums.map { it.id })
@@ -144,6 +175,8 @@ class AlbumsViewModelTest {
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
+        initUnderTest()
+
         underTest.state.drop(1).test {
             assertThat(awaitItem().albums.map { it.id })
                 .containsExactlyElementsIn(defaultAlbums.keys.filter { it == Album.FavouriteAlbum })
@@ -160,7 +193,7 @@ class AlbumsViewModelTest {
 
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
-
+        initUnderTest()
         underTest.state.drop(1).test {
             val albums = awaitItem().albums
             assertEquals(albums.size, 1)
@@ -185,9 +218,10 @@ class AlbumsViewModelTest {
 
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(testPhotosList))
-
+        initUnderTest()
         underTest.state.drop(1).test {
             assertThat(awaitItem().albums.map { it.coverPhoto?.id }.firstOrNull()).isEqualTo(1L)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -255,12 +289,17 @@ class AlbumsViewModelTest {
         runTest {
             val expectedName = "New album"
             whenever(getUserAlbums()).thenReturn(flowOf(listOf()))
-
-            underTest.setPlaceholderAlbumTitle("New album")
+            whenever(
+                getNextDefaultAlbumNameUseCase(
+                    any(),
+                    any()
+                )
+            ).thenReturn(expectedName)
+            underTest.setPlaceholderAlbumTitle(expectedName)
 
             underTest.state.test {
                 val actualName = awaitItem().createAlbumPlaceholderTitle
-                assertEquals(expectedName, actualName)
+                assertThat(actualName).isEqualTo(expectedName)
             }
         }
 
@@ -268,7 +307,8 @@ class AlbumsViewModelTest {
     fun `test that setPlaceholderAlbumTitle set the right text if an album with default name already exists`() =
         runTest {
             val expectedName = "New album (1)"
-            val newUserAlbum = createUserAlbum(title = "New album")
+            val albumName = "New album"
+            val newUserAlbum = createUserAlbum(title = albumName)
             whenever(getUserAlbums()).thenReturn(
                 flowOf(
                     listOf(
@@ -277,12 +317,16 @@ class AlbumsViewModelTest {
                 )
             )
             whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
-
+            whenever(
+                getNextDefaultAlbumNameUseCase(
+                    any(),
+                    any()
+                )
+            ).thenReturn(expectedName)
             underTest.state.drop(1).test {
-                awaitItem()
-                underTest.setPlaceholderAlbumTitle("New album")
+                underTest.setPlaceholderAlbumTitle(albumName)
                 val actualName = awaitItem().createAlbumPlaceholderTitle
-                assertEquals(expectedName, actualName)
+                assertThat(actualName).isEqualTo(expectedName)
             }
         }
 
@@ -304,10 +348,15 @@ class AlbumsViewModelTest {
                 )
             )
             whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
+            whenever(
+                getNextDefaultAlbumNameUseCase(
+                    any(),
+                    any()
+                )
+            ).thenReturn(expectedName)
+            underTest.setPlaceholderAlbumTitle("New album")
 
             underTest.state.drop(1).test {
-                awaitItem()
-                underTest.setPlaceholderAlbumTitle("New album")
                 val actualName = awaitItem().createAlbumPlaceholderTitle
                 assertEquals(expectedName, actualName)
             }
@@ -326,7 +375,7 @@ class AlbumsViewModelTest {
             whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
             whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
-            underTest.state.drop(1).test {
+            underTest.state.test {
                 awaitItem()
                 underTest.createNewAlbum("favourites")
                 val item = awaitItem()
@@ -353,7 +402,7 @@ class AlbumsViewModelTest {
             whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
             whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
-            underTest.state.drop(1).test {
+            underTest.state.test {
                 awaitItem()
                 underTest.createNewAlbum("raw")
                 val item = awaitItem()

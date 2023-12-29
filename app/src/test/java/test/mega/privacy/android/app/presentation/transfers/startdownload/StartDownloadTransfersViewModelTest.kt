@@ -185,7 +185,10 @@ class StartDownloadTransfersViewModelTest {
     fun `test that job in progress is set to ProcessingFiles when start download use case starts`() =
         runTest {
             commonStub()
-            stubStartDownload(flow { delay(500) })
+            stubStartDownload(flow {
+                delay(500)
+                emit(DownloadNodesEvent.FinishProcessingTransfers)
+            })
             underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
             Truth.assertThat(underTest.uiState.value.jobInProgressState)
                 .isEqualTo(StartDownloadTransferJobInProgress.ProcessingFiles)
@@ -195,7 +198,6 @@ class StartDownloadTransfersViewModelTest {
     fun `test that FinishProcessing event is emitted if start download use case finishes correctly`() =
         runTest {
             commonStub()
-            stubStartDownload(flowOf(DownloadNodesEvent.FinishProcessingTransfers))
             underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
             assertCurrentEventIsEqualTo(StartDownloadTransferEvent.FinishProcessing(null, 1))
         }
@@ -290,6 +292,7 @@ class StartDownloadTransfersViewModelTest {
 
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(1)
+        stubStartDownload(flowOf(DownloadNodesEvent.FinishProcessingTransfers))
     }
 
     private fun stubStartDownload(flow: Flow<DownloadNodesEvent>) {

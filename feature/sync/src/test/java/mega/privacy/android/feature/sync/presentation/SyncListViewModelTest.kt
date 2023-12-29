@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.presentation
 
-import mega.privacy.android.feature.sync.R
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +12,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
@@ -88,6 +88,8 @@ class SyncListViewModelTest {
 
     @Test
     fun `test that view model initialization sets onboarding shown to true`() = runTest {
+        val monitorSyncByWiFiStateFlow = MutableStateFlow(false)
+        whenever(monitorSyncByWiFiUseCase()).thenReturn(monitorSyncByWiFiStateFlow)
         initViewModel()
 
         verify(setOnboardingShownUseCase).invoke(true)
@@ -117,6 +119,8 @@ class SyncListViewModelTest {
             emit(stalledIssues)
             awaitCancellation()
         })
+        val monitorSyncByWiFiStateFlow = MutableStateFlow(false)
+        whenever(monitorSyncByWiFiUseCase()).thenReturn(monitorSyncByWiFiStateFlow)
         val selectedResolution = StalledIssueResolutionAction(
             resolutionActionType = StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE,
             actionName = "Choose remote file",
@@ -148,6 +152,8 @@ class SyncListViewModelTest {
                 emit(solvedIssues)
                 awaitCancellation()
             })
+            val monitorSyncByWiFiStateFlow = MutableStateFlow(false)
+            whenever(monitorSyncByWiFiUseCase()).thenReturn(monitorSyncByWiFiStateFlow)
             initViewModel()
             underTest.state.test {
                 assertThat(awaitItem().shouldShowCleanSolvedIssueMenuItem).isTrue()
@@ -176,6 +182,8 @@ class SyncListViewModelTest {
 
     @Test
     fun `test that set sync by wifi usecase is invoked when sync option is selected`() = runTest {
+        val monitorSyncByWiFiStateFlow = MutableStateFlow(false)
+        whenever(monitorSyncByWiFiUseCase()).thenReturn(monitorSyncByWiFiStateFlow)
         initViewModel()
 
         underTest.handleAction(SyncListAction.SyncOptionsSelected(SyncOption.WI_FI_ONLY))
@@ -186,6 +194,8 @@ class SyncListViewModelTest {
 
     @Test
     fun `test that snackbar is shown when sync option is selected`() = runTest {
+        val monitorSyncByWiFiStateFlow = MutableStateFlow(false)
+        whenever(monitorSyncByWiFiUseCase()).thenReturn(monitorSyncByWiFiStateFlow)
         initViewModel()
 
         underTest.handleAction(SyncListAction.SyncOptionsSelected(SyncOption.WI_FI_ONLY))

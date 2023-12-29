@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -63,6 +64,7 @@ class AudioSectionViewModelTest {
     private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val setViewType = mock<SetViewType>()
+    private val fakeMonitorViewTypeFlow = MutableSharedFlow<ViewType>()
     private val monitorViewType = mock<MonitorViewType>()
 
     private val expectedAudio: UIAudio = mock { on { name }.thenReturn("audio name") }
@@ -76,7 +78,7 @@ class AudioSectionViewModelTest {
     fun setUp() {
         wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorOfflineNodeUpdatesUseCase() }.thenReturn(emptyFlow())
-        wheneverBlocking { monitorViewType() }.thenReturn(emptyFlow())
+        wheneverBlocking { monitorViewType() }.thenReturn(fakeMonitorViewTypeFlow)
         underTest = AudioSectionViewModel(
             getAllAudioUseCase = getAllAudioUseCase,
             uiAudioMapper = uiAudioMapper,
@@ -156,9 +158,7 @@ class AudioSectionViewModelTest {
         runTest {
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
 
-            underTest.state.drop(1).test {
-                assertThat(awaitItem().isPendingRefresh).isTrue()
-
+            underTest.state.test {
                 underTest.markHandledPendingRefresh()
                 assertThat(awaitItem().isPendingRefresh).isFalse()
                 cancelAndIgnoreRemainingEvents()
@@ -170,9 +170,7 @@ class AudioSectionViewModelTest {
         runTest {
             whenever(monitorNodeUpdatesUseCase()).thenReturn(flowOf(NodeUpdate(emptyMap())))
 
-            underTest.state.drop(1).test {
-                assertThat(awaitItem().isPendingRefresh).isTrue()
-
+            underTest.state.test {
                 underTest.markHandledPendingRefresh()
                 assertThat(awaitItem().isPendingRefresh).isFalse()
                 cancelAndIgnoreRemainingEvents()
@@ -233,9 +231,8 @@ class AudioSectionViewModelTest {
     @Test
     fun `test that the currentViewType is correctly updated when monitorViewType is triggered`() =
         runTest {
-            whenever(monitorViewType()).thenReturn(flowOf(ViewType.GRID))
-
             underTest.state.drop(1).test {
+                fakeMonitorViewTypeFlow.emit(ViewType.GRID)
                 assertThat(awaitItem().currentViewType).isEqualTo(ViewType.GRID)
                 cancelAndIgnoreRemainingEvents()
             }

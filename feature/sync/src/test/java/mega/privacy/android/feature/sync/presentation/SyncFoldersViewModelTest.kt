@@ -147,7 +147,7 @@ class SyncFoldersViewModelTest {
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val folderPairId = 9999L
         whenever(removeFolderPairUseCase(folderPairId)).thenReturn(Unit)
-
+        whenever(getSyncStalledIssuesUseCase()).thenReturn(stalledIssues)
         initViewModel()
         underTest.handleAction(
             SyncFoldersAction.RemoveFolderClicked(folderPairId)

@@ -59,14 +59,15 @@ internal class ManagerDrawerViewModelTest {
     private val monitorMyChatOnlineStatusUseCase: MonitorMyChatOnlineStatusUseCase = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock {
+        onBlocking { invoke(any()) }.thenReturn(false)
+    }
     private val monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase = mock()
     private val monitorVerificationStatus: MonitorVerificationStatus = mock()
 
     @BeforeAll
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        initTestClass()
     }
 
     @AfterAll
