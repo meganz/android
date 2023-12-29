@@ -19,6 +19,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -90,7 +91,7 @@ class HandleSDCardEventUseCaseTest {
         }
 
     @Test
-    fun `test that deleteSdTransferByTagUseCase is invoked for root sd transfers finish event`() =
+    fun `test that deleteSdTransferByTagUseCase is invoked when root sd transfers finish event is received`() =
         runTest {
             val transfer = mockTransfer()
             whenever(transfer.isRootTransfer).thenReturn(true)
@@ -98,6 +99,18 @@ class HandleSDCardEventUseCaseTest {
             val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
             underTest(transferEvent)
             verify(deleteSdTransferByTagUseCase)(any())
+        }
+
+    @Test
+    fun `test that deleteSdTransferByTagUseCase is not invoked when the received finish event is not a sd transfer`() =
+        runTest {
+            val transfer = mockTransfer()
+            whenever(transfer.isRootTransfer).thenReturn(true)
+            whenever(transfer.isFolderTransfer).thenReturn(true)
+            whenever(transfer.appData).thenReturn(emptyList())
+            val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
+            underTest(transferEvent)
+            verifyNoInteractions(deleteSdTransferByTagUseCase)
         }
 
     private fun mockTransfer() =

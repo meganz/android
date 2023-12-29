@@ -65,8 +65,8 @@ class HandleSDCardEventUseCase @Inject constructor(
                             )
                         }
                     }
-                    if (transfer.isRootTransfer) {
-                        //if it's a root transfer we can remove the sd transfer from the data base
+                    if (transfer.isRootTransfer && transfer.isSDCardDownload()) {
+                        //if it's a root sd card transfer we can remove the sd transfer from the data base
                         deleteSdTransferByTagUseCase(transferEvent.transfer.tag)
                     }
                 }

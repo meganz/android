@@ -30,12 +30,10 @@ class SDCardFacade @Inject constructor(
 
     override suspend fun doesFolderExists(localPath: String): Boolean {
         val fileList = context.getExternalFilesDirs(null)
-        return if (fileList.isNotEmpty() && fileList[1] != null) {
+        return fileList.getOrNull(1)?.let {
             val rootSDCardPath = getRootSDCardPath(fileList[1].absolutePath)
             localPath.startsWith(rootSDCardPath)
-        } else {
-            false
-        }
+        } ?: false
     }
 
     override suspend fun getRootSDCardPath(path: String): String {
