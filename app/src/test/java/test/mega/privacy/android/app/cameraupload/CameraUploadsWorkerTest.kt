@@ -16,7 +16,6 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -26,12 +25,16 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
+import mega.privacy.android.data.R
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CHECK_FILE_UPLOAD
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.STATUS_INFO
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -94,7 +97,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.UUID
@@ -343,6 +348,185 @@ class CameraUploadsWorkerTest {
     }
 
     @Test
+    fun `test that the worker calls handleLocalIpChangeUseCase`() = runTest {
+        underTest.doWork()
+
+        verify(handleLocalIpChangeUseCase).invoke(false)
+    }
+
+    @Test
+    fun `test that the worker returns failure when camera uploads is not enabled`() = runTest {
+        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+
+        val result = underTest.doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
+    }
+
+    @Test
+    fun `test that the worker returns failure when required permissions are not granted`() =
+        runTest {
+            whenever(hasMediaPermissionUseCase()).thenReturn(false)
+
+            val result = underTest.doWork()
+
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+            verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
+        }
+
+    @Test
+    fun `test that the worker returns failure when login is not successful`() = runTest {
+        whenever(backgroundFastLoginUseCase()).thenThrow(RuntimeException())
+
+        val result = underTest.doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
+    }
+
+    @Test
+    fun `test that the worker returns failure, reset primary local folder paths and show an error notification when local primary folder path is not valid`() =
+        runTest {
+            whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(false)
+
+            val result = underTest.doWork()
+
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+            verify(setPrimaryFolderLocalPathUseCase).invoke("")
+            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.RefreshSettings)
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FOLDER_UNAVAILABLE,
+                    FOLDER_TYPE to CameraUploadFolderType.Primary.ordinal
+                )
+            )
+            verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
+        }
+
+    @Test
+    fun `test that the worker disable media uploads, reset secondary local folder path and show an error notification when media uploads enabled and local secondary folder path is not valid`() =
+        runTest {
+            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            whenever(isSecondaryFolderSetUseCase()).thenReturn(false)
+
+            underTest.doWork()
+
+            verify(disableMediaUploadSettings).invoke()
+            verify(setSecondaryFolderLocalPathUseCase).invoke("")
+            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.DisableMediaUploads)
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FOLDER_UNAVAILABLE,
+                    FOLDER_TYPE to CameraUploadFolderType.Secondary.ordinal
+                )
+            )
+        }
+
+    @Test
+    fun `test that the worker returns failure when upload nodes are not retrieved`() = runTest {
+        whenever(establishCameraUploadsSyncHandlesUseCase()).thenThrow(RuntimeException())
+
+        val result = underTest.doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
+    }
+
+    @Test
+    fun `test that the worker returns failure when primary upload node does not exist and fails to be created`() =
+        runTest {
+            whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
+                .thenReturn(-1L)
+            whenever(getDefaultNodeHandleUseCase(context.getString(R.string.section_photo_sync)))
+                .thenReturn(-1L)
+            whenever(createCameraUploadFolder(context.getString(R.string.section_photo_sync)))
+                .thenThrow(RuntimeException())
+
+            val result = underTest.doWork()
+
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+            verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
+        }
+
+    @Test
+    fun `test that the worker returns failure when secondary upload node does not exist and fails to be created`() =
+        runTest {
+            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
+                .thenReturn(1111L)
+            whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
+                .thenReturn(-1L)
+            whenever(getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads)))
+                .thenReturn(-1L)
+            whenever(createCameraUploadFolder(context.getString(R.string.section_secondary_media_uploads)))
+                .thenThrow(RuntimeException())
+
+            val result = underTest.doWork()
+
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+            verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
+        }
+
+    @Test
+    fun `test that the worker returns failure when primary upload node is in rubbish bin and fails to be created`() =
+        runTest {
+            whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
+                .thenReturn(1111L)
+            whenever(isNodeInRubbishOrDeletedUseCase(1111L)).thenReturn(true)
+            whenever(getDefaultNodeHandleUseCase(context.getString(R.string.section_photo_sync)))
+                .thenReturn(1111L)
+            whenever(createCameraUploadFolder(context.getString(R.string.section_photo_sync)))
+                .thenThrow(RuntimeException())
+
+            val result = underTest.doWork()
+
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+            verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
+        }
+
+    @Test
+    fun `test that the worker returns failure when secondary upload node is in rubbish bin and fails to be created`() =
+        runTest {
+            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
+                .thenReturn(1111L)
+            whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
+                .thenReturn(2222L)
+            whenever(isNodeInRubbishOrDeletedUseCase(2222L)).thenReturn(true)
+            whenever(getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads)))
+                .thenReturn(2222L)
+            whenever(createCameraUploadFolder(context.getString(R.string.section_secondary_media_uploads)))
+                .thenThrow(RuntimeException())
+
+            val result = underTest.doWork()
+
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+            verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
+        }
+
+    @Test
+    fun `test that the worker returns failure is backup not initialized`() = runTest {
+        whenever(initializeBackupsUseCase()).thenThrow(RuntimeException())
+
+        val result = underTest.doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
+    }
+
+    @Test
+    fun `test that the worker returns failure when it fails to create the temporary folder`() =
+        runTest {
+            whenever(createCameraUploadTemporaryRootDirectoryUseCase()).thenThrow(RuntimeException())
+
+            val result = underTest.doWork()
+
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+            verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
+        }
+
+    @Test
     fun `test that the check upload notification is displayed when the worker runs`() = runTest {
         underTest.doWork()
 
@@ -431,7 +615,7 @@ class CameraUploadsWorkerTest {
                     } to listOf(NodeChanges.Attributes)
                 )
             )
-            whenever(monitorNodeUpdatesUseCase()).thenReturn(MutableStateFlow(nodeUpdate))
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(flowOf(nodeUpdate))
             whenever(
                 areCameraUploadsFoldersInRubbishBinUseCase(
                     primaryNodeHandle,
@@ -465,7 +649,7 @@ class CameraUploadsWorkerTest {
         }
 
     @Test
-    fun `test that worker returns failure primary folder path is not valid`() =
+    fun `test that worker returns failure primary local folder path is not valid`() =
         runTest {
             whenever(isPrimaryFolderPathValidUseCase(primaryLocalPath)).thenReturn(false)
 
@@ -478,6 +662,16 @@ class CameraUploadsWorkerTest {
     fun `test that worker is disabled when primary folder path is not valid`() =
         runTest {
             whenever(isPrimaryFolderPathValidUseCase(primaryLocalPath)).thenReturn(false)
+
+            underTest.doWork()
+
+            verify(disableCameraUploadsUseCase).invoke()
+        }
+
+    @Test
+    fun `test that the worker is disabled when required permissions are not granted`() =
+        runTest {
+            whenever(hasMediaPermissionUseCase()).thenReturn(false)
 
             underTest.doWork()
 

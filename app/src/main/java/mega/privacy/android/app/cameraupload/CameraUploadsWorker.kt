@@ -193,8 +193,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     companion object {
         private const val LOW_BATTERY_LEVEL = 20
         private const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 1000
-
-        private const val INVALID_NON_NULL_VALUE = "-1"
     }
 
     /**
@@ -202,6 +200,11 @@ class CameraUploadsWorker @AssistedInject constructor(
      * the required battery level to run the CU
      */
     private var deviceAboveMinimumBatteryLevel: Boolean = true
+
+    /**
+     * True if the wifi constraint is met
+     */
+    private var isWifiConstraintSatisfied: Boolean = true
 
     /**
      * Temp root path used for generating temporary files in the CU process
@@ -309,9 +312,9 @@ class CameraUploadsWorker @AssistedInject constructor(
             monitorStorageOverQuotaStatusJob = monitorStorageOverQuotaStatus()
             monitorParentNodesDeletedJob = monitorParentNodesDeleted()
 
-            initService()
+            handleLocalIpChangeUseCase(shouldRetryChatConnections = false)
 
-            if (hasMediaPermissionUseCase().not() || isLoginSuccessful().not() || canRunCameraUploads().not()) {
+            if (canRunCameraUploads().not()) {
                 abortWork(cancelMessage = "Required conditions to start CU not met")
             } else {
                 Timber.d("Starting upload process")
@@ -324,17 +327,13 @@ class CameraUploadsWorker @AssistedInject constructor(
                 val secondaryUploadNodeId =
                     NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
 
-                getAndPrepareRecords(
-                    primaryUploadNodeId,
-                    secondaryUploadNodeId
-                )?.let { records ->
+                val records = getAndPrepareRecords(primaryUploadNodeId, secondaryUploadNodeId)
+
+                records?.let {
                     sendBackupHeartbeatJob = startHeartbeat()
-                    uploadJob = uploadFiles(
-                        records,
-                        primaryUploadNodeId,
-                        secondaryUploadNodeId,
-                        tempRoot,
-                    )
+
+                    uploadJob =
+                        uploadFiles(it, primaryUploadNodeId, secondaryUploadNodeId, tempRoot)
                     uploadJob?.join()
                 }
             }
@@ -410,7 +409,8 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     private fun CoroutineScope.monitorConnectivityStatus() = launch {
         monitorConnectivityUseCase().collect {
-            if (!it || isWifiNotSatisfiedUseCase()) {
+            isWifiConstraintSatisfied = it && isWifiNotSatisfiedUseCase().not()
+            if (!isWifiConstraintSatisfied) {
                 abortWork(cancelMessage = "Camera Uploads by Wifi only")
             }
         }
@@ -483,16 +483,55 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      * @return true if all conditions have been met, and false if otherwise
      */
-    private suspend fun canRunCameraUploads(): Boolean =
-        isStorageQuotaExceeded().not()
-                && isCameraUploadsSyncEnabled()
+    private suspend fun canRunCameraUploads(): Boolean {
+        val isLocalPrimaryFolderValid = isLocalPrimaryFolderValid()
+        return isCameraUploadsEnabled()
+                && hasMediaPermission()
                 && isWifiConstraintSatisfied()
                 && isDeviceAboveMinimumBatteryLevel()
-                && isPrimaryFolderValid()
-                && isSecondaryFolderConfigured()
-                && areCameraUploadsSyncHandlesEstablished()
-                && areFoldersCheckedAndEstablished()
-                && isBackupInitialized()
+                && isLoginSuccessful()
+                && isStorageQuotaExceeded().not()
+                && (!isSecondaryFolderEnabled() || isLocalSecondaryFolderValid() || isLocalPrimaryFolderValid)
+                && isLocalPrimaryFolderValid
+                && synchronizeUploadNodeHandles()
+                && checkOrCreateUploadNodes()
+                && initializeBackup()
+                && createTempCacheFile()
+    }
+
+
+    /**
+     * Checks if the Camera Uploads from [isCameraUploadsEnabledUseCase] is enabled
+     *
+     * @return true if enabled, and false if otherwise
+     */
+    private suspend fun isCameraUploadsEnabled(): Boolean = isCameraUploadsEnabledUseCase().also {
+        if (!it) Timber.e("Camera Uploads disabled")
+    }
+
+    /**
+     * Check if the media permission is granted
+     * Disable the Camera Uploads if the media permission is granted
+     *
+     * @return true if the media permission is granted
+     */
+    private suspend fun hasMediaPermission() = hasMediaPermissionUseCase().also {
+        if (!it) {
+            abortWork(
+                cancelMessage = "Camera Uploads does not have media permission",
+                restartMode = CameraUploadsRestartMode.StopAndDisable
+            )
+        }
+    }
+
+    /**
+     * Checks if the Wi-Fi constraint from the negated [isWifiNotSatisfiedUseCase] is satisfied
+     *
+     * @return true if the Wi-Fi constraint is satisfied, and false if otherwise
+     */
+    private fun isWifiConstraintSatisfied(): Boolean = isWifiConstraintSatisfied.also {
+        if (!it) Timber.e("Wi-Fi or Mobile network required")
+    }
 
     /**
      * Check if the account has enough cloud storage space
@@ -500,14 +539,24 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @return true if the device has not enough cloud storage space
      */
     private suspend fun isStorageQuotaExceeded() = isNotEnoughQuota().also {
-        Timber.d("isNotEnoughQuota $it")
+        if (it) Timber.e("Storage Quota exceeded")
     }
 
+    /**
+     * Check if the device battery is above the required battery level
+     *
+     * @return true if the device battery is above the required battery level
+     */
     private fun isDeviceAboveMinimumBatteryLevel() = deviceAboveMinimumBatteryLevel.also {
-        Timber.d("Device Battery level above $it")
+        if (!it) Timber.e("Device Battery level requirement not met")
     }
 
-    private suspend fun areCameraUploadsSyncHandlesEstablished(): Boolean {
+    /**
+     * Retrieve the Camera Uploads Nodes from the server and update the local preferences
+     *
+     * @return true if the Camera Uploads Nodes are retrieved and local preferences are updated successfully
+     */
+    private suspend fun synchronizeUploadNodeHandles(): Boolean {
         return runCatching {
             establishCameraUploadsSyncHandlesUseCase()
         }.onFailure {
@@ -515,158 +564,102 @@ class CameraUploadsWorker @AssistedInject constructor(
         }.isSuccess
     }
 
-    private suspend fun isBackupInitialized(): Boolean {
-        Timber.d("Setting up Backup")
+    /**
+     * Initialize backup
+     *
+     * @return true if the backup is initialized successfully
+     */
+    private suspend fun initializeBackup(): Boolean {
         return runCatching { initializeBackupsUseCase() }.onFailure {
             Timber.e(it)
         }.isSuccess
     }
-
-    private suspend fun areFoldersCheckedAndEstablished(): Boolean {
-        return if (areFoldersEstablished()) {
-            true
-        } else {
-            runCatching { establishFolders() }.onFailure {
-                Timber.e("Establishing Folder $it")
-            }.isSuccess.also {
-                Timber.d("Establish Folder $it")
-            }
-        }
-    }
-
-
-    private suspend fun isSecondaryFolderConfigured(): Boolean {
-        if (isSecondaryFolderEnabled()) {
-            return hasSecondaryFolder().also {
-                if (!it) {
-                    Timber.e("Local Secondary Folder is disabled.")
-                    handleSecondaryFolderDisabled()
-                }
-            }
-        }
-        return true
-    }
-
-    /**
-     * Checks if the Camera Uploads sync from [isCameraUploadsEnabledUseCase] is enabled
-     *
-     * @return true if enabled, and false if otherwise
-     */
-    private suspend fun isCameraUploadsSyncEnabled(): Boolean =
-        isCameraUploadsEnabledUseCase().also {
-            if (!it) Timber.w("Camera Uploads sync disabled")
-        }
-
-    /**
-     * Checks if the Wi-Fi constraint from the negated [isWifiNotSatisfiedUseCase] is satisfied
-     *
-     * @return true if the Wi-Fi constraint is satisfied, and false if otherwise
-     */
-    private suspend fun isWifiConstraintSatisfied(): Boolean =
-        !isWifiNotSatisfiedUseCase().also {
-            if (it) Timber.w("Cannot start, Wi-Fi required")
-        }
 
     /**
      * Checks if the Primary Folder exists and is valid
      *
      * @return true if the Primary Folder exists and is valid, and false if otherwise
      */
-    private suspend fun isPrimaryFolderValid(): Boolean =
+    private suspend fun isLocalPrimaryFolderValid(): Boolean =
         isPrimaryFolderPathValidUseCase(getPrimaryFolderPathUseCase()).also {
             if (!it) {
-                Timber.w("The Primary Folder does not exist or is invalid")
-                handlePrimaryFolderDisabled()
+                Timber.e("The local Primary Folder does not exist or is invalid")
+                handleInvalidLocalPrimaryFolder()
             }
         }
 
     /**
-     * Checks if the Secondary Folder from [isSecondaryFolderSetUseCase] exists
+     * Checks if the Secondary Folder exists and is valid
      *
-     * @return true if it exists, and false if otherwise
+     * @return true if the Secondary Folder exists and is valid, and false if otherwise
      */
-    private suspend fun hasSecondaryFolder(): Boolean =
+    private suspend fun isLocalSecondaryFolderValid(): Boolean =
         isSecondaryFolderSetUseCase().also {
-            if (!it) Timber.w("The Secondary Folder is not set")
-        }
-
-    /**
-     * Checks whether both Primary and Secondary Folders are established
-     *
-     * @return true if the Primary Folder exists and the Secondary Folder option disabled, or
-     * if the Primary Folder exists and the Secondary Folder option enabled with the folder also existing.
-     *
-     * false if both conditions are not met
-     */
-    private suspend fun areFoldersEstablished(): Boolean {
-        val isPrimaryFolderEstablished = isPrimaryFolderEstablished()
-        val isSecondaryFolderEnabled = isSecondaryFolderEnabled()
-        return (isPrimaryFolderEstablished && !isSecondaryFolderEnabled) ||
-                (isPrimaryFolderEstablished && isSecondaryFolderEstablished())
-    }
-
-    /**
-     * Checks whether the Primary Folder is established
-     *
-     * @return true if the Primary Folder handle is a valid handle, and false if otherwise
-     */
-    private suspend fun isPrimaryFolderEstablished(): Boolean {
-        val primarySyncHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)
-        Timber.d("primarySyncHandle $primarySyncHandle")
-        return !(primarySyncHandle == MegaApiJava.INVALID_HANDLE
-                || isNodeInRubbishOrDeletedUseCase(primarySyncHandle))
-    }
-
-    /**
-     * Checks whether the Secondary Folder is established
-     *
-     * @return true if the Secondary Folder handle is a valid handle, and false if otherwise
-     */
-    private suspend fun isSecondaryFolderEstablished(): Boolean {
-        val secondarySyncHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
-        Timber.d("secondarySyncHandle $secondarySyncHandle")
-        return !(secondarySyncHandle == MegaApiJava.INVALID_HANDLE
-                || isNodeInRubbishOrDeletedUseCase(secondarySyncHandle))
-    }
-
-    /**
-     * When the Primary Folder and Secondary Folder (if enabled) does not exist, this function will establish
-     * the folders
-     *
-     * @throws Exception if the creation of one of the upload folder failed
-     */
-    private suspend fun establishFolders() {
-        // Setup the Primary Folder if it is missing
-        if (!isPrimaryFolderEstablished()) {
-            Timber.w("The Primary Folder is missing")
-
-            val primaryHandle =
-                getDefaultNodeHandleUseCase(context.getString(R.string.section_photo_sync))
-
-            if (primaryHandle == MegaApiJava.INVALID_HANDLE) {
-                Timber.d("Proceed to create the Primary Folder")
-                createAndSetupPrimaryUploadFolder()
-            } else {
-                Timber.d("Primary Handle retrieved from getPrimaryFolderHandle(): $primaryHandle")
-                setPrimarySyncHandle(primaryHandle)
+            if (!it) {
+                Timber.e("The local Secondary Folder does not exist or is invalid")
+                handleInvalidLocalSecondaryFolder()
             }
         }
 
-        // If Secondary Media Uploads is enabled, setup the Secondary Folder if it is missing
-        if (isSecondaryFolderEnabled() && !isSecondaryFolderEstablished()) {
-            Timber.w("The local secondary folder is missing")
-
-            val secondaryHandle =
-                getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads))
-
-            if (secondaryHandle == MegaApiJava.INVALID_HANDLE) {
-                Timber.d("Proceed to create the Secondary Folder")
-                createAndSetupSecondaryUploadFolder()
-            } else {
-                Timber.d("Secondary Handle retrieved from getSecondaryFolderHandle(): $secondaryHandle")
-                setSecondarySyncHandle(secondaryHandle)
-            }
+    /**
+     * Checks whether the Upload Node is valid
+     *
+     * @param cameraUploadFolderType
+     * @return true if the Upload Node handle is a valid handle, and false if otherwise
+     */
+    private suspend fun isUploadNodeHandleValid(cameraUploadFolderType: CameraUploadFolderType): Boolean =
+        getUploadFolderHandleUseCase(cameraUploadFolderType).let {
+            !(it == MegaApiJava.INVALID_HANDLE || isNodeInRubbishOrDeletedUseCase(it))
         }
+
+    /**
+     * Check if the Primary Upload Node and Secondary Upload Node are valid.
+     * When the Primary Upload Node and Secondary Upload Node (if enabled) does not exist,
+     * this function will create the corresponding node
+     *
+     * @return true if the Primary Upload Node and Secondary Upload Node (if enabled) are valid,
+     *         or the creation of the corresponding node is successful
+     */
+    private suspend fun checkOrCreateUploadNodes(): Boolean {
+        return runCatching {
+            // Setup the Primary Folder if it is missing
+            if (!isUploadNodeHandleValid(CameraUploadFolderType.Primary)) {
+                Timber.d("The Primary Folder is missing")
+
+                val primaryHandle =
+                    getDefaultNodeHandleUseCase(context.getString(R.string.section_photo_sync))
+
+                if (primaryHandle == MegaApiJava.INVALID_HANDLE
+                    || isNodeInRubbishOrDeletedUseCase(primaryHandle)
+                ) {
+                    Timber.d("Proceed to create the Primary Folder")
+                    createAndSetupPrimaryUploadFolder()
+                } else {
+                    Timber.d("Primary Handle retrieved from getPrimaryFolderHandle(): $primaryHandle")
+                    setPrimarySyncHandle(primaryHandle)
+                }
+            }
+
+            // If Secondary Media Uploads is enabled, setup the Secondary Folder if it is missing
+            if (isSecondaryFolderEnabled() && !isUploadNodeHandleValid(CameraUploadFolderType.Secondary)) {
+                Timber.d("The local secondary folder is missing")
+
+                val secondaryHandle =
+                    getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads))
+
+                if (secondaryHandle == MegaApiJava.INVALID_HANDLE
+                    || isNodeInRubbishOrDeletedUseCase(secondaryHandle)
+                ) {
+                    Timber.d("Proceed to create the Secondary Folder")
+                    createAndSetupSecondaryUploadFolder()
+                } else {
+                    Timber.d("Secondary Handle retrieved from getSecondaryFolderHandle(): $secondaryHandle")
+                    setSecondarySyncHandle(secondaryHandle)
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+        }.isSuccess
     }
 
     /**
@@ -1055,34 +1048,39 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * Executes certain behavior when the Primary Folder is disabled
+     * Perform some operations when the local Primary Folder is not valid:
+     * - Display an error notification
+     * - Reset the local folder path
+     * - Notify the app of a local folder path change
+     * - Disable the Camera Uploads if the local Primary Folder is not valid
      */
-    private suspend fun handlePrimaryFolderDisabled() {
+    private suspend fun handleInvalidLocalPrimaryFolder() {
         showFolderUnavailableStatus(CameraUploadFolderType.Primary)
-        setPrimaryFolderLocalPathUseCase(INVALID_NON_NULL_VALUE)
-        setSecondaryFolderLocalPathUseCase(INVALID_NON_NULL_VALUE)
-        // Refresh SettingsCameraUploadsFragment
+        setPrimaryFolderLocalPathUseCase("")
         broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.RefreshSettings)
         abortWork(
-            cancelMessage = "Primary Folder is disabled",
+            cancelMessage = "Local Primary Folder is not valid",
             restartMode = CameraUploadsRestartMode.StopAndDisable
         )
     }
 
     /**
-     * Executes certain behavior when the Secondary Folder is disabled
+     * Perform some operations when the local Secondary Folder is not valid:
+     * - Display an error notification
+     * - Reset the local folder path
+     * - Notify the app of a local folder path change
+     * - Disable the Camera Uploads if the local Primary Folder is not valid
      */
-    private suspend fun handleSecondaryFolderDisabled() {
+    private suspend fun handleInvalidLocalSecondaryFolder() {
         showFolderUnavailableStatus(CameraUploadFolderType.Secondary)
-        // Disable Media Uploads only
         disableMediaUploadSettings()
-        // setting an invalid path
-        setSecondaryFolderLocalPathUseCase(INVALID_NON_NULL_VALUE)
+        setSecondaryFolderLocalPathUseCase("")
         broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.DisableMediaUploads)
     }
 
     /**
      * When the user is not logged in, perform a Complete Fast Login procedure
+     *
      * @return [Boolean] true if the login process successful otherwise false
      */
     private suspend fun isLoginSuccessful(): Boolean {
@@ -1091,14 +1089,12 @@ class CameraUploadsWorker @AssistedInject constructor(
         // arbitrary retry value
         var retry = 3
         while (loginMutex.isLocked && retry > 0) {
-            Timber.d("Wait for the isLoggingIn lock to be available")
+            Timber.d("Wait for the login lock to be available")
             delay(1000)
             retry--
         }
 
         return if (!loginMutex.isLocked) {
-            // Legacy support: isLoggingIn needs to be set in order to inform other parts of the
-            // app that a Login Procedure is occurring
             val result = runCatching { backgroundFastLoginUseCase() }.onFailure {
                 Timber.e(it, "performCompleteFastLogin exception")
             }
@@ -1139,17 +1135,17 @@ class CameraUploadsWorker @AssistedInject constructor(
         } ?: throw Exception("Failed to create secondary upload folder")
     }
 
-    private suspend fun initService() {
-        handleLocalIpChangeUseCase(shouldRetryChatConnections = false)
-
-        // Reset properties
-        lastUpdated = 0
-        // Create temp root folder
-        runCatching { tempRoot = createCameraUploadTemporaryRootDirectoryUseCase() }
-            .onFailure {
-                Timber.w("Root path doesn't exist")
-                throw it
-            }
+    /**
+     * Create the temporary cache folder for the CU process
+     *
+     * @return true if the creation of the temporary cache folder succeed, false otherwise
+     */
+    private suspend fun createTempCacheFile(): Boolean {
+        return runCatching {
+            tempRoot = createCameraUploadTemporaryRootDirectoryUseCase()
+        }.onFailure {
+            Timber.e(it)
+        }.isSuccess
     }
 
     /**
