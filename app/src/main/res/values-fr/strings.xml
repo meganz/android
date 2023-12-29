@@ -2510,7 +2510,7 @@
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">Préparation des fichiers</string>
     <!-- Label indicating some content has been sent as message -->
-    <string name="sent_as_message">A été envoyé en tant que message.</string>
+    <string name="sent_as_message">A été envoyé sous forme de message.</string>
     <!-- Action delete all file versions -->
     <string name="delete_versions">Supprimer les versions précédentes</string>
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
