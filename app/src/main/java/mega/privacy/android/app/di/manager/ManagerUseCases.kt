@@ -13,14 +13,12 @@ import mega.privacy.android.app.domain.usecase.DefaultGetIncomingSharesChildrenN
 import mega.privacy.android.app.domain.usecase.DefaultGetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetParentNodeHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetPublicLinks
-import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.GetBackupsChildrenNodes
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetRootFolder
-import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -36,9 +34,6 @@ import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
 @Module(includes = [GetNodeModule::class])
 @InstallIn(ViewModelComponent::class, ServiceComponent::class)
 abstract class ManagerUseCases {
-
-    @Binds
-    abstract fun bindMonitorGlobalUpdates(useCase: DefaultMonitorGlobalUpdates): MonitorGlobalUpdates
 
     @Binds
     abstract fun bindGetParentNode(useCase: DefaultGetParentNodeHandle): GetParentNodeHandle

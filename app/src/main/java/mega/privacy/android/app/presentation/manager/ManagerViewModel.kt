@@ -22,7 +22,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
@@ -58,6 +57,7 @@ import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
+import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
@@ -117,7 +117,7 @@ import javax.inject.Inject
 /**
  * Manager view model
  *
- * @property monitorGlobalUpdates
+ * @property monitorUserAlertUpdates
  * @property getBackupsNode
  * @property getNumUnreadUserAlertsUseCase
  * @property hasBackupsChildren
@@ -164,7 +164,7 @@ import javax.inject.Inject
 class ManagerViewModel @Inject constructor(
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     monitorContactUpdates: MonitorContactUpdates,
-    private val monitorGlobalUpdates: MonitorGlobalUpdates,
+    private val monitorUserAlertUpdates: MonitorUserAlertUpdates,
     monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val getBackupsNode: GetBackupsNode,
     private val getNumUnreadUserAlertsUseCase: GetNumUnreadUserAlertsUseCase,
@@ -385,6 +385,7 @@ class ManagerViewModel @Inject constructor(
                     MegaNodeUtil.myBackupHandle = backupsFolderNodeId.longValue
                 }
         }
+
         viewModelScope.launch {
             monitorContactRequestUpdates()
                 .collect {
@@ -393,10 +394,9 @@ class ManagerViewModel @Inject constructor(
                     updateContactRequests(it)
                 }
         }
-        @Suppress("DEPRECATION")
+
         viewModelScope.launch {
-            monitorGlobalUpdates()
-                .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
+            monitorUserAlertUpdates()
                 .collect {
                     Timber.d("onUserAlertsUpdate")
                     updateIncomingContactRequests()

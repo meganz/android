@@ -10,6 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -32,13 +33,17 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
+import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.EventType
+import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
@@ -134,7 +139,8 @@ import kotlin.test.assertFalse
 class ManagerViewModelTest {
     private lateinit var underTest: ManagerViewModel
 
-    private val monitorGlobalUpdates = MutableStateFlow<GlobalUpdate>(GlobalUpdate.OnReloadNeeded)
+    private val mutableMonitorUserAlertUpdates = MutableSharedFlow<List<UserAlert>>()
+    private val monitorUserAlertUpdates = mutableMonitorUserAlertUpdates.asSharedFlow()
     private lateinit var monitorNodeUpdatesFakeFlow: MutableSharedFlow<NodeUpdate>
     private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
     private val monitorSecurityUpgradeInApp = MutableStateFlow(false)
@@ -305,7 +311,7 @@ class ManagerViewModelTest {
                 on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
             },
             monitorContactUpdates = { monitorContactUpdates },
-            monitorGlobalUpdates = { monitorGlobalUpdates },
+            monitorUserAlertUpdates = { monitorUserAlertUpdates },
             monitorContactRequestUpdates = { monitorContactRequestUpdates },
             getBackupsNode = getBackupsNode,
             getNumUnreadUserAlertsUseCase = getNumUnreadUserAlertsUseCase,
@@ -727,7 +733,21 @@ class ManagerViewModelTest {
             )
             whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
             whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
-            monitorGlobalUpdates.emit(GlobalUpdate.OnUserAlertsUpdate(arrayListOf()))
+            mutableMonitorUserAlertUpdates.emit(
+                listOf(
+                    IncomingPendingContactRequestAlert(
+                        id = 1,
+                        seen = false,
+                        createdTime = 100,
+                        isOwnChange = false,
+                        contact = Contact(
+                            userId = 2,
+                            hasPendingRequest = true,
+                            email = "test@mega.co.nz"
+                        )
+                    )
+                )
+            )
             testScheduler.advanceUntilIdle()
             underTest.incomingContactRequests.test {
                 assertThat(awaitItem()).isEqualTo(contactRequests)
