@@ -109,6 +109,9 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                         send(VideoCompressionState.Successful(attachment?.id))
                     }.onFailure {
                         Timber.d("Video Compression Failed $it")
+                        attachment?.let { videoAttachment ->
+                            File(videoAttachment.newPath).takeIf { file -> file.exists() }?.delete()
+                        }
                         send(VideoCompressionState.Failed(attachment?.id))
                     }
                 }
