@@ -14,8 +14,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
-import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -31,17 +29,20 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -55,7 +56,7 @@ import javax.inject.Inject
  * @param getRootNodeUseCase Fetch the root node
  * @param monitorMediaDiscoveryView Monitor media discovery view settings
  * @param monitorNodeUpdatesUseCase Monitor node updates
- * @param getFileBrowserParentNodeHandle To get parent handle of current node
+ * @param getParentNodeUseCase To get parent node of current node
  * @param getIsNodeInRubbish To get current node is in rubbish
  * @param getFileBrowserNodeChildrenUseCase [GetFileBrowserNodeChildrenUseCase]
  * @param getCloudSortOrder [GetCloudSortOrder]
@@ -73,7 +74,7 @@ class FileBrowserViewModel @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
-    private val getFileBrowserParentNodeHandle: GetParentNodeHandle,
+    private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getIsNodeInRubbish: IsNodeInRubbish,
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
@@ -294,7 +295,7 @@ class FileBrowserViewModel @Inject constructor(
         _state.update {
             it.copy(
                 showMediaDiscoveryIcon = !isRootNode && hasMediaFile,
-                parentHandle = getFileBrowserParentNodeHandle(_state.value.fileBrowserHandle),
+                parentHandle = getParentNodeUseCase(NodeId(_state.value.fileBrowserHandle))?.id?.longValue,
                 nodesList = nodeList,
                 sortOrder = getCloudSortOrder(),
                 isFileBrowserEmpty = MegaApiJava.INVALID_HANDLE == _state.value.fileBrowserHandle ||

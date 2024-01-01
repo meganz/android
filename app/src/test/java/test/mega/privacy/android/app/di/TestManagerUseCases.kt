@@ -16,7 +16,6 @@ import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.HasBackupsChildren
 import nz.mega.sdk.MegaNode
 import org.mockito.kotlin.any
@@ -68,9 +67,6 @@ object TestManagerUseCases {
     fun provideAuthorizeNode() = mock<AuthorizeNode> {
         onBlocking { invoke(any()) }.thenReturn(MegaNode())
     }
-
-    @Provides
-    fun provideGetParentNodeHandle() = mock<GetParentNodeHandle> {}
 
     @Provides
     fun provideGetBackupsNode() = mock<GetBackupsNode> {

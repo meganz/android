@@ -35,7 +35,6 @@ import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
@@ -61,7 +60,6 @@ class SearchActivityViewModelTest {
     private lateinit var underTest: SearchActivityViewModel
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
-    private val getParentNodeHandle: GetParentNodeHandle = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val searchNodesUseCase: SearchNodesUseCase = mock()
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase = mock()
@@ -105,7 +103,6 @@ class SearchActivityViewModelTest {
     private fun initViewModel() {
         underTest = SearchActivityViewModel(
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
-            getParentNodeHandle = getParentNodeHandle,
             setViewType = setViewType,
             monitorViewType = monitorViewType,
             stateHandle = stateHandle,
@@ -422,7 +419,6 @@ class SearchActivityViewModelTest {
         nodeList.clear()
         reset(
             monitorNodeUpdatesUseCase,
-            getParentNodeHandle,
             cancelCancelTokenUseCase,
             searchNodesUseCase,
             getSearchCategoriesUseCase,

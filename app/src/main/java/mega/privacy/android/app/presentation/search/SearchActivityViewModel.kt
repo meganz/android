@@ -19,7 +19,6 @@ import mega.privacy.android.app.di.ui.toolbaritem.qualifier.IncomingShares
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.Links
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.OutgoingShares
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.RubbishBin
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -43,10 +42,10 @@ import mega.privacy.android.domain.entity.search.SearchType.RUBBISH_BIN
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -60,7 +59,6 @@ import javax.inject.Inject
  * SearchActivity View Model
  * @property monitorNodeUpdatesUseCase [MonitorNodeUpdatesUseCase]
  * @property searchNodesUseCase [SearchNodesUseCase]
- * @property getParentNodeHandle [GetParentNodeHandle]
  * @property setViewType [SetViewType]
  * @property getSearchCategoriesUseCase [GetSearchCategoriesUseCase]
  * @property searchFilterMapper [SearchFilterMapper]
@@ -71,7 +69,6 @@ import javax.inject.Inject
 class SearchActivityViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val searchNodesUseCase: SearchNodesUseCase,
-    private val getParentNodeHandle: GetParentNodeHandle,
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
     private val searchFilterMapper: SearchFilterMapper,
     private val emptySearchViewMapper: EmptySearchViewMapper,

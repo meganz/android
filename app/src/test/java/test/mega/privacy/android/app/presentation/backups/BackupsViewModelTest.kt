@@ -19,9 +19,10 @@ import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.FakeMonitorViewType
 import nz.mega.sdk.MegaNode
@@ -54,8 +55,7 @@ internal class BackupsViewModelTest {
     private val getChildrenNode = mock<GetChildrenNode>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
-    private val getParentNodeHandle = mock<GetParentNodeHandle>()
-
+    private val getParentNodeUseCase = mock<GetParentNodeUseCase>()
     private val monitorBackupFolder = FakeMonitorBackupFolder()
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
@@ -77,7 +77,7 @@ internal class BackupsViewModelTest {
             getChildrenNode,
             getCloudSortOrder,
             getNodeByHandle,
-            getParentNodeHandle,
+            getParentNodeUseCase,
         )
     }
 
@@ -94,7 +94,8 @@ internal class BackupsViewModelTest {
             getChildrenNode = getChildrenNode,
             getCloudSortOrder = getCloudSortOrder,
             getNodeByHandle = getNodeByHandle,
-            getParentNodeHandle = getParentNodeHandle,
+            getParentNodeUseCase =
+            getParentNodeUseCase,
             monitorBackupFolder = monitorBackupFolder,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorViewType = monitorViewType,
@@ -428,7 +429,7 @@ internal class BackupsViewModelTest {
             val originalBackupsHandle = 123456L
             val newCurrentBackupsFolderNodeId = 789012L
 
-            whenever(getParentNodeHandle(any())).thenReturn(null)
+            whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(null)
 
             // On ViewModel initialization, set the Original Backups Node ID to the current Backups Node ID
             setUnderTest(originalBackupsHandle = originalBackupsHandle)
@@ -513,7 +514,10 @@ internal class BackupsViewModelTest {
 
             // Prepare values for when the users performs a Back Navigation
             // The content should be the same as when the ViewModel was initialized
-            whenever(getParentNodeHandle(any())).thenReturn(originalBackupsHandle)
+            val parentNode = mock<TypedFileNode> {
+                on { this.id }.thenReturn(NodeId(originalBackupsHandle))
+            }
+            whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(parentNode)
             whenever(getNodeByHandle(any())).thenReturn(backupsNode)
             whenever(
                 getChildrenNode(

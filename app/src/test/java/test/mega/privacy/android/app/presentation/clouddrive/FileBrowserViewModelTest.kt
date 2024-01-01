@@ -32,12 +32,13 @@ import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
@@ -75,7 +76,7 @@ class FileBrowserViewModelTest {
     }
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
-    private val getFileBrowserParentNodeHandle = mock<GetParentNodeHandle>()
+    private val getParentNodeUseCase = mock<GetParentNodeUseCase>()
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val handleOptionClickMapper: HandleOptionClickMapper = mock()
@@ -103,7 +104,7 @@ class FileBrowserViewModelTest {
             getRootNodeUseCase = getRootNodeUseCase,
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
-            getFileBrowserParentNodeHandle = getFileBrowserParentNodeHandle,
+            getParentNodeUseCase = getParentNodeUseCase,
             getIsNodeInRubbish = isNodeInRubbish,
             getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
             getCloudSortOrder = getCloudSortOrder,
@@ -465,7 +466,7 @@ class FileBrowserViewModelTest {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(getFileBrowserNodeChildrenUseCase(any())).thenReturn(emptyList())
-        whenever(getFileBrowserParentNodeHandle(any())).thenReturn(null)
+        whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(null)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
         whenever(getBandWidthOverQuotaDelayUseCase()).thenReturn(1L)
@@ -479,7 +480,7 @@ class FileBrowserViewModelTest {
         Dispatchers.resetMain()
         reset(
             monitorNodeUpdatesUseCase,
-            getFileBrowserParentNodeHandle,
+            getParentNodeUseCase,
             getFileBrowserNodeChildrenUseCase,
             getCloudSortOrder,
             handleOptionClickMapper,

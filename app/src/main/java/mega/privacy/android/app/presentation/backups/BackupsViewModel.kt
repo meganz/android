@@ -14,12 +14,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.backups.model.BackupsState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -32,7 +32,7 @@ import javax.inject.Inject
  * @property getChildrenNode [GetChildrenNode]
  * @property getCloudSortOrder [GetCloudSortOrder]
  * @property getNodeByHandle [GetNodeByHandle]
- * @property getParentNodeHandle [GetParentNodeHandle]
+ * @property getParentNodeUseCase [GetParentNodeUseCase]
  * @property monitorBackupFolder [MonitorBackupFolder]
  * @property monitorNodeUpdatesUseCase [MonitorNodeUpdatesUseCase]
  * @property monitorViewType [MonitorViewType]
@@ -43,7 +43,7 @@ class BackupsViewModel @Inject constructor(
     private val getChildrenNode: GetChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getNodeByHandle: GetNodeByHandle,
-    private val getParentNodeHandle: GetParentNodeHandle,
+    private val getParentNodeUseCase: GetParentNodeUseCase,
     private val monitorBackupFolder: MonitorBackupFolder,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorViewType: MonitorViewType,
@@ -235,15 +235,13 @@ class BackupsViewModel @Inject constructor(
             } else {
                 runCatching {
                     val parentBackupsNodeHandle =
-                        getParentNodeHandle(currentBackupsFolderNodeId.longValue)
+                        getParentNodeUseCase(NodeId(currentBackupsFolderNodeId.longValue))
                     parentBackupsNodeHandle?.let { nonNullParentBackupsNodeHandle ->
-                        refreshNodes(nodeHandle = nonNullParentBackupsNodeHandle).also { backupsNodePair ->
+                        refreshNodes(nodeHandle = nonNullParentBackupsNodeHandle.id.longValue).also { backupsNodePair ->
                             val toolbarName = getToolbarName(backupsNodePair.first)
                             _state.update {
                                 it.copy(
-                                    currentBackupsFolderNodeId = NodeId(
-                                        nonNullParentBackupsNodeHandle
-                                    ),
+                                    currentBackupsFolderNodeId = nonNullParentBackupsNodeHandle.id,
                                     triggerBackPress = true,
                                     nodes = backupsNodePair.second,
                                     currentBackupsFolderName = toolbarName,

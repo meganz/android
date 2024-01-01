@@ -15,12 +15,14 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -48,7 +50,7 @@ class OutgoingSharesViewModelTest {
     private lateinit var underTest: OutgoingSharesViewModel
 
     private val getNodeByHandle = mock<GetNodeByHandle>()
-    private val getParentNodeHandle = mock<GetParentNodeHandle>()
+    private val getParentNodeUseCase = mock<GetParentNodeUseCase>()
     private val getOutgoingSharesChildrenNode = mock<GetOutgoingSharesChildrenNode>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val getOtherSortOrder = mock<GetOthersSortOrder>()
@@ -76,7 +78,7 @@ class OutgoingSharesViewModelTest {
     fun resetMocks() {
         reset(
             getNodeByHandle,
-            getParentNodeHandle,
+            getParentNodeUseCase,
             getOutgoingSharesChildrenNode,
             getCloudSortOrder,
             getOtherSortOrder,
@@ -97,7 +99,7 @@ class OutgoingSharesViewModelTest {
     private fun initViewModel() {
         underTest = OutgoingSharesViewModel(
             getNodeByHandle,
-            getParentNodeHandle,
+            getParentNodeUseCase,
             getOutgoingSharesChildrenNode,
             getCloudSortOrder,
             getOtherSortOrder,
@@ -366,18 +368,21 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
-    fun `test that getParentNodeHandle is called when setOutgoingTreeDepth`() =
+    fun `test that getParentNodeUseCase is called when setOutgoingTreeDepth`() =
         runTest {
             val handle = 123456789L
             underTest.increaseOutgoingTreeDepth(handle)
-            verify(getParentNodeHandle).invoke(handle)
+            verify(getParentNodeUseCase).invoke(NodeId(handle))
         }
 
     @Test
-    fun `test that parent handle is set with result of getParentNodeHandle`() =
+    fun `test that parent handle is set with result of getParentNodeUseCase`() =
         runTest {
             val expected = 111111111L
-            whenever(getParentNodeHandle(any())).thenReturn(expected)
+            val parentNode = mock<TypedFileNode> {
+                on { this.id }.thenReturn(NodeId(expected))
+            }
+            whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(parentNode)
             whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
@@ -392,7 +397,11 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that parent handle is set to null when refreshNodes fails`() =
         runTest {
-            whenever(getParentNodeHandle(any())).thenReturn(111111111L)
+            val expected = 111111111L
+            val parentNode = mock<TypedFileNode> {
+                on { this.id }.thenReturn(NodeId(expected))
+            }
+            whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(parentNode)
             whenever(getOutgoingSharesChildrenNode(any())).thenReturn(emptyList())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
@@ -400,7 +409,7 @@ class OutgoingSharesViewModelTest {
                 .test {
                     assertThat(awaitItem()).isEqualTo(null)
                     underTest.increaseOutgoingTreeDepth(123456789L)
-                    assertThat(awaitItem()).isEqualTo(111111111L)
+                    assertThat(awaitItem()).isEqualTo(expected)
                     whenever(getOutgoingSharesChildrenNode(any())).thenReturn(null)
                     underTest.increaseOutgoingTreeDepth(123456789L)
                     assertThat(awaitItem()).isEqualTo(null)

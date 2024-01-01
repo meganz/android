@@ -12,7 +12,6 @@ import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
@@ -20,10 +19,11 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetVerifiedIncomingSharesUseCase
@@ -42,7 +42,7 @@ import javax.inject.Inject
 class IncomingSharesViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val authorizeNode: AuthorizeNode,
-    private val getParentNodeHandle: GetParentNodeHandle,
+    private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getIncomingSharesChildrenNode: GetIncomingSharesChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
@@ -175,7 +175,7 @@ class IncomingSharesViewModel @Inject constructor(
                 incomingTreeDepth = depth,
                 incomingHandle = handle,
                 incomingNodeName = getNodeByHandle(handle)?.name,
-                incomingParentHandle = getParentNodeHandle(handle),
+                incomingParentHandle = getParentNodeUseCase(NodeId(handle))?.id?.longValue,
                 sortOrder = if (depth == 0) getOthersSortOrder() else getCloudSortOrder()
             )
         }

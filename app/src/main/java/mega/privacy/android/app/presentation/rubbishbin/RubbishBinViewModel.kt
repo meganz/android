@@ -12,9 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
-import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
@@ -31,8 +28,11 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -43,7 +43,7 @@ import javax.inject.Inject
  * [ViewModel] class associated to RubbishBinFragment
  *
  * @param monitorNodeUpdatesUseCase Monitor node updates
- * @param getRubbishBinParentNodeHandle [GetParentNodeHandle] Fetch parent handle
+ * @param getParentNodeUseCase [GetParentNodeUseCase] Fetch parent node
  * @param getRubbishBinNodeChildrenUseCase [GetRubbishBinNodeChildrenUseCase] Fetch list of Rubbish Bin [Node]
  * @param isNodeDeletedFromBackupsUseCase Checks whether the deleted Node came from Backups or not
  * @param setViewType [SetViewType] to set view type
@@ -55,7 +55,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RubbishBinViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
-    private val getRubbishBinParentNodeHandle: GetParentNodeHandle,
+    private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getRubbishBinNodeChildrenUseCase: GetRubbishBinNodeChildrenUseCase,
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
     private val setViewType: SetViewType,
@@ -135,7 +135,7 @@ class RubbishBinViewModel @Inject constructor(
                 getNodeUiItems(getRubbishBinNodeChildrenUseCase(_state.value.rubbishBinHandle))
             _state.update {
                 it.copy(
-                    parentHandle = getRubbishBinParentNodeHandle(_state.value.rubbishBinHandle),
+                    parentHandle = getParentNodeUseCase(NodeId(_state.value.rubbishBinHandle))?.id?.longValue,
                     nodeList = nodeList,
                     sortOrder = getCloudSortOrder(),
                     isRubbishBinEmpty = INVALID_HANDLE == _state.value.rubbishBinHandle ||

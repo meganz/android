@@ -22,11 +22,12 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -58,7 +59,7 @@ class IncomingSharesViewModelTest {
     private lateinit var underTest: IncomingSharesViewModel
 
     private val getNodeByHandle = mock<GetNodeByHandle>()
-    private val getParentNodeHandle = mock<GetParentNodeHandle>()
+    private val getParentNodeUseCase = mock<GetParentNodeUseCase>()
     private val authorizeNode = mock<AuthorizeNode>()
     private val getIncomingSharesChildrenNode = mock<GetIncomingSharesChildrenNode>()
     private val monitorRefreshSessionUseCase = mock<MonitorRefreshSessionUseCase>()
@@ -74,9 +75,7 @@ class IncomingSharesViewModelTest {
     private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
 
     private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares>()
-
     private val getVerifiedIncomingSharesUseCase = mock<GetVerifiedIncomingSharesUseCase>()
-
     private val refreshSessionFlow = MutableSharedFlow<Unit>()
 
     @BeforeAll
@@ -89,7 +88,7 @@ class IncomingSharesViewModelTest {
         reset(
             getNodeByHandle,
             authorizeNode,
-            getParentNodeHandle,
+            getParentNodeUseCase,
             getIncomingSharesChildrenNode,
             getCloudSortOrder,
             getOthersSortOrder,
@@ -114,7 +113,7 @@ class IncomingSharesViewModelTest {
         underTest = IncomingSharesViewModel(
             getNodeByHandle = getNodeByHandle,
             authorizeNode = authorizeNode,
-            getParentNodeHandle = getParentNodeHandle,
+            getParentNodeUseCase = getParentNodeUseCase,
             getIncomingSharesChildrenNode = getIncomingSharesChildrenNode,
             getCloudSortOrder = getCloudSortOrder,
             getOthersSortOrder = getOtherSortOrder,
@@ -385,7 +384,7 @@ class IncomingSharesViewModelTest {
         runTest {
             val handle = 123456789L
             whenever(getNodeByHandle(any())).thenReturn(null)
-            whenever(getParentNodeHandle(any())).thenReturn(null)
+            whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(null)
             underTest.setIncomingTreeDepth(1, handle)
             verify(getIncomingSharesChildrenNode).invoke(handle)
         }
@@ -487,18 +486,21 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that getParentNodeHandle is called when setIncomingTreeDepth`() =
+    fun `test that getParentNodeUseCase is called when setIncomingTreeDepth`() =
         runTest {
             val handle = 123456789L
             underTest.increaseIncomingTreeDepth(handle)
-            verify(getParentNodeHandle).invoke(handle)
+            verify(getParentNodeUseCase).invoke(NodeId(handle))
         }
 
     @Test
-    fun `test that parent handle is set with result of getParentNodeHandle`() =
+    fun `test that parent handle is set with result of getParentNodeUseCase`() =
         runTest {
             val expected = 111111111L
-            whenever(getParentNodeHandle(any())).thenReturn(expected)
+            val parentNode = mock<TypedFileNode> {
+                on { this.id }.thenReturn(NodeId(expected))
+            }
+            whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(parentNode)
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(emptyList())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
@@ -513,7 +515,10 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that parent handle is set to null when refreshNodes fails`() =
         runTest {
-            whenever(getParentNodeHandle(any())).thenReturn(111111111L)
+            val parentNode = mock<TypedFileNode> {
+                on { this.id }.thenReturn(NodeId(111111111L))
+            }
+            whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(parentNode)
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(listOf())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
@@ -535,7 +540,6 @@ class IncomingSharesViewModelTest {
             val expected = SortOrder.ORDER_CREATION_ASC
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getOtherSortOrder()).thenReturn(expected)
-
             underTest.state.map { it.sortOrder }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(default)

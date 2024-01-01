@@ -14,11 +14,12 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import nz.mega.sdk.MegaApiJava
@@ -35,7 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OutgoingSharesViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
-    private val getParentNodeHandle: GetParentNodeHandle,
+    private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getOutgoingSharesChildrenNode: GetOutgoingSharesChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
@@ -133,7 +134,7 @@ class OutgoingSharesViewModel @Inject constructor(
                 isLoading = true,
                 outgoingTreeDepth = depth,
                 outgoingHandle = handle,
-                outgoingParentHandle = getParentNodeHandle(handle),
+                outgoingParentHandle = getParentNodeUseCase(NodeId(handle))?.id?.longValue,
                 sortOrder = if (depth == 0) getOthersSortOrder() else
                     getCloudSortOrder()
             )

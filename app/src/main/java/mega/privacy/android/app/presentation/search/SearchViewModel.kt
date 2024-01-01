@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.fragments.homepage.Event
@@ -20,15 +19,17 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.SearchState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -44,7 +45,7 @@ import javax.inject.Inject
  * @param rootNodeExistsUseCase Check if the root node exists
  * @param searchNodesUseCase Perform a search request
  * @param getCloudSortOrder Get the Cloud Sort Order
- * @param getSearchParentNodeHandle Get parent node for current node
+ * @param getParentNodeUseCase Get parent node for current node
  */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -54,7 +55,7 @@ class SearchViewModel @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val getSearchParentNodeHandle: GetParentNodeHandle,
+    private val getParentNodeUseCase: GetParentNodeUseCase,
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
@@ -411,8 +412,8 @@ class SearchViewModel @Inject constructor(
         if (levelSearch >= 0) {
             if (levelSearch > 0) {
                 viewModelScope.launch {
-                    getSearchParentNodeHandle(_state.value.searchParentHandle)?.let {
-                        setSearchParentHandle(it)
+                    getParentNodeUseCase(NodeId(_state.value.searchParentHandle))?.let {
+                        setSearchParentHandle(it.id.longValue)
                     } ?: run {
                         setSearchParentHandle(-1)
                     }

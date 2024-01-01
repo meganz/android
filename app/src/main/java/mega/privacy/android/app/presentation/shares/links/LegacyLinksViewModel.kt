@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.shares.links.model.LegacyLinksState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -26,7 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LegacyLinksViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
-    private val getParentNodeHandle: GetParentNodeHandle,
+    private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getPublicLinks: GetPublicLinks,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getLinksSortOrder: GetLinksSortOrder,
@@ -104,7 +105,7 @@ class LegacyLinksViewModel @Inject constructor(
                 isLoading = true,
                 linksTreeDepth = depth,
                 linksHandle = handle,
-                linksParentHandle = getParentNodeHandle(handle),
+                linksParentHandle = getParentNodeUseCase(NodeId(handle))?.id?.longValue,
                 sortOrder = if (depth == 0) getLinksSortOrder() else
                     getCloudSortOrder()
             )

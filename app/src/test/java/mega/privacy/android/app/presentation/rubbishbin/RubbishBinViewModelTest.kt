@@ -27,7 +27,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -52,7 +52,7 @@ class RubbishBinViewModelTest {
 
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
-    private val getRubbishBinParentNodeHandle = mock<GetParentNodeHandle>()
+    private val getParentNodeUseCase = mock<GetParentNodeUseCase>()
     private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase>()
     private val setViewType = mock<SetViewType>()
     private val monitorViewType = mock<MonitorViewType>()
@@ -75,7 +75,7 @@ class RubbishBinViewModelTest {
     private fun initViewModel() {
         underTest = RubbishBinViewModel(
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
-            getRubbishBinParentNodeHandle = getRubbishBinParentNodeHandle,
+            getParentNodeUseCase = getParentNodeUseCase,
             getRubbishBinNodeChildrenUseCase = getRubbishBinNodeChildrenUseCase,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
             setViewType = setViewType,
@@ -435,7 +435,7 @@ class RubbishBinViewModelTest {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(getRubbishBinNodeChildrenUseCase(any())).thenReturn(emptyList())
-        whenever(getRubbishBinParentNodeHandle(any())).thenReturn(null)
+        whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(null)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(getRubbishBinFolderUseCase()).thenReturn(null)
         whenever(fileDurationMapper(any())).thenReturn(1)
@@ -446,7 +446,7 @@ class RubbishBinViewModelTest {
         Dispatchers.resetMain()
         reset(
             monitorNodeUpdatesUseCase,
-            getRubbishBinParentNodeHandle,
+            getParentNodeUseCase,
             isNodeDeletedFromBackupsUseCase,
             setViewType,
             monitorViewType,
