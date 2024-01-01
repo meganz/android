@@ -19,7 +19,7 @@ import mega.privacy.android.app.di.ui.toolbaritem.qualifier.IncomingShares
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.Links
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.OutgoingShares
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.RubbishBin
-import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase.offline
 
 import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject

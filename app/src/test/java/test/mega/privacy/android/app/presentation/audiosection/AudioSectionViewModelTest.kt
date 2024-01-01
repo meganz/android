@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.audiosection.AudioSectionViewModel
 import mega.privacy.android.app.presentation.audiosection.mapper.UIAudioMapper
 import mega.privacy.android.app.presentation.audiosection.model.UIAudio
