@@ -1889,6 +1889,11 @@ object MegaNodeUtil {
      *
      * @return The type of MyBackup folder, if the folder is not belong to the "My Backups" folder, return BACKUP_NONE
      */
+    @Deprecated(
+        message = "This method is Deprecated",
+        replaceWith = ReplaceWith("CheckBackupNodeTypeByHandleUseCase"),
+        level = DeprecationLevel.WARNING
+    )
     @JvmStatic
     fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, node: MegaNode?): Int =
         node?.let { selectedNode ->
