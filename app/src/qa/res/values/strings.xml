@@ -8,4 +8,6 @@
     <string name="settings_qa_save_logs">Open logs</string>
     <string name="settings_qa_feature_flags_title">Feature flags</string>
     <string name="settings_qa_feature_flags_summary">Enable or disable features locally</string>
+    <string name="settings_qa_feature_flag_quick_settings_title">Select feature flag for quick settings tile</string>
+    <string name="settings_qa_filter">Filter features by name or description</string>
 </resources>

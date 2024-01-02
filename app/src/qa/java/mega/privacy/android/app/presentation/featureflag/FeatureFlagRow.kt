@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.featureflag
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,11 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.core.ui.controls.controlssliders.MegaRadioButton
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.grey_700
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Creates one row for each element in @@FeatureFlag list
@@ -43,6 +43,7 @@ fun FeatureFlagRow(
     isEnabled: Boolean,
     onCheckedChange: (String, Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    useRadioButton: Boolean = false,
 ) {
     Column(
         modifier = modifier
@@ -66,10 +67,14 @@ fun FeatureFlagRow(
                     .wrapContentWidth(),
                 color = MaterialTheme.colors.onSurface,
             )
-            Switch(
-                checked = isEnabled,
-                onCheckedChange = null
-            )
+            if (useRadioButton) {
+                MegaRadioButton(selected = isEnabled, onClick = null)
+            } else {
+                Switch(
+                    checked = isEnabled,
+                    onCheckedChange = null
+                )
+            }
         }
         description?.let {
             Text(
@@ -83,22 +88,21 @@ fun FeatureFlagRow(
                 style = TextStyle(
                     color = grey_700,
                     fontSize = 10.sp
-                )
+                ),
+                color = MaterialTheme.colors.onSurface,
             )
         }
     }
 }
 
-@Preview
-@Preview(
-    uiMode = UI_MODE_NIGHT_YES,
-    name = "DarkFeatureFlagRowPreview"
-)
+@CombinedThemePreviews
 @Composable
-fun FeatureFlagRowPreview() {
+private fun FeatureFlagRowPreview() {
     var enabled by remember { mutableStateOf(true) }
-    val description by derivedStateOf {
-        if (enabled) "This is the subtitle, it goes away when you toggle this switch" else null
+    val description by remember {
+        derivedStateOf {
+            if (enabled) "This is the subtitle, it goes away when you toggle this switch" else null
+        }
     }
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         FeatureFlagRow(

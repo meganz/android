@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.catch
@@ -55,4 +56,23 @@ class FeatureFlagPreferencesDataStore
         }.map { preferences ->
             preferences[booleanPreferencesKey(feature.name)]
         }.firstOrNull()
+
+    override suspend fun setFeatureFlagForQuickSettingsTile(featureName: String?) {
+        context.featureFlagDataStore.edit { mutablePreferences ->
+            if (featureName == null) {
+                mutablePreferences.remove(key)
+            } else {
+                mutablePreferences[key] = featureName
+            }
+        }
+    }
+
+    override fun getCurrentFeatureFlagForQuickSettingsTile() =
+        context.featureFlagDataStore.data.map { it[key] }
+
+    private companion object {
+        const val KEY_QUICK_SETTINGS = "featureFlagForQuickSettingsTile"
+        val key = stringPreferencesKey(KEY_QUICK_SETTINGS)
+    }
+
 }

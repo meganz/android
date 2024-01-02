@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <application>
+    <application tools:node="merge">
+        <service
+            android:name="mega.privacy.android.app.featuretoggle.FeatureFlagTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_mega_logo"
+            android:label="Feature Flag"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".presentation.featureflag.FeatureFlagActivity"
             android:exported="false"
             android:label="@string/qa_feature_flag_title"
             android:launchMode="singleTop"
             android:parentActivityName=".main.ManagerActivity" />
+        <activity
+            android:name=".presentation.featureflag.FeatureFlagForQuickSettingsTileActivity"
+            android:exported="false"
+            android:label="@string/qa_feature_flag_title"
+            android:launchMode="singleTop" >
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
+            </intent-filter>
+        </activity>
 
     </application>
 

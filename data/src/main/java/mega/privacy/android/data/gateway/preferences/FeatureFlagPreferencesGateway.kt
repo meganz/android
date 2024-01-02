@@ -22,4 +22,15 @@ interface FeatureFlagPreferencesGateway {
      * @return Flow of Map of feature name & boolean value
      */
     fun getAllFeatures(): Flow<Preferences>
+
+    /**
+     * Set feature flag that will be used for quick settings tile
+     */
+    suspend fun setFeatureFlagForQuickSettingsTile(featureName: String?)
+
+    /**
+     * Get feature flag used for quick settings tile
+     * @return a [Flow] that emits current feature flag for quick settings tile
+     */
+    fun getCurrentFeatureFlagForQuickSettingsTile(): Flow<String?>
 }

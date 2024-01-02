@@ -12,6 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
@@ -22,12 +23,13 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 import javax.inject.Inject
 
 /**
- * Dialog to show feature flag view
+ * This is a QA only activity. When long click on Quick Settings tile, this activity will be displayed to allow configure which feature flag will be used in the tile
  */
 @AndroidEntryPoint
-class FeatureFlagActivity : BaseActivity() {
+class FeatureFlagForQuickSettingsTileActivity : BaseActivity() {
 
-    private val featureFlagMenuViewModel by viewModels<FeatureFlagMenuViewModel>()
+
+    private val featureFlagForQuickSettingsTileViewModel by viewModels<FeatureFlagForQuickSettingsTileViewModel>()
 
     /**
      * Current theme
@@ -45,45 +47,36 @@ class FeatureFlagActivity : BaseActivity() {
                 setContent {
                     val mode by getThemeMode()
                         .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                    val uiState by featureFlagMenuViewModel.state.collectAsStateWithLifecycle()
+                    val uiState by featureFlagForQuickSettingsTileViewModel.state.collectAsStateWithLifecycle()
                     MegaAppTheme(isDark = mode.isDarkMode()) {
                         MegaScaffold(
                             topBar = {
                                 MegaAppBar(
                                     appBarType = AppBarType.BACK_NAVIGATION,
-                                    title = stringResource(id = R.string.settings_qa_feature_flags_title),
+                                    title = stringResource(id = R.string.settings_qa_feature_flag_quick_settings_title),
                                     onNavigationPressed = ::finish
                                 )
                             }
                         ) { paddingValues ->
                             FeatureFlagBody(
                                 featureFlags = uiState.filteredFeatureFlags,
-                                onFeatureFlagChecked = featureFlagMenuViewModel::setFeatureEnabled,
+                                onFeatureFlagChecked = { name, _ ->
+                                    featureFlagForQuickSettingsTileViewModel.setFeatureEnabled(
+                                        AppFeatures.valueOf(name)
+                                    )
+                                },
                                 displayDescriptions = uiState.showDescription,
                                 filter = uiState.filter,
-                                onFilterChanged = featureFlagMenuViewModel::onFilterChanged,
+                                onFilterChanged = featureFlagForQuickSettingsTileViewModel::onFilterChanged,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(paddingValues),
+                                useRadioButton = true
                             )
                         }
                     }
                 }
-            }
-        )
+            })
     }
 
-    companion object {
-        /**
-         * Tag for logging
-         */
-        const val TAG = "FeatureFlagDialogFragment"
-
-        /**
-         * Creates instance of this class
-         *
-         * @return FeatureFlagDialogFragment new instance
-         */
-        fun newInstance() = FeatureFlagActivity()
-    }
 }
