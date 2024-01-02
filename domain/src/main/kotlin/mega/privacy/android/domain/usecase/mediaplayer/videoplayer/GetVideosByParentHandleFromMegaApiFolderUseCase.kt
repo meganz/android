@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.mediaplayer.videoplayer
 
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.repository.MediaPlayerRepository
@@ -9,8 +9,8 @@ import javax.inject.Inject
  */
 class GetVideosByParentHandleFromMegaApiFolderUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
-    private val addNodeType: AddNodeType,
 ) {
+
     /**
      * Get video children by parent handle from MegaApiFolder
      *
@@ -19,8 +19,5 @@ class GetVideosByParentHandleFromMegaApiFolderUseCase @Inject constructor(
      * @return video nodes
      */
     suspend operator fun invoke(parentHandle: Long, order: SortOrder) =
-        mediaPlayerRepository.getVideosByParentHandleFromMegaApiFolder(parentHandle, order)?.map {
-            addNodeType(it)
-        }
-
+        mediaPlayerRepository.getVideosByParentHandleFromMegaApiFolder(parentHandle, order)
 }

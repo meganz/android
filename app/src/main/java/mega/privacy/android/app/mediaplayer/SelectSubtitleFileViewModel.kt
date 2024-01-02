@@ -20,7 +20,7 @@ import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
-import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.mobile.analytics.event.SearchModeEnablePressedEvent

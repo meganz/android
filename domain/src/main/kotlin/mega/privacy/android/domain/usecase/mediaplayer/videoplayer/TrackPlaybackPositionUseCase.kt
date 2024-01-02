@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.mediaplayer
+package mega.privacy.android.domain.usecase.mediaplayer.videoplayer
 
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map

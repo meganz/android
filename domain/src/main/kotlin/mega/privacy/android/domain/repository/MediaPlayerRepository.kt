@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.exception.MegaException
 
 /**
@@ -53,7 +53,7 @@ interface MediaPlayerRepository {
      * @param order list order
      * @return video nodes
      */
-    suspend fun getVideoNodes(order: SortOrder): List<UnTypedNode>
+    suspend fun getVideoNodes(order: SortOrder): List<TypedVideoNode>
 
     /**
      * Get thumbnail from MegaApiFolder
@@ -97,12 +97,12 @@ interface MediaPlayerRepository {
      *
      * @param parentHandle parent node handle
      * @param order list order
-     * @return List<[UnTypedNode]>?
+     * @return List<[TypedVideoNode]>?
      */
     suspend fun getVideoNodesByParentHandle(
         parentHandle: Long,
         order: SortOrder,
-    ): List<UnTypedNode>?
+    ): List<TypedVideoNode>?
 
     /**
      * Get audio children by parent handle from MegaApiFolder
@@ -121,12 +121,12 @@ interface MediaPlayerRepository {
      *
      * @param parentHandle parent node handle
      * @param order list order
-     * @return List<[UnTypedNode]>?
+     * @return List<[TypedVideoNode]>?
      */
     suspend fun getVideosByParentHandleFromMegaApiFolder(
         parentHandle: Long,
         order: SortOrder,
-    ): List<UnTypedNode>?
+    ): List<TypedVideoNode>?
 
     /**
      * Get audio nodes from public links
@@ -138,9 +138,9 @@ interface MediaPlayerRepository {
     /**
      * Get video nodes from public links
      * @param order list order
-     * @return List<[UnTypedNode]>
+     * @return List<[TypedVideoNode]>
      */
-    suspend fun getVideoNodesFromPublicLinks(order: SortOrder): List<UnTypedNode>
+    suspend fun getVideoNodesFromPublicLinks(order: SortOrder): List<TypedVideoNode>
 
     /**
      * Get audio nodes from InShares
@@ -152,9 +152,9 @@ interface MediaPlayerRepository {
     /**
      * Get video nodes from InShares
      * @param order list order
-     * @return List<[UnTypedNode]>
+     * @return List<[TypedVideoNode]>
      */
-    suspend fun getVideoNodesFromInShares(order: SortOrder): List<UnTypedNode>
+    suspend fun getVideoNodesFromInShares(order: SortOrder): List<TypedVideoNode>
 
     /**
      * Get audio nodes from OutShares
@@ -166,9 +166,9 @@ interface MediaPlayerRepository {
     /**
      * Get video nodes from OutShares
      * @param order list order
-     * @return List<[UnTypedNode]>
+     * @return List<[TypedVideoNode]>
      */
-    suspend fun getVideoNodesFromOutShares(lastHandle: Long, order: SortOrder): List<UnTypedNode>
+    suspend fun getVideoNodesFromOutShares(lastHandle: Long, order: SortOrder): List<TypedVideoNode>
 
     /**
      * Get audio nodes by email
@@ -182,9 +182,9 @@ interface MediaPlayerRepository {
      * Get video nodes by email
      *
      * @param email email of account
-     * @return List<[UnTypedNode]>?
+     * @return List<[TypedVideoNode]>?
      */
-    suspend fun getVideoNodesByEmail(email: String): List<UnTypedNode>?
+    suspend fun getVideoNodesByEmail(email: String): List<TypedVideoNode>?
 
     /**
      * Get username by email
@@ -361,14 +361,14 @@ interface MediaPlayerRepository {
      * @param searchString containing a search string in their name
      * @param recursive is search recursively
      * @param order SortOrder
-     * @return List<UnTypedNode>
+     * @return List<TypedVideoNode>
      */
     suspend fun getVideosBySearchType(
         handle: Long,
         searchString: String,
         recursive: Boolean,
         order: SortOrder,
-    ): List<UnTypedNode>?
+    ): List<TypedVideoNode>?
 
     /**
      * Get audio nodes by handles
@@ -377,4 +377,23 @@ interface MediaPlayerRepository {
      * @return List<[TypedAudioNode]>
      */
     suspend fun getAudioNodesByHandles(handles: List<Long>): List<TypedAudioNode>
+
+    /**
+     * Get video nodes by handles
+     *
+     * @param handles handle list
+     * @return List<[TypedVideoNode]>
+     */
+    suspend fun getVideoNodesByHandles(handles: List<Long>): List<TypedVideoNode>
+
+    /**
+     * Get video node by handle
+     *
+     * @param handle node handle
+     * @param attemptFromFolderApi whether attempt from folder api
+     */
+    suspend fun getVideoNodeByHandle(
+        handle: Long,
+        attemptFromFolderApi: Boolean = false,
+    ): TypedVideoNode?
 }

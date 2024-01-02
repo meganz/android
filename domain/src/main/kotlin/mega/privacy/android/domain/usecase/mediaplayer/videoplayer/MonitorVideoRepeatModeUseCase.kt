@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.mediaplayer
+package mega.privacy.android.domain.usecase.mediaplayer.videoplayer
 
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import javax.inject.Inject

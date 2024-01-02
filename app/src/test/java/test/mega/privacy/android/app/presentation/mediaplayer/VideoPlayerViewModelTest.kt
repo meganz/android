@@ -22,7 +22,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.domain.usecase.mediaplayer.MonitorVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.AfterAll
@@ -94,7 +94,7 @@ internal class VideoPlayerViewModelTest {
             getRootNodeUseCase = mock(),
             getRootNodeFromMegaApiFolderUseCase = mock(),
             getRubbishNodeUseCase = mock(),
-            getNodeByHandleUseCase = mock(),
+            getVideoNodeByHandleUseCase = mock(),
             getVideoNodesFromPublicLinksUseCase = mock(),
             getVideoNodesFromInSharesUseCase = mock(),
             getVideoNodesFromOutSharesUseCase = mock(),
@@ -103,9 +103,8 @@ internal class VideoPlayerViewModelTest {
             getUserNameByEmailUseCase = mock(),
             getVideosByParentHandleFromMegaApiFolderUseCase = mock(),
             getVideoNodesByParentHandleUseCase = mock(),
-            getNodesByHandlesUseCase = mock(),
+            getVideoNodesByHandlesUseCase = mock(),
             getFingerprintUseCase = mock(),
-            fileDurationMapper = mock(),
             getSRTSubtitleFileListUseCase = mock(),
             setVideoRepeatModeUseCase = mock(),
             getVideosBySearchTypeUseCase = mock(),

@@ -19,7 +19,7 @@ import mega.privacy.android.data.mapper.audios.TypedAudioNodeMapper
 import mega.privacy.android.data.mapper.mediaplayer.RepeatToggleModeMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
-import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
@@ -54,12 +54,12 @@ class DefaultMediaPlayerRepositoryTest {
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val fileNodeMapper = mock<FileNodeMapper>()
     private val typedAudioNodeMapper = mock<TypedAudioNodeMapper>()
+    private val typedVideoNodeMapper = mock<TypedVideoNodeMapper>()
 
     private val expectedHandle = 100L
     private val expectedMediaId: Long = 1234567
     private val expectedTotalDuration: Long = 200000
     private val expectedCurrentPosition: Long = 16000
-    private val nodeMapper = mock<NodeMapper>()
 
     @BeforeAll
     fun initialise() {
@@ -68,9 +68,9 @@ class DefaultMediaPlayerRepositoryTest {
             megaApiFolder = megaApiFolder,
             megaLocalRoomGateway = megaLocalRoomGateway,
             dbHandler = dbHandler,
-            nodeMapper = nodeMapper,
             fileNodeMapper = fileNodeMapper,
             typedAudioNodeMapper = typedAudioNodeMapper,
+            typedVideoNodeMapper = typedVideoNodeMapper,
             fileGateway = fileGateway,
             sortOrderIntMapper = sortOrderIntMapper,
             appPreferencesGateway = appPreferencesGateway,
@@ -94,6 +94,7 @@ class DefaultMediaPlayerRepositoryTest {
             mediaPlayerPreferencesGateway,
             fileNodeMapper,
             typedAudioNodeMapper,
+            typedVideoNodeMapper,
             megaLocalRoomGateway
         )
     }

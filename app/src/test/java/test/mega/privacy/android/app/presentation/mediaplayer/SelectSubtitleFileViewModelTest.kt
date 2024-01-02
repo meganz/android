@@ -13,7 +13,7 @@ import mega.privacy.android.app.mediaplayer.SelectSubtitleFileViewModel
 import mega.privacy.android.app.mediaplayer.mapper.SubtitleFileInfoItemMapper
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
-import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach

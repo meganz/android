@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.mediaplayer.videoplayer
 
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.repository.MediaPlayerRepository
@@ -9,7 +9,6 @@ import javax.inject.Inject
  */
 class GetVideoNodesUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
-    private val addNodeType: AddNodeType,
 ) {
     /**
      * Getting video nodes
@@ -17,6 +16,5 @@ class GetVideoNodesUseCase @Inject constructor(
      * @param order [SortOrder]
      * @return video nodes
      */
-    suspend operator fun invoke(order: SortOrder) =
-        mediaPlayerRepository.getVideoNodes(order).map { addNodeType(it) }
+    suspend operator fun invoke(order: SortOrder) = mediaPlayerRepository.getVideoNodes(order)
 }

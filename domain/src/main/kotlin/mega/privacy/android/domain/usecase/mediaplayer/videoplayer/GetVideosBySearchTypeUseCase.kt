@@ -1,8 +1,7 @@
-package mega.privacy.android.domain.usecase.mediaplayer
+package mega.privacy.android.domain.usecase.mediaplayer.videoplayer
 
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.repository.MediaPlayerRepository
-import mega.privacy.android.domain.usecase.AddNodeType
 import javax.inject.Inject
 
 /**
@@ -10,7 +9,6 @@ import javax.inject.Inject
  */
 class GetVideosBySearchTypeUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
-    private val addNodeType: AddNodeType,
 ) {
 
     /**
@@ -33,5 +31,5 @@ class GetVideosBySearchTypeUseCase @Inject constructor(
             searchString = searchString,
             recursive = recursive,
             order = order
-        )?.map { addNodeType(it) }
+        )
 }
