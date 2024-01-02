@@ -55,11 +55,21 @@ enum class ABTestFeatures(
     ads(
         "Real experiment flag to show ads",
         false
+    ),
+
+    /**
+     * To use remote feature flag 'ab_adse' from API
+     * this flag is part of real experiment related to Ads
+     * DO NOT USE this flag anywhere else, except the Ads related files
+     */
+    adse(
+        "Real experiment flag to show external ads",
+        false
     );
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
-            ABTestFeatures.values().firstOrNull { it == feature }?.defaultValue
+            entries.firstOrNull { it == feature }?.defaultValue
     }
 }
 
