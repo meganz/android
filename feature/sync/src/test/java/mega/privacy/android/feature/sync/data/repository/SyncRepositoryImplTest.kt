@@ -3,18 +3,20 @@ package mega.privacy.android.feature.sync.data.repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
 import mega.privacy.android.feature.sync.data.mapper.StalledIssueTypeMapper
 import mega.privacy.android.feature.sync.data.mapper.StalledIssuesMapper
 import mega.privacy.android.feature.sync.data.mapper.SyncStatusMapper
+import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import nz.mega.sdk.MegaSyncList
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -38,6 +40,9 @@ class SyncRepositoryImplTest {
     private val stalledIssuesMapper: StalledIssuesMapper = StalledIssuesMapper(
         StalledIssueTypeMapper()
     )
+
+    private val fakeGlobalUpdatesFlow = MutableSharedFlow<GlobalUpdate>()
+    private val fakeSyncUpdatesFlow = MutableSharedFlow<MegaSyncListenerEvent>()
     private val scheduler = TestCoroutineScheduler()
     private val unconfinedTestDispatcher = UnconfinedTestDispatcher(scheduler)
     private val testScope = CoroutineScope(unconfinedTestDispatcher)
@@ -45,7 +50,8 @@ class SyncRepositoryImplTest {
 
     @BeforeAll
     fun setUp() {
-        Dispatchers.setMain(unconfinedTestDispatcher)
+        whenever(syncGateway.syncUpdate).thenReturn(fakeSyncUpdatesFlow)
+        whenever(megaApiGateway.globalUpdates).thenReturn(fakeGlobalUpdatesFlow)
         underTest = SyncRepositoryImpl(
             syncGateway = syncGateway,
             syncStatsCacheGateway = syncStatsCacheGateway,

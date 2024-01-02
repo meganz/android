@@ -49,6 +49,36 @@ internal data class SQLCipherManager @Inject constructor(
                 dbTemp.delete()
                 throw IOException("Could not rename $dbFile to $dbBackup")
             }
+        } else if (state == DatabaseState.ENCRYPTED) {
+            // ensure passphrase is correct
+            var db: SQLiteDatabase? = null
+            try {
+                db = SQLiteDatabase.openOrCreateDatabase(
+                    dbFile.absolutePath,
+                    passphrase,
+                    null,
+                )
+                db.version
+            } finally {
+                db?.close()
+            }
+        }
+    }
+
+    /**
+     * Destruct secure database if it's encrypted.
+     *
+     * @param name
+     */
+    fun destructSecureDatabase(name: String) {
+        runCatching {
+            val dbFile = context.getDatabasePath(name)
+            val state = getDatabaseState(context, dbFile)
+            if (state != DatabaseState.UNENCRYPTED) {
+                dbFile.delete()
+            }
+        }.onFailure {
+            Timber.e(it, "Failed to destruct secure database")
         }
     }
 
@@ -142,10 +172,16 @@ internal data class SQLCipherManager @Inject constructor(
             Timber.d("Passphrase file does not exist")
             passphraseEncryptedFile?.let { encryptedFile ->
                 Timber.d("Writing passphrase to encrypted file")
-                encryptedFile.openFileOutput().use { it.write(result) }
+                encryptedFile.openFileOutput().use {
+                    it.write(result)
+                    it.flush()
+                }
             } ?: run {
                 Timber.d("Writing passphrase to file")
-                passphraseFile.writeBytes(result)
+                passphraseFile.outputStream().use {
+                    it.write(result)
+                    it.flush()
+                }
             }
             result
         }
