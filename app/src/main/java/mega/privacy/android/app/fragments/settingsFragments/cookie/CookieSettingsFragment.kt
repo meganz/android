@@ -22,6 +22,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ACCEPT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ADS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ANALYTICS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_POLICIES
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
@@ -44,7 +45,7 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     private var analyticsCookiesPreference: SwitchPreferenceCompat? = null
     private var adsCookiesPreference: SwitchPreferenceCompat? = null
     private var policiesPreference: TwoButtonsPreference? = null
-    private var isAdsFeatureEnabled = false
+    private var showAdsCookiePreference = false
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_cookie)
@@ -73,9 +74,12 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement).let {
-                    isAdsFeatureEnabled = it
-                    adsCookiesPreference?.isVisible = it
+                if (getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement) &&
+                    getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
+                    getFeatureFlagValueUseCase(ABTestFeatures.adse)
+                ) {
+                    showAdsCookiePreference = true
+                    adsCookiesPreference?.isVisible = true
                 }
             }.onFailure {
                 Timber.e("Failed to fetch feature flag with error: ${it.message}")
@@ -116,7 +120,7 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     private fun showCookies(cookies: Set<CookieType>) {
         analyticsCookiesPreference?.isChecked = cookies.contains(ANALYTICS) == true
         adsCookiesPreference?.isChecked = cookies.contains(ADVERTISEMENT) == true
-        if (isAdsFeatureEnabled) {
+        if (showAdsCookiePreference) {
             acceptCookiesPreference?.isChecked = analyticsCookiesPreference?.isChecked ?: false ||
                     adsCookiesPreference?.isChecked ?: false
         } else {
