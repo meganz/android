@@ -5,10 +5,10 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ForegroundInfo
 import androidx.work.ListenableWorker
+import androidx.work.SystemClock
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.impl.WorkDatabase
-import androidx.work.impl.foreground.ForegroundProcessor
 import androidx.work.impl.utils.WorkForegroundUpdater
 import androidx.work.impl.utils.WorkProgressUpdater
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
@@ -24,12 +24,12 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.cameraupload.CameraUploadsWorker
 import mega.privacy.android.data.R
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CHECK_FILE_UPLOAD
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.STATUS_INFO
+import mega.privacy.android.data.worker.CameraUploadsWorker
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BatteryInfo
@@ -203,7 +203,12 @@ class CameraUploadsWorkerTest {
         context = ApplicationProvider.getApplicationContext()
         executor = Executors.newSingleThreadExecutor()
         workExecutor = WorkManagerTaskExecutor(executor)
-        workDatabase = WorkDatabase.create(context, workExecutor.serialTaskExecutor, true)
+        workDatabase = WorkDatabase.create(
+            context,
+            workExecutor.serialTaskExecutor,
+            clock = SystemClock(),
+            useTestDatabase = true
+        )
         underTest = Mockito.spy(
             CameraUploadsWorker(
                 context = context,
@@ -218,16 +223,10 @@ class CameraUploadsWorkerTest {
                     workExecutor,
                     WorkerFactory.getDefaultWorkerFactory(),
                     WorkProgressUpdater(workDatabase, workExecutor),
-                    WorkForegroundUpdater(workDatabase, object : ForegroundProcessor {
-                        override fun startForeground(
-                            workSpecId: String,
-                            foregroundInfo: ForegroundInfo,
-                        ) {
-                        }
-
-                        override fun stopForeground(workSpecId: String) {}
-                        override fun isEnqueuedInForeground(workSpecId: String): Boolean = true
-                    }, workExecutor)
+                    WorkForegroundUpdater(
+                        workDatabase,
+                        { _, _ -> }, workExecutor
+                    )
                 ),
                 isNotEnoughQuota = isNotEnoughQuota,
                 getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,

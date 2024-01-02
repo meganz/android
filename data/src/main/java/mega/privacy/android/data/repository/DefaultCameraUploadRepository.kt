@@ -18,7 +18,7 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadsMediaGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.gateway.WorkerGateway
+import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -35,8 +35,8 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
-import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
+import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -67,7 +67,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val heartbeatStatusIntMapper: HeartbeatStatusIntMapper,
     private val mediaStoreFileTypeUriMapper: MediaStoreFileTypeUriMapper,
     private val appEventGateway: AppEventGateway,
-    private val workerGateway: WorkerGateway,
+    private val workManagerGateway: WorkManagerGateway,
     private val videoQualityIntMapper: VideoQualityIntMapper,
     private val videoQualityMapper: VideoQualityMapper,
     private val backupStateMapper: BackupStateMapper,
@@ -384,19 +384,19 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         }
 
     override suspend fun startCameraUploads() = withContext(ioDispatcher) {
-        workerGateway.startCameraUploads()
+        workManagerGateway.startCameraUploads()
     }
 
     override suspend fun stopCameraUploads() = withContext(ioDispatcher) {
-        workerGateway.stopCameraUploads()
+        workManagerGateway.stopCameraUploads()
     }
 
     override suspend fun scheduleCameraUploads() = withContext(ioDispatcher) {
-        workerGateway.scheduleCameraUploads()
+        workManagerGateway.scheduleCameraUploads()
     }
 
     override suspend fun stopCameraUploadsAndBackupHeartbeat() = withContext(ioDispatcher) {
-        workerGateway.cancelCameraUploadAndHeartbeatWorkRequest()
+        workManagerGateway.cancelCameraUploadAndHeartbeatWorkRequest()
     }
 
     override suspend fun listenToNewMedia() {
@@ -560,7 +560,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override fun monitorCameraUploadsStatusInfo() =
-        workerGateway.monitorCameraUploadsStatusInfo().mapNotNull { workInfoList ->
+        workManagerGateway.monitorCameraUploadsStatusInfo().mapNotNull { workInfoList ->
             cameraUploadsStatusInfoMapper(workInfoList.first().progress)
         }.catch {
             Timber.e(it)

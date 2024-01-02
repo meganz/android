@@ -18,7 +18,7 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
-import mega.privacy.android.data.gateway.WorkerGateway
+import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -75,7 +75,7 @@ class DefaultCameraUploadRepositoryTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val fileGateway = mock<FileGateway>()
     private val cameraUploadsMediaGateway = mock<CameraUploadsMediaGateway>()
-    private val workerGateway = mock<WorkerGateway>()
+    private val workManagerGateway = mock<WorkManagerGateway>()
     private val heartbeatStatusIntMapper = mock<HeartbeatStatusIntMapper>()
     private val mediaStoreFileTypeUriWrapper = mock<MediaStoreFileTypeUriMapper>()
     private val cameraUploadsHandlesMapper = mock<CameraUploadsHandlesMapper>()
@@ -100,7 +100,7 @@ class DefaultCameraUploadRepositoryTest {
             megaApiGateway = megaApiGateway,
             cacheGateway = mock(),
             cameraUploadsMediaGateway = cameraUploadsMediaGateway,
-            workerGateway = workerGateway,
+            workManagerGateway = workManagerGateway,
             heartbeatStatusIntMapper = heartbeatStatusIntMapper,
             mediaStoreFileTypeUriMapper = mediaStoreFileTypeUriWrapper,
             cameraUploadsHandlesMapper = cameraUploadsHandlesMapper,
@@ -127,7 +127,7 @@ class DefaultCameraUploadRepositoryTest {
             megaApiGateway,
             fileGateway,
             cameraUploadsMediaGateway,
-            workerGateway,
+            workManagerGateway,
             heartbeatStatusIntMapper,
             mediaStoreFileTypeUriWrapper,
             cameraUploadsHandlesMapper,
@@ -601,25 +601,25 @@ class DefaultCameraUploadRepositoryTest {
         @Test
         fun `test that the worker is called to start camera uploads`() = runTest {
             underTest.startCameraUploads()
-            verify(workerGateway).startCameraUploads()
+            verify(workManagerGateway).startCameraUploads()
         }
 
         @Test
         fun `test that the worker is called to stop camera uploads`() = runTest {
             underTest.stopCameraUploads()
-            verify(workerGateway).stopCameraUploads()
+            verify(workManagerGateway).stopCameraUploads()
         }
 
         @Test
         fun `test that the worker is called to schedule camera uploads`() = runTest {
             underTest.scheduleCameraUploads()
-            verify(workerGateway).scheduleCameraUploads()
+            verify(workManagerGateway).scheduleCameraUploads()
         }
 
         @Test
         fun `test that the worker is called to stop camera uploads heartbeat workers`() = runTest {
             underTest.stopCameraUploadsAndBackupHeartbeat()
-            verify(workerGateway).cancelCameraUploadAndHeartbeatWorkRequest()
+            verify(workManagerGateway).cancelCameraUploadAndHeartbeatWorkRequest()
         }
 
         @Test
@@ -664,7 +664,9 @@ class DefaultCameraUploadRepositoryTest {
                 val expected = mock<CameraUploadsStatusInfo.Progress>()
 
                 whenever(cameraUploadsStatusInfoMapper(workInfo.progress)).thenReturn(expected)
-                whenever(workerGateway.monitorCameraUploadsStatusInfo()).thenReturn(workInfoFlow)
+                whenever(workManagerGateway.monitorCameraUploadsStatusInfo()).thenReturn(
+                    workInfoFlow
+                )
                 underTest.monitorCameraUploadsStatusInfo().test {
                     assertThat(awaitItem()).isEqualTo(expected)
                     cancelAndConsumeRemainingEvents()

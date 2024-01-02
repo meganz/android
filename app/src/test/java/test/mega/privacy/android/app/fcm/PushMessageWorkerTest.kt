@@ -5,12 +5,11 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.ForegroundInfo
 import androidx.work.ListenableWorker
+import androidx.work.SystemClock
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.impl.WorkDatabase
-import androidx.work.impl.foreground.ForegroundProcessor
 import androidx.work.impl.utils.WorkForegroundUpdater
 import androidx.work.impl.utils.WorkProgressUpdater
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
@@ -88,7 +87,8 @@ class PushMessageWorkerTest {
         context = ApplicationProvider.getApplicationContext()
         executor = Executors.newSingleThreadExecutor()
         workExecutor = WorkManagerTaskExecutor(executor)
-        workDatabase = WorkDatabase.create(context, workExecutor.serialTaskExecutor, true)
+        workDatabase =
+            WorkDatabase.create(context, workExecutor.serialTaskExecutor, SystemClock(), true)
 
         underTest = PushMessageWorker(
             context = context,
@@ -103,16 +103,9 @@ class PushMessageWorkerTest {
                 workExecutor,
                 WorkerFactory.getDefaultWorkerFactory(),
                 WorkProgressUpdater(workDatabase, workExecutor),
-                WorkForegroundUpdater(workDatabase, object : ForegroundProcessor {
-                    override fun startForeground(
-                        workSpecId: String,
-                        foregroundInfo: ForegroundInfo,
-                    ) {
-                    }
-
-                    override fun stopForeground(workSpecId: String) {}
-                    override fun isEnqueuedInForeground(workSpecId: String): Boolean = true
-                }, workExecutor)
+                WorkForegroundUpdater(workDatabase,
+                    { _, _ -> }, workExecutor
+                )
             ),
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             pushReceivedUseCase = pushReceivedUseCase,
