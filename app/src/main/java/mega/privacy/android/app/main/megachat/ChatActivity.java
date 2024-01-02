@@ -85,7 +85,6 @@ import static mega.privacy.android.app.utils.ChatUtil.showConfirmationLeaveChat;
 import static mega.privacy.android.app.utils.ChatUtil.showShareChatLinkDialog;
 import static mega.privacy.android.app.utils.ChatUtil.unlockOrientation;
 import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE;
-import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_OPEN;
 import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.ACTION_CHECK_COMPRESSING_MESSAGE;
 import static mega.privacy.android.app.utils.Constants.ACTION_JOIN_OPEN_CHAT_LINK;
@@ -1451,7 +1450,6 @@ public class ChatActivity extends PasscodeActivity
             Intent i = new Intent(this,
                     chatRoom.isGroup() ? GroupChatInfoActivity.class : ContactInfoActivity.class);
             i.putExtra(HANDLE, chatRoom.getChatId());
-            i.putExtra(ACTION_CHAT_OPEN, true);
             startActivity(i);
         }
     }
