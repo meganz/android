@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
@@ -62,13 +63,13 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
 import timber.log.Timber
 import javax.inject.Inject
@@ -148,6 +149,8 @@ class FileBrowserComposeFragment : Fragment() {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by fileBrowserViewModel.state.collectAsStateWithLifecycle()
+                val snackbarHostState = remember { SnackbarHostState() }
+                val coroutineScope = rememberCoroutineScope()
                 MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     FileBrowserComposeView(
                         uiState = uiState,
@@ -162,7 +165,17 @@ class FileBrowserComposeFragment : Fragment() {
                                     )
                             }
                         },
-                        onMenuClick = ::showOptionsMenuForItem,
+                        onMenuClick = {
+                            if (uiState.isConnected) {
+                                showOptionsMenuForItem(it)
+                            } else {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        message = getString(R.string.error_server_connection_problem),
+                                    )
+                                }
+                            }
+                        },
                         sortOrder = getString(
                             SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
                                 ?: R.string.sortby_name
@@ -179,9 +192,8 @@ class FileBrowserComposeFragment : Fragment() {
                         onEnterMediaDiscoveryClick = {
                             disableSelectMode()
                             showMediaDiscovery(isOpenByMDIcon = true)
-                        }
+                        },
                     )
-                    val snackbarHostState = remember { SnackbarHostState() }
                     //snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet
                     LaunchedEffect(snackbarHostState.currentSnackbarData) {
                         snackbarHostState.currentSnackbarData?.message?.let {

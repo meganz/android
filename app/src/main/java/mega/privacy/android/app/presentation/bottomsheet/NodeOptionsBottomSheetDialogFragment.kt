@@ -227,57 +227,69 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                 if (mode == RECENTS_MODE || mode == FAVOURITES_IN_TAB_MODE) {
                     viewInFolder.visibility = View.VISIBLE
-                    viewInFolder.setOnClickListener { onViewInFolderClicked(node) }
+                    viewInFolder.setOnClickListener { onClick { onViewInFolderClicked(node) } }
                 } else {
                     viewInFolder.visibility = View.GONE
                     viewInFolder.setOnClickListener(null)
                 }
 
-                optionEdit.setOnClickListener { onEditClicked(node) }
-                optionLabel.setOnClickListener { onLabelClicked(node) }
-                optionFavourite.setOnClickListener { onFavouriteClicked(node) }
-                optionDownload.setOnClickListener { onDownloadClicked(node) }
+                optionEdit.setOnClickListener { onClick { onEditClicked(node) } }
+                optionLabel.setOnClickListener { onClick { onLabelClicked(node) } }
+                optionFavourite.setOnClickListener { onClick { onFavouriteClicked(node) } }
+                optionDownload.setOnClickListener { onClick { onDownloadClicked(node) } }
                 optionOffline.setOnClickListener {
-                    onOfflineClicked(
-                        node = node,
-                        nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
-                    )
+                    onClick {
+                        onOfflineClicked(
+                            node = node,
+                            nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
+                        )
+                    }
                 }
-                optionInfo.setOnClickListener { onInfoClicked(node) }
+                optionInfo.setOnClickListener { onClick { onInfoClicked(node) } }
                 optionLink.setOnClickListener {
-                    if (drawerItem == DrawerItem.SEARCH) {
-                        Analytics.tracker.trackEvent(SearchResultGetLinkMenuItemEvent)
+                    onClick {
+                        if (drawerItem == DrawerItem.SEARCH) {
+                            Analytics.tracker.trackEvent(SearchResultGetLinkMenuItemEvent)
+                        }
+                        onLinkClicked(node)
                     }
-                    onLinkClicked(node)
                 }
-                optionRemoveLink.setOnClickListener { onRemoveLinkClicked(node) }
+                optionRemoveLink.setOnClickListener { onClick { onRemoveLinkClicked(node) } }
                 optionShare.setOnClickListener {
-                    if (drawerItem == DrawerItem.SEARCH) {
-                        Analytics.tracker.trackEvent(SearchResultShareMenuItemEvent)
+                    onClick {
+                        if (drawerItem == DrawerItem.SEARCH) {
+                            Analytics.tracker.trackEvent(SearchResultShareMenuItemEvent)
+                        }
+                        shareNode(requireActivity(), node)
                     }
-                    shareNode(requireActivity(), node)
                 }
-                optionShareFolder.setOnClickListener { nodeOptionsViewModel.createShareKey() }
-                optionClearShares.setOnClickListener { onClearShareClicked(node) }
-                optionLeaveShares.setOnClickListener { onLeaveShareClicked(node) }
-                optionRename.setOnClickListener { onRenameClicked(node) }
-                optionSendChat.setOnClickListener { onSendChatClicked(node) }
-                optionMove.setOnClickListener { nodeOptionsViewModel.setMoveNodeClicked(true) }
-                optionCopy.setOnClickListener { onCopyClicked(node) }
-                optionRubbishBin.setOnClickListener { onDeleteClicked(node) }
+                optionShareFolder.setOnClickListener { onClick { nodeOptionsViewModel.createShareKey() } }
+                optionClearShares.setOnClickListener { onClick { onClearShareClicked(node) } }
+                optionLeaveShares.setOnClickListener { onClick { onLeaveShareClicked(node) } }
+                optionRename.setOnClickListener { onClick { onRenameClicked(node) } }
+                optionSendChat.setOnClickListener { onClick { onSendChatClicked(node) } }
+                optionMove.setOnClickListener {
+                    onClick {
+                        nodeOptionsViewModel.setMoveNodeClicked(true)
+                    }
+                }
+                optionCopy.setOnClickListener { onClick { onCopyClicked(node) } }
+                optionRubbishBin.setOnClickListener { onClick { onDeleteClicked(node) } }
                 optionRestoreFromRubbish.setOnClickListener {
-                    nodeOptionsViewModel.setRestoreNodeClicked(true)
+                    onClick { nodeOptionsViewModel.setRestoreNodeClicked(true) }
                 }
-                optionRemove.setOnClickListener { onDeleteClicked(node) }
-                optionOpenFolder.setOnClickListener { onOpenFolderClicked(node) }
-                optionSlideshow.setOnClickListener { onSlideShowClicked(node) }
+                optionRemove.setOnClickListener { onClick { onDeleteClicked(node) } }
+                optionOpenFolder.setOnClickListener { onClick { onOpenFolderClicked(node) } }
+                optionSlideshow.setOnClickListener { onClick { onSlideShowClicked(node) } }
                 optionOpenWith.setOnClickListener {
-                    if (drawerItem == DrawerItem.SEARCH) {
-                        Analytics.tracker.trackEvent(SearchResultOpenWithMenuItemEvent)
+                    onClick {
+                        if (drawerItem == DrawerItem.SEARCH) {
+                            Analytics.tracker.trackEvent(SearchResultOpenWithMenuItemEvent)
+                        }
+                        onOpenWithClicked(node)
                     }
-                    onOpenWithClicked(node)
                 }
-                optionVersionsLayout.setOnClickListener { onVersionsClicked(node) }
+                optionVersionsLayout.setOnClickListener { onClick { onVersionsClicked(node) } }
 
                 val isTakenDown = node.isTakenDown
                 val accessLevel = megaApi.getAccess(node)
@@ -355,12 +367,14 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 if (isTakenDown) {
                     contentView.findViewById<View>(R.id.dispute_option).visibility = View.VISIBLE
                     contentView.findViewById<View>(R.id.dispute_option).setOnClickListener {
-                        startActivity(
-                            Intent(requireContext(), WebViewActivity::class.java)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                .setData(Uri.parse(Constants.DISPUTE_URL))
-                        )
-                        dismiss()
+                        onClick {
+                            startActivity(
+                                Intent(requireContext(), WebViewActivity::class.java)
+                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                    .setData(Uri.parse(Constants.DISPUTE_URL))
+                            )
+                            dismiss()
+                        }
                     }
                     counterSave--
                     optionDownload.visibility = View.GONE
@@ -640,10 +654,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 separatorShares.visibility = if (counterShares <= 0) View.GONE else View.VISIBLE
                 separatorModify.visibility = if (counterModify <= 0) View.GONE else View.VISIBLE
                 offlineSwitch.setOnCheckedChangeListener { _: CompoundButton, _: Boolean ->
-                    onOfflineClicked(
-                        node = node,
-                        nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
-                    )
+                    onClick {
+                        onOfflineClicked(
+                            node = node,
+                            nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
+                        )
+                    }
                 }
                 optionFavourite.setText(if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite)
                 optionFavourite.setCompoundDrawablesWithIntrinsicBounds(
@@ -689,6 +705,18 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
         }
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun onClick(action: () -> Unit) {
+        if (nodeOptionsViewModel.isOnline()) {
+            action()
+        } else {
+            dismiss()
+            Util.showSnackbar(
+                requireActivity(),
+                getString(R.string.error_server_connection_problem)
+            )
+        }
     }
 
     /**
@@ -1112,7 +1140,11 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 nodeInfo?.text
             )
         }
-        optionVerifyUser.setOnClickListener { onVerifyUserClicked(nodeShareInformation, node) }
+        optionVerifyUser.setOnClickListener {
+            onClick {
+                onVerifyUserClicked(nodeShareInformation, node)
+            }
+        }
         contentView.findViewById<View>(R.id.favorite_option).visibility = View.GONE
         contentView.findViewById<View>(R.id.rename_option).visibility = View.GONE
         contentView.findViewById<View>(R.id.link_option).visibility =

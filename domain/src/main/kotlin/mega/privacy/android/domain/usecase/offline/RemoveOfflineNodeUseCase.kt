@@ -8,7 +8,6 @@ import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
-import java.io.File
 import javax.inject.Inject
 
 /**

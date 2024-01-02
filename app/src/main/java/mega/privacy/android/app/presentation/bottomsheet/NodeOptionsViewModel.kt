@@ -55,6 +55,11 @@ class NodeOptionsViewModel @Inject constructor(
      */
     val state = _state.asStateFlow()
 
+    /**
+     * Whether the device is online
+     */
+    fun isOnline() = state.value.isOnline
+
     init {
         viewModelScope.launch {
             combine(

@@ -46,6 +46,7 @@ import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -70,25 +71,24 @@ class FileBrowserViewModelTest {
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val isNodeInRubbish = mock<IsNodeInRubbish>()
     private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView> {
-        on { invoke() }.thenReturn(
-            emptyFlow()
-        )
+        on { invoke() }.thenReturn(emptyFlow())
     }
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val getParentNodeUseCase = mock<GetParentNodeUseCase>()
-    private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase = mock()
-    private val getCloudSortOrder: GetCloudSortOrder = mock()
-    private val handleOptionClickMapper: HandleOptionClickMapper = mock()
-    private val monitorViewType: MonitorViewType = mock()
-    private val setViewType: SetViewType = mock()
-    private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase = mock()
-    private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase = mock()
-    private val transfersManagement: TransfersManagement = mock()
-    private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
-    private val fileDurationMapper: FileDurationMapper = mock()
+    private val getFileBrowserNodeChildrenUseCase = mock<GetFileBrowserNodeChildrenUseCase>()
+    private val getCloudSortOrder = mock<GetCloudSortOrder>()
+    private val handleOptionClickMapper = mock<HandleOptionClickMapper>()
+    private val monitorViewType = mock<MonitorViewType>()
+    private val setViewType = mock<SetViewType>()
+    private val monitorRefreshSessionUseCase = mock<MonitorRefreshSessionUseCase>()
+    private val getBandWidthOverQuotaDelayUseCase = mock<GetBandWidthOverQuotaDelayUseCase>()
+    private val transfersManagement = mock<TransfersManagement>()
+    private val containsMediaItemUseCase = mock<ContainsMediaItemUseCase>()
+    private val fileDurationMapper = mock<FileDurationMapper>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -117,7 +117,8 @@ class FileBrowserViewModelTest {
             containsMediaItemUseCase = containsMediaItemUseCase,
             fileDurationMapper = fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase
         )
     }
 
@@ -472,6 +473,7 @@ class FileBrowserViewModelTest {
         whenever(getBandWidthOverQuotaDelayUseCase()).thenReturn(1L)
         whenever(fileDurationMapper(any())).thenReturn(1)
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
+        whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
     }
 
@@ -492,7 +494,8 @@ class FileBrowserViewModelTest {
             containsMediaItemUseCase,
             fileDurationMapper,
             getFeatureFlagValueUseCase,
-            monitorOfflineNodeUpdatesUseCase
+            monitorOfflineNodeUpdatesUseCase,
+            monitorConnectivityUseCase
         )
     }
 }

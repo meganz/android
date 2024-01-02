@@ -13,9 +13,9 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.app.presentation.view.OverQuotaView
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
 /**
  * Composable view for FileBrowser
@@ -44,7 +44,7 @@ fun FileBrowserComposeView(
     onDisputeTakeDownClicked: (String) -> Unit,
     onUpgradeClicked: () -> Unit,
     onDismissClicked: () -> Unit,
-    onEnterMediaDiscoveryClick: () -> Unit
+    onEnterMediaDiscoveryClick: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()

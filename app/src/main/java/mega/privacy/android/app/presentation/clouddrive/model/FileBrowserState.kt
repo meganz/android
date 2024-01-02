@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property shouldShowBannerVisibility
  * @property bannerTime timer
  * @property showMediaDiscoveryIcon showMediaDiscoveryIcon
+ * @property isConnected is connected to internet
  * @property downloadEvent download event
  */
 data class FileBrowserState(
@@ -57,5 +58,6 @@ data class FileBrowserState(
     val shouldShowBannerVisibility: Boolean = false,
     val bannerTime: Long = 0L,
     val showMediaDiscoveryIcon: Boolean = false,
+    val isConnected: Boolean = false,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
 )

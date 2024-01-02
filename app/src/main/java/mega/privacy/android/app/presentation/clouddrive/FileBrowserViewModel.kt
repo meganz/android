@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -87,6 +88,7 @@ class FileBrowserViewModel @Inject constructor(
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     private val fileDurationMapper: FileDurationMapper,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
@@ -110,6 +112,15 @@ class FileBrowserViewModel @Inject constructor(
         monitorRefreshSession()
         changeTransferOverQuotaBannerVisibility()
         monitorOfflineNodes()
+        monitorConnectivity()
+    }
+
+    private fun monitorConnectivity() {
+        viewModelScope.launch {
+            monitorConnectivityUseCase().collect {
+                _state.update { state -> state.copy(isConnected = it) }
+            }
+        }
     }
 
     /**
