@@ -2,9 +2,8 @@ package mega.privacy.android.data.di
 
 import android.content.Context
 import android.provider.Settings
-import androidx.room.Room
 import androidx.security.crypto.EncryptedFile
-import androidx.security.crypto.MasterKeys
+import androidx.security.crypto.MasterKey
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import dagger.Module
@@ -15,7 +14,6 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.MegaDatabaseConstant
-import mega.privacy.android.data.database.MegaOpenHelperFactor
 import mega.privacy.android.data.database.SQLCipherManager
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
@@ -43,30 +41,23 @@ internal object RoomDatabaseModule {
         legacyDatabaseMigration: LegacyDatabaseMigration,
         sqlCipherManager: SQLCipherManager,
     ): MegaDatabase {
-        val passphrase = sqlCipherManager.getPassphrase()
-        val isMigrateSuccess = runCatching {
+        return try {
+            val passphrase = sqlCipherManager.getPassphrase()
             sqlCipherManager.migrateToSecureDatabase(MegaDatabaseConstant.DATABASE_NAME, passphrase)
-        }.onFailure {
-            Timber.e(it)
-        }.isSuccess
-        val factory = if (isMigrateSuccess) {
-            SupportFactory(passphrase)
-        } else {
-            FrameworkSQLiteOpenHelperFactory()
-        }
-        return Room.databaseBuilder(
-            applicationContext,
-            MegaDatabase::class.java, MegaDatabaseConstant.DATABASE_NAME
-        ).fallbackToDestructiveMigrationFrom(
-            *(1..66).toList().toIntArray() // allow destructive migration for version 1 to 66
-        ).addMigrations(*MegaDatabase.MIGRATIONS)
-            .openHelperFactory(
-                MegaOpenHelperFactor(
-                    factory,
-                    legacyDatabaseMigration
-                )
+            MegaDatabase.init(
+                applicationContext,
+                SupportFactory(passphrase),
+                legacyDatabaseMigration
             )
-            .build()
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to migrate database to secure database")
+            sqlCipherManager.destructSecureDatabase(MegaDatabaseConstant.DATABASE_NAME)
+            MegaDatabase.init(
+                applicationContext,
+                FrameworkSQLiteOpenHelperFactory(),
+                legacyDatabaseMigration
+            )
+        }
     }
 
     @Provides
@@ -129,10 +120,13 @@ internal object RoomDatabaseModule {
         passphraseFile: File,
     ): EncryptedFile? {
         return runCatching {
+            val masterKey = MasterKey.Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
             EncryptedFile.Builder(
-                passphraseFile,
                 context,
-                MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+                passphraseFile,
+                masterKey,
                 EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
             ).build()
         }.onFailure {

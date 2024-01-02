@@ -1,10 +1,13 @@
 package mega.privacy.android.data.database
 
+import android.content.Context
 import androidx.room.AutoMigration
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.sqlite.db.SupportSQLiteOpenHelper
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
@@ -74,6 +77,31 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun cameraUploadsRecordDao(): CameraUploadsRecordDao
 
     companion object {
+
+        /**
+         * Init MegaDatabase
+         *
+         * @param context Context
+         * @param factory SupportSQLiteOpenHelper.Factory
+         * @param legacyDatabaseMigration LegacyDatabaseMigration
+         */
+        fun init(
+            context: Context,
+            factory: SupportSQLiteOpenHelper.Factory,
+            legacyDatabaseMigration: LegacyDatabaseMigration,
+        ): MegaDatabase = Room.databaseBuilder(
+            context,
+            MegaDatabase::class.java, MegaDatabaseConstant.DATABASE_NAME
+        ).fallbackToDestructiveMigrationFrom(
+            *(1..66).toList().toIntArray() // allow destructive migration for version 1 to 66
+        ).addMigrations(*MIGRATIONS)
+            .openHelperFactory(
+                MegaOpenHelperFactor(
+                    factory,
+                    legacyDatabaseMigration
+                )
+            )
+            .build()
 
         private val MIGRATION_67_68 = object : Migration(67, 68) {
             override fun migrate(database: SupportSQLiteDatabase) {
