@@ -98,5 +98,12 @@ private fun ReturnToCallBannerPreview() {
     }
 }
 
-internal const val TEST_TAG_RETURN_TO_CALL = "chat_view:return_to_call"
-internal const val TEST_TAG_RETURN_TO_CALL_CHRONOMETER = "chat_view:return_to_call_chronometer"
+/**
+ * Test tag for ReturnToCallBanner
+ */
+const val TEST_TAG_RETURN_TO_CALL = "chat_view:return_to_call"
+
+/**
+ * Test tag for ReturnToCallBanner chronometer
+ */
+const val TEST_TAG_RETURN_TO_CALL_CHRONOMETER = "chat_view:return_to_call_chronometer"

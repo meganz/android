@@ -49,3 +49,13 @@ enum class ChatCallStatus {
      */
     Unknown
 }
+
+/**
+ * Extension function to check if a call is finished
+ *
+ * @return true if the call is finished, false otherwise
+ */
+fun ChatCallStatus.isCallFinished() =
+    this == ChatCallStatus.Destroyed
+            || this == ChatCallStatus.TerminatingUserParticipation
+            || this == ChatCallStatus.Unknown

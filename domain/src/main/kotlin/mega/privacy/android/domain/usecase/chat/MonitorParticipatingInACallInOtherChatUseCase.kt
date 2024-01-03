@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.isCallFinished
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCurrentChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -33,19 +33,16 @@ class MonitorParticipatingInACallInOtherChatUseCase @Inject constructor(
         return monitorChatCallUpdatesUseCase()
             .filter { it.chatId != currentChatId }
             .map { call ->
-                when (call.status) {
-                    ChatCallStatus.TerminatingUserParticipation,
-                    ChatCallStatus.Destroyed,
-                    ChatCallStatus.Unknown,
-                    -> getChatCall(currentChatId)
-
-                    else -> call
+                if (call.status?.isCallFinished() == true) {
+                    getCallInOtherChat(currentChatId)
+                } else {
+                    call
                 }
             }
-            .onStart { emit(getChatCall(currentChatId)) }
+            .onStart { emit(getCallInOtherChat(currentChatId)) }
     }
 
-    private suspend fun getChatCall(currentChatId: Long): ChatCall? =
+    private suspend fun getCallInOtherChat(currentChatId: Long): ChatCall? =
         getCurrentChatCallUseCase()?.let { chatId ->
             if (currentChatId != chatId) {
                 getChatCallUseCase(chatId)

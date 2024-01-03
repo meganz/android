@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
+import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
@@ -60,6 +61,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUs
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
@@ -136,6 +138,8 @@ internal class ChatViewModel @Inject constructor(
     private val enableGeolocationUseCase: EnableGeolocationUseCase,
     private val sendTextMessageUseCase: SendTextMessageUseCase,
     private val joinChatLinkUseCase: JoinChatLinkUseCase,
+    private val holdChatCallUseCase: HoldChatCallUseCase,
+    private val hangChatCallUseCase: HangChatCallUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -885,6 +889,34 @@ internal class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             chatId?.let {
                 val tempMessage = sendTextMessageUseCase(it, message)
+            }
+        }
+    }
+
+    fun onHoldAndAnswerCall() {
+        viewModelScope.launch {
+            state.value.callInOtherChat?.chatId?.let {
+                runCatching {
+                    holdChatCallUseCase(chatId = it, setOnHold = true)
+                }.onFailure { Timber.e(it) }
+                    .onSuccess { onAnswerCall() }
+            } ?: run {
+                // The call finished before setting on hold, just answer
+                onAnswerCall()
+            }
+        }
+    }
+
+    fun onEndAndAnswerCall() {
+        viewModelScope.launch {
+            state.value.callInOtherChat?.callId?.let {
+                runCatching {
+                    hangChatCallUseCase(it)
+                }.onFailure { Timber.e(it) }
+                    .onSuccess { onAnswerCall() }
+            } ?: run {
+                // The call finished before ending, just answer
+                onAnswerCall()
             }
         }
     }

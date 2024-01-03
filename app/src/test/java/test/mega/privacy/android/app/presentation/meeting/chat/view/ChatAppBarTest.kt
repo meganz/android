@@ -1270,7 +1270,7 @@ class ChatAppBarTest {
                 uiState = state,
                 onBackPressed = {},
                 onMenuActionPressed = actionPressed,
-                messageListView = {}
+                contentView = { _, _, _, _ -> },
             )
             lastGreen = getLastSeenString(lastGreen = state.userLastGreen) ?: ""
         }

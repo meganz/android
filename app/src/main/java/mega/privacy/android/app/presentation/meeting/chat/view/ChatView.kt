@@ -13,8 +13,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -34,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -52,7 +49,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
-import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
 import mega.privacy.android.app.presentation.meeting.chat.extension.toInfoText
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
@@ -64,6 +60,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContact
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EnableGeolocationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EndCallForAllDialog
+import mega.privacy.android.app.presentation.meeting.chat.view.dialog.JoinAnswerCallDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.MutePushNotificationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactToAddDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
@@ -79,10 +76,7 @@ import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
-import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
-import mega.privacy.android.core.ui.controls.chat.ChatMeetingButton
-import mega.privacy.android.core.ui.controls.chat.ReturnToCallBanner
 import mega.privacy.android.core.ui.controls.chat.ScrollToBottomFab
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
@@ -90,7 +84,6 @@ import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
@@ -121,6 +114,8 @@ internal fun ChatView(
         onAnswerCall = viewModel::onAnswerCall,
         onEnableGeolocation = viewModel::onEnableGeolocation,
         onSendClick = viewModel::sendMessage,
+        onHoldAndAnswerCall = viewModel::onHoldAndAnswerCall,
+        onEndAndAnswerCall = viewModel::onEndAndAnswerCall,
     )
 }
 
@@ -152,13 +147,18 @@ internal fun ChatView(
     onStartOrJoinMeeting: (isStarted: Boolean) -> Unit = {},
     onAnswerCall: () -> Unit = {},
     onEnableGeolocation: () -> Unit = {},
-    messageListView: @Composable (LazyListState) -> Unit = { listState ->
-        MessageListView(
+    contentView: @Composable (LazyListState, Modifier, topViews: @Composable () -> Unit, bottomViews: @Composable () -> Unit) -> Unit = { listState, modifier, topViews, bottomViews ->
+        ChatContentView(
             scrollState = listState,
-            uiState = uiState
+            uiState = uiState,
+            modifier = modifier,
+            topViews = topViews,
+            bottomViews = bottomViews,
         )
     },
     onSendClick: (String) -> Unit = {},
+    onHoldAndAnswerCall: () -> Unit = {},
+    onEndAndAnswerCall: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -171,6 +171,7 @@ internal fun ChatView(
     var showMutePushNotificationDialog by rememberSaveable { mutableStateOf(false) }
     var muteNotificationDialogOptions by rememberSaveable { mutableStateOf(emptyList<ChatPushNotificationMuteOption>()) }
     var isSelectMode by rememberSaveable { mutableStateOf(false) }
+    var showJoinAnswerCallDialog by rememberSaveable { mutableStateOf(false) }
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val toolbarModalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -358,7 +359,6 @@ internal fun ChatView(
                             )
                             ReturnToCallBanner(
                                 uiState = uiState,
-                                context = context,
                                 isAudioPermissionGranted = audioPermissionState.status.isGranted,
                                 onAnswerCall = onAnswerCall
                             )
@@ -406,41 +406,24 @@ internal fun ChatView(
                 }
             )
             { paddingValues ->
-                Box(
-                    modifier = Modifier
+                contentView(
+                    scrollState,
+                    Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    messageListView(scrollState)
-                    if (schedIsPending && isActive && !isArchived) {
-                        StartOrJoinMeeting(this@with, onStartOrJoinMeeting = {
+                        .padding(paddingValues),
+                    {
+                        TopCallButton(this@with, onStartOrJoinMeeting = {
                             callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
                         })
-                    }
-                    if (callInOtherChat != null && callInThisChat?.isOnHold == true) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.BottomCenter
-                        ) {
-                            println("call on hold")
-                            OutlinedMegaButton(
-                                textId = R.string.call_on_hold,
-                                onClick = {
-                                    enablePasscodeCheck()
-                                    startMeetingActivity(context, chatId)
-                                },
-                                rounded = true,
-                                modifier = Modifier.padding(
-                                    start = 24.dp,
-                                    top = 2.dp,
-                                    end = 24.dp,
-                                    bottom = 16.dp
-                                ),
-                                iconId = R.drawable.ic_pause_thin
-                            )
-                        }
-                    }
-                }
+                    },
+                    {
+                        BottomCallButton(
+                            uiState = this@with,
+                            enablePasscodeCheck = enablePasscodeCheck,
+                            onJoinAnswerCallClick = { showJoinAnswerCallDialog = true }
+                        )
+                    },
+                )
 
                 if (showParticipatingInACallDialog) {
                     ParticipatingInACallDialog(
@@ -520,6 +503,21 @@ internal fun ChatView(
                     waitingForPickLocation = false
                     openLocationPicker(context, locationPickerLauncher)
                 }
+
+                if (showJoinAnswerCallDialog) {
+                    JoinAnswerCallDialog(
+                        isGroup = isGroup,
+                        onHoldAndAnswer = {
+                            showJoinAnswerCallDialog = false
+                            onHoldAndAnswerCall()
+                        },
+                        onEndAndAnswer = {
+                            showJoinAnswerCallDialog = false
+                            onEndAndAnswerCall()
+                        },
+                        onDismiss = { showJoinAnswerCallDialog = false },
+                    )
+                }
             }
 
             EventEffect(
@@ -559,28 +557,7 @@ internal fun ChatView(
     }
 }
 
-@Composable
-private fun BoxScope.StartOrJoinMeeting(
-    uiState: ChatUiState,
-    onStartOrJoinMeeting: () -> Unit = {},
-) {
-    val modifier = Modifier
-        .padding(top = 16.dp)
-        .align(Alignment.TopCenter)
-    if (uiState.callInThisChat?.status?.isStarted != true) {
-        ChatMeetingButton(
-            modifier = modifier,
-            text = stringResource(id = R.string.meetings_chat_room_start_scheduled_meeting_option),
-            onClick = onStartOrJoinMeeting,
-        )
-    } else if (uiState.callInThisChat.status?.isJoined != true) {
-        ChatMeetingButton(
-            modifier = modifier,
-            text = stringResource(id = R.string.meetings_chat_room_join_scheduled_meeting_option),
-            onClick = onStartOrJoinMeeting,
-        )
-    }
-}
+
 
 private fun getInfoToShow(infoToShow: InfoToShow, context: Context): String? = with(infoToShow) {
     inviteContactToChatResult?.toInfoText(context)
@@ -592,52 +569,9 @@ private fun getInfoToShow(infoToShow: InfoToShow, context: Context): String? = w
         }
 }
 
-@Composable
-private fun ReturnToCallBanner(
-    uiState: ChatUiState,
-    context: Context,
-    isAudioPermissionGranted: Boolean,
-    onAnswerCall: () -> Unit,
-) = with(uiState) {
-    if (!isConnected) return@with null
-
-    val callInThisChatNotAnswered =
-        callInThisChat?.status == ChatCallStatus.TerminatingUserParticipation
-                || callInThisChat?.status == ChatCallStatus.UserNoPresent
-
-    when {
-        !isGroup && callInThisChatNotAnswered && callInOtherChat == null ->
-            // Only one call in this chat, and it is not answered
-            ReturnToCallBanner(
-                text = stringResource(id = R.string.join_call_layout),
-                onBannerClicked = {
-                    if (isAudioPermissionGranted) {
-                        onAnswerCall()
-                    } else {
-                        startMeetingActivity(context, chatId, enableAudio = false)
-                    }
-                })
-
-        !schedIsPending && (callInThisChat != null || callInOtherChat != null) ->
-            // At least one call in which I am participating
-            ReturnToCallBanner(
-                text = stringResource(id = R.string.call_in_progress_layout),
-                onBannerClicked = {
-                    (if (callInThisChatNotAnswered || callInThisChat?.isOnHold == true) {
-                        callInOtherChat?.chatId ?: chatId
-                    } else {
-                        chatId
-                    }).let {
-                        startMeetingActivity(context, it)
-                    }
-                },
-                duration = callInOtherChat?.duration ?: callInThisChat?.duration
-            )
-
-        else -> null
-    }
-}
-
+/**
+ * Checks if location picker can be shown depending on permissions.
+ */
 /**
  * Checks if location picker can be shown depending on permissions.
  */

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.isCallFinished
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -70,15 +71,7 @@ internal class MonitorCallInChatUseCaseTest {
             on { this.chatId } doReturn chatId
             on { this.status } doReturn finalCallStatus
         }
-        val finalCall =
-            if (finalCallStatus != ChatCallStatus.Destroyed
-                && finalCallStatus != ChatCallStatus.Unknown
-                && finalCallStatus != ChatCallStatus.TerminatingUserParticipation
-            ) {
-                updatedCall
-            } else {
-                null
-            }
+        val finalCall = if (!finalCallStatus.isCallFinished()) updatedCall else null
         whenever(callRepository.getChatCall(chatId)).thenReturn(initialCall).thenReturn(updatedCall)
         underTest(chatId).test {
             Truth.assertThat(awaitItem()).isEqualTo(initialCall)

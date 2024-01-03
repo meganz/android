@@ -21,8 +21,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_AT
 import mega.privacy.android.core.ui.controls.chat.TEST_TAG_ATTACHMENT_ICON
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -141,78 +139,6 @@ class ChatViewTest {
             .assertIsDisplayed()
     }
 
-
-    @Test
-    fun `test that start meeting view shows correctly when chat room is pending meeting and available and user doesn't join`() {
-        initComposeRuleContent(
-            ChatUiState(
-                schedIsPending = true,
-                isActive = true,
-                callInThisChat = ChatCall(
-                    chatId = 1L,
-                    callId = 1L,
-                    status = ChatCallStatus.Unknown
-                ),
-            )
-        )
-        composeTestRule.onNodeWithText(
-            composeTestRule.activity.getString(
-                R.string.meetings_chat_room_start_scheduled_meeting_option
-            )
-        ).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that join meeting view shows correctly when chat room is pending meeting and available and user doesn't join`() {
-        initComposeRuleContent(
-            ChatUiState(
-                schedIsPending = true,
-                isActive = true,
-                callInThisChat = ChatCall(
-                    chatId = 1L,
-                    callId = 1L,
-                    status = ChatCallStatus.UserNoPresent
-                ),
-            )
-        )
-        composeTestRule.onNodeWithText(
-            composeTestRule.activity.getString(
-                R.string.meetings_chat_room_join_scheduled_meeting_option
-            )
-        ).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that join current call banner is shown in 1on1 chat, in which there is a call I am not participating yet`() {
-        initComposeRuleContent(
-            ChatUiState(
-                isConnected = true,
-                callInThisChat = ChatCall(
-                    chatId = 1L,
-                    callId = 1L,
-                    status = ChatCallStatus.UserNoPresent
-                ),
-                isGroup = false,
-            )
-        )
-        composeTestRule.onNodeWithText(
-            composeTestRule.activity.getString(R.string.join_call_layout)
-        ).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that return to call banner is shown when I am already participating in a call`() {
-        initComposeRuleContent(
-            ChatUiState(
-                isConnected = true,
-                callInOtherChat = mock(),
-            )
-        )
-        composeTestRule.onNodeWithText(
-            composeTestRule.activity.getString(R.string.call_in_progress_layout)
-        ).assertIsDisplayed()
-    }
-
     @Test
     fun `test that enable geolocation dialog shows when geolocation is not enabled and user clicks on location`() {
         initComposeRuleContent(
@@ -235,7 +161,7 @@ class ChatViewTest {
                 uiState = state,
                 onBackPressed = {},
                 onMenuActionPressed = actionPressed,
-                messageListView = {}
+                contentView = { _, _, _, _ -> }
             )
         }
     }
