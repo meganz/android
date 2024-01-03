@@ -70,7 +70,6 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
-import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -112,7 +111,6 @@ internal class FileInfoViewModelTest {
     private val fileUtilWrapper: FileUtilWrapper = mock()
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
-    private val getFileHistoryNumVersionsUseCase: GetFileHistoryNumVersionsUseCase = mock()
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val isNodeInRubbish: IsNodeInRubbish = mock()
     private val checkNameCollision: CheckNameCollision = mock()
@@ -174,7 +172,6 @@ internal class FileInfoViewModelTest {
             fileUtilWrapper,
             monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase,
-            getFileHistoryNumVersionsUseCase,
             isNodeInBackupsUseCase,
             isNodeInRubbish,
             checkNameCollision,
@@ -223,7 +220,6 @@ internal class FileInfoViewModelTest {
             fileUtilWrapper = fileUtilWrapper,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
-            getFileHistoryNumVersionsUseCase = getFileHistoryNumVersionsUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             isNodeInRubbish = isNodeInRubbish,
             checkNameCollision = checkNameCollision,
@@ -266,7 +262,7 @@ internal class FileInfoViewModelTest {
         whenever(node.handle).thenReturn(NODE_HANDLE)
         whenever(typedFileNode.id).thenReturn(nodeId)
         whenever(isConnectedToInternetUseCase.invoke()).thenReturn(true)
-        whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(0)
+        whenever(typedFileNode.versionCount).thenReturn(0)
         whenever(isNodeInBackupsUseCase(NODE_HANDLE)).thenReturn(false)
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(false)
         whenever(previewFile.exists()).thenReturn(true)
@@ -303,7 +299,7 @@ internal class FileInfoViewModelTest {
     fun `test that viewModel state's historyVersions property reflects the value of the getFileHistoryNumVersions use case after updating the node`() =
         runTest {
             for (n in 0..5) {
-                whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(n)
+                whenever(typedFileNode.versionCount).thenReturn(n)
                 underTest.setNode(node.handle, true)
                 Truth.assertThat(underTest.uiState.value.historyVersions).isEqualTo(n)
             }
@@ -339,7 +335,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test showHistoryVersions is true if the node contains one version`() =
         runTest {
-            whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(1)
+            whenever(typedFileNode.versionCount).thenReturn(1)
             underTest.setNode(node.handle, true)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
@@ -347,7 +343,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test showHistoryVersions is true if the node contains more than one version`() =
         runTest {
-            whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(2)
+            whenever(typedFileNode.versionCount).thenReturn(2)
             underTest.setNode(node.handle, true)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
@@ -355,7 +351,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test showHistoryVersions is false if the node contains no versions`() =
         runTest {
-            whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(0)
+            whenever(typedFileNode.versionCount).thenReturn(0)
             underTest.setNode(node.handle, true)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
         }

@@ -167,7 +167,7 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
         return if (isImageNode) {
             imageNodeMapper(
                 megaNode = node,
-                hasVersion = megaApiGateway::hasVersion,
+                numVersion = megaApiGateway::getNumVersions,
                 requireSerializedData = true,
                 offline = null,
             )

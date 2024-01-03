@@ -27,7 +27,6 @@ internal class SampleNodeDataProvider {
             override val parentId = NodeId(2L)
             override val base64Id = "1L"
             override val label = 1
-            override val hasVersion = true
             override val isFavourite = false
             override val exportedData = null
             override val isTakenDown = false
@@ -36,6 +35,7 @@ internal class SampleNodeDataProvider {
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
             override val isAvailableOffline = false
+            override val versionCount: Int = 0
         }
 
         private val nodeUIItem2 = object : TypedFolderNode {
@@ -52,7 +52,6 @@ internal class SampleNodeDataProvider {
             override val parentId = NodeId(2L)
             override val base64Id = "1L"
             override val label = 1
-            override val hasVersion = true
             override val isFavourite = true
             override val exportedData = null
             override val isTakenDown = false
@@ -61,6 +60,7 @@ internal class SampleNodeDataProvider {
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
             override val isAvailableOffline = false
+            override val versionCount: Int = 0
         }
 
         private val nodeUIItem3 = object : TypedFolderNode {
@@ -77,7 +77,6 @@ internal class SampleNodeDataProvider {
             override val parentId = NodeId(2L)
             override val base64Id = "1L"
             override val label = 1
-            override val hasVersion = true
             override val isFavourite = false
             override val exportedData = null
             override val isTakenDown = false
@@ -86,6 +85,7 @@ internal class SampleNodeDataProvider {
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
             override val isAvailableOffline = false
+            override val versionCount: Int = 0
         }
 
         private val nodeUIItem4 = object : TypedFileNode {
@@ -94,7 +94,6 @@ internal class SampleNodeDataProvider {
             override val parentId = NodeId(2L)
             override val base64Id = "14L"
             override val label = 1
-            override val hasVersion = true
             override val isFavourite = false
             override val exportedData = null
             override val isTakenDown = false
@@ -116,6 +115,7 @@ internal class SampleNodeDataProvider {
             override val hasPreview: Boolean = true
             override val serializedData = null
             override val isAvailableOffline = false
+            override val versionCount: Int = 0
         }
 
         val values: List<TypedNode> =

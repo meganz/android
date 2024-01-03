@@ -619,6 +619,7 @@ class NodeRepositoryImplTest {
         }
         whenever(cacheGateway.getThumbnailCacheFolder()).thenReturn(File("thumbnail_path"))
         whenever(megaApiGateway.hasVersion(megaNode)).thenReturn(true)
+        whenever(megaApiGateway.getNumVersions(megaNode)).thenReturn(2)
         whenever(megaApiGateway.getNumChildFolders(megaNode)).thenReturn(2)
         whenever(megaApiGateway.getNumChildFiles(megaNode)).thenReturn(3)
         whenever(megaApiGateway.isPendingShare(megaNode)).thenReturn(true)

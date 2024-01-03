@@ -20,13 +20,13 @@ internal class ImageNodeMapper @Inject constructor(
 ) {
     suspend operator fun invoke(
         megaNode: MegaNode,
-        hasVersion: suspend (MegaNode) -> Boolean,
+        numVersion: suspend (MegaNode) -> Int,
         requireSerializedData: Boolean = false,
         offline: Offline?
     ) = if (megaNode.isFolder) {
         throw IllegalStateException("Node is a folder")
     } else {
-        val hasVersion = hasVersion(megaNode)
+        val version = (numVersion(megaNode) - 1).coerceAtLeast(0)
         val isAvailableOffline = offline?.let { offlineAvailabilityMapper(megaNode, it) } ?: false
         object : ImageNode {
             override val id = NodeId(megaNode.handle)
@@ -37,7 +37,6 @@ internal class ImageNodeMapper @Inject constructor(
             override val base64Id = megaNode.base64Handle
             override val creationTime = megaNode.creationTime
             override val modificationTime = megaNode.modificationTime
-            override val hasVersion = hasVersion
             override val thumbnailPath = null
             override val previewPath = null
             override val fullSizePath = null
@@ -60,6 +59,7 @@ internal class ImageNodeMapper @Inject constructor(
             override val longitude = megaNode.longitude
             override val serializedData = if (requireSerializedData) megaNode.serialize() else null
             override val isAvailableOffline: Boolean = isAvailableOffline
+            override val versionCount: Int = version
         }
     }
 }

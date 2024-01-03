@@ -51,7 +51,6 @@ internal class FileNodeMapper @Inject constructor(
         base64Id = megaNode.base64Handle,
         creationTime = megaNode.creationTime,
         modificationTime = megaNode.modificationTime,
-        hasVersion = megaApiGateway.hasVersion(megaNode),
         thumbnailPath = getThumbnailCacheFilePath(
             megaNode,
             cacheGateway.getThumbnailCacheFolder()
@@ -77,7 +76,8 @@ internal class FileNodeMapper @Inject constructor(
         hasThumbnail = megaNode.hasThumbnail(),
         hasPreview = megaNode.hasPreview(),
         serializedData = if (requireSerializedData) megaNode.serialize() else null,
-        isAvailableOffline = offline?.let { offlineAvailabilityMapper(megaNode, it) } ?: false
+        isAvailableOffline = offline?.let { offlineAvailabilityMapper(megaNode, it) } ?: false,
+        versionCount = (megaApiGateway.getNumVersions(megaNode) - 1).coerceAtLeast(0)
     )
 
     private fun getThumbnailCacheFilePath(megaNode: MegaNode, thumbnailFolder: File?): String? =

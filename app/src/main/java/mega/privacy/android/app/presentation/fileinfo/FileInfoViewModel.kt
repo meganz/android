@@ -69,7 +69,6 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
-import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -98,7 +97,6 @@ class FileInfoViewModel @Inject constructor(
     private val fileUtilWrapper: FileUtilWrapper,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
-    private val getFileHistoryNumVersionsUseCase: GetFileHistoryNumVersionsUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val checkNameCollision: CheckNameCollision,
@@ -752,7 +750,7 @@ class FileInfoViewModel @Inject constructor(
 
     private fun updateHistory() {
         (typedNode as? FileNode)?.let { fileNode ->
-            updateState { it.copy(historyVersions = getFileHistoryNumVersionsUseCase(fileNode)) }
+            updateState { it.copy(historyVersions = fileNode.versionCount) }
         }
     }
 

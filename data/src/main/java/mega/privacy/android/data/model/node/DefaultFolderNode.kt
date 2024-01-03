@@ -12,7 +12,6 @@ internal data class DefaultFolderNode(
     override val parentId: NodeId,
     override val base64Id: String,
     override val label: Int,
-    override val hasVersion: Boolean,
     override val childFolderCount: Int,
     override val childFileCount: Int,
     override val isFavourite: Boolean,
@@ -27,5 +26,6 @@ internal data class DefaultFolderNode(
     override val creationTime: Long,
     override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode>,
     override val serializedData: String?,
-    override val isAvailableOffline: Boolean
+    override val isAvailableOffline: Boolean,
+    override val versionCount: Int
 ) : FolderNode

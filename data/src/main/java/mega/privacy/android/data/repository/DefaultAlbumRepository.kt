@@ -668,8 +668,8 @@ internal class DefaultAlbumRepository @Inject constructor(
             val node = publicNodesMap[nodeId] ?: throw IllegalArgumentException("Node not found")
             imageNodeMapper(
                 megaNode = node,
-                hasVersion = megaApiGateway::hasVersion,
-                offline = offline
+                offline = offline,
+                numVersion = megaApiGateway::getNumVersions
             )
         }
     }
@@ -679,9 +679,9 @@ internal class DefaultAlbumRepository @Inject constructor(
             val offline = megaLocalRoomGateway.getOfflineInformation(nodeHandle = megaNode.handle)
             imageNodeMapper(
                 megaNode = megaNode,
-                hasVersion = megaApiGateway::hasVersion,
                 offline = offline,
                 requireSerializedData = true,
+                numVersion = megaApiGateway::getNumVersions
             )
         }
     }

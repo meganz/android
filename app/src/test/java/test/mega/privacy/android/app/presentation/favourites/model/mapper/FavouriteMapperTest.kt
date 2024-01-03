@@ -33,7 +33,7 @@ class FavouriteMapperTest {
         val expectedIsFavourite = false
         val expectedIsTakenDown = false
         val expectedShowLabel = true
-        val expectedHasVersion = true
+        val expectedNumVersion = 2
         val expectedIsAvailableOffline = false
         val expectedLabelColour = R.color.salmon_400_salmon_300
         val expectedIsInRubbishBin = false
@@ -51,7 +51,7 @@ class FavouriteMapperTest {
             on { label }.thenReturn(expectedLabel)
             on { parentId }.thenReturn(expectedNodeId)
             on { base64Id }.thenReturn("")
-            on { hasVersion }.thenReturn(expectedHasVersion)
+            on { versionCount }.thenReturn(expectedNumVersion - 1)
             on { childFileCount }.thenReturn(0)
             on { childFolderCount }.thenReturn(0)
             on { isFavourite }.thenReturn(expectedIsFavourite)
@@ -102,7 +102,7 @@ class FavouriteMapperTest {
         val expectedIsExported = false
         val expectedIsTakenDown = false
         val expectedShowLabel = true
-        val expectedHasVersion = true
+        val expectedNumVersion = 2
         val expectedIsAvailableOffline = false
         val expectedLabelColour = R.color.salmon_400_salmon_300
         val expectedSize = 1000L
@@ -132,7 +132,7 @@ class FavouriteMapperTest {
             on { parentId }.thenReturn(expectedNodeId)
             on { base64Id }.thenReturn("")
             on { modificationTime }.thenReturn(expectedModificationTime)
-            on { hasVersion }.thenReturn(expectedHasVersion)
+            on { versionCount }.thenReturn(expectedNumVersion - 1)
             on { isFavourite }.thenReturn(expectedIsFavourite)
             on { isTakenDown }.thenReturn(expectedIsTakenDown)
             on { type }.thenReturn(PdfFileTypeInfo)

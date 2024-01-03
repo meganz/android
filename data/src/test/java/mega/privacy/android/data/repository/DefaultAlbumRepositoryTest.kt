@@ -489,7 +489,7 @@ class DefaultAlbumRepositoryTest {
         underTest = createUnderTest(this)
         (underTest as DefaultAlbumRepository).publicNodesMap[nodeId] = node
 
-        whenever(imageNodeMapper(node, { false }, offline = null))
+        whenever(imageNodeMapper(node, { 0 }, offline = null))
             .thenReturn(mock())
 
         // then

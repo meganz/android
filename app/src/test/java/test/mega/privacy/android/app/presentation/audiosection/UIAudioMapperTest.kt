@@ -33,7 +33,7 @@ class UIAudioMapperTest {
         val expectedIsFavourite = true
         val expectedIsExported = ExportedData("link", 100)
         val expectedIsTakeDown = true
-        val expectedHasVersions = true
+        val expectedNumVersions = 2
         val expectedModificationTime: Long = 999
         val expectedLabel = 1
         val expectedAvailableOffline = true
@@ -48,10 +48,11 @@ class UIAudioMapperTest {
             on { isFavourite }.thenReturn(expectedIsFavourite)
             on { exportedData }.thenReturn(expectedIsExported)
             on { isTakenDown }.thenReturn(expectedIsTakeDown)
-            on { hasVersion }.thenReturn(expectedHasVersions)
+            on { versionCount }.thenReturn(expectedNumVersions - 1)
             on { modificationTime }.thenReturn(expectedModificationTime)
             on { label }.thenReturn(expectedLabel)
             on { isAvailableOffline }.thenReturn(expectedAvailableOffline)
+            on { hasVersion }.thenReturn(true)
         }
 
         underTest(typedAudioNode = expectedTypedAudioNode).let {

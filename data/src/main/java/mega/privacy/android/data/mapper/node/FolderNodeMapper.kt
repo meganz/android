@@ -38,7 +38,6 @@ internal class FolderNodeMapper @Inject constructor(
         label = megaNode.label,
         parentId = NodeId(megaNode.parentHandle),
         base64Id = megaNode.base64Handle,
-        hasVersion = megaApiGateway.hasVersion(megaNode),
         childFolderCount = if (fromFolderLink)
             megaApiFolderGateway.getNumChildFolders(megaNode)
         else
@@ -61,6 +60,7 @@ internal class FolderNodeMapper @Inject constructor(
         creationTime = megaNode.creationTime,
         fetchChildren = fetChildrenMapper(megaNode),
         serializedData = if (requireSerializedData) megaNode.serialize() else null,
-        isAvailableOffline = isAvailableOffline
+        isAvailableOffline = isAvailableOffline,
+        versionCount = (megaApiGateway.getNumVersions(megaNode) - 1).coerceAtLeast(0)
     )
 }

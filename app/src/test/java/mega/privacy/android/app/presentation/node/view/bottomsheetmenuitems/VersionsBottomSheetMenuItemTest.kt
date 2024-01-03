@@ -67,6 +67,7 @@ class VersionsBottomSheetMenuItemTest {
             false,
             mock<TypedFileNode> {
                 on { isTakenDown } doReturn false
+                on { versionCount } doReturn 2
                 on { hasVersion } doReturn true
             },
             true

@@ -33,11 +33,11 @@ class NodeMapperTest {
     val offline = mock<Offline>()
 
     private val megaApiGateway = mock<MegaApiGateway> {
-        onBlocking { hasVersion(any()) }.thenReturn(false)
         onBlocking { getNumChildFolders(any()) }.thenReturn(0)
         onBlocking { getNumChildFiles(any()) }.thenReturn(0)
         onBlocking { isInRubbish(any()) }.thenReturn(false)
         onBlocking { isPendingShare(any()) }.thenReturn(false)
+        onBlocking { getNumVersions(any()) }.thenReturn(2)
     }
     private val megaApiFolderGateway = mock<MegaApiFolderGateway> {
         onBlocking { getNumChildFolders(any()) }.thenReturn(0)
@@ -106,11 +106,11 @@ class NodeMapperTest {
     fun `test that values returned by gateway are used`() = runTest {
         val node = getMockNode(isFile = false)
         whenever(megaLocalRoomGateway.isOfflineInformationAvailable(node.handle)).thenReturn(false)
-        val expectedHasVersion = true
+        val expectedNumberVersion = 2
         val expectedNumChildFolders = 2
         val expectedNumChildFiles = 3
         megaApiGateway.stub {
-            onBlocking { hasVersion(node) }.thenReturn(expectedHasVersion)
+            onBlocking { getNumVersions(node) }.thenReturn(expectedNumberVersion)
             onBlocking { getNumChildFolders(node) }.thenReturn(expectedNumChildFolders)
             onBlocking { getNumChildFiles(node) }.thenReturn(expectedNumChildFiles)
             onBlocking { isInRubbish(node) }.thenReturn(true)
@@ -124,7 +124,7 @@ class NodeMapperTest {
 
         assertThat(actual.name).isEqualTo(expectedName)
         assertThat(actual.label).isEqualTo(expectedLabel)
-        assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
+        assertThat(actual.versionCount).isEqualTo(expectedNumberVersion - 1)
         assertThat(actual.id).isEqualTo(NodeId(expectedId))
         assertThat(actual.parentId).isEqualTo(NodeId(expectedParentId))
         assertThat(actual.base64Id).isEqualTo(expectedBase64Id)

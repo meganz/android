@@ -76,7 +76,9 @@ internal class ImageRepositoryImpl @Inject constructor(
                 ?: throw IllegalArgumentException("Node not found")
             val offline = megaLocalRoomGateway.getOfflineInformation(megaNode.handle)
             imageNodeMapper(
-                megaNode = megaNode, hasVersion = megaApiGateway::hasVersion, offline = offline
+                megaNode = megaNode,
+                offline = offline,
+                numVersion = megaApiGateway::getNumVersions
             )
         }
 

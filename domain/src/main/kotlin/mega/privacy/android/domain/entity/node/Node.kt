@@ -32,11 +32,6 @@ interface Node {
     val label: Int
 
     /**
-     * Has version
-     */
-    val hasVersion: Boolean
-
-    /**
      * Is favourite
      */
     val isFavourite: Boolean
@@ -76,5 +71,16 @@ interface Node {
      * offline available
      */
     val isAvailableOffline: Boolean
+
+    /**
+     * version count exclude current version
+     */
+    val versionCount: Int
+
+    /**
+     * Has version
+     */
+    val hasVersion: Boolean
+        get() = versionCount > 0
 }
 

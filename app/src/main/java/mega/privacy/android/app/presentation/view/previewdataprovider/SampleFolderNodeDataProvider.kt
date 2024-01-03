@@ -28,7 +28,6 @@ internal class SampleFolderNodeDataProvider :
             override val parentId = NodeId(2L)
             override val base64Id = "1L"
             override val label = 1
-            override val hasVersion = true
             override val isFavourite = false
             override val exportedData = null
             override val isTakenDown = false
@@ -37,6 +36,7 @@ internal class SampleFolderNodeDataProvider :
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
             override val isAvailableOffline: Boolean = false
+            override val versionCount: Int = 0
         })
 
     private val nodeUIItem2 = NodeUIItem<TypedFolderNode>(
@@ -56,7 +56,6 @@ internal class SampleFolderNodeDataProvider :
             override val parentId = NodeId(2L)
             override val base64Id = "1L"
             override val label = 1
-            override val hasVersion = true
             override val isFavourite = true
             override val exportedData = null
             override val isTakenDown = false
@@ -65,6 +64,7 @@ internal class SampleFolderNodeDataProvider :
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
             override val isAvailableOffline: Boolean = false
+            override val versionCount: Int = 0
         })
 
     private val nodeUIItem3 = NodeUIItem<TypedFolderNode>(
@@ -84,7 +84,6 @@ internal class SampleFolderNodeDataProvider :
             override val parentId = NodeId(2L)
             override val base64Id = "1L"
             override val label = 1
-            override val hasVersion = true
             override val isFavourite = false
             override val exportedData = null
             override val isTakenDown = false
@@ -93,6 +92,7 @@ internal class SampleFolderNodeDataProvider :
             override val creationTime = System.currentTimeMillis()
             override val serializedData = null
             override val isAvailableOffline: Boolean = false
+            override val versionCount: Int = 0
         })
 
     override val values: Sequence<List<NodeUIItem<TypedFolderNode>>> = sequenceOf(

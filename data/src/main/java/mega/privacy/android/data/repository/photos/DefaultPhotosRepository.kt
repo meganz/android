@@ -226,9 +226,9 @@ internal class DefaultPhotosRepository @Inject constructor(
         val nodes = (imageNodes + videoNodes).map { node ->
             imageNodeMapper(
                 megaNode = node,
-                hasVersion = megaApiFacade::hasVersion,
                 requireSerializedData = true,
                 offline = offlineNodesCache[node.handle.toString()],
+                numVersion = megaApiFacade::getNumVersions
             )
         }
 
@@ -754,9 +754,9 @@ internal class DefaultPhotosRepository @Inject constructor(
             ) {
                 imageNodeMapper(
                     megaNode = megaNode,
-                    hasVersion = megaApiFacade::hasVersion,
                     requireSerializedData = true,
                     offline = offlineNodesCache[megaNode.handle.toString()],
+                    numVersion = megaApiFacade::getNumVersions
                 )
             } else {
                 null
@@ -768,7 +768,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         return getPublicNode(url)?.let { megaNode ->
             imageNodeMapper(
                 megaNode = megaNode,
-                hasVersion = megaApiFacade::hasVersion,
+                numVersion = megaApiFacade::getNumVersions,
                 requireSerializedData = true,
                 offline = offlineNodesCache[megaNode.handle.toString()],
             )
@@ -812,9 +812,9 @@ internal class DefaultPhotosRepository @Inject constructor(
         nodes.map { megaNode ->
             imageNodeMapper(
                 megaNode = megaNode,
-                hasVersion = megaApiFacade::hasVersion,
                 requireSerializedData = true,
                 offline = offlineNodesCache[megaNode.handle.toString()],
+                numVersion = megaApiFacade::getNumVersions
             )
         }
     }
@@ -842,9 +842,9 @@ internal class DefaultPhotosRepository @Inject constructor(
         megaNodes.map { megaNode ->
             imageNodeMapper(
                 megaNode = megaNode,
-                hasVersion = megaApiFacade::hasVersion,
                 requireSerializedData = true,
                 offline = offlineNodesCache[megaNode.handle.toString()],
+                numVersion = megaApiFacade::getNumVersions
             )
         }
     }
