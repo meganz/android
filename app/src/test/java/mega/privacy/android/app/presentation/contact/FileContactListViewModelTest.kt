@@ -8,12 +8,13 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import org.junit.jupiter.api.AfterAll
@@ -33,13 +34,15 @@ import java.util.stream.Stream
 class FileContactListViewModelTest {
     private val email = "email"
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
-    private val createShareKey: CreateShareKey = mock()
+    private val createShareKeyUseCase: CreateShareKeyUseCase = mock()
+    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase = mock()
     private val getOutShare: GetOutShares = mock()
     private val underTest = FileContactListViewModel(
         monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
-        createShareKey = createShareKey,
+        createShareKeyUseCase = createShareKeyUseCase,
+        getNodeByIdUseCase = getNodeByIdUseCase,
         getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
         areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
         getOutShares = getOutShare
@@ -59,7 +62,7 @@ class FileContactListViewModelTest {
     fun resetMocks() {
         reset(
             monitorStorageStateEventUseCase,
-            createShareKey,
+            createShareKeyUseCase,
             getContactVerificationWarningUseCase,
             areCredentialsVerifiedUseCase
         )

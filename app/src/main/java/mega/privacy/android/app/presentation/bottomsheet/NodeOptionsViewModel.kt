@@ -11,16 +11,18 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
+import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,7 +30,7 @@ import javax.inject.Inject
 /**
  * [ViewModel] associated with [NodeOptionsBottomSheetDialogFragment]
  *
- * @property createShareKey [CreateShareKey]
+ * @property createShareKeyUseCase [CreateShareKeyUseCase]
  * @property getNodeByHandle [GetNodeByHandle]
  * @property isNodeDeletedFromBackupsUseCase [IsNodeDeletedFromBackupsUseCase]
  * @property monitorConnectivityUseCase [MonitorConnectivityUseCase]
@@ -37,7 +39,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class NodeOptionsViewModel @Inject constructor(
-    private val createShareKey: CreateShareKey,
+    private val createShareKeyUseCase: CreateShareKeyUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -115,10 +118,16 @@ class NodeOptionsViewModel @Inject constructor(
      */
     fun createShareKey() {
         viewModelScope.launch {
-            kotlin.runCatching {
+            runCatching {
                 val node = state.value.node
-                    ?: throw IllegalArgumentException("Cannot create a share key for a null node")
-                createShareKey(node)
+                require(node != null) { "Cannot create a share key for a null node" }
+
+                val typedNode = getNodeByIdUseCase(NodeId(node.handle))
+                require(typedNode is FolderNode) {
+                    "Cannot create a share key for a non-folder node"
+                }
+
+                createShareKeyUseCase(typedNode)
             }.onSuccess {
                 shareKeyCreated.emit(true)
             }.onFailure {

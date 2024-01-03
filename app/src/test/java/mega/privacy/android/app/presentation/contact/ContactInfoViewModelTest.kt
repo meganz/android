@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
@@ -35,6 +34,7 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatRoomUseCase
@@ -59,6 +59,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -111,7 +112,8 @@ class ContactInfoViewModelTest {
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
         on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
     }
-    private var createShareKey: CreateShareKey = mock()
+    private var createShareKeyUseCase: CreateShareKeyUseCase = mock()
+    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private var checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
     private val copyNodesUseCase: CopyNodesUseCase = mock()
     private var openOrStartCallUseCase: OpenOrStartCallUseCase = mock()
@@ -180,7 +182,7 @@ class ContactInfoViewModelTest {
             monitorChatOnlineStatusUseCase,
             monitorChatPresenceLastGreenUpdatesUseCase,
             isChatConnectedToInitiateCallUseCase,
-            createShareKey,
+            createShareKeyUseCase,
             checkNodesNameCollisionUseCase,
             copyNodesUseCase,
             openOrStartCallUseCase,
@@ -210,10 +212,11 @@ class ContactInfoViewModelTest {
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             createChatRoomUseCase = createChatRoomUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
             startConversationUseCase = startConversationUseCase,
             ioDispatcher = standardDispatcher,
             applicationScope = testScope,
-            createShareKey = createShareKey,
+            createShareKeyUseCase = createShareKeyUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
             monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,

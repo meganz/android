@@ -48,7 +48,6 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
@@ -409,7 +408,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createShareKey(node: TypedNode): (suspend (AccessPermission, String) -> Unit)? {
+    override suspend fun createShareKey(node: FolderNode): (suspend (AccessPermission, String) -> Unit)? {
         return withContext(ioDispatcher) {
             megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let { megaNode ->
                 suspendCancellableCoroutine { continuation ->

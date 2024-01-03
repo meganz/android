@@ -6,7 +6,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -59,15 +58,5 @@ abstract class GetNodeModule {
                     type,
                 )
             }
-
-        /**
-         * Provides [CreateShareKey] implementation
-         *
-         * @param megaNodeRepository [MegaNodeRepository]
-         * @return [CreateShareKey]
-         */
-        @Provides
-        fun provideCreateShareKey(megaNodeRepository: MegaNodeRepository): CreateShareKey =
-            CreateShareKey(megaNodeRepository::createShareKey)
     }
 }

@@ -13,17 +13,19 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
+import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -42,7 +44,8 @@ class NodeOptionsViewModelTest {
     private lateinit var underTest: NodeOptionsViewModel
     private val getNodeByHandle =
         mock<GetNodeByHandle> { onBlocking { invoke(any()) }.thenReturn(null) }
-    private val createShareKey = mock<CreateShareKey>()
+    private val createShareKeyUseCase = mock<CreateShareKeyUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase> {
         onBlocking { invoke(NodeId(any())) }.thenReturn(false)
     }
@@ -87,7 +90,8 @@ class NodeOptionsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = NodeOptionsViewModel(
-            createShareKey = createShareKey,
+            createShareKeyUseCase = createShareKeyUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
             getNodeByHandle = getNodeByHandle,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
@@ -123,6 +127,8 @@ class NodeOptionsViewModelTest {
         getNodeByHandle.stub {
             onBlocking { invoke(nodeId) }.thenReturn(node)
         }
+        val typedNode = mock<TypedFolderNode>()
+        whenever(getNodeByIdUseCase.invoke(NodeId(any()))).thenReturn(typedNode)
         nodeIdFlow.emit(nodeId)
 
         underTest.state.filter { it.node != null }
@@ -144,7 +150,7 @@ class NodeOptionsViewModelTest {
         }
         nodeIdFlow.emit(nodeId)
 
-        createShareKey.stub {
+        createShareKeyUseCase.stub {
             onBlocking { invoke(any()) }.thenAnswer { throw Throwable() }
         }
         underTest.state.filter { it.node != null }
@@ -159,7 +165,7 @@ class NodeOptionsViewModelTest {
 
     @Test
     fun `test that shareKeyCreated is false if called with null node`() = runTest {
-        createShareKey.stub {
+        createShareKeyUseCase.stub {
             onBlocking { invoke(any()) }.thenAnswer { throw Throwable() }
         }
 

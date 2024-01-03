@@ -21,7 +21,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
@@ -31,10 +30,8 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
-import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.MyAccountUpdate
@@ -62,6 +59,7 @@ import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.HasBackupsChildren
@@ -106,6 +104,7 @@ import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
@@ -260,7 +259,8 @@ class ManagerViewModelTest {
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val saveContactByEmailUseCase = mock<SaveContactByEmailUseCase>()
-    private val createShareKey = mock<CreateShareKey>()
+    private val createShareKeyUseCase = mock<CreateShareKeyUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val deleteOldestCompletedTransfersUseCase =
         mock<DeleteOldestCompletedTransfersUseCase>()
     private val monitorOfflineNodeAvailabilityUseCase =
@@ -342,7 +342,8 @@ class ManagerViewModelTest {
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             saveContactByEmailUseCase = saveContactByEmailUseCase,
-            createShareKey = createShareKey,
+            createShareKeyUseCase = createShareKeyUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
             deleteOldestCompletedTransfersUseCase = deleteOldestCompletedTransfersUseCase,
             getIncomingContactRequestsUseCase = getIncomingContactRequestUseCase,
             monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
@@ -404,7 +405,7 @@ class ManagerViewModelTest {
             startCameraUploadUseCase,
             stopCameraUploadsUseCase,
             saveContactByEmailUseCase,
-            createShareKey,
+            createShareKeyUseCase,
             deleteOldestCompletedTransfersUseCase,
             restoreNodesUseCase,
             checkNodesNameCollisionUseCase,

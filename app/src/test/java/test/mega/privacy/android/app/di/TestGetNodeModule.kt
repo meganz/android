@@ -6,7 +6,6 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.GetNodeModule
-import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.domain.entity.node.NodeId
@@ -36,8 +35,5 @@ object TestGetNodeModule {
     fun provideGetNodeByHandle() = mock<GetNodeByHandle> {
         onBlocking { invoke(any()) }.thenReturn(MegaNode())
     }
-
-    @Provides
-    fun provideOpenShareDialog() = mock<CreateShareKey>()
 
 }

@@ -5,8 +5,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.shares.CreateShareKey
-import mega.privacy.android.domain.usecase.shares.DefaultCreateShareKey
 import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.DefaultSetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
@@ -26,12 +24,6 @@ abstract class InternalSharesModule {
      */
     @Binds
     abstract fun bindGetContactItemFromInShareFolder(useCase: DefaultGetContactItemFromInShareFolder): GetContactItemFromInShareFolder
-
-    /**
-     * Provides [CreateShareKey] implementation.
-     */
-    @Binds
-    abstract fun bindCreateShareKey(useCase: DefaultCreateShareKey): CreateShareKey
 
     /**
      * Provides [SetOutgoingPermissions] implementation.

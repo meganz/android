@@ -7,14 +7,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
@@ -26,7 +28,8 @@ import javax.inject.Inject
 @HiltViewModel
 class FileContactListViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val createShareKey: CreateShareKey,
+    private val createShareKeyUseCase: CreateShareKeyUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     private val getOutShares: GetOutShares,
@@ -58,7 +61,9 @@ class FileContactListViewModel @Inject constructor(
      * @param node
      */
     suspend fun initShareKey(node: MegaNode) = runCatching {
-        createShareKey(node)
+        val typedNode = getNodeByIdUseCase(NodeId(node.handle))
+        require(typedNode is FolderNode) { "Cannot create a share key for a non-folder node" }
+        createShareKeyUseCase(typedNode)
     }.onFailure {
         Timber.e(it)
     }

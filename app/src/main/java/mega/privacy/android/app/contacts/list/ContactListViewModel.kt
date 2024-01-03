@@ -24,7 +24,6 @@ import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
-import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -33,7 +32,11 @@ import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
@@ -65,7 +68,8 @@ class ContactListViewModel @Inject constructor(
     private val chatApiGateway: MegaChatApiGateway,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val chatManagement: ChatManagement,
-    private val createShareKey: CreateShareKey,
+    private val createShareKeyUseCase: CreateShareKeyUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
 
@@ -279,7 +283,9 @@ class ContactListViewModel @Inject constructor(
      * @param node
      */
     suspend fun initShareKey(node: MegaNode) = runCatching {
-        createShareKey(node)
+        val typedNode = getNodeByIdUseCase(NodeId(node.handle))
+        require(typedNode is FolderNode) { "Cannot create a share key for a non-folder node" }
+        createShareKeyUseCase(typedNode)
     }.onFailure {
         Timber.e(it)
     }
