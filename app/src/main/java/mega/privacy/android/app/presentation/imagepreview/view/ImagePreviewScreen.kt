@@ -93,6 +93,7 @@ internal fun ImagePreviewScreen(
     onClickLabel: (ImageNode) -> Unit = {},
     onClickOpenWith: (ImageNode) -> Unit = {},
     onClickSaveToDevice: (ImageNode) -> Unit = {},
+    onClickImport: (ImageNode) -> Unit = {},
     onSwitchAvailableOffline: ((checked: Boolean, ImageNode) -> Unit)? = null,
     onClickGetLink: (ImageNode) -> Unit = {},
     onClickSendTo: (ImageNode) -> Unit = {},
@@ -270,12 +271,14 @@ internal fun ImagePreviewScreen(
                     modalSheetState = modalSheetState,
                     imageNode = currentImageNode,
                     isAvailableOffline = isCurrentImageNodeAvailableOffline,
+                    showInfoMenu = viewModel::isInfoMenuVisible,
                     showFavouriteMenu = viewModel::isFavouriteMenuVisible,
                     showLabelMenu = viewModel::isLabelMenuVisible,
                     showDisputeMenu = viewModel::isDisputeMenuVisible,
                     showOpenWithMenu = viewModel::isOpenWithMenuVisible,
                     showForwardMenu = viewModel::isForwardMenuVisible,
                     showSaveToDeviceMenu = viewModel::isSaveToDeviceMenuVisible,
+                    showImportMenu = viewModel::isImportMenuVisible,
                     showGetLinkMenu = viewModel::isGetLinkMenuVisible,
                     showSendToChatMenu = viewModel::isSendToChatMenuVisible,
                     showShareMenu = viewModel::isShareMenuVisible,
@@ -284,7 +287,9 @@ internal fun ImagePreviewScreen(
                     showCopyMenu = viewModel::isCopyMenuVisible,
                     showRestoreMenu = viewModel::isRestoreMenuVisible,
                     showRemoveMenu = viewModel::isRemoveMenuVisible,
+                    showAvailableOfflineMenu = viewModel::isAvailableOfflineMenuVisible,
                     showRemoveOfflineMenu = viewModel::isRemoveOfflineMenuVisible,
+                    showMoveToRubbishBin = viewModel::isMoveToRubbishBinMenuVisible,
                     downloadImage = viewModel::monitorImageResult,
                     getImageThumbnailPath = viewModel::getLowestResolutionImagePath,
                     onClickInfo = {
@@ -305,6 +310,9 @@ internal fun ImagePreviewScreen(
                     onClickSaveToDevice = {
                         onClickSaveToDevice(currentImageNode)
                         hideBottomSheet(coroutineScope, modalSheetState)
+                    },
+                    onClickImport = {
+                        onClickImport(currentImageNode)
                     },
                     onSwitchAvailableOffline = { checked ->
                         onSwitchAvailableOffline?.invoke(checked, currentImageNode)

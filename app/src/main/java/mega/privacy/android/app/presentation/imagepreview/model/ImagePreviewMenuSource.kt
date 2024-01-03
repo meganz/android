@@ -11,4 +11,5 @@ enum class ImagePreviewMenuSource {
     FAVOURITE,
     FILE,
     PUBLIC_FILE,
+    FOLDER_LINK,
 }

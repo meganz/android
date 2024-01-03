@@ -11,6 +11,10 @@ internal class AlbumSharingImagePreviewMenu @Inject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val isNodeInRubbish: IsNodeInRubbish,
 ) : ImagePreviewMenu {
+    override suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {
+        return true
+    }
+
     override suspend fun isSlideshowMenuVisible(imageNode: ImageNode): Boolean {
         return imageNode.type !is VideoFileTypeInfo
     }
@@ -37,6 +41,10 @@ internal class AlbumSharingImagePreviewMenu @Inject constructor(
 
     override suspend fun isSaveToDeviceMenuVisible(imageNode: ImageNode): Boolean {
         return true
+    }
+
+    override suspend fun isImportMenuVisible(imageNode: ImageNode): Boolean {
+        return false
     }
 
     override suspend fun isGetLinkMenuVisible(imageNode: ImageNode): Boolean {
@@ -76,11 +84,19 @@ internal class AlbumSharingImagePreviewMenu @Inject constructor(
         return false
     }
 
+    override suspend fun isAvailableOfflineMenuVisible(imageNode: ImageNode): Boolean {
+        return true
+    }
+
     override suspend fun isRemoveOfflineMenuVisible(imageNode: ImageNode): Boolean {
         return false
     }
 
     override suspend fun isMoreMenuVisible(imageNode: ImageNode): Boolean {
+        return false
+    }
+
+    override suspend fun isMoveToRubbishBinMenuVisible(imageNode: ImageNode): Boolean {
         return false
     }
 }

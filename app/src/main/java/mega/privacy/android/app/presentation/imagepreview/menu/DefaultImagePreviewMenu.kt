@@ -5,6 +5,10 @@ import mega.privacy.android.domain.entity.node.ImageNode
 import javax.inject.Inject
 
 internal class DefaultImagePreviewMenu @Inject constructor() : ImagePreviewMenu {
+    override suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {
+        return true
+    }
+
     override suspend fun isSlideshowMenuVisible(imageNode: ImageNode): Boolean {
         return imageNode.type !is VideoFileTypeInfo
     }
@@ -31,6 +35,10 @@ internal class DefaultImagePreviewMenu @Inject constructor() : ImagePreviewMenu 
 
     override suspend fun isSaveToDeviceMenuVisible(imageNode: ImageNode): Boolean {
         return true
+    }
+
+    override suspend fun isImportMenuVisible(imageNode: ImageNode): Boolean {
+        return false
     }
 
     override suspend fun isGetLinkMenuVisible(imageNode: ImageNode): Boolean {
@@ -65,11 +73,19 @@ internal class DefaultImagePreviewMenu @Inject constructor() : ImagePreviewMenu 
         return false
     }
 
+    override suspend fun isAvailableOfflineMenuVisible(imageNode: ImageNode): Boolean {
+        return true
+    }
+
     override suspend fun isRemoveOfflineMenuVisible(imageNode: ImageNode): Boolean {
         return false
     }
 
     override suspend fun isMoreMenuVisible(imageNode: ImageNode): Boolean {
+        return true
+    }
+
+    override suspend fun isMoveToRubbishBinMenuVisible(imageNode: ImageNode): Boolean {
         return true
     }
 }

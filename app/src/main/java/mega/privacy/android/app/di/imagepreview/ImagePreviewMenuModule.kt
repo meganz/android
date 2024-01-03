@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.imagepreview.menu.CloudDriveImagePr
 import mega.privacy.android.app.presentation.imagepreview.menu.DefaultImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.FavouriteImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.FileImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.FolderLinkImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.MediaDiscoveryImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.OfflineImagePreviewMenu
@@ -70,4 +71,9 @@ internal interface ImagePreviewMenuModule {
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.PUBLIC_FILE)
     fun PublicFileImagePreviewMenu.bindPublicFileMenu(): ImagePreviewMenu
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.FOLDER_LINK)
+    fun FolderLinkImagePreviewMenu.bindFolderLinkMenu(): ImagePreviewMenu
 }

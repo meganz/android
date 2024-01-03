@@ -52,12 +52,14 @@ internal fun ImagePreviewBottomSheet(
     modalSheetState: ModalBottomSheetState,
     imageNode: ImageNode,
     isAvailableOffline: Boolean = false,
+    showInfoMenu: suspend (ImageNode) -> Boolean,
     showFavouriteMenu: suspend (ImageNode) -> Boolean,
     showLabelMenu: suspend (ImageNode) -> Boolean,
     showDisputeMenu: suspend (ImageNode) -> Boolean,
     showOpenWithMenu: suspend (ImageNode) -> Boolean,
     showForwardMenu: suspend (ImageNode) -> Boolean,
     showSaveToDeviceMenu: suspend (ImageNode) -> Boolean,
+    showImportMenu: suspend (ImageNode) -> Boolean,
     showGetLinkMenu: suspend (ImageNode) -> Boolean,
     showSendToChatMenu: suspend (ImageNode) -> Boolean,
     showShareMenu: suspend (ImageNode) -> Boolean,
@@ -66,7 +68,9 @@ internal fun ImagePreviewBottomSheet(
     showCopyMenu: suspend (ImageNode) -> Boolean,
     showRestoreMenu: suspend (ImageNode) -> Boolean,
     showRemoveMenu: suspend (ImageNode) -> Boolean,
+    showAvailableOfflineMenu: suspend (ImageNode) -> Boolean,
     showRemoveOfflineMenu: suspend (ImageNode) -> Boolean,
+    showMoveToRubbishBin: suspend (ImageNode) -> Boolean,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
     getImageThumbnailPath: suspend (ImageResult?) -> String?,
     onClickInfo: () -> Unit = {},
@@ -76,6 +80,7 @@ internal fun ImagePreviewBottomSheet(
     onClickOpenWith: () -> Unit = {},
     onClickForward: () -> Unit = {},
     onClickSaveToDevice: () -> Unit = {},
+    onClickImport: () -> Unit = {},
     onSwitchAvailableOffline: (checked: Boolean) -> Unit = {},
     onClickGetLink: () -> Unit = {},
     onClickRemoveLink: () -> Unit = {},
@@ -108,6 +113,10 @@ internal fun ImagePreviewBottomSheet(
                 MegaNodeUtil.getNodeLabelText(imageNode.label, context)
             }
 
+            val isInfoMenuVisible by produceState(false, imageNode) {
+                value = showInfoMenu(imageNode)
+            }
+
             val isFavouriteMenuVisible by produceState(false, imageNode) {
                 value = showFavouriteMenu(imageNode)
             }
@@ -130,6 +139,10 @@ internal fun ImagePreviewBottomSheet(
 
             val isSaveToDeviceMenuVisible by produceState(false, imageNode) {
                 value = showSaveToDeviceMenu(imageNode)
+            }
+
+            val isImportMenuVisible by produceState(false, imageNode) {
+                value = showImportMenu(imageNode)
             }
 
             val isGetLinkMenuVisible by produceState(false, imageNode) {
@@ -164,20 +177,29 @@ internal fun ImagePreviewBottomSheet(
                 value = showRemoveMenu(imageNode)
             }
 
+            val isAvailableOfflineMenuVisible by produceState(false, imageNode) {
+                value = showAvailableOfflineMenu(imageNode)
+            }
+
             val isRemoveOfflineMenuVisible by produceState(false, imageNode) {
                 value = showRemoveOfflineMenu(imageNode)
+            }
+
+            val isMoveToRubbishBinMenuVisible by produceState(false, imageNode) {
+                value = showMoveToRubbishBin(imageNode)
             }
 
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
-                MenuActionListTile(
-                    icon = painterResource(id = R.drawable.info_ic),
-                    text = stringResource(id = R.string.general_info),
-                    onActionClicked = onClickInfo,
-                    addSeparator = false,
-                )
-
+                if (isInfoMenuVisible) {
+                    MenuActionListTile(
+                        icon = painterResource(id = R.drawable.info_ic),
+                        text = stringResource(id = R.string.general_info),
+                        onActionClicked = onClickInfo,
+                        addSeparator = false,
+                    )
+                }
                 if (isFavouriteMenuVisible) {
                     MenuActionListTile(
                         icon = painterResource(
@@ -266,7 +288,16 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (!isRemoveOfflineMenuVisible) {
+                if (isImportMenuVisible) {
+                    MenuActionListTile(
+                        icon = painterResource(id = R.drawable.ic_import_to_cloud_white),
+                        text = stringResource(id = R.string.general_import),
+                        onActionClicked = onClickImport,
+                        addSeparator = false,
+                    )
+                }
+
+                if (isAvailableOfflineMenuVisible) {
                     MenuActionListTile(
                         text = stringResource(id = R.string.file_properties_available_offline),
                         icon = painterResource(id = R.drawable.ic_save_offline),
@@ -344,6 +375,8 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
+                Divider(modifier = Modifier.padding(start = 72.dp))
+
                 if (isCopyMenuVisible) {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_menu_copy),
@@ -352,8 +385,6 @@ internal fun ImagePreviewBottomSheet(
                         addSeparator = false,
                     )
                 }
-
-                Divider(modifier = Modifier.padding(start = 72.dp))
 
                 if (isRestoreMenuVisible) {
                     MenuActionListTile(
@@ -383,7 +414,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (!isRemoveOfflineMenuVisible) {
+                if (isMoveToRubbishBinMenuVisible) {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_rubbish_bin),
                         text = stringResource(id = R.string.context_move_to_trash),

@@ -8,11 +8,16 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.FolderInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
+import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.FolderInfo
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.folderlink.FetchNodeRequestResult
+import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
@@ -35,6 +40,8 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val nodeMapper: NodeMapper,
     private val folderInfoMapper: FolderInfoMapper,
+    private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val imageNodeMapper: ImageNodeMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FolderLinkRepository {
 
@@ -143,4 +150,29 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    @Throws(SynchronisationException::class)
+    override suspend fun getFolderLinkImageNodes(handle: Long, order: Int?): List<ImageNode> {
+        return withContext(ioDispatcher) {
+            megaApiFolderGateway.getMegaNodeByHandle(handle)?.let { parent ->
+                megaApiFolderGateway.getChildrenByNode(parent, order)
+                    .mapNotNull { convertToImageNode(it) }
+            } ?: throw SynchronisationException("Non null node found be null when fetched from api")
+        }
+    }
+
+    private suspend fun convertToImageNode(node: MegaNode): ImageNode? {
+        val fileTypeInfo = fileTypeInfoMapper(node)
+        val isImageNode = fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo
+        return if (isImageNode) {
+            imageNodeMapper(
+                megaNode = node,
+                hasVersion = megaApiGateway::hasVersion,
+                requireSerializedData = true,
+                offline = null,
+            )
+        } else {
+            null
+        }
+    }
 }

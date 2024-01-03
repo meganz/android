@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.folderlink.FetchNodeRequestResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 
@@ -56,4 +57,11 @@ interface FolderLinkRepository {
      * @param folderLink link of the folder. If link is invalid, exception will be thrown.
      */
     suspend fun getPublicLinkInformation(folderLink: String): FolderInfo
+
+    /**
+     * Get [ImageNode]s of a public link
+     * @param handle handle of the folder. If handle is invalid, exception will be thrown.
+     * @param order order of the nodes. If null, default order will be used.
+     */
+    suspend fun getFolderLinkImageNodes(handle: Long, order: Int? = null): List<ImageNode>
 }

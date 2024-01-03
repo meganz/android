@@ -48,6 +48,10 @@ import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
@@ -289,13 +293,30 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 val nameType = MimeTypeList.typeForName(fileNode.name)
                 when {
                     nameType.isImage -> {
-                        val intent = ImageViewerActivity.getIntentForChildren(
-                            this@FolderLinkComposeActivity,
-                            viewModel.state.value.nodesList.map { it.id.longValue }.toLongArray(),
-                            fileNode.id.longValue,
-                            fromFolderLink = true
-                        )
-                        viewModel.updateImageIntent(intent)
+                        lifecycleScope.launch {
+                            val intent = if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                                val parentNodeLongValue =
+                                    viewModel.state.value.parentNode?.id?.longValue ?: 0
+                                ImagePreviewActivity.createIntent(
+                                    context = this@FolderLinkComposeActivity,
+                                    imageSource = ImagePreviewFetcherSource.FOLDER_LINK,
+                                    menuOptionsSource = ImagePreviewMenuSource.FOLDER_LINK,
+                                    anchorImageNodeId = fileNode.id,
+                                    params = mapOf(
+                                        FolderLinkImageNodeFetcher.PARENT_ID to parentNodeLongValue,
+                                    ),
+                                )
+                            } else {
+                                ImageViewerActivity.getIntentForChildren(
+                                    this@FolderLinkComposeActivity,
+                                    viewModel.state.value.nodesList.map { it.id.longValue }
+                                        .toLongArray(),
+                                    fileNode.id.longValue,
+                                    fromFolderLink = true
+                                )
+                            }
+                            viewModel.updateImageIntent(intent)
+                        }
                     }
 
                     nameType.isVideoMimeType || nameType.isAudio -> {

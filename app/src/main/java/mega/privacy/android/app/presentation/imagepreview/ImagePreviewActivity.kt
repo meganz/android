@@ -74,6 +74,7 @@ class ImagePreviewActivity : BaseActivity() {
             SelectFolderToCopyActivityContract(),
             ::handleCopyFolderResult,
         )
+
     private val viewModel: ImagePreviewViewModel by viewModels()
     private val nodeSaver: NodeSaver by lazy {
         NodeSaver(
@@ -110,6 +111,7 @@ class ImagePreviewActivity : BaseActivity() {
                     onClickLabel = ::handleLabel,
                     onClickOpenWith = ::handleOpenWith,
                     onClickSaveToDevice = ::saveNodeToDevice,
+                    onClickImport = ::handleImport,
                     onSwitchAvailableOffline = ::setAvailableOffline,
                     onClickGetLink = ::getNodeLink,
                     onClickSendTo = ::sendNodeToChat,
@@ -196,6 +198,10 @@ class ImagePreviewActivity : BaseActivity() {
         viewModel.executeTransfer(transferMessage = getString(R.string.resume_paused_transfers_text)) {
             saveNode(MegaNode.unserialize(imageNode.serializedData))
         }
+    }
+
+    private fun handleImport(imageNode: ImageNode) {
+        viewModel.importNodes(imageNode)
     }
 
     private fun setAvailableOffline(checked: Boolean, imageNode: ImageNode) {

@@ -13,8 +13,10 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.FolderInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
+import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
@@ -50,6 +52,8 @@ class FolderLinkRepositoryImplTest {
     private val untypedNode = mock<FolderNode>()
     private val nodeMapper: NodeMapper = mock()
     private val folderInfoMapper: FolderInfoMapper = mock()
+    private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
+    private val imageNodeMapper: ImageNodeMapper = mock()
 
     @Before
     fun setup() {
@@ -62,6 +66,8 @@ class FolderLinkRepositoryImplTest {
                 megaLocalStorageGateway = megaLocalStorageGateway,
                 nodeMapper = nodeMapper,
                 folderInfoMapper = folderInfoMapper,
+                fileTypeInfoMapper = fileTypeInfoMapper,
+                imageNodeMapper = imageNodeMapper,
                 ioDispatcher = UnconfinedTestDispatcher()
             )
     }

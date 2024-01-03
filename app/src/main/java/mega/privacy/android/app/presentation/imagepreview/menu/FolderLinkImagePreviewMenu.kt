@@ -4,9 +4,9 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
 import javax.inject.Inject
 
-internal class OfflineImagePreviewMenu @Inject constructor() : ImagePreviewMenu {
+internal class FolderLinkImagePreviewMenu @Inject constructor() : ImagePreviewMenu {
     override suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return false
     }
 
     override suspend fun isSlideshowMenuVisible(imageNode: ImageNode): Boolean {
@@ -26,7 +26,7 @@ internal class OfflineImagePreviewMenu @Inject constructor() : ImagePreviewMenu 
     }
 
     override suspend fun isOpenWithMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return false
     }
 
     override suspend fun isForwardMenuVisible(imageNode: ImageNode): Boolean {
@@ -38,7 +38,7 @@ internal class OfflineImagePreviewMenu @Inject constructor() : ImagePreviewMenu 
     }
 
     override suspend fun isImportMenuVisible(imageNode: ImageNode): Boolean {
-        return false
+        return true
     }
 
     override suspend fun isGetLinkMenuVisible(imageNode: ImageNode): Boolean {
@@ -46,11 +46,11 @@ internal class OfflineImagePreviewMenu @Inject constructor() : ImagePreviewMenu 
     }
 
     override suspend fun isSendToChatMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return false
     }
 
     override suspend fun isShareMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return false
     }
 
     override suspend fun isRenameMenuVisible(imageNode: ImageNode): Boolean {
@@ -78,7 +78,7 @@ internal class OfflineImagePreviewMenu @Inject constructor() : ImagePreviewMenu 
     }
 
     override suspend fun isRemoveOfflineMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return false
     }
 
     override suspend fun isMoreMenuVisible(imageNode: ImageNode): Boolean {

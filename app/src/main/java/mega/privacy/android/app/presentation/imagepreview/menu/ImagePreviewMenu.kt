@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.imagepreview.menu
 import mega.privacy.android.domain.entity.node.ImageNode
 
 interface ImagePreviewMenu {
+    suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean
+
     suspend fun isSlideshowMenuVisible(imageNode: ImageNode): Boolean
 
     suspend fun isFavouriteMenuVisible(imageNode: ImageNode): Boolean
@@ -16,6 +18,8 @@ interface ImagePreviewMenu {
     suspend fun isForwardMenuVisible(imageNode: ImageNode): Boolean
 
     suspend fun isSaveToDeviceMenuVisible(imageNode: ImageNode): Boolean
+
+    suspend fun isImportMenuVisible(imageNode: ImageNode): Boolean
 
     suspend fun isGetLinkMenuVisible(imageNode: ImageNode): Boolean
 
@@ -33,7 +37,11 @@ interface ImagePreviewMenu {
 
     suspend fun isRemoveMenuVisible(imageNode: ImageNode): Boolean
 
+    suspend fun isAvailableOfflineMenuVisible(imageNode: ImageNode): Boolean
+
     suspend fun isRemoveOfflineMenuVisible(imageNode: ImageNode): Boolean
 
     suspend fun isMoreMenuVisible(imageNode: ImageNode): Boolean
+
+    suspend fun isMoveToRubbishBinMenuVisible(imageNode: ImageNode): Boolean
 }
