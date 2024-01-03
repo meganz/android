@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package mega.privacy.android.app.presentation.meeting.chat.view
 
 import android.Manifest
@@ -33,8 +35,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -184,11 +188,24 @@ internal fun ChatView(
     var isSelectMode by rememberSaveable { mutableStateOf(false) }
     var showJoinAnswerCallDialog by rememberSaveable { mutableStateOf(false) }
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
-    val toolbarModalSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-    )
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val toolbarModalSheetState =
+        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden,
+            confirmValueChange = {
+                if (it != ModalBottomSheetValue.Hidden) {
+                    keyboardController?.hide()
+                }
+                true
+            }
+        )
     val fileModalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = {
+            if (it != ModalBottomSheetValue.Hidden) {
+                keyboardController?.hide()
+            }
+            true
+        }
     )
     var showEnableGeolocationDialog by rememberSaveable { mutableStateOf(false) }
     var waitingForPickLocation by rememberSaveable { mutableStateOf(false) }
