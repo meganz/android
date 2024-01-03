@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- Sync title for toolbar when inside sync screen-->
-    <string name="sync_toolbar_title">동기화</string>
+    <string name="sync_toolbar_title">Sync</string>
     <!-- Sync text for the the button to begin sync-->
-    <string name="sync_button_label">동기화</string>
+    <string name="sync_button_label">Sync</string>
     <!-- Sync text of sync-->
-    <string name="sync">동기화</string>
+    <string name="sync">Sync</string>
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Sync [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
@@ -14,19 +14,23 @@
     <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background.</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
-        <item quantity="other">%d개의 파일</item>
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
     </plurals>
     <!-- Sync folder counts to show ongoing syncing-->
     <plurals name="num_folders_with_parameter">
-        <item quantity="other">%d개의 폴더</item>
+        <item quantity="one">%d folder</item>
+        <item quantity="other">%d folders</item>
     </plurals>
     <!-- Sync folder counts to show ongoing syncing-->
     <plurals name="num_folders_num_files">
-        <item quantity="other">폴더 %1$d개&#160;.&#160;</item>
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_folders_num_files_2">
-        <item quantity="other">파일 %1$d개</item>
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
     </plurals>
     <!-- Sync options -->
     <string name="sync_menu_sync_options">Sync options</string>
@@ -53,17 +57,17 @@
     <!-- Sync message to access storage permission on device -->
     <string name="sync_access_storage_permission_message">To back up your files, MEGA needs access to the files and folders in this device. Your data is always safe with us.</string>
     <!-- Sync dialog continue button -->
-    <string name="sync_dialog_file_permission_positive_button">계속</string>
+    <string name="sync_dialog_file_permission_positive_button">Continue</string>
     <!-- Sync dialog not now button -->
-    <string name="sync_dialog_file_permission_negative_button">나중에</string>
+    <string name="sync_dialog_file_permission_negative_button">Not now</string>
     <!-- Sync dialog title for storage access -->
     <string name="sync_dialog_storage_access_title">All files access</string>
     <!-- Sync dialog title for battery optimization -->
     <string name="sync_dialog_battery_optimization_title">Battery optimization</string>
     <!-- Sync dialog cancel button text -->
-    <string name="sync_dialog_battery_optimization_negative_button">취소</string>
+    <string name="sync_dialog_battery_optimization_negative_button">Cancel</string>
     <!-- Sync dialog allow button text -->
-    <string name="sync_dialog_battery_optimization_positive_button">허가</string>
+    <string name="sync_dialog_battery_optimization_positive_button">Allow</string>
     <!-- Sync dialog battery optimization message -->
     <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
@@ -75,33 +79,33 @@
     <!-- Sync option to choose device folder -->
     <string name="sync_folder_choose_device_folder_title">Device folder</string>
     <!-- Sync option to choose Mega folder -->
-    <string name="sync_folders_choose_mega_folder_title">MEGA 폴더</string>
+    <string name="sync_folders_choose_mega_folder_title">MEGA folder</string>
     <!-- Sync option for sync method -->
     <string name="sync_folders_method">Sync type</string>
     <!-- Sync state Paused -->
-    <string name="sync_list_sync_state_paused">일시정지 중</string>
+    <string name="sync_list_sync_state_paused">Paused</string>
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">Syncing&#8230;</string>
     <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">실패</string>
+    <string name="sync_folders_sync_state_failed">Failed</string>
     <!-- Sync state synced -->
     <string name="sync_list_sync_state_synced">Synced</string>
     <!-- Sync permission title for device storage -->
     <string name="sync_folders_device_storage">Device folder</string>
     <!-- Sync permission title for mega storage -->
-    <string name="sync_folders_mega_storage">MEGA 폴더</string>
+    <string name="sync_folders_mega_storage">MEGA folder</string>
     <!-- Sync while syncing title for Issues info -->
     <string name="sync_card_sync_issues_info">Issues info</string>
     <!-- Sync Pause -->
-    <string name="sync_card_pause_sync">일시정지</string>
+    <string name="sync_card_pause_sync">Pause</string>
     <!-- Sync Run -->
     <string name="sync_card_run_sync">Run</string>
     <!-- Sync Remove -->
-    <string name="sync_card_remove_sync">제거</string>
+    <string name="sync_card_remove_sync">Remove</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
-    <string name="sync_dialog_message_wifi_or_mobile_data">와이파이 또는 모바일 데이터</string>
+    <string name="sync_dialog_message_wifi_or_mobile_data">Wi-Fi or mobile data</string>
     <!-- Sync dialog for sync only over Wi-Fi -->
-    <string name="sync_dialog_message_wifi_only">와이파이 전용</string>
+    <string name="sync_dialog_message_wifi_only">Wi-Fi only</string>
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">You will need to set up a local folder on your\ndevice that would pair with a chosen folder on\nyour Cloud Drive.</string>
     <!-- Sync notification title description sync monitoring-->
@@ -141,7 +145,7 @@
     <!-- Sync stalled issue reason is Last PlusOne-->
     <string name="sync_stalled_issue_last_plus_one">Last plus one</string>
     <!-- Sync chip folder chip title-->
-    <string name="sync_folders">폴더</string>
+    <string name="sync_folders">Folders</string>
     <!-- Sync stalled issue count chip title for 1 or more stalled issues-->
     <string name="sync_stalled_issues">Issues (%d)</string>
     <!-- Sync stalled issue count chip title for 0 stalled issues-->
@@ -151,11 +155,11 @@
     <!-- Sync start sync button -->
     <string name="sync_start_sync">Start sync</string>
     <!-- Text that indicates that a folder is currently empty -->
-    <string name="sync_file_browser_empty_folder">빈 폴더</string>
+    <string name="sync_file_browser_empty_folder">Empty folder</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="sync_general_select_to_download">폴더 선택</string>
+    <string name="sync_general_select_to_download">Select folder</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="sync_general_select">선택</string>
+    <string name="sync_general_select">Select</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
     <string name="sync_stalled_issue_file_issue_detail">A single file or folder had an issue that needs a user decision to solve</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
