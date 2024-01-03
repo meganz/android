@@ -9515,7 +9515,7 @@ public class ChatActivity extends PasscodeActivity
             writeMsgLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_write_layout));
 
             tB.setVisibility(View.VISIBLE);
-            expandCollapseInputTextIcon.setImageResource(R.drawable.ic_expand_text_input);
+            expandCollapseInputTextIcon.setImageResource(mega.privacy.android.core.R.drawable.ic_expand_text_input);
 
             writingContainerLayout.getLayoutParams().height = WRAP_CONTENT;
             inputTextContainer.getLayoutParams().height = WRAP_CONTENT;
@@ -9546,7 +9546,7 @@ public class ChatActivity extends PasscodeActivity
             writeMsgLayout.setBackground(null);
 
             tB.setVisibility(View.GONE);
-            expandCollapseInputTextIcon.setImageResource(R.drawable.ic_collapse_text_input);
+            expandCollapseInputTextIcon.setImageResource(mega.privacy.android.core.R.drawable.ic_collapse_text_input);
 
             writingContainerLayout.getLayoutParams().height = MATCH_PARENT;
             inputTextContainer.getLayoutParams().height = MATCH_PARENT;

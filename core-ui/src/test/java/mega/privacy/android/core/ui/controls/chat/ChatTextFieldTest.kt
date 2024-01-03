@@ -15,7 +15,7 @@ class ChatTextFieldTest {
     @Test
     fun `test that emoji icon show correctly`() {
         composeRule.setContent {
-            ChatTextField(text = "Hello world", onTextChange = {})
+            ChatTextField(text = "Hello world", onTextChange = {}, isExpanded = false)
         }
         composeRule.onNodeWithTag(CHAT_TEXT_FIELD_EMOJI_ICON).assertExists()
     }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -27,14 +28,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.extensions.conditional
 
 internal const val CHAT_TEXT_FIELD_TEXT_TAG = "chat_text_field"
 internal const val CHAT_TEXT_FIELD_EMOJI_ICON = "chat_text_field:emoji_icon"
@@ -54,12 +58,16 @@ internal const val CHAT_TEXT_FIELD_EMOJI_ICON = "chat_text_field:emoji_icon"
 @Composable
 fun ChatTextField(
     text: String,
+    isExpanded: Boolean,
     onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String = "",
-    singleLine: Boolean = true,
-    imeAction: ImeAction = ImeAction.Done,
+    singleLine: Boolean = false,
+    imeAction: ImeAction = ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    maxLines: Int = if (isExpanded) Int.MAX_VALUE else 5,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
+    shape: RoundedCornerShape = CircleShape,
 ) = Box(modifier = modifier) {
     val colors = TextFieldDefaults.textFieldColors(
         textColor = MegaTheme.colors.text.placeholder,
@@ -82,10 +90,12 @@ fun ChatTextField(
             onValueChange = onTextChange,
             modifier = Modifier
                 .testTag(CHAT_TEXT_FIELD_TEXT_TAG)
-                .background(
-                    color = MegaTheme.colors.background.surface2,
-                    shape = CircleShape
-                )
+                .conditional(!isExpanded) {
+                    background(
+                        color = MegaTheme.colors.background.surface2,
+                        shape = shape,
+                    )
+                }
                 .indicatorLine(
                     enabled = true,
                     isError = false,
@@ -102,6 +112,8 @@ fun ChatTextField(
             keyboardActions = keyboardActions,
             interactionSource = interactionSource,
             singleLine = singleLine,
+            maxLines = maxLines,
+            onTextLayout = onTextLayout,
         ) {
             TextFieldDefaults.TextFieldDecorationBox(
                 value = text,
@@ -114,7 +126,9 @@ fun ChatTextField(
                 placeholder = {
                     Text(
                         text = placeholder,
-                        style = MaterialTheme.typography.body1
+                        style = MaterialTheme.typography.body1,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 },
                 colors = colors,
@@ -122,16 +136,17 @@ fun ChatTextField(
                     start = 12.dp,
                     bottom = 10.dp,
                     top = 10.dp,
-                    end = 40.dp
+                    end = if (isExpanded) 12.dp else 40.dp
                 ),
             )
         }
     }
 
     Icon(
-        modifier = Modifier.testTag(CHAT_TEXT_FIELD_EMOJI_ICON)
-            .align(Alignment.CenterEnd)
-            .padding(end = 8.dp),
+        modifier = Modifier
+            .testTag(CHAT_TEXT_FIELD_EMOJI_ICON)
+            .align(Alignment.BottomEnd)
+            .padding(end = 8.dp, bottom = 8.dp),
         painter = painterResource(id = R.drawable.ic_emoji_smile),
         contentDescription = "Emoji Icon",
         tint = MegaTheme.colors.icon.secondary
@@ -143,9 +158,10 @@ fun ChatTextField(
 private fun ChatTextFieldPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ChatTextField(
-            text = "Very long text to show how it looks like when the text is too long",
+            text = "how it looks like when the text is too long",
             placeholder = "Message",
             onTextChange = {},
+            isExpanded = false
         )
     }
 }
