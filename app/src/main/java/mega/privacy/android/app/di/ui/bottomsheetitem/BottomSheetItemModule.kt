@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.Info
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.LabelBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.LeaveShareBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.ManageLinkBottomSheetMenuItem
+import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.ManageShareFolderBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.MoveBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.NodeBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.OpenLocationBottomSheetMenuItem
@@ -66,6 +67,7 @@ abstract class BottomSheetItemModule {
             labelMenuAction: LabelBottomSheetMenuItem,
             leaveShareMenuAction: LeaveShareBottomSheetMenuItem,
             manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
+            manageShareFolderBottomSheetMenuItem: ManageShareFolderBottomSheetMenuItem,
             moveMenuAction: MoveBottomSheetMenuItem,
             openLocationMenuAction: OpenLocationBottomSheetMenuItem,
             openWithMenuAction: OpenWithBottomSheetMenuItem,
@@ -96,6 +98,7 @@ abstract class BottomSheetItemModule {
                 labelMenuAction,
                 leaveShareMenuAction,
                 manageLinkMenuAction,
+                manageShareFolderBottomSheetMenuItem,
                 moveMenuAction,
                 openLocationMenuAction,
                 openWithMenuAction,

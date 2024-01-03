@@ -1,20 +1,19 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import mega.privacy.android.app.presentation.extensions.isOutShare
-import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.ManageShareFolderMenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
 
 /**
- * Share folder bottom sheet menu item
+ * Manage share folder bottom sheet menu item
  *
- * @param menuAction [ShareFolderMenuAction]
+ * @param menuAction [ManageShareFolderMenuAction]
  */
-class ShareFolderBottomSheetMenuItem @Inject constructor(
-    override val menuAction: ShareFolderMenuAction,
+class ManageShareFolderBottomSheetMenuItem @Inject constructor(
+    override val menuAction: ManageShareFolderMenuAction,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -23,9 +22,12 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         isConnected: Boolean,
     ) = node.isTakenDown.not()
-            && node is TypedFolderNode
+            && accessPermission == AccessPermission.OWNER
             && isNodeInRubbish.not()
-            && node.isOutShare().not()
+            && node.isOutShare()
 
     override val groupId = 7
+
 }
+
+

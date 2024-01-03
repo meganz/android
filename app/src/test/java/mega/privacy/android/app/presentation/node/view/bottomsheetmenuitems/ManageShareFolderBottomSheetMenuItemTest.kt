@@ -1,10 +1,10 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
-import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.ManageShareFolderMenuAction
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -14,15 +14,14 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ShareFolderBottomSheetMenuItemTest {
-
-    private val shareFolderBottomSheetMenuItem = ShareFolderBottomSheetMenuItem(
-        ShareFolderMenuAction()
+class ManageShareFolderBottomSheetMenuItemTest {
+    private val manageShareFolderBottomSheetMenuItem = ManageShareFolderBottomSheetMenuItem(
+        ManageShareFolderMenuAction()
     )
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - isConnected {4} - expected {5}")
     @MethodSource("provideTestParameters")
-    fun `test that share folder bottom sheet menu item visibility is correct`(
+    fun `test that manage share folder bottom sheet menu item visibility is correct`(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
@@ -30,14 +29,14 @@ class ShareFolderBottomSheetMenuItemTest {
         isConnected: Boolean,
         expected: Boolean,
     ) {
-        val result = shareFolderBottomSheetMenuItem.shouldDisplay(
+        val result = manageShareFolderBottomSheetMenuItem.shouldDisplay(
             isNodeInRubbish,
             accessPermission,
             isInBackups,
             node,
             isConnected,
         )
-        Truth.assertThat(result).isEqualTo(expected)
+        assertEquals(expected, result)
     }
 
     private fun provideTestParameters() = Stream.of(
@@ -53,7 +52,10 @@ class ShareFolderBottomSheetMenuItemTest {
             true,
             AccessPermission.OWNER,
             false,
-            mock<TypedFolderNode> { on { isTakenDown } doReturn false },
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn true
+                on { isShared } doReturn true
+            },
             false,
             false,
         ),
@@ -63,7 +65,7 @@ class ShareFolderBottomSheetMenuItemTest {
             false,
             mock<TypedFolderNode> {
                 on { isTakenDown } doReturn false
-                on { isPendingShare } doReturn true
+                on { isShared } doReturn true
             },
             false,
             false,
@@ -74,18 +76,7 @@ class ShareFolderBottomSheetMenuItemTest {
             false,
             mock<TypedFolderNode> {
                 on { isTakenDown } doReturn false
-                on { isPendingShare } doReturn true
-            },
-            false,
-            false,
-        ),
-        Arguments.of(
-            false,
-            AccessPermission.OWNER,
-            false,
-            mock<TypedFolderNode> {
-                on { isTakenDown } doReturn false
-                on { isPendingShare } doReturn false
+                on { isShared } doReturn true
             },
             false,
             true,

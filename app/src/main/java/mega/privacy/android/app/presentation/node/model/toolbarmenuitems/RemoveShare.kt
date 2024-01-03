@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
+import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.RemoveShareMenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
 
@@ -19,13 +19,7 @@ class RemoveShare @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon
         noNodeTakenDown: Boolean,
         allFileNodes: Boolean,
         resultCount: Int,
-    ): Boolean = selectedNodes.isNotEmpty() && selectedNodes.all { isOutShare(it) }
-
-    private fun isOutShare(node: TypedNode) = if (node is FolderNode) {
-        node.isPendingShare || node.isShared
-    } else {
-        false
-    }
+    ): Boolean = selectedNodes.isNotEmpty() && selectedNodes.all { it.isOutShare() }
 
     override val menuAction = RemoveShareMenuAction(210)
 
