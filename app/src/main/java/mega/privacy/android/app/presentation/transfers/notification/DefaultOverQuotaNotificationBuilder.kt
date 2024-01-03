@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.facade.AccountInfoFacade
-import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
+import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.app.fcm.CreateTransferNotificationChannelsUseCase
 import mega.privacy.android.app.presentation.notifications.DownloadNotificationIntentService
 import mega.privacy.android.app.utils.Constants
@@ -30,7 +30,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
     private val isUserLoggedIn: IsUserLoggedIn,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
-    private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase,
+    private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
     private val areCredentialsNullUseCase: AreCredentialsNullUseCase,
     private val accountInfoFacade: AccountInfoFacade,
 ) : OverQuotaNotificationBuilder {
@@ -80,7 +80,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             R.id.content_text,
             context.getString(
                 R.string.current_text_depleted_transfer_overquota,
-                TimeUtils.getHumanizedTime(getBandWidthOverQuotaDelayUseCase())
+                TimeUtils.getHumanizedTime(getBandwidthOverQuotaDelayUseCase())
             )
         )
         val dismissButtonText =

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase.quota
 
 import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Use case for getting bandwidth width quota delay
  */
-class GetBandWidthOverQuotaDelayUseCase @Inject constructor(
+class GetBandwidthOverQuotaDelayUseCase @Inject constructor(
     private val repository: NodeRepository,
 ) {
 

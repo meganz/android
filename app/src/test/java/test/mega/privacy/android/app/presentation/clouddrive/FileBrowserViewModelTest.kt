@@ -17,8 +17,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
-import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -48,6 +46,8 @@ import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildre
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -82,7 +82,7 @@ class FileBrowserViewModelTest {
     private val monitorViewType = mock<MonitorViewType>()
     private val setViewType = mock<SetViewType>()
     private val monitorRefreshSessionUseCase = mock<MonitorRefreshSessionUseCase>()
-    private val getBandWidthOverQuotaDelayUseCase = mock<GetBandWidthOverQuotaDelayUseCase>()
+    private val getBandwidthOverQuotaDelayUseCase = mock<GetBandwidthOverQuotaDelayUseCase>()
     private val transfersManagement = mock<TransfersManagement>()
     private val containsMediaItemUseCase = mock<ContainsMediaItemUseCase>()
     private val fileDurationMapper = mock<FileDurationMapper>()
@@ -112,7 +112,7 @@ class FileBrowserViewModelTest {
             monitorViewType = monitorViewType,
             handleOptionClickMapper = handleOptionClickMapper,
             monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
-            getBandWidthOverQuotaDelayUseCase = getBandWidthOverQuotaDelayUseCase,
+            getBandwidthOverQuotaDelayUseCase = getBandwidthOverQuotaDelayUseCase,
             transfersManagement = transfersManagement,
             containsMediaItemUseCase = containsMediaItemUseCase,
             fileDurationMapper = fileDurationMapper,
@@ -420,7 +420,7 @@ class FileBrowserViewModelTest {
     fun `test that when transfer management quota is false then visibility for transfer in state is false`() =
         runTest {
             whenever(transfersManagement.isTransferOverQuotaBannerShown).thenReturn(false)
-            whenever(getBandWidthOverQuotaDelayUseCase()).thenReturn(10000)
+            whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(10000)
             underTest.changeTransferOverQuotaBannerVisibility()
             underTest.state.test {
                 Truth.assertThat(awaitItem().shouldShowBannerVisibility).isFalse()
@@ -470,7 +470,7 @@ class FileBrowserViewModelTest {
         whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(null)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-        whenever(getBandWidthOverQuotaDelayUseCase()).thenReturn(1L)
+        whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(1L)
         whenever(fileDurationMapper(any())).thenReturn(1)
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
@@ -489,7 +489,7 @@ class FileBrowserViewModelTest {
             monitorViewType,
             setViewType,
             monitorRefreshSessionUseCase,
-            getBandWidthOverQuotaDelayUseCase,
+            getBandwidthOverQuotaDelayUseCase,
             transfersManagement,
             containsMediaItemUseCase,
             fileDurationMapper,

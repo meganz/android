@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
-import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -44,6 +42,8 @@ import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildre
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -65,7 +65,7 @@ import javax.inject.Inject
  * @param setViewType [SetViewType] to set view type
  * @param handleOptionClickMapper [HandleOptionClickMapper] handle option click click mapper
  * @param monitorRefreshSessionUseCase [MonitorRefreshSessionUseCase]
- * @param getBandWidthOverQuotaDelayUseCase [GetBandWidthOverQuotaDelayUseCase]
+ * @param getBandwidthOverQuotaDelayUseCase [GetBandwidthOverQuotaDelayUseCase]
  * @param transfersManagement [TransfersManagement]
  * @param containsMediaItemUseCase [ContainsMediaItemUseCase]
  * @param fileDurationMapper [FileDurationMapper]
@@ -83,7 +83,7 @@ class FileBrowserViewModel @Inject constructor(
     private val setViewType: SetViewType,
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
-    private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase,
+    private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
     private val transfersManagement: TransfersManagement,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     private val fileDurationMapper: FileDurationMapper,
@@ -444,7 +444,7 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun changeTransferOverQuotaBannerVisibility() {
         viewModelScope.launch {
-            val overQuotaBannerTimeDelay = getBandWidthOverQuotaDelayUseCase()
+            val overQuotaBannerTimeDelay = getBandwidthOverQuotaDelayUseCase()
             _state.update {
                 it.copy(
                     shouldShowBannerVisibility = transfersManagement.isTransferOverQuotaBannerShown,
