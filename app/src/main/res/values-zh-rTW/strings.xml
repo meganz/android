@@ -2048,7 +2048,7 @@
     <!-- Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB. -->
     <string name="settings_compression_queue_subtitle">最小大小為%1$s，最大大小為%2$s。</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
-    <string name="settings_rb_scheduler_select_days_title">刪除早於此的舊檔案</string>
+    <string name="settings_rb_scheduler_select_days_title">刪除早於此期間的舊檔案</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">請通知我，如果大小大於</string>
     <!-- Title of compression queue size option in settings -->

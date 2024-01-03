@@ -764,7 +764,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Este é o último passo para excluir a sua conta. Todos os dados armazenados na sua nuvem de arquivos serão permanentemente deletados. Por favor, digite sua senha abaixo para confirmar.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Email address verification</string>
+    <string name="email_verification_title">Comprovação de email</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Por favor, verifique seu e-mail para continuar.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1407,9 +1407,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Mover para a Lixeira?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Você quer mover esta pasta para a Lixeira? Será gerada automaticamente uma nova pasta para os Uploads da câmera.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Você quer mover esta pasta para a Lixeira? Será gerada automaticamente uma nova pasta para os Uploads de mídias.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Mover para a Lixeira?</string>
     <!-- confirmation message before removing a file -->
@@ -2050,7 +2050,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Ativar ou desativar o controle das versões de arquivos na sua conta. \nDesativar o controle das versões de arquivos não impede que os seus contatos criem novas versões em pastas compartilhadas.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Tap, enter name or email address</string>
+    <string name="type_mail">Digite o nome ou email</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Você quer adicionar %s aos seus contatos?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -3076,7 +3076,7 @@
     <!-- Title for Cookie dialog, visible for new users. -->
     <string name="dialog_cookie_alert_title">Gerenciar cookies</string>
     <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We use cookies and similar technologies to help us improve our services. Learn more in our [A]Cookie Policy[/A].</string>
+    <string name="dialog_cookie_alert_message">Usamos cookies e tecnologias semelhantes para melhorar os nossos serviços. Para mais informações, acesse a nossa [A]Política de cookies[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">As configurações dos cookies não foram salvas.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -5388,7 +5388,7 @@
         <item quantity="other">Uploads da câmera concluídos, foi feito o upload de %1$d arquivos</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">O MEGA tem acesso limitado à biblioteca de fotos e não pode fazer backup de todas as suas fotos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Pressione para alterar as permissões.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5458,9 +5458,9 @@
     <!-- Preference screen item summary for Ads Cookie-->
     <string name="settings_cookies_settings_ads_summary">Usados por parceiros de publicidade aprovados para coletar dados sobre as suas atividades de navegação e personalizar os anúncios que você vê nos nossos serviços e em outros sites. Não aceitar esses cookies significa que você ainda verá anúncios, mas eles não personalizados.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
-    <string name="dialog_ads_cookie_alert_message">We use cookies and similar technologies to help us improve our services and for advertising purposes. By continuing to use MEGA you agree with the terms of our updated [A]Cookie Policy[/A].</string>
+    <string name="dialog_ads_cookie_alert_message">Nós usamos cookies e tecnologias similares para melhorar os nossos serviços e com fins publicitários. Ao continuar usado o MEGA, você concorda com os termos da nossa [A]Política de cookies[/A] atualizada.</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sincronizar</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Sem anúncios</string>
 </resources>

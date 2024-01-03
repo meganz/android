@@ -4992,7 +4992,7 @@
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">우리는 우리의 서비스를 향상시키고 광고를 하기 위한 목적으로 쿠키 그리고 이와 유사한 기술을 이용합니다. MEGA를 계속 이용함으로써 당신은 우리의 개정된 [A]쿠키 정책[/A]에 동의함을 뜻합니다.</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
-    <string name="home_side_menu_sync_title">동기화</string>
+    <string name="home_side_menu_sync_title">Sync</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;광고 없음</string>
 </resources>
