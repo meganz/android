@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.model.menuaction
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -17,7 +18,7 @@ class RemoveShareMenuAction @Inject constructor(
 ) : MenuActionWithIcon {
 
     @Composable
-    override fun getIconPainter() = painterResource(id = R.drawable.ic_remove_share)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_remove_share)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.context_clean_shares_menu)

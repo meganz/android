@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.model.menuaction
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -20,7 +21,7 @@ class RemoveLinkMenuAction @Inject constructor(
     override fun getDescription() = stringResource(id = R.string.context_remove_link_menu)
 
     @Composable
-    override fun getIconPainter() = painterResource(id = R.drawable.ic_remove_link)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_remove_link)
 
 
     override val testTag: String = "menu_action:remove_link"

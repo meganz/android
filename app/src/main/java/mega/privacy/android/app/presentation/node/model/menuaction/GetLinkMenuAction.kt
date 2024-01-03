@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.model.menuaction
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -16,7 +17,7 @@ class GetLinkMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() =
-        painterResource(id = mega.privacy.android.core.R.drawable.link_ic_white)
+        painterResource(id = iconPackR.drawable.ic_menu_link)
 
     override val orderInCategory = 160
 
