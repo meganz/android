@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -28,7 +29,7 @@ class RemoveLinkBottomSheetMenuItemTest {
         isInBackups: Boolean,
         node: TypedFileNode,
         expected: Boolean,
-    ) {
+    ) = runTest {
         val result = underTest.shouldDisplay(
             isNodeInRubbish,
             accessPermission,

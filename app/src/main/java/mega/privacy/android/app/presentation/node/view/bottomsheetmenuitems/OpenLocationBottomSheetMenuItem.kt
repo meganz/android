@@ -14,7 +14,7 @@ import javax.inject.Inject
 class OpenLocationBottomSheetMenuItem @Inject constructor(
     override val menuAction: OpenLocationMenuAction,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import com.google.common.truth.Truth
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -29,7 +30,7 @@ class ShareFolderBottomSheetMenuItemTest {
         node: TypedNode,
         isConnected: Boolean,
         expected: Boolean,
-    ) {
+    ) = runTest {
         val result = shareFolderBottomSheetMenuItem.shouldDisplay(
             isNodeInRubbish,
             accessPermission,

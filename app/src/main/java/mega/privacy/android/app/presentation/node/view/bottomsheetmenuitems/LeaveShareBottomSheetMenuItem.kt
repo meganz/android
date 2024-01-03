@@ -14,7 +14,7 @@ import javax.inject.Inject
 class LeaveShareBottomSheetMenuItem @Inject constructor(
     override val menuAction: LeaveShareMenuAction,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,

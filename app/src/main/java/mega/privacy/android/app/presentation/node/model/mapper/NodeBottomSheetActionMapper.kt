@@ -19,7 +19,7 @@ class NodeBottomSheetActionMapper @Inject constructor() {
      * @param toolbarOptions all the toolbar options available for selected screen
      * @param selectedNode selected node
      */
-    operator fun invoke(
+    suspend operator fun invoke(
         toolbarOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<*>>,
         selectedNode: TypedNode,
         isNodeInRubbish: Boolean,

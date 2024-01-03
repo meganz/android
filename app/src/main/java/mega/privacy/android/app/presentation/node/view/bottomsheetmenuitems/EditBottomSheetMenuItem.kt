@@ -19,7 +19,7 @@ import javax.inject.Inject
 class EditBottomSheetMenuItem @Inject constructor(
     override val menuAction: EditMenuAction,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,

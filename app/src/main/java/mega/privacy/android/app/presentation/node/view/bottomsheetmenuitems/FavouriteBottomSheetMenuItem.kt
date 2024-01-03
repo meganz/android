@@ -22,7 +22,7 @@ class FavouriteBottomSheetMenuItem @Inject constructor(
     private val updateNodeFavoriteUseCase: UpdateNodeFavoriteUseCase,
     @ApplicationScope private val scope: CoroutineScope,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,

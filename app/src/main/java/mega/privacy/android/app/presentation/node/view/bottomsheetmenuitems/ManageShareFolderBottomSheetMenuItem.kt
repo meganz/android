@@ -15,7 +15,7 @@ import javax.inject.Inject
 class ManageShareFolderBottomSheetMenuItem @Inject constructor(
     override val menuAction: ManageShareFolderMenuAction,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,

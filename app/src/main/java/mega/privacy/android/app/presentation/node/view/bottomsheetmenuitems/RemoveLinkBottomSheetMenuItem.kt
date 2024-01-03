@@ -11,7 +11,7 @@ import javax.inject.Inject
  */
 class RemoveLinkBottomSheetMenuItem @Inject constructor() :
     NodeBottomSheetMenuItem<MenuActionWithIcon> {
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,

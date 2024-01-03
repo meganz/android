@@ -44,7 +44,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
      * checks if menu item should be displayed or not
      * @return [Boolean]
      */
-    fun shouldDisplay(
+    suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,

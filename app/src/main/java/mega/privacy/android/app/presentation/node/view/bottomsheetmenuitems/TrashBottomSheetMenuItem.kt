@@ -14,7 +14,7 @@ import javax.inject.Inject
 class TrashBottomSheetMenuItem @Inject constructor(
     override val menuAction: TrashMenuAction,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,

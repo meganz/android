@@ -14,7 +14,7 @@ import javax.inject.Inject
 class ViewInFolderBottomSheetMenuItem @Inject constructor(
     override val menuAction: ViewInFolderMenuAction,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,

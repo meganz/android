@@ -11,7 +11,7 @@ import javax.inject.Inject
  */
 class RenameBottomSheetMenuItem @Inject constructor() :
     NodeBottomSheetMenuItem<MenuActionWithIcon> {
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,

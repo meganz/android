@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -27,7 +28,7 @@ class VersionsBottomSheetMenuItemTest {
         isInBackups: Boolean,
         node: TypedNode,
         expected: Boolean,
-    ) {
+    ) = runTest {
         val result = underTest.shouldDisplay(
             isNodeInRubbish,
             accessPermission,
