@@ -126,7 +126,17 @@ interface PhotosRepository {
      * Get image node
      * @param nodeId
      */
-    suspend fun fetchImageNode(nodeId: NodeId, filterSvg: Boolean = true): ImageNode?
+    suspend fun fetchImageNode(
+        nodeId: NodeId,
+        filterSvg: Boolean = true,
+        includeRubbishBin: Boolean = false,
+    ): ImageNode?
+
+    /**
+     * Get image node
+     * @param url
+     */
+    suspend fun fetchImageNode(url: String): ImageNode?
 
     /**
      * Monitor media discovery nodes
@@ -134,7 +144,11 @@ interface PhotosRepository {
     suspend fun getMediaDiscoveryNodes(parentId: NodeId, recursive: Boolean): List<ImageNode>
 
     /**
-     * Monitor imageNodes in a cloud drive folder
+     * Monitor imageNodes from a folder
      */
-    suspend fun getCloudDriveImageNodes(parentId: NodeId, order: SortOrder?): List<ImageNode>
+    suspend fun fetchImageNodes(
+        parentId: NodeId,
+        order: SortOrder?,
+        includeRubbishBin: Boolean = false,
+    ): List<ImageNode>
 }

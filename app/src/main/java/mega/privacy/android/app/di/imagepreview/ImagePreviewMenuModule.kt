@@ -8,15 +8,24 @@ import dagger.multibindings.IntoMap
 import mega.privacy.android.app.presentation.imagepreview.menu.AlbumContentImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.AlbumSharingImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.CloudDriveImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.DefaultImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.FavouriteImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.FileImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.MediaDiscoveryImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.OfflineImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.PublicFileImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.TimelineImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 
 @Module
 @InstallIn(ViewModelComponent::class)
 internal interface ImagePreviewMenuModule {
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.DEFAULT)
+    fun DefaultImagePreviewMenu.bindDefaultMenu(): ImagePreviewMenu
+
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.TIMELINE)
@@ -46,4 +55,19 @@ internal interface ImagePreviewMenuModule {
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.OFFLINE)
     fun OfflineImagePreviewMenu.bindOfflineMenu(): ImagePreviewMenu
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.FAVOURITE)
+    fun FavouriteImagePreviewMenu.bindFavouriteMenu(): ImagePreviewMenu
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.FILE)
+    fun FileImagePreviewMenu.bindFileMenu(): ImagePreviewMenu
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.PUBLIC_FILE)
+    fun PublicFileImagePreviewMenu.bindPublicFileMenu(): ImagePreviewMenu
 }

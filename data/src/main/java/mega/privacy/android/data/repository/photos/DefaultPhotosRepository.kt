@@ -121,6 +121,10 @@ internal class DefaultPhotosRepository @Inject constructor(
         ::checkCloudDriveNode,
     )
 
+    init {
+        monitorOfflineNodes()
+    }
+
     override fun monitorPhotos(): Flow<List<Photo>> {
         initialize()
         return photosFlow.filterNotNull()
@@ -129,8 +133,6 @@ internal class DefaultPhotosRepository @Inject constructor(
     private fun initialize() {
         if (isInitialized) return
         isInitialized = true
-
-        monitorOfflineNodes()
 
         populateNodes()
         monitorNodeUpdates()
@@ -175,19 +177,28 @@ internal class DefaultPhotosRepository @Inject constructor(
         searchVideos().filter { isVideoNodeValid(it) }
     }
 
-    private suspend fun isImageNodeValid(node: MegaNode, filterSvg: Boolean = true): Boolean {
+    private suspend fun isImageNodeValid(
+        node: MegaNode,
+        filterSvg: Boolean = true,
+        includeRubbishBin: Boolean = false,
+    ): Boolean {
         val fileType = fileTypeInfoMapper(node)
         return node.isFile
                 && fileType is ImageFileTypeInfo
                 && (fileType !is SvgFileTypeInfo || !filterSvg)
-                && node.isValidPhotoNode()
+                && (!nodeRepository.isNodeInRubbish(node.handle) || includeRubbishBin)
+                && node.hasThumbnail()
     }
 
-    private suspend fun isVideoNodeValid(node: MegaNode): Boolean {
+    private suspend fun isVideoNodeValid(
+        node: MegaNode,
+        includeRubbishBin: Boolean = false,
+    ): Boolean {
         val fileType = fileTypeInfoMapper(node)
         return node.isFile
                 && fileType is VideoFileTypeInfo
-                && node.isValidPhotoNode()
+                && (!nodeRepository.isNodeInRubbish(node.handle) || includeRubbishBin)
+                && node.hasThumbnail()
     }
 
     private fun updatePhotos(
@@ -735,9 +746,12 @@ internal class DefaultPhotosRepository @Inject constructor(
     override suspend fun fetchImageNode(
         nodeId: NodeId,
         filterSvg: Boolean,
+        includeRubbishBin: Boolean,
     ): ImageNode? = withContext(ioDispatcher) {
         getMegaNode(nodeId)?.let { megaNode ->
-            if (isImageNodeValid(megaNode, filterSvg) || isVideoNodeValid(megaNode)) {
+            if (isImageNodeValid(megaNode, filterSvg, includeRubbishBin) ||
+                isVideoNodeValid(megaNode, includeRubbishBin)
+            ) {
                 imageNodeMapper(
                     megaNode = megaNode,
                     hasVersion = megaApiFacade::hasVersion,
@@ -747,6 +761,17 @@ internal class DefaultPhotosRepository @Inject constructor(
             } else {
                 null
             }
+        }
+    }
+
+    override suspend fun fetchImageNode(url: String): ImageNode? {
+        return getPublicNode(url)?.let { megaNode ->
+            imageNodeMapper(
+                megaNode = megaNode,
+                hasVersion = megaApiFacade::hasVersion,
+                requireSerializedData = true,
+                offline = offlineNodesCache[megaNode.handle.toString()],
+            )
         }
     }
 
@@ -794,15 +819,25 @@ internal class DefaultPhotosRepository @Inject constructor(
         }
     }
 
-    override suspend fun getCloudDriveImageNodes(
+    override suspend fun fetchImageNodes(
         parentId: NodeId,
         order: SortOrder?,
+        includeRubbishBin: Boolean,
     ): List<ImageNode> = withContext(ioDispatcher) {
         val parentNode = getMegaNode(parentId) ?: return@withContext emptyList()
         val megaNodes = megaApiFacade.getChildrenByNode(
             parentNode = parentNode,
             order = order?.let { sortOrderIntMapper(it) },
-        ).filter { isImageNodeValid(node = it, filterSvg = false) || isVideoNodeValid(it) }
+        ).filter {
+            isImageNodeValid(
+                node = it,
+                filterSvg = false,
+                includeRubbishBin = includeRubbishBin,
+            ) || isVideoNodeValid(
+                node = it,
+                includeRubbishBin = includeRubbishBin,
+            )
+        }
 
         megaNodes.map { megaNode ->
             imageNodeMapper(

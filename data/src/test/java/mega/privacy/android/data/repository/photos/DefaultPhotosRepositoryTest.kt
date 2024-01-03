@@ -73,6 +73,9 @@ class DefaultPhotosRepositoryTest {
     fun setUp() {
         whenever(nodeRepository.monitorNodeUpdates())
             .thenReturn(flowOf())
+
+        whenever(nodeRepository.monitorOfflineNodeUpdates())
+            .thenReturn(flowOf())
     }
 
     @Test

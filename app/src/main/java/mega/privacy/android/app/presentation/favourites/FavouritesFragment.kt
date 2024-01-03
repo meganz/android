@@ -29,6 +29,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
 import mega.privacy.android.app.databinding.FragmentFavouritesBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -48,6 +49,10 @@ import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.presentation.favourites.model.FavouriteItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.FavouritePlaceholderItem
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -57,6 +62,7 @@ import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -85,6 +91,9 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
      */
     @Inject
     lateinit var openFileWrapper: OpenFileWrapper
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private var actionMode: ActionMode? = null
     private var actionModeCallback: FavouriteActionModeCallback? = null
@@ -338,18 +347,29 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     private fun openNode(favourite: FavouriteFile) {
         MimeTypeList.typeForName(favourite.typedNode.name).apply {
             when {
-                isImage ||
-                        (isVideoMimeType || isAudio) ||
-                        isPdf -> {
-                    launchIntent(
-                        openFileWrapper.getIntentForOpenFile(
-                            context = requireContext(),
-                            node = favourite.node,
-                            isText = false,
-                            availablePlaylist = false,
-                            snackbarShower = activity as ManagerActivity
+                isImage || (isVideoMimeType || isAudio) || isPdf -> viewLifecycleOwner.lifecycleScope.launch {
+                    if (isImage && getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                        val handle = favourite.node.handle
+                        launchIntent(
+                            ImagePreviewActivity.createIntent(
+                                context = requireContext(),
+                                imageSource = ImagePreviewFetcherSource.FAVOURITE,
+                                menuOptionsSource = ImagePreviewMenuSource.FAVOURITE,
+                                anchorImageNodeId = NodeId(handle),
+                                params = mapOf(FavouriteImageNodeFetcher.NODE_ID to handle),
+                            )
                         )
-                    )
+                    } else {
+                        launchIntent(
+                            openFileWrapper.getIntentForOpenFile(
+                                context = requireContext(),
+                                node = favourite.node,
+                                isText = false,
+                                availablePlaylist = false,
+                                snackbarShower = activity as ManagerActivity
+                            )
+                        )
+                    }
                 }
                 isURL -> {
                     megaUtilWrapper.manageURLNode(requireContext(), favourite.node)

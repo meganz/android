@@ -38,6 +38,10 @@ import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.view.FileLinkView
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
@@ -294,11 +298,20 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
         with(viewModel.state.value) {
             val nameType = typeForName(title)
             when {
-                nameType.isImage -> {
-                    val intent = ImageViewerActivity.getIntentForSingleNode(
-                        this@FileLinkComposeActivity,
-                        url
-                    )
+                nameType.isImage -> lifecycleScope.launch {
+                    val intent = if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                        ImagePreviewActivity.createIntent(
+                            context = this@FileLinkComposeActivity,
+                            imageSource = ImagePreviewFetcherSource.PUBLIC_FILE,
+                            menuOptionsSource = ImagePreviewMenuSource.PUBLIC_FILE,
+                            params = mapOf(PublicFileImageNodeFetcher.URL to url),
+                        )
+                    } else {
+                        ImageViewerActivity.getIntentForSingleNode(
+                            this@FileLinkComposeActivity,
+                            url
+                        )
+                    }
                     viewModel.updateImageIntent(intent)
                 }
 

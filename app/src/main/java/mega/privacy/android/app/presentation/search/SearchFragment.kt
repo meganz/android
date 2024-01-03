@@ -42,6 +42,7 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.databinding.FragmentSearchBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
@@ -55,6 +56,10 @@ import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
@@ -80,9 +85,11 @@ import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
@@ -133,6 +140,9 @@ class SearchFragment : RotatableFragment() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private lateinit var adapter: MegaNodeAdapter
 
@@ -914,11 +924,21 @@ class SearchFragment : RotatableFragment() {
             val nodeHandles = nodes.stream().mapToLong {
                 it?.handle ?: INVALID_HANDLE
             }.toArray()
-            val intent = ImageViewerActivity.getIntentForChildren(
-                requireContext(),
-                nodeHandles,
-                currentNodeHandle
-            )
+            val intent = if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                ImagePreviewActivity.createIntent(
+                    context = requireContext(),
+                    imageSource = ImagePreviewFetcherSource.DEFAULT,
+                    menuOptionsSource = ImagePreviewMenuSource.DEFAULT,
+                    anchorImageNodeId = NodeId(node.handle),
+                    params = mapOf(DefaultImageNodeFetcher.NODE_IDS to nodeHandles),
+                )
+            } else {
+                ImageViewerActivity.getIntentForChildren(
+                    requireContext(),
+                    nodeHandles,
+                    currentNodeHandle
+                )
+            }
             DragToExitSupport.putThumbnailLocation(
                 intent,
                 recyclerView,

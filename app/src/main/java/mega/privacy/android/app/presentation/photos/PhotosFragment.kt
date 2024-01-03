@@ -645,7 +645,8 @@ class PhotosFragment : Fragment() {
                     context = requireContext(),
                     imageSource = ImagePreviewFetcherSource.TIMELINE,
                     menuOptionsSource = ImagePreviewMenuSource.TIMELINE,
-                    anchorImageNodeId = NodeId(photo.id)
+                    anchorImageNodeId = NodeId(photo.id),
+                    showScreenLabel = false,
                 )
                 startActivity(intent)
             } else {

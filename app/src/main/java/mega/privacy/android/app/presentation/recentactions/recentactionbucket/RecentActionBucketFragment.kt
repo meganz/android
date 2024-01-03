@@ -34,9 +34,14 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentActionBucketBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.recentactions.RecentActionsViewModel
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -62,6 +67,8 @@ import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.mutateIconSecondary
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -77,6 +84,9 @@ class RecentActionBucketFragment : Fragment() {
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val viewModel by viewModels<RecentActionBucketViewModel>()
 
@@ -384,21 +394,31 @@ class RecentActionBucketFragment : Fragment() {
     private fun openImage(
         index: Int,
         node: MegaNode,
-    ) {
+    ) = viewLifecycleOwner.lifecycleScope.launch {
         val handles = getNodesHandles(true)
-        val intent = if (handles.isNotEmpty()) {
-            ImageViewerActivity.getIntentForChildren(
-                requireContext(),
-                handles,
-                node.handle
+        val intent = if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+            ImagePreviewActivity.createIntent(
+                context = requireContext(),
+                imageSource = ImagePreviewFetcherSource.DEFAULT,
+                menuOptionsSource = ImagePreviewMenuSource.DEFAULT,
+                anchorImageNodeId = NodeId(node.handle),
+                params = mapOf(DefaultImageNodeFetcher.NODE_IDS to handles),
             )
         } else {
-            ImageViewerActivity.getIntentForSingleNode(
-                requireContext(),
-                node.handle
-            )
+            if (handles.isNotEmpty()) {
+                ImageViewerActivity.getIntentForChildren(
+                    requireContext(),
+                    handles,
+                    node.handle
+                )
+            } else {
+                ImageViewerActivity.getIntentForSingleNode(
+                    requireContext(),
+                    node.handle
+                )
+            }
         }
-        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter ?: return)
+        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter ?: return@launch)
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)
     }

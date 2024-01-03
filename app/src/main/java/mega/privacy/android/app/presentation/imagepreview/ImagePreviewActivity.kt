@@ -84,10 +84,15 @@ class ImagePreviewActivity : BaseActivity() {
         )
     }
     private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
+    private val showScreenLabel: Boolean by lazy {
+        intent.getBooleanExtra("show_screen_label", false)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Toast.makeText(this, "New Image Preview", Toast.LENGTH_SHORT).show()
+        if (showScreenLabel) {
+            Toast.makeText(this, "New Image Preview", Toast.LENGTH_SHORT).show()
+        }
         Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
         if (savedInstanceState != null) {
             nodeSaver.restoreState(savedInstanceState)
@@ -318,14 +323,17 @@ class ImagePreviewActivity : BaseActivity() {
             context: Context,
             imageSource: ImagePreviewFetcherSource,
             menuOptionsSource: ImagePreviewMenuSource,
-            anchorImageNodeId: NodeId,
+            anchorImageNodeId: NodeId? = null,
             params: Map<String, Any> = mapOf(),
+            showScreenLabel: Boolean = true,
         ): Intent {
             return Intent(context, ImagePreviewActivity::class.java).apply {
                 putExtra(IMAGE_NODE_FETCHER_SOURCE, imageSource)
                 putExtra(IMAGE_PREVIEW_MENU_OPTIONS, menuOptionsSource)
-                putExtra(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE, anchorImageNodeId.longValue)
+                putExtra(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE, anchorImageNodeId?.longValue)
                 putExtra(FETCHER_PARAMS, bundleOf(*params.toList().toTypedArray()))
+                // For QA & Dev purpose: To remove once new Image Preview migration is done
+                putExtra("show_screen_label", showScreenLabel)
             }
         }
     }

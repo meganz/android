@@ -30,11 +30,16 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityVersionsFileBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForSingleNode
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.adapters.VersionsFileAdapter
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.VersionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.versions.VersionsFileViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -47,6 +52,8 @@ import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
@@ -62,6 +69,7 @@ import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
 /**
  * File Version list activity
@@ -105,6 +113,8 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, M
     private var checkPermissionRevertVersionDialog: AlertDialog? = null
     private var deleteVersionHistoryDialog: AlertDialog? = null
 
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @SuppressWarnings("deprecation")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -566,8 +576,18 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, M
                     adapter!!.toggleSelection(position)
                     updateActionModeTitle()
                 }
-                mimetype.isImage -> {
-                    val intent = getIntentForSingleNode(this, vNode.handle, true)
+                mimetype.isImage -> lifecycleScope.launch {
+                    val intent = if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                        ImagePreviewActivity.createIntent(
+                            context = this@VersionsFileActivity,
+                            imageSource = ImagePreviewFetcherSource.DEFAULT,
+                            menuOptionsSource = ImagePreviewMenuSource.FILE,
+                            anchorImageNodeId = NodeId(vNode.handle),
+                            params = mapOf(DefaultImageNodeFetcher.NODE_IDS to longArrayOf(vNode.handle)),
+                        )
+                    } else {
+                        getIntentForSingleNode(this@VersionsFileActivity, vNode.handle, true)
+                    }
                     putThumbnailLocation(
                         intent,
                         binding.recyclerViewVersionsFile,

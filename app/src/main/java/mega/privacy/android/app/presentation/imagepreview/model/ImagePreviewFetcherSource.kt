@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.imagepreview.model
 
 enum class ImagePreviewFetcherSource {
+    DEFAULT,
     TIMELINE,
     ALBUM_CONTENT,
     ALBUM_SHARING,
@@ -11,5 +12,7 @@ enum class ImagePreviewFetcherSource {
     OFFLINE,
     FILE_LINK,
     FOLDER_LINK,
-    FILE
+    FILE,
+    FAVOURITE,
+    PUBLIC_FILE,
 }

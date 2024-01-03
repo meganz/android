@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentFavouriteFolderBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.favourites.adapter.FavouritesAdapter
@@ -29,10 +30,16 @@ import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadS
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 /**
@@ -57,6 +64,9 @@ class FavouriteFolderFragment : Fragment() {
      */
     @Inject
     lateinit var openFileWrapper: OpenFileWrapper
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val onBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -167,18 +177,29 @@ class FavouriteFolderFragment : Fragment() {
     private fun openNode(favourite: FavouriteFile) {
         MimeTypeList.typeForName(favourite.typedNode.name).apply {
             when {
-                isImage ||
-                        (isVideoMimeType || isAudio) ||
-                        isPdf -> {
-                    launchIntent(
-                        openFileWrapper.getIntentForOpenFile(
-                            context = requireContext(),
-                            node = favourite.node,
-                            isText = false,
-                            availablePlaylist = true,
-                            snackbarShower = activity as ManagerActivity
+                isImage || (isVideoMimeType || isAudio) || isPdf -> viewLifecycleOwner.lifecycleScope.launch {
+                    if (isImage && getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                        val handle = favourite.node.handle
+                        launchIntent(
+                            ImagePreviewActivity.createIntent(
+                                context = requireContext(),
+                                imageSource = ImagePreviewFetcherSource.DEFAULT,
+                                menuOptionsSource = ImagePreviewMenuSource.FAVOURITE,
+                                anchorImageNodeId = NodeId(handle),
+                                params = mapOf(DefaultImageNodeFetcher.NODE_IDS to longArrayOf(handle)),
+                            )
                         )
-                    )
+                    } else {
+                        launchIntent(
+                            openFileWrapper.getIntentForOpenFile(
+                                context = requireContext(),
+                                node = favourite.node,
+                                isText = false,
+                                availablePlaylist = true,
+                                snackbarShower = activity as ManagerActivity
+                            )
+                        )
+                    }
                 }
                 isURL -> {
                     megaUtilWrapper.manageURLNode(requireContext(), favourite.node)
