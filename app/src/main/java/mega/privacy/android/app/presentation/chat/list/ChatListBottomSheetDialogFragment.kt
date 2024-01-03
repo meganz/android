@@ -150,7 +150,6 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
             } else {
                 Intent(context, GroupChatInfoActivity::class.java).apply {
                     putExtra(Constants.HANDLE, chatId)
-                    putExtra(Constants.ACTION_CHAT_OPEN, true)
                 }
             }
         startActivity(intent)
