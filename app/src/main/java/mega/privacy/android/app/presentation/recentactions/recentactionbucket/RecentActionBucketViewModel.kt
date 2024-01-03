@@ -13,13 +13,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
-import mega.privacy.android.domain.usecase.UpdateRecentAction
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
+import mega.privacy.android.domain.usecase.UpdateRecentAction
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -31,9 +32,9 @@ import javax.inject.Inject
 @HiltViewModel
 class RecentActionBucketViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val getParentMegaNode: GetParentMegaNode,
     private val updateRecentAction: UpdateRecentAction,
     private val getRecentActionNodes: GetRecentActionNodes,
+    private val getParentNodeUseCase: GetParentNodeUseCase,
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
@@ -79,7 +80,7 @@ class RecentActionBucketViewModel @Inject constructor(
         .map { it?.let { getRecentActionNodes(it.nodes) } ?: emptyList() }
         .onEach {
             isInShare = it.firstOrNull()?.node?.let { node ->
-                getParentMegaNode(node)?.isInShare
+                getParentNodeUseCase(NodeId(node.handle))?.isIncomingShare
             } ?: false
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())

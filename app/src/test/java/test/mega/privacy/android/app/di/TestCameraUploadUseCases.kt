@@ -6,7 +6,6 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
-import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.utils.wrapper.CameraEnumeratorWrapper
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
@@ -43,9 +42,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetNodeByFingerprint() = mock<GetNodeByFingerprintUseCase>()
-
-    @Provides
-    fun provideGetParentMegaNode() = mock<GetParentMegaNode>()
 
     @Provides
     fun provideIsChargingRequired() = mock<IsChargingRequired>()

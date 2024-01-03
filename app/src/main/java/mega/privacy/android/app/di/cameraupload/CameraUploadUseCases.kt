@@ -9,8 +9,6 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
-import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
@@ -54,13 +52,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideHasCredentials(cameraUploadRepository: CameraUploadRepository): HasCredentials =
             HasCredentials(cameraUploadRepository::doCredentialsExist)
-
-        /**
-         * Provide the [GetParentMegaNode] implementation
-         */
-        @Provides
-        fun provideGetParentMegaNode(megaNodeRepository: MegaNodeRepository): GetParentMegaNode =
-            GetParentMegaNode(megaNodeRepository::getParentNode)
 
         /**
          * Provide the [IsNodeInRubbish] implementation
