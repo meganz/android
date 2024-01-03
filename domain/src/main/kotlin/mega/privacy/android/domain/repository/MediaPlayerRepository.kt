@@ -396,4 +396,15 @@ interface MediaPlayerRepository {
         handle: Long,
         attemptFromFolderApi: Boolean = false,
     ): TypedVideoNode?
+
+    /**
+     * Get audio node by handle
+     *
+     * @param handle node handle
+     * @param attemptFromFolderApi whether attempt from folder api
+     */
+    suspend fun getAudioNodeByHandle(
+        handle: Long,
+        attemptFromFolderApi: Boolean = false,
+    ): TypedAudioNode?
 }

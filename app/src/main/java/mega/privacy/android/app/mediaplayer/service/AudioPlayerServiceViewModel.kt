@@ -78,7 +78,6 @@ import mega.privacy.android.app.utils.OfflineUtils.getOfflineFolderName
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
-import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.TypedAudioNode
@@ -103,28 +102,28 @@ import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.GetAudioNodesByEmailUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.GetAudioNodesByHandlesUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.GetAudioNodesByParentHandleUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.GetAudioNodesFromInSharesUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.GetAudioNodesFromOutSharesUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.GetAudioNodesFromPublicLinksUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.GetAudioNodesUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.GetAudiosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MonitorAudioBackgroundPlayEnabledUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MonitorAudioRepeatModeUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MonitorAudioShuffleEnabledUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.SetAudioBackgroundPlayEnabledUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.SetAudioRepeatModeUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.SetAudioShuffleEnabledUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodesByEmailUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodesByHandlesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodesByParentHandleUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodesFromInSharesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodesFromOutSharesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodesFromPublicLinksUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudiosByParentHandleFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioBackgroundPlayEnabledUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioShuffleEnabledUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioBackgroundPlayEnabledUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
@@ -162,7 +161,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getRootNodeFromMegaApiFolderUseCase: GetRootNodeFromMegaApiFolderUseCase,
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
-    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
+    private val getAudioNodeByHandleUseCase: GetAudioNodeByHandleUseCase,
     private val getAudioNodesFromPublicLinksUseCase: GetAudioNodesFromPublicLinksUseCase,
     private val getAudioNodesFromInSharesUseCase: GetAudioNodesFromInSharesUseCase,
     private val getAudioNodesFromOutSharesUseCase: GetAudioNodesFromOutSharesUseCase,
@@ -173,14 +172,13 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val getAudioNodesByParentHandleUseCase: GetAudioNodesByParentHandleUseCase,
     private val getAudioNodesByHandlesUseCase: GetAudioNodesByHandlesUseCase,
     private val getFingerprintUseCase: GetFingerprintUseCase,
-    private val fileDurationMapper: FileDurationMapper,
-    monitorAudioBackgroundPlayEnabledUseCase: MonitorAudioBackgroundPlayEnabledUseCase,
-    monitorAudioShuffleEnabledUseCase: MonitorAudioShuffleEnabledUseCase,
-    monitorAudioRepeatModeUseCase: MonitorAudioRepeatModeUseCase,
     private val setAudioBackgroundPlayEnabledUseCase: SetAudioBackgroundPlayEnabledUseCase,
     private val setAudioShuffleEnabledUseCase: SetAudioShuffleEnabledUseCase,
     private val setAudioRepeatModeUseCase: SetAudioRepeatModeUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    monitorAudioBackgroundPlayEnabledUseCase: MonitorAudioBackgroundPlayEnabledUseCase,
+    monitorAudioShuffleEnabledUseCase: MonitorAudioShuffleEnabledUseCase,
+    monitorAudioRepeatModeUseCase: MonitorAudioRepeatModeUseCase,
 ) : AudioPlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener,
     SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
@@ -442,7 +440,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                                 else -> getRootNodeUseCase()
                             }
                         } else {
-                            getNodeByHandleUseCase(parentHandle)
+                            getAudioNodeByHandleUseCase(parentHandle)
                         }?.let { parent ->
                             if (parentHandle == INVALID_HANDLE) {
                                 context.getString(
@@ -538,8 +536,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
         } else {
             playlistItems.clear()
 
-            val node: TypedFileNode? =
-                getNodeByHandleUseCase(firstPlayHandle) as? TypedFileNode
+            val node = getAudioNodeByHandleUseCase(firstPlayHandle)
             val thumbnail = when {
                 type == OFFLINE_ADAPTER -> {
                     offlineThumbnailFileWrapper.getThumbnailFile(
@@ -557,9 +554,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 }
             }
 
-            val duration = node?.type?.let {
-                fileDurationMapper(it)
-            } ?: 0
+            val duration = node?.duration ?: 0
 
             playlistItemMapper(
                 firstPlayHandle,

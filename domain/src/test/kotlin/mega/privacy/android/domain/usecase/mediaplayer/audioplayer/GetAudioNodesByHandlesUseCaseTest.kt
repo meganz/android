@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.mediaplayer
+package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,13 +19,15 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetAudioNodesByEmailUseCaseTest {
-    lateinit var underTest: GetAudioNodesByEmailUseCase
+class GetAudioNodesByHandlesUseCaseTest {
+    lateinit var underTest: GetAudioNodesByHandlesUseCase
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
+
+    private val handles = listOf(123456L)
 
     @BeforeAll
     fun setUp() {
-        underTest = GetAudioNodesByEmailUseCase(
+        underTest = GetAudioNodesByHandlesUseCase(
             mediaPlayerRepository = mediaPlayerRepository,
         )
     }
@@ -40,21 +43,18 @@ class GetAudioNodesByEmailUseCaseTest {
     }
 
     @Test
-    fun `test that audios is not empty`() =
-        runTest {
-            val email = "abc@example.com"
-            val list = listOf(mock<TypedAudioNode>())
-            whenever(mediaPlayerRepository.getAudioNodesByEmail(email)).thenReturn(list)
+    fun `test that audios is not empty`() = runTest {
+        val handles = listOf(123456L)
+        val list = listOf(mock<TypedAudioNode>())
+        whenever(mediaPlayerRepository.getAudioNodesByHandles(handles)).thenReturn(list)
 
-            assertThat(underTest(email)).isNotEmpty()
-        }
+        assertThat(underTest(handles)).isNotEmpty()
+    }
 
     @Test
-    fun `test that audios is empty`() =
-        runTest {
-            val email = "abc@example.com"
-            whenever(mediaPlayerRepository.getAudioNodesByEmail(email)).thenReturn(emptyList())
+    fun `test that audios is empty`() = runTest {
+        whenever(mediaPlayerRepository.getAudioNodesByHandles(handles)).thenReturn(emptyList())
 
-            assertThat(underTest(email)).isEmpty()
-        }
+        assertThat(underTest(handles)).isEmpty()
+    }
 }

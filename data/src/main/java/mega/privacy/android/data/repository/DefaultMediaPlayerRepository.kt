@@ -347,6 +347,17 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 }
         }
 
+    override suspend fun getAudioNodeByHandle(handle: Long, attemptFromFolderApi: Boolean) =
+        withContext(ioDispatcher) {
+            getMegaNodeByHandle(NodeId(handle), attemptFromFolderApi)
+                ?.let { megaNode ->
+                    convertToTypedAudioNode(
+                        node = megaNode,
+                        offline = getOfflineNode(megaNode.handle)
+                    )
+                }
+        }
+
     private suspend fun getMegaNodeByHandle(nodeId: NodeId, attemptFromFolderApi: Boolean = false) =
         megaApi.getMegaNodeByHandle(nodeId.longValue)
             ?: takeIf { attemptFromFolderApi }

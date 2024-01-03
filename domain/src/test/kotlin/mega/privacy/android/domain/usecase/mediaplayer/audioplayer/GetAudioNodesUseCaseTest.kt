@@ -1,14 +1,14 @@
-package mega.privacy.android.domain.usecase.mediaplayer
+package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,15 +19,15 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetAudioNodesByHandlesUseCaseTest {
-    lateinit var underTest: GetAudioNodesByHandlesUseCase
+class GetAudioNodesUseCaseTest {
+    lateinit var underTest: GetAudioNodesUseCase
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
 
-    private val handles = listOf(123456L)
+    private val order = SortOrder.ORDER_MODIFICATION_DESC
 
     @BeforeAll
     fun setUp() {
-        underTest = GetAudioNodesByHandlesUseCase(
+        underTest = GetAudioNodesUseCase(
             mediaPlayerRepository = mediaPlayerRepository,
         )
     }
@@ -44,17 +44,16 @@ class GetAudioNodesByHandlesUseCaseTest {
 
     @Test
     fun `test that audios is not empty`() = runTest {
-        val handles = listOf(123456L)
         val list = listOf(mock<TypedAudioNode>())
-        whenever(mediaPlayerRepository.getAudioNodesByHandles(handles)).thenReturn(list)
+        whenever(mediaPlayerRepository.getAudioNodes(order)).thenReturn(list)
 
-        assertThat(underTest(handles)).isNotEmpty()
+        assertThat(underTest(order)).isNotEmpty()
     }
 
     @Test
     fun `test that audios is empty`() = runTest {
-        whenever(mediaPlayerRepository.getAudioNodesByHandles(handles)).thenReturn(emptyList())
+        whenever(mediaPlayerRepository.getAudioNodes(order)).thenReturn(emptyList())
 
-        assertThat(underTest(handles)).isEmpty()
+        assertThat(underTest(order)).isEmpty()
     }
 }
