@@ -374,17 +374,11 @@ class TransfersManagement @Inject constructor(
      */
     private fun tryToStartForegroundService(vararg intents: Intent) {
         val active =
-            ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(
-                Lifecycle.State.STARTED
-            )
-        val shouldStartForeground =
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.S || active //starting with Android 12 only active apps can startForegroundService
-
-        intents.forEach {
-            if (shouldStartForeground) {
+            ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+        //starting with Android 12 only active apps can startForegroundService
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || active) {
+            intents.forEach {
                 context.startForegroundService(it)
-            } else {
-                context.startService(it)
             }
         }
     }
