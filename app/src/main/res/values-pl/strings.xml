@@ -5697,4 +5697,14 @@
     <string name="home_side_menu_sync_title">Sync</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <!-- Text when sharing a meeting link indicating the subject for the email -->
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Zaproszenie na spotkanie</string>
+    <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
+    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
+    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
+    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
 </resources>
