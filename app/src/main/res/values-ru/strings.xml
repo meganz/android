@@ -1766,7 +1766,7 @@
         <item>Низкое</item>
         <item>Среднее</item>
         <item>Высокое</item>
-        <item>Оригинал</item>
+        <item>Исходное</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Пропущенный звонок</string>
@@ -3525,7 +3525,7 @@
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]Недавние[/B] действия скрыты</string>
     <!-- Label indicating video original quality -->
-    <string name="original_quality">Оригинальное качество</string>
+    <string name="original_quality">Исходное качество</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">Отпечаток пальца</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
@@ -5568,7 +5568,7 @@
     <!-- Title of video option of zoom to fill-->
     <string name="media_player_video_option_zoom_to_fill_title">Растянуть</string>
     <!-- Title of video option of original-->
-    <string name="media_player_video_option_original_title">Оригинал</string>
+    <string name="media_player_video_option_original_title">Исходное</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Обнаружение медиа в подпапках</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
@@ -5696,5 +5696,5 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Синхронизация</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Без рекламы</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
 </resources>
