@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
+import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
@@ -125,6 +126,8 @@ class NodeRepositoryImplTest {
 
     val offline: Offline = mock()
 
+    private val nodeLabelIntMapper = NodeLabelIntMapper()
+
     @BeforeAll
     fun setup() {
         underTest = NodeRepositoryImpl(
@@ -150,7 +153,8 @@ class NodeRepositoryImplTest {
             nodeShareKeyResultMapper = nodeShareKeyResultMapper,
             accessPermissionIntMapper = accessPermissionIntMapper,
             megaLocalRoomGateway = megaLocalRoomGateway,
-            megaNodeMapper = megaNodeMapper
+            megaNodeMapper = megaNodeMapper,
+            nodeLabelIntMapper = nodeLabelIntMapper
         )
     }
 

@@ -35,12 +35,14 @@ import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
+import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -108,6 +110,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val accessPermissionIntMapper: AccessPermissionIntMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val megaNodeMapper: MegaNodeMapper,
+    private val nodeLabelIntMapper: NodeLabelIntMapper
 ) : NodeRepository {
     override suspend fun getOutgoingSharesNode(order: SortOrder) =
         withContext(ioDispatcher) {
@@ -836,10 +839,10 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaLocalRoomGateway.removeOfflineInformationById(id)
     }
 
-    override suspend fun setNodeLabel(nodeId: NodeId, label: Int): Unit =
+    override suspend fun setNodeLabel(nodeId: NodeId, label: NodeLabel): Unit =
         withContext(ioDispatcher) {
             megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
-                megaApiGateway.setNodeLabel(it, label)
+                megaApiGateway.setNodeLabel(it, nodeLabelIntMapper(label))
             }
         }
 
@@ -868,6 +871,17 @@ internal class NodeRepositoryImpl @Inject constructor(
         requireNotNull(rubbish) { "Rubbish bin node not found" }
         moveNode(node, rubbish, null)
     }
+
+    override fun getNodeLabelList(): List<NodeLabel> =
+        buildList {
+            add(NodeLabel.RED)
+            add(NodeLabel.ORANGE)
+            add(NodeLabel.YELLLOW)
+            add(NodeLabel.GREEN)
+            add(NodeLabel.BLUE)
+            add(NodeLabel.PURPLE)
+            add(NodeLabel.GREY)
+        }
 
     private suspend fun getAllOfflineNodeHandle() =
         megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }

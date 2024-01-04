@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
@@ -585,7 +586,7 @@ interface NodeRepository {
      * @param nodeId [NodeId]
      * @param label Int
      */
-    suspend fun setNodeLabel(nodeId: NodeId, label: Int)
+    suspend fun setNodeLabel(nodeId: NodeId, label: NodeLabel)
 
     /**
      * Resets the label for node
@@ -608,4 +609,10 @@ interface NodeRepository {
      * @param nodeId the node's handle [NodeId] that we want to move to the rubbish bin
      */
     suspend fun moveNodeToRubbishBinByHandle(nodeId: NodeId)
+
+    /**
+     * Gets list of NodeLabel
+     * @return list of [NodeLabel]
+     */
+    fun getNodeLabelList(): List<NodeLabel>
 }

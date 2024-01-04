@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase
 
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
@@ -15,7 +16,7 @@ class UpdateNodeLabelUseCase @Inject constructor(
      * @param nodeId [NodeId]
      * @param label Int
      */
-    suspend operator fun invoke(nodeId: NodeId, label: Int?) {
+    suspend operator fun invoke(nodeId: NodeId, label: NodeLabel?) {
         label?.let {
             nodeRepository.setNodeLabel(nodeId = nodeId, label = it)
         } ?: run {
