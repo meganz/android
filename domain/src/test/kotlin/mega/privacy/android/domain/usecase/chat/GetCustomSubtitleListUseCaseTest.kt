@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.chat
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -15,7 +14,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetCustomSubtitleListUseCaseTest {
 
@@ -41,11 +39,10 @@ class GetCustomSubtitleListUseCaseTest {
         reset(getParticipantFirstNameUseCase, loadUserAttributesUseCase)
     }
 
-    @ParameterizedTest(name = " participants {0}, is preview {1} and result {2} and updated result {3}")
+    @ParameterizedTest(name = " participants {0} and result {2} and updated result {3}")
     @MethodSource("provideParameters")
     fun `test that get custom subtitle returns correctly when`(
         participantsList: List<Long>,
-        isPreview: Boolean,
         namesResult: List<String?>,
         updatedNamesResult: List<String>,
         expectedResult: List<String>,
@@ -53,7 +50,7 @@ class GetCustomSubtitleListUseCaseTest {
         val chatId = 123L
 
         if (participantsList.isEmpty()) {
-            Truth.assertThat(underTest.invoke(chatId, participantsList, isPreview))
+            Truth.assertThat(underTest.invoke(chatId, participantsList))
                 .isEqualTo(expectedResult)
 
             return@runTest
@@ -84,179 +81,143 @@ class GetCustomSubtitleListUseCaseTest {
             }
         }
 
-        Truth.assertThat(underTest.invoke(chatId, participantsList, isPreview))
+        Truth.assertThat(underTest.invoke(chatId, participantsList))
             .isEqualTo(expectedResult)
     }
 
     private fun provideParameters(): Stream<Arguments> = Stream.of(
         Arguments.of(
             emptyList<Long>(),
-            true,
             emptyList<String>(),
             emptyList<String>(),
             emptyList<String>()
         ),
         Arguments.of(
             emptyList<Long>(),
-            false,
             emptyList<String>(),
             emptyList<String>(),
             emptyList<String>()
         ),
-        Arguments.of(listOf(1L), true, listOf(userA), emptyList<String>(), listOf(userA)),
-        Arguments.of(listOf(1L), false, listOf(userA), emptyList<String>(), listOf(userA)),
-        Arguments.of(listOf(1L), true, listOf(null), listOf(userA), listOf(userA)),
-        Arguments.of(listOf(1L), false, listOf(null), listOf(userA), listOf(userA)),
+        Arguments.of(listOf(1L), listOf(userA), emptyList<String>(), listOf(userA)),
+        Arguments.of(listOf(1L), listOf(userA), emptyList<String>(), listOf(userA)),
+        Arguments.of(listOf(1L), listOf(null), listOf(userA), listOf(userA)),
+        Arguments.of(listOf(1L), listOf(null), listOf(userA), listOf(userA)),
         Arguments.of(
             listOf(1L, 2L),
-            true,
             listOf(null, userB),
             listOf(userA),
             listOf(userA, userB)
         ),
         Arguments.of(
             listOf(1L, 2L),
-            true,
             listOf(userA, null),
             listOf(userB),
             listOf(userA, userB)
         ),
         Arguments.of(
             listOf(1L, 2L),
-            false,
             listOf(null, userB),
             listOf(userA),
             listOf(userA, userB)
         ),
         Arguments.of(
             listOf(1L, 2L),
-            false,
             listOf(userA, null),
             listOf(userB),
             listOf(userA, userB)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            true,
             listOf(userA, userB, userC),
             emptyList<String>(),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            true,
             listOf(null, userB, userC),
             listOf(userA),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            true,
             listOf(null, null, userC),
             listOf(userA, userB),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            true,
             listOf(null, null, null),
             listOf(userA, userB, userC),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            true,
             listOf(userA, null, userC),
             listOf(userB),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            true,
             listOf(userA, null, null),
             listOf(userB, userC),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            true,
             listOf(userA, userB, null),
             listOf(userC),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            false,
             listOf(userA, userB, userC),
             emptyList<String>(),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            false,
             listOf(null, userB, userC),
             listOf(userA),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            false,
             listOf(null, null, userC),
             listOf(userA, userB),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            false,
             listOf(null, null, null),
             listOf(userA, userB, userC),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            false,
             listOf(userA, null, userC),
             listOf(userB),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            false,
             listOf(userA, null, null),
             listOf(userB, userC),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L),
-            false,
             listOf(userA, userB, null),
             listOf(userC),
             listOf(userA, userB, userC)
         ),
         Arguments.of(
             listOf(1L, 2L, 3L, 4L),
-            true,
-            listOf(userA, userB, userC, "1"),
-            emptyList<String>(),
-            listOf(userA, userB, userC, "1")
-        ),
-        Arguments.of(
-            listOf(1L, 2L, 3L, 4L),
-            false,
             listOf(userA, userB, userC, "2"),
             emptyList<String>(),
             listOf(userA, userB, userC, "2"),
         ),
         Arguments.of(
             listOf(1L, 2L, 3L, 4L, 5L),
-            true,
-            listOf(userA, userB, userC, "2"),
-            emptyList<String>(),
-            listOf(userA, userB, userC, "2"),
-        ),
-        Arguments.of(
-            listOf(1L, 2L, 3L, 4L, 5L),
-            false,
             listOf(userA, userB, userC, "3"),
             emptyList<String>(),
             listOf(userA, userB, userC, "3"),

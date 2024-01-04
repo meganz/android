@@ -77,6 +77,7 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
+import mega.privacy.android.core.ui.controls.chat.ChatObserverIndicator
 import mega.privacy.android.core.ui.controls.chat.ScrollToBottomFab
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
@@ -374,24 +375,26 @@ internal fun ChatView(
                     }
                 },
                 bottomBar = {
-                    Column {
-                        UserTypingView(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            usersTyping = uiState.usersTyping,
-                        )
-                        ChatInputTextToolbar(
-                            onAttachmentClick = {
-                                coroutineScope.launch {
-                                    toolbarModalSheetState.show()
-                                }
-                            },
-                            text = uiState.sendingText,
-                            placeholder = stringResource(
-                                R.string.type_message_hint_with_customized_title,
-                                uiState.title.orEmpty()
-                            ),
-                            onSendClick = onSendClick
-                        )
+                    if (myPermission == ChatRoomPermission.Standard || myPermission == ChatRoomPermission.Moderator) {
+                        Column {
+                            UserTypingView(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                usersTyping = uiState.usersTyping,
+                            )
+                            ChatInputTextToolbar(
+                                onAttachmentClick = {
+                                    coroutineScope.launch {
+                                        toolbarModalSheetState.show()
+                                    }
+                                },
+                                text = uiState.sendingText,
+                                placeholder = stringResource(
+                                    R.string.type_message_hint_with_customized_title,
+                                    uiState.title.orEmpty()
+                                ),
+                                onSendClick = onSendClick
+                            )
+                        }
                     }
                 },
                 floatingActionButton = {
@@ -418,6 +421,9 @@ internal fun ChatView(
                         TopCallButton(this@with, onStartOrJoinMeeting = {
                             callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
                         })
+                        if (numPreviewers > 0) {
+                            ChatObserverIndicator(numObservers = numPreviewers.toString())
+                        }
                     },
                     {
                         BottomCallButton(
@@ -560,8 +566,6 @@ internal fun ChatView(
     }
 }
 
-
-
 private fun getInfoToShow(infoToShow: InfoToShow, context: Context): String? = with(infoToShow) {
     inviteContactToChatResult?.toInfoText(context)
         ?: chatPushNotificationMuteOption?.toInfoText(context)
@@ -572,9 +576,6 @@ private fun getInfoToShow(infoToShow: InfoToShow, context: Context): String? = w
         }
 }
 
-/**
- * Checks if location picker can be shown depending on permissions.
- */
 /**
  * Checks if location picker can be shown depending on permissions.
  */

@@ -146,14 +146,24 @@ class ChatAppBarTest {
 
     @Test
     fun `test that audio call is shown and enabled when my permission is standard`() {
-        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Standard))
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Standard,
+                isConnected = true,
+            )
+        )
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION, true)
             .assertIsDisplayed()
     }
 
     @Test
     fun `test that audio call is shown and enabled when my permission is moderator`() {
-        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Moderator))
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Moderator,
+                isConnected = true,
+            )
+        )
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION, true)
             .assertIsDisplayed()
     }
@@ -163,7 +173,8 @@ class ChatAppBarTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Moderator,
-                callInThisChat = mock()
+                callInThisChat = mock(),
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION, true)
@@ -218,14 +229,24 @@ class ChatAppBarTest {
 
     @Test
     fun `test that video call is shown and enabled when my permission is standard`() {
-        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Standard))
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Standard,
+                isConnected = true,
+            )
+        )
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION, true)
             .assertIsDisplayed()
     }
 
     @Test
     fun `test that video call is shown and enabled when my permission is moderator`() {
-        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Moderator))
+        initComposeRuleContent(
+            ChatUiState(
+                myPermission = ChatRoomPermission.Moderator,
+                isConnected = true,
+            )
+        )
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION, true)
             .assertIsDisplayed()
     }
@@ -235,7 +256,8 @@ class ChatAppBarTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Moderator,
-                callInThisChat = mock()
+                callInThisChat = mock(),
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION, true)
@@ -251,7 +273,8 @@ class ChatAppBarTest {
         initComposeRuleContent(
             ChatUiState(
                 isGroup = true,
-                myPermission = ChatRoomPermission.Moderator
+                myPermission = ChatRoomPermission.Moderator,
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
@@ -267,7 +290,8 @@ class ChatAppBarTest {
         initComposeRuleContent(
             ChatUiState(
                 isGroup = true,
-                isOpenInvite = true
+                isOpenInvite = true,
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
@@ -727,7 +751,8 @@ class ChatAppBarTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Standard,
-                isWaitingRoom = true
+                isWaitingRoom = true,
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION, true).apply {
@@ -1129,7 +1154,8 @@ class ChatAppBarTest {
             ChatUiState(
                 isGroup = true,
                 myPermission = ChatRoomPermission.Moderator,
-                callInThisChat = mock()
+                callInThisChat = mock(),
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
@@ -1146,7 +1172,8 @@ class ChatAppBarTest {
             ChatUiState(
                 isGroup = true,
                 myPermission = ChatRoomPermission.Moderator,
-                callInThisChat = null
+                callInThisChat = null,
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
@@ -1216,6 +1243,7 @@ class ChatAppBarTest {
             ChatUiState(
                 isPreviewMode = false,
                 messages = listOf(textMessage),
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()

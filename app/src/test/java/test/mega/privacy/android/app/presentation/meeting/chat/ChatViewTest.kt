@@ -39,6 +39,7 @@ class ChatViewTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Standard,
+                isConnected = true,
                 callInOtherChat = mock()
             )
         )
@@ -55,7 +56,8 @@ class ChatViewTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Standard,
-                callInOtherChat = null
+                callInOtherChat = null,
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION, true).apply {
@@ -73,6 +75,7 @@ class ChatViewTest {
                 hasAnyContact = false,
                 myPermission = ChatRoomPermission.Moderator,
                 isGroup = true,
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
@@ -89,6 +92,7 @@ class ChatViewTest {
                 allContactsParticipateInChat = true,
                 isGroup = true,
                 hasAnyContact = true,
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
@@ -126,6 +130,7 @@ class ChatViewTest {
                 myPermission = ChatRoomPermission.Moderator,
                 callInThisChat = mock(),
                 isGroup = true,
+                isConnected = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
@@ -143,7 +148,8 @@ class ChatViewTest {
     fun `test that enable geolocation dialog shows when geolocation is not enabled and user clicks on location`() {
         initComposeRuleContent(
             ChatUiState(
-                isGeolocationEnabled = false
+                myPermission = ChatRoomPermission.Standard,
+                isGeolocationEnabled = false,
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_ATTACHMENT_ICON, true).apply {

@@ -54,6 +54,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property isGeolocationEnabled True if geolocation internal permission (not device one) is granted, false otherwise.
  * @property isLoadingGalleryFiles True if gallery files are being loaded, false otherwise.
  * @property userUpdate [UserUpdate] with the changes in the user.
+ * @property numPreviewers Number of previewers in the chat.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -93,6 +94,7 @@ data class ChatUiState(
     val isGeolocationEnabled: Boolean = false,
     val isLoadingGalleryFiles: Boolean = true,
     val userUpdate: UserUpdate? = null,
+    val numPreviewers: Long = 0,
 ) {
 
     /**

@@ -1221,7 +1221,7 @@ internal class ChatViewModelTest {
         }
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
-        whenever(getCustomSubtitleListUseCase(chatId, userHandles, false))
+        whenever(getCustomSubtitleListUseCase(chatId, userHandles))
             .thenReturn(customSubtitleList)
         initTestClass()
         testScheduler.advanceUntilIdle()
@@ -1255,7 +1255,7 @@ internal class ChatViewModelTest {
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
         whenever(monitorChatRoomUpdates(chatId)).thenReturn(updateFlow)
-        whenever(getCustomSubtitleListUseCase(chatId, userHandles, false))
+        whenever(getCustomSubtitleListUseCase(chatId, userHandles))
             .thenReturn(customSubtitleList)
             .thenReturn(updatedCustomSubtitleList)
         initTestClass()

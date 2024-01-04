@@ -149,11 +149,11 @@ internal fun ChatAppBar(
 
 private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> = buildList {
     with(uiState) {
-        if (isJoiningOrLeaving) return@buildList
+        if (isJoiningOrLeaving || isPreviewMode || !isConnected) return@buildList
 
         val hasModeratorPermission = myPermission == ChatRoomPermission.Moderator
 
-        if ((hasModeratorPermission || myPermission == ChatRoomPermission.Standard) && !isPreviewMode) {
+        if (hasModeratorPermission || myPermission == ChatRoomPermission.Standard) {
             add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat && (!isWaitingRoom || hasModeratorPermission)))
 
             if (!isGroup) {
@@ -165,32 +165,25 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
             add(ChatRoomMenuAction.AddParticipants)
         }
 
-        if (isPreviewMode.not() && isConnected && (isGroup || myPermission != ChatRoomPermission.ReadOnly)
-        ) {
+        if (isGroup || myPermission != ChatRoomPermission.ReadOnly) {
             add(ChatRoomMenuAction.Info)
         }
 
-        if (!isPreviewMode && isConnected
-            && ((isGroup && hasModeratorPermission) || (!isGroup && myPermission != ChatRoomPermission.ReadOnly))
-        ) {
+        if ((isGroup && hasModeratorPermission) || (!isGroup && myPermission != ChatRoomPermission.ReadOnly)) {
             add(ChatRoomMenuAction.Clear)
         }
 
-        if (!isPreviewMode && isConnected) {
-            if (isArchived) {
-                add(ChatRoomMenuAction.Unarchive)
-            } else {
-                add(ChatRoomMenuAction.Archive)
-            }
+        if (isArchived) {
+            add(ChatRoomMenuAction.Unarchive)
+        } else {
+            add(ChatRoomMenuAction.Archive)
         }
 
         if (hasModeratorPermission && (uiState.isGroup || uiState.isMeeting) && uiState.hasACallInThisChat) {
             add(ChatRoomMenuAction.EndCallForAll)
         }
 
-        if (!isPreviewMode && isConnected &&
-            ((isGroup && isActive) || (!isGroup && hasModeratorPermission))
-        ) {
+        if ((isGroup && isActive) || (!isGroup && hasModeratorPermission)) {
             if (isChatNotificationMute) {
                 add(ChatRoomMenuAction.Unmute)
             } else {
@@ -229,11 +222,11 @@ private fun getSubtitle(uiState: ChatUiState) = with(uiState) {
             stringResource(id = R.string.archived_chat)
         }
 
-        myPermission == ChatRoomPermission.ReadOnly -> {
+        myPermission == ChatRoomPermission.ReadOnly && !isPreviewMode -> {
             stringResource(id = R.string.observer_permission_label_participants_panel)
         }
 
-        myPermission == ChatRoomPermission.Removed -> {
+        myPermission == ChatRoomPermission.Removed && !isPreviewMode -> {
             stringResource(id = R.string.inactive_chat)
         }
 

@@ -21,14 +21,9 @@ class GetCustomSubtitleListUseCase @Inject constructor(
      *
      * @param chatId Chat id.
      * @param participantsList List of participants' handles.
-     * @param isPreviewMode True if it is in preview mode, false otherwise.
      * @return The list of participant's names.
      */
-    suspend operator fun invoke(
-        chatId: Long,
-        participantsList: List<Long>,
-        isPreviewMode: Boolean,
-    ): List<String> =
+    suspend operator fun invoke(chatId: Long, participantsList: List<Long>): List<String> =
         buildList {
             if (participantsList.isEmpty()) return@buildList
             val participantsCount = participantsList.size
@@ -53,7 +48,7 @@ class GetCustomSubtitleListUseCase @Inject constructor(
             }
 
             if (maxExceeded) {
-                val otherParticipantsCount = participantsCount.minus(if (isPreviewMode) 3 else 2)
+                val otherParticipantsCount = participantsCount.minus(2)
                 add(otherParticipantsCount.toString())
             }
         }

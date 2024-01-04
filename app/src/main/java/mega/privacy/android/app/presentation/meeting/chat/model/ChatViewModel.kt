@@ -172,7 +172,7 @@ internal class ChatViewModel @Inject constructor(
         checkGeolocation()
         monitorStorageStateEvent()
         loadChatRoom()
-        joinChatCallIfNeeded()
+        joinChatIfNeeded()
         monitorContactCacheUpdate()
     }
 
@@ -189,7 +189,7 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun joinChatCallIfNeeded() {
+    private fun joinChatIfNeeded() {
         if (chatLink.isNotEmpty()) {
             viewModelScope.launch {
                 val action = savedStateHandle.get<String>(EXTRA_ACTION).orEmpty()
@@ -345,7 +345,8 @@ internal class ChatViewModel @Inject constructor(
                                 isArchived = isArchived,
                                 isMeeting = isMeeting,
                                 participantsCount = getNumberParticipants(),
-                                isWaitingRoom = isWaitingRoom
+                                isWaitingRoom = isWaitingRoom,
+                                numPreviewers = numPreviewers
                             )
                         }
                         if (peerHandlesList.isNotEmpty()) {
@@ -369,9 +370,9 @@ internal class ChatViewModel @Inject constructor(
     }
 
     private fun ChatRoom.checkCustomTitle() {
-        if (isGroup && hasCustomTitle) {
+        if (!isPreview && isGroup && hasCustomTitle) {
             viewModelScope.launch {
-                runCatching { getCustomSubtitleListUseCase(chatId, peerHandlesList, isPreview) }
+                runCatching { getCustomSubtitleListUseCase(chatId, peerHandlesList) }
                     .onSuccess { customSubtitleList ->
                         _state.update { state -> state.copy(customSubtitleList = customSubtitleList) }
                     }
@@ -468,6 +469,10 @@ internal class ChatViewModel @Inject constructor(
                                     _state.update { state ->
                                         state.copy(isWaitingRoom = isWaitingRoom)
                                     }
+                                }
+
+                                ChatRoomChange.UpdatePreviewers -> {
+                                    _state.update { state -> state.copy(numPreviewers = numPreviewers) }
                                 }
 
                                 else -> {}
