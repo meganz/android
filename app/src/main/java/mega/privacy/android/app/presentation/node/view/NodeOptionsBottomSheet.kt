@@ -7,6 +7,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -43,8 +44,11 @@ internal fun NodeOptionsBottomSheet(
     viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
 ) {
-    viewModel.getBottomSheetOptions(node)
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.getBottomSheetOptions(node)
+    }
     BottomSheet(
         modalSheetState = modalSheetState,
         sheetHeader = {
@@ -62,8 +66,8 @@ internal fun NodeOptionsBottomSheet(
         },
         sheetBody = {
             LazyColumn {
-                state.actions.groupBy { it.group }
-                    .toSortedMap()
+                val groups = state.actions.groupBy { it.group }
+                groups.toSortedMap()
                     .mapValues { (_, list) ->
                         list.sortedBy { it.orderInGroup }
                     }
@@ -73,7 +77,7 @@ internal fun NodeOptionsBottomSheet(
                             item.control(onDismiss, handler::handleAction)
                         }
 
-                        if (index < state.actions.size - 1) {
+                        if (index < state.actions.size - 1 && index != groups.size - 1) {
                             item {
                                 Divider(
                                     modifier = Modifier

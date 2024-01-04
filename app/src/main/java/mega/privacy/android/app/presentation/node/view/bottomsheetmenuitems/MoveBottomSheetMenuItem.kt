@@ -24,7 +24,10 @@ class MoveBottomSheetMenuItem @Inject constructor(
             && isNodeInRubbish.not()
             && node.isIncomingShare.not()
             && node.isTakenDown.not()
-
+            && accessPermission in listOf(
+        AccessPermission.OWNER,
+        AccessPermission.FULL,
+    )
 
     override val groupId: Int
         get() = 8

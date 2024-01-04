@@ -63,7 +63,7 @@ class MoveBottomSheetMenuItemTest {
                 on { isTakenDown } doReturn false
                 on { isIncomingShare } doReturn false
             },
-            true
+            false
         ),
         Arguments.of(
             true,

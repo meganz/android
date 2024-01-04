@@ -2,11 +2,11 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 
 import androidx.compose.runtime.Composable
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 
 /**
  * Bottom sheet click handler
@@ -67,6 +67,9 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
 
     /**
      * Is destructive action
+     *
+     * true if action is destructive
+     *      menu item will be displayed in red
      */
     val isDestructiveAction: Boolean
         get() = false

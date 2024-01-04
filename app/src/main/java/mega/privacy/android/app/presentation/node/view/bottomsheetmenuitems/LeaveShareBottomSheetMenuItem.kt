@@ -23,6 +23,8 @@ class LeaveShareBottomSheetMenuItem @Inject constructor(
     ) = node.isTakenDown.not()
             && node.isIncomingShare
 
+    override val isDestructiveAction: Boolean
+        get() = true
     override val groupId: Int
         get() = 9
 }
