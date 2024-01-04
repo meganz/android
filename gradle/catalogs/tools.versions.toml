@@ -1,6 +1,6 @@
 [versions]
 lint = "31.1.1"
-mega-gradle = "0.13"
+mega-gradle = "0.14"
 
 [libraries]
 lint = { module = "com.android.tools.lint:lint", version.ref = "lint" }
