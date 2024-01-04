@@ -20,6 +20,9 @@ DATA_UNIT_TEST_SUMMARY = ""
 APP_UNIT_TEST_RESULT = ""
 DOMAIN_UNIT_TEST_RESULT = ""
 DATA_UNIT_TEST_RESULT = ""
+COREUI_UNIT_TEST_RESULT = ""
+FEATURE_SYNC_UNIT_TEST_RESULT = ""
+FEATURE_DEVICECENTER_UNIT_TEST_RESULT = ""
 
 APP_COVERAGE = ""
 DOMAIN_COVERAGE = ""
@@ -133,6 +136,18 @@ pipeline {
                         }
                         if (!DATA_UNIT_TEST_RESULT.isEmpty()) {
                             unitTestResult += "<br>Data Unit Test: ${DATA_UNIT_TEST_RESULT}"
+                        }
+
+                        if (!COREUI_UNIT_TEST_RESULT.isEmpty()) {
+                            unitTestResult += "<br>CoreUi Unit Test: ${COREUI_UNIT_TEST_RESULT}"
+                        }
+
+                        if (!FEATURE_SYNC_UNIT_TEST_RESULT.isEmpty()) {
+                            unitTestResult += "<br>feature/sync Unit Test: ${FEATURE_SYNC_UNIT_TEST_RESULT}"
+                        }
+
+                        if (!FEATURE_DEVICECENTER_UNIT_TEST_RESULT.isEmpty()) {
+                            unitTestResult += "<br>feature/devicecenter Unit Test: ${FEATURE_DEVICECENTER_UNIT_TEST_RESULT}"
                         }
                     }
 
@@ -324,12 +339,23 @@ pipeline {
                                         APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
                                         println("APP_COVERAGE = ${APP_COVERAGE}")
 
+                                        try {
+                                            sh "./gradlew feature:devicecenter:testDebugUnitTest"
+                                        } finally {
+                                            FEATURE_DEVICECENTER_UNIT_TEST_RESULT = unitTestArchiveLink("feature/devicecenter/build/reports/tests/testDebugUnitTest", "feature_devicecenter_unit_test_result.zip")
+                                        }
 
-                                        sh "./gradlew feature:devicecenter:testDebugUnitTest"
+                                        try {
+                                            sh "./gradlew feature:sync:testDebugUnitTest"
+                                        } finally {
+                                            FEATURE_SYNC_UNIT_TEST_RESULT = unitTestArchiveLink("feature/sync/build/reports/tests/testDebugUnitTest", "feature_sync_unit_test_result.zip")
+                                        }
 
-                                        sh "./gradlew feature:sync:testDebugUnitTest"
-
-                                        sh "./gradlew core-ui:testDebugUnitTest"
+                                        try {
+                                            sh "./gradlew core-ui:testDebugUnitTest"
+                                        } finally {
+                                            COREUI_UNIT_TEST_RESULT = unitTestArchiveLink("core-ui/build/reports/tests/testDebugUnitTest", "core_ui_unit_test_result.zip")
+                                        }
 
                                         // below code is only run when UnitTest is OK, before test reports are cleaned up.
                                         // If UnitTest is failed, summary is collected at post.failure{} phase
