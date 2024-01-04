@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.NotificationBehaviour
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
@@ -29,7 +29,7 @@ class GetChatMessageNotificationDataUseCaseTest {
 
     private lateinit var underTest: GetChatMessageNotificationDataUseCase
 
-    private val getChatRoom: GetChatRoom = mock()
+    private val getChatRoomUseCase: GetChatRoomUseCase = mock()
     private val getChatMessageUseCase: GetChatMessageUseCase = mock()
     private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase = mock()
     private val getUserAvatarUseCase: GetUserAvatarUseCase = mock()
@@ -45,7 +45,7 @@ class GetChatMessageNotificationDataUseCaseTest {
     @BeforeAll
     fun setup() {
         underTest = GetChatMessageNotificationDataUseCase(
-            getChatRoom,
+            getChatRoomUseCase,
             getChatMessageUseCase,
             getMessageSenderNameUseCase,
             getUserAvatarUseCase,
@@ -58,7 +58,7 @@ class GetChatMessageNotificationDataUseCaseTest {
     @AfterAll
     fun resetMocks() {
         reset(
-            getChatRoom,
+            getChatRoomUseCase,
             getChatMessageUseCase,
             getMessageSenderNameUseCase,
             getUserAvatarUseCase,
@@ -102,7 +102,7 @@ class GetChatMessageNotificationDataUseCaseTest {
                 notificationBehaviour = notificationBehaviour
             )
             whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
-            whenever(getChatRoom(chatId)).thenReturn(chat)
+            whenever(getChatRoomUseCase(chatId)).thenReturn(chat)
             whenever(getMessageSenderNameUseCase(userHandle, chatId)).thenReturn(senderName)
             whenever(getUserAvatarUseCase(userHandle)).thenReturn(senderAvatar)
             whenever(getUserAvatarColorUseCase(userHandle)).thenReturn(senderAvatarColor)

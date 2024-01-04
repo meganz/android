@@ -12,7 +12,6 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatParticipants
-import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
@@ -48,12 +47,6 @@ abstract class ChatModule {
 
 
     companion object {
-        /**
-         * Provides the Use Case [GetChatRoom]
-         */
-        @Provides
-        fun provideGetChatRoom(chatRepository: ChatRepository): GetChatRoom =
-            GetChatRoom(chatRepository::getChatRoom)
 
         /**
          * Provides the Use Case [GetScheduledMeetingByChat]

@@ -301,7 +301,7 @@ import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -432,7 +432,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     lateinit var hasArchivedChatsUseCase: HasArchivedChatsUseCase
 
     @Inject
-    lateinit var getChatRoomUseCase: GetChatRoom
+    lateinit var getChatRoomUseCase: GetChatRoomUseCase
 
     @Inject
     lateinit var managerRedirectIntentMapper: ManagerRedirectIntentMapper

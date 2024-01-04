@@ -40,7 +40,7 @@ import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetChatParticipants
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
@@ -67,7 +67,7 @@ import javax.inject.Inject
 /**
  * ScheduledMeetingInfoActivity view model.
  *
- * @property getChatRoom                                    [GetChatRoom]
+ * @property getChatRoomUseCase                                    [GetChatRoomUseCase]
  * @property getChatParticipants                            [GetChatParticipants]
  * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
  * @property getVisibleContactsUseCase                      [GetVisibleContactsUseCase]
@@ -97,7 +97,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ScheduledMeetingInfoViewModel @Inject constructor(
-    private val getChatRoom: GetChatRoom,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val getChatParticipants: GetChatParticipants,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
@@ -188,7 +188,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun getChat() =
         viewModelScope.launch {
             runCatching {
-                getChatRoom(state.value.chatId)
+                getChatRoomUseCase(state.value.chatId)
             }.onFailure { exception ->
                 Timber.e("Chat room does not exist, finish $exception")
                 finishActivity()

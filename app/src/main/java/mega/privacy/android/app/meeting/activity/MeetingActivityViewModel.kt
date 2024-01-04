@@ -78,7 +78,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatParticipants
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
@@ -131,7 +131,7 @@ import javax.inject.Inject
  * @property logoutUseCase                                  [LogoutUseCase]
  * @property monitorFinishActivityUseCase                   [MonitorFinishActivityUseCase]
  * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
- * @property getChatRoomByChatIdUseCase                     [GetChatRoom]
+ * @property getChatRoomByChatIdUseCaseUseCase                     [GetChatRoomUseCase]
  * @property getChatCallUseCase                             [GetChatCallUseCase]
  * @property getFeatureFlagValue                            [GetFeatureFlagValueUseCase]
  * @property setOpenInvite                                  [SetOpenInvite]
@@ -172,7 +172,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
-    private val getChatRoomByChatIdUseCase: GetChatRoom,
+    private val getChatRoomByChatIdUseCaseUseCase: GetChatRoomUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val queryChatLink: QueryChatLink,
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
@@ -413,7 +413,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun getChatRoom() = viewModelScope.launch {
         runCatching {
-            getChatRoomByChatIdUseCase(_state.value.chatId)
+            getChatRoomByChatIdUseCaseUseCase(_state.value.chatId)
         }.onSuccess { chatRoom ->
             chatRoom?.apply {
                 _state.update {

@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.chat
 
 import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.repository.ChatRepository
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import javax.inject.Inject
 
 /**
@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 class JoinChatCallUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
-    private val getChatRoom: GetChatRoom,
+    private val getChatRoom: GetChatRoomUseCase,
     private val joinChatLinkUseCase: JoinChatLinkUseCase,
 ) {
     /**

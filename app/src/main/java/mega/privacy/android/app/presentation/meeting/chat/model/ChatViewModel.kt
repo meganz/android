@@ -33,7 +33,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -107,7 +107,7 @@ const val EXTRA_LINK = "LINK"
 @HiltViewModel
 internal class ChatViewModel @Inject constructor(
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase,
-    private val getChatRoomUseCase: GetChatRoom,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,

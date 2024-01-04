@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingData
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import java.time.Instant
 import javax.inject.Inject
 
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class GetScheduleMeetingDataUseCase @Inject constructor(
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChat,
     private val getNextSchedMeetingOccurrenceUseCase: GetNextSchedMeetingOccurrenceUseCase,
-    private val getChatRoomUseCase: GetChatRoom,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
 ) {
 
     /**

@@ -46,7 +46,7 @@ import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -125,7 +125,7 @@ internal class ChatViewModelTest {
 
     private lateinit var underTest: ChatViewModel
 
-    private val getChatRoomUseCase: GetChatRoom = mock()
+    private val getChatRoomUseCase: GetChatRoomUseCase = mock()
     private val savedStateHandle: SavedStateHandle = mock {
         on { get<Long>(Constants.CHAT_ID) } doReturn chatId
     }

@@ -27,7 +27,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartScheduledMeetingUseCase
@@ -46,7 +46,7 @@ import javax.inject.Inject
  * @property answerChatCallUseCase                  [AnswerChatCallUseCase]
  * @property startScheduledMeetingUseCase           [StartScheduledMeetingUseCase]
  * @property startMeetingInWaitingRoomChatUseCase   [StartMeetingInWaitingRoomChatUseCase]
- * @property getChatRoomUseCase                     [GetChatRoom]
+ * @property getChatRoomUseCase                     [GetChatRoomUseCase]
  * @property notificationManager                    [NotificationManagerCompat]
  * @property ioDispatcher                           [CoroutineDispatcher]
  * @property coroutineScope                         [CoroutineScope]
@@ -75,7 +75,7 @@ class CallNotificationIntentService : Service(),
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
 
     @Inject
-    lateinit var getChatRoomUseCase: GetChatRoom
+    lateinit var getChatRoomUseCase: GetChatRoomUseCase
 
     @Inject
     lateinit var notificationManager: NotificationManagerCompat

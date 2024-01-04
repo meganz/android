@@ -51,7 +51,7 @@ import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
@@ -105,7 +105,7 @@ import javax.inject.Inject
  * @property isConnected                                    True if the app has some network connection, false otherwise.
  * @property monitorUpdatePushNotificationSettingsUseCase   monitors push notification settings update
  * @property deviceGateway                                  [DeviceGateway]
- * @property getChatRoom                                    [GetChatRoom]
+ * @property getChatRoomUseCase                                    [GetChatRoomUseCase]
  * @property getFeatureFlagValueUseCase                     [GetFeatureFlagValueUseCase]
  * @property monitorChatArchivedUseCase                     [MonitorChatArchivedUseCase]
  * @property broadcastChatArchivedUseCase                   [BroadcastChatArchivedUseCase]
@@ -134,7 +134,7 @@ class ChatViewModel @Inject constructor(
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getChatCallUseCase: GetChatCallUseCase,
-    private val getChatRoom: GetChatRoom,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val endCallUseCase: EndCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
@@ -436,7 +436,7 @@ class ChatViewModel @Inject constructor(
     private fun getChat() =
         viewModelScope.launch {
             runCatching {
-                getChatRoom(state.value.chatId)
+                getChatRoomUseCase(state.value.chatId)
             }.onFailure { exception ->
                 Timber.e("Chat room does not exist, finish $exception")
             }.onSuccess { chatRoom ->

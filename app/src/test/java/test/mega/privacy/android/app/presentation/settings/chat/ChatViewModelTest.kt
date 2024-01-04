@@ -19,7 +19,7 @@ import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.contacts.ContactLink
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
@@ -80,7 +80,7 @@ class ChatViewModelTest {
     private val startCallUseCase: StartCallUseCase = mock()
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
     private val getChatCallUseCase: GetChatCallUseCase = mock()
-    private val getChatRoom: GetChatRoom = mock()
+    private val getChatRoomUseCase: GetChatRoomUseCase = mock()
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val endCallUseCase: EndCallUseCase = mock()
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase = mock()
@@ -134,7 +134,7 @@ class ChatViewModelTest {
             startCallUseCase,
             getScheduledMeetingByChat,
             getChatCallUseCase,
-            getChatRoom,
+            getChatRoomUseCase,
             monitorChatCallUpdatesUseCase,
             endCallUseCase,
             sendStatisticsMeetingsUseCase,
@@ -175,7 +175,7 @@ class ChatViewModelTest {
             startChatCallNoRingingUseCase = startChatCallNoRingingUseCase,
             getScheduledMeetingByChat = getScheduledMeetingByChat,
             getChatCallUseCase = getChatCallUseCase,
-            getChatRoom = getChatRoom,
+            getChatRoomUseCase = getChatRoomUseCase,
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             endCallUseCase = endCallUseCase,
             sendStatisticsMeetingsUseCase = sendStatisticsMeetingsUseCase,

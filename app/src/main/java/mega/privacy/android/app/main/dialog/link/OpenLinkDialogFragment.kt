@@ -30,7 +30,6 @@ import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivit
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.ThemeMode
@@ -39,11 +38,12 @@ import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,7 +59,7 @@ internal class OpenLinkDialogFragment : DialogFragment() {
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
-    lateinit var getChatRoomUseCase: GetChatRoom
+    lateinit var getChatRoomUseCase: GetChatRoomUseCase
 
     @Inject
     lateinit var openLinkErrorMapper: OpenLinkErrorMapper

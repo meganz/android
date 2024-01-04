@@ -36,11 +36,10 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -83,7 +82,7 @@ import javax.inject.Inject
  * @property chatManagement                     [ChatManagement]
  * @property monitorContactUpdates              [MonitorContactUpdates]
  * @property requestUserLastGreenUseCase        [RequestUserLastGreenUseCase]
- * @property getChatRoom                        [GetChatRoom]
+ * @property getChatRoomUseCase                        [GetChatRoomUseCase]
  * @property getUserOnlineStatusByHandleUseCase [GetUserOnlineStatusByHandleUseCase]
  * @property getChatRoomByUserUseCase           [GetChatRoomByUserUseCase]
  * @property getContactFromChatUseCase          [GetContactFromChatUseCase]
@@ -103,7 +102,7 @@ class ContactInfoViewModel @Inject constructor(
     private val monitorContactUpdates: MonitorContactUpdates,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
-    private val getChatRoom: GetChatRoom,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val getChatRoomByUserUseCase: GetChatRoomByUserUseCase,
     private val getContactFromChatUseCase: GetContactFromChatUseCase,
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
@@ -195,7 +194,7 @@ class ContactInfoViewModel @Inject constructor(
         monitorChatConnectionStateUseCase().collectLatest {
             val shouldInitiateCall = isChatConnectedToInitiateCallUseCase(
                 newState = it.chatConnectionStatus,
-                chatRoom = getChatRoom(it.chatId),
+                chatRoom = getChatRoomUseCase(it.chatId),
                 isWaitingForCall = MegaApplication.isWaitingForCall,
                 userWaitingForCall = MegaApplication.userWaitingForCall,
             )
@@ -428,7 +427,7 @@ class ContactInfoViewModel @Inject constructor(
             }
         } else {
             runCatching {
-                chatRoom = getChatRoom(chatHandle)
+                chatRoom = getChatRoomUseCase(chatHandle)
                 userInfo = getContactFromChatUseCase(chatHandle, isOnline())
             }
         }
@@ -628,7 +627,7 @@ class ContactInfoViewModel @Inject constructor(
             runCatching {
                 startConversationUseCase(isGroup = false, userHandles = listOf(it))
             }.onSuccess {
-                val chatRoom = getChatRoom(it)
+                val chatRoom = getChatRoomUseCase(it)
                 chatRoom?.let {
                     _state.update { state ->
                         state.copy(chatRoom = chatRoom, shouldNavigateToChat = true)
@@ -660,7 +659,7 @@ class ContactInfoViewModel @Inject constructor(
             runCatching {
                 createChatRoomUseCase(isGroup = false, userHandles = listOf(it))
             }.onSuccess {
-                val chatRoom = getChatRoom(it)
+                val chatRoom = getChatRoomUseCase(it)
                 _state.update { state ->
                     state.copy(chatRoom = chatRoom)
                 }

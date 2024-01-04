@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fcm
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Notification
@@ -35,14 +36,13 @@ import mega.privacy.android.domain.entity.pushes.PushMessage.*
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
 import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
-import mega.privacy.android.icon.pack.R as iconPackR
 import timber.log.Timber
 
 /**
@@ -66,7 +66,7 @@ class PushMessageWorker @AssistedInject constructor(
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val notificationManager: NotificationManagerCompat,
     private val isChatNotifiableUseCase: IsChatNotifiableUseCase,
-    private val getChatRoom: GetChatRoom,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val fileDurationMapper: FileDurationMapper,
     private val getChatMessageNotificationDataUseCase: GetChatMessageNotificationDataUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -228,7 +228,7 @@ class PushMessageWorker @AssistedInject constructor(
                 CallsMeetingReminders.Enabled
 
     private suspend fun ScheduledMeetingPushMessage.updateTitle(): ScheduledMeetingPushMessage =
-        runCatching { getChatRoom(chatRoomHandle)?.title }.getOrNull()?.let { chatRoomTitle ->
+        runCatching { getChatRoomUseCase(chatRoomHandle)?.title }.getOrNull()?.let { chatRoomTitle ->
             copy(title = chatRoomTitle)
         } ?: this
 

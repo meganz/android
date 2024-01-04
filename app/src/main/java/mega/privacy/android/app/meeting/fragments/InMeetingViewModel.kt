@@ -66,7 +66,7 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableAudioLevelMonitorUseCase
@@ -121,7 +121,7 @@ import javax.inject.Inject
  * @property stopHighResolutionVideoUseCase     [StopHighResolutionVideoUseCase]
  * @property stopLowResolutionVideoUseCase      [StopLowResolutionVideoUseCase]
  * @property getChatCallUseCase                 [GetChatCallUseCase]
- * @property getChatRoomUseCase                 [GetChatRoom]
+ * @property getChatRoomUseCase                 [GetChatRoomUseCase]
  * @property monitorChatRoomUpdates             [MonitorChatRoomUpdates]
  * @property state                              Current view state as [InMeetingUiState]
  */
@@ -150,7 +150,7 @@ class InMeetingViewModel @Inject constructor(
     private val stopHighResolutionVideoUseCase: StopHighResolutionVideoUseCase,
     private val stopLowResolutionVideoUseCase: StopLowResolutionVideoUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
-    private val getChatRoomUseCase: GetChatRoom,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {

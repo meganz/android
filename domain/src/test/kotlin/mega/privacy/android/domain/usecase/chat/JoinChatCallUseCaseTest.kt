@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.repository.ChatRepository
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -19,7 +19,7 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 class JoinChatCallUseCaseTest {
     private val chatRepository: ChatRepository = Mockito.mock()
-    private val getChatRoom: GetChatRoom = Mockito.mock()
+    private val getChatRoom: GetChatRoomUseCase = Mockito.mock()
     private val joinChatLinkUseCase = mock<JoinChatLinkUseCase>()
 
     private lateinit var underTest: JoinChatCallUseCase

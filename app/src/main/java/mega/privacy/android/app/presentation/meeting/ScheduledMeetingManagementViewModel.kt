@@ -32,7 +32,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.usecase.CreateChatLink
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
@@ -62,7 +62,7 @@ import javax.inject.Inject
  * @property archiveChatUseCase                         [ArchiveChatUseCase]
  * @property cancelScheduledMeetingUseCase              [CancelScheduledMeetingUseCase]
  * @property cancelScheduledMeetingOccurrenceUseCase    [CancelScheduledMeetingOccurrenceUseCase]
- * @property getChatRoomUseCase                         [GetChatRoom]
+ * @property getChatRoomUseCase                         [GetChatRoomUseCase]
  * @property getStringFromStringResMapper               [GetStringFromStringResMapper]
  * @property queryChatLink                              [QueryChatLink]
  * @property removeChatLink                             [RemoveChatLink]
@@ -86,7 +86,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val archiveChatUseCase: ArchiveChatUseCase,
     private val cancelScheduledMeetingUseCase: CancelScheduledMeetingUseCase,
     private val cancelScheduledMeetingOccurrenceUseCase: CancelScheduledMeetingOccurrenceUseCase,
-    private val getChatRoomUseCase: GetChatRoom,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val queryChatLink: QueryChatLink,
     private val removeChatLink: RemoveChatLink,

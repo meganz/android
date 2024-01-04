@@ -5,7 +5,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
@@ -16,7 +16,7 @@ import javax.inject.Inject
  * Use case for getting all the required data for a chat message notification.
  */
 class GetChatMessageNotificationDataUseCase @Inject constructor(
-    private val getChatRoom: GetChatRoom,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase,
     private val getUserAvatarUseCase: GetUserAvatarUseCase,
@@ -43,7 +43,7 @@ class GetChatMessageNotificationDataUseCase @Inject constructor(
             if (message.isDeleted) {
                 ChatMessageNotificationData(msg = message)
             } else {
-                val chatRoom = getChatRoom(chatId) ?: return@withContext null
+                val chatRoom = getChatRoomUseCase(chatId) ?: return@withContext null
                 val senderName = async {
                     runCatching {
                         getMessageSenderNameUseCase(

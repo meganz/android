@@ -33,7 +33,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -89,7 +89,7 @@ class ContactInfoViewModelTest {
     private var monitorContactUpdates: MonitorContactUpdates = mock()
     private var getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
     private var requestUserLastGreenUseCase: RequestUserLastGreenUseCase = mock()
-    private var getChatRoom: GetChatRoom = mock()
+    private var getChatRoomUseCase: GetChatRoomUseCase = mock()
     private var getContactFromEmailUseCase: GetContactFromEmailUseCase = mock()
     private var getContactFromChatUseCase: GetContactFromChatUseCase = mock()
     private var getChatRoomByUserUseCase: GetChatRoomByUserUseCase = mock()
@@ -165,7 +165,7 @@ class ContactInfoViewModelTest {
             monitorContactUpdates,
             getUserOnlineStatusByHandleUseCase,
             requestUserLastGreenUseCase,
-            getChatRoom,
+            getChatRoomUseCase,
             getContactFromEmailUseCase,
             getContactFromChatUseCase,
             getChatRoomByUserUseCase,
@@ -200,7 +200,7 @@ class ContactInfoViewModelTest {
             monitorContactUpdates = monitorContactUpdates,
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
-            getChatRoom = getChatRoom,
+            getChatRoomUseCase = getChatRoomUseCase,
             getChatRoomByUserUseCase = getChatRoomByUserUseCase,
             getContactFromChatUseCase = getContactFromChatUseCase,
             getContactFromEmailUseCase = getContactFromEmailUseCase,
@@ -294,7 +294,7 @@ class ContactInfoViewModelTest {
     @Test
     fun `test when contact info screen launched from contacts emits title`() =
         runTest {
-            whenever(getChatRoom(testHandle)).thenReturn(chatRoom)
+            whenever(getChatRoomUseCase(testHandle)).thenReturn(chatRoom)
             whenever(
                 getContactFromChatUseCase(
                     testHandle,
@@ -410,7 +410,7 @@ class ContactInfoViewModelTest {
             whenever(getChatRoomByUserUseCase(userHandle = testHandle)).thenReturn(null)
             whenever(createChatRoomUseCase(isGroup = false, userHandles = listOf(testHandle)))
                 .thenReturn(newChatId)
-            whenever(getChatRoom(newChatId)).thenReturn(newChatRoom)
+            whenever(getChatRoomUseCase(newChatId)).thenReturn(newChatRoom)
             initViewModel()
             underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             verifyInitialData()
@@ -439,7 +439,7 @@ class ContactInfoViewModelTest {
         whenever(monitorStorageStateEventUseCase()).thenReturn(storageFlow)
         whenever(startConversationUseCase(isGroup = false, userHandles = listOf(testHandle)))
             .thenReturn(chatId)
-        whenever(getChatRoom(chatId)).thenReturn(chatRoom)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
         initViewModel()
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
