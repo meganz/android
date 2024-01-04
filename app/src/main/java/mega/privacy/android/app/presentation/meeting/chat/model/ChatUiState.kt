@@ -25,7 +25,8 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property userLastGreen User chat last green if is a 1to1 conversation and if chat status is different than online, null otherwise.
  * @property myPermission [ChatRoomPermission] of the current logged in user.
  * @property isPreviewMode True if the current logged in user is in a chat link in preview mode (not participating).
- * @property isJoiningOrLeaving True if the current logged in user is joining or leaving this chat, false otherwise.
+ * @property isJoining True if the current logged in user is joining this chat, false otherwise.
+ * @property isLeaving True if the current logged in user is leaving this chat, false otherwise.
  * @property callInOtherChat [ChatCall] if I am already participating in a call in other chat. Null otherwise.
  * @property callInThisChat [ChatCall] if the current logged in user has a call in this chat, null otherwise.
  * @property isGroup True if is a chat group, false otherwise.
@@ -55,6 +56,8 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property isLoadingGalleryFiles True if gallery files are being loaded, false otherwise.
  * @property userUpdate [UserUpdate] with the changes in the user.
  * @property numPreviewers Number of previewers in the chat.
+ * @property isAnonymousMode True if the chat is in anonymous mode, false otherwise.
+ * @property chatLink String with the chat link.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -65,7 +68,8 @@ data class ChatUiState(
     val userLastGreen: Int? = null,
     val myPermission: ChatRoomPermission = ChatRoomPermission.Unknown,
     val isPreviewMode: Boolean = false,
-    val isJoiningOrLeaving: Boolean = false,
+    val isJoining: Boolean = false,
+    val isLeaving: Boolean = false,
     val callInOtherChat: ChatCall? = null,
     val callInThisChat: ChatCall? = null,
     val isGroup: Boolean = false,
@@ -95,10 +99,17 @@ data class ChatUiState(
     val isLoadingGalleryFiles: Boolean = true,
     val userUpdate: UserUpdate? = null,
     val numPreviewers: Long = 0,
+    val isAnonymousMode: Boolean = false,
+    val chatLink: String? = null,
 ) {
 
     /**
      * Has a call in this chat.
      */
     val hasACallInThisChat = callInThisChat != null
+
+    /**
+     * True if the current logged in user is joining or leaving this chat, false otherwise.
+     */
+    val isJoiningOrLeaving = isJoining || isLeaving
 }

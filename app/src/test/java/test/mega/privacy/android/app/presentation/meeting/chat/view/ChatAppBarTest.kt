@@ -131,8 +131,8 @@ class ChatAppBarTest {
     }
 
     @Test
-    fun `test that audio call is hidden when is joining or leaving`() {
-        initComposeRuleContent(ChatUiState(isJoiningOrLeaving = true))
+    fun `test that audio call is hidden when is joining`() {
+        initComposeRuleContent(ChatUiState(isJoining = true))
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION)
             .assertDoesNotExist()
     }
@@ -207,8 +207,8 @@ class ChatAppBarTest {
     }
 
     @Test
-    fun `test that video call is hidden when is joining or leaving`() {
-        initComposeRuleContent(ChatUiState(isJoiningOrLeaving = true))
+    fun `test that video call is hidden when is joining`() {
+        initComposeRuleContent(ChatUiState(isJoining = true))
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION)
             .assertDoesNotExist()
     }
@@ -311,8 +311,8 @@ class ChatAppBarTest {
     }
 
     @Test
-    fun `test that add participants is not available when is joining or leaving`() {
-        initComposeRuleContent(ChatUiState(isJoiningOrLeaving = true))
+    fun `test that add participants is not available when is joining`() {
+        initComposeRuleContent(ChatUiState(isJoining = true))
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION)
             .assertDoesNotExist()
@@ -451,7 +451,7 @@ class ChatAppBarTest {
     fun `test that Info menu action is available in 1on1 chat and my permission is Moderator`() {
         initComposeRuleContent(
             ChatUiState(
-                isJoiningOrLeaving = false,
+                isJoining = false,
                 isPreviewMode = false,
                 isConnected = true,
                 isGroup = false,
@@ -467,7 +467,7 @@ class ChatAppBarTest {
     fun `test that Info menu action is available in group chat`() {
         initComposeRuleContent(
             ChatUiState(
-                isJoiningOrLeaving = false,
+                isJoining = false,
                 isPreviewMode = false,
                 isConnected = true,
                 isGroup = true,
@@ -763,12 +763,8 @@ class ChatAppBarTest {
     }
 
     @Test
-    fun `test that toolbar tap is disabled if is joining or leaving`() {
-        initComposeRuleContent(
-            ChatUiState(
-                isJoiningOrLeaving = true
-            )
-        )
+    fun `test that toolbar tap is disabled if is joining`() {
+        initComposeRuleContent(ChatUiState(isJoining = true))
         composeTestRule.onNodeWithTag(TEST_TAG_APP_BAR).apply {
             assertIsDisplayed()
             performClick()
@@ -882,7 +878,7 @@ class ChatAppBarTest {
         ChatUiState(
             isGroup = false,
             isPreviewMode = false,
-            isJoiningOrLeaving = false,
+            isJoining = false,
             isChatNotificationMute = true,
             isConnected = true,
             myPermission = ChatRoomPermission.Moderator,
@@ -892,16 +888,16 @@ class ChatAppBarTest {
         ChatUiState(
             isGroup = true,
             isPreviewMode = false,
-            isJoiningOrLeaving = false,
+            isJoining = false,
             isChatNotificationMute = true,
             isConnected = true,
             isActive = true,
         )
 
     @Test
-    fun `test that unmute menu action is not shown when it is joining or leaving`() {
+    fun `test that unmute menu action is not shown when it is joining`() {
         initComposeRuleContent(
-            uiStateToShowUnmuteIn1on1Chat().copy(isJoiningOrLeaving = true)
+            uiStateToShowUnmuteIn1on1Chat().copy(isJoining = true)
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
@@ -989,7 +985,7 @@ class ChatAppBarTest {
         ChatUiState(
             isGroup = false,
             isPreviewMode = false,
-            isJoiningOrLeaving = false,
+            isJoining = false,
             isChatNotificationMute = false,
             isConnected = true,
             myPermission = ChatRoomPermission.Moderator,
@@ -999,16 +995,16 @@ class ChatAppBarTest {
         ChatUiState(
             isGroup = true,
             isPreviewMode = false,
-            isJoiningOrLeaving = false,
+            isJoining = false,
             isChatNotificationMute = true,
             isConnected = true,
             isActive = true,
         )
 
     @Test
-    fun `test that mute menu action is not shown when it is joining or leaving`() {
+    fun `test that mute menu action is not shown when it is joining`() {
         initComposeRuleContent(
-            uiStateToShowMuteIn1on1Chat().copy(isJoiningOrLeaving = true)
+            uiStateToShowMuteIn1on1Chat().copy(isJoining = true)
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
@@ -1087,9 +1083,9 @@ class ChatAppBarTest {
     }
 
     @Test
-    fun `test that Clear menu action is not available when is joining or leaving`() {
+    fun `test that Clear menu action is not available when is joining`() {
         initComposeRuleContent(
-            ChatUiState(isJoiningOrLeaving = true)
+            ChatUiState(isJoining = true)
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION)
@@ -1185,9 +1181,9 @@ class ChatAppBarTest {
     }
 
     @Test
-    fun `test that Archive menu action is not available if is joining or leaving`() {
+    fun `test that Archive menu action is not available if is joining`() {
         initComposeRuleContent(
-            ChatUiState(isJoiningOrLeaving = true)
+            ChatUiState(isJoining = true)
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertDoesNotExist()

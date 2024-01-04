@@ -25,6 +25,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class ChatViewTest {
@@ -158,6 +159,18 @@ class ChatViewTest {
         }
         composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_LOCATION).performClick()
         composeTestRule.onNodeWithTag(TEST_TAG_ENABLE_GEOLOCATION_DIALOG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that join button is shown if it is in preview mode`() {
+        initComposeRuleContent(ChatUiState(isPreviewMode = true))
+        composeTestRule.onNodeWithText(R.string.action_join).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that join button is not shown if it is not in preview mode`() {
+        initComposeRuleContent(ChatUiState(isPreviewMode = false))
+        composeTestRule.onNodeWithText(R.string.action_join).assertDoesNotExist()
     }
 
 

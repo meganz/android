@@ -45,8 +45,10 @@ import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
+import mega.privacy.android.domain.usecase.chat.IsAnonymousModeUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
+import mega.privacy.android.domain.usecase.chat.JoinChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.JoinChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
@@ -143,17 +145,19 @@ internal class ChatViewModel @Inject constructor(
     private val isGeolocationEnabledUseCase: IsGeolocationEnabledUseCase,
     private val enableGeolocationUseCase: EnableGeolocationUseCase,
     private val sendTextMessageUseCase: SendTextMessageUseCase,
-    private val joinChatLinkUseCase: JoinChatLinkUseCase,
+    private val joinChatCallUseCase: JoinChatCallUseCase,
     private val holdChatCallUseCase: HoldChatCallUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val monitorContactCacheUpdates: MonitorContactCacheUpdates,
+    private val joinChatLinkUseCase: JoinChatLinkUseCase,
+    private val isAnonymousModeUseCase: IsAnonymousModeUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
 
     private val chatId: Long?
-        get() = savedStateHandle.get(Constants.CHAT_ID)
+        get() = savedStateHandle[Constants.CHAT_ID]
     private val chatLink: String
         get() = savedStateHandle.get<String>(EXTRA_LINK).orEmpty()
     private val usersTyping = Collections.synchronizedMap(mutableMapOf<Long, String?>())
@@ -173,7 +177,15 @@ internal class ChatViewModel @Inject constructor(
         monitorStorageStateEvent()
         loadChatRoom()
         joinChatIfNeeded()
+        checkAnonymousMode()
         monitorContactCacheUpdate()
+    }
+
+    private fun checkAnonymousMode() {
+        viewModelScope.launch {
+            val isAnonymousMode = isAnonymousModeUseCase()
+            _state.update { state -> state.copy(isAnonymousMode = isAnonymousMode) }
+        }
     }
 
     private fun monitorContactCacheUpdate() {
@@ -191,11 +203,12 @@ internal class ChatViewModel @Inject constructor(
 
     private fun joinChatIfNeeded() {
         if (chatLink.isNotEmpty()) {
+            _state.update { state -> state.copy(chatLink = chatLink) }
             viewModelScope.launch {
                 val action = savedStateHandle.get<String>(EXTRA_ACTION).orEmpty()
                 val isAutoJoin = action == Constants.ACTION_JOIN_OPEN_CHAT_LINK
                 runCatching {
-                    joinChatLinkUseCase(
+                    joinChatCallUseCase(
                         chatLink = chatLink,
                         isAutoJoin = isAutoJoin
                     )
@@ -949,6 +962,22 @@ internal class ChatViewModel @Inject constructor(
 
     fun onUserUpdateHandled() {
         _state.update { state -> state.copy(userUpdate = null) }
+    }
+
+    fun onSetPendingJoinLink() {
+        chatManagement.pendingJoinLink = chatLink
+    }
+
+    fun onJoinChat() {
+        viewModelScope.launch {
+            chatId?.let {
+                runCatching {
+                    joinChatLinkUseCase(it)
+                }.onFailure {
+                    Timber.e(it)
+                }
+            }
+        }
     }
 
     companion object {

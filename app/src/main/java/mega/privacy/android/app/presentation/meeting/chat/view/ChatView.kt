@@ -15,6 +15,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -68,6 +69,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAd
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openLocationPicker
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.showGroupOrContactInfoActivity
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startLoginActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startWaitingRoom
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatAttachFileBottomSheet
@@ -76,6 +78,7 @@ import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
+import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.ChatObserverIndicator
 import mega.privacy.android.core.ui.controls.chat.ScrollToBottomFab
@@ -118,6 +121,8 @@ internal fun ChatView(
         onHoldAndAnswerCall = viewModel::onHoldAndAnswerCall,
         onEndAndAnswerCall = viewModel::onEndAndAnswerCall,
         onUserUpdateHandled = viewModel::onUserUpdateHandled,
+        onJoinChat = viewModel::onJoinChat,
+        onSetPendingJoinLink = viewModel::onSetPendingJoinLink,
     )
 }
 
@@ -163,6 +168,8 @@ internal fun ChatView(
     onSendClick: (String) -> Unit = {},
     onHoldAndAnswerCall: () -> Unit = {},
     onEndAndAnswerCall: () -> Unit = {},
+    onJoinChat: () -> Unit = {},
+    onSetPendingJoinLink: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -395,6 +402,22 @@ internal fun ChatView(
                                 onSendClick = onSendClick
                             )
                         }
+                    }
+                    if (isPreviewMode) {
+                        RaisedDefaultMegaButton(
+                            textId = R.string.action_join,
+                            onClick = {
+                                if (isAnonymousMode) {
+                                    onSetPendingJoinLink()
+                                    startLoginActivity(context, chatLink)
+                                } else {
+                                    onJoinChat()
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                        )
                     }
                 },
                 floatingActionButton = {
