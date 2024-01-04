@@ -328,6 +328,8 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 )
             }
 
+            setOnAddingParticipantsConsumed()
+
             if (state.value.participantItemList.isNotEmpty()) {
                 if (participantsAdded.isNotEmpty()) {
                     updateParticipantsSnackbarMessage(isAdding = true, list = participantsAdded)
@@ -589,7 +591,14 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * Sets openAddContact as consumed.
      */
     fun setOnOpenAddContactConsumed() = _state.update { state ->
-        state.copy(openAddContact = null)
+        state.copy(openAddContact = null, isAddingParticipants = true)
+    }
+
+    /**
+     * Sets isAddingParticipants as consumed.
+     */
+    fun setOnAddingParticipantsConsumed() = _state.update { state ->
+        state.copy(isAddingParticipants = false)
     }
 
     /**

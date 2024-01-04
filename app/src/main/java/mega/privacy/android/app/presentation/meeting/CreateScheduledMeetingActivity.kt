@@ -117,6 +117,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         }
                 } else {
                     Timber.e("Error adding participants")
+                    viewModel.setOnAddingParticipantsConsumed()
                 }
             }
     }

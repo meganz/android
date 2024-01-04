@@ -495,14 +495,14 @@ private fun ScheduleMeetingAppBar(
                         .wrapContentSize(Alignment.CenterEnd)
                 ) {
                     IconButton(onClick = {
-                        if (!state.isCreatingMeeting && state.isValid()) {
+                        if (!state.isCreatingMeeting && !state.isAddingParticipants && state.isValid()) {
                             onAcceptClicked()
                         }
                     }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_confirm),
                             contentDescription = "Accept schedule meeting button",
-                            tint = if (state.isValid()) MaterialTheme.colors.secondary
+                            tint = if (state.isValid() && !state.isAddingParticipants) MaterialTheme.colors.secondary
                             else MaterialTheme.colors.grey_alpha_038_white_alpha_038
                         )
                     }

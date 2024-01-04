@@ -53,6 +53,7 @@ import java.time.temporal.WeekFields
  * @property customRecurrenceState                      [CustomRecurrenceState]
  * @property showMonthlyRecurrenceWarning               True, if the text on the monthly recurrence warning should be displayed. False, if not.
  * @property isCreatingMeeting                          True, if the meeting is being created. False, if not.
+ * @property isAddingParticipants                       True, if is adding participants. False, if not.
  * @property type                                       [ScheduledMeetingType]
  * @property initialMeetingLinkOption                   True if is enabled the meeting link option, false otherwise.
  * @property initialAllowAddParticipantsOption          True if is enabled the allow non-hosts to add participants option, false otherwise.
@@ -84,6 +85,7 @@ data class CreateScheduledMeetingState constructor(
     val addParticipantsNoContactsDialog: Boolean = false,
     val numOfParticipants: Int = 1,
     val isEditingDescription: Boolean = false,
+    val isAddingParticipants: Boolean = false,
     val isEmptyTitleError: Boolean = false,
     val allowAddParticipants: Boolean = true,
     val recurringMeetingDialog: Boolean = false,
