@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property is24HourFormat                             True, if it's 24 hour format.
  * @property enabledWaitingRoomOption                   True if is enabled waiting room option, false otherwise.
  * @property snackbarMsg                                State to show snackbar message
+ * @property myFullName                                 My full name
  */
 data class ScheduledMeetingInfoState(
     val chatId: Long = -1L,
@@ -72,6 +73,7 @@ data class ScheduledMeetingInfoState(
     val is24HourFormat: Boolean = false,
     val enabledWaitingRoomOption: Boolean = true,
     val snackbarMsg: StateEventWithContent<String> = consumed(),
+    val myFullName: String = "",
 ) {
 
     /**

@@ -653,7 +653,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             chatLink
                 ?: return,
             chat?.ownPrivilege == MegaChatRoom.PRIV_MODERATOR,
-            chat?.title
+            chat?.title, chat?.isMeeting ?: false
         )
 
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)

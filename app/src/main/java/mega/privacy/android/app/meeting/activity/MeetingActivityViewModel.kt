@@ -23,7 +23,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -59,22 +61,26 @@ import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.VideoCaptureUtils
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
@@ -82,6 +88,7 @@ import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
@@ -90,10 +97,12 @@ import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
@@ -141,6 +150,10 @@ import javax.inject.Inject
  * @property broadcastCallRecordingConsentEventUseCase      [BroadcastCallRecordingConsentEventUseCase]
  * @property monitorCallEndedUseCase                        [MonitorCallEndedUseCase]
  * @property broadcastCallEndedUseCase                      [BroadcastCallEndedUseCase]
+ * @property monitorScheduledMeetingUpdatesUseCase          [MonitorScheduledMeetingUpdatesUseCase]
+ * @property getMyFullNameUseCase                           [GetMyFullNameUseCase]
+ * @property deviceGateway                                  [DeviceGateway]
+ * @property monitorUserUpdates                             [MonitorUserUpdates]
  * @property state                                          Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -177,6 +190,11 @@ class MeetingActivityViewModel @Inject constructor(
     private val broadcastCallRecordingConsentEventUseCase: BroadcastCallRecordingConsentEventUseCase,
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
     private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase,
+    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val getMyFullNameUseCase: GetMyFullNameUseCase,
+    private val monitorUserUpdates: MonitorUserUpdates,
+    private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
+    private val deviceGateway: DeviceGateway,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -190,6 +208,11 @@ class MeetingActivityViewModel @Inject constructor(
      * @return True if it is only or False otherwise.
      */
     fun isOnline(): Boolean = isConnectedToInternetUseCase()
+
+    /**
+     * Check if it's 24 hour format
+     */
+    val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
 
     /**
      * Get latest [StorageState] from [MonitorStorageStateEventUseCase] use case.
@@ -301,6 +324,7 @@ class MeetingActivityViewModel @Inject constructor(
 
         startMonitoringChatCallUpdates()
         startMonitorChatSessionUpdates()
+        getMyFullName()
 
         getCallUseCase.getCallEnded()
             .subscribeOn(Schedulers.io())
@@ -329,6 +353,19 @@ class MeetingActivityViewModel @Inject constructor(
         showDefaultAvatar().invokeOnCompletion {
             loadAvatar(true)
         }
+
+        viewModelScope.launch {
+            flow {
+                emitAll(monitorUserUpdates()
+                    .catch { Timber.w("Exception monitoring user updates: $it") }
+                    .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
+            }.collect {
+                when (it) {
+                    UserChanges.Firstname, UserChanges.Lastname -> getMyFullName()
+                    else -> Unit
+                }
+            }
+        }
     }
 
     /**
@@ -351,6 +388,25 @@ class MeetingActivityViewModel @Inject constructor(
      * @return True, if I am a guest. False if not
      */
     fun amIAGuest(): Boolean = meetingActivityRepository.amIAGuest()
+
+    /**
+     * Get my full name
+     */
+    private fun getMyFullName() = viewModelScope.launch {
+        runCatching {
+            getMyFullNameUseCase()
+        }.onSuccess {
+            it?.apply {
+                _state.update {state ->
+                    state.copy(
+                        myFullName = this,
+                    )
+                }
+            }
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
 
     /**
      * Get chat room
@@ -398,6 +454,167 @@ class MeetingActivityViewModel @Inject constructor(
             Timber.e(exception)
         }
     }
+
+    private fun getScheduledMeeting() =
+        viewModelScope.launch {
+            runCatching {
+                getScheduledMeetingByChat(state.value.chatId)
+            }.onFailure {
+                Timber.d("Scheduled meeting does not exist")
+                _state.update {
+                    it.copy(
+                        chatScheduledMeeting = null
+                    )
+                }
+            }.onSuccess { scheduledMeetingList ->
+                scheduledMeetingList?.let { list ->
+                    list.forEach { scheduledMeetReceived ->
+                        if (scheduledMeetReceived.parentSchedId == -1L) {
+                            _state.update {
+                                it.copy(
+                                    chatScheduledMeeting = scheduledMeetReceived
+                                )
+                            }
+                            return@forEach
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+    /**
+     * Get scheduled meeting updates
+     */
+    private fun startMonitorScheduledMeetingUpdates() =
+        viewModelScope.launch {
+            monitorScheduledMeetingUpdatesUseCase().collectLatest { scheduledMeetReceived ->
+                if (scheduledMeetReceived.chatId != state.value.chatId) {
+                    return@collectLatest
+                }
+
+                if (scheduledMeetReceived.parentSchedId != -1L) {
+                    return@collectLatest
+                }
+
+                scheduledMeetReceived.changes?.let { changes ->
+                    changes.forEach {
+                        Timber.d("Monitor scheduled meeting updated, changes $changes")
+                        if (_state.value.chatScheduledMeeting == null) {
+                            _state.update { state ->
+                                state.copy(
+                                    chatScheduledMeeting = scheduledMeetReceived
+                                )
+                            }
+                            return@forEach
+                        }
+
+                        when (it) {
+                            ScheduledMeetingChanges.NewScheduledMeeting ->
+                                _state.update { state ->
+                                    state.copy(
+                                        chatScheduledMeeting = scheduledMeetReceived
+                                    )
+                                }
+
+                            ScheduledMeetingChanges.Title ->
+                                _state.update { state ->
+                                    state.copy(
+                                        chatScheduledMeeting = state.chatScheduledMeeting?.copy(
+                                            title = scheduledMeetReceived.title
+                                        )
+                                    )
+                                }
+
+                            ScheduledMeetingChanges.Description ->
+                                _state.update { state ->
+                                    state.copy(
+                                        chatScheduledMeeting = state.chatScheduledMeeting?.copy(
+                                            title = scheduledMeetReceived.description
+                                        )
+                                    )
+                                }
+
+                            ScheduledMeetingChanges.StartDate -> _state.update { state ->
+                                state.copy(
+                                    chatScheduledMeeting = state.chatScheduledMeeting?.copy(
+                                        startDateTime = scheduledMeetReceived.startDateTime,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.EndDate,
+                            -> _state.update { state ->
+                                state.copy(
+                                    chatScheduledMeeting = state.chatScheduledMeeting?.copy(
+                                        startDateTime = scheduledMeetReceived.endDateTime,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.ParentScheduledMeetingId -> _state.update { state ->
+                                state.copy(
+                                    chatScheduledMeeting = state.chatScheduledMeeting?.copy(
+                                        parentSchedId = scheduledMeetReceived.parentSchedId,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.TimeZone -> _state.update { state ->
+                                state.copy(
+                                    chatScheduledMeeting = state.chatScheduledMeeting?.copy(
+                                        timezone = scheduledMeetReceived.timezone,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.Attributes -> _state.update { state ->
+                                state.copy(
+                                    chatScheduledMeeting = state.chatScheduledMeeting?.copy(
+                                        attributes = scheduledMeetReceived.attributes,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.OverrideDateTime -> _state.update { state ->
+                                state.copy(
+                                    chatScheduledMeeting = state.chatScheduledMeeting?.copy(
+                                        overrides = scheduledMeetReceived.overrides,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.ScheduledMeetingsFlags -> _state.update { state ->
+                                state.copy(
+                                    chatScheduledMeeting = state.chatScheduledMeeting?.copy(
+                                        flags = scheduledMeetReceived.flags,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.RepetitionRules -> _state.update { state ->
+                                state.copy(
+                                    chatScheduledMeeting = state.chatScheduledMeeting?.copy(
+                                        rules = scheduledMeetReceived.rules,
+                                    )
+                                )
+                            }
+
+                            ScheduledMeetingChanges.CancelledFlag -> _state.update { state ->
+                                state.copy(
+                                    chatScheduledMeeting = state.chatScheduledMeeting?.copy(
+                                        isCanceled = scheduledMeetReceived.isCanceled,
+                                    )
+                                )
+                            }
+
+                            else -> {}
+                        }
+                    }
+                }
+            }
+        }
 
     /**
      * Check if some participant is presenting
@@ -646,8 +863,10 @@ class MeetingActivityViewModel @Inject constructor(
             }
             getChatRoom()
             getChatCall()
+            getScheduledMeeting()
             startMonitoringChatParticipantsUpdated(chatId = chatId)
             startMonitorChatRoomUpdates(chatId = chatId)
+            startMonitorScheduledMeetingUpdates()
         }
     }
 

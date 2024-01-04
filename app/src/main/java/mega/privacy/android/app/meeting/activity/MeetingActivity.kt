@@ -51,9 +51,11 @@ import mega.privacy.android.app.presentation.meeting.view.ParticipantsFullListVi
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
+import mega.privacy.android.app.utils.ScheduledMeetingDateUtil.getAppropriateStringForScheduledMeetingDate
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -394,7 +396,12 @@ class MeetingActivity : PasscodeActivity() {
 
             if (state.shouldShareMeetingLink && state.meetingLink.isNotEmpty()) {
                 meetingViewModel.onConsumeShouldShareMeetingLinkEvent()
-                shareLink(state.meetingLink, state.title)
+                shareLink(
+                    state.meetingLink,
+                    state.title,
+                    state.chatScheduledMeeting,
+                    state.myFullName
+                )
             }
 
             if (state.chatIdToOpen != -1L) {
@@ -708,17 +715,52 @@ class MeetingActivity : PasscodeActivity() {
     /**
      * Method for sharing the link
      *
-     * @param link      link
-     * @param title     title
+     * @param meetingLink               meeting link
+     * @param meetingTitle              meeting title
+     * @param chatScheduledMeeting      [ChatScheduledMeeting]
+     * @param participantFullName       participant full name
      */
-    fun shareLink(link: String, title: String) {
-        Timber.d("Share the link")
-        startActivity(Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, link)
-            putExtra(Intent.EXTRA_SUBJECT, title)
-            type = "text/plain"
-        })
+    fun shareLink(
+        meetingLink: String,
+        meetingTitle: String,
+        chatScheduledMeeting: ChatScheduledMeeting?,
+        participantFullName: String,
+    ) {
+        val subject = getString(R.string.meetings_sharing_meeting_link_meeting_invite_subject)
+        val title = getString(R.string.meetings_sharing_meeting_link_title, participantFullName)
+        val meetingName =
+            getString(R.string.meetings_sharing_meeting_link_meeting_name, meetingTitle)
+        val meetingLink =
+            getString(R.string.meetings_sharing_meeting_link_meeting_link, meetingLink)
+
+        val body = StringBuilder()
+        body.append(title)
+            .append("\n\n")
+            .append(meetingName)
+            .append("\n")
+
+        chatScheduledMeeting?.let {
+            val meetingDateAndTime = getString(
+                R.string.meetings_sharing_meeting_link_meeting_date_and_time,
+                getAppropriateStringForScheduledMeetingDate(
+                    this@MeetingActivity,
+                    meetingViewModel.is24HourFormat,
+                    chatScheduledMeeting
+                )
+            )
+            body.append(meetingDateAndTime)
+                .append("\n")
+        }
+
+        body.append(meetingLink)
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = Constants.TYPE_TEXT_PLAIN
+            putExtra(Intent.EXTRA_TEXT, body.toString())
+            putExtra(Intent.EXTRA_SUBJECT, subject)
+        }
+
+        startActivity(Intent.createChooser(intent, " "))
     }
 
     /**

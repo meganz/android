@@ -5,6 +5,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 
@@ -45,6 +46,9 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property showRecordingConsentDialog                 True if should show the recording consent dialog or False otherwise.
  * @property isRecordingConsentAccepted                 True if recording consent dialog has been already accepted or False otherwise.
  * @property startOrStopRecordingParticipantName        Name of the [Participant] who has started/stopped the recording.
+ * @property isScheduledMeeting                         True, if it is a scheduled meeting. False, if not.
+ * @property myFullName                                 My full name
+ * @property chatScheduledMeeting                       [ChatScheduledMeeting]
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -81,6 +85,9 @@ data class MeetingState(
     val showRecordingConsentDialog: Boolean = false,
     val isRecordingConsentAccepted: Boolean = false,
     val startOrStopRecordingParticipantName: String? = null,
+    val isScheduledMeeting: Boolean = false,
+    val myFullName: String = "",
+    val chatScheduledMeeting: ChatScheduledMeeting? = null
 ) {
     /**
      * Check if waiting room is opened

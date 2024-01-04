@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -35,18 +38,21 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
@@ -85,8 +91,9 @@ import javax.inject.Inject
  * @property setWaitingRoomUseCase                          [SetWaitingRoomUseCase]
  * @property setWaitingRoomRemindersUseCase                 [SetWaitingRoomRemindersUseCase]
  * @property getStringFromStringResMapper                   [GetStringFromStringResMapper]
+ * @property getMyFullNameUseCase                           [GetMyFullNameUseCase]
+ * @property monitorUserUpdates                             [MonitorUserUpdates]
  * @property state                    Current view state as [ScheduledMeetingInfoState]
-
  */
 @HiltViewModel
 class ScheduledMeetingInfoViewModel @Inject constructor(
@@ -116,12 +123,14 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
     private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
-) : ViewModel() {
+    private val getMyFullNameUseCase: GetMyFullNameUseCase,
+    private val monitorUserUpdates: MonitorUserUpdates,
+    ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
     val state: StateFlow<ScheduledMeetingInfoState> = _state
 
-    private val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
+    val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
 
     private var scheduledMeetingId: Long = megaChatApiGateway.getChatInvalidHandle()
 
@@ -137,7 +146,21 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         get() = isConnectedToInternetUseCase()
 
     init {
+        getMyFullName()
         monitorMutedChatsUpdates()
+
+        viewModelScope.launch {
+            flow {
+                emitAll(monitorUserUpdates()
+                    .catch { Timber.w("Exception monitoring user updates: $it") }
+                    .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
+            }.collect {
+                when (it) {
+                    UserChanges.Firstname, UserChanges.Lastname -> getMyFullName()
+                    else -> Unit
+                }
+            }
+        }
     }
 
     /**
@@ -1065,6 +1088,24 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             it.copy(snackbarMsg = consumed())
         }
 
+    /**
+     * Get my full name
+     */
+    private fun getMyFullName() = viewModelScope.launch {
+        runCatching {
+            getMyFullNameUseCase()
+        }.onSuccess {
+            it?.apply {
+                _state.update {state ->
+                    state.copy(
+                        myFullName = this,
+                    )
+                }
+            }
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
 
     companion object {
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100

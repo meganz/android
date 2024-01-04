@@ -8,12 +8,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetManageChatLinkBinding
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.ChatUtil.showConfirmationRemoveChatLink
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL
-import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 import mega.privacy.android.app.utils.Util.showSnackbar
 
 class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
@@ -21,19 +25,25 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
     companion object {
         private const val CHAT_LINK = "CHAT_LINK"
         private const val IS_MODERATOR = "IS_MODERATOR"
+        private const val IS_MEETING = "IS_MEETING"
         private const val CHAT_TITLE = "CHAT_TITLE"
     }
+
+    private val viewModel by activityViewModels<ScheduledMeetingInfoViewModel>()
 
     private lateinit var binding: BottomSheetManageChatLinkBinding
 
     private var chatLink = ""
     private var isModerator = false
     private var chatTitle: String? = null
+    private var isMeeting: Boolean = false
+    private var myFullName: String? = ""
 
-    fun setValues(chatLink: String, isModerator: Boolean, chatTitle: String?) {
+    fun setValues(chatLink: String, isModerator: Boolean, chatTitle: String?, isMeeting: Boolean) {
         this.chatLink = chatLink
         this.isModerator = isModerator
         this.chatTitle = chatTitle
+        this.isMeeting = isMeeting
     }
 
     override fun onCreateView(
@@ -49,9 +59,18 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
             chatLink = savedInstanceState.getString(CHAT_LINK, "")
             isModerator = savedInstanceState.getBoolean(IS_MODERATOR, false)
             chatTitle = savedInstanceState.getString(CHAT_TITLE, null)
+            isMeeting = savedInstanceState.getBoolean(IS_MEETING, false)
         }
 
+        collectFlows()
+
         return contentView
+    }
+
+    private fun collectFlows() {
+        collectFlow(viewModel.state) { state: ScheduledMeetingInfoState ->
+            myFullName = state.myFullName
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,11 +89,41 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
         }
 
         binding.shareManageChatLinkOption.setOnClickListener {
-            val sharingIntent = Intent(Intent.ACTION_SEND)
-            sharingIntent.type = TYPE_TEXT_PLAIN
-            sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink)
-            sharingIntent.putExtra(Intent.EXTRA_SUBJECT, chatTitle)
-            startActivity(Intent.createChooser(sharingIntent, getString(R.string.context_share)))
+            val subject =
+                if (isMeeting) getString(R.string.meetings_sharing_meeting_link_meeting_invite_subject) else chatTitle
+
+            val body = StringBuilder()
+
+            if (isMeeting) {
+                body.append(getString(R.string.meetings_sharing_meeting_link_title, myFullName))
+                    .append("\n\n")
+                    .append(
+                        getString(
+                            R.string.meetings_sharing_meeting_link_meeting_name,
+                            chatTitle
+                        )
+                    )
+                    .append("\n")
+                    .append(
+                        getString(
+                            R.string.meetings_sharing_meeting_link_meeting_link,
+                            chatLink
+                        )
+                    )
+            }
+
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = Constants.TYPE_TEXT_PLAIN
+                putExtra(Intent.EXTRA_TEXT, if (isMeeting) body.toString() else chatLink)
+                putExtra(Intent.EXTRA_SUBJECT, subject)
+            }
+
+            startActivity(
+                Intent.createChooser(
+                    intent,
+                    if (isMeeting) " " else getString(R.string.context_share)
+                )
+            )
 
             setStateBottomSheetBehaviorHidden()
         }
@@ -92,6 +141,7 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
         outState.putString(CHAT_LINK, chatLink)
         outState.putBoolean(IS_MODERATOR, isModerator)
         outState.putString(CHAT_TITLE, chatTitle)
+        outState.putBoolean(IS_MEETING, isMeeting)
 
         super.onSaveInstanceState(outState)
     }
