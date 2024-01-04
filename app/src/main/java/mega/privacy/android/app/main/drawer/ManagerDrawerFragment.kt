@@ -204,8 +204,8 @@ internal class ManagerDrawerFragment : Fragment() {
         binding.transfersSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.TRANSFERS) }
         binding.syncSection.setOnClickListener {
             Analytics.tracker.trackEvent(AndroidSyncNavigationItemEvent)
-            drawerManager.drawerItemClicked(DrawerItem.SYNC) }
-        binding.rubbishBinSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.RUBBISH_BIN) }
+            drawerManager.drawerItemClicked(DrawerItem.SYNC)
+        }
         binding.rubbishBinSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.RUBBISH_BIN) }
         binding.offlineSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.OFFLINE) }
     }

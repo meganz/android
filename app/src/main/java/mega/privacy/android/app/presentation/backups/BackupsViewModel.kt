@@ -302,13 +302,6 @@ class BackupsViewModel @Inject constructor(
     fun isUserInRootBackupsFolderLevel() = _state.value.isUserInRootBackupsFolderLevel
 
     /**
-     * Returns the Toolbar Name from [BackupsState.currentBackupsFolderName]
-     *
-     * @return The Toolbar Name
-     */
-    fun getToolbarName() = _state.value.currentBackupsFolderName
-
-    /**
      * Notifies [BackupsState.hideMultipleItemSelection] that the Backups screen has handled the hiding
      * of the Multiple Item Selection by setting its value to false
      */

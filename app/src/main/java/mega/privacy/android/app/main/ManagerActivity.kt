@@ -2802,6 +2802,23 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         ft.commitNowAllowingStateLoss()
     }
 
+    /**
+     * Displays the specified [Fragment] by performing a [FragmentTransaction.replace] and adding
+     * the [Fragment] to the Back Stack
+     *
+     * @param fragment The specified [Fragment]
+     * @param fragmentTag An optional [Fragment] tag
+     */
+    private fun replaceFragmentWithBackStack(fragment: Fragment, fragmentTag: String?) {
+        supportFragmentManager.apply {
+            beginTransaction().apply {
+                replace(R.id.fragment_container, fragment, fragmentTag)
+                addToBackStack(Fragment::class.java.name)
+            }.commit()
+            executePendingTransactions()
+        }
+    }
+
     fun refreshFragment(fragmentTag: String) {
         supportFragmentManager.findFragmentByTag(fragmentTag)?.let {
             Timber.d("Fragment %s refreshing", fragmentTag)
@@ -3601,7 +3618,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             setTabsVisibility()
         } else {
             drawerItem = item
-            selectDrawerItem(item = item, alwaysInitializeDrawerItem = true)
+            selectDrawerItem(item)
         }
     }
 
@@ -3616,8 +3633,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * set to -1 by default
      * @param backupsHandle The Backups Node Handle used to load its contents in the Backups feature.
      * The value is set to -1 by default if no other Backups Node Handle is passed
-     * @param alwaysInitializeDrawerItem True if the specified Drawer Item must always be
-     * initialized, and false if otherwise
      */
     @SuppressLint("NewApi")
     @JvmOverloads
@@ -3626,7 +3641,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         chatId: Long? = null,
         cloudDriveNodeHandle: Long = -1L,
         backupsHandle: Long = -1L,
-        alwaysInitializeDrawerItem: Boolean = false,
     ) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         if (!this::drawerLayout.isInitialized) {
@@ -3734,19 +3748,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showFabButton()
                 hideAdsView()
 
-                val fragmentTransaction = supportFragmentManager.beginTransaction()
-                fragmentTransaction.replace(
-                    R.id.fragment_container,
-                    if (alwaysInitializeDrawerItem) {
-                        DeviceCenterFragment.newInstance()
-                    } else {
-                        deviceCenterFragment ?: DeviceCenterFragment.newInstance()
-                    },
-                    FragmentTag.DEVICE_CENTER.tag,
-                )
-                fragmentTransaction.addToBackStack(DeviceCenterFragment::class.java.name)
-                fragmentTransaction.commit()
-                supportFragmentManager.executePendingTransactions()
+                if (deviceCenterFragment == null) {
+                    replaceFragmentWithBackStack(
+                        fragment = DeviceCenterFragment.newInstance(),
+                        fragmentTag = FragmentTag.DEVICE_CENTER.tag,
+                    )
+                }
             }
 
             DrawerItem.SYNC -> {
@@ -3823,14 +3830,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showFabButton()
                 hideAdsView()
 
-                replaceFragment(
-                    fragment = if (alwaysInitializeDrawerItem) {
-                        createBackupsFragment(backupsHandle)
-                    } else {
-                        backupsFragment ?: createBackupsFragment(backupsHandle)
-                    },
-                    fragmentTag = FragmentTag.BACKUPS.tag,
-                )
+                if (backupsFragment == null) {
+                    replaceFragmentWithBackStack(
+                        fragment = createBackupsFragment(backupsHandle),
+                        fragmentTag = FragmentTag.BACKUPS.tag,
+                    )
+                }
             }
 
             DrawerItem.SHARED_ITEMS -> {
@@ -3982,7 +3987,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (fragment === fullscreenOfflineFragment) {
             fullscreenOfflineFragment = null
             if (bottomItemBeforeOpenFullscreenOffline != Constants.INVALID_VALUE && !mStopped) {
-                backToDrawerItem(bottomItemBeforeOpenFullscreenOffline)
+                goBackToBottomNavigationItem(bottomItemBeforeOpenFullscreenOffline)
                 bottomItemBeforeOpenFullscreenOffline = Constants.INVALID_VALUE
             }
             pathNavigationOffline = "/"
@@ -4008,7 +4013,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (fragment === fullscreenOfflineFragmentCompose) {
             fullscreenOfflineFragmentCompose = null
             if (bottomItemBeforeOpenFullscreenOffline != Constants.INVALID_VALUE && !mStopped) {
-                backToDrawerItem(bottomItemBeforeOpenFullscreenOffline)
+                goBackToBottomNavigationItem(bottomItemBeforeOpenFullscreenOffline)
                 bottomItemBeforeOpenFullscreenOffline = Constants.INVALID_VALUE
             }
             pathNavigationOffline = "/"
@@ -4624,9 +4629,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         megaChatApi.retryPendingConnections(false, null)
         return when (item.itemId) {
             android.R.id.home -> {
-                if (isFirstNavigationLevel && drawerItem !== DrawerItem.SEARCH) {
-                    if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.TRANSFERS) {
-                        backToDrawerItem(bottomNavigationCurrentItem)
+                if (isFirstNavigationLevel && drawerItem != DrawerItem.SEARCH) {
+                    if (drawerItem == DrawerItem.SYNC || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.TRANSFERS) {
+                        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+                        if (transfersToImageViewer) {
+                            switchImageViewerToFront()
+                        }
+                    } else if (drawerItem == DrawerItem.DEVICE_CENTER) {
+                        handleSuperBackPressed()
+                        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
                         if (transfersToImageViewer) {
                             switchImageViewerToFront()
                         }
@@ -4645,20 +4656,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 fileBrowserComposeFragment?.onBackPressed()
                             }
                         }
-                    } else if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER) {
+                    } else if (drawerItem == DrawerItem.SYNC || drawerItem == DrawerItem.DEVICE_CENTER) {
                         onBackPressedDispatcher.onBackPressed()
-                    } else if (drawerItem === DrawerItem.RUBBISH_BIN) {
+                    } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
                         rubbishBinComposeFragment = getRubbishBinComposeFragment()
                         rubbishBinComposeFragment?.onBackPressed()
-                    } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
-                        if (tabItemShares === SharesTab.INCOMING_TAB && isIncomingAdded) {
+                    } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
+                        if (tabItemShares == SharesTab.INCOMING_TAB && isIncomingAdded) {
                             incomingSharesFragment?.onBackPressed()
-                        } else if (tabItemShares === SharesTab.OUTGOING_TAB && isOutgoingAdded) {
+                        } else if (tabItemShares == SharesTab.OUTGOING_TAB && isOutgoingAdded) {
                             outgoingSharesFragment?.onBackPressed()
-                        } else if (tabItemShares === SharesTab.LINKS_TAB && isLinksAdded) {
+                        } else if (tabItemShares == SharesTab.LINKS_TAB && isLinksAdded) {
                             linksFragment?.onBackPressed()
                         }
-                    } else if (drawerItem === DrawerItem.PHOTOS) {
+                    } else if (drawerItem == DrawerItem.PHOTOS) {
                         if (getPhotosFragment() != null) {
                             if (canPhotosEnableCUViewBack()) {
                                 photosFragment?.onBackPressed()
@@ -4670,22 +4681,22 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             // When current fragment is AlbumContentFragment, the photosFragment will be null due to replaceFragment.
                             onBackPressedDispatcher.onBackPressed()
                         }
-                    } else if (drawerItem === DrawerItem.BACKUPS) {
+                    } else if (drawerItem == DrawerItem.BACKUPS) {
                         backupsFragment?.let {
                             it.onBackPressed()
                             return true
                         }
-                    } else if (drawerItem === DrawerItem.SEARCH) {
+                    } else if (drawerItem == DrawerItem.SEARCH) {
                         if (getSearchFragment() != null) {
                             onBackPressedDispatcher.onBackPressed()
                             return true
                         }
-                    } else if (drawerItem === DrawerItem.TRANSFERS) {
+                    } else if (drawerItem == DrawerItem.TRANSFERS) {
                         drawerItem = getStartDrawerItem()
                         selectDrawerItem(drawerItem)
                         return true
-                    } else if (drawerItem === DrawerItem.HOMEPAGE) {
-                        if (homepageScreen === HomepageScreen.FULLSCREEN_OFFLINE) {
+                    } else if (drawerItem == DrawerItem.HOMEPAGE) {
+                        if (homepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
                             handleBackPressIfFullscreenOfflineFragmentOpened()
                         } else if (navController?.currentDestination != null &&
                             navController?.currentDestination?.id == R.id.favouritesFolderFragment
@@ -4716,7 +4727,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             R.id.action_menu_do_not_disturb -> {
-                if (drawerItem === DrawerItem.CHAT) {
+                if (drawerItem == DrawerItem.CHAT) {
                     if (ChatUtil.getGeneralNotification() == Constants.NOTIFICATIONS_ENABLED) {
                         ChatUtil.createMuteNotificationsChatAlertDialog(this, null)
                     } else {
@@ -4923,49 +4934,54 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 lifecycleScope.launch {
                     isInMDMode = false
                     fileBrowserViewModel.handleBackFromMD()
-                    backToDrawerItem(bottomNavigationCurrentItem)
+                    goBackToBottomNavigationItem(bottomNavigationCurrentItem)
                 }
             } else {
                 if (!isCloudAdded || fileBrowserComposeFragment?.onBackPressed() == 0) {
                     performOnBack()
                 }
             }
-        } else if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER) {
-            backToDrawerItem(bottomNavigationCurrentItem)
-        } else if (drawerItem === DrawerItem.RUBBISH_BIN) {
+        } else if (drawerItem == DrawerItem.SYNC) {
+            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+        } else if (drawerItem == DrawerItem.DEVICE_CENTER) {
+            handleSuperBackPressed()
+            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+        } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
             rubbishBinComposeFragment = getRubbishBinComposeFragment()
             if (rubbishBinComposeFragment == null || rubbishBinComposeFragment?.onBackPressed() == 0) {
-                backToDrawerItem(bottomNavigationCurrentItem)
+                goBackToBottomNavigationItem(bottomNavigationCurrentItem)
             }
 
-        } else if (drawerItem === DrawerItem.TRANSFERS) {
-            backToDrawerItem(bottomNavigationCurrentItem)
+        } else if (drawerItem == DrawerItem.TRANSFERS) {
+            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
             if (transfersToImageViewer) {
                 switchImageViewerToFront()
             }
-        } else if (drawerItem === DrawerItem.BACKUPS) {
-            backupsFragment?.onBackPressed() ?: backToDrawerItem(bottomNavigationCurrentItem)
-        } else if (drawerItem === DrawerItem.NOTIFICATIONS) {
-            backToDrawerItem(bottomNavigationCurrentItem)
-        } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
+        } else if (drawerItem == DrawerItem.BACKUPS) {
+            backupsFragment?.onBackPressed() ?: goBackToBottomNavigationItem(
+                bottomNavigationCurrentItem
+            )
+        } else if (drawerItem == DrawerItem.NOTIFICATIONS) {
+            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+        } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
             onBackPressedInSharedItemsDrawerItem()
-        } else if (drawerItem === DrawerItem.CHAT) {
+        } else if (drawerItem == DrawerItem.CHAT) {
             performOnBack()
-        } else if (drawerItem === DrawerItem.PHOTOS) {
+        } else if (drawerItem == DrawerItem.PHOTOS) {
             if (isInAlbumContent) {
                 fromAlbumContent = true
                 isInAlbumContent = false
-                backToDrawerItem(bottomNavigationCurrentItem)
+                goBackToBottomNavigationItem(bottomNavigationCurrentItem)
             } else if (isInFilterPage) {
                 isInFilterPage = false
-                backToDrawerItem(bottomNavigationCurrentItem)
+                goBackToBottomNavigationItem(bottomNavigationCurrentItem)
                 if (photosFragment == null) {
-                    backToDrawerItem(bottomNavigationCurrentItem)
+                    goBackToBottomNavigationItem(bottomNavigationCurrentItem)
                 }
             } else if (getPhotosFragment() == null || photosFragment?.onBackPressed() == 0) {
                 performOnBack()
             }
-        } else if (drawerItem === DrawerItem.SEARCH) {
+        } else if (drawerItem == DrawerItem.SEARCH) {
             if (getSearchFragment() == null || searchFragment?.onBackPressed() == 0) {
                 closeSearchSection()
             }
@@ -5026,7 +5042,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (drawerItem?.let { shouldCloseApp(startItem, it) } == true) {
             handleSuperBackPressed()
         } else {
-            backToDrawerItem(startItem)
+            goBackToBottomNavigationItem(startItem)
         }
     }
 
@@ -5036,7 +5052,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             // offline, and hide AppBarLayout when immediately on go back, we will see the flicker
             // of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
             if (bottomNavigationCurrentItem != HOME_BNV) {
-                backToDrawerItem(bottomNavigationCurrentItem)
+                goBackToBottomNavigationItem(bottomNavigationCurrentItem)
             } else {
                 drawerItem = DrawerItem.HOMEPAGE
             }
@@ -5077,16 +5093,22 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Otherwise, the User goes back to the previous Bottom Navigation Fragment
      */
     fun exitBackupsPage() {
+        handleSuperBackPressed()
         val isDeviceCenterFeatureFlagEnabled =
             viewModel.state.value.enabledFlags.contains(AppFeatures.DeviceCenter)
         if (isDeviceCenterFeatureFlagEnabled) {
             selectDrawerItem(DrawerItem.DEVICE_CENTER)
         } else {
-            backToDrawerItem(bottomNavigationCurrentItem)
+            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
         }
     }
 
-    private fun backToDrawerItem(item: Int) {
+    /**
+     * Goes back to the specified Bottom Navigation item
+     *
+     * @param item The Bottom Navigation item
+     */
+    private fun goBackToBottomNavigationItem(item: Int) {
         if (item == CLOUD_DRIVE_BNV) {
             drawerItem = DrawerItem.CLOUD_DRIVE
             if (isCloudAdded) {
@@ -8122,7 +8144,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     fun switchToCDFromMD() {
         isInMDMode = false
-        backToDrawerItem(bottomNavigationCurrentItem)
+        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
     }
 
     /**

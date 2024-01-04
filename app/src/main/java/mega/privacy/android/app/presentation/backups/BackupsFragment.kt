@@ -954,13 +954,6 @@ class BackupsFragment : RotatableFragment() {
     fun getCurrentBackupsFolderHandle(): Long = viewModel.getCurrentBackupsFolderHandle()
 
     /**
-     * Returns the Toolbar Name
-     *
-     * @return The Toolbar Name
-     */
-    fun getToolbarName() = viewModel.getToolbarName()
-
-    /**
      * Refreshes the list of Backups Nodes
      */
     fun refreshBackupsNodes() = viewModel.refreshBackupsNodes()
