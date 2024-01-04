@@ -1892,7 +1892,7 @@ class InMeetingViewModel @Inject constructor(
         participantSharingScreen?.let {
             if (_state.value.callUIStatus == CallUIStatusType.SpeakerView) {
                 _pinItemEvent.value = Event(it)
-                sortParticipantsListForSpeakerView()
+                sortParticipantsListForSpeakerView(it)
             }
         } ?: run {
             speakerParticipants.value = speakerParticipants.value?.map { speakerParticipant ->
@@ -1916,7 +1916,7 @@ class InMeetingViewModel @Inject constructor(
         participantSharingScreenForSpeaker?.let {
             if (_state.value.callUIStatus == CallUIStatusType.SpeakerView) {
                 _pinItemEvent.value = Event(it)
-                sortParticipantsListForSpeakerView()
+                sortParticipantsListForSpeakerView(it)
             }
         }
 
@@ -2864,8 +2864,13 @@ class InMeetingViewModel @Inject constructor(
 
     /**
      * Sort participants list for speaker view
+     *
+     * @param participantAtTheBeginning [Participant] to be placed first in the carousel
      */
-    private fun sortParticipantsListForSpeakerView() {
+    private fun sortParticipantsListForSpeakerView(participantAtTheBeginning: Participant? = null) {
+        participantAtTheBeginning?.apply {
+            participants.value?.sortByDescending { it.peerId == peerId }
+        }
         participants.value?.sortByDescending { it.isPresenting }
         _state.update { it.copy(updateListUi = true) }
     }
