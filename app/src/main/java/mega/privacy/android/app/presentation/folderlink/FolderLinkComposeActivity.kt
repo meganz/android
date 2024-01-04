@@ -302,6 +302,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                                     imageSource = ImagePreviewFetcherSource.FOLDER_LINK,
                                     menuOptionsSource = ImagePreviewMenuSource.FOLDER_LINK,
                                     anchorImageNodeId = fileNode.id,
+                                    isForeign = true,
                                     params = mapOf(
                                         FolderLinkImageNodeFetcher.PARENT_ID to parentNodeLongValue,
                                     ),

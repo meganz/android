@@ -394,6 +394,43 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
+    fun importNode(context: Context, importHandle: Long, toHandle: Long) {
+        viewModelScope.launch {
+            checkForNameCollision(
+                context = context,
+                nodeHandle = importHandle,
+                newParentHandle = toHandle,
+                type = NameCollisionType.COPY,
+                completeAction = {
+                    handleImportNodeNameCollision(
+                        importHandle,
+                        toHandle,
+                        context
+                    )
+                }
+            )
+        }
+    }
+
+    private suspend fun handleImportNodeNameCollision(
+        importHandle: Long,
+        toHandle: Long,
+        context: Context,
+    ) {
+        runCatching {
+            copyNodeUseCase(
+                nodeToCopy = NodeId(importHandle),
+                newNodeParent = NodeId(toHandle),
+                newNodeName = null,
+            )
+        }.onSuccess {
+            setResultMessage(context.getString(R.string.context_correctly_copied))
+        }.onFailure { throwable ->
+            Timber.e("Error not copied $throwable")
+            setCopyMoveException(throwable)
+        }
+    }
+
     /**
      * Checks if there is a name collision before proceeding with the action.
      *
@@ -491,14 +528,11 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
-    fun importNodes(imageNode: ImageNode) {
-        //TODO
-    }
-
     companion object {
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"
         const val IMAGE_PREVIEW_MENU_OPTIONS = "image_preview_menu_options"
         const val FETCHER_PARAMS = "fetcher_params"
         const val PARAMS_CURRENT_IMAGE_NODE_ID_VALUE = "currentImageNodeIdValue"
+        const val IMAGE_PREVIEW_IS_FOREIGN = "image_preview_is_foreign"
     }
 }

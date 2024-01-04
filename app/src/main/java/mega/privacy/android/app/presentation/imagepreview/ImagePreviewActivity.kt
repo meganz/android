@@ -21,6 +21,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
+import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -30,6 +31,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.FETCHER_PARAMS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_IS_FOREIGN
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_MENU_OPTIONS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -75,6 +77,12 @@ class ImagePreviewActivity : BaseActivity() {
             ::handleCopyFolderResult,
         )
 
+    private val selectImportFolderLauncher: ActivityResultLauncher<LongArray> =
+        registerForActivityResult(
+            SelectFolderToImportActivityContract(),
+            ::handleImportFolderResult
+        )
+
     private val viewModel: ImagePreviewViewModel by viewModels()
     private val nodeSaver: NodeSaver by lazy {
         NodeSaver(
@@ -87,6 +95,9 @@ class ImagePreviewActivity : BaseActivity() {
     private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
     private val showScreenLabel: Boolean by lazy {
         intent.getBooleanExtra("show_screen_label", false)
+    }
+    private val isForeign: Boolean by lazy {
+        intent.getBooleanExtra(IMAGE_PREVIEW_IS_FOREIGN, false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,7 +122,7 @@ class ImagePreviewActivity : BaseActivity() {
                     onClickLabel = ::handleLabel,
                     onClickOpenWith = ::handleOpenWith,
                     onClickSaveToDevice = ::saveNodeToDevice,
-                    onClickImport = ::handleImport,
+                    onClickImport = ::importNode,
                     onSwitchAvailableOffline = ::setAvailableOffline,
                     onClickGetLink = ::getNodeLink,
                     onClickSendTo = ::sendNodeToChat,
@@ -165,6 +176,20 @@ class ImagePreviewActivity : BaseActivity() {
         )
     }
 
+    private fun handleImportFolderResult(result: Pair<LongArray, Long>?) {
+        result ?: return
+        val (handles, toHandle) = result
+
+        val targetHandle = handles.firstOrNull()
+        if (targetHandle != null && targetHandle != MegaApiJava.INVALID_HANDLE && toHandle != MegaApiJava.INVALID_HANDLE) {
+            viewModel.importNode(
+                context = this,
+                importHandle = targetHandle,
+                toHandle = toHandle,
+            )
+        }
+    }
+
     private fun checkInfo(imageNode: ImageNode) {
         val intent = Intent(this, FileInfoActivity::class.java).apply {
             putExtra(Constants.HANDLE, imageNode.id.longValue)
@@ -200,8 +225,8 @@ class ImagePreviewActivity : BaseActivity() {
         }
     }
 
-    private fun handleImport(imageNode: ImageNode) {
-        viewModel.importNodes(imageNode)
+    private fun importNode(imageNode: ImageNode) {
+        selectImportFolderLauncher.launch(longArrayOf(imageNode.id.longValue))
     }
 
     private fun setAvailableOffline(checked: Boolean, imageNode: ImageNode) {
@@ -265,7 +290,7 @@ class ImagePreviewActivity : BaseActivity() {
         nodeSaver.saveNode(
             node,
             highPriority = false,
-            isFolderLink = node.isForeign,
+            isFolderLink = isForeign,
             fromMediaViewer = true,
             needSerialize = true,
         )
@@ -331,6 +356,7 @@ class ImagePreviewActivity : BaseActivity() {
             menuOptionsSource: ImagePreviewMenuSource,
             anchorImageNodeId: NodeId? = null,
             params: Map<String, Any> = mapOf(),
+            isForeign: Boolean = false,
             showScreenLabel: Boolean = true,
         ): Intent {
             return Intent(context, ImagePreviewActivity::class.java).apply {
@@ -338,6 +364,7 @@ class ImagePreviewActivity : BaseActivity() {
                 putExtra(IMAGE_PREVIEW_MENU_OPTIONS, menuOptionsSource)
                 putExtra(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE, anchorImageNodeId?.longValue)
                 putExtra(FETCHER_PARAMS, bundleOf(*params.toList().toTypedArray()))
+                putExtra(IMAGE_PREVIEW_IS_FOREIGN, isForeign)
                 // For QA & Dev purpose: To remove once new Image Preview migration is done
                 putExtra("show_screen_label", showScreenLabel)
             }

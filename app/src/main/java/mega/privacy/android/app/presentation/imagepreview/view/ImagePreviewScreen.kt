@@ -257,11 +257,11 @@ internal fun ImagePreviewScreen(
                                 R.string.wizard_steps_indicator,
                                 index + 1,
                                 imageNodes.size
-                            )
+                            ).takeIf { imageNodes.size > 1 }
 
                             ImagePreviewBottomBar(
                                 imageName = currentImageNode.name,
-                                imageIndex = photoIndexText,
+                                imageIndex = photoIndexText.orEmpty(),
                             )
                         }
                     }

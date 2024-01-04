@@ -15,6 +15,7 @@ import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -36,6 +37,7 @@ import kotlin.contracts.contract
 @OptIn(ExperimentalContracts::class)
 class CheckNameCollisionUseCase @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val getNodeUseCase: GetNodeUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -61,7 +63,8 @@ class CheckNameCollisionUseCase @Inject constructor(
         type: NameCollisionType,
     ): NameCollision =
         checkNodeCollisionsWithType(
-            node = megaApiGateway.getMegaNodeByHandle(handle),
+            node = megaApiGateway.getMegaNodeByHandle(handle)
+                ?: megaApiFolderGateway.getMegaNodeByHandle(handle),
             parentNode = getParentOrRootNode(parentHandle),
             type = type,
         )
