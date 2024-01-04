@@ -64,7 +64,9 @@ internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
  * @param onBackupFolderClicked Lambda that performs a specific action when a Backup Folder is clicked
  * @param onBackupFolderMenuClicked Lambda that performs a specific action when a Backup Folder's Menu
  * Icon is clicked
- * @param onNonBackupFolderMenuClicked Lambda that performs a specific action when a Non-Backup Backup
+ * @param onNonBackupFolderClicked Lambda that performs a specific action when a Non Backup Folder
+ * is clicked
+ * @param onNonBackupFolderMenuClicked Lambda that performs a specific action when a Non-Backup
  * Folder's Menu Icon is clicked
  * @param onCameraUploadsClicked Lambda that performs a specific action when the User clicks the
  * "Camera uploads" Bottom Dialog Option
@@ -89,6 +91,7 @@ internal fun DeviceCenterScreen(
     onDeviceMenuClicked: (DeviceUINode) -> Unit,
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit,
     onBackupFolderMenuClicked: (BackupDeviceFolderUINode) -> Unit,
+    onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit,
     onNonBackupFolderMenuClicked: (NonBackupDeviceFolderUINode) -> Unit,
     onCameraUploadsClicked: () -> Unit,
     onRenameDeviceOptionClicked: (DeviceUINode) -> Unit,
@@ -169,6 +172,7 @@ internal fun DeviceCenterScreen(
                     },
                     onBackupFolderClicked = onBackupFolderClicked,
                     onBackupFolderMenuClicked = onBackupFolderMenuClicked,
+                    onNonBackupFolderClicked = onNonBackupFolderClicked,
                     onNonBackupFolderMenuClicked = onNonBackupFolderMenuClicked,
                     modifier = Modifier.padding(paddingValues),
                 )
@@ -216,6 +220,7 @@ private fun DeviceCenterContent(
     onDeviceMenuClicked: (DeviceUINode) -> Unit,
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit,
     onBackupFolderMenuClicked: (BackupDeviceFolderUINode) -> Unit,
+    onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit,
     onNonBackupFolderMenuClicked: (NonBackupDeviceFolderUINode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -237,6 +242,7 @@ private fun DeviceCenterContent(
                         uiNode = deviceFolders[itemIndex],
                         onBackupFolderClicked = onBackupFolderClicked,
                         onBackupFolderMenuClicked = onBackupFolderMenuClicked,
+                        onNonBackupFolderClicked = onNonBackupFolderClicked,
                         onNonBackupFolderMenuClicked = onNonBackupFolderMenuClicked,
                     )
                 }
@@ -286,7 +292,7 @@ private fun DeviceCenterContent(
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewDeviceCenterInInitialLoading() {
+private fun DeviceCenterInInitialLoadingPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
             uiState = DeviceCenterState(),
@@ -295,6 +301,7 @@ private fun PreviewDeviceCenterInInitialLoading() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onBackupFolderMenuClicked = {},
+            onNonBackupFolderClicked = {},
             onNonBackupFolderMenuClicked = {},
             onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
@@ -312,7 +319,7 @@ private fun PreviewDeviceCenterInInitialLoading() {
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewDeviceCenterInDeviceView() {
+private fun DeviceCenterInDeviceViewPreview() {
     val uiState = DeviceCenterState(
         devices = listOf(
             ownDeviceUINode,
@@ -330,6 +337,7 @@ private fun PreviewDeviceCenterInDeviceView() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onBackupFolderMenuClicked = {},
+            onNonBackupFolderClicked = {},
             onNonBackupFolderMenuClicked = {},
             onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
@@ -347,7 +355,7 @@ private fun PreviewDeviceCenterInDeviceView() {
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewDeviceCenterInFolderView() {
+private fun DeviceCenterInFolderViewPreview() {
     val uiState = DeviceCenterState(
         devices = listOf(ownDeviceUINodeTwo),
         isInitialLoadingFinished = true,
@@ -361,6 +369,7 @@ private fun PreviewDeviceCenterInFolderView() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onBackupFolderMenuClicked = {},
+            onNonBackupFolderClicked = {},
             onNonBackupFolderMenuClicked = {},
             onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
@@ -378,7 +387,7 @@ private fun PreviewDeviceCenterInFolderView() {
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewDeviceCenterContentWithOwnDeviceSectionOnly() {
+private fun DeviceCenterContentWithOwnDeviceSectionOnlyPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(ownDeviceUINode),
@@ -386,6 +395,7 @@ private fun PreviewDeviceCenterContentWithOwnDeviceSectionOnly() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onBackupFolderMenuClicked = {},
+            onNonBackupFolderClicked = {},
             onNonBackupFolderMenuClicked = {},
         )
     }
@@ -396,7 +406,7 @@ private fun PreviewDeviceCenterContentWithOwnDeviceSectionOnly() {
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewDeviceCenterContentWithOtherDevicesSectionOnly() {
+private fun DeviceCenterContentWithOtherDevicesSectionOnlyPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(otherDeviceUINodeOne),
@@ -404,6 +414,7 @@ private fun PreviewDeviceCenterContentWithOtherDevicesSectionOnly() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onBackupFolderMenuClicked = {},
+            onNonBackupFolderClicked = {},
             onNonBackupFolderMenuClicked = {},
         )
     }
@@ -414,7 +425,7 @@ private fun PreviewDeviceCenterContentWithOtherDevicesSectionOnly() {
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewDeviceCenterContentWithBothDeviceSections() {
+private fun DeviceCenterContentWithBothDeviceSectionsPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterContent(
             itemsToDisplay = listOf(
@@ -427,6 +438,7 @@ private fun PreviewDeviceCenterContentWithBothDeviceSections() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onBackupFolderMenuClicked = {},
+            onNonBackupFolderClicked = {},
             onNonBackupFolderMenuClicked = {},
         )
     }

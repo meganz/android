@@ -47,6 +47,8 @@ internal const val DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG =
  * @param onBackupFolderClicked Lambda that performs a specific action when a Backup Folder is clicked
  * @param onBackupFolderMenuClicked Lambda that performs a specific action when a Backup Folder's
  * Menu Icon is clicked
+ * @param onNonBackupFolderClicked Lambda that performs a specific action when a Non Backup Folder
+ * is clicked
  * @param onNonBackupFolderMenuClicked Lambda that performs a specific action when a Non Backup Folder's
  * Menu icon is clicked
  */
@@ -57,6 +59,7 @@ internal fun DeviceCenterListViewItem(
     onDeviceMenuClicked: (DeviceUINode) -> Unit = {},
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit = {},
     onBackupFolderMenuClicked: (BackupDeviceFolderUINode) -> Unit = {},
+    onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit = {},
     onNonBackupFolderMenuClicked: (NonBackupDeviceFolderUINode) -> Unit = {},
 ) {
     ConstraintLayout(
@@ -94,6 +97,7 @@ internal fun DeviceCenterListViewItem(
                 when (uiNode) {
                     is DeviceUINode -> onDeviceClicked(uiNode)
                     is BackupDeviceFolderUINode -> onBackupFolderClicked(uiNode)
+                    is NonBackupDeviceFolderUINode -> onNonBackupFolderClicked(uiNode)
                 }
             },
             onMenuClick = {
@@ -147,7 +151,7 @@ private fun getStatusColor(uiNodeStatus: DeviceCenterUINodeStatus) =
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewDeviceCenterListViewItem() {
+private fun DeviceCenterListViewItemPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(
@@ -167,7 +171,7 @@ private fun PreviewDeviceCenterListViewItem() {
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewDeviceCenterListViewItemWithEmptyTitle() {
+private fun DeviceCenterListViewItemWithEmptyTitlePreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(

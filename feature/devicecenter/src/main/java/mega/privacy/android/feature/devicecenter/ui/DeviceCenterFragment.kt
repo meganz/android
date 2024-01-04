@@ -93,6 +93,13 @@ class DeviceCenterFragment : Fragment() {
                                 nodeStatusIcon = backupDeviceFolderUINode.status.icon,
                             )
                         },
+                        onNonBackupFolderClicked = { nonBackupDeviceFolderUINode ->
+                            megaNavigator.openNodeInCloudDrive(
+                                activity = this@DeviceCenterFragment.activity
+                                    ?: return@DeviceCenterScreen,
+                                nodeHandle = nonBackupDeviceFolderUINode.rootHandle,
+                            )
+                        },
                         onNonBackupFolderMenuClicked = { nonBackupDeviceFolderUINode ->
                             megaNavigator.openDeviceCenterFolderNodeOptions(
                                 activity = this@DeviceCenterFragment.activity
