@@ -259,7 +259,7 @@ fun UpgradeAccountView(
                     )
                 }
 
-                FeaturesOfPlans()
+                FeaturesOfPlans(showNoAdsFeature = state.showNoAdsFeature)
 
                 Text(
                     text = stringResource(id = R.string.account_upgrade_account_terms_of_service_link),
@@ -490,7 +490,9 @@ fun EmptySubscriptionPlansInfoCards(brush: Brush) {
 }
 
 @Composable
-private fun FeaturesOfPlans() {
+private fun FeaturesOfPlans(
+    showNoAdsFeature: Boolean,
+) {
     val style = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
@@ -565,8 +567,19 @@ private fun FeaturesOfPlans() {
                 text = stringResource(id = R.string.account_upgrade_account_description_feature_rubbish_bin),
                 style = style,
                 color = MaterialTheme.colors.black_white,
-                modifier = Modifier.padding(start = 10.dp)
+                modifier = Modifier.padding(
+                    start = 10.dp,
+                    bottom = if (showNoAdsFeature) 12.dp else 0.dp
+                )
             )
+            if (showNoAdsFeature) {
+                Text(
+                    text = stringResource(id = R.string.account_upgrade_account_description_feature_advertisement),
+                    style = style,
+                    color = MaterialTheme.colors.black_white,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+            }
         }
     }
 }

@@ -38,6 +38,7 @@ import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCas
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -48,6 +49,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -77,6 +79,7 @@ class UpgradeAccountViewModelTest {
             formattedSizeMapper,
         )
     private val getPaymentMethodUseCase = mock<GetPaymentMethodUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeAll
     fun initialise() {
@@ -97,6 +100,7 @@ class UpgradeAccountViewModelTest {
             formattedSizeMapper,
             getPaymentMethodUseCase,
             monitorAccountDetailUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 
@@ -110,6 +114,7 @@ class UpgradeAccountViewModelTest {
             localisedSubscriptionMapper = localisedSubscriptionMapper,
             getPaymentMethodUseCase = getPaymentMethodUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -127,6 +132,37 @@ class UpgradeAccountViewModelTest {
             assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
         }
     }
+
+    private fun provideShowNoAdsFeatureParameters() = listOf(
+        Arguments.of(true, true, true, true),
+        Arguments.of(false, true, true, false),
+        Arguments.of(true, false, true, false),
+        Arguments.of(true, true, false, false),
+    )
+
+    @ParameterizedTest(name = "The showNoAdsFeature should be: {3} when in-app ads feature is: {0}, ads are: {1} and external ads are: {2}")
+    @MethodSource("provideShowNoAdsFeatureParameters")
+    fun `test that showNoAdsFeature is updated correctly when all required fields are provided`(
+        inAppAdvertisementFeature: Boolean,
+        isAdsEnabledFeature: Boolean,
+        isExternalAdsEnabledFeature: Boolean,
+        expected: Boolean,
+    ) =
+        runTest {
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+            whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
+            whenever(getFeatureFlagValueUseCase.invoke(any())).thenReturn(
+                inAppAdvertisementFeature,
+                isAdsEnabledFeature,
+                isExternalAdsEnabledFeature
+            )
+
+            initViewModel()
+            underTest.state.map { it.showNoAdsFeature }.test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
 
     @Test
     fun `test that current subscribed plan is listed`() =

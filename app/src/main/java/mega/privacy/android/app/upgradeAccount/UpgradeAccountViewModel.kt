@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
@@ -29,6 +31,7 @@ import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCas
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -43,6 +46,8 @@ import javax.inject.Inject
  * @param isBillingAvailableUseCase use case to check if billing is available
  * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
  * @param getPaymentMethodUseCase use case to to get available payment method (Google Wallet)
+ * @param monitorAccountDetailUseCase use case to monitor account detail
+ * @param getFeatureFlagValueUseCase use case to get the value of a feature flag
  *
  * @property state The current UI state
  */
@@ -56,6 +61,7 @@ class UpgradeAccountViewModel @Inject constructor(
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         UpgradeAccountState(
@@ -147,6 +153,20 @@ class UpgradeAccountViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+        viewModelScope.launch {
+            runCatching {
+                val showNoAds = getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement)
+                        && getFeatureFlagValueUseCase(ABTestFeatures.ads)
+                        && getFeatureFlagValueUseCase(ABTestFeatures.adse)
+                _state.update { state ->
+                    state.copy(
+                        showNoAdsFeature = showNoAds
+                    )
+                }
+            }.onFailure {
+                Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
+            }
         }
     }
 
