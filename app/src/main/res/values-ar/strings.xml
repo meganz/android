@@ -1484,7 +1484,7 @@
     <!-- title of incoming shared folder notification -->
     <string name="title_incoming_folder_notification">ملف مشارك جديد</string>
     <!-- title of the notification for a new incoming contact request -->
-    <string name="title_contact_request_notification">طلب جهة اتصال جديد</string>
+    <string name="title_contact_request_notification">طلب تواصل جديد</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_chat_clear">مسح سجلات المحادثة</string>
     <!-- Title of the section to remove contact in the Contact Properties screen -->
@@ -1991,7 +1991,7 @@
         <item quantity="other">%1$d طلب تواصل قيد الانتظار</item>
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
-    <string name="title_new_contact_request_notification">طلب جهة اتصال جديد</string>
+    <string name="title_new_contact_request_notification">طلب تواصل جديد</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
     <string name="transfers_empty_new">[B]لا يوجد[/B][A] عمليات تراسل جارية[/A]</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
@@ -2358,7 +2358,7 @@
     <!-- Subtitle of the historic notification for a reminder new contact request -->
     <string name="notification_reminder_contact_request">[A]تذكير: [/A][B]%s [/B][C]أرسل لك طلب تواصل.[/C]</string>
     <!-- Title of the historic notification for a contact request cancelled -->
-    <string name="title_contact_request_notification_cancelled">تم الغاء طلب الاتصال</string>
+    <string name="title_contact_request_notification_cancelled">تم الغاء طلب التواصل</string>
     <!-- Subtitle of the historic notification for contact request cancelled -->
     <string name="subtitle_contact_request_notification_cancelled">[A]%s [/A][B]ألغى طلب التواصل.[/B]</string>
     <!-- Title of the historic notification when an user deletes you as contact -->
@@ -6164,5 +6164,5 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">مزامنة</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160; خالي من الإعلانات</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
 </resources>

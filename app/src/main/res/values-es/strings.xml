@@ -5462,5 +5462,5 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sincronizar</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Sin anuncios</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
 </resources>
