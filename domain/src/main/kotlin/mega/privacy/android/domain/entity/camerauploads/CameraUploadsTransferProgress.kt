@@ -115,5 +115,12 @@ sealed interface CameraUploadsTransferProgress {
         data class Successful(
             override val record: CameraUploadsRecord,
         ) : Compressing
+
+        /**
+         * Represents a record that compression cancelled
+         */
+        data class Cancel(
+            override val record: CameraUploadsRecord,
+        ) : Compressing
     }
 }

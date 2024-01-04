@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -7,7 +8,9 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.singleOrNull
@@ -29,6 +32,7 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
@@ -80,6 +84,9 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     private val addCompletedTransferUseCase: AddCompletedTransferUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val fileSystemRepository: FileSystemRepository,
+    private val monitorChargingStoppedState: MonitorChargingStoppedState,
+    private val isChargingUseCase: IsChargingUseCase,
+    private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase,
 ) {
 
     companion object {
@@ -107,6 +114,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
      * @param secondaryUploadNodeId The secondary upload node id
      * @param tempRoot The file path to the temporary folder to generate temp files
      */
+    @OptIn(DelicateCoroutinesApi::class)
     operator fun invoke(
         cameraUploadsRecords: List<CameraUploadsRecord>,
         primaryUploadNodeId: NodeId,
@@ -115,6 +123,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     ): Flow<CameraUploadsTransferProgress> = channelFlow {
         val videoQuality = getUploadVideoQualityUseCase()
         val locationTagsDisabled = !areLocationTagsEnabledUseCase()
+        val isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompressionUseCase()
 
         cameraUploadsRecords.map { record ->
             launch {
@@ -131,6 +140,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
 
                         val shouldRemoveLocationTags =
                             record.type == CameraUploadsRecordType.TYPE_PHOTO && locationTagsDisabled
+
                         val shouldCompressVideo =
                             record.type == CameraUploadsRecordType.TYPE_VIDEO && videoQuality != VideoQuality.ORIGINAL
 
@@ -161,44 +171,89 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
 
                         // Compress Video
                         if (shouldCompressVideo) {
+                            var isCompressionCancelled = false
                             videoCompressionSemaphore.acquire()
-                            compressVideo(record, tempRoot, videoQuality)
-                                .catch {
-                                    emit(VideoCompressionState.Finished)
-                                    trySend(CameraUploadsTransferProgress.Error(record, it))
-                                }
-                                .onCompletion { videoCompressionSemaphore.release() }
-                                .collect {
-                                    when (it) {
-                                        is VideoCompressionState.Progress -> {
-                                            trySend(
-                                                CameraUploadsTransferProgress.Compressing.Progress(
-                                                    record = record,
-                                                    progress = it.progress,
-                                                )
-                                            )
+                            if (isChargingRequiredForVideoCompression && isChargingUseCase().not()) {
+                                videoCompressionSemaphore.release()
+                                semaphore.release()
+                                return@launch
+                            }
+                            channelFlow compression@{
+                                launch {
+                                    flow {
+                                        emit(isChargingUseCase())
+                                        emitAll(monitorChargingStoppedState().map { !it })
+                                    }.collect { isCharging ->
+                                        if (isChargingRequiredForVideoCompression && !isCharging) {
+                                            isCompressionCancelled = true
+                                            send(VideoCompressionState.Cancel)
+                                            this@compression.close()
                                         }
-
-                                        is VideoCompressionState.Successful -> {
-                                            trySend(
-
-                                                CameraUploadsTransferProgress.Compressing.Successful(
-                                                    record = record,
-                                                )
-                                            )
-                                        }
-
-                                        is VideoCompressionState.InsufficientStorage -> {
-                                            trySend(
-                                                CameraUploadsTransferProgress.Compressing.InsufficientStorage(
-                                                    record = record,
-                                                )
-                                            )
-                                        }
-
-                                        else -> Unit
                                     }
                                 }
+
+                                launch {
+                                    compressVideo(
+                                        record,
+                                        tempRoot,
+                                        videoQuality
+                                    ).collect {
+                                        if (!isClosedForSend || !isCompressionCancelled) {
+                                            send(it)
+                                            yield()
+                                        }
+                                        if (it is VideoCompressionState.Successful || it is VideoCompressionState.InsufficientStorage) {
+                                            this@compression.close()
+                                        }
+                                    }
+                                }
+                            }.catch {
+                                emit(VideoCompressionState.Finished)
+                                trySend(CameraUploadsTransferProgress.Error(record, it))
+                            }.onCompletion {
+                                videoCompressionSemaphore.release()
+                            }.collect {
+                                when (it) {
+                                    is VideoCompressionState.Progress -> {
+                                        trySend(
+                                            CameraUploadsTransferProgress.Compressing.Progress(
+                                                record = record,
+                                                progress = it.progress,
+                                            )
+                                        )
+                                    }
+
+                                    is VideoCompressionState.Successful -> {
+                                        trySend(
+                                            CameraUploadsTransferProgress.Compressing.Successful(
+                                                record = record,
+                                            )
+                                        )
+                                    }
+
+                                    is VideoCompressionState.InsufficientStorage -> {
+                                        trySend(
+                                            CameraUploadsTransferProgress.Compressing.InsufficientStorage(
+                                                record = record,
+                                            )
+                                        )
+                                    }
+
+                                    is VideoCompressionState.Cancel -> {
+                                        trySend(
+                                            CameraUploadsTransferProgress.Compressing.Cancel(
+                                                record = record,
+                                            )
+                                        )
+                                    }
+
+                                    else -> Unit
+                                }
+                            }
+                            if (isCompressionCancelled) {
+                                semaphore.release()
+                                return@launch
+                            }
                         }
 
                         yield()
@@ -261,7 +316,6 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                         .onFailure {
                                             trySend(CameraUploadsTransferProgress.Error(record, it))
                                         }
-
 
                                     trySend(
                                         CameraUploadsTransferProgress.Uploaded(
@@ -383,7 +437,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
      */
     private suspend fun createTempFileAndRemoveCoordinates(
         record: CameraUploadsRecord,
-        tempRoot: String
+        tempRoot: String,
     ): Flow<String> = flow {
         emit(
             createTempFileAndRemoveCoordinatesUseCase(
@@ -441,7 +495,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
      * @param record
      */
     private suspend fun setGeneratedFingerprint(
-        record: CameraUploadsRecord
+        record: CameraUploadsRecord,
     ) = runCatching {
         getFingerprintUseCase(record.tempFilePath)?.let { generatedFingerprint ->
             setCameraUploadsRecordGeneratedFingerprintUseCase(
@@ -589,7 +643,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
      */
     private suspend fun setGpsCoordinatesFromNode(
         existingNodeId: NodeId,
-        newNodeId: NodeId
+        newNodeId: NodeId,
     ) = runCatching {
         getGpsCoordinatesFromNode(
             existingNodeId = existingNodeId,
@@ -692,7 +746,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     private fun getParentNodeId(
         record: CameraUploadsRecord,
         primaryUploadNodeId: NodeId,
-        secondaryUploadNodeId: NodeId
+        secondaryUploadNodeId: NodeId,
     ): NodeId = when (record.folderType) {
         CameraUploadFolderType.Primary -> primaryUploadNodeId
         CameraUploadFolderType.Secondary -> secondaryUploadNodeId

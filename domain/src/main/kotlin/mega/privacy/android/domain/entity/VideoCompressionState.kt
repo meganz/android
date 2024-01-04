@@ -14,7 +14,7 @@ sealed interface VideoCompressionState {
     /**
      * Initial
      */
-    object Initial : VideoCompressionState
+    data object Initial : VideoCompressionState
 
     /**
      * Update Progress
@@ -61,7 +61,7 @@ sealed interface VideoCompressionState {
     /**
      * Video Compression Finished
      */
-    object Finished : VideoCompressionState
+    data object Finished : VideoCompressionState
 
     /**
      * Finished Compression for a single file
@@ -84,5 +84,10 @@ sealed interface VideoCompressionState {
     /**
      * Insufficient Storage
      */
-    object InsufficientStorage : VideoCompressionState
+    data object InsufficientStorage : VideoCompressionState
+
+    /**
+     * Compression Cancelled
+     */
+    data object Cancel : VideoCompressionState
 }

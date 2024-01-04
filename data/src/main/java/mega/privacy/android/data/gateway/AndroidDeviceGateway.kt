@@ -11,7 +11,6 @@ import android.os.StatFs
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.format.DateFormat
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -137,6 +136,7 @@ internal class AndroidDeviceGateway @Inject constructor(
             flags = ContextCompat.RECEIVER_EXPORTED,
             Intent.ACTION_POWER_DISCONNECTED,
         ).map {
+            Timber.d("Charging Stopped")
             true
         }.catch {
             Timber.e(it, "MonitorChargingStoppedState Exception")

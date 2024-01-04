@@ -6,7 +6,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -26,6 +28,7 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
@@ -48,6 +51,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.io.FileNotFoundException
@@ -81,6 +85,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val addCompletedTransferUseCase = mock<AddCompletedTransferUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val monitorChargingStoppedState: MonitorChargingStoppedState = mock()
+    private val isChargingUseCase: IsChargingUseCase = mock()
+    private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase =
+        mock()
 
     private val primaryUploadNodeId = NodeId(1111L)
     private val secondaryUploadNodeId = NodeId(2222L)
@@ -129,6 +137,9 @@ class UploadCameraUploadsRecordsUseCaseTest {
             fileSystemRepository = fileSystemRepository,
             addCompletedTransferUseCase = addCompletedTransferUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            monitorChargingStoppedState = monitorChargingStoppedState,
+            isChargingUseCase = isChargingUseCase,
+            isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase
         )
     }
 
@@ -160,6 +171,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
     @BeforeEach
     fun setupMock(): Unit = runBlocking {
         whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
+        whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(false)
     }
 
     private fun getUploadNodeId(cameraUploadFolderType: CameraUploadFolderType) =
@@ -1038,6 +1050,56 @@ class UploadCameraUploadsRecordsUseCaseTest {
             ).thenReturn(flowOf(TransferEvent.TransferFinishEvent(mock(), null)))
         }
 
+        @ParameterizedTest(name = "when folder type is {0}")
+        @MethodSource("provideParameters")
+        fun `test that when device is not charging and the charging is required for compression,then no compression is executed`(
+            cameraUploadFolderType: CameraUploadFolderType,
+        ) = runTest {
+            val quality = VideoQuality.HIGH
+            whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
+            setInput(cameraUploadFolderType, type = CameraUploadsRecordType.TYPE_VIDEO)
+            whenever(isChargingUseCase()).thenReturn(false)
+            whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(true)
+            whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
+            whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(true)
+            executeUnderTest().collect()
+            verifyNoInteractions(compressVideoUseCase, startUploadUseCase)
+        }
+
+        @ParameterizedTest(name = "when folder type is {0} and compression events are {1}")
+        @MethodSource("provideParameters")
+        fun `test that when charging is disconnected, compression cancelled and file is not uploaded`(
+            cameraUploadFolderType: CameraUploadFolderType,
+        ) = runTest {
+            val compressionEvents: List<VideoCompressionState> =
+                (0..2).map {
+                    VideoCompressionState.Progress(it, 0, 1, "path")
+                }
+            setInput(cameraUploadFolderType, type = CameraUploadsRecordType.TYPE_VIDEO)
+            val quality = VideoQuality.HIGH
+            whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
+            whenever(isChargingUseCase()).thenReturn(true)
+            whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(true)
+            whenever(monitorChargingStoppedState()).thenReturn(flowOf(true, false))
+            whenever(compressVideoUseCase(tempRoot, record.filePath, record.tempFilePath, quality))
+                .thenReturn(flow {
+                    emit(compressionEvents.first())
+                })
+            whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(true)
+            whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
+            executeUnderTest().test {
+                val cancelItem = awaitItem()
+                assertThat(cancelItem).isInstanceOf(CameraUploadsTransferProgress.Compressing.Cancel::class.java)
+                verify(compressVideoUseCase).invoke(
+                    tempRoot,
+                    record.filePath,
+                    record.tempFilePath,
+                    quality
+                )
+                verifyNoInteractions(getFingerprintUseCase)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
         @ParameterizedTest(name = "when folder type is {0}")
         @MethodSource("provideParameters")
@@ -1046,6 +1108,9 @@ class UploadCameraUploadsRecordsUseCaseTest {
         ) = runTest {
             setInput(cameraUploadFolderType)
             val quality = VideoQuality.MEDIUM
+            whenever(isChargingUseCase()).thenReturn(false)
+            whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(false)
+            whenever(monitorChargingStoppedState()).thenReturn(emptyFlow())
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
@@ -1095,6 +1160,9 @@ class UploadCameraUploadsRecordsUseCaseTest {
         ) = runTest {
             setInput(cameraUploadFolderType, CameraUploadsRecordType.TYPE_VIDEO)
             val quality = VideoQuality.MEDIUM
+            whenever(isChargingUseCase()).thenReturn(false)
+            whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(false)
+            whenever(monitorChargingStoppedState()).thenReturn(emptyFlow())
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(true)
@@ -1147,6 +1215,9 @@ class UploadCameraUploadsRecordsUseCaseTest {
         ) = runTest {
             setInput(cameraUploadFolderType, CameraUploadsRecordType.TYPE_VIDEO)
             val quality = VideoQuality.MEDIUM
+            whenever(isChargingUseCase()).thenReturn(false)
+            whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(false)
+            whenever(monitorChargingStoppedState()).thenReturn(emptyFlow())
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)

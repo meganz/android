@@ -74,7 +74,6 @@ import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
-import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
@@ -151,7 +150,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val monitorBatteryInfo: MonitorBatteryInfo,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
-    private val monitorChargingStoppedState: MonitorChargingStoppedState,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase,
     private val cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase,
@@ -238,11 +236,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private var lastUpdated: Long = 0
 
     /**
-     * Dedicated job to encapsulate video compression process
-     */
-    private var videoCompressionJob: Job? = null
-
-    /**
      * Total video size to upload in MB
      */
     private var totalVideoSize = 0L
@@ -266,11 +259,6 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Job to monitor battery level status flow
      */
     private var monitorBatteryLevelStatusJob: Job? = null
-
-    /**
-     * Job to monitor charging stopped status flow
-     */
-    private var monitorChargingStoppedStatusJob: Job? = null
 
     /**
      * Job to monitor transfer over quota status flow
@@ -306,7 +294,6 @@ class CameraUploadsWorker @AssistedInject constructor(
             setForegroundAsync(getForegroundInfo())
 
             monitorConnectivityStatusJob = monitorConnectivityStatus()
-            monitorChargingStoppedStatusJob = monitorChargingStoppedStatus()
             monitorBatteryLevelStatusJob = monitorBatteryLevelStatus()
             monitorUploadPauseStatusJob = monitorUploadPauseStatus()
             monitorStorageOverQuotaStatusJob = monitorStorageOverQuotaStatus()
@@ -421,15 +408,6 @@ class CameraUploadsWorker @AssistedInject constructor(
             deviceAboveMinimumBatteryLevel = (it.level > LOW_BATTERY_LEVEL || it.isCharging)
             if (!deviceAboveMinimumBatteryLevel) {
                 abortWork(cancelMessage = "Low Battery Level")
-            }
-        }
-    }
-
-    private fun CoroutineScope.monitorChargingStoppedStatus() = launch {
-        monitorChargingStoppedState().collect {
-            if (isChargingRequired(totalVideoSize)) {
-                Timber.d("Detected device stops charging")
-                videoCompressionJob?.cancel()
             }
         }
     }
@@ -876,6 +854,9 @@ class CameraUploadsWorker @AssistedInject constructor(
             is CameraUploadsTransferProgress.Compressing.InsufficientStorage,
             -> processCompressingInsufficientStorage()
 
+            is CameraUploadsTransferProgress.Compressing.Cancel,
+            -> showVideoCompressionErrorStatus()
+
             is CameraUploadsTransferProgress.Compressing.Successful,
             -> processCompressingSuccessful()
 
@@ -1190,7 +1171,6 @@ class CameraUploadsWorker @AssistedInject constructor(
             monitorUploadPauseStatusJob,
             monitorConnectivityStatusJob,
             monitorBatteryLevelStatusJob,
-            monitorChargingStoppedStatusJob,
             monitorStorageOverQuotaStatusJob,
             monitorParentNodesDeletedJob,
             sendBackupHeartbeatJob,
@@ -1478,6 +1458,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun showVideoCompressionErrorStatus() {
         runCatching {
+            cameraUploadsNotificationManagerWrapper.cancelCompressionNotification()
             setProgress(workDataOf(STATUS_INFO to COMPRESSION_ERROR))
         }.onFailure {
             Timber.w(it)

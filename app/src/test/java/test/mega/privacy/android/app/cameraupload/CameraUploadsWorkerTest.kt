@@ -49,7 +49,6 @@ import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
-import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
@@ -141,7 +140,6 @@ class CameraUploadsWorkerTest {
     private val monitorBatteryInfo: MonitorBatteryInfo = mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase = mock()
-    private val monitorChargingStoppedState: MonitorChargingStoppedState = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase = mock()
     private val cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase = mock()
@@ -248,7 +246,6 @@ class CameraUploadsWorkerTest {
                 monitorBatteryInfo = monitorBatteryInfo,
                 backgroundFastLoginUseCase = backgroundFastLoginUseCase,
                 isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
-                monitorChargingStoppedState = monitorChargingStoppedState,
                 monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
                 handleLocalIpChangeUseCase = handleLocalIpChangeUseCase,
                 cancelAllUploadTransfersUseCase = cancelAllUploadTransfersUseCase,
@@ -297,7 +294,6 @@ class CameraUploadsWorkerTest {
 
         // mock monitor events
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
-        whenever(monitorChargingStoppedState()).thenReturn(emptyFlow())
         whenever(monitorBatteryInfo()).thenReturn(emptyFlow())
         whenever(monitorPausedTransfersUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
@@ -537,7 +533,6 @@ class CameraUploadsWorkerTest {
         underTest.doWork()
 
         verify(monitorConnectivityUseCase).invoke()
-        verify(monitorChargingStoppedState).invoke()
         verify(monitorBatteryInfo).invoke()
         verify(monitorPausedTransfersUseCase).invoke()
         verify(monitorStorageOverQuotaUseCase).invoke()
