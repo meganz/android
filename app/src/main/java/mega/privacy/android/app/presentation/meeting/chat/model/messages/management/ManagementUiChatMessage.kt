@@ -31,6 +31,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
     @Composable
     override fun MessageListItem(
         uiState: ChatUiState,
+        lastUpdatedCache: Long,
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
     ) {
@@ -50,7 +51,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
     override val timeSent: Long
         get() = message.time
 
-    override val userHandle: Long?
+    override val userHandle: Long
         get() = message.userHandle
 
     override val id: Long

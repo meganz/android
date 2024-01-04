@@ -116,6 +116,7 @@ internal fun ChatView(
         onSendClick = viewModel::sendMessage,
         onHoldAndAnswerCall = viewModel::onHoldAndAnswerCall,
         onEndAndAnswerCall = viewModel::onEndAndAnswerCall,
+        onUserUpdateHandled = viewModel::onUserUpdateHandled,
     )
 }
 
@@ -147,6 +148,7 @@ internal fun ChatView(
     onStartOrJoinMeeting: (isStarted: Boolean) -> Unit = {},
     onAnswerCall: () -> Unit = {},
     onEnableGeolocation: () -> Unit = {},
+    onUserUpdateHandled: () -> Unit = {},
     contentView: @Composable (LazyListState, Modifier, topViews: @Composable () -> Unit, bottomViews: @Composable () -> Unit) -> Unit = { listState, modifier, topViews, bottomViews ->
         ChatContentView(
             scrollState = listState,
@@ -154,6 +156,7 @@ internal fun ChatView(
             modifier = modifier,
             topViews = topViews,
             bottomViews = bottomViews,
+            onUserUpdateHandled = onUserUpdateHandled
         )
     },
     onSendClick: (String) -> Unit = {},

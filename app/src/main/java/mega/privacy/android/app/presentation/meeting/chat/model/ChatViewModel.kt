@@ -6,12 +6,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,6 +35,7 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
@@ -73,6 +76,8 @@ import timber.log.Timber
 import java.util.Collections
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * Extra Action
@@ -96,6 +101,7 @@ const val EXTRA_LINK = "LINK"
  *
  * @param savedStateHandle
  */
+@OptIn(FlowPreview::class)
 @HiltViewModel
 internal class ChatViewModel @Inject constructor(
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase,
@@ -140,6 +146,7 @@ internal class ChatViewModel @Inject constructor(
     private val joinChatLinkUseCase: JoinChatLinkUseCase,
     private val holdChatCallUseCase: HoldChatCallUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
+    private val monitorContactCacheUpdates: MonitorContactCacheUpdates,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -166,6 +173,20 @@ internal class ChatViewModel @Inject constructor(
         monitorStorageStateEvent()
         loadChatRoom()
         joinChatCallIfNeeded()
+        monitorContactCacheUpdate()
+    }
+
+    private fun monitorContactCacheUpdate() {
+        viewModelScope.launch {
+            monitorContactCacheUpdates()
+                // I don't know why sdk emit 2 the same events, add debounce to optimize
+                .debounce(300L.toDuration(DurationUnit.MILLISECONDS))
+                .catch { Timber.e(it) }
+                .collect {
+                    Timber.d("Contact cache update: $it")
+                    _state.update { state -> state.copy(userUpdate = it) }
+                }
+        }
     }
 
     private fun joinChatCallIfNeeded() {
@@ -919,6 +940,10 @@ internal class ChatViewModel @Inject constructor(
                 onAnswerCall()
             }
         }
+    }
+
+    fun onUserUpdateHandled() {
+        _state.update { state -> state.copy(userUpdate = null) }
     }
 
     companion object {

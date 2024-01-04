@@ -26,6 +26,7 @@ interface UiChatMessage {
     @Composable
     fun MessageListItem(
         uiState: ChatUiState,
+        lastUpdatedCache: Long,
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
     )
@@ -75,7 +76,7 @@ interface UiChatMessage {
     /**
      * User handle
      */
-    val userHandle: Long?
+    val userHandle: Long
 
     /**
      * Show time

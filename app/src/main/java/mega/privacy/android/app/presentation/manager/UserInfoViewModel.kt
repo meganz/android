@@ -17,20 +17,15 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.domain.entity.user.UserChanges
-import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
-import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
-import mega.privacy.android.domain.usecase.contact.GetContactEmail
-import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
+import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.contact.GetUserFirstName
-import mega.privacy.android.domain.usecase.contact.GetUserLastName
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import timber.log.Timber
@@ -42,12 +37,8 @@ internal class UserInfoViewModel @Inject constructor(
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val updateMyAvatarWithNewEmail: UpdateMyAvatarWithNewEmail,
-    private val monitorContactUpdates: MonitorContactUpdates,
-    private val getUserFirstName: GetUserFirstName,
-    private val getUserLastName: GetUserLastName,
-    private val getCurrentUserAliases: GetCurrentUserAliases,
+    private val monitorContactCacheUpdates: MonitorContactCacheUpdates,
     private val reloadContactDatabase: ReloadContactDatabase,
-    private val getContactEmail: GetContactEmail,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
@@ -79,10 +70,10 @@ internal class UserInfoViewModel @Inject constructor(
                 }
         }
         viewModelScope.launch {
-            monitorContactUpdates()
+            monitorContactCacheUpdates()
                 .catch { Timber.e(it) }
                 .collect {
-                    handleOtherUsersUpdate(it)
+                    Timber.d("Contact cache update: $it")
                 }
         }
         viewModelScope.launch {
@@ -114,50 +105,6 @@ internal class UserInfoViewModel @Inject constructor(
             it.copy(
                 avatarContent = avatarContent,
             )
-        }
-    }
-
-    private suspend fun handleOtherUsersUpdate(userUpdate: UserUpdate) {
-        userUpdate.changes.forEach { entry ->
-            if (entry.value.contains(UserChanges.Firstname)) {
-                Timber.d("The user: ${entry.key.id} changed his first name")
-                runCatching {
-                    getUserFirstName(
-                        handle = entry.key.id,
-                        skipCache = true,
-                        shouldNotify = true
-                    )
-                }.onFailure {
-                    Timber.e(it)
-                }
-            }
-
-            if (entry.value.contains(UserChanges.Lastname)) {
-                Timber.d("The user: ${entry.key.id} changed his last name")
-                runCatching {
-                    getUserLastName(
-                        handle = entry.key.id,
-                        skipCache = true,
-                        shouldNotify = true
-                    )
-                }.onFailure {
-                    Timber.e(it)
-                }
-            }
-
-            if (entry.value.contains(UserChanges.Alias)) {
-                Timber.d("I changed the user: ${entry.key.id} nickname")
-                runCatching { getCurrentUserAliases() }.onFailure {
-                    Timber.e(it)
-                }
-            }
-
-            if (entry.value.contains(UserChanges.Email)) {
-                Timber.d("The contact: ${entry.key.id} changes the mail.")
-                runCatching { getContactEmail(entry.key.id) }.onFailure {
-                    Timber.e(it)
-                }
-            }
         }
     }
 

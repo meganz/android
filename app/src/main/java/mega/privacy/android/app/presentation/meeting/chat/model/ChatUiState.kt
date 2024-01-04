@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion.NUMBER_MESSAGES_TO_LOAD
 
 /**
@@ -52,6 +53,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property openWaitingRoomScreen True if should open waiting room screen, false otherwise.
  * @property isGeolocationEnabled True if geolocation internal permission (not device one) is granted, false otherwise.
  * @property isLoadingGalleryFiles True if gallery files are being loaded, false otherwise.
+ * @property userUpdate [UserUpdate] with the changes in the user.
  */
 data class ChatUiState(
     val chatId: Long = -1L,
@@ -90,6 +92,7 @@ data class ChatUiState(
     val openWaitingRoomScreen: Boolean = false,
     val isGeolocationEnabled: Boolean = false,
     val isLoadingGalleryFiles: Boolean = true,
+    val userUpdate: UserUpdate? = null,
 ) {
 
     /**

@@ -4,12 +4,17 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.FileConstant
@@ -49,6 +54,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ContactDoesNotExistException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaApiJava
@@ -56,12 +62,10 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaStringMap
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
-import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -101,6 +105,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @ApplicationContext private val context: Context,
     private val userChatStatusMapper: UserChatStatusMapper,
+    @ApplicationScope private val sharingScope: CoroutineScope,
 ) : ContactsRepository {
 
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
@@ -136,14 +141,15 @@ internal class DefaultContactsRepository @Inject constructor(
             .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
             .mapNotNull { it.users }
             .map { usersList ->
+                val myUserHandle = megaApiGateway.myUserHandle
                 userUpdateMapper(usersList.filter { user ->
-                    (user.handle != megaApiGateway.myUserHandle &&
+                    (user.handle != myUserHandle &&
                             (user.changes == 0L ||
                                     (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) && user.isOwnChange == 0) ||
                                     user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()) ||
                                     user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME.toLong()) ||
                                     user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL.toLong())) ||
-                            (user.handle == megaApiGateway.myUserHandle &&
+                            (user.handle == myUserHandle &&
                                     (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS.toLong()) ||
                                             user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING.toLong()))))
                 })
@@ -233,22 +239,17 @@ internal class DefaultContactsRepository @Inject constructor(
     private suspend fun getContactAvatar(
         email: String,
         avatarFileName: String,
-    ): String? =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaApiGateway.getContactAvatar(email,
-                    avatarFileName,
-                    OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { request: MegaRequest, error: MegaError ->
-                            if (error.errorCode == MegaError.API_OK) {
-                                continuation.resumeWith(Result.success(request.file))
-                            } else {
-                                continuation.failWithError(error, "getContactAvatar")
-                            }
-                        }
-                    ))
-            }
+    ): String? = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("getContactAvatar") { it.file }
+            megaApiGateway.getContactAvatar(
+                email,
+                avatarFileName,
+                listener
+            )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
+    }
 
     override suspend fun getUserEmail(handle: Long, skipCache: Boolean): String =
         withContext(ioDispatcher) {
@@ -258,17 +259,10 @@ internal class DefaultContactsRepository @Inject constructor(
                     return@withContext cachedEmail
                 }
             }
-            suspendCoroutine { continuation ->
-                megaApiGateway.getUserEmail(handle,
-                    OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { request: MegaRequest, error: MegaError ->
-                            if (error.errorCode == MegaError.API_OK) {
-                                continuation.resume(request.email)
-                            } else {
-                                continuation.failWithError(error, "getUserEmail")
-                            }
-                        }
-                    ))
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("getUserEmail") { it.email }
+                megaApiGateway.getUserEmail(handle, listener)
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -284,14 +278,14 @@ internal class DefaultContactsRepository @Inject constructor(
                     return@withContext cachedName
                 }
             }
-            suspendCoroutine { continuation ->
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("getUserFirstName") { it }
                 megaApiGateway.getUserAttribute(
                     emailOrHandle = handle.toBase64Handle(),
                     type = MegaApiJava.USER_ATTR_FIRSTNAME,
-                    listener = OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onRequestGetUserNameCompleted(continuation)
-                    )
+                    listener = listener
                 )
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }.also { request ->
                 megaLocalRoomGateway.updateContactFistNameByHandle(handle, request.text)
                 if (shouldNotify) {
@@ -312,14 +306,14 @@ internal class DefaultContactsRepository @Inject constructor(
                     return@withContext cachedName
                 }
             }
-            suspendCoroutine { continuation ->
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("getUserLastName") { it }
                 megaApiGateway.getUserAttribute(
                     emailOrHandle = handle.toBase64Handle(),
                     type = MegaApiJava.USER_ATTR_LASTNAME,
-                    listener = OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onRequestGetUserNameCompleted(continuation)
-                    )
+                    listener = listener
                 )
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }.also { request ->
                 megaLocalRoomGateway.updateContactLastNameByHandle(handle, request.text)
                 if (shouldNotify) {
@@ -340,15 +334,6 @@ internal class DefaultContactsRepository @Inject constructor(
             getUserFirstName(handle)
             getUserLastName(handle)
             megaChatApiGateway.getUserFullNameFromCache(handle) ?: error("Can't retrieve full name")
-        }
-
-    private fun onRequestGetUserNameCompleted(continuation: Continuation<MegaRequest>) =
-        { request: MegaRequest, error: MegaError ->
-            if (error.errorCode == MegaError.API_OK) {
-                continuation.resumeWith(Result.success(request))
-            } else {
-                continuation.failWithError(error, "onRequestGetUserNameCompleted")
-            }
         }
 
     override suspend fun applyContactUpdates(
@@ -453,30 +438,23 @@ internal class DefaultContactsRepository @Inject constructor(
     }
 
     override suspend fun getCurrentUserAliases(): Map<Long, String> = withContext(ioDispatcher) {
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("getCurrentUserAliases") {
+                it.megaStringMap
+            }
             megaApiGateway.myUser?.let {
                 megaApiGateway.getUserAttribute(
                     user = it,
                     type = MegaApiJava.USER_ATTR_ALIAS,
-                    listener = OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onRequestGetAliasesCompleted(continuation)
-                    )
+                    listener = listener
                 )
             } ?: continuation.resumeWith(Result.failure(NullPointerException("myUser null")))
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }.getDecodedAliases()
             .also {
                 updateContactsNickname(megaApiGateway.getContacts(), it)
             }
     }
-
-    private fun onRequestGetAliasesCompleted(continuation: Continuation<MegaStringMap>) =
-        { request: MegaRequest, error: MegaError ->
-            if (error.errorCode == MegaError.API_OK) {
-                continuation.resumeWith(Result.success(request.megaStringMap))
-            } else {
-                continuation.failWithError(error, "onRequestGetAliasesCompleted")
-            }
-        }
 
     override suspend fun addNewContacts(
         outdatedContactList: List<ContactItem>,
@@ -869,4 +847,55 @@ internal class DefaultContactsRepository @Inject constructor(
                 } ?: user
             } else null
         }
+
+    override val monitorContactCacheUpdates: Flow<UserUpdate> = monitorContactUpdates()
+        .filter {
+            val validChanges = setOf(
+                UserChanges.Alias,
+                UserChanges.Firstname,
+                UserChanges.Lastname,
+                UserChanges.Email,
+                UserChanges.Avatar
+            )
+            it.changes.any { entry ->
+                entry.value.any { change -> validChanges.contains(change) }
+            }
+        }
+        .onEach {
+            updateContactCache(it)
+        }
+        .catch { Timber.e(it, "updateContactCache failed") }
+        .shareIn(sharingScope, SharingStarted.WhileSubscribed())
+
+    private suspend fun updateContactCache(userUpdate: UserUpdate) {
+        Timber.d("updateContactCache")
+        if (userUpdate.changes.any { it.value.contains(UserChanges.Alias) }) {
+            getCurrentUserAliases()
+        }
+        userUpdate.changes.forEach { entry ->
+            entry.value.forEach {
+                when (it) {
+                    UserChanges.Firstname -> {
+                        getUserFirstName(entry.key.id, skipCache = true, shouldNotify = true)
+                    }
+
+                    UserChanges.Lastname -> {
+                        getUserLastName(entry.key.id, skipCache = true, shouldNotify = true)
+                    }
+
+                    UserChanges.Email -> {
+                        getContactEmail(entry.key.id)
+                    }
+
+                    UserChanges.Avatar -> {
+                        megaApiGateway.getContact(entry.key.id.toBase64Handle())?.let {
+                            getAvatarUri(it.email.orEmpty())
+                        }
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
+    }
 }

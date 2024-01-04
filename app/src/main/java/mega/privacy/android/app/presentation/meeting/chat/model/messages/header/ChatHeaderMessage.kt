@@ -13,6 +13,7 @@ class ChatHeaderMessage : UiChatMessage {
     @Composable
     override fun MessageListItem(
         uiState: ChatUiState,
+        lastUpdatedCache: Long,
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
     ) {
@@ -26,7 +27,7 @@ class ChatHeaderMessage : UiChatMessage {
     override val canForward: Boolean
         get() = false
     override val timeSent: Long? = null
-    override val userHandle: Long? = null
+    override val userHandle: Long = -1L
     override val showTime: Boolean
         get() = false
     override val showDate: Boolean

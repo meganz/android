@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -36,8 +37,10 @@ import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ContactDoesNotExistException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ContactsRepository
@@ -57,6 +60,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -112,6 +116,12 @@ class DefaultContactsRepositoryTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
+        initRepository()
+
+        whenever(megaApiGateway.userHandleToBase64(userHandle)).thenReturn("LTEyMzQ1Ng==")
+    }
+
+    private fun initRepository() {
         underTest = DefaultContactsRepository(
             megaApiGateway = megaApiGateway,
             megaChatApiGateway = megaChatApiGateway,
@@ -131,10 +141,9 @@ class DefaultContactsRepositoryTest {
             chatConnectionStateMapper = chatConnectionStateMapper,
             context = context,
             megaLocalRoomGateway = megaLocalRoomGateway,
-            userChatStatusMapper = userChatStatusMapper
+            userChatStatusMapper = userChatStatusMapper,
+            sharingScope = CoroutineScope(UnconfinedTestDispatcher()),
         )
-
-        whenever(megaApiGateway.userHandleToBase64(userHandle)).thenReturn("LTEyMzQ1Ng==")
     }
 
     @Test
@@ -1331,4 +1340,114 @@ class DefaultContactsRepositoryTest {
             whenever(contactWrapper.getMegaUserNameDB(any())).thenReturn(userNameInDatabase)
             assertThat(underTest.getContactUserNameFromDatabase(user)).isEqualTo(userNameInDatabase)
         }
+
+    @Test
+    fun `test that avatar cache update when user updates avatar`() = runTest {
+        val otherUserHandle = 321L
+        val myUserHandle = 123L
+        val user = mock<MegaUser> {
+            on { handle } doReturn otherUserHandle
+            on { changes } doReturn MegaUser.CHANGE_TYPE_AVATAR.toLong()
+            on { email } doReturn "email"
+            on { hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) } doReturn true
+        }
+        whenever(megaApiGateway.myUserHandle).thenReturn(myUserHandle)
+        whenever(megaApiGateway.globalUpdates).thenReturn(
+            flowOf(GlobalUpdate.OnUsersUpdate(arrayListOf(user)))
+        )
+        val userUpdate = UserUpdate(
+            mapOf(UserId(otherUserHandle) to listOf(UserChanges.Avatar))
+        )
+        whenever(userUpdateMapper(listOf(user))).thenReturn(userUpdate)
+        whenever(megaApiGateway.getContact(anyOrNull())).thenReturn(user)
+        val cacheFile = mock<File> {
+            on { absolutePath }.thenReturn(avatarUri)
+        }
+        whenever(cacheGateway.buildAvatarFile(any())).thenReturn(cacheFile)
+        val avatarRequest = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_AVATAR)
+            on { file }.thenReturn(avatarUri)
+        }
+        whenever(megaApiGateway.getContactAvatar(any(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface)
+                .onRequestFinish(mock(), avatarRequest, success)
+        }
+        initRepository()
+        underTest.monitorContactCacheUpdates.test {
+            val actual = awaitItem()
+            verify(megaApiGateway).getContactAvatar(any(), any(), any())
+            assertThat(actual).isEqualTo(userUpdate)
+        }
+    }
+
+    @Test
+    fun `test that first name cache update when user updates first name`() = runTest {
+        val myUserHandle = 123L
+        val otherUserHandle = 321L
+        val user = mock<MegaUser> {
+            on { handle } doReturn otherUserHandle
+            on { changes } doReturn MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()
+            on { email } doReturn "email"
+            on { hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()) } doReturn true
+        }
+        whenever(megaApiGateway.globalUpdates).thenReturn(
+            flowOf(GlobalUpdate.OnUsersUpdate(arrayListOf(user)))
+        )
+        whenever(megaApiGateway.myUserHandle).thenReturn(myUserHandle)
+        val userUpdate = UserUpdate(
+            mapOf(UserId(otherUserHandle) to listOf(UserChanges.Firstname))
+        )
+        whenever(userUpdateMapper(listOf(user))).thenReturn(userUpdate)
+        whenever(megaApiGateway.getUserAttribute(anyOrNull<String>(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), request, success
+            )
+        }
+        initRepository()
+        underTest.monitorContactCacheUpdates.test {
+            val actual = awaitItem()
+            verify(megaApiGateway).getUserAttribute(
+                anyOrNull<String>(),
+                eq(MegaApiJava.USER_ATTR_FIRSTNAME),
+                any()
+            )
+            assertThat(actual).isEqualTo(userUpdate)
+        }
+    }
+
+    @Test
+    fun `test that last name cache update when user updates last name`() = runTest {
+        val myUserHandle = 123L
+        val otherUserHandle = 321L
+        val user = mock<MegaUser> {
+            on { handle } doReturn otherUserHandle
+            on { changes } doReturn MegaUser.CHANGE_TYPE_LASTNAME.toLong()
+            on { email } doReturn "email"
+            on { hasChanged(MegaUser.CHANGE_TYPE_LASTNAME.toLong()) } doReturn true
+        }
+        whenever(megaApiGateway.globalUpdates).thenReturn(
+            flowOf(GlobalUpdate.OnUsersUpdate(arrayListOf(user)))
+        )
+        whenever(megaApiGateway.myUserHandle).thenReturn(myUserHandle)
+        val userUpdate = UserUpdate(
+            mapOf(UserId(otherUserHandle) to listOf(UserChanges.Lastname))
+        )
+        whenever(userUpdateMapper(listOf(user))).thenReturn(userUpdate)
+        whenever(megaApiGateway.getUserAttribute(anyOrNull<String>(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), request, success
+            )
+        }
+        initRepository()
+        underTest.monitorContactCacheUpdates.test {
+            val actual = awaitItem()
+            verify(megaApiGateway).getUserAttribute(
+                anyOrNull<String>(),
+                eq(MegaApiJava.USER_ATTR_LASTNAME),
+                any()
+            )
+            assertThat(actual).isEqualTo(userUpdate)
+        }
+    }
 }

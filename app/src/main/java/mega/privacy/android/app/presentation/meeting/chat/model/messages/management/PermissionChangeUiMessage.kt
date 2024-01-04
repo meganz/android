@@ -17,8 +17,11 @@ import mega.privacy.android.domain.entity.chat.messages.management.PermissionCha
 data class PermissionChangeUiMessage(
     override val message: PermissionChangeMessage,
     override val showDate: Boolean,
-) : ManagementUiChatMessage() {
+) : ParticipantUiMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         PermissionChangeMessageView(message = message, modifier = Modifier.padding(start = 32.dp))
     }
+
+    override val handleOfAction: Long
+        get() = message.handleOfAction
 }

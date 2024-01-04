@@ -27,6 +27,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ParticipantUiMessage
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
 import timber.log.Timber
@@ -39,6 +40,7 @@ internal fun ChatContentView(
     viewModel: MessageListViewModel = hiltViewModel(),
     topViews: @Composable () -> Unit = {},
     bottomViews: @Composable () -> Unit = {},
+    onUserUpdateHandled: () -> Unit = {},
 ) = Box(
     modifier = modifier
 ) {
@@ -46,7 +48,9 @@ internal fun ChatContentView(
     Timber.d("Paging pagingItems load state ${pagingItems.loadState}")
     Timber.d("Paging pagingItems count ${pagingItems.itemCount}")
 
-
+    var lastCacheUpdateTime by remember {
+        mutableStateOf(emptyMap<Long, Long>())
+    }
     var scrollToBottom by remember { mutableStateOf(true) }
     val derivedScrollToBottom by remember {
         derivedStateOf {
@@ -60,7 +64,16 @@ internal fun ChatContentView(
         LaunchedEffect(chatId) {
             viewModel.updateChatId(chatId)
         }
-
+        LaunchedEffect(userUpdate) {
+            if (userUpdate != null) {
+                val newLastCacheUpdateTime = lastCacheUpdateTime.toMutableMap()
+                userUpdate.changes.forEach {
+                    newLastCacheUpdateTime[it.key.id] = System.currentTimeMillis()
+                }
+                lastCacheUpdateTime = newLastCacheUpdateTime
+                onUserUpdateHandled()
+            }
+        }
         LaunchedEffect(key1 = derivedScrollToBottom) {
             Timber.d("Paging derivedScrollToBottom is $derivedScrollToBottom")
             if (derivedScrollToBottom) {
@@ -104,10 +117,18 @@ internal fun ChatContentView(
 
             items(
                 count = pagingItems.itemCount,
-                key = pagingItems.itemKey { it.key() },
+                key = pagingItems.itemKey {
+                    if (it is ParticipantUiMessage) {
+                        // some messages we show the name of 2 users
+                        "${it.key()}_${lastCacheUpdateTime[it.userHandle]}_${lastCacheUpdateTime[it.handleOfAction]}"
+                    } else {
+                        "${it.key()}_${lastCacheUpdateTime[it.userHandle]}"
+                    }
+                },
                 contentType = pagingItems.itemContentType()
             ) { index ->
                 pagingItems[index]?.MessageListItem(uiState = uiState,
+                    lastUpdatedCache = lastCacheUpdateTime[pagingItems[index]?.userHandle] ?: 0L,
                     timeFormatter = TimeUtils::formatTime,
                     dateFormatter = {
                         TimeUtils.formatDate(

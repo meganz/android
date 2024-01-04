@@ -139,6 +139,7 @@ internal abstract class RepositoryModule {
     abstract fun bindAlbumRepository(repository: DefaultAlbumRepository): AlbumRepository
 
     @Binds
+    @Singleton
     abstract fun bindContactsRepository(repository: DefaultContactsRepository): ContactsRepository
 
     @Binds

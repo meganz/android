@@ -26,6 +26,7 @@ data class CallUiMessage(
     @Composable
     override fun MessageListItem(
         uiState: ChatUiState,
+        lastUpdatedCache: Long,
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
     ) {

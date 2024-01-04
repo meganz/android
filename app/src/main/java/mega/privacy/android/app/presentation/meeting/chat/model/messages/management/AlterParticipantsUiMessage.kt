@@ -17,8 +17,11 @@ import mega.privacy.android.domain.entity.chat.messages.management.AlterParticip
 data class AlterParticipantsUiMessage(
     override val message: AlterParticipantsMessage,
     override val showDate: Boolean,
-) : ManagementUiChatMessage() {
+) : ParticipantUiMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         AlterParticipantsMessageView(message = message, modifier = Modifier.padding(start = 32.dp))
     }
+
+    override val handleOfAction: Long
+        get() = message.handleOfAction
 }

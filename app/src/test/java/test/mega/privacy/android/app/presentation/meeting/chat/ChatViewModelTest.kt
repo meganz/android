@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -39,11 +40,15 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
@@ -206,6 +211,9 @@ internal class ChatViewModelTest {
     private val joinChatLinkUseCase = mock<JoinChatLinkUseCase>()
     private val holdChatCallUseCase = mock<HoldChatCallUseCase>()
     private val hangChatCallUseCase = mock<HangChatCallUseCase>()
+    private val monitorContactCacheUpdates: MonitorContactCacheUpdates = mock {
+        onBlocking { invoke() } doReturn emptyFlow()
+    }
 
     @BeforeAll
     fun setup() {
@@ -277,6 +285,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorParticipatingInACallInOtherChatUseCase(any()) } doReturn emptyFlow()
         whenever(monitorAllContactParticipantsInChatUseCase(any())) doReturn emptyFlow()
         wheneverBlocking { (monitorMessageLoadedUseCase(chatId)) } doReturn emptyFlow()
+        wheneverBlocking { monitorContactCacheUpdates() } doReturn emptyFlow()
     }
 
     private fun initTestClass() {
@@ -324,6 +333,7 @@ internal class ChatViewModelTest {
             joinChatLinkUseCase = joinChatLinkUseCase,
             holdChatCallUseCase = holdChatCallUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
+            monitorContactCacheUpdates = monitorContactCacheUpdates
         )
     }
 
@@ -2188,6 +2198,36 @@ internal class ChatViewModelTest {
             verify(hangChatCallUseCase).invoke(callId)
             verifyNoInteractions(answerChatCallUseCase)
         }
+
+    @Test
+    fun `test that userUpdates is updated when user updates`() = runTest {
+        val chatRoom = mock<ChatRoom> {
+            on { chatId } doReturn chatId
+            on { isGroup } doReturn true
+            on { ownPrivilege } doReturn ChatRoomPermission.Standard
+            on { peerCount } doReturn 0L
+            on { peerHandlesList } doReturn listOf(1L, 2L, 3L)
+            on { isPreview } doReturn false
+        }
+        val updateFlow = MutableSharedFlow<UserUpdate>()
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+        whenever(monitorContactCacheUpdates()).thenReturn(updateFlow)
+        initTestClass()
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.userUpdate).isNull()
+        }
+        val userUpdate = mock<UserUpdate> {
+            on { changes } doReturn mapOf(UserId(1L) to listOf(UserChanges.Avatar))
+        }
+        updateFlow.emit(userUpdate)
+        advanceUntilIdle()
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.userUpdate).isEqualTo(userUpdate)
+        }
+    }
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

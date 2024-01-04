@@ -12,10 +12,19 @@ import coil.transform.CircleCropTransformation
 import mega.privacy.android.domain.entity.user.ContactAvatar
 import mega.privacy.android.domain.entity.user.UserId
 
+/**
+ * Chat avatar
+ *
+ * @param handle User handle
+ * @param modifier Modifier
+ * @param lastUpdatedCache Last update time of the avatar
+
+ */
 @Composable
 fun ChatAvatar(
     handle: Long,
     modifier: Modifier = Modifier,
+    lastUpdatedCache: Long = 0L,
 ) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
@@ -23,6 +32,7 @@ fun ChatAvatar(
                 ContactAvatar(id = UserId(handle))
             )
             .transformations(CircleCropTransformation())
+            .memoryCacheKey("${handle}_$lastUpdatedCache}")
             .build(),
         contentDescription = "Avatar",
         contentScale = ContentScale.Inside,

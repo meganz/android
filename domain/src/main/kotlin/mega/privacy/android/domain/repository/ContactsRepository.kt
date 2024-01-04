@@ -404,4 +404,11 @@ interface ContactsRepository {
      * @return The username from the database, which can be potentially nullable
      */
     suspend fun getContactUserNameFromDatabase(user: String?): String?
+
+    /**
+     * Monitor contact cache updates.
+     *
+     * @return A flow of [UserUpdate].
+     */
+    val monitorContactCacheUpdates: Flow<UserUpdate>
 }
