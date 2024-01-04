@@ -377,6 +377,7 @@ class MeetingActivity : PasscodeActivity() {
                 startActivity(getIntentOngoingCall(this@MeetingActivity, chatId))
             }
         }
+
     }
 
     private fun collectFlows() {
@@ -413,6 +414,10 @@ class MeetingActivity : PasscodeActivity() {
                         .putExtra(Constants.CHAT_ID, state.chatIdToOpen)
                 )
                 meetingViewModel.onConsumeNavigateToChatEvent()
+            }
+
+            if (state.isNecessaryToUpdateCall) {
+                meetingViewModel.getChatCall(false)
             }
 
             binding.recIndicator.visibility =

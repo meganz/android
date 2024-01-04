@@ -442,16 +442,25 @@ class MeetingActivityViewModel @Inject constructor(
     /**
      * Get chat call
      */
-    private fun getChatCall() = viewModelScope.launch {
-        runCatching {
-            getChatCallUseCase(_state.value.chatId)
-        }.onSuccess { call ->
-            call?.let {
-                checkIfPresenting(it)
-                checkEphemeralAccountAndWaitingRoom(it)
+    fun getChatCall(checkEphemeralAccount: Boolean = true) {
+        _state.update {
+            it.copy(
+                isNecessaryToUpdateCall = false
+            )
+        }
+        viewModelScope.launch {
+            runCatching {
+                getChatCallUseCase(_state.value.chatId)
+            }.onSuccess { call ->
+                call?.let {
+                    checkIfPresenting(it)
+                    if (checkEphemeralAccount) {
+                        checkEphemeralAccountAndWaitingRoom(it)
+                    }
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
             }
-        }.onFailure { exception ->
-            Timber.e(exception)
         }
     }
 
@@ -741,11 +750,7 @@ class MeetingActivityViewModel @Inject constructor(
                                 if (session.hasScreenShare) {
                                     _state.update { it.copy(isParticipantSharingScreen = true) }
                                 } else {
-                                    getChatCallUseCase(_state.value.chatId)?.let {
-                                        it?.let {
-                                            checkIfPresenting(it)
-                                        }
-                                    }
+                                    _state.update { it.copy(isNecessaryToUpdateCall = true) }
                                 }
                             }
                             if (contains(ChatSessionChanges.SessionOnRecording)) {

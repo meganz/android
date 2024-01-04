@@ -46,6 +46,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property showRecordingConsentDialog                 True if should show the recording consent dialog or False otherwise.
  * @property isRecordingConsentAccepted                 True if recording consent dialog has been already accepted or False otherwise.
  * @property startOrStopRecordingParticipantName        Name of the [Participant] who has started/stopped the recording.
+ * @property isNecessaryToUpdateCall                    True, it is necessary to update call. False, it's not necessary.
  * @property isScheduledMeeting                         True, if it is a scheduled meeting. False, if not.
  * @property myFullName                                 My full name
  * @property chatScheduledMeeting                       [ChatScheduledMeeting]
@@ -85,6 +86,7 @@ data class MeetingState(
     val showRecordingConsentDialog: Boolean = false,
     val isRecordingConsentAccepted: Boolean = false,
     val startOrStopRecordingParticipantName: String? = null,
+    val isNecessaryToUpdateCall: Boolean = false,
     val isScheduledMeeting: Boolean = false,
     val myFullName: String = "",
     val chatScheduledMeeting: ChatScheduledMeeting? = null
