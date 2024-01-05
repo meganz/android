@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -159,14 +160,12 @@ internal fun ChatView(
     onAnswerCall: () -> Unit = {},
     onEnableGeolocation: () -> Unit = {},
     onUserUpdateHandled: () -> Unit = {},
-    contentView: @Composable (LazyListState, Modifier, topViews: @Composable () -> Unit, bottomViews: @Composable () -> Unit) -> Unit = { listState, modifier, topViews, bottomViews ->
-        ChatContentView(
+    messageListView: @Composable (ChatUiState, LazyListState, Dp) -> Unit = { state, listState, bottomPadding ->
+        MessageListView(
+            uiState = state,
             scrollState = listState,
-            uiState = uiState,
-            modifier = modifier,
-            topViews = topViews,
-            bottomViews = bottomViews,
-            onUserUpdateHandled = onUserUpdateHandled
+            bottomPadding = bottomPadding,
+            onUserUpdateHandled = onUserUpdateHandled,
         )
     },
     onSendClick: (String) -> Unit = {},
@@ -452,27 +451,36 @@ internal fun ChatView(
                 }
             )
             { paddingValues ->
-                contentView(
-                    scrollState,
-                    Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    {
-                        TopCallButton(this@with, onStartOrJoinMeeting = {
-                            callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
-                        })
-                        if (numPreviewers > 0) {
-                            ChatObserverIndicator(numObservers = numPreviewers.toString())
-                        }
-                    },
-                    {
-                        BottomCallButton(
-                            uiState = this@with,
-                            enablePasscodeCheck = enablePasscodeCheck,
-                            onJoinAnswerCallClick = { showJoinAnswerCallDialog = true }
-                        )
-                    },
-                )
+
+                if (uiState.chatId != -1L) {
+                    ChatContentView(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        topViews = {
+                            TopCallButton(this@with, onStartOrJoinMeeting = {
+                                callPermissionsLauncher.launch(PermissionUtils.getCallPermissionListByVersion())
+                            })
+                            if (numPreviewers > 0) {
+                                ChatObserverIndicator(numObservers = numPreviewers.toString())
+                            }
+                        },
+                        bottomViews = {
+                            BottomCallButton(
+                                uiState = this@with,
+                                enablePasscodeCheck = enablePasscodeCheck,
+                                onJoinAnswerCallClick = { showJoinAnswerCallDialog = true }
+                            )
+                        },
+                        listView = { bottomPadding ->
+                            messageListView(
+                                uiState,
+                                scrollState,
+                                bottomPadding
+                            )
+                        },
+                    )
+                }
 
                 if (showParticipatingInACallDialog) {
                     ParticipatingInACallDialog(

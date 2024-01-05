@@ -6,14 +6,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import androidx.paging.insertHeaderItem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
@@ -38,7 +35,6 @@ import javax.inject.Inject
  *
  * @param savedStateHandle
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MessageListViewModel @Inject constructor(
     private val loadMessagesUseCase: LoadMessagesUseCase,
@@ -48,41 +44,31 @@ class MessageListViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val chatId = MutableStateFlow(savedStateHandle.get<Long?>(Constants.CHAT_ID))
+    private val chatId = savedStateHandle.get<Long?>(Constants.CHAT_ID) ?: -1
 
-    /**
-     * Update chat id
-     *
-     * @param chatId   Chat id
-     */
-    fun updateChatId(chatId: Long) {
-        this.chatId.value = chatId.takeIf { it != -1L }
-    }
-
-    private val pagedFlow = chatId
-        .filterNotNull()
-        .flatMapLatest { chatId ->
-            Pager(
-                PagingConfig(
-                    pageSize = 32,
-                    prefetchDistance = 10
-                )
-            ) {
-                ChatMessagePagingSource(
-                    chatId = chatId,
-                    loadMessages = loadMessagesUseCase,
-                    fetchMessages = fetchMessagePageUseCase,
+    private val pagedFlow =
+        Pager(
+            PagingConfig(
+                pageSize = 32,
+                prefetchDistance = 10
+            )
+        ) {
+            ChatMessagePagingSource(
+                chatId = chatId,
+                loadMessages = loadMessagesUseCase,
+                fetchMessages = fetchMessagePageUseCase,
+                scope = viewModelScope,
+                messageFlow = monitorChatRoomMessagesUseCase(chatId).shareIn(
                     scope = viewModelScope,
-                    messageFlow = monitorChatRoomMessagesUseCase(chatId).shareIn(
-                        scope = viewModelScope,
-                        started = SharingStarted.Eagerly,
-                    ).onEach {
-                        Timber.d("Paging monitorChatRoomMessagesUseCase returned with message: $it")
-                    },
-                    pagedTypedMessageResultUiMapper = pagedTypedMessageResultUiMapper,
-                )
-            }.flow
-        }
+                    started = SharingStarted.Eagerly,
+                ).onEach {
+                    Timber.d("Paging monitorChatRoomMessagesUseCase returned with message: $it")
+                },
+                pagedTypedMessageResultUiMapper = pagedTypedMessageResultUiMapper,
+            )
+        }.flow
+            .cachedIn(viewModelScope)
+
 
     /**
      * Paged messages

@@ -1343,4 +1343,14 @@ interface MegaChatApiGateway {
      * @return MegaChatMessage that will be sent. The message id is not definitive, but temporal.
      */
     fun sendMessage(chatId: Long, message: String): MegaChatMessage
+
+    /**
+     * This method should be called when we want to close a public chat preview
+     *
+     * It automatically disconnect to this chat, remove all internal data related, and make
+     * a cache cleanup in order to clean all the related records.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     */
+    suspend fun closeChatPreview(chatId: Long)
 }

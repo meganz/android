@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -52,6 +53,7 @@ import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.CloseChatPreviewUseCase
 import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
@@ -218,10 +220,12 @@ internal class ChatViewModelTest {
     }
     private val joinChatLinkUseCase = mock<JoinChatLinkUseCase>()
     private val isAnonymousModeUseCase = mock<IsAnonymousModeUseCase>()
+    private val closeChatPreviewUseCase : CloseChatPreviewUseCase = mock()
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeAll
     fun setup() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+        Dispatchers.setMain(testDispatcher)
     }
 
     @AfterAll
@@ -267,6 +271,7 @@ internal class ChatViewModelTest {
             hangChatCallUseCase,
             joinChatLinkUseCase,
             isAnonymousModeUseCase,
+            closeChatPreviewUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -342,6 +347,8 @@ internal class ChatViewModelTest {
             monitorContactCacheUpdates = monitorContactCacheUpdates,
             joinChatLinkUseCase = joinChatLinkUseCase,
             isAnonymousModeUseCase = isAnonymousModeUseCase,
+            closeChatPreviewUseCase = closeChatPreviewUseCase,
+            applicationScope = CoroutineScope(testDispatcher),
         )
     }
 
@@ -389,14 +396,6 @@ internal class ChatViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().isPrivateChat).isTrue()
         }
-    }
-
-
-    @Test
-    fun `test that title not update when chatId is not passed`() = runTest {
-        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(null)
-        initTestClass()
-        verifyNoInteractions(getChatRoomUseCase)
     }
 
     @Test
@@ -460,14 +459,6 @@ internal class ChatViewModelTest {
             assertThat(awaitItem().userChatStatus).isEqualTo(updatedUserChatStatus)
         }
     }
-
-    @Test
-    fun `test that notification mute icon is not updated when chatId is not passed`() =
-        runTest {
-            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(null)
-            initTestClass()
-            verifyNoInteractions(isChatNotificationMuteUseCase)
-        }
 
     @Test
     fun `test that notification mute icon is shown when mute is enabled`() = runTest {
@@ -2057,7 +2048,6 @@ internal class ChatViewModelTest {
     fun `test that join chat successfully when open by chat link`() = runTest {
         val chatLink = "https://mega.nz/chat/123456789"
         val action = "action"
-        whenever(savedStateHandle.get<Long?>(Constants.CHAT_ID)).thenReturn(null)
         whenever(savedStateHandle.get<String?>(EXTRA_LINK)).thenReturn(chatLink)
         whenever(savedStateHandle.get<String?>(EXTRA_ACTION)).thenReturn(action)
         whenever(joinChatCallUseCase(chatLink, false)).thenReturn(chatId)
@@ -2066,14 +2056,12 @@ internal class ChatViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().chatId).isEqualTo(chatId)
         }
-        verify(savedStateHandle).set(Constants.CHAT_ID, chatId)
     }
 
     @Test
     fun `test that join chat failed with general exception when open by chat link`() = runTest {
         val chatLink = "https://mega.nz/chat/123456789"
         val action = "action"
-        whenever(savedStateHandle.get<Long?>(Constants.CHAT_ID)).thenReturn(null)
         whenever(savedStateHandle.get<String?>(EXTRA_LINK)).thenReturn(chatLink)
         whenever(savedStateHandle.get<String?>(EXTRA_ACTION)).thenReturn(action)
         whenever(joinChatCallUseCase(chatLink, false)).thenThrow(RuntimeException())
@@ -2090,7 +2078,6 @@ internal class ChatViewModelTest {
         runTest {
             val chatLink = "https://mega.nz/chat/123456789"
             val action = "action"
-            whenever(savedStateHandle.get<Long?>(Constants.CHAT_ID)).thenReturn(null)
             whenever(savedStateHandle.get<String?>(EXTRA_LINK)).thenReturn(chatLink)
             whenever(savedStateHandle.get<String?>(EXTRA_ACTION)).thenReturn(action)
             whenever(joinChatCallUseCase(chatLink, false)).thenThrow(

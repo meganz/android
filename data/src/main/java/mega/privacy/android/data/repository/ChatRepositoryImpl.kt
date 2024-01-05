@@ -1078,4 +1078,8 @@ internal class ChatRepositoryImpl @Inject constructor(
         localStorageGateway.setLastPublicHandle(handle)
         localStorageGateway.setLastPublicHandleTimeStamp()
     }
+
+    override suspend fun closeChatPreview(chatId: Long) {
+        megaChatApiGateway.closeChatPreview(chatId)
+    }
 }

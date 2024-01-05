@@ -807,4 +807,11 @@ interface ChatRepository {
      * @param handle
      */
     suspend fun setLastPublicHandle(handle: Long)
+
+    /**
+     * Close chat preview
+     *
+     * @param chatId
+     */
+    suspend fun closeChatPreview(chatId: Long)
 }

@@ -890,4 +890,10 @@ class ChatRepositoryImplTest {
         underTest.autorejoinPublicChat(chatId, chatPublicHandle)
         verify(megaChatApiGateway).autorejoinPublicChat(eq(chatId), eq(chatPublicHandle), any())
     }
+
+    @Test
+    fun `test that close chat preview invokes correctly`() = runTest {
+        underTest.closeChatPreview(chatId)
+        verify(megaChatApiGateway).closeChatPreview(chatId)
+    }
 }

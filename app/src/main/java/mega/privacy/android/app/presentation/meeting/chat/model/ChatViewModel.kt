@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -33,12 +34,14 @@ import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
+import mega.privacy.android.domain.usecase.chat.CloseChatPreviewUseCase
 import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
@@ -145,21 +148,24 @@ internal class ChatViewModel @Inject constructor(
     private val isGeolocationEnabledUseCase: IsGeolocationEnabledUseCase,
     private val enableGeolocationUseCase: EnableGeolocationUseCase,
     private val sendTextMessageUseCase: SendTextMessageUseCase,
-    private val joinChatCallUseCase: JoinChatCallUseCase,
     private val holdChatCallUseCase: HoldChatCallUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val monitorContactCacheUpdates: MonitorContactCacheUpdates,
     private val joinChatLinkUseCase: JoinChatLinkUseCase,
     private val isAnonymousModeUseCase: IsAnonymousModeUseCase,
     private val savedStateHandle: SavedStateHandle,
+    private val joinChatCallUseCase: JoinChatCallUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    private val closeChatPreviewUseCase: CloseChatPreviewUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
 
-    private val chatId: Long?
-        get() = savedStateHandle[Constants.CHAT_ID]
+    private val chatId: Long = savedStateHandle[Constants.CHAT_ID]
+        ?: throw IllegalStateException("Chat screen must have a chat room id")
     private val chatLink: String
         get() = savedStateHandle.get<String>(EXTRA_LINK).orEmpty()
+
     private val usersTyping = Collections.synchronizedMap(mutableMapOf<Long, String?>())
     private val jobs = mutableMapOf<Long, Job>()
 
@@ -175,10 +181,36 @@ internal class ChatViewModel @Inject constructor(
     init {
         checkGeolocation()
         monitorStorageStateEvent()
-        loadChatRoom()
-        joinChatIfNeeded()
+        loadChatOrPreview()
         checkAnonymousMode()
         monitorContactCacheUpdate()
+    }
+
+    private fun loadChatOrPreview() {
+        val action = savedStateHandle.get<String>(EXTRA_ACTION).orEmpty()
+        if (chatLink.isNotEmpty()) {
+            val isAutoJoin = action == Constants.ACTION_JOIN_OPEN_CHAT_LINK
+            viewModelScope.launch {
+                runCatching {
+                    joinChatCallUseCase(
+                        chatLink = chatLink,
+                        isAutoJoin = isAutoJoin
+                    )
+                }.onSuccess {
+                    loadChatRoom()
+                }.onFailure {
+                    Timber.e(it)
+                    val infoToShow = if (it is ResourceDoesNotExistChatException) {
+                        InfoToShow(stringId = R.string.invalid_chat_link)
+                    } else {
+                        InfoToShow(stringId = R.string.error_general_nodes)
+                    }
+                    _state.update { state -> state.copy(infoToShowEvent = triggered(infoToShow)) }
+                }
+            }
+        } else {
+            loadChatRoom()
+        }
     }
 
     private fun checkAnonymousMode() {
@@ -201,47 +233,18 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun joinChatIfNeeded() {
-        if (chatLink.isNotEmpty()) {
-            _state.update { state -> state.copy(chatLink = chatLink) }
-            viewModelScope.launch {
-                val action = savedStateHandle.get<String>(EXTRA_ACTION).orEmpty()
-                val isAutoJoin = action == Constants.ACTION_JOIN_OPEN_CHAT_LINK
-                runCatching {
-                    joinChatCallUseCase(
-                        chatLink = chatLink,
-                        isAutoJoin = isAutoJoin
-                    )
-                }.onSuccess { chatId ->
-                    savedStateHandle[Constants.CHAT_ID] = chatId
-                    loadChatRoom()
-                }.onFailure {
-                    Timber.e(it)
-                    val infoToShow = if (it is ResourceDoesNotExistChatException) {
-                        InfoToShow(stringId = R.string.invalid_chat_link)
-                    } else {
-                        InfoToShow(stringId = R.string.error_general_nodes)
-                    }
-                    _state.update { state -> state.copy(infoToShowEvent = triggered(infoToShow)) }
-                }
-            }
-        }
-    }
-
     private fun loadChatRoom() {
-        chatId?.let {
-            updateChatId(it)
-            getChatRoom(it)
-            getNotificationMute(it)
-            getChatConnectionState(it)
-            getScheduledMeeting(it)
-            monitorACallInThisChat(it)
-            monitorParticipatingInACall(it)
-            monitorChatRoom(it)
-            monitorNotificationMute(it)
-            monitorChatConnectionState(it)
-            monitorNetworkConnectivity(it)
-        }
+        updateChatId()
+        getChatRoom()
+        getNotificationMute()
+        getChatConnectionState()
+        getScheduledMeeting()
+        monitorACallInThisChat()
+        monitorParticipatingInACall()
+        monitorChatRoom()
+        monitorNotificationMute()
+        monitorChatConnectionState()
+        monitorNetworkConnectivity()
     }
 
     private fun monitorAllContactParticipantsInChat(peerHandles: List<Long>) {
@@ -255,7 +258,7 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun getScheduledMeeting(chatId: Long) {
+    private fun getScheduledMeeting() {
         viewModelScope.launch {
             runCatching {
                 getScheduledMeetingByChatUseCase(chatId)
@@ -276,7 +279,7 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun monitorNetworkConnectivity(chatId: Long) {
+    private fun monitorNetworkConnectivity() {
         viewModelScope.launch {
             monitorConnectivityUseCase()
                 .collect { networkConnected ->
@@ -293,13 +296,13 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun updateChatId(chatId: Long) {
+    private fun updateChatId() {
         viewModelScope.launch {
             _state.update { it.copy(chatId = chatId) }
         }
     }
 
-    private fun monitorChatConnectionState(chatId: Long) {
+    private fun monitorChatConnectionState() {
         viewModelScope.launch {
             monitorChatConnectionStateUseCase()
                 .filter { it.chatId == chatId }
@@ -309,13 +312,13 @@ internal class ChatViewModel @Inject constructor(
                             it.copy(isConnected = false)
                         }
                     } else {
-                        getChatConnectionState(chatId = chatId)
+                        getChatConnectionState()
                     }
                 }
         }
     }
 
-    private fun getChatConnectionState(chatId: Long) {
+    private fun getChatConnectionState() {
         viewModelScope.launch {
             runCatching {
                 isChatStatusConnectedForCallUseCase(chatId = chatId)
@@ -338,7 +341,7 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun getChatRoom(chatId: Long) {
+    private fun getChatRoom() {
         viewModelScope.launch {
             runCatching {
                 getChatRoomUseCase(chatId)
@@ -410,7 +413,7 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun getNotificationMute(chatId: Long) {
+    private fun getNotificationMute() {
         viewModelScope.launch {
             runCatching {
                 isChatNotificationMuteUseCase(chatId)
@@ -422,7 +425,7 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun monitorChatRoom(chatId: Long) {
+    private fun monitorChatRoom() {
         viewModelScope.launch {
             monitorChatRoomUpdates(chatId)
                 .collect { chat ->
@@ -526,11 +529,11 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun monitorNotificationMute(chatId: Long) {
+    private fun monitorNotificationMute() {
         viewModelScope.launch {
             monitorUpdatePushNotificationSettingsUseCase().collect { changed ->
                 if (changed) {
-                    getNotificationMute(chatId)
+                    getNotificationMute()
                 }
             }
         }
@@ -562,7 +565,7 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun monitorParticipatingInACall(chatId: Long) {
+    private fun monitorParticipatingInACall() {
         viewModelScope.launch {
             monitorParticipatingInACallInOtherChatUseCase(chatId)
                 .catch { Timber.e(it) }
@@ -573,7 +576,7 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun monitorACallInThisChat(chatId: Long) {
+    private fun monitorACallInThisChat() {
         viewModelScope.launch {
             monitorCallInChatUseCase(chatId)
                 .catch { Timber.e(it) }
@@ -965,19 +968,30 @@ internal class ChatViewModel @Inject constructor(
     }
 
     fun onSetPendingJoinLink() {
-        chatManagement.pendingJoinLink = chatLink
+        chatManagement.pendingJoinLink = savedStateHandle[EXTRA_LINK]
     }
 
     fun onJoinChat() {
         viewModelScope.launch {
-            chatId?.let {
+            runCatching {
+                joinChatLinkUseCase(chatId)
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    override fun onCleared() {
+        if (state.value.isPreviewMode) {
+            applicationScope.launch {
                 runCatching {
-                    joinChatLinkUseCase(it)
+                    closeChatPreviewUseCase(chatId)
                 }.onFailure {
                     Timber.e(it)
                 }
             }
         }
+        super.onCleared()
     }
 
     companion object {
