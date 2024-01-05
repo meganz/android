@@ -131,7 +131,7 @@ import javax.inject.Inject
  * @property logoutUseCase                                  [LogoutUseCase]
  * @property monitorFinishActivityUseCase                   [MonitorFinishActivityUseCase]
  * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
- * @property getChatRoomByChatIdUseCaseUseCase                     [GetChatRoomUseCase]
+ * @property getChatRoomUseCase                             [GetChatRoomUseCase]
  * @property getChatCallUseCase                             [GetChatCallUseCase]
  * @property getFeatureFlagValue                            [GetFeatureFlagValueUseCase]
  * @property setOpenInvite                                  [SetOpenInvite]
@@ -172,7 +172,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
-    private val getChatRoomByChatIdUseCaseUseCase: GetChatRoomUseCase,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val queryChatLink: QueryChatLink,
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
@@ -397,7 +397,7 @@ class MeetingActivityViewModel @Inject constructor(
             getMyFullNameUseCase()
         }.onSuccess {
             it?.apply {
-                _state.update {state ->
+                _state.update { state ->
                     state.copy(
                         myFullName = this,
                     )
@@ -413,7 +413,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun getChatRoom() = viewModelScope.launch {
         runCatching {
-            getChatRoomByChatIdUseCaseUseCase(_state.value.chatId)
+            getChatRoomUseCase(_state.value.chatId)
         }.onSuccess { chatRoom ->
             chatRoom?.apply {
                 _state.update {
@@ -490,7 +490,6 @@ class MeetingActivityViewModel @Inject constructor(
                 }
             }
         }
-
 
 
     /**
