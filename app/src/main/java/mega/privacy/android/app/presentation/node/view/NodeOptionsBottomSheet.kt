@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.view.extension.fileInfo
@@ -39,7 +38,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 @Composable
 internal fun NodeOptionsBottomSheet(
     modalSheetState: ModalBottomSheetState,
-    node: NodeUIItem<TypedNode>,
+    node: TypedNode,
     handler: NodeBottomSheetActionHandler,
     viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
@@ -53,15 +52,15 @@ internal fun NodeOptionsBottomSheet(
         modalSheetState = modalSheetState,
         sheetHeader = {
             NodeListViewItem(
-                title = node.node.name,
-                subtitle = when (node.node) {
-                    is FileNode -> node.node.fileInfo()
-                    is FolderNode -> node.node.folderInfo()
+                title = node.name,
+                subtitle = when (node) {
+                    is FileNode -> node.fileInfo()
+                    is FolderNode -> node.folderInfo()
                     else -> ""
                 },
-                icon = node.node.let { node -> node as? TypedFolderNode }?.getIcon()
-                    ?: MimeTypeList.typeForName(node.node.name).iconResourceId,
-                thumbnailData = ThumbnailRequest(node.node.id),
+                icon = node.let { node -> node as? TypedFolderNode }?.getIcon()
+                    ?: MimeTypeList.typeForName(node.name).iconResourceId,
+                thumbnailData = ThumbnailRequest(node.id),
             )
         },
         sheetBody = {

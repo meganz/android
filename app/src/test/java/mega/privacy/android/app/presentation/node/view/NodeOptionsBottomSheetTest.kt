@@ -30,10 +30,6 @@ class NodeOptionsBottomSheetTest {
     private val sampleNode = mock<TypedFolderNode> {
         on { name }.thenReturn("name")
     }
-    private val sampleNodeUiItem = mock<NodeUIItem<TypedNode>> {
-        on { name }.thenReturn("name")
-        on { node }.thenReturn(sampleNode)
-    }
 
     @Test
     fun `test that a single group has no dividers`() {
@@ -57,7 +53,7 @@ class NodeOptionsBottomSheetTest {
         composeTestRule.setContent {
             NodeOptionsBottomSheet(
                 modalSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Expanded),
-                node = sampleNodeUiItem,
+                node = sampleNode,
                 viewModel = viewModel,
                 handler = nodeBottomSheetActionHandler
             ) {}
@@ -93,7 +89,7 @@ class NodeOptionsBottomSheetTest {
         composeTestRule.setContent {
             NodeOptionsBottomSheet(
                 modalSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Expanded),
-                node = sampleNodeUiItem,
+                node = sampleNode,
                 viewModel = viewModel,
                 handler = nodeBottomSheetActionHandler,
             ) {}

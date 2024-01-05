@@ -12,10 +12,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +28,7 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
@@ -36,7 +37,6 @@ import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -44,6 +44,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
@@ -122,14 +123,16 @@ class SearchActivity : AppCompatActivity() {
             val uiState by viewModel.state.collectAsStateWithLifecycle()
             val modalSheetState = rememberModalBottomSheetState(
                 initialValue = ModalBottomSheetValue.Hidden,
-                skipHalfExpanded = false,
             )
             var selectedNode: NodeUIItem<TypedNode>? by remember {
                 mutableStateOf(null)
             }
-
+            val coroutineScope = rememberCoroutineScope()
             BackHandler(enabled = modalSheetState.isVisible) {
                 selectedNode = null
+                coroutineScope.launch {
+                    modalSheetState.hide()
+                }
             }
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 SearchComposeView(
@@ -145,7 +148,11 @@ class SearchActivity : AppCompatActivity() {
                         showSortOrderBottomSheet()
                     },
                     onMenuClick = {
+                        hideKeyboard()
                         selectedNode = it
+                        coroutineScope.launch {
+                            modalSheetState.show()
+                        }
                     },
                     onDisputeTakeDownClicked = ::navigateToLink,
                     onLinkClicked = ::navigateToLink,
@@ -159,19 +166,14 @@ class SearchActivity : AppCompatActivity() {
                 selectedNode?.let {
                     NodeOptionsBottomSheet(
                         modalSheetState = modalSheetState,
-                        node = it,
+                        node = it.node,
                         handler = NodeBottomSheetActionHandler(this),
                     ) {
                         selectedNode = null
+                        coroutineScope.launch {
+                            modalSheetState.hide()
+                        }
                     }
-                }
-            }
-
-            LaunchedEffect(key1 = selectedNode) {
-                if (selectedNode == null) {
-                    modalSheetState.hide()
-                } else {
-                    modalSheetState.show()
                 }
             }
         }
