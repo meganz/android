@@ -888,4 +888,8 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     private suspend fun getOfflineNode(handle: Long) =
         megaLocalRoomGateway.getOfflineInformation(handle)
+
+    override suspend fun getContactVerificationEnabledWarning() = withContext(ioDispatcher) {
+        megaApiGateway.getContactVerificationWarningEnabled()
+    }
 }

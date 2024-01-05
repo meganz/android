@@ -316,8 +316,4 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             }
         }
     }
-
-    override suspend fun getContactVerificationEnabledWarning() = withContext(ioDispatcher) {
-        return@withContext megaApiGateway.getContactVerificationWarningEnabled()
-    }
 }

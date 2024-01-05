@@ -611,6 +611,11 @@ interface NodeRepository {
     suspend fun moveNodeToRubbishBinByHandle(nodeId: NodeId)
 
     /**
+     * Get contact verification warning enabled flag
+     */
+    suspend fun getContactVerificationEnabledWarning(): Boolean
+
+    /**
      * Gets list of NodeLabel
      * @return list of [NodeLabel]
      */

@@ -239,9 +239,4 @@ interface MegaNodeRepository {
      * @param megaNode : [MegaNode] object which needs to be shared
      */
     suspend fun createShareKey(megaNode: MegaNode)
-
-    /**
-     * Get contact verification warning enabled flag
-     */
-    suspend fun getContactVerificationEnabledWarning(): Boolean
 }
