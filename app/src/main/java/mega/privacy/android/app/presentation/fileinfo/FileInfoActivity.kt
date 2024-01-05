@@ -58,13 +58,12 @@ import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -427,7 +426,6 @@ class FileInfoActivity : BaseActivity() {
     }
 
     private fun downloadNode() {
-        PermissionUtils.checkNotificationsPermission(this)
         viewModel.startDownloadNode()
     }
 

@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.transfers.startdownload.view
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.view.View
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.SnackbarHostState
@@ -20,6 +22,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
@@ -30,6 +36,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
 import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadTransfersViewModel
@@ -41,19 +48,20 @@ import mega.privacy.android.app.presentation.transfers.view.TransferInProgressDi
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.utils.MinimumTimeVisibility
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 
 /**
  * Helper compose view to show UI related to starting a download transfer
  * (scanning in progress dialog, not enough space snackbar, start download snackbar, quota exceeded, etc.)
  */
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun StartDownloadTransferComponent(
     event: StateEventWithContent<TransferTriggerEvent>,
@@ -62,10 +70,25 @@ internal fun StartDownloadTransferComponent(
     viewModel: StartDownloadTransfersViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
+    } else {
+        null
+    }
     EventEffect(
         event = event,
         onConsumed = onConsumeEvent,
         action = {
+            notificationPermission?.status?.let { permissionStatus ->
+                if (permissionStatus.shouldShowRationale) {
+                    context.startActivity(
+                        Intent(context, NotificationsPermissionActivity::class.java)
+                    )
+                } else if (!permissionStatus.isGranted) {
+                    notificationPermission.launchPermissionRequest()
+                }
+            }
             viewModel.startDownload(it)
         })
     StartDownloadTransferComponent(

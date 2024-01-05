@@ -79,9 +79,7 @@ class DownloadsWorker @AssistedInject constructor(
                     //set progress percent as worker progress
                     setProgress(workDataOf(Progress to transferTotals.progressPercent))
                     //update the notification
-                    if (areNotificationsEnabledUseCase()) {
-                        notify(downloadNotificationMapper(transferTotals, paused))
-                    }
+                    notify(downloadNotificationMapper(transferTotals, paused))
                     Timber.d("DownloadsWorker ${if (paused) "(paused) " else ""} Notification update (${transferTotals.progressPercent}):${transferTotals.hasOngoingTransfers()}")
                 }
                 .last().let { (lastActiveTransferTotals, _, overQuota) ->
@@ -138,22 +136,26 @@ class DownloadsWorker @AssistedInject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    private fun notify(notification: Notification) {
-        notificationManager.notify(
-            DOWNLOAD_NOTIFICATION_ID,
-            notification,
-        )
+    private suspend fun notify(notification: Notification) {
+        if (areNotificationsEnabledUseCase()) {
+            notificationManager.notify(
+                DOWNLOAD_NOTIFICATION_ID,
+                notification,
+            )
+        }
     }
 
     private suspend fun showFinishNotification(activeTransferTotals: ActiveTransferTotals) =
         showFinalNotification(transfersFinishedNotificationMapper(activeTransferTotals))
 
     @SuppressLint("MissingPermission")
-    private fun showFinalNotification(notification: Notification) {
-        notificationManager.notify(
-            NOTIFICATION_DOWNLOAD_FINAL,
-            notification,
-        )
+    private suspend fun showFinalNotification(notification: Notification) {
+        if (areNotificationsEnabledUseCase()) {
+            notificationManager.notify(
+                NOTIFICATION_DOWNLOAD_FINAL,
+                notification,
+            )
+        }
     }
 
     /**
