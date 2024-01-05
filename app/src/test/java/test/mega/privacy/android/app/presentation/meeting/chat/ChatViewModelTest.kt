@@ -63,14 +63,14 @@ import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsAnonymousModeUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
-import mega.privacy.android.domain.usecase.chat.JoinChatCallUseCase
-import mega.privacy.android.domain.usecase.chat.JoinChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
+import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
+import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorMessageLoadedUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -212,13 +212,13 @@ internal class ChatViewModelTest {
     private val isGeolocationEnabledUseCase = mock<IsGeolocationEnabledUseCase>()
     private val enableGeolocationUseCase = mock<EnableGeolocationUseCase>()
     private val sendTextMessageUseCase = mock<SendTextMessageUseCase>()
-    private val joinChatCallUseCase = mock<JoinChatCallUseCase>()
+    private val openChatLinkUseCase = mock<OpenChatLinkUseCase>()
     private val holdChatCallUseCase = mock<HoldChatCallUseCase>()
     private val hangChatCallUseCase = mock<HangChatCallUseCase>()
     private val monitorContactCacheUpdates: MonitorContactCacheUpdates = mock {
         onBlocking { invoke() } doReturn emptyFlow()
     }
-    private val joinChatLinkUseCase = mock<JoinChatLinkUseCase>()
+    private val joinPublicChatUseCase = mock<JoinPublicChatUseCase>()
     private val isAnonymousModeUseCase = mock<IsAnonymousModeUseCase>()
     private val closeChatPreviewUseCase : CloseChatPreviewUseCase = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -266,10 +266,10 @@ internal class ChatViewModelTest {
             isGeolocationEnabledUseCase,
             enableGeolocationUseCase,
             sendTextMessageUseCase,
-            joinChatCallUseCase,
+            openChatLinkUseCase,
             holdChatCallUseCase,
             hangChatCallUseCase,
-            joinChatLinkUseCase,
+            joinPublicChatUseCase,
             isAnonymousModeUseCase,
             closeChatPreviewUseCase
         )
@@ -341,11 +341,11 @@ internal class ChatViewModelTest {
             isGeolocationEnabledUseCase = isGeolocationEnabledUseCase,
             enableGeolocationUseCase = enableGeolocationUseCase,
             sendTextMessageUseCase = sendTextMessageUseCase,
-            joinChatCallUseCase = joinChatCallUseCase,
+            openChatLinkUseCase = openChatLinkUseCase,
             holdChatCallUseCase = holdChatCallUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
             monitorContactCacheUpdates = monitorContactCacheUpdates,
-            joinChatLinkUseCase = joinChatLinkUseCase,
+            joinPublicChatUseCase = joinPublicChatUseCase,
             isAnonymousModeUseCase = isAnonymousModeUseCase,
             closeChatPreviewUseCase = closeChatPreviewUseCase,
             applicationScope = CoroutineScope(testDispatcher),
@@ -2050,7 +2050,7 @@ internal class ChatViewModelTest {
         val action = "action"
         whenever(savedStateHandle.get<String?>(EXTRA_LINK)).thenReturn(chatLink)
         whenever(savedStateHandle.get<String?>(EXTRA_ACTION)).thenReturn(action)
-        whenever(joinChatCallUseCase(chatLink, false)).thenReturn(chatId)
+        whenever(openChatLinkUseCase(chatLink, chatId, false)).thenReturn(chatId)
         whenever(savedStateHandle.get<Long?>(Constants.CHAT_ID)).thenReturn(chatId)
         initTestClass()
         underTest.state.test {
@@ -2064,7 +2064,7 @@ internal class ChatViewModelTest {
         val action = "action"
         whenever(savedStateHandle.get<String?>(EXTRA_LINK)).thenReturn(chatLink)
         whenever(savedStateHandle.get<String?>(EXTRA_ACTION)).thenReturn(action)
-        whenever(joinChatCallUseCase(chatLink, false)).thenThrow(RuntimeException())
+        whenever(openChatLinkUseCase(chatLink, null, false)).thenThrow(RuntimeException())
         initTestClass()
         underTest.state.test {
             val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
@@ -2080,7 +2080,7 @@ internal class ChatViewModelTest {
             val action = "action"
             whenever(savedStateHandle.get<String?>(EXTRA_LINK)).thenReturn(chatLink)
             whenever(savedStateHandle.get<String?>(EXTRA_ACTION)).thenReturn(action)
-            whenever(joinChatCallUseCase(chatLink, false)).thenThrow(
+            whenever(openChatLinkUseCase(chatLink, chatId, false)).thenThrow(
                 ResourceDoesNotExistChatException()
             )
             initTestClass()
@@ -2236,9 +2236,9 @@ internal class ChatViewModelTest {
 
     @Test
     fun `test that joinChatLinkUseCase is invoked if onJoinChat is`() = runTest {
-        whenever(joinChatLinkUseCase(chatId)).thenReturn(Unit)
+        whenever(joinPublicChatUseCase(chatId)).thenReturn(Unit)
         underTest.onJoinChat()
-        verify(joinChatLinkUseCase).invoke(chatId)
+        verify(joinPublicChatUseCase).invoke(chatId)
     }
 
     @Test

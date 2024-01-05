@@ -35,8 +35,8 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatLocalVideoUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.InitGuestChatSessionUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
-import mega.privacy.android.domain.usecase.chat.JoinChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.JoinGuestChatCallUseCase
+import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
@@ -78,7 +78,7 @@ import javax.inject.Inject
  * @property isEphemeralPlusPlusUseCase                 [IsEphemeralPlusPlusUseCase]
  * @property logoutUseCase                              [LogoutUseCase]
  * @property hangChatCallUseCase                        [HangChatCallUseCase]
- * @property joinChatCallUseCase                        [JoinChatCallUseCase]
+ * @property openChatLinkUseCase                        [OpenChatLinkUseCase]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -104,7 +104,7 @@ class WaitingRoomViewModel @Inject constructor(
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
-    private val joinChatCallUseCase: JoinChatCallUseCase
+    private val openChatLinkUseCase: OpenChatLinkUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(WaitingRoomState())
@@ -531,7 +531,7 @@ class WaitingRoomViewModel @Inject constructor(
                         lastName = requireNotNull(currentState.guestLastName),
                     )
                 } else {
-                    joinChatCallUseCase(
+                    openChatLinkUseCase(
                         chatLink = requireNotNull(currentState.chatLink)
                     )
                 }

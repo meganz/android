@@ -3,16 +3,17 @@ package mega.privacy.android.domain.entity.chat
 /**
  * Chat link content
  *
- * @property link
+ * @property link Chat link
+ * @property chatHandle Chat id
  */
 sealed interface ChatLinkContent {
+
     val link: String
+    val chatHandle: Long
 
     /**
      * Meeting link
      *
-     * @property link
-     * @property chatHandle
      * @property isInThisMeeting
      * @property handles
      * @property text
@@ -22,7 +23,7 @@ sealed interface ChatLinkContent {
      */
     data class MeetingLink(
         override val link: String,
-        val chatHandle: Long,
+        override val chatHandle: Long,
         val isInThisMeeting: Boolean,
         val handles: List<Long>?,
         val text: String,
@@ -33,10 +34,9 @@ sealed interface ChatLinkContent {
 
     /**
      * Chat link
-     *
-     * @property link
      */
     data class ChatLink(
         override val link: String,
+        override val chatHandle: Long,
     ) : ChatLinkContent
 }

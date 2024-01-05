@@ -10,7 +10,7 @@ import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
-import mega.privacy.android.domain.usecase.chat.link.LoadChatPreviewUseCase
+import mega.privacy.android.domain.usecase.chat.link.OpenChatPreviewUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,18 +22,18 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JoinChatCallUseCaseTest {
-    private lateinit var underTest: JoinChatCallUseCase
+class OpenChatLinkUseCaseTest {
+    private lateinit var underTest: OpenChatLinkUseCase
 
-    private val loadChatPreviewUseCase = mock<LoadChatPreviewUseCase>()
+    private val openChatPreviewUseCase = mock<OpenChatPreviewUseCase>()
     private val joinPublicChatUseCase = mock<JoinPublicChatUseCase>()
     private val checkChatLinkUseCase = mock<CheckChatLinkUseCase>()
     private val getChatRoomUseCase = mock<GetChatRoomUseCase>()
 
     @BeforeAll
     fun setup() {
-        underTest = JoinChatCallUseCase(
-            loadChatPreviewUseCase = loadChatPreviewUseCase,
+        underTest = OpenChatLinkUseCase(
+            openChatPreviewUseCase = openChatPreviewUseCase,
             joinPublicChatUseCase = joinPublicChatUseCase,
             checkChatLinkUseCase = checkChatLinkUseCase,
             getChatRoomUseCase = getChatRoomUseCase,
@@ -43,7 +43,7 @@ class JoinChatCallUseCaseTest {
     @BeforeEach
     fun reset() {
         reset(
-            loadChatPreviewUseCase,
+            openChatPreviewUseCase,
             joinPublicChatUseCase,
             checkChatLinkUseCase,
             getChatRoomUseCase
@@ -101,11 +101,15 @@ class JoinChatCallUseCaseTest {
             isSpeakRequest = false
         )
 
-        whenever(checkChatLinkUseCase(chatLink)).thenReturn(chatRequest)
+        whenever(openChatPreviewUseCase(chatLink)).thenReturn(ChatPreview(chatRequest, true))
         whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
-        underTest.invoke(chatLink)
+        whenever(joinPublicChatUseCase(chatId)).thenReturn(Unit)
 
-        verify(joinPublicChatUseCase).invoke(chatId, chatPublicHandle, false)
+        underTest.invoke(chatLink, null, true)
+
+        verify(openChatPreviewUseCase).invoke(chatLink)
+        verify(getChatRoomUseCase).invoke(chatId)
+        verify(joinPublicChatUseCase).invoke(chatId, chatPublicHandle)
     }
 
     @Test
@@ -135,7 +139,7 @@ class JoinChatCallUseCaseTest {
 
         whenever(checkChatLinkUseCase(chatLink)).thenReturn(chatRequest)
         whenever(getChatRoomUseCase(chatId)).thenReturn(null)
-        whenever(loadChatPreviewUseCase(chatLink)).thenReturn(chatPreview)
+        whenever(openChatPreviewUseCase(chatLink)).thenReturn(chatPreview)
 
         assertThrows<ChatRoomDoesNotExistException> {
             underTest.invoke(chatLink)

@@ -335,7 +335,7 @@ class GetChatsUseCase @Inject constructor(
 
             chatRepository.getCombinedChatRoom(chatListItem.chatId)
                 ?.takeIf {
-                    (it.isMeeting && chatRoomType == ChatRoomType.MEETINGS)
+                    (!it.isPreview && it.isMeeting && chatRoomType == ChatRoomType.MEETINGS)
                             || (!it.isMeeting && chatRoomType == ChatRoomType.NON_MEETINGS)
                 }
                 ?.let(chatRoomItemMapper::invoke)

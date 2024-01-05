@@ -15,6 +15,8 @@ class JoinPublicChatUseCaseTest {
 
     private val chatRepository = mock<ChatRepository>()
 
+    private val chatId = 1L
+
 
     @BeforeAll
     internal fun initialise() {
@@ -31,10 +33,9 @@ class JoinPublicChatUseCaseTest {
     @Test
     fun `test that autorejoinPublicChat is called when chat room is exist`() =
         runTest {
-            val chatId = 1L
             val chatPublicHandle = 2L
 
-            underTest.invoke(chatId, chatPublicHandle, true)
+            underTest.invoke(chatId, chatPublicHandle)
 
             verify(chatRepository).autorejoinPublicChat(chatId, chatPublicHandle)
             verify(chatRepository).setLastPublicHandle(chatId)
@@ -43,10 +44,7 @@ class JoinPublicChatUseCaseTest {
     @Test
     fun `test that autojoinPublicChat is called when chat room is not exist`() =
         runTest {
-            val chatId = 1L
-            val chatPublicHandle = 2L
-
-            underTest.invoke(chatId, chatPublicHandle, false)
+            underTest.invoke(chatId)
 
             verify(chatRepository).autojoinPublicChat(chatId)
             verify(chatRepository).setLastPublicHandle(chatId)

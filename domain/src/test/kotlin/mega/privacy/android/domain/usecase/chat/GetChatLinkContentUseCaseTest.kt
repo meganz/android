@@ -11,6 +11,7 @@ import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
+import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -58,12 +59,14 @@ internal class GetChatLinkContentUseCaseTest {
     fun `test that the chat link returns correctly when CheckChatLinkUseCase returns a chat link`() =
         runTest {
             val link = "link"
+            val chatId = 1L
             val request = mock<ChatRequest> {
                 on { this.paramType } doReturn null
                 on { this.link } doReturn link
+                on { this.chatHandle } doReturn chatId
             }
             whenever(checkChatLinkUseCase(link)) doReturn request
-            Truth.assertThat(underTest(link)).isEqualTo(ChatLinkContent.ChatLink(link))
+            Truth.assertThat(underTest(link)).isEqualTo(ChatLinkContent.ChatLink(link, chatId))
         }
 
     @Test

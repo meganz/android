@@ -51,14 +51,14 @@ import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsAnonymousModeUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
-import mega.privacy.android.domain.usecase.chat.JoinChatCallUseCase
-import mega.privacy.android.domain.usecase.chat.JoinChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
+import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
+import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
@@ -151,10 +151,10 @@ internal class ChatViewModel @Inject constructor(
     private val holdChatCallUseCase: HoldChatCallUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val monitorContactCacheUpdates: MonitorContactCacheUpdates,
-    private val joinChatLinkUseCase: JoinChatLinkUseCase,
+    private val joinPublicChatUseCase: JoinPublicChatUseCase,
     private val isAnonymousModeUseCase: IsAnonymousModeUseCase,
     private val savedStateHandle: SavedStateHandle,
-    private val joinChatCallUseCase: JoinChatCallUseCase,
+    private val openChatLinkUseCase: OpenChatLinkUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val closeChatPreviewUseCase: CloseChatPreviewUseCase,
 ) : ViewModel() {
@@ -189,12 +189,13 @@ internal class ChatViewModel @Inject constructor(
     private fun loadChatOrPreview() {
         val action = savedStateHandle.get<String>(EXTRA_ACTION).orEmpty()
         if (chatLink.isNotEmpty()) {
-            val isAutoJoin = action == Constants.ACTION_JOIN_OPEN_CHAT_LINK
+            val requireJoin = action == Constants.ACTION_JOIN_OPEN_CHAT_LINK
             viewModelScope.launch {
                 runCatching {
-                    joinChatCallUseCase(
+                    openChatLinkUseCase(
                         chatLink = chatLink,
-                        isAutoJoin = isAutoJoin
+                        chatId = chatId,
+                        requireJoin = requireJoin,
                     )
                 }.onSuccess {
                     loadChatRoom()
@@ -628,21 +629,19 @@ internal class ChatViewModel @Inject constructor(
     }
 
     private fun unmutePushNotification() {
-        chatId?.let { chatId ->
-            viewModelScope.launch {
-                runCatching {
-                    unmuteChatNotificationUseCase(chatId)
-                    _state.update {
-                        it.copy(
-                            infoToShowEvent = triggered(
-                                InfoToShow(
-                                    chatPushNotificationMuteOption = ChatPushNotificationMuteOption.Unmute
-                                )
+        viewModelScope.launch {
+            runCatching {
+                unmuteChatNotificationUseCase(chatId)
+                _state.update {
+                    it.copy(
+                        infoToShowEvent = triggered(
+                            InfoToShow(
+                                chatPushNotificationMuteOption = ChatPushNotificationMuteOption.Unmute
                             )
                         )
-                    }
-                }.onFailure { Timber.e(it) }
-            }
+                    )
+                }
+            }.onFailure { Timber.e(it) }
         }
     }
 
@@ -650,12 +649,10 @@ internal class ChatViewModel @Inject constructor(
      * Show the dialog of selecting chat mute options
      */
     fun showMutePushNotificationDialog() {
-        chatId?.let { chatId ->
-            viewModelScope.launch {
-                val muteOptionList = getChatMuteOptionListUseCase(listOf(chatId))
-                _state.update {
-                    it.copy(mutePushNotificationDialogEvent = triggered(muteOptionList))
-                }
+        viewModelScope.launch {
+            val muteOptionList = getChatMuteOptionListUseCase(listOf(chatId))
+            _state.update {
+                it.copy(mutePushNotificationDialogEvent = triggered(muteOptionList))
             }
         }
     }
@@ -671,21 +668,19 @@ internal class ChatViewModel @Inject constructor(
      * @param option [ChatPushNotificationMuteOption]
      */
     fun mutePushNotification(option: ChatPushNotificationMuteOption) {
-        chatId?.let { chatId ->
-            viewModelScope.launch {
-                runCatching {
-                    muteChatNotificationForChatRoomsUseCase(listOf(chatId), option)
-                    _state.update {
-                        it.copy(
-                            infoToShowEvent = triggered(
-                                InfoToShow(
-                                    chatPushNotificationMuteOption = option
-                                )
+        viewModelScope.launch {
+            runCatching {
+                muteChatNotificationForChatRoomsUseCase(listOf(chatId), option)
+                _state.update {
+                    it.copy(
+                        infoToShowEvent = triggered(
+                            InfoToShow(
+                                chatPushNotificationMuteOption = option
                             )
                         )
-                    }
-                }.onFailure { Timber.e(it) }
-            }
+                    )
+                }
+            }.onFailure { Timber.e(it) }
         }
     }
 
@@ -710,24 +705,22 @@ internal class ChatViewModel @Inject constructor(
 
     fun clearChatHistory() {
         viewModelScope.launch {
-            chatId?.let {
-                runCatching { clearChatHistoryUseCase(it) }
-                    .onSuccess {
-                        _state.update { state ->
-                            state.copy(
-                                infoToShowEvent = triggered(InfoToShow(stringId = R.string.clear_history_success))
-                            )
-                        }
+            runCatching { clearChatHistoryUseCase(chatId) }
+                .onSuccess {
+                    _state.update { state ->
+                        state.copy(
+                            infoToShowEvent = triggered(InfoToShow(stringId = R.string.clear_history_success))
+                        )
                     }
-                    .onFailure {
-                        Timber.e("Error clearing chat history $it")
-                        _state.update { state ->
-                            state.copy(
-                                infoToShowEvent = triggered(InfoToShow(stringId = R.string.clear_history_error))
-                            )
-                        }
+                }
+                .onFailure {
+                    Timber.e("Error clearing chat history $it")
+                    _state.update { state ->
+                        state.copy(
+                            infoToShowEvent = triggered(InfoToShow(stringId = R.string.clear_history_error))
+                        )
                     }
-            }
+                }
         }
     }
 
@@ -736,68 +729,60 @@ internal class ChatViewModel @Inject constructor(
     }
 
     fun endCall() {
-        chatId?.let { chatId ->
-            viewModelScope.launch {
-                runCatching {
-                    endCallUseCase(chatId)
-                    sendStatisticsMeetingsUseCase(EndCallForAll())
-                }.onFailure {
-                    Timber.e(it)
-                }
+        viewModelScope.launch {
+            runCatching {
+                endCallUseCase(chatId)
+                sendStatisticsMeetingsUseCase(EndCallForAll())
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }
 
     fun archiveChat() {
         viewModelScope.launch {
-            chatId?.let {
-                runCatching { archiveChatUseCase(it, true) }
-                    .onFailure {
-                        Timber.e("Error archiving chat $it")
-                        _state.update { state ->
-                            state.copy(
-                                infoToShowEvent = triggered(
-                                    InfoToShow(
-                                        stringId = R.string.error_archive_chat,
-                                        args = state.title?.let { title -> listOf(title) }.orEmpty()
-                                    )
+            runCatching { archiveChatUseCase(chatId, true) }
+                .onFailure {
+                    Timber.e("Error archiving chat $it")
+                    _state.update { state ->
+                        state.copy(
+                            infoToShowEvent = triggered(
+                                InfoToShow(
+                                    stringId = R.string.error_archive_chat,
+                                    args = state.title?.let { title -> listOf(title) }.orEmpty()
                                 )
                             )
-                        }
+                        )
                     }
-            }
+                }
         }
     }
 
     fun unarchiveChat() {
         viewModelScope.launch {
-            chatId?.let {
-                runCatching { archiveChatUseCase(it, false) }
-                    .onFailure {
-                        Timber.e("Error unarchiving chat $it")
-                        _state.update { state ->
-                            state.copy(
-                                infoToShowEvent = triggered(
-                                    InfoToShow(
-                                        stringId = R.string.error_unarchive_chat,
-                                        args = state.title?.let { title -> listOf(title) }.orEmpty()
-                                    )
+            runCatching { archiveChatUseCase(chatId, false) }
+                .onFailure {
+                    Timber.e("Error unarchiving chat $it")
+                    _state.update { state ->
+                        state.copy(
+                            infoToShowEvent = triggered(
+                                InfoToShow(
+                                    stringId = R.string.error_unarchive_chat,
+                                    args = state.title?.let { title -> listOf(title) }.orEmpty()
                                 )
                             )
-                        }
+                        )
                     }
-            }
+                }
         }
     }
 
     fun startCall(video: Boolean) {
         viewModelScope.launch {
-            chatId?.let {
-                runCatching { startCallUseCase(it, video) }
-                    .onSuccess { call ->
-                        setCallReady(call)
-                    }.onFailure { Timber.e("Exception starting call $it") }
-            }
+            runCatching { startCallUseCase(chatId, video) }
+                .onSuccess { call ->
+                    setCallReady(call)
+                }.onFailure { Timber.e("Exception starting call $it") }
         }
     }
 
@@ -849,7 +834,6 @@ internal class ChatViewModel @Inject constructor(
         if (isHost) {
             viewModelScope.launch {
                 runCatching {
-                    val chatId = requireNotNull(chatId)
                     val schedId = state.value.scheduledMeeting?.schedId ?: -1L
                     startMeetingInWaitingRoomChatUseCase(
                         chatId = chatId,
@@ -871,7 +855,6 @@ internal class ChatViewModel @Inject constructor(
     private fun startMeeting() {
         viewModelScope.launch {
             runCatching {
-                val chatId = requireNotNull(chatId)
                 val scheduledMeeting = requireNotNull(state.value.scheduledMeeting)
                 startChatCallNoRingingUseCase(
                     chatId = chatId,
@@ -887,20 +870,18 @@ internal class ChatViewModel @Inject constructor(
 
     fun onAnswerCall() {
         viewModelScope.launch {
-            chatId?.let { chatId ->
-                chatManagement.addJoiningCallChatId(chatId)
-                runCatching {
-                    answerChatCallUseCase(chatId = chatId, video = false, audio = true)
-                }.onSuccess { call ->
-                    call?.apply {
-                        chatManagement.removeJoiningCallChatId(chatId)
-                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                        _state.update { state -> state.copy(isStartingCall = true) }
-                    }
-                }.onFailure {
-                    Timber.w("Exception answering call: $it")
+            chatManagement.addJoiningCallChatId(chatId)
+            runCatching {
+                answerChatCallUseCase(chatId = chatId, video = false, audio = true)
+            }.onSuccess { call ->
+                call?.apply {
                     chatManagement.removeJoiningCallChatId(chatId)
+                    rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                    _state.update { state -> state.copy(isStartingCall = true) }
                 }
+            }.onFailure {
+                Timber.w("Exception answering call: $it")
+                chatManagement.removeJoiningCallChatId(chatId)
             }
         }
     }
@@ -929,9 +910,7 @@ internal class ChatViewModel @Inject constructor(
 
     fun sendMessage(message: String) {
         viewModelScope.launch {
-            chatId?.let {
-                val tempMessage = sendTextMessageUseCase(it, message)
-            }
+            val tempMessage = sendTextMessageUseCase(chatId, message)
         }
     }
 
@@ -974,7 +953,7 @@ internal class ChatViewModel @Inject constructor(
     fun onJoinChat() {
         viewModelScope.launch {
             runCatching {
-                joinChatLinkUseCase(chatId)
+                joinPublicChatUseCase(chatId)
             }.onFailure {
                 Timber.e(it)
             }

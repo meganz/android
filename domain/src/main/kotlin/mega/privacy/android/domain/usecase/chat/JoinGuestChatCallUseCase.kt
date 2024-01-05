@@ -7,12 +7,12 @@ import javax.inject.Inject
  *
  * @property createEphemeralAccountUseCase  [CreateEphemeralAccountUseCase]
  * @property initGuestChatSessionUseCase    [InitGuestChatSessionUseCase]
- * @property joinChatCallUseCase            [JoinChatCallUseCase]
+ * @property openChatLinkUseCase            [OpenChatLinkUseCase]
  */
 class JoinGuestChatCallUseCase @Inject constructor(
     private val createEphemeralAccountUseCase: CreateEphemeralAccountUseCase,
     private val initGuestChatSessionUseCase: InitGuestChatSessionUseCase,
-    private val joinChatCallUseCase: JoinChatCallUseCase,
+    private val openChatLinkUseCase: OpenChatLinkUseCase,
 ) {
 
     /**
@@ -31,6 +31,6 @@ class JoinGuestChatCallUseCase @Inject constructor(
 
         createEphemeralAccountUseCase(firstName, lastName)
 
-        joinChatCallUseCase(chatLink)
+        openChatLinkUseCase(chatLink)
     }
 }

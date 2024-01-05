@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.chat
+package mega.privacy.android.domain.usecase.chat.link
 
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
@@ -6,6 +6,9 @@ import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
+import mega.privacy.android.domain.usecase.chat.CheckIfIAmInThisMeetingUseCase
+import mega.privacy.android.domain.usecase.chat.GetAnotherCallParticipatingUseCase
+import mega.privacy.android.domain.usecase.chat.IsMeetingEndedUseCase
 import javax.inject.Inject
 
 /**
@@ -27,7 +30,7 @@ class GetChatLinkContentUseCase @Inject constructor(
         val request = checkChatLinkUseCase(link)
         if (request.paramType == ChatRequestParamType.MEETING_LINK) {
             if (isMeetingEndedUseCase(request.privilege, request.handleList)) {
-                throw MeetingEndedException(request.link.orEmpty())
+                throw MeetingEndedException(request.link.orEmpty(), request.chatHandle,)
             }
             if (checkIfIAmInThisMeetingUseCase(request.chatHandle)) {
                 return ChatLinkContent.MeetingLink(
@@ -56,7 +59,10 @@ class GetChatLinkContentUseCase @Inject constructor(
                 isWaitingRoom = repository.hasWaitingRoomChatOptions(chatPreview.request.privilege),
             )
         } else {
-            return ChatLinkContent.ChatLink(request.link.orEmpty())
+            return ChatLinkContent.ChatLink(
+                link = request.link.orEmpty(),
+                chatHandle = request.chatHandle,
+            )
         }
     }
 }

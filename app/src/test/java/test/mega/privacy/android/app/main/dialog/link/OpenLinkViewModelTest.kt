@@ -20,8 +20,8 @@ import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
-import mega.privacy.android.domain.usecase.chat.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
+import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat

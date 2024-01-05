@@ -15,20 +15,16 @@ class JoinPublicChatUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param chatId
-     * @param chatPublicHandle
-     * @param autoJoin
+     * @param chatId Chat id.
+     * @param chatPublicHandle Chat public handle. Mandatory in case of re-joining.
      */
     suspend operator fun invoke(
         chatId: Long,
-        chatPublicHandle: Long,
-        exist: Boolean,
+        chatPublicHandle: Long? = null,
     ) {
-        if (exist) {
+        chatPublicHandle?.let {
             chatRepository.autorejoinPublicChat(chatId, chatPublicHandle)
-        } else {
-            chatRepository.autojoinPublicChat(chatId)
-        }
+        } ?: chatRepository.autojoinPublicChat(chatId)
         chatRepository.setLastPublicHandle(chatId)
     }
 }

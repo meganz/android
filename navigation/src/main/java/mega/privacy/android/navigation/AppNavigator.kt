@@ -46,7 +46,7 @@ interface AppNavigator {
      */
     fun openChat(
         context: Context,
-        chatId: Long? = null,
+        chatId: Long,
         action: String? = null,
         link: String? = null,
         text: String? = null,

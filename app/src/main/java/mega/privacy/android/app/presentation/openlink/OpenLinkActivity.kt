@@ -530,8 +530,13 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     /**
      * Navigate to ChatActivity
      */
-    private fun goToChatActivity() {
-        navigator.openChat(context = this, action = ACTION_OPEN_CHAT_LINK, link = url)
+    private fun goToChatActivity(chatId: Long) {
+        navigator.openChat(
+            context = this,
+            action = ACTION_OPEN_CHAT_LINK,
+            link = url,
+            chatId = chatId
+        )
         finish()
     }
 
@@ -744,7 +749,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
         } else {
             Timber.d("It's a chat link")
-            goToChatActivity()
+            goToChatActivity(chatId)
         }
     }
 

@@ -11,7 +11,7 @@ import org.mockito.kotlin.whenever
 class JoinGuestChatCallUseCaseTest {
     private val createEphemeralAccountUseCase: CreateEphemeralAccountUseCase = mock()
     private val initGuestChatSessionUseCase: InitGuestChatSessionUseCase = mock()
-    private val joinChatCallUseCase: JoinChatCallUseCase = mock()
+    private val openChatLinkUseCase: OpenChatLinkUseCase = mock()
 
     private lateinit var underTest: JoinGuestChatCallUseCase
 
@@ -20,7 +20,7 @@ class JoinGuestChatCallUseCaseTest {
         underTest = JoinGuestChatCallUseCase(
             createEphemeralAccountUseCase,
             initGuestChatSessionUseCase,
-            joinChatCallUseCase
+            openChatLinkUseCase
         )
     }
 
@@ -34,7 +34,7 @@ class JoinGuestChatCallUseCaseTest {
 
         verify(initGuestChatSessionUseCase).invoke(false)
         verify(createEphemeralAccountUseCase).invoke(firstName, lastName)
-        verify(joinChatCallUseCase).invoke(chatLink)
+        verify(openChatLinkUseCase).invoke(chatLink)
     }
 
     @Test(expected = ChatRoomDoesNotExistException::class)
@@ -43,7 +43,7 @@ class JoinGuestChatCallUseCaseTest {
         val firstName = "firstName"
         val lastName = "lastName"
 
-        whenever(joinChatCallUseCase.invoke(chatLink)).thenThrow(ChatRoomDoesNotExistException())
+        whenever(openChatLinkUseCase.invoke(chatLink)).thenThrow(ChatRoomDoesNotExistException())
 
         underTest.invoke(chatLink, firstName, lastName)
     }

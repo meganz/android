@@ -223,7 +223,7 @@ internal class OpenLinkDialogFragment : DialogFragment() {
                 MeetingHasEndedDialogFragment(object :
                     MeetingHasEndedDialogFragment.ClickCallback {
                     override fun onViewMeetingChat() {
-                        showChatLink(e.link)
+                        showChatLink(e.link, e.chatId)
                     }
 
                     override fun onLeave() {}
@@ -273,16 +273,17 @@ internal class OpenLinkDialogFragment : DialogFragment() {
 
             chatLinkContent is ChatLinkContent.ChatLink -> {
                 Timber.d("It's a chat link")
-                showChatLink(chatLinkContent.link)
+                showChatLink(chatLinkContent.link, chatLinkContent.chatHandle)
             }
         }
         dismissAllowingStateLoss()
     }
 
-    fun showChatLink(link: String?) {
+    fun showChatLink(link: String?, chatId: Long) {
         Timber.d("showChatLink: %s", link)
         navigator.openChat(
             context = requireContext(),
+            chatId = chatId,
             link = link,
             action = Constants.ACTION_OPEN_CHAT_LINK
         )

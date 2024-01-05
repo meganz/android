@@ -5402,7 +5402,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    fun showChatLink(link: String?) {
+    fun showChatLink(link: String?, chatId: Long) {
         Timber.d("Link: %s", link)
         val action = if (joiningToChatLink) {
             resetJoiningChatLink()
@@ -5410,7 +5410,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else {
             Constants.ACTION_OPEN_CHAT_LINK
         }
-        navigator.openChat(context = this, action = action, link = link)
+        navigator.openChat(
+            context = this,
+            action = action,
+            link = link,
+            chatId = chatId,
+        )
         if (drawerItem != DrawerItem.CHAT) {
             drawerItem = DrawerItem.CHAT
             selectDrawerItem(drawerItem)
@@ -8057,7 +8062,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             } else if (chatLinkContent is ChatLinkContent.ChatLink) {
                 Timber.d("It's a chat")
                 if (chatLinkContent.link.isEmpty()) return
-                showChatLink(chatLinkContent.link)
+                showChatLink(chatLinkContent.link, chatLinkContent.chatHandle)
             }
         } else if (result.exceptionOrNull() != null) {
             when (val e = result.exceptionOrNull()) {
@@ -8073,7 +8078,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     MeetingHasEndedDialogFragment(object :
                         MeetingHasEndedDialogFragment.ClickCallback {
                         override fun onViewMeetingChat() {
-                            showChatLink(e.link)
+                            showChatLink(e.link, e.chatId)
                         }
 
                         override fun onLeave() {}

@@ -8,7 +8,7 @@ import javax.inject.Inject
  *
  * @property chatRepository
  */
-class LoadChatPreviewUseCase @Inject constructor(private val chatRepository: ChatRepository) {
+class OpenChatPreviewUseCase @Inject constructor(private val chatRepository: ChatRepository) {
 
     /**
      * Invoke
