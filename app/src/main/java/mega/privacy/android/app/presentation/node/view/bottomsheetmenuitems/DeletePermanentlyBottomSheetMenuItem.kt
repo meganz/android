@@ -20,7 +20,7 @@ class DeletePermanentlyBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
-    ) = isNodeInRubbish
+    ) = isNodeInRubbish && isInBackups.not()
 
     override val isDestructiveAction = true
     override val groupId = 9

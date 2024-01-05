@@ -20,10 +20,12 @@ class TrashBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
-    ) = isNodeInRubbish.not() && node.isIncomingShare.not() && accessPermission in listOf(
+    ) = isNodeInRubbish.not()
+            && node.isIncomingShare.not()
+            && accessPermission in listOf(
         AccessPermission.OWNER,
         AccessPermission.FULL,
-    )
+    ) && isInBackups.not()
 
     override val isDestructiveAction: Boolean
         get() = true

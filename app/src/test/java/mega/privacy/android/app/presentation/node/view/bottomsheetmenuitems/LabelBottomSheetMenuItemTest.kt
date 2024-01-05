@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.node.model.menuaction.LeaveShareMenuAction
+import mega.privacy.android.app.presentation.node.model.mapper.NodeLabelResourceMapper
+import mega.privacy.android.app.presentation.node.model.menuaction.LabelMenuAction
+import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import org.junit.jupiter.api.Assertions.*
@@ -16,12 +17,19 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LeaveShareBottomSheetMenuItemTest {
-    private val underTest = LeaveShareBottomSheetMenuItem(LeaveShareMenuAction())
+class LabelBottomSheetMenuItemTest {
+
+    private val labelResourceMapper = NodeLabelResourceMapper()
+    private val nodeLabelMapper = NodeLabelMapper()
+    private val underTest = LabelBottomSheetMenuItem(
+        menuAction = LabelMenuAction(),
+        nodeLabelMapper = nodeLabelMapper,
+        labelResourceMapper = labelResourceMapper
+    )
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - expected {4}")
     @MethodSource("provideTestParameters")
-    fun `test that leave share bottom sheet menu item visibility is correct`(
+    fun `test that label bottom sheet menu item visibility is correct`(
         isNodeInRubbish: Boolean,
         accessPermission: AccessPermission?,
         isInBackups: Boolean,
@@ -47,7 +55,7 @@ class LeaveShareBottomSheetMenuItemTest {
             false
         ),
         Arguments.of(
-            false,
+            true,
             AccessPermission.OWNER,
             false,
             mock<TypedFileNode> { on { isTakenDown } doReturn false },
@@ -57,51 +65,23 @@ class LeaveShareBottomSheetMenuItemTest {
             false,
             AccessPermission.READWRITE,
             false,
-            mock<TypedFolderNode> {
-                on { isTakenDown } doReturn false
-                on { isIncomingShare } doReturn true
-            },
-            true
-        ),
-        Arguments.of(
-            true,
-            AccessPermission.OWNER,
-            false,
-            mock<TypedFolderNode> {
-                on { isTakenDown } doReturn false
-                on { isIncomingShare } doReturn true
-            },
-            true
+            mock<TypedFileNode> { on { isTakenDown } doReturn false },
+            false
         ),
         Arguments.of(
             false,
             AccessPermission.OWNER,
             true,
-            mock<TypedFolderNode> {
-                on { isTakenDown } doReturn false
-                on { isIncomingShare } doReturn true
-            },
+            mock<TypedFileNode> { on { isTakenDown } doReturn false },
             false
         ),
         Arguments.of(
             false,
             AccessPermission.OWNER,
             false,
-            mock<TypedFolderNode> {
-                on { isTakenDown } doReturn false
-                on { isIncomingShare } doReturn true
-            },
-            true
-        ),
-        Arguments.of(
-            false,
-            AccessPermission.OWNER,
-            false,
-            mock<TypedFolderNode> {
-                on { isTakenDown } doReturn false
-                on { isIncomingShare } doReturn true
-            },
+            mock<TypedFileNode> { on { isTakenDown } doReturn false },
             true
         ),
     )
+
 }

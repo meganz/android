@@ -32,6 +32,7 @@ class FavouriteBottomSheetMenuItem @Inject constructor(
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
             && node.isFavourite.not()
+            && isInBackups.not()
 
 
     override fun getOnClickFunction(

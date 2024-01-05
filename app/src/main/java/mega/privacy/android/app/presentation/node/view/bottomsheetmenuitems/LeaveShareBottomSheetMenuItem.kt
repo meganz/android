@@ -22,6 +22,7 @@ class LeaveShareBottomSheetMenuItem @Inject constructor(
         isConnected: Boolean,
     ) = node.isTakenDown.not()
             && node.isIncomingShare
+            && isInBackups.not()
 
     override val isDestructiveAction: Boolean
         get() = true

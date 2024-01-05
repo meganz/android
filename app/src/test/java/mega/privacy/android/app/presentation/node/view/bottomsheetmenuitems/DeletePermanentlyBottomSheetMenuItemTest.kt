@@ -93,7 +93,7 @@ class DeletePermanentlyBottomSheetMenuItemTest {
         val result = underTest.shouldDisplay(
             isNodeInRubbish = true,
             accessPermission = null,
-            isInBackups = true,
+            isInBackups = false,
             node = node,
             isConnected = true
         )
