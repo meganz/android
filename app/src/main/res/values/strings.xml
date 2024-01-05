@@ -4487,18 +4487,12 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -5245,4 +5239,8 @@
     <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
     <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">All the invited participants have joined the call</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">There is no one in the waiting room</string>
 </resources>
