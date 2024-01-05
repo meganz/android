@@ -56,6 +56,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
+import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -390,13 +391,6 @@ class CameraUploadsWorkerTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-    }
-
-    @Test
-    fun `test that worker returns successfully in minimal condition`() = runTest {
-        val result = underTest.doWork()
-
-        assertThat(result).isEqualTo(ListenableWorker.Result.success())
     }
 
     @Test
@@ -1143,8 +1137,7 @@ class CameraUploadsWorkerTest {
     fun `test that the worker returns failure when secondary upload node does not exist and fails to be created`() =
         runTest {
             whenever(isSecondaryFolderEnabled()).thenReturn(true)
-            whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
-                .thenReturn(1111L)
+            whenever(isSecondaryFolderSetUseCase()).thenReturn(true)
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
                 .thenReturn(-1L)
             whenever(getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads)))
@@ -1179,8 +1172,7 @@ class CameraUploadsWorkerTest {
     fun `test that the worker returns failure when secondary upload node is in rubbish bin and fails to be created`() =
         runTest {
             whenever(isSecondaryFolderEnabled()).thenReturn(true)
-            whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
-                .thenReturn(1111L)
+            whenever(isSecondaryFolderSetUseCase()).thenReturn(true)
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
                 .thenReturn(2222L)
             whenever(isNodeInRubbishOrDeletedUseCase(2222L)).thenReturn(true)
@@ -1364,5 +1356,90 @@ class CameraUploadsWorkerTest {
             underTest.doWork()
 
             verify(disableCameraUploadsUseCase).invoke()
+        }
+
+    @Test
+    fun `test that the temporary folder is deleted when the worker complete with success`() =
+        runTest {
+            val result = underTest.doWork()
+            verify(deleteCameraUploadsTemporaryRootDirectoryUseCase).invoke()
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun `test that total upload count is reset on the back end when the worker complete with success`() =
+        runTest {
+            val result = underTest.doWork()
+            verify(resetTotalUploadsUseCase).invoke()
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun `test that all pending transfers are cancelled when the worker complete with failure`() =
+        runTest {
+            whenever(isPrimaryFolderPathValidUseCase(primaryLocalPath)).thenReturn(false)
+            val result = underTest.doWork()
+            verify(cancelAllUploadTransfersUseCase).invoke()
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
+
+    @Test
+    fun `test that the termination progress status is sent when the worker complete with success`() =
+        runTest {
+            val result = underTest.doWork()
+            verify(broadcastCameraUploadProgress).invoke(100, 0)
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun `test that no child jobs are running when the worker complete`() =
+        runTest {
+            val result = underTest.doWork()
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun `test that the interrupted backup is sent when the worker complete with failure`() =
+        runTest {
+            whenever(isPrimaryFolderPathValidUseCase(primaryLocalPath)).thenReturn(false)
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            val result = underTest.doWork()
+            verify(updateCameraUploadsBackupStatesUseCase).invoke(BackupState.TEMPORARILY_DISABLED)
+            verify(updateCameraUploadsBackupHeartbeatStatusUseCase)
+                .invoke(eq(HeartbeatStatus.INACTIVE), any())
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
+
+    @Test
+    fun `test that the up-to-date backup state is sent when the worker complete with success`() =
+        runTest {
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            val result = underTest.doWork()
+            verify(updateCameraUploadsBackupHeartbeatStatusUseCase)
+                .invoke(eq(HeartbeatStatus.UP_TO_DATE), any())
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun `test that the interrupted backup is not sent when the worker complete with failure and no internet connection`() =
+        runTest {
+            whenever(isPrimaryFolderPathValidUseCase(primaryLocalPath)).thenReturn(false)
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            val result = underTest.doWork()
+            verify(updateCameraUploadsBackupStatesUseCase, never())
+                .invoke(BackupState.TEMPORARILY_DISABLED)
+            verify(updateCameraUploadsBackupHeartbeatStatusUseCase, never())
+                .invoke(eq(HeartbeatStatus.INACTIVE), any())
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
+
+    @Test
+    fun `test that the up-to-date backup state is not sent when the worker complete with success and no internet connection`() =
+        runTest {
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            val result = underTest.doWork()
+            verify(updateCameraUploadsBackupHeartbeatStatusUseCase, never())
+                .invoke(eq(HeartbeatStatus.UP_TO_DATE), any())
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
 }

@@ -2,8 +2,10 @@ package mega.privacy.android.data.worker
 
 
 import android.content.Context
+import android.os.Build
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.WorkInfo.Companion.STOP_REASON_CANCELLED_BY_APP
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import dagger.assisted.Assisted
@@ -336,27 +338,19 @@ class CameraUploadsWorker @AssistedInject constructor(
                     uploadJob?.join()
                 }
             }
-
-            return@withContext withContext(NonCancellable) {
-                cleanResources()
-                endWork(isAborted.get(), restartMode)
-            }
         } catch (throwable: Throwable) {
             Timber.e(throwable, "Worker cancelled")
 
-            /*
-             * It is currently not possible to differentiate the reason between
-             * a worker being cancelled by the system or by the app itself.
-             * This functionality will be provided in androidx.work:work-*:2.9.0
-             * with getStopReason() method.
-             * In case the reason is cancelled by the system, the worker will be rescheduled
-             * In case the reason is cancelled by the app, the worker will be stopped and not rescheduled
-             * https://developer.android.com/jetpack/androidx/releases/work#2.9.0
-             */
-            return@withContext withContext(NonCancellable) {
-                cleanResources()
-                endWork(true, restartMode)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                && stopReason == STOP_REASON_CANCELLED_BY_APP
+            ) {
+                restartMode = CameraUploadsRestartMode.Stop
             }
+        }
+
+        return@withContext withContext(NonCancellable) {
+            cleanResources()
+            endWork(isAborted.get(), restartMode)
         }
     }
 
@@ -376,19 +370,21 @@ class CameraUploadsWorker @AssistedInject constructor(
         restartMode: CameraUploadsRestartMode,
     ): Result = if (isAborted) {
         Timber.d("Camera Uploads process aborted with restart mode: $restartMode")
+        cancelAllPendingTransfers()
         sendTransfersInterruptedInfoToBackupCenter()
+
         when (restartMode) {
             CameraUploadsRestartMode.RestartImmediately -> {
                 Result.retry()
             }
 
             CameraUploadsRestartMode.Reschedule -> {
-                scheduleCameraUploadUseCase()
+                scheduleCameraUploads()
                 Result.failure()
             }
 
             CameraUploadsRestartMode.StopAndDisable -> {
-                disableCameraUploadsUseCase()
+                disableCameraUploads()
                 Result.failure()
             }
 
@@ -396,6 +392,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     } else {
         Timber.d("Camera Uploads process ended successfully: Process completed")
+        resetTotalUploads()
         sendTransfersUpToDateInfoToBackupCenter()
         Result.success()
     }
@@ -468,16 +465,37 @@ class CameraUploadsWorker @AssistedInject constructor(
             .launchIn(this)
 
     /**
+     * Schedule the camera uploads to run at a later time
+     */
+    private suspend fun scheduleCameraUploads() {
+        runCatching { scheduleCameraUploadUseCase() }
+            .onFailure { Timber.e(it) }
+    }
+
+    /**
+     * Disable the camera uploads
+     */
+    private suspend fun disableCameraUploads() {
+        runCatching { disableCameraUploadsUseCase() }
+            .onFailure { Timber.e(it) }
+    }
+
+    /**
      * Cancels all pending [Transfer] items through [CancelAllUploadTransfersUseCase],
      * and call [resetTotalUploadsUseCase] afterwards
      */
     private suspend fun cancelAllPendingTransfers() {
         runCatching { cancelAllUploadTransfersUseCase() }
-            .onSuccess {
-                Timber.d("Cancel all transfers successful")
-                resetTotalUploadsUseCase()
-            }
-            .onFailure { error -> Timber.e("Cancel all transfers error: $error") }
+            .onSuccess { resetTotalUploads() }
+            .onFailure { Timber.e(it) }
+    }
+
+    /**
+     * Reset totals uploads
+     */
+    private suspend fun resetTotalUploads() {
+        runCatching { resetTotalUploadsUseCase() }
+            .onFailure { Timber.e(it) }
     }
 
     /**
@@ -496,7 +514,8 @@ class CameraUploadsWorker @AssistedInject constructor(
                 && (!isSecondaryFolderEnabled() || isLocalSecondaryFolderValid() || isLocalPrimaryFolderValid)
                 && isLocalPrimaryFolderValid
                 && synchronizeUploadNodeHandles()
-                && checkOrCreateUploadNodes()
+                && checkOrCreatePrimaryUploadNodes()
+                && (!isSecondaryFolderEnabled() || checkOrCreateSecondaryUploadNodes())
                 && initializeBackup()
                 && createTempCacheFile()
     }
@@ -615,14 +634,12 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
 
     /**
-     * Check if the Primary Upload Node and Secondary Upload Node are valid.
-     * When the Primary Upload Node and Secondary Upload Node (if enabled) does not exist,
-     * this function will create the corresponding node
+     * Check if the Primary Upload Node is valid.
+     * When the Primary Upload Node does not exist, this function will create the corresponding node
      *
-     * @return true if the Primary Upload Node and Secondary Upload Node (if enabled) are valid,
-     *         or the creation of the corresponding node is successful
+     * @return true if the Primary Upload Node is valid, or the creation of the corresponding node is successful
      */
-    private suspend fun checkOrCreateUploadNodes(): Boolean {
+    private suspend fun checkOrCreatePrimaryUploadNodes(): Boolean {
         return runCatching {
             // Setup the Primary Folder if it is missing
             if (!isUploadNodeHandleValid(CameraUploadFolderType.Primary)) {
@@ -641,9 +658,21 @@ class CameraUploadsWorker @AssistedInject constructor(
                     setPrimarySyncHandle(primaryHandle)
                 }
             }
+        }.onFailure {
+            Timber.e(it)
+        }.isSuccess
+    }
 
+    /**
+     * Check if the Secondary Upload Node is valid.
+     * When the Secondary Upload Node (if enabled) does not exist, this function will create the corresponding node
+     *
+     * @return true if the Secondary Upload Node (if enabled) are valid, or the creation of the corresponding node is successful
+     */
+    private suspend fun checkOrCreateSecondaryUploadNodes(): Boolean {
+        return runCatching {
             // If Secondary Media Uploads is enabled, setup the Secondary Folder if it is missing
-            if (isSecondaryFolderEnabled() && !isUploadNodeHandleValid(CameraUploadFolderType.Secondary)) {
+            if (!isUploadNodeHandleValid(CameraUploadFolderType.Secondary)) {
                 Timber.d("The local secondary folder is missing")
 
                 val secondaryHandle =
@@ -1143,6 +1172,19 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
+     * Delete the temporary cache folder for the CU process
+     *
+     * @return true if the creation of the temporary cache folder succeed, false otherwise
+     */
+    private suspend fun deleteTempCacheFile(): Boolean {
+        return runCatching {
+            deleteCameraUploadsTemporaryRootDirectoryUseCase()
+        }.onFailure {
+            Timber.e(it)
+        }.isSuccess
+    }
+
+    /**
      * Abort the worker
      * This function is called if an error is caught inside the CameraUploadsWorker
      * and will cancel the child jobs
@@ -1172,9 +1214,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun cleanResources() {
         cancelJobs()
-        resetUploadsCounts()
-        deleteCameraUploadsTemporaryRootDirectoryUseCase()
-        cancelAllPendingTransfers()
+        deleteTempCacheFile()
         broadcastProgress(100, 0)
     }
 
@@ -1628,28 +1668,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                 )
             }
         }
-    }
-
-    /**
-     * Reset the total uploads counts
-     */
-    private suspend fun resetUploadsCounts() = stateUpdateMutex.withLock {
-        updateState(
-            cameraUploadFolderType = CameraUploadFolderType.Primary,
-            toUploadCount = 0,
-            uploadedCount = 0,
-            bytesToUploadCount = 0L,
-            bytesUploadedTable = Hashtable(),
-            bytesFinishedUploadedCount = 0L,
-        )
-        updateState(
-            cameraUploadFolderType = CameraUploadFolderType.Secondary,
-            toUploadCount = 0,
-            uploadedCount = 0,
-            bytesToUploadCount = 0L,
-            bytesUploadedTable = Hashtable(),
-            bytesFinishedUploadedCount = 0L,
-        )
     }
 
     /**
