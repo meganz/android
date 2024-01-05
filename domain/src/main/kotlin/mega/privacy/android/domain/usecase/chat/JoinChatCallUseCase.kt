@@ -1,50 +1,39 @@
 package mega.privacy.android.domain.usecase.chat
 
-import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
-import mega.privacy.android.domain.repository.ChatRepository
-import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
+import mega.privacy.android.domain.usecase.chat.link.LoadChatPreviewUseCase
 import javax.inject.Inject
 
 /**
- * Use case to join chat calls
+ * Join chat link
  *
- * @property chatRepository     [ChatRepository]
- * @property getChatRoom        [GetChatRoom]
+ * @property loadChatPreviewUseCase
+ * @property joinPublicChatUseCase
  */
 class JoinChatCallUseCase @Inject constructor(
-    private val chatRepository: ChatRepository,
-    private val getChatRoom: GetChatRoomUseCase,
-    private val joinChatLinkUseCase: JoinChatLinkUseCase,
+    private val loadChatPreviewUseCase: LoadChatPreviewUseCase,
+    private val joinPublicChatUseCase: JoinPublicChatUseCase,
 ) {
     /**
      * Invoke
      *
      * @param chatLink
+     * @param isAutoJoin
+     * @return chatId
      */
     suspend operator fun invoke(
         chatLink: String,
         isAutoJoin: Boolean = true,
     ): Long {
-        val chatRequest = chatRepository.openChatPreview(chatLink).request
+        val chatRequest = loadChatPreviewUseCase(chatLink).request
         val chatId = chatRequest.chatHandle
         val chatPublicHandle = chatRequest.userHandle
 
-        val chatRoom = getChatRoom(chatId) ?: throw ChatRoomDoesNotExistException()
-        when {
-            !chatRoom.isPreview -> {
-                // Already joined, do nothing
-            }
-
-            !chatRoom.isActive -> {
-                chatRepository.autorejoinPublicChat(chatId, chatPublicHandle)
-            }
-
-            isAutoJoin -> {
-                joinChatLinkUseCase(chatId)
-            }
-
-        }
-        chatRepository.setLastPublicHandle(chatId)
+        joinPublicChatUseCase(
+            chatId = chatId,
+            chatPublicHandle = chatPublicHandle,
+            autoJoin = isAutoJoin
+        )
         return chatId
     }
 }
