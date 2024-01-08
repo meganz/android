@@ -82,6 +82,26 @@ sealed class InvalidUiMessage : AvatarMessage() {
     }
 
     /**
+     * Invalid meta ui message
+     *
+     * @property message
+     * @property showAvatar
+     * @property showTime
+     * @property showDate
+     */
+    data class MetaInvalidUiMessage(
+        override val message: TypedMessage,
+        override val showAvatar: Boolean,
+        override val showTime: Boolean,
+        override val showDate: Boolean,
+    ) : InvalidUiMessage() {
+
+        @Composable
+        override fun getErrorMessage() =
+            stringResource(id = R.string.error_meta_message_invalid)
+    }
+
+    /**
      * Unrecognizable invalid ui message
      *
      * @property message
@@ -100,4 +120,5 @@ sealed class InvalidUiMessage : AvatarMessage() {
         override fun getErrorMessage() =
             stringResource(id = R.string.error_message_unrecognizable)
     }
+
 }

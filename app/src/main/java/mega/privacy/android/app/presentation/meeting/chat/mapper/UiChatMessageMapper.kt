@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.chat.messages.management.ScheduledMeet
 import mega.privacy.android.domain.entity.chat.messages.management.TitleChangeMessage
 import mega.privacy.android.domain.entity.chat.messages.management.TruncateHistoryMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
+import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.ContactLinkMessage
@@ -149,7 +150,12 @@ class UiChatMessageMapper @Inject constructor() {
                 showAvatar = showAvatar
             )
 
-            is InvalidMessage -> mapInvalidMessage(message, showAvatar, showTime, showDate)
+            is InvalidMessage, is InvalidMetaMessage -> mapInvalidMessage(
+                message,
+                showAvatar,
+                showTime,
+                showDate
+            )
 
             else -> InvalidUiMessage.UnrecognizableInvalidUiMessage(
                 message = message,
@@ -161,7 +167,7 @@ class UiChatMessageMapper @Inject constructor() {
     }
 
     private fun mapInvalidMessage(
-        message: InvalidMessage,
+        message: TypedMessage,
         showAvatar: Boolean,
         showTime: Boolean,
         showDate: Boolean,
@@ -175,6 +181,13 @@ class UiChatMessageMapper @Inject constructor() {
             )
 
             is FormatInvalidMessage -> InvalidUiMessage.FormatInvalidUiMessage(
+                message = message,
+                showAvatar = showAvatar,
+                showTime = showTime,
+                showDate = showDate
+            )
+
+            is InvalidMetaMessage -> InvalidUiMessage.MetaInvalidUiMessage(
                 message = message,
                 showAvatar = showAvatar,
                 showTime = showTime,
