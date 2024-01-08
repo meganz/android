@@ -81,6 +81,20 @@ interface CallRepository {
     ): ChatRequest
 
     /**
+     * Ring a participant in chatroom with an ongoing call that they didn't pick up
+     *
+     * @param chatId        The chat ID
+     * @param userId        The participant user ID
+     * @param ringTimeout   Timeout in seconds (greater than 0) for the call to stop ringing
+     * @return              [ChatRequest]
+     */
+    suspend fun ringIndividualInACall(
+        chatId: Long,
+        userId: Long,
+        ringTimeout: Int = 40,
+    ): ChatRequest
+
+    /**
      * Answers call.
      *
      * @param chatId            The Chat id.

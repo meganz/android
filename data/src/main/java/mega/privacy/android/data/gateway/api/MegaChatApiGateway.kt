@@ -442,6 +442,42 @@ interface MegaChatApiGateway {
     )
 
     /**
+     * Ring a user in chatroom with an ongoing call that they didn't pick up
+     *
+     * When a call is started and one user doesn't pick it up, ringing stops for that user/participant after a given time.
+     * This function can be used to force another ringing event at said user/participant.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_RING_INDIVIDUAL_IN_CALL
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getUserHandle() - Returns the user's id to ring again
+     *
+     * Valid data in the MegaChatRequest object received in onRequestFinish when the error code
+     * is MegaError::ERROR_OK:
+     *
+     * The request will fail with MegaChatError::ERROR_ARGS
+     * - if chat id provided as param is invalid
+     * - if user id to ring again provided as param is invalid
+     *
+     * The request will fail with MegaChatError::ERROR_NOENT
+     * - if the chatroom doesn't exists.
+     * - if an ongoing call cannot be found for the chat id provided as a param
+     *
+     * To receive call notifications, the app needs to register MegaChatCallListener.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param userId MegaChatHandle that identifies the user to ring again
+     * @param ringTimeout timeout in seconds (greater than 0) for the call to stop ringing
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun ringIndividualInACall(
+        chatId: Long,
+        userId: Long,
+        ringTimeout: Int,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
      * Answer call.
      *
      * @param chatId  The chat id.

@@ -164,6 +164,28 @@ internal class CallRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun ringIndividualInACall(
+        chatId: Long,
+        userId: Long,
+        ringTimeout: Int,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val callback = continuation.getChatRequestListener(
+                methodName = "ringIndividualInACall",
+                chatRequestMapper::invoke
+            )
+
+            megaChatApiGateway.ringIndividualInACall(
+                chatId,
+                userId,
+                ringTimeout,
+                callback
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
+        }
+    }
+
     override suspend fun answerChatCall(
         chatId: Long,
         enabledVideo: Boolean,
