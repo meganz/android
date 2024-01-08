@@ -3207,4 +3207,59 @@ interface MegaApiGateway {
      */
     fun setCookieSettings(bitSetToDecimal: Int, listener: OptionalMegaRequestListenerInterface)
 
+    /**
+     * Check if the app should show the rich link warning dialog to the user
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_RICH_PREVIEWS
+     * - MegaRequest::getNumDetails - Returns one
+     * <p>
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getFlag - Returns true if it is necessary to show the rich link warning
+     * - MegaRequest::getNumber - Returns the number of times that user has indicated that doesn't want
+     * modify the message with a rich link. If number is bigger than three, the extra option "Never"
+     * must be added to the warning dialog.
+     * - MegaRequest::getMegaStringMap - Returns the raw content of the attribute: [<key><value>]*
+     * <p>
+     * If the corresponding user attribute is not set yet, the request will fail with the
+     * error code MegaError::API_ENOENT, but the value of MegaRequest::getFlag will still be valid (true).
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun shouldShowRichLinkWarning(listener: MegaRequestListenerInterface)
+
+    /**
+     * Check if rich previews are automatically generated
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_RICH_PREVIEWS
+     * - MegaRequest::getNumDetails - Returns zero
+     * <p>
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getFlag - Returns true if generation of rich previews is enabled
+     * - MegaRequest::getMegaStringMap - Returns the raw content of the attribute: [<key><value>]*
+     * <p>
+     * If the corresponding user attribute is not set yet, the request will fail with the
+     * error code MegaError::API_ENOENT, but the value of MegaRequest::getFlag will still be valid (false).
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun isRichPreviewsEnabled(listener: MegaRequestListenerInterface)
+
+    /**
+     * Set the number of times "Not now" option has been selected in the rich link warning dialog
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_RICH_PREVIEWS
+     *
+     * @param value    Number of times "Not now" option has been selected
+     * @param listener MegaRequestListener to track this request
+     */
+    fun setRichLinkWarningCounterValue(value: Int, listener: MegaRequestListenerInterface)
 }

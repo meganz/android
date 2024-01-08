@@ -524,23 +524,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         var isClosedChat = true
 
         /**
-         * Is show rich link warning
-         */
-        @JvmStatic
-        var isShowRichLinkWarning = false
-
-        /**
-         * Counter not now rich link warning
-         */
-        @JvmStatic
-        var counterNotNowRichLinkWarning = -1
-
-        /**
-         * Is enabled rich links
-         */
-        var isEnabledRichLinks = false
-
-        /**
          * Is enabled geo location
          *
          * @deprecated

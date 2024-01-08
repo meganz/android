@@ -55,6 +55,7 @@ import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import org.junit.After
 import org.junit.Before
@@ -889,6 +890,48 @@ class ChatRepositoryImplTest {
         }
         underTest.autorejoinPublicChat(chatId, chatPublicHandle)
         verify(megaChatApiGateway).autorejoinPublicChat(eq(chatId), eq(chatPublicHandle), any())
+    }
+
+    @Test
+    fun `test that should show rich warning returns correctly`() = runTest {
+        val shouldShow = true
+        val request = mock<MegaRequest> {
+            on { flag }.thenReturn(shouldShow)
+            on { number }.thenReturn(1L)
+        }
+        whenever(megaApiGateway.shouldShowRichLinkWarning(any())).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                request,
+                megaErrorSuccess,
+            )
+        }
+        assertThat(underTest.shouldShowRichLinkWarning()).isEqualTo(shouldShow)
+        underTest.monitorRichLinkPreviewConfig().test {
+            val item = awaitItem()
+            assertThat(item.isShowRichLinkWarning).isEqualTo(shouldShow)
+            assertThat(item.counterNotNowRichLinkWarning).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `test that is rich link enabled returns correctly`() = runTest {
+        val isEnabled = true
+        val request = mock<MegaRequest> {
+            on { flag }.thenReturn(isEnabled)
+        }
+        whenever(megaApiGateway.isRichPreviewsEnabled(any())).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                request,
+                megaErrorSuccess,
+            )
+        }
+        assertThat(underTest.isRichPreviewsEnabled()).isEqualTo(isEnabled)
+        underTest.monitorRichLinkPreviewConfig().test {
+            val item = awaitItem()
+            assertThat(item.isRichLinkEnabled).isEqualTo(isEnabled)
+        }
     }
 
     @Test

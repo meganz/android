@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.RichLinkConfig
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 
@@ -814,4 +815,33 @@ interface ChatRepository {
      * @param chatId
      */
     suspend fun closeChatPreview(chatId: Long)
+
+    /**
+     * Should show rich link warning
+     *
+     * @return true if should show rich link warning, false otherwise
+     */
+    suspend fun shouldShowRichLinkWarning(): Boolean
+
+    /**
+     * Is rich link enabled
+     *
+     * @return true if rich link is enabled, false otherwise
+     */
+    suspend fun isRichPreviewsEnabled(): Boolean
+
+    /**
+     * Monitor rich link preview config
+     *
+     * @return Flow [RichLinkConfig]
+     */
+    fun monitorRichLinkPreviewConfig(): Flow<RichLinkConfig>
+
+    /**
+     * Set rich link warning counter value
+     *
+     * @param value
+     * @return number of rich link warning counter
+     */
+    suspend fun setRichLinkWarningCounterValue(value: Int): Int
 }

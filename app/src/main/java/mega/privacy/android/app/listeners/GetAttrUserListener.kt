@@ -145,19 +145,6 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                             MegaApplication.getInstance().sendBroadcast(this)
                         }
                     }
-                    MegaApiJava.USER_ATTR_RICH_PREVIEWS -> {
-                        if (e.errorCode == MegaError.API_ENOENT) {
-                            Timber.w("Attribute USER_ATTR_RICH_PREVIEWS not set")
-                        }
-                        if (numDetails == 1) {
-                            MegaApplication.isShowRichLinkWarning = flag
-                            MegaApplication.counterNotNowRichLinkWarning = number.toInt()
-                        } else if (numDetails == 0) {
-                            MegaApplication.isEnabledRichLinks = flag
-                            MegaApplication.getInstance()
-                                .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE).setPackage(context.applicationContext.packageName))
-                        }
-                    }
                 }
             }
         }

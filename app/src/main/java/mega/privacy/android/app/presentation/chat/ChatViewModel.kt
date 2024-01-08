@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.RichLinkConfig
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
@@ -60,6 +61,8 @@ import mega.privacy.android.domain.usecase.chat.LoadPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
+import mega.privacy.android.domain.usecase.chat.link.MonitorRichLinkPreviewConfigUseCase
+import mega.privacy.android.domain.usecase.chat.link.SetRichLinkWarningCounterUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
 import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -157,6 +160,8 @@ class ChatViewModel @Inject constructor(
     private val broadcastCallRecordingConsentEventUseCase: BroadcastCallRecordingConsentEventUseCase,
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase,
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
+    private val setRichLinkWarningCounterUseCase: SetRichLinkWarningCounterUseCase,
+    monitorRichLinkPreviewConfigUseCase: MonitorRichLinkPreviewConfigUseCase,
     monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
 ) : ViewModel() {
 
@@ -191,6 +196,21 @@ class ChatViewModel @Inject constructor(
         monitorPausedTransfersUseCase()
             .stateIn(viewModelScope, SharingStarted.Eagerly, false)
     }
+
+    private val richLinkConfig = monitorRichLinkPreviewConfigUseCase()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, RichLinkConfig())
+
+    /**
+     * Is show rich link warning
+     */
+    val isShowRichLinkWarning: Boolean
+        get() = richLinkConfig.value.isShowRichLinkWarning
+
+    /**
+     * Counter not now rich link warning
+     */
+    val counterNotNowRichLinkWarning: Int
+        get() = richLinkConfig.value.counterNotNowRichLinkWarning
 
     /**
      * Current value of areTransfersPausedFlow
@@ -1137,6 +1157,20 @@ class ChatViewModel @Inject constructor(
                 showRecordingConsentDialog = false,
                 isRecordingConsentAccepted = false
             )
+        }
+    }
+
+    /**
+     * Set rich link warning counter
+     *
+     */
+    fun setRichLinkWarningCounter(counter: Int) {
+        viewModelScope.launch {
+            runCatching {
+                setRichLinkWarningCounterUseCase(counter)
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 }

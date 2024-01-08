@@ -52,6 +52,8 @@ import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
+import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCase
+import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetIncomingContactRequestsNotificationListUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -89,6 +91,8 @@ class GlobalListener @Inject constructor(
     private val broadcastAccountBlockedUseCase: BroadcastAccountBlockedUseCase,
     private val getIncomingContactRequestsNotificationListUseCase: GetIncomingContactRequestsNotificationListUseCase,
     private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
+    private val shouldShowRichLinkWarningUseCase: ShouldShowRichLinkWarningUseCase,
+    private val isRichPreviewsEnabledUseCase: IsRichPreviewsEnabledUseCase,
 ) : MegaGlobalListenerInterface {
 
     private val globalSyncUpdates = MutableSharedFlow<Unit>()
@@ -131,8 +135,14 @@ class GlobalListener @Inject constructor(
                 api.getMyChatFilesFolder(GetAttrUserListener(appContext, true))
             }
             if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS.toLong()) && isMyChange) {
-                api.shouldShowRichLinkWarning(GetAttrUserListener(appContext))
-                api.isRichPreviewsEnabled(GetAttrUserListener(appContext))
+                applicationScope.launch {
+                    runCatching {
+                        shouldShowRichLinkWarningUseCase()
+                        isRichPreviewsEnabledUseCase()
+                    }.onFailure {
+                        Timber.e(it, "Error checking rich link settings")
+                    }
+                }
                 return@forEach
             }
             if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME.toLong()) && isMyChange) {

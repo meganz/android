@@ -1,9 +1,5 @@
 package mega.privacy.android.app.activities.settingsActivities
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
@@ -18,7 +14,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE
 import mega.privacy.android.app.presentation.settings.chat.SettingsChatFragment
 import mega.privacy.android.app.utils.Constants
 import timber.log.Timber
@@ -32,14 +27,6 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
     private var newFolderDialog: AlertDialog? = null
     private val viewModel by viewModels<ChatPreferencesViewModel>()
 
-    private val richLinksUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (sttChat != null && intent.action == BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE) {
-                sttChat?.updateEnabledRichLinks()
-            }
-        }
-    }
-
     /**
      * onCreate
      */
@@ -49,10 +36,6 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
         sttChat = SettingsChatFragment()
         sttChat?.let { replaceFragment(it) }
         collectFlows()
-        registerReceiver(
-            richLinksUpdateReceiver,
-            IntentFilter(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE)
-        )
     }
 
     private fun collectFlows() {
@@ -70,14 +53,6 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
                 }
             }
         }
-    }
-
-    /**
-     * onDestroy
-     */
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(richLinksUpdateReceiver)
     }
 
     /**

@@ -3477,7 +3477,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 if (MegaChatApi.hasUrl(messageContent)) {
                     if (((ChatActivity) context).checkMegaLink(message) == -1) {
                         Timber.d("Is a link - not from MEGA");
-                        if (MegaApplication.isShowRichLinkWarning()) {
+                        if (viewModel.isShowRichLinkWarning()) {
                             Timber.w("SDK - show link rich warning");
                             if (((ChatActivity) context).showRichLinkWarning == RICH_WARNING_TRUE) {
                                 Timber.w("ANDROID - show link rich warning");
@@ -3515,7 +3515,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                 ((ChatActivity) context).hideKeyboard();
                                 holder.urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
-                                int notNowCounter = MegaApplication.getCounterNotNowRichLinkWarning();
+                                int notNowCounter = viewModel.getCounterNotNowRichLinkWarning();
 
                                 if (notNowCounter >= 3) {
                                     holder.neverRichLinkButton.setVisibility(View.VISIBLE);
@@ -7715,13 +7715,13 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.notifyItemChanged(currentPositionInAdapter);
         } else if (id == R.id.url_no_disable_button || id == R.id.url_not_now_button) {
             ((ChatActivity) context).showRichLinkWarning = RICH_WARNING_FALSE;
-            int counter = MegaApplication.getCounterNotNowRichLinkWarning();
+            int counter = viewModel.getCounterNotNowRichLinkWarning();
             if (counter < 1) {
                 counter = 1;
             } else {
                 counter++;
             }
-            megaApi.setRichLinkWarningCounterValue(counter);
+            viewModel.setRichLinkWarningCounter(counter);
             this.notifyItemChanged(currentPositionInAdapter);
         } else if (id == R.id.url_never_button) {
             ((ChatActivity) context).showRichLinkWarning = RICH_WARNING_CONFIRMATION;

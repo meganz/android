@@ -126,7 +126,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         richLinksSwitch =
             findPreference<SwitchPreferenceCompat?>(SettingsConstants.KEY_CHAT_RICH_LINK)?.apply {
                 onPreferenceClickListener = this@SettingsChatFragment
-                isChecked = MegaApplication.isEnabledRichLinks
+                isChecked = viewModel.state.value.isRichLinkEnabled
             }
 
         megaChatApi.signalPresenceActivity()
@@ -157,6 +157,12 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                 viewModel.state.collect { state ->
                     findPreference<Preference?>(KEY_CHAT_IMAGE_QUALITY)?.summary =
                         state.imageQuality?.title?.let { getString(it) }
+
+                    richLinksSwitch?.apply {
+                        onPreferenceClickListener = null
+                        isChecked = state.isRichLinkEnabled
+                        onPreferenceClickListener = this@SettingsChatFragment
+                    }
                 }
             }
         }
@@ -181,6 +187,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                 )
                 return true
             }
+
             SettingsConstants.KEY_CHAT_AUTOAWAY_SWITCH -> {
                 statusConfig = megaChatApi.presenceConfig
 
@@ -199,20 +206,24 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                 }
                 return true
             }
+
             SettingsConstants.KEY_CHAT_AUTOAWAY_PREFERENCE -> {
                 (requireActivity() as ChatPreferencesActivity).showAutoAwayValueDialog()
                 return true
             }
+
             SettingsConstants.KEY_CHAT_PERSISTENCE -> {
                 megaChatApi.setPresencePersist(!statusConfig!!.isPersist)
                 return true
             }
+
             SettingsConstants.KEY_CHAT_LAST_GREEN -> {
                 (requireActivity() as ChatPreferencesActivity).enableLastGreen(
                     enableLastGreenChatSwitch!!.isChecked
                 )
                 return true
             }
+
             SettingsConstants.KEY_CHAT_RICH_LINK -> {
                 megaApi.enableRichPreviews(
                     richLinksSwitch!!.isChecked,
@@ -220,6 +231,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                 )
                 return true
             }
+
             KEY_CHAT_IMAGE_QUALITY -> {
                 startActivity(
                     Intent(
@@ -242,11 +254,13 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                 updateNotifChat()
                 return true
             }
+
             SettingsConstants.KEY_CHAT_STATUS -> {
                 statusChatListPreference?.summary = statusChatListPreference?.entry
                 megaChatApi.onlineStatus = (newValue as String).toInt()
                 return true
             }
+
             SettingsConstants.KEY_CHAT_SEND_ORIGINALS -> {
                 val newStatus = (newValue as String).toInt()
                 dbH.chatVideoQuality = newStatus
@@ -282,19 +296,6 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                 pushNotificationSettings!!.globalChatsDnd,
                 requireContext()
             )
-        }
-    }
-
-    /**
-     * Method for updating the rich link previews option.
-     */
-    fun updateEnabledRichLinks() {
-        if (MegaApplication.isEnabledRichLinks == richLinksSwitch?.isChecked) return
-
-        richLinksSwitch?.apply {
-            onPreferenceClickListener = null
-            isChecked = MegaApplication.isEnabledRichLinks
-            onPreferenceClickListener = this@SettingsChatFragment
         }
     }
 

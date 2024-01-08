@@ -125,11 +125,6 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
                     } else {
                         Util.showSnackbar(context, context?.getString(R.string.error_general_nodes))
                     }
-
-                    MegaApiJava.USER_ATTR_RICH_PREVIEWS -> if (e.errorCode != MegaError.API_OK) {
-                        MegaApplication.getInstance()
-                            .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE).setPackage(context.applicationContext.packageName))
-                    }
                 }
             }
         }

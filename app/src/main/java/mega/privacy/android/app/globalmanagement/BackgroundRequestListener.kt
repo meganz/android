@@ -17,6 +17,8 @@ import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.backup.SetupDeviceNameUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
+import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCase
+import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
@@ -61,6 +63,8 @@ class BackgroundRequestListener @Inject constructor(
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
     @LoginMutex private val loginMutex: Mutex,
     private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
+    private val shouldShowRichLinkWarningUseCase: ShouldShowRichLinkWarningUseCase,
+    private val isRichPreviewsEnabledUseCase: IsRichPreviewsEnabledUseCase,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -154,10 +158,15 @@ class BackgroundRequestListener @Inject constructor(
 
         if (e.errorCode == MegaError.API_OK) {
             askForFullAccountInfo()
-            var listener: GetAttrUserListener? = GetAttrUserListener(application)
-            megaApi.shouldShowRichLinkWarning(listener)
-            megaApi.isRichPreviewsEnabled(listener)
-            listener = GetAttrUserListener(application, true)
+            applicationScope.launch {
+                runCatching {
+                    shouldShowRichLinkWarningUseCase()
+                    isRichPreviewsEnabledUseCase()
+                }.onFailure {
+                    Timber.e(it, "Error checking rich link settings")
+                }
+            }
+            val listener = GetAttrUserListener(application, true)
             if (dbH.myChatFilesFolderHandle == INVALID_HANDLE) {
                 megaApi.getMyChatFilesFolder(listener)
             }
