@@ -2,7 +2,9 @@ package mega.privacy.android.app.usecase
 
 import android.content.Context
 import android.content.Intent
-import androidx.core.content.ContextCompat
+import android.os.Build
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
@@ -45,7 +47,7 @@ class UploadUseCase @Inject constructor(
         absolutePath: String,
         fileName: String,
         lastModified: Long,
-        parentHandle: Long?
+        parentHandle: Long?,
     ): Completable = Completable.create { emitter ->
         if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning()
@@ -63,13 +65,30 @@ class UploadUseCase @Inject constructor(
             .putExtra(UploadService.EXTRA_NAME, fileName)
             .putExtra(UploadService.EXTRA_LAST_MODIFIED, lastModified / 1000)
             .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
-        ContextCompat.startForegroundService(context, uploadServiceIntent)
+
+        tryToStartForegroundService(context = context, intent = uploadServiceIntent)
 
         if (emitter.isDisposed) {
             return@create
         }
 
         emitter.onComplete()
+    }
+
+    /**
+     * Attempts to start a Foreground Service when the requirements are met. If not, it would start
+     * with startService
+     *
+     * @param context The Context object used to start the Foreground Service
+     * @param intent The Intent to start the Foreground Service
+     */
+    private fun tryToStartForegroundService(context: Context, intent: Intent) {
+        val active =
+            ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+        // Beginning with Android 12, only active apps can start Foreground Services
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || active) {
+            context.startForegroundService(intent)
+        }
     }
 
     /**
@@ -102,7 +121,7 @@ class UploadUseCase @Inject constructor(
         context: Context,
         shareInfo: ShareInfo,
         renameName: String? = null,
-        parentHandle: Long?
+        parentHandle: Long?,
     ): Completable =
         upload(
             context = context,
@@ -123,7 +142,7 @@ class UploadUseCase @Inject constructor(
     fun upload(
         context: Context,
         collisionResult: NameCollisionResult,
-        rename: Boolean
+        rename: Boolean,
     ): Completable =
         upload(
             context,
@@ -142,7 +161,7 @@ class UploadUseCase @Inject constructor(
      */
     fun upload(
         context: Context,
-        uploadResult: UploadFolderResult
+        uploadResult: UploadFolderResult,
     ): Completable =
         upload(
             context,
@@ -165,7 +184,7 @@ class UploadUseCase @Inject constructor(
         context: Context,
         infos: List<ShareInfo>,
         nameFiles: HashMap<String, String>? = null,
-        parentHandle: Long
+        parentHandle: Long,
     ): Completable =
         Completable.create { emitter ->
             if (infos.isEmpty()) {
@@ -200,7 +219,7 @@ class UploadUseCase @Inject constructor(
     fun upload(
         context: Context,
         collisions: List<NameCollisionResult>,
-        rename: Boolean
+        rename: Boolean,
     ): Completable =
         Completable.create { emitter ->
             if (collisions.isEmpty()) {
