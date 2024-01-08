@@ -15,13 +15,13 @@ data class ChangeLabelState(
 /**
  * Info about label
  * @property label [NodeLabel]
- * @property colorRes
+ * @property labelColor
  * @property labelName
  * @property isSelected
  */
 data class Label(
     val label: NodeLabel,
-    @ColorRes val colorRes: Int,
+    @ColorRes val labelColor: Int,
     @StringRes val labelName: Int,
     val isSelected: Boolean,
 )

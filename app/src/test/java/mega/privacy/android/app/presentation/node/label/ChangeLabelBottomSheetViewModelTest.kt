@@ -19,7 +19,6 @@ import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
@@ -69,7 +68,7 @@ class ChangeLabelBottomSheetViewModelTest {
             add(NodeLabel.PURPLE)
             add(NodeLabel.GREY)
         })
-        underTest.getLabelInfo(fileNode)
+        underTest.loadLabelInfo(fileNode)
         underTest.state.test {
             val state = awaitItem()
             Truth.assertThat(state.labelList).isNotEmpty()

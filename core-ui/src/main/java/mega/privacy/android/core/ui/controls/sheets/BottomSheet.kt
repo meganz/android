@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
+import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -50,7 +52,6 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  * @param modalSheetState state of [ModalBottomSheetLayout]
  * @param sheetHeader header composable for the bottom sheet
  * @param content scaffold/layout in which bottom sheet is shown
- * @param headerDividerPadding header divider padding
  * @param sheetBody list of composable which will be included in sheet content below sheet header
  * @param scrimColor when bottom sheet displayed this color will overlay on background content
  */
@@ -61,15 +62,15 @@ fun BottomSheet(
     sheetHeader: @Composable () -> Unit,
     sheetBody: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    headerDividerPadding: Dp = 16.dp,
     scrimColor: Color = Color.Black.copy(alpha = 0.5f),
+    dividerSpacing: DividerSpacing = DividerSpacing.StartSmall,
     content: (@Composable () -> Unit)? = null,
 ) {
     BottomSheet(
         modalSheetState = modalSheetState,
         sheetBody = {
             sheetHeader()
-            Divider(Modifier.padding(start = headerDividerPadding))
+            MegaDivider(dividerSpacing = dividerSpacing)
             sheetBody()
         },
         modifier = modifier,

@@ -29,7 +29,7 @@ class NodeLabelResourceMapperTest {
         Arguments.of(
             NodeLabel.RED, null, Label(
                 label = NodeLabel.RED,
-                colorRes = R.color.salmon_400_salmon_300,
+                labelColor = R.color.salmon_400_salmon_300,
                 labelName = R.string.label_red,
                 isSelected = false
             )
@@ -37,7 +37,7 @@ class NodeLabelResourceMapperTest {
         Arguments.of(
             NodeLabel.GREEN, NodeLabel.GREEN, Label(
                 label = NodeLabel.GREEN,
-                colorRes = R.color.green_400_green_300,
+                labelColor = R.color.green_400_green_300,
                 labelName = R.string.label_green,
                 isSelected = true
             )
@@ -45,7 +45,7 @@ class NodeLabelResourceMapperTest {
         Arguments.of(
             NodeLabel.ORANGE, NodeLabel.GREY, Label(
                 label = NodeLabel.ORANGE,
-                colorRes = R.color.orange_400_orange_300,
+                labelColor = R.color.orange_400_orange_300,
                 labelName = R.string.label_orange,
                 isSelected = false
             )
@@ -53,7 +53,7 @@ class NodeLabelResourceMapperTest {
         Arguments.of(
             NodeLabel.YELLLOW, null, Label(
                 label = NodeLabel.YELLLOW,
-                colorRes = R.color.yellow_600_yellow_300,
+                labelColor = R.color.yellow_600_yellow_300,
                 labelName = R.string.label_yellow,
                 isSelected = false
             )
@@ -61,7 +61,7 @@ class NodeLabelResourceMapperTest {
         Arguments.of(
             NodeLabel.BLUE, NodeLabel.BLUE, Label(
                 label = NodeLabel.BLUE,
-                colorRes = R.color.blue_300_blue_200,
+                labelColor = R.color.blue_300_blue_200,
                 labelName = R.string.label_blue,
                 isSelected = true
             )
@@ -69,7 +69,7 @@ class NodeLabelResourceMapperTest {
         Arguments.of(
             NodeLabel.PURPLE, null, Label(
                 label = NodeLabel.PURPLE,
-                colorRes = R.color.purple_300_purple_200,
+                labelColor = R.color.purple_300_purple_200,
                 labelName = R.string.label_purple,
                 isSelected = false
             )
@@ -77,7 +77,7 @@ class NodeLabelResourceMapperTest {
         Arguments.of(
             NodeLabel.GREY, null, Label(
                 label = NodeLabel.GREY,
-                colorRes = R.color.grey_300,
+                labelColor = R.color.grey_300,
                 labelName = R.string.label_grey,
                 isSelected = false
             )

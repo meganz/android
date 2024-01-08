@@ -42,7 +42,7 @@ class ChangeLabelBottomSheetViewModel @Inject constructor(
      * get label info for a node
      * @param node [Node]
      */
-    fun getLabelInfo(node: Node) {
+    fun loadLabelInfo(node: Node) {
         val labelList = getNodeLabelListUseCase().map {
             nodeLabelResourceMapper(it, nodeLabelMapper(node.label))
         }

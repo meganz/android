@@ -49,7 +49,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
                     resource?.let {
                         LabelAccessoryView(
                             text = stringResource(id = it.labelName),
-                            color = colorResource(it.colorRes)
+                            color = colorResource(it.labelColor)
                         )
                     }
                 }
