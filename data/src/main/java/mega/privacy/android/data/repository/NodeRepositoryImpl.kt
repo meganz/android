@@ -52,6 +52,7 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
+import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
@@ -110,7 +111,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val accessPermissionIntMapper: AccessPermissionIntMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val megaNodeMapper: MegaNodeMapper,
-    private val nodeLabelIntMapper: NodeLabelIntMapper
+    private val nodeLabelIntMapper: NodeLabelIntMapper,
 ) : NodeRepository {
     override suspend fun getOutgoingSharesNode(order: SortOrder) =
         withContext(ioDispatcher) {
@@ -830,6 +831,14 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getOfflineNodeByParentId(parentId: Int): List<OfflineNodeInformation>? =
         megaLocalRoomGateway.getOfflineInfoByParentId(parentId)?.map {
             offlineNodeInformationMapper(it)
+        }
+
+    override suspend fun getOfflineFolderInfo(parentId: Int): OfflineFolderInfo? =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getOfflineInfoByParentId(parentId)?.let { offlineNodes ->
+                val numberOfFolders = offlineNodes.count { it.isFolder }
+                OfflineFolderInfo(numberOfFolders, offlineNodes.size - numberOfFolders)
+            }
         }
 
     override suspend fun getOfflineNodeById(id: Int) =

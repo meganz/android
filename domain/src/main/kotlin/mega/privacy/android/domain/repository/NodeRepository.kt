@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
@@ -568,6 +569,13 @@ interface NodeRepository {
      * @return list of [OfflineNodeInformation]
      */
     suspend fun getOfflineNodeByParentId(parentId: Int): List<OfflineNodeInformation>?
+
+    /**
+     * Get offline folder info
+     * @param parentId
+     * @return [OfflineFolderInfo]
+     */
+    suspend fun getOfflineFolderInfo(parentId: Int): OfflineFolderInfo?
 
     /**
      * Get offline node from id
