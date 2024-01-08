@@ -1,6 +1,6 @@
 package mega.privacy.android.app.mediaplayer.model
 
-import com.google.android.exoplayer2.MediaItem
+import androidx.media3.common.MediaItem
 
 /**
  * The media play source item

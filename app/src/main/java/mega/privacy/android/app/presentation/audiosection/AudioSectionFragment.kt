@@ -18,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.util.UnstableApi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -53,6 +54,7 @@ import javax.inject.Inject
 /**
  * The fragment for audio section
  */
+@UnstableApi
 @AndroidEntryPoint
 class AudioSectionFragment : Fragment(), HomepageSearchable {
     private val audioSectionViewModel by viewModels<AudioSectionViewModel>()

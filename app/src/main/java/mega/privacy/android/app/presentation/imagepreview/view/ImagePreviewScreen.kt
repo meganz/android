@@ -2,7 +2,6 @@
 
 package mega.privacy.android.app.presentation.imagepreview.view
 
-import com.google.android.exoplayer2.ui.R as RExoPlayer
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -418,7 +417,7 @@ private fun ImagePreviewContent(
                         onClick = { onClickVideoPlay(imageNode) }
                     ) {
                         Icon(
-                            painter = painterResource(id = RExoPlayer.drawable.exo_icon_play),
+                            painter = painterResource(id = R.drawable.ic_play),
                             contentDescription = "Image Preview play video",
                             tint = Color.White,
                         )

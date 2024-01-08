@@ -6,9 +6,10 @@ import android.net.Uri
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.source.ShuffleOrder
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.source.ShuffleOrder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineDispatcher
@@ -136,6 +137,7 @@ import javax.inject.Inject
  * A class containing audio player service logic, because using ViewModel in Service
  * is not the standard scenario, so this class is actually not a subclass of ViewModel.
  */
+@UnstableApi
 class AudioPlayerServiceViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,

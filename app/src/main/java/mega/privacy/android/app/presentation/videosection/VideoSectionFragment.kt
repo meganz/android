@@ -17,6 +17,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.util.UnstableApi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -53,6 +54,7 @@ import javax.inject.Inject
 /**
  * The Fragment for video section
  */
+@UnstableApi
 @AndroidEntryPoint
 class VideoSectionFragment : Fragment(), HomepageSearchable {
 

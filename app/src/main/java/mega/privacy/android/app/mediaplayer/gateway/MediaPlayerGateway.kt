@@ -1,9 +1,9 @@
 package mega.privacy.android.app.mediaplayer.gateway
 
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.source.ShuffleOrder
-import com.google.android.exoplayer2.ui.StyledPlayerView
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.source.ShuffleOrder
+import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
@@ -193,7 +193,7 @@ interface MediaPlayerGateway {
      * @param showShuffleButton showShuffleButton
      */
     fun setupPlayerView(
-        playerView: StyledPlayerView,
+        playerView: PlayerView,
         useController: Boolean = true,
         controllerShowTimeoutMs: Int = 0,
         controllerHideOnTouch: Boolean = false,

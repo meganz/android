@@ -1,16 +1,20 @@
 package mega.privacy.android.app.mediaplayer.service
 
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Tracks
-import com.google.android.exoplayer2.metadata.Metadata
-import com.google.android.exoplayer2.metadata.id3.TextInformationFrame
+import androidx.annotation.OptIn
+import androidx.media3.common.Metadata
+import androidx.media3.common.Player
+import androidx.media3.common.Tracks
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.extractor.metadata.id3.TextInformationFrame
 
 /**
  * This class will receive metadata from ExoPlayer.
  * */
+@OptIn(UnstableApi::class)
 class MetadataExtractor(
-    private val callback: (String?, String?, String?) -> Unit
+    private val callback: (String?, String?, String?) -> Unit,
 ) : Player.Listener {
+
 
     override fun onTracksChanged(tracksInfo: Tracks) {
         super.onTracksChanged(tracksInfo)
@@ -41,9 +45,11 @@ class MetadataExtractor(
                     entry.id.startsWith(ID3_TITLE_PREFIX) -> {
                         title = entry.value
                     }
+
                     entry.id == ID3_ALBUM -> {
                         album = entry.value
                     }
+
                     entry.id.startsWith(ID3_ARTIST_PREFIX) -> {
                         artist = entry.value
                     }

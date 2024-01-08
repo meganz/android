@@ -25,8 +25,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.StyledPlayerView
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,12 +55,16 @@ import android.app.NotificationManager
 import androidx.core.app.NotificationCompat
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import mega.privacy.android.domain.monitoring.CrashReporter
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.ui.PlayerView
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * The service for playing audio
  */
+@UnstableApi
 @AndroidEntryPoint
 class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlayerServiceGateway {
     /**
@@ -505,7 +507,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     override fun getPlaybackState() = mediaPlayerGateway.getPlaybackState()
 
     override fun setupPlayerView(
-        playerView: StyledPlayerView,
+        playerView: PlayerView,
         useController: Boolean,
         controllerShowTimeoutMs: Int,
         controllerHideOnTouch: Boolean,
