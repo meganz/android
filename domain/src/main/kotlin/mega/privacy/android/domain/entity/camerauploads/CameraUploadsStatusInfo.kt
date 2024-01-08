@@ -6,6 +6,16 @@ package mega.privacy.android.domain.entity.camerauploads
 sealed interface CameraUploadsStatusInfo {
 
     /**
+     *  object used to notify that the Camera Uploads has started
+     */
+    data object Started : CameraUploadsStatusInfo
+
+    /**
+     *  object used to notify that the Camera Uploads has finished
+     */
+    data object Finished : CameraUploadsStatusInfo
+
+    /**
      *  class for displaying a notification for upload progress
      *  @property totalUploaded
      *  @property totalToUpload
@@ -35,32 +45,35 @@ sealed interface CameraUploadsStatusInfo {
         val totalCount: Int,
     ) : CameraUploadsStatusInfo
 
+    /**
+     *  object used to notify video compression success
+     */
+    data object VideoCompressionSuccess : CameraUploadsStatusInfo
 
     /**
      *  object used to notify that local storage is out of space while compressing Video
      */
-    object VideoCompressionOutOfSpace : CameraUploadsStatusInfo
+    data object VideoCompressionOutOfSpace : CameraUploadsStatusInfo
 
     /**
      *  object used to notify video compression error
      */
-    object VideoCompressionError : CameraUploadsStatusInfo
-
+    data object VideoCompressionError : CameraUploadsStatusInfo
 
     /**
      *  object used to notify that camera uploads worker is checking Files For Upload
      */
-    object CheckFilesForUpload : CameraUploadsStatusInfo
+    data object CheckFilesForUpload : CameraUploadsStatusInfo
 
     /**
      *  object used to notify that storage quota exceeded
      */
-    object StorageOverQuota : CameraUploadsStatusInfo
+    data object StorageOverQuota : CameraUploadsStatusInfo
 
     /**
      *  object used to notify that Not Enough Storage on the Device
      */
-    object NotEnoughStorage : CameraUploadsStatusInfo
+    data object NotEnoughStorage : CameraUploadsStatusInfo
 
     /**
      *  object used to notify that Not Enough Storage on the Device

@@ -11,19 +11,4 @@ interface CameraUploadsNotificationManagerWrapper {
      *  get ForegroundInfo for Camera Uploads Worker
      */
     fun getForegroundInfo(): ForegroundInfo
-
-    /**
-     *  cancel all error notifications
-     */
-    fun cancelNotifications()
-
-    /**
-     *  cancel camera uploads notification
-     */
-    fun cancelNotification()
-
-    /**
-     * cancel camera uploads compression notification
-     */
-    fun cancelCompressionNotification()
 }

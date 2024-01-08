@@ -168,15 +168,6 @@ abstract class UtilWrapperModule {
             object : CameraUploadsNotificationManagerWrapper {
                 override fun getForegroundInfo() =
                     cameraUploadsNotificationManager.getForegroundInfo()
-
-                override fun cancelNotifications() =
-                    cameraUploadsNotificationManager.cancelAllNotifications()
-
-                override fun cancelNotification() =
-                    cameraUploadsNotificationManager.cancelNotification()
-
-                override fun cancelCompressionNotification() =
-                    cameraUploadsNotificationManager.cancelCompressionNotification()
             }
 
         /**

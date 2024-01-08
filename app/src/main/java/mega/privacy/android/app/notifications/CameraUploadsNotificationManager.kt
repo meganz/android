@@ -84,6 +84,12 @@ class CameraUploadsNotificationManager @Inject constructor(
 
     suspend fun showNotification(cameraUploadsStatusInfo: CameraUploadsStatusInfo) {
         when (cameraUploadsStatusInfo) {
+            is CameraUploadsStatusInfo.Started -> cancelAllNotifications()
+            is CameraUploadsStatusInfo.Finished -> {
+                cancelNotification()
+                cancelCompressionNotification()
+            }
+
             CameraUploadsStatusInfo.CheckFilesForUpload -> showCheckUploadsNotification()
             is CameraUploadsStatusInfo.FolderUnavailable -> showFolderUnavailableNotification(
                 cameraUploadsStatusInfo.cameraUploadsFolderType
@@ -100,7 +106,16 @@ class CameraUploadsNotificationManager @Inject constructor(
             )
 
             CameraUploadsStatusInfo.StorageOverQuota -> showStorageOverQuotaNotification()
-            CameraUploadsStatusInfo.VideoCompressionError -> showVideoCompressionErrorNotification()
+
+            is CameraUploadsStatusInfo.VideoCompressionSuccess -> {
+                cancelCompressionNotification()
+            }
+
+            CameraUploadsStatusInfo.VideoCompressionError -> {
+                cancelCompressionNotification()
+                showVideoCompressionErrorNotification()
+            }
+
             CameraUploadsStatusInfo.VideoCompressionOutOfSpace -> showVideoCompressionOutOfSpaceNotification()
             is CameraUploadsStatusInfo.VideoCompressionProgress -> showVideoCompressionProgressNotification(
                 progress = cameraUploadsStatusInfo.progress,

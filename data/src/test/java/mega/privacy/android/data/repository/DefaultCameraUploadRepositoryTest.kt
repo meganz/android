@@ -658,12 +658,18 @@ class DefaultCameraUploadRepositoryTest {
                 }
                 val workInfo = mock<WorkInfo> {
                     on { this.progress }.thenReturn(progress)
+                    on { this.state }.thenReturn(WorkInfo.State.RUNNING)
                 }
                 val workInfoFlow = flowOf(listOf(workInfo, mock()))
 
                 val expected = mock<CameraUploadsStatusInfo.Progress>()
 
-                whenever(cameraUploadsStatusInfoMapper(workInfo.progress)).thenReturn(expected)
+                whenever(
+                    cameraUploadsStatusInfoMapper(
+                        workInfo.progress,
+                        workInfo.state,
+                    )
+                ).thenReturn(expected)
                 whenever(workManagerGateway.monitorCameraUploadsStatusInfo()).thenReturn(
                     workInfoFlow
                 )

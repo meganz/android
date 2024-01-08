@@ -31,6 +31,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.ARE_
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CHECK_FILE_UPLOAD
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_ERROR
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_PROGRESS
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_SUCCESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_FILE_INDEX
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
@@ -38,6 +39,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLD
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NOT_ENOUGH_STORAGE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.OUT_OF_SPACE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.PROGRESS
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.START
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.STATUS_INFO
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.STORAGE_OVER_QUOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_COUNT
@@ -305,7 +307,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 abortWork(cancelMessage = "Required conditions to start CU not met")
             } else {
                 Timber.d("Starting upload process")
-                cameraUploadsNotificationManagerWrapper.cancelNotifications()
+                sendStartUploadStatus()
 
                 scanFiles()
 
@@ -415,7 +417,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private fun CoroutineScope.monitorStorageOverQuotaStatus() = launch {
         monitorStorageOverQuotaUseCase().collect {
             if (it) {
-                showStorageOverQuotaStatus()
+                sendStorageOverQuotaStatus()
                 abortWork(cancelMessage = "Storage Over Quota")
             }
         }
@@ -646,7 +648,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     //@Karma
     private suspend fun scanFiles() {
         Timber.d("Get Pending Files from Media Store")
-        showCheckUploadStatus()
+        sendCheckUploadStatus()
         processCameraUploadsMediaUseCase(tempRoot = tempRoot)
     }
 
@@ -755,7 +757,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 records
             } else {
                 Timber.d("Compression queue bigger than setting, show notification to user.")
-                showVideoCompressionErrorStatus()
+                sendVideoCompressionErrorStatus()
                 records.filter { it.type == CameraUploadsRecordType.TYPE_PHOTO }
             }
         }
@@ -855,7 +857,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             -> processCompressingInsufficientStorage()
 
             is CameraUploadsTransferProgress.Compressing.Cancel,
-            -> showVideoCompressionErrorStatus()
+            -> sendVideoCompressionErrorStatus()
 
             is CameraUploadsTransferProgress.Compressing.Successful,
             -> processCompressingSuccessful()
@@ -976,7 +978,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * - End service
      */
     private suspend fun processCompressingInsufficientStorage() {
-        showVideoCompressionOutOfSpaceStatus()
+        sendVideoCompressionOutOfSpaceStatus()
         abortWork(cancelMessage = "Not enough space to compress videos")
     }
 
@@ -985,8 +987,8 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      * Cancel the compression notification
      */
-    private fun processCompressingSuccessful() {
-        cameraUploadsNotificationManagerWrapper.cancelCompressionNotification()
+    private suspend fun processCompressingSuccessful() {
+        sendCompressionSuccessUploadStatus()
     }
 
     /**
@@ -997,7 +999,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun processError(error: Throwable) {
         when (error) {
             is NotEnoughStorageException -> {
-                showNotEnoughStorageStatus()
+                sendNotEnoughStorageStatus()
                 abortWork(cancelMessage = error.message ?: "Not enough space to create temp file")
             }
 
@@ -1036,7 +1038,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * - Disable the Camera Uploads if the local Primary Folder is not valid
      */
     private suspend fun handleInvalidLocalPrimaryFolder() {
-        showFolderUnavailableStatus(CameraUploadFolderType.Primary)
+        sendFolderUnavailableStatus(CameraUploadFolderType.Primary)
         setPrimaryFolderLocalPathUseCase("")
         broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.RefreshSettings)
         abortWork(
@@ -1053,7 +1055,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * - Disable the Camera Uploads if the local Primary Folder is not valid
      */
     private suspend fun handleInvalidLocalSecondaryFolder() {
-        showFolderUnavailableStatus(CameraUploadFolderType.Secondary)
+        sendFolderUnavailableStatus(CameraUploadFolderType.Secondary)
         disableMediaUploadSettings()
         setSecondaryFolderLocalPathUseCase("")
         broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.DisableMediaUploads)
@@ -1160,10 +1162,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         deleteCameraUploadsTemporaryRootDirectoryUseCase()
         cancelAllPendingTransfers()
         broadcastProgress(100, 0)
-        with(cameraUploadsNotificationManagerWrapper) {
-            cancelNotification()
-            cancelCompressionNotification()
-        }
     }
 
     private fun cancelJobs() {
@@ -1408,9 +1406,31 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     *  Display a notification for checking files to upload
+     *  Notify observers that the Camera Uploads has started
      */
-    private suspend fun showCheckUploadStatus() {
+    private suspend fun sendStartUploadStatus() {
+        runCatching {
+            setProgress(workDataOf(STATUS_INFO to START))
+        }.onFailure {
+            Timber.w(it)
+        }
+    }
+
+    /**
+     * Notify observers that the video compression has succeeded
+     */
+    private suspend fun sendCompressionSuccessUploadStatus() {
+        runCatching {
+            setProgress(workDataOf(STATUS_INFO to COMPRESSION_SUCCESS))
+        }.onFailure {
+            Timber.w(it)
+        }
+    }
+
+    /**
+     * Notify observers that the Camera Uploads is in Check upload step
+     */
+    private suspend fun sendCheckUploadStatus() {
         runCatching {
             setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
         }.onFailure {
@@ -1419,9 +1439,9 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     *  Display a notification in case the cloud storage does not have enough space
+     * Notify observers that the cloud storage does not have enough space
      */
-    private suspend fun showStorageOverQuotaStatus() {
+    private suspend fun sendStorageOverQuotaStatus() {
         runCatching {
             setProgress(workDataOf(STATUS_INFO to STORAGE_OVER_QUOTA))
         }.onFailure {
@@ -1430,10 +1450,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     *  Display a notification in case the device does not have enough local storage
-     *  for video compression
+     * Notify observers that the device does not have enough local storage
+     * for video compression
      */
-    private suspend fun showVideoCompressionOutOfSpaceStatus() {
+    private suspend fun sendVideoCompressionOutOfSpaceStatus() {
         runCatching {
             setProgress(workDataOf(STATUS_INFO to OUT_OF_SPACE))
         }.onFailure {
@@ -1442,10 +1462,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     *  Display a notification in case the device does not have enough local storage
-     *  for creating temporary files
+     * Notify observers that the device does not have enough local storage
+     * for creating temporary files
      */
-    private suspend fun showNotEnoughStorageStatus() {
+    private suspend fun sendNotEnoughStorageStatus() {
         runCatching {
             setProgress(workDataOf(STATUS_INFO to NOT_ENOUGH_STORAGE))
         }.onFailure {
@@ -1454,11 +1474,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     *  Display a notification in case an error happened during video compression
+     * Notify observers that an error happened during video compression
      */
-    private suspend fun showVideoCompressionErrorStatus() {
+    private suspend fun sendVideoCompressionErrorStatus() {
         runCatching {
-            cameraUploadsNotificationManagerWrapper.cancelCompressionNotification()
             setProgress(workDataOf(STATUS_INFO to COMPRESSION_ERROR))
         }.onFailure {
             Timber.w(it)
@@ -1466,12 +1485,11 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * When Camera Uploads cannot launch due to the Folder being unavailable, display a Notification
-     * to inform the User
+     * Notify observers that Camera Uploads cannot launch due to the Folder being unavailable
      *
      * @param cameraUploadsFolderType
      */
-    private suspend fun showFolderUnavailableStatus(cameraUploadsFolderType: CameraUploadFolderType) {
+    private suspend fun sendFolderUnavailableStatus(cameraUploadsFolderType: CameraUploadFolderType) {
         runCatching {
             setProgress(
                 workDataOf(

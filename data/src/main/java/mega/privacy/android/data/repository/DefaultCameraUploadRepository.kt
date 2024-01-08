@@ -561,7 +561,9 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override fun monitorCameraUploadsStatusInfo() =
         workManagerGateway.monitorCameraUploadsStatusInfo().mapNotNull { workInfoList ->
-            cameraUploadsStatusInfoMapper(workInfoList.first().progress)
+            with(workInfoList.first()) {
+                cameraUploadsStatusInfoMapper(progress, state)
+            }
         }.catch {
             Timber.e(it)
         }.flowOn(ioDispatcher)

@@ -1,9 +1,9 @@
 package mega.privacy.android.data.mapper.camerauploads
 
 import androidx.work.Data
+import androidx.work.WorkInfo
 import androidx.work.workDataOf
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.ARE_UPLOADS_PAUSED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CHECK_FILE_UPLOAD
@@ -32,7 +32,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CameraUploadsStatusInfoMapperTest {
     private lateinit var underTest: CameraUploadsStatusInfoMapper
@@ -88,33 +87,39 @@ class CameraUploadsStatusInfoMapperTest {
     @MethodSource("provideParameters")
     fun `test that mapper returns model correctly when invoke function`(
         progress: Data,
+        state: WorkInfo.State,
         cameraUploadsStatusInfo: CameraUploadsStatusInfo,
     ) = runTest {
-        val actual = underTest(progress)
+        val actual = underTest(progress, state)
         Truth.assertThat(actual).isEqualTo(cameraUploadsStatusInfo)
     }
 
     private fun provideParameters(): Stream<Arguments> = Stream.of(
-        Arguments.of(progressData, cameraUploadProgressInfo),
-        Arguments.of(videoProgressData, videoProgressInfo),
+        Arguments.of(progressData, WorkInfo.State.RUNNING, cameraUploadProgressInfo),
+        Arguments.of(videoProgressData, WorkInfo.State.RUNNING, videoProgressInfo),
         Arguments.of(
             workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD),
+            WorkInfo.State.RUNNING,
             CameraUploadsStatusInfo.CheckFilesForUpload
         ),
         Arguments.of(
             workDataOf(STATUS_INFO to STORAGE_OVER_QUOTA),
+            WorkInfo.State.RUNNING,
             CameraUploadsStatusInfo.StorageOverQuota
         ),
         Arguments.of(
             workDataOf(STATUS_INFO to OUT_OF_SPACE),
+            WorkInfo.State.RUNNING,
             CameraUploadsStatusInfo.VideoCompressionOutOfSpace
         ),
         Arguments.of(
             workDataOf(STATUS_INFO to NOT_ENOUGH_STORAGE),
+            WorkInfo.State.RUNNING,
             CameraUploadsStatusInfo.NotEnoughStorage
         ),
         Arguments.of(
             workDataOf(STATUS_INFO to COMPRESSION_ERROR),
+            WorkInfo.State.RUNNING,
             CameraUploadsStatusInfo.VideoCompressionError
         ),
         Arguments.of(
@@ -122,6 +127,7 @@ class CameraUploadsStatusInfoMapperTest {
                 STATUS_INFO to FOLDER_UNAVAILABLE,
                 FOLDER_TYPE to CameraUploadFolderType.Primary.ordinal
             ),
+            WorkInfo.State.RUNNING,
             CameraUploadsStatusInfo.FolderUnavailable(CameraUploadFolderType.Primary)
         ),
         Arguments.of(
@@ -129,7 +135,11 @@ class CameraUploadsStatusInfoMapperTest {
                 STATUS_INFO to FOLDER_UNAVAILABLE,
                 FOLDER_TYPE to CameraUploadFolderType.Secondary.ordinal
             ),
+            WorkInfo.State.RUNNING,
             CameraUploadsStatusInfo.FolderUnavailable(CameraUploadFolderType.Secondary)
         ),
+        Arguments.of(progressData, WorkInfo.State.SUCCEEDED, CameraUploadsStatusInfo.Finished),
+        Arguments.of(progressData, WorkInfo.State.FAILED, CameraUploadsStatusInfo.Finished),
+        Arguments.of(progressData, WorkInfo.State.CANCELLED, CameraUploadsStatusInfo.Finished),
     )
 }

@@ -11,14 +11,24 @@ object CameraUploadsWorkerStatusConstant {
     const val STATUS_INFO = "status_info"
 
     /**
+     * START key
+     */
+    const val START = "start"
+
+    /**
      * PROGRESS Key
      */
     const val PROGRESS = "progress"
 
     /**
-     *COMPRESSION_PROGRESS Key
+     * COMPRESSION_PROGRESS Key
      */
     const val COMPRESSION_PROGRESS = "compression_progress"
+
+    /**
+     * COMPRESSION_SUCCESS Key
+     */
+    const val COMPRESSION_SUCCESS = "compression_success"
 
     /**
      * COMPRESSION_ERROR key
