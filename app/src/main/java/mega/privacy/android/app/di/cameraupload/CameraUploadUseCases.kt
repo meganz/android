@@ -8,7 +8,6 @@ import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.di.GetNodeModule
-import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
@@ -20,12 +19,9 @@ import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.DefaultDisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
 import mega.privacy.android.domain.usecase.DefaultIsNotEnoughQuota
-import mega.privacy.android.domain.usecase.DefaultRenamePrimaryFolder
-import mega.privacy.android.domain.usecase.DefaultRenameSecondaryFolder
 import mega.privacy.android.domain.usecase.DefaultSetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.DefaultSetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
@@ -33,8 +29,6 @@ import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
-import mega.privacy.android.domain.usecase.RenamePrimaryFolder
-import mega.privacy.android.domain.usecase.RenameSecondaryFolder
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 
@@ -120,24 +114,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindSetSecondarySyncHandle(setSecondarySyncHandle: DefaultSetSecondarySyncHandle): SetSecondarySyncHandle
-
-    /**
-     * Provide the [GetCameraUploadFolderName] implementation
-     */
-    @Binds
-    abstract fun bindGetCameraUploadFolderName(getCameraUploadFolderName: DefaultGetCameraUploadFolderName): GetCameraUploadFolderName
-
-    /**
-     * Provide the [RenamePrimaryFolder] implementation
-     */
-    @Binds
-    abstract fun bindRenamePrimaryFolder(renamePrimaryFolder: DefaultRenamePrimaryFolder): RenamePrimaryFolder
-
-    /**
-     * Provide the [RenameSecondaryFolder] implementation
-     */
-    @Binds
-    abstract fun bindRenameSecondaryFolder(renameSecondaryFolder: DefaultRenameSecondaryFolder): RenameSecondaryFolder
 
     /**
      * Provide the [IsChargingRequired] implementation
