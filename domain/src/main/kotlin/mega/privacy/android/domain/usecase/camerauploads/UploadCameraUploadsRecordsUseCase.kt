@@ -198,11 +198,11 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                         tempRoot,
                                         videoQuality
                                     ).collect {
-                                        if (!isClosedForSend || !isCompressionCancelled) {
+                                        if (!isClosedForSend) {
                                             send(it)
                                             yield()
                                         }
-                                        if (it is VideoCompressionState.Successful || it is VideoCompressionState.InsufficientStorage) {
+                                        if (it is VideoCompressionState.Finished) {
                                             this@compression.close()
                                         }
                                     }
