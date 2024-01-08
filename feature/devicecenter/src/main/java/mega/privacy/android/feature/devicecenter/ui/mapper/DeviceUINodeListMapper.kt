@@ -31,10 +31,7 @@ internal class DeviceUINodeListMapper @Inject constructor(
                 id = deviceNode.id,
                 name = deviceNode.name,
                 icon = deviceUINodeIconMapper(deviceNode.folders),
-                status = deviceCenterUINodeStatusMapper(
-                    isDevice = true,
-                    status = deviceNode.status,
-                ),
+                status = deviceCenterUINodeStatusMapper(deviceNode.status),
                 folders = deviceFolderUINodeListMapper(deviceNode.folders),
             )
         } else {
@@ -42,10 +39,7 @@ internal class DeviceUINodeListMapper @Inject constructor(
                 id = deviceNode.id,
                 name = deviceNode.name,
                 icon = deviceUINodeIconMapper(deviceNode.folders),
-                status = deviceCenterUINodeStatusMapper(
-                    isDevice = true,
-                    status = deviceNode.status,
-                ),
+                status = deviceCenterUINodeStatusMapper(deviceNode.status),
                 folders = deviceFolderUINodeListMapper(deviceNode.folders),
             )
         }

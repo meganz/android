@@ -125,12 +125,7 @@ internal class DeviceUINodeListMapperTest {
             )
         }
 
-        whenever(
-            deviceCenterUINodeStatusMapper(
-                isDevice = true,
-                status = DeviceCenterNodeStatus.UpToDate,
-            )
-        ).thenReturn(
+        whenever(deviceCenterUINodeStatusMapper(DeviceCenterNodeStatus.UpToDate)).thenReturn(
             expectedUINodeStatus
         )
         whenever(deviceFolderUINodeListMapper(deviceFolders)).thenReturn(expectedFolderUINodeList)

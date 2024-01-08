@@ -12,9 +12,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
@@ -37,68 +37,46 @@ internal class DeviceCenterUINodeStatusMapperTest {
         reset(deviceFolderUINodeErrorMessageMapper)
     }
 
-    @ParameterizedTest(name = "when isDevice is {0} and errorSubState is {1}")
-    @MethodSource("provideBlockedParameters")
-    fun `test that a blocked UI node status is returned`(
-        isDevice: Boolean,
-        errorSubState: BackupInfoSubState?,
-    ) {
-        assertThat(
-            underTest(
-                isDevice = isDevice,
-                status = DeviceCenterNodeStatus.Blocked(errorSubState = errorSubState),
-            )
-        ).isEqualTo(DeviceCenterUINodeStatus.Blocked)
+    @Test
+    fun `test that a blocked UI node status is returned without a specific error message`() {
+        assertThat(underTest(DeviceCenterNodeStatus.Blocked(errorSubState = null))).isEqualTo(
+            DeviceCenterUINodeStatus.Blocked(specificErrorMessage = null)
+        )
+        verifyNoInteractions(deviceFolderUINodeErrorMessageMapper)
     }
-
-    private fun provideBlockedParameters() = Stream.of(
-        Arguments.of(true, BackupInfoSubState.ACCOUNT_BLOCKED),
-        Arguments.of(true, null),
-        Arguments.of(false, null),
-    )
 
     @Test
-    fun `test that a folder error UI node status is returned if the blocked folder node status has a sub state`() {
-        val errorMessageRes = R.string.device_center_list_view_item_sub_state_account_blocked
-        whenever(deviceFolderUINodeErrorMessageMapper(any())).thenReturn(errorMessageRes)
-        assertThat(
-            underTest(
-                isDevice = false,
-                status = DeviceCenterNodeStatus.Blocked(errorSubState = BackupInfoSubState.ACCOUNT_BLOCKED),
-            )
-        ).isEqualTo(DeviceCenterUINodeStatus.FolderError(errorMessageRes))
-    }
+    fun `test that a blocked UI node status is returned with a specific error message`() {
+        val errorSubState = BackupInfoSubState.ACCOUNT_BLOCKED
+        val specificErrorMessage = R.string.device_center_list_view_item_sub_state_account_blocked
 
-    @ParameterizedTest(name = "when isDevice is {0} and errorSubState is {1}")
-    @MethodSource("provideOverquotaParameters")
-    fun `test that an overquota UI node status is returned`(
-        isDevice: Boolean,
-        errorSubState: BackupInfoSubState?,
-    ) {
-        assertThat(
-            underTest(
-                isDevice = isDevice,
-                status = DeviceCenterNodeStatus.Overquota(errorSubState = errorSubState),
-            )
-        ).isEqualTo(DeviceCenterUINodeStatus.Overquota)
+        whenever(deviceFolderUINodeErrorMessageMapper(errorSubState)).thenReturn(
+            specificErrorMessage
+        )
+        assertThat(underTest(DeviceCenterNodeStatus.Blocked(errorSubState = errorSubState))).isEqualTo(
+            DeviceCenterUINodeStatus.Blocked(specificErrorMessage = specificErrorMessage)
+        )
     }
-
-    private fun provideOverquotaParameters() = Stream.of(
-        Arguments.of(true, BackupInfoSubState.STORAGE_OVERQUOTA),
-        Arguments.of(true, null),
-        Arguments.of(false, null),
-    )
 
     @Test
-    fun `test that a folder error UI node status is returned if the overquota folder node status has a sub state`() {
-        val errorMessageRes = R.string.device_center_list_view_item_sub_state_storage_overquota
-        whenever(deviceFolderUINodeErrorMessageMapper(any())).thenReturn(errorMessageRes)
-        assertThat(
-            underTest(
-                isDevice = false,
-                status = DeviceCenterNodeStatus.Overquota(errorSubState = BackupInfoSubState.STORAGE_OVERQUOTA),
-            )
-        ).isEqualTo(DeviceCenterUINodeStatus.FolderError(errorMessageRes))
+    fun `test that an overquota UI node status is returned without a specific error message`() {
+        assertThat(underTest(DeviceCenterNodeStatus.Overquota(errorSubState = null))).isEqualTo(
+            DeviceCenterUINodeStatus.Overquota(specificErrorMessage = null)
+        )
+        verifyNoInteractions(deviceFolderUINodeErrorMessageMapper)
+    }
+
+    @Test
+    fun `test that an overquota UI node status is returned with a specific error message`() {
+        val errorSubState = BackupInfoSubState.STORAGE_OVERQUOTA
+        val specificErrorMessage = R.string.device_center_list_view_item_sub_state_storage_overquota
+
+        whenever(deviceFolderUINodeErrorMessageMapper(errorSubState)).thenReturn(
+            specificErrorMessage
+        )
+        assertThat(underTest(DeviceCenterNodeStatus.Overquota(errorSubState = errorSubState))).isEqualTo(
+            DeviceCenterUINodeStatus.Overquota(specificErrorMessage = specificErrorMessage)
+        )
     }
 
     @ParameterizedTest(name = "when the node status is {0}, its ui node status equivalent is {1}")
@@ -107,12 +85,7 @@ internal class DeviceCenterUINodeStatusMapperTest {
         deviceCenterNodeStatus: DeviceCenterNodeStatus,
         expectedNodeUiStatus: DeviceCenterUINodeStatus,
     ) {
-        assertThat(
-            underTest(
-                isDevice = true,
-                status = deviceCenterNodeStatus,
-            )
-        ).isEqualTo(expectedNodeUiStatus)
+        assertThat(underTest(deviceCenterNodeStatus)).isEqualTo(expectedNodeUiStatus)
     }
 
     private fun provideParameters() = Stream.of(
@@ -138,12 +111,7 @@ internal class DeviceCenterUINodeStatusMapperTest {
     )
 
     @Test
-    fun `test that a non matching device status returns a default ui device status`() {
-        assertThat(
-            underTest(
-                isDevice = true,
-                status = DeviceCenterNodeStatus.Unknown,
-            )
-        ).isEqualTo(DeviceCenterUINodeStatus.Unknown)
+    fun `test that a non matching device status returns a default UI device status`() {
+        assertThat(underTest(DeviceCenterNodeStatus.Unknown)).isEqualTo(DeviceCenterUINodeStatus.Unknown)
     }
 }

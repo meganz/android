@@ -17,38 +17,25 @@ internal class DeviceCenterUINodeStatusMapper @Inject constructor(
     /**
      * Invocation function
      *
-     * @param isDevice true if the node is a Device Node, and false if otherwise
      * @param status The [DeviceCenterNodeStatus]
      * @return the corresponding [DeviceCenterUINodeStatus]
      */
-    operator fun invoke(isDevice: Boolean, status: DeviceCenterNodeStatus) = when (status) {
+    operator fun invoke(status: DeviceCenterNodeStatus) = when (status) {
         DeviceCenterNodeStatus.Stopped -> DeviceCenterUINodeStatus.Stopped
         DeviceCenterNodeStatus.Disabled -> DeviceCenterUINodeStatus.Disabled
         DeviceCenterNodeStatus.Offline -> DeviceCenterUINodeStatus.Offline
         DeviceCenterNodeStatus.UpToDate -> DeviceCenterUINodeStatus.UpToDate
-        is DeviceCenterNodeStatus.Blocked -> {
-            if (isDevice || status.errorSubState == null) {
-                DeviceCenterUINodeStatus.Blocked
-            } else {
-                DeviceCenterUINodeStatus.FolderError(
-                    errorMessage = deviceFolderUINodeErrorMessageMapper(
-                        errorSubState = status.errorSubState,
-                    )
-                )
+        is DeviceCenterNodeStatus.Blocked -> DeviceCenterUINodeStatus.Blocked(
+            specificErrorMessage = status.errorSubState?.let {
+                deviceFolderUINodeErrorMessageMapper(status.errorSubState)
             }
-        }
+        )
 
-        is DeviceCenterNodeStatus.Overquota -> {
-            if (isDevice || status.errorSubState == null) {
-                DeviceCenterUINodeStatus.Overquota
-            } else {
-                DeviceCenterUINodeStatus.FolderError(
-                    errorMessage = deviceFolderUINodeErrorMessageMapper(
-                        errorSubState = status.errorSubState,
-                    )
-                )
+        is DeviceCenterNodeStatus.Overquota -> DeviceCenterUINodeStatus.Overquota(
+            specificErrorMessage = status.errorSubState?.let {
+                deviceFolderUINodeErrorMessageMapper(status.errorSubState)
             }
-        }
+        )
 
         DeviceCenterNodeStatus.Paused -> DeviceCenterUINodeStatus.Paused
         DeviceCenterNodeStatus.Initializing -> DeviceCenterUINodeStatus.Initializing

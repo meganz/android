@@ -52,11 +52,8 @@ private class DeviceCenterUINodeStatusProvider :
         DeviceCenterUINodeStatus.Offline,
         DeviceCenterUINodeStatus.Paused,
         DeviceCenterUINodeStatus.Stopped,
-        DeviceCenterUINodeStatus.Overquota,
-        DeviceCenterUINodeStatus.Error,
-        DeviceCenterUINodeStatus.FolderError(
-            errorMessage = R.string.device_center_list_view_item_sub_state_storage_overquota,
-        ),
-        DeviceCenterUINodeStatus.Blocked,
+        DeviceCenterUINodeStatus.Overquota(specificErrorMessage = R.string.device_center_list_view_item_sub_state_storage_overquota),
+        DeviceCenterUINodeStatus.Error(specificErrorMessage = R.string.device_center_list_view_item_sub_state_put_nodes_error),
+        DeviceCenterUINodeStatus.Blocked(specificErrorMessage = R.string.device_center_list_view_item_sub_state_account_blocked),
     ).asSequence()
 }
