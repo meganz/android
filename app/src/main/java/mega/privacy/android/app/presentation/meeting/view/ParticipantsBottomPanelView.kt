@@ -360,9 +360,9 @@ private fun EmptyState(section: ParticipantsSection) {
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_empty_contacts),
+            painter = painterResource(id = R.drawable.ic_meeting_participants_list_empty),
             contentDescription = "Empty state",
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier.size(120.dp).padding(bottom = 16.dp)
         )
         Text(
             text = when (section) {
