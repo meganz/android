@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import androidx.work.WorkInfo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -459,6 +460,11 @@ internal class DefaultTransfersRepository @Inject constructor(
     override fun startDownloadWorker() {
         workerManagerGateway.enqueueDownloadsWorkerRequest()
     }
+
+    override fun isDownloadsWorkerEnqueuedFlow() =
+        workerManagerGateway.monitorDownloadsStatusInfo().map { workInfos ->
+            workInfos.any { it.state == WorkInfo.State.ENQUEUED }
+        }
 
     override fun monitorTransfersFinished() = appEventGateway.monitorTransfersFinished()
 

@@ -6,10 +6,13 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -22,12 +25,14 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.CancelTokenRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import org.junit.jupiter.api.AfterAll
@@ -41,9 +46,12 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.internal.verification.Times
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -61,6 +69,9 @@ class DownloadNodesUseCaseTest {
     private val transfer: Transfer = mock()
     private val addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase = mock()
     private val handleSDCardEventUseCase: HandleSDCardEventUseCase = mock()
+    private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
+
+    private val ioDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var underTest: DownloadNodesUseCase
 
@@ -71,9 +82,11 @@ class DownloadNodesUseCaseTest {
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
                 invalidateCancelTokenUseCase = invalidateCancelTokenUseCase,
                 addOrUpdateActiveTransferUseCase = addOrUpdateActiveTransferUseCase,
+                handleSDCardEventUseCase = handleSDCardEventUseCase,
                 transferRepository = transferRepository,
                 fileSystemRepository = fileSystemRepository,
-                handleSDCardEventUseCase = handleSDCardEventUseCase
+                ioDispatcher = ioDispatcher,
+                monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             )
     }
 
@@ -82,8 +95,14 @@ class DownloadNodesUseCaseTest {
         reset(
             transferRepository, cancelTokenRepository, fileSystemRepository,
             addOrUpdateActiveTransferUseCase, fileNode, folderNode, invalidateCancelTokenUseCase,
-            cancelCancelTokenUseCase, transfer, handleSDCardEventUseCase
+            cancelCancelTokenUseCase, transfer, handleSDCardEventUseCase,
+            monitorTransferEventsUseCase,
         )
+        commonStub()
+    }
+
+    private fun commonStub() {
+        whenever(monitorTransferEventsUseCase()).thenReturn(emptyFlow())
     }
 
     @AfterAll
@@ -400,6 +419,56 @@ class DownloadNodesUseCaseTest {
         }
         verify(fileSystemRepository).createDirectory(DESTINATION_PATH_FOLDER)
     }
+
+    @Test
+    fun `test that monitorTransferEventsUseCase is invoked before starting the download`() =
+        runTest {
+            val inOrder = inOrder(transferRepository, monitorTransferEventsUseCase)
+            underTest(listOf(fileNode), DESTINATION_PATH_FOLDER, null, false).test {
+                cancelAndIgnoreRemainingEvents()
+            }
+            inOrder.verify(monitorTransferEventsUseCase).invoke()
+            inOrder.verify(transferRepository).startDownload(any(), any(), anyOrNull(), any())
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that monitorTransferEventsUseCase events are filtered and handled`(childTransferEvent: Boolean) =
+        runTest {
+            val tag = 1
+            val globalEvents = MutableSharedFlow<TransferEvent>()
+            val transferEvents = MutableSharedFlow<TransferEvent>()
+            whenever(monitorTransferEventsUseCase()).thenReturn(globalEvents)
+            whenever(transferRepository.startDownload(any(), any(), anyOrNull(), any())).thenReturn(
+                transferEvents
+            )
+            underTest(listOf(fileNode), DESTINATION_PATH_FOLDER, null, false).test {
+                //emits an event to store its tag in the use case
+                val transfer = mock<Transfer> {
+                    on { this.tag }.thenReturn(tag)
+                }
+                val event = TransferEvent.TransferStartEvent(transfer)
+                transferEvents.emit(event)
+
+                //emits a global event that will be a child transfer depending on the test parameter
+                val childEventTransfer = mock<Transfer> {
+                    on { folderTransferTag }.thenReturn(tag.takeIf { childTransferEvent })
+                    on { transferType }.thenReturn(TransferType.DOWNLOAD)
+                }
+                val globalEvent = TransferEvent.TransferStartEvent(childEventTransfer)
+                globalEvents.emit(globalEvent)
+
+                //verify it's received if corresponds
+                if (childTransferEvent) {
+                    verify(handleSDCardEventUseCase)(globalEvent)
+                    verify(addOrUpdateActiveTransferUseCase)(globalEvent)
+                } else {
+                    verify(handleSDCardEventUseCase, times(0))(globalEvent)
+                    verify(addOrUpdateActiveTransferUseCase, times(0))(globalEvent)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that cancel token is invalidated when all transfers are processed`() = runTest {

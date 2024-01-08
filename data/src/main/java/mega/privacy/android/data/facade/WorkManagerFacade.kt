@@ -61,7 +61,7 @@ internal class WorkManagerFacade @Inject constructor(
         workManager
             .enqueueUniqueWork(
                 DownloadsWorker.SINGLE_DOWNLOAD_TAG,
-                ExistingWorkPolicy.REPLACE,
+                ExistingWorkPolicy.KEEP,
                 request
             )
     }
@@ -219,4 +219,7 @@ internal class WorkManagerFacade @Inject constructor(
             it.takeUnless { it.isEmpty() }
         }
     }
+
+    override fun monitorDownloadsStatusInfo() =
+        workManager.getWorkInfosByTagFlow(DownloadsWorker.SINGLE_DOWNLOAD_TAG)
 }

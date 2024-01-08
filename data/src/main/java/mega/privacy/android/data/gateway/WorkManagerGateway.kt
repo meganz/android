@@ -44,4 +44,9 @@ interface WorkManagerGateway {
      * Get CameraUploadsWorker Info
      */
     fun monitorCameraUploadsStatusInfo(): Flow<List<WorkInfo>>
+
+    /**
+     * Get DownloadsWorker Info
+     */
+    fun monitorDownloadsStatusInfo(): Flow<List<WorkInfo>>
 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import androidx.work.WorkInfo
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
@@ -1026,12 +1027,6 @@ class DefaultTransfersRepositoryTest {
             assertThat(actual).isEqualTo(expected)
         }
 
-        @Test
-        fun `test that workerManagerGateway enqueueDownloadsWorkerRequest is called when startDownloadWorker is called`() {
-            underTest.startDownloadWorker()
-            verify(workerManagerGateway).enqueueDownloadsWorkerRequest()
-        }
-
         @ParameterizedTest
         @EnumSource(TransferType::class)
         fun `test that updateTransferredBytes adds currentTransferred bytes and deleteAllActiveTransfersByType clears the values`(
@@ -1086,6 +1081,36 @@ class DefaultTransfersRepositoryTest {
             whenever(transfer.totalBytes).thenReturn(total)
             whenever(transfer.tag).thenReturn(tag)
         }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class WorkerTests {
+        @Test
+        fun `test that workerManagerGateway enqueueDownloadsWorkerRequest is called when startDownloadWorker is called`() {
+            underTest.startDownloadWorker()
+            verify(workerManagerGateway).enqueueDownloadsWorkerRequest()
+        }
+
+        @ParameterizedTest
+        @EnumSource(WorkInfo.State::class)
+        fun `test that isDownloadsWorkerEnqueuedFlow returns workerManagerGateway values`(state: WorkInfo.State) =
+            runTest {
+                val workInfo = mock<WorkInfo> {
+                    on { this.state }.thenReturn(state)
+                }
+                whenever(workerManagerGateway.monitorDownloadsStatusInfo())
+                    .thenReturn(flowOf(listOf(workInfo)))
+                underTest.isDownloadsWorkerEnqueuedFlow().test {
+                    if (state == WorkInfo.State.ENQUEUED) {
+                        assertThat(awaitItem()).isTrue()
+                    } else {
+                        assertThat(awaitItem()).isFalse()
+                    }
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+            }
     }
 
     @Nested

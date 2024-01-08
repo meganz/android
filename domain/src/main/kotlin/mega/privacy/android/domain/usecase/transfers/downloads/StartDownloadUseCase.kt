@@ -36,6 +36,7 @@ class StartDownloadUseCase @Inject constructor(
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
+    private val ensureDownloadsWorkerHasStartedUseCase: EnsureDownloadsWorkerHasStartedUseCase,
 ) {
     /**
      * Invoke
@@ -89,6 +90,9 @@ class StartDownloadUseCase @Inject constructor(
                         //emitting a FinishProcessingTransfers can cause a terminal event in the collector (firstOrNull for instance), so we need to start the worker before emitting it
                         if (finished) {
                             startDownloadWorkerUseCase()
+
+                            //ensure worker has started and is listening to global events so we can finish downloadNodesUseCase
+                            ensureDownloadsWorkerHasStartedUseCase()
                         }
                         emit(event)
                         return@transformWhile !finished

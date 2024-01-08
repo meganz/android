@@ -1,8 +1,9 @@
 package mega.privacy.android.domain.usecase.transfers
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -20,12 +21,14 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.EnsureDownloadsWorkerHasStartedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.AdditionalAnswers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
@@ -48,6 +51,8 @@ class StartDownloadUseCaseTest {
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase = mock()
+    private val ensureDownloadsWorkerHasStartedUseCase: EnsureDownloadsWorkerHasStartedUseCase =
+        mock()
 
     @BeforeAll
     fun setup() {
@@ -58,6 +63,7 @@ class StartDownloadUseCaseTest {
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
                 fileSystemRepository = fileSystemRepository,
                 startDownloadWorkerUseCase = startDownloadWorkerUseCase,
+                ensureDownloadsWorkerHasStartedUseCase = ensureDownloadsWorkerHasStartedUseCase,
             )
     }
 
@@ -69,6 +75,7 @@ class StartDownloadUseCaseTest {
             cancelCancelTokenUseCase,
             fileSystemRepository,
             startDownloadWorkerUseCase,
+            ensureDownloadsWorkerHasStartedUseCase,
         )
         whenever(fileSystemRepository.isSDCardPath(any())).thenReturn(false)
     }
@@ -88,7 +95,7 @@ class StartDownloadUseCaseTest {
         runTest {
             whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(false)
             underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
-                Truth.assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.NotSufficientSpace)
+                assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.NotSufficientSpace)
                 awaitComplete()
             }
         }
@@ -102,7 +109,7 @@ class StartDownloadUseCaseTest {
             )
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
-            Truth.assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.FinishProcessingTransfers)
+            assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.FinishProcessingTransfers)
             awaitComplete()
         }
     }
@@ -116,7 +123,7 @@ class StartDownloadUseCaseTest {
             )
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
-            Truth.assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.FinishProcessingTransfers)
+            assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.FinishProcessingTransfers)
             awaitComplete()
         }
     }
@@ -130,6 +137,29 @@ class StartDownloadUseCaseTest {
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).collect()
         verify(startDownloadWorkerUseCase).invoke()
+    }
+
+    @Test
+    fun `test that flow is not finished until the worker is started`() = runTest {
+        var workerStarted = false
+        mockFlow(
+            flow {
+                emit(DownloadNodesEvent.FinishProcessingTransfers)
+                awaitCancellation()
+            }
+        )
+        whenever(ensureDownloadsWorkerHasStartedUseCase()).then(
+            AdditionalAnswers.answersWithDelay(
+                10
+            ) {
+                workerStarted = true
+            })
+        underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
+            awaitItem()
+            awaitComplete()
+            assertThat(workerStarted).isTrue()
+        }
+        verify(ensureDownloadsWorkerHasStartedUseCase).invoke()
     }
 
     @Test
