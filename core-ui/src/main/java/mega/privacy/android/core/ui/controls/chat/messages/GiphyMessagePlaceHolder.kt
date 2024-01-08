@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.chat.messages
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -10,7 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -22,9 +26,10 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  *
  * @param width
  * @param height
+ * @param content the content in the center of the placeholder.
  */
 @Composable
-fun GiphyMessagePlaceHolder(width: Int, height: Int) {
+fun GiphyMessagePlaceHolder(width: Int, height: Int, content: @Composable () -> Unit) {
     Box(
         modifier = Modifier
             .size(width = width.dp, height = height.dp)
@@ -37,14 +42,30 @@ fun GiphyMessagePlaceHolder(width: Int, height: Int) {
             .background(color = MegaTheme.colors.background.surface2),
         contentAlignment = Alignment.Center,
     ) {
-        MegaCircularProgressIndicator(modifier = Modifier.size(48.dp))
+        content()
     }
 }
 
 @CombinedThemePreviews
 @Composable
-private fun GiphyMessagePlaceHolderPreview() {
+private fun GiphyMessageLoadingPlaceHolderPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        GiphyMessagePlaceHolder(width = 256, height = 200)
+        GiphyMessagePlaceHolder(width = 256, height = 200) {
+            MegaCircularProgressIndicator(modifier = Modifier.size(48.dp))
+        }
     }
 }
+
+@CombinedThemePreviews
+@Composable
+private fun GiphyMessageStaticPlaceHolderPreview() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        GiphyMessagePlaceHolder(width = 256, height = 200) {
+            Image(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_check_circle),
+                contentDescription = null
+            )
+        }
+    }
+}
+
