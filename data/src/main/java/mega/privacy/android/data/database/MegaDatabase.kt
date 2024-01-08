@@ -52,6 +52,7 @@ import timber.log.Timber
         AutoMigration(79, 80),
         AutoMigration(80, 81),
         AutoMigration(81, 82, spec = AutoMigrationSpec81to82::class),
+        AutoMigration(82, 83),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {

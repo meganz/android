@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
  * @param isFinished true if the transfer has already finished but it's still part of the current
  * @param isFolderTransfer True if it's a folder transfer, false otherwise (file transfer).
  * @param isPaused True if the transfer is paused, false otherwise
+ * @param isAlreadyDownloaded True if the transfer finished without actually transferring bytes because it was already transferred
  */
 @Entity(
     MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS,
@@ -37,4 +38,6 @@ internal data class ActiveTransferEntity(
     override val isFolderTransfer: Boolean,
     @ColumnInfo(name = "is_paused", defaultValue = "0")
     override val isPaused: Boolean,
+    @ColumnInfo(name = "is_already_downloaded", defaultValue = "0")
+    override val isAlreadyDownloaded: Boolean,
 ) : ActiveTransfer

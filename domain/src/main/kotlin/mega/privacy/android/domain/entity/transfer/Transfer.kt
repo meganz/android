@@ -69,6 +69,12 @@ data class Transfer(
     override val isPaused get() = state == TransferState.STATE_PAUSED
 
     /**
+     * True if the transfer finished without actually transferring bytes because it was already transferred
+     */
+    override val isAlreadyDownloaded =
+        isFinished && transferredBytes == 0L && state != TransferState.STATE_FAILED
+
+    /**
      * true if represents a transfer initiated by the app false if the transfer was initiated by the sdk for children nodes of a folder transfer
      */
     val isRootTransfer = folderTransferTag == null

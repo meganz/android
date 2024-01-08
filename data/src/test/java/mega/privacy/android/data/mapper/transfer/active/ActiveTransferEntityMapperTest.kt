@@ -34,28 +34,32 @@ class ActiveTransferEntityMapperTest {
     }
 
     private fun provideParameters(): List<Arguments> =
-        TransferType.values().flatMap { transferType ->
+        TransferType.entries.flatMap { transferType ->
             listOf(true, false).flatMap { isFinished ->
                 listOf(true, false).flatMap { isFolder ->
-                    listOf(true, false).map { isPaused ->
-                        Arguments.of(
-                            ActiveTransferTestImpl(
-                                tag = TAG,
-                                transferType = transferType,
-                                totalBytes = TOTAL,
-                                isFinished = isFinished,
-                                isFolderTransfer = isFolder,
-                                isPaused = isPaused,
-                            ),
-                            ActiveTransferEntity(
-                                tag = TAG,
-                                transferType = transferType,
-                                totalBytes = TOTAL,
-                                isFinished = isFinished,
-                                isFolderTransfer = isFolder,
-                                isPaused = isPaused,
+                    listOf(true, false).flatMap { isPaused ->
+                        listOf(true, false).map { isAlreadyDownloaded ->
+                            Arguments.of(
+                                ActiveTransferTestImpl(
+                                    tag = TAG,
+                                    transferType = transferType,
+                                    totalBytes = TOTAL,
+                                    isFinished = isFinished,
+                                    isFolderTransfer = isFolder,
+                                    isPaused = isPaused,
+                                    isAlreadyDownloaded = isAlreadyDownloaded,
+                                ),
+                                ActiveTransferEntity(
+                                    tag = TAG,
+                                    transferType = transferType,
+                                    totalBytes = TOTAL,
+                                    isFinished = isFinished,
+                                    isFolderTransfer = isFolder,
+                                    isPaused = isPaused,
+                                    isAlreadyDownloaded = isAlreadyDownloaded,
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -79,5 +83,6 @@ class ActiveTransferEntityMapperTest {
         override val isFinished: Boolean,
         override val isFolderTransfer: Boolean,
         override val isPaused: Boolean,
+        override val isAlreadyDownloaded: Boolean,
     ) : ActiveTransfer
 }
