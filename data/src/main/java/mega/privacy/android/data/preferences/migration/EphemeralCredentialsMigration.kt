@@ -10,17 +10,17 @@ internal class EphemeralCredentialsMigration @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     private val ephemeralCredentialsPreferenceMapper: EphemeralCredentialsPreferenceMapper,
 ) : DataMigration<Preferences> {
-    val ephemeral = databaseHandler.ephemeral
 
     override suspend fun cleanUp() {
         databaseHandler.clearEphemeral()
     }
 
     override suspend fun shouldMigrate(currentData: Preferences): Boolean =
-        ephemeral != null
+        databaseHandler.ephemeral != null
 
     override suspend fun migrate(currentData: Preferences): Preferences {
         // it only run if shouldMigrate as true so ephemeral not null
+        val ephemeral = databaseHandler.ephemeral
         checkNotNull(ephemeral)
         return currentData.toMutablePreferences().apply {
             ephemeralCredentialsPreferenceMapper(this, ephemeral)

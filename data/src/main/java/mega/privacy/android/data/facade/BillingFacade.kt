@@ -53,6 +53,7 @@ import mega.privacy.android.domain.exception.ConnectBillingServiceException
 import mega.privacy.android.domain.exception.ProductNotFoundException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -73,6 +74,7 @@ internal class BillingFacade @Inject constructor(
     private val megaSkuMapper: MegaSkuMapper,
     private val megaPurchaseMapper: MegaPurchaseMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     private val verifyPurchaseGateway: VerifyPurchaseGateway,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val skusCache: Cache<List<MegaSku>>,
@@ -88,7 +90,9 @@ internal class BillingFacade @Inject constructor(
     }
 
     init {
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        applicationScope.launch(mainDispatcher) {
+            ProcessLifecycleOwner.get().lifecycle.addObserver(this@BillingFacade)
+        }
     }
 
     override fun onStart(owner: LifecycleOwner) {

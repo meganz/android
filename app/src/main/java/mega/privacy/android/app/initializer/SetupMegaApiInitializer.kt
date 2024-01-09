@@ -7,10 +7,13 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.globalmanagement.BackgroundRequestListener
 import mega.privacy.android.app.listeners.GlobalListener
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -47,6 +50,13 @@ class SetupMegaApiInitializer : Initializer<Unit> {
          *
          */
         fun requestListener(): BackgroundRequestListener
+
+        /**
+         * App scope
+         *
+         */
+        @ApplicationScope
+        fun appScope(): CoroutineScope
     }
 
     /**
@@ -63,7 +73,9 @@ class SetupMegaApiInitializer : Initializer<Unit> {
         megaApi.retrySSLerrors(true)
         megaApi.downloadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
         megaApi.uploadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
-        addListeners(megaApi, entryPoint)
+        entryPoint.appScope().launch {
+            addListeners(megaApi, entryPoint)
+        }
         setStreamingBufferSize(megaApi, context)
         setSDKLanguage(megaApi)
         setResourceLimit(megaApi)
