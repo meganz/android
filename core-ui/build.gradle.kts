@@ -83,6 +83,7 @@ dependencies {
     implementation(androidx.lifecycle.runtime)
     implementation(androidx.lifecycle.runtime.compose)
     implementation(lib.compose.state.events)
+    implementation(androidx.emojiPicker)
     implementation(lib.coil.compose)
     implementation(lib.balloon)
     implementation(google.accompanist.placeholder)

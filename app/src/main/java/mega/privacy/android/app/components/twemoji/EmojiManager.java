@@ -2,16 +2,16 @@ package mega.privacy.android.app.components.twemoji;
 
 import static mega.privacy.android.app.components.twemoji.Utils.checkNotNull;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.Spannable;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.emoji.text.EmojiCompat;
+import androidx.emoji2.text.EmojiCompat;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,22 +29,17 @@ public final class EmojiManager {
     private static final EmojiManager INSTANCE = new EmojiManager();
     private static final int GUESSED_UNICODE_AMOUNT = 3000;
     private static final int GUESSED_TOTAL_PATTERN_LENGTH = GUESSED_UNICODE_AMOUNT * 4;
-    private static final Pattern SPACE_REMOVAL = Pattern.compile("[\\s]");
-    private static final Comparator<String> STRING_LENGTH_COMPARATOR = new Comparator<String>() {
-        @Override
-        public int compare(final String first, final String second) {
-            final int firstLength = first.length();
-            final int secondLength = second.length();
-            return firstLength < secondLength ? 1 : firstLength == secondLength ? 0 : -1;
-        }
-    };
+    private static final Pattern SPACE_REMOVAL = Pattern.compile("\\s");
+    private static final Comparator<String> STRING_LENGTH_COMPARATOR =
+            (first, second) -> Integer.compare(second.length(), first.length());
 
+    @SuppressLint("CheckResult")
     private static final EmojiReplacer DEFAULT_EMOJI_REPLACER = (context, text, emojiSize, defaultEmojiSize, fallback) -> {
 
         final EmojiManager emojiManager = EmojiManager.getInstance();
         final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text);
         EmojiCompat emojiCompat = EmojiCompat.get();
-        boolean shouldProcess = emojiCompat != null && emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED;
+        boolean shouldProcess = emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED;
 
         if (findAllEmojis.size() == 0) {
             if (shouldProcess) {
@@ -108,27 +103,18 @@ public final class EmojiManager {
         INSTANCE.emojiMap.clear();
         INSTANCE.emojiReplacer = provider instanceof EmojiReplacer ? (EmojiReplacer) provider : DEFAULT_EMOJI_REPLACER;
         final List<String> unicodesForPattern = new ArrayList<>(GUESSED_UNICODE_AMOUNT);
-        final int categoriesSize = INSTANCE.categories.length;
 
-        //noinspection ForLoopReplaceableByForEach
-        for (int i = 0; i < categoriesSize; i++) {
 
-            final Emoji[] emojis = checkNotNull(INSTANCE.categories[i].getEmojis(), "emojis == null");
+        for (EmojiCategory category : INSTANCE.categories) {
+            final Emoji[] emojis = checkNotNull(category.getEmojis(), "emojis == null");
 
-            final int emojisSize = emojis.length;
-
-            //noinspection ForLoopReplaceableByForEach
-            for (int j = 0; j < emojisSize; j++) {
-                final Emoji emoji = emojis[j];
-
+            for (Emoji emoji : emojis) {
                 final String unicode = emoji.getUnicode();
                 final List<Emoji> variants = emoji.getVariants();
                 INSTANCE.emojiMap.put(unicode, emoji);
                 unicodesForPattern.add(unicode);
 
-                //noinspection ForLoopReplaceableByForEach
-                for (int k = 0; k < variants.size(); k++) {
-                    final Emoji variant = variants.get(k);
+                for (Emoji variant: variants) {
                     final String variantUnicode = variant.getUnicode();
                     INSTANCE.emojiMap.put(variantUnicode, variant);
                     unicodesForPattern.add(variantUnicode);
@@ -140,7 +126,7 @@ public final class EmojiManager {
             throw new IllegalArgumentException("Your EmojiProvider must at least have one category with at least one emoji.");
         }
         // We need to sort the unicodes by length so the longest one gets matched first.
-        Collections.sort(unicodesForPattern, STRING_LENGTH_COMPARATOR);
+        unicodesForPattern.sort(STRING_LENGTH_COMPARATOR);
         final StringBuilder patternBuilder = new StringBuilder(GUESSED_TOTAL_PATTERN_LENGTH);
         final int unicodesForPatternSize = unicodesForPattern.size();
         for (int i = 0; i < unicodesForPatternSize; i++) {
@@ -201,8 +187,7 @@ public final class EmojiManager {
 
     public int getNumEmojis(@Nullable final CharSequence text) {
         List<EmojiRange> emojis = findAllEmojis(text);
-        int num = emojis.size();
-        return num;
+        return emojis.size();
     }
 
     public @NonNull
@@ -232,8 +217,7 @@ public final class EmojiManager {
         // We need to call toString on the candidate, since the emojiMap may not find the requested entry otherwise, because
         // the type is different.
 
-        Emoji emojiFounded = emojiMap.get(candidate.toString());
-        return emojiFounded;
+        return emojiMap.get(candidate.toString());
     }
 
     public Emoji getFirstEmoji(@NonNull final CharSequence candidate) {

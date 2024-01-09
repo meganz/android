@@ -12,7 +12,7 @@ compose-bom = "2023.10.01"
 compose-compiler = "1.5.7"
 compose-viewmodel = "2.6.2"
 datastore = "1.0.0"
-emoji = "1.1.0"
+emoji = "1.4.0"
 exifinterface = "1.3.6"
 fragment = "1.6.0"
 hilt-android = "1.0.0"
@@ -53,7 +53,8 @@ compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 compose-ui-viewbinding = { group = "androidx.compose.ui", name = "ui-viewbinding"}
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
-emoji = { module = "androidx.emoji:emoji-appcompat", version.ref = "emoji" }
+emoji2 = { module = "androidx.emoji2:emoji2", version.ref = "emoji" }
+emojiPicker = {module = "androidx.emoji2:emoji2-emojipicker", version.ref = "emoji"}
 exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 fragment-test = { module = "androidx.fragment:fragment-testing", version.ref = "fragment" }

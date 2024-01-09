@@ -2,8 +2,8 @@ package mega.privacy.android.app.initializer
 
 import android.content.Context
 import androidx.core.provider.FontRequest
-import androidx.emoji.text.EmojiCompat
-import androidx.emoji.text.FontRequestEmojiCompatConfig
+import androidx.emoji2.text.EmojiCompat
+import androidx.emoji2.text.FontRequestEmojiCompatConfig
 import androidx.startup.Initializer
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiManager
@@ -22,7 +22,6 @@ class EmojiInitializer : Initializer<Unit> {
      */
     override fun create(context: Context) {
         EmojiManagerShortcodes.initEmojiData(context)
-        EmojiManager.install(TwitterEmojiProvider())
 
         Timber.d("Use downloadable font for EmojiCompat")
 
@@ -34,6 +33,7 @@ class EmojiInitializer : Initializer<Unit> {
 
         val config = FontRequestEmojiCompatConfig(context, fontRequest)
             .setReplaceAll(false)
+            .setMetadataLoadStrategy(EmojiCompat.LOAD_STRATEGY_MANUAL)
             .registerInitCallback(object : EmojiCompat.InitCallback() {
                 override fun onInitialized() {
                     Timber.d("EmojiCompat initialized")
@@ -45,6 +45,7 @@ class EmojiInitializer : Initializer<Unit> {
             })
 
         EmojiCompat.init(config)
+        EmojiManager.install(TwitterEmojiProvider())
     }
 
     /**

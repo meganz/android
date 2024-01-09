@@ -326,7 +326,7 @@ dependencies {
     implementation(androidx.constraintlayout)
     implementation(androidx.constraintlayout.compose)
     implementation(androidx.datastore.preferences)
-    implementation(androidx.emoji)
+    implementation(androidx.emoji2)
     implementation(androidx.exifinterface)
     implementation(androidx.fragment)
     implementation(androidx.legacy.support)

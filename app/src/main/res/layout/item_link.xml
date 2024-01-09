@@ -17,7 +17,7 @@
         app:roundedCornerRadius="4dp"
         tools:placeholderImage="@drawable/ic_image_list" />
 
-    <androidx.emoji.widget.EmojiTextView
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/name_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
