@@ -48,7 +48,7 @@ internal class FileFacadeTest {
         whenever(contentUriMock.lastPathSegment).thenReturn("primary:Sync/someFolder")
         whenever(Uri.parse(contentUri)).thenReturn(contentUriMock)
         whenever(Environment.getExternalStorageDirectory()).thenReturn(
-            java.io.File("/storage/emulated/0")
+            File("/storage/emulated/0")
         )
 
         val actual = underTest.getExternalPathByContentUri(contentUri)
@@ -84,5 +84,44 @@ internal class FileFacadeTest {
         val result = underTest.getFileByPath("non/existent/path")
 
         assertThat(result).isNull()
+    }
+
+    @Test
+    fun `test that getTotalSize returns correct file size`() = runTest {
+        val expectedSize = 1000L
+        val file = mock<File> {
+            on { isFile } doReturn true
+            on { length() } doReturn expectedSize
+        }
+
+        val actualSize = underTest.getTotalSize(file)
+        assertEquals(expectedSize, actualSize)
+    }
+
+    @Test
+    fun `test that getTotalSize returns correct total size if it's a directory`() = runTest {
+        val file1 = mock<File> {
+            on { isFile } doReturn true
+            on { isDirectory } doReturn false
+            on { length() } doReturn 1000L
+        }
+        val file2 = mock<File> {
+            on { isFile } doReturn true
+            on { isDirectory } doReturn false
+            on { length() } doReturn 1500L
+        }
+        val childDir = mock<File> {
+            on { isFile } doReturn false
+            on { isDirectory } doReturn true
+            on { listFiles() } doReturn arrayOf(file1, file2)
+        }
+        val dir = mock<File> {
+            on { isFile } doReturn false
+            on { isDirectory } doReturn true
+            on { listFiles() } doReturn arrayOf(file1, file2, childDir)
+        }
+
+        val actualSize = underTest.getTotalSize(dir)
+        assertThat(actualSize).isEqualTo(5000L)
     }
 }

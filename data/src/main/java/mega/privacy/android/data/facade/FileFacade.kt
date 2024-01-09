@@ -50,22 +50,11 @@ class FileFacade @Inject constructor(
             Environment.DIRECTORY_DCIM
         )?.absolutePath ?: ""
 
-    override suspend fun getDirSize(dir: File?): Long {
-        dir ?: return -1L
-        var size = 0L
-        val files = dir.listFiles().orEmpty()
-
-        if (files.isNotEmpty()) {
-            for (file in files) {
-                size += if (file.isFile) {
-                    file.length()
-                } else {
-                    getDirSize(file)
-                }
-            }
-        }
-        Timber.d("Dir size: %s", size)
-        return size
+    override suspend fun getTotalSize(file: File?): Long {
+        file ?: return -1L
+        return file.walkTopDown()
+            .filter { it.isFile }
+            .sumOf { it.length() }
     }
 
     override fun deleteFolderAndSubFolders(folder: File?): Boolean {

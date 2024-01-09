@@ -15,7 +15,7 @@ class GetOfflineFolderSizeUseCase @Inject constructor(
     suspend operator fun invoke(): Long {
         val offlineFolder = fileSystemRepository.getOfflineFolder()
         if (offlineFolder.exists()) {
-            return fileSystemRepository.getDirSize(offlineFolder)
+            return fileSystemRepository.getTotalSize(offlineFolder)
         }
         return 0
     }

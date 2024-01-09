@@ -379,8 +379,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun getOfflineFolder(): File =
         withContext(ioDispatcher) { fileGateway.getOfflineFolder() }
 
-    override suspend fun getDirSize(dir: File?): Long =
-        withContext(ioDispatcher) { fileGateway.getDirSize(dir) }
+    override suspend fun getTotalSize(file: File?): Long =
+        withContext(ioDispatcher) { fileGateway.getTotalSize(file) }
 
     override suspend fun checkFileExistsByUriPath(uriPath: String?): String? =
         withContext(ioDispatcher) {

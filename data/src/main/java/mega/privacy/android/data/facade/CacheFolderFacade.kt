@@ -1,14 +1,12 @@
 package mega.privacy.android.data.facade
 
 import android.content.Context
-import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -90,7 +88,7 @@ internal class CacheFolderFacade @Inject constructor(
         cacheIntDir?.let {
             Timber.d("Path to check internal: ${it.absolutePath}")
         }
-        fileGateway.getDirSize(cacheIntDir).plus(fileGateway.getDirSize(cacheExtDir))
+        fileGateway.getTotalSize(cacheIntDir).plus(fileGateway.getTotalSize(cacheExtDir))
     }
 
     override suspend fun clearCache() {

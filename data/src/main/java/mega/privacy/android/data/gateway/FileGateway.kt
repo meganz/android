@@ -20,9 +20,9 @@ interface FileGateway {
     /**
      * Get dir size
      *
-     * @return total size of dir in bytes
+     * @return total size of file or dir in bytes
      */
-    suspend fun getDirSize(dir: File?): Long
+    suspend fun getTotalSize(file: File?): Long
 
     /**
      * Delete folder and sub folders

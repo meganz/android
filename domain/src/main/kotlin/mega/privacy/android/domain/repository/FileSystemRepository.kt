@@ -274,9 +274,9 @@ interface FileSystemRepository {
     suspend fun getOfflineFolder(): File
 
     /**
-     * Get dir size
+     * Get size of file or dir in bytes
      */
-    suspend fun getDirSize(dir: File?): Long
+    suspend fun getTotalSize(file: File?): Long
 
     /**
      * Check if file is exists
