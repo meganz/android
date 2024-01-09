@@ -27,7 +27,6 @@ internal class AppEventFacade @Inject constructor(
     @ApplicationScope private val appScope: CoroutineScope,
 ) : AppEventGateway {
 
-    private val _monitorCameraUploadProgress = MutableSharedFlow<Pair<Int, Int>>()
     private val cameraUploadsFolderDestinationUpdate =
         MutableSharedFlow<CameraUploadsFolderDestinationUpdate>()
     private val _transferOverQuota = MutableSharedFlow<Boolean>()
@@ -64,9 +63,6 @@ internal class AppEventFacade @Inject constructor(
 
     override val monitorCookieSettings: Flow<Set<CookieType>> = _cookieSettings.asSharedFlow()
 
-    override val monitorCameraUploadProgress =
-        _monitorCameraUploadProgress.toSharedFlow(appScope)
-
     override val monitorCompletedTransfer =
         _monitorCompletedTransfer.toSharedFlow(appScope)
 
@@ -76,10 +72,6 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>) {
         _cookieSettings.emit(enabledCookieSettings)
-    }
-
-    override suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int) {
-        _monitorCameraUploadProgress.emit(Pair(progress, pending))
     }
 
     override suspend fun setSMSVerificationShown(isShown: Boolean) {

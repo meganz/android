@@ -10,7 +10,6 @@ import mega.privacy.android.app.utils.wrapper.CameraEnumeratorWrapper
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
-import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
@@ -20,7 +19,6 @@ import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
-import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
@@ -72,12 +70,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideCreateCameraUploadFolder() = mock<CreateCameraUploadFolder>()
-
-    @Provides
-    fun provideBroadcastCameraUploadProgress() = mock<BroadcastCameraUploadProgress>()
-
-    @Provides
-    fun provideMonitorCameraUploadsProgress() = mock<MonitorCameraUploadProgress>()
 
     @Provides
     fun provideNotificationHelper() = mock<CameraUploadsNotificationManagerWrapper>()

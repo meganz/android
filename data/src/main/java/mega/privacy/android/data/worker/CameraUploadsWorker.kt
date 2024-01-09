@@ -71,7 +71,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
-import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
@@ -167,7 +166,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
     private val createCameraUploadTemporaryRootDirectoryUseCase: CreateCameraUploadTemporaryRootDirectoryUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
-    private val broadcastCameraUploadProgress: BroadcastCameraUploadProgress,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val updateCameraUploadsBackupStatesUseCase: UpdateCameraUploadsBackupStatesUseCase,
     private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase,
@@ -1215,7 +1213,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun cleanResources() {
         cancelJobs()
         deleteTempCacheFile()
-        broadcastProgress(100, 0)
     }
 
     private suspend fun cancelJobs() {
@@ -1349,16 +1346,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         displayUploadProgress()
     }
 
-    /**
-     * Broadcast progress
-     *
-     * @param progress a value between 0 and 100
-     * @param pending count of items pending to be uploaded
-     */
-    private suspend fun broadcastProgress(progress: Int, pending: Int) {
-        broadcastCameraUploadProgress(progress, pending)
-    }
-
     private suspend fun canCompressVideo(queueSize: Long): Boolean =
         (isChargingUseCase() || !isChargingRequired(queueSize)).also {
             if (!it) Timber.d("Charging required for video compression of $queueSize MB")
@@ -1389,7 +1376,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                             "progress: $progressPercent"
                 )
                 if (totalToUpload > 0) {
-                    broadcastProgress(progressPercent, pendingToUpload)
                     showUploadProgress(
                         totalUploaded,
                         totalToUpload,

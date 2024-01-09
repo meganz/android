@@ -66,7 +66,6 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
-import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
@@ -129,7 +128,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -186,7 +184,6 @@ class CameraUploadsWorkerTest {
         mock()
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase =
         mock()
-    private val broadcastCameraUploadProgress: BroadcastCameraUploadProgress = mock()
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase = mock()
 
     private val updateCameraUploadsBackupStatesUseCase: UpdateCameraUploadsBackupStatesUseCase =
@@ -292,7 +289,6 @@ class CameraUploadsWorkerTest {
                 disableMediaUploadSettings = disableMediaUploadSettings,
                 createCameraUploadTemporaryRootDirectoryUseCase = createCameraUploadTemporaryRootDirectoryUseCase,
                 deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
-                broadcastCameraUploadProgress = broadcastCameraUploadProgress,
                 scheduleCameraUploadUseCase = scheduleCameraUploadUseCase,
                 updateCameraUploadsBackupStatesUseCase = updateCameraUploadsBackupStatesUseCase,
                 sendBackupHeartBeatSyncUseCase = sendBackupHeartBeatSyncUseCase,
@@ -607,12 +603,8 @@ class CameraUploadsWorkerTest {
             )
             underTest.doWork()
             verify(underTest).setProgress(afterToUploadEventData)
-            verify(broadcastCameraUploadProgress).invoke(0, 1)
             verify(underTest).setProgress(afterTransferUpdateEventData)
-            verify(broadcastCameraUploadProgress).invoke(50, 1)
             verify(underTest).setProgress(afterUploadedEventData)
-            // 1 for the uploaded event, 1 to clean up the worker process
-            verify(broadcastCameraUploadProgress, times(2)).invoke(100, 0)
         }
 
     @Test
@@ -759,10 +751,7 @@ class CameraUploadsWorkerTest {
             )
             underTest.doWork()
             verify(underTest).setProgress(afterToCopyEventData)
-            verify(broadcastCameraUploadProgress).invoke(0, 1)
             verify(underTest).setProgress(afterCopiedEventData)
-            // 1 for the copied event, 1 to clean up the worker process
-            verify(broadcastCameraUploadProgress, times(2)).invoke(100, 0)
         }
 
     @Test
@@ -1381,14 +1370,6 @@ class CameraUploadsWorkerTest {
             val result = underTest.doWork()
             verify(cancelAllUploadTransfersUseCase).invoke()
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
-        }
-
-    @Test
-    fun `test that the termination progress status is sent when the worker complete with success`() =
-        runTest {
-            val result = underTest.doWork()
-            verify(broadcastCameraUploadProgress).invoke(100, 0)
-            assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
 
     @Test

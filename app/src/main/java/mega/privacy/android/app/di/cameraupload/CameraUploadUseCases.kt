@@ -11,7 +11,6 @@ import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
@@ -27,7 +26,6 @@ import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
-import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
@@ -60,20 +58,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideClearCacheDirectory(cameraUploadRepository: CameraUploadRepository): ClearCacheDirectory =
             ClearCacheDirectory(cameraUploadRepository::clearCacheDirectory)
-
-        /**
-         * Provide the [MonitorCameraUploadProgress] implementation
-         */
-        @Provides
-        fun provideMonitorCameraUploadProgress(cameraUploadRepository: CameraUploadRepository): MonitorCameraUploadProgress =
-            MonitorCameraUploadProgress(cameraUploadRepository::monitorCameraUploadProgress)
-
-        /**
-         * Provide the [BroadcastCameraUploadProgress] implementation
-         */
-        @Provides
-        fun provideBroadcastCameraUploadProgress(cameraUploadRepository: CameraUploadRepository): BroadcastCameraUploadProgress =
-            BroadcastCameraUploadProgress(cameraUploadRepository::broadcastCameraUploadProgress)
 
         /**
          * Provide the [MonitorBatteryInfo] implementation

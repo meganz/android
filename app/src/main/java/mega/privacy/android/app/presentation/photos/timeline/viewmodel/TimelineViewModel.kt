@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,6 +39,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -45,10 +48,10 @@ import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
@@ -102,7 +105,7 @@ class TimelineViewModel @Inject constructor(
     private val timelinePreferencesMapper: TimelinePreferencesMapper,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
-    monitorCameraUploadProgress: MonitorCameraUploadProgress,
+    monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
 ) : ViewModel() {
 
     internal val _state = MutableStateFlow(TimelineViewState(loadPhotosDone = false))
@@ -120,9 +123,24 @@ class TimelineViewModel @Inject constructor(
                 }.collectLatest(::handlePhotos)
         }
         viewModelScope.launch {
-            monitorCameraUploadProgress().collectLatest {
-                updateCameraUploadProgressIfNeeded(progress = it.first, pending = it.second)
-            }
+            monitorCameraUploadsStatusInfoUseCase()
+                .filter { it is CameraUploadsStatusInfo.Progress || it is CameraUploadsStatusInfo.Finished }
+                .collect {
+                    when (it) {
+                        is CameraUploadsStatusInfo.Progress -> {
+                            updateCameraUploadProgressIfNeeded(
+                                progress = it.progress,
+                                pending = it.totalToUpload - it.totalUploaded,
+                            )
+                        }
+
+                        is CameraUploadsStatusInfo.Finished -> {
+                            updateCameraUploadProgressIfNeeded(progress = 100, pending = 0)
+                        }
+
+                        else -> Unit
+                    }
+                }
         }
     }
 
@@ -167,7 +185,7 @@ class TimelineViewModel @Inject constructor(
      * @param progress value between 0 and 100
      * @param pending count of pending items to be uploaded
      */
-    fun updateCameraUploadProgressIfNeeded(progress: Int, pending: Int) {
+    private fun updateCameraUploadProgressIfNeeded(progress: Int, pending: Int) {
         if (state.value.selectedPhotoCount > 0 || !isInAllView()) {
             setShowProgressBar(show = false)
         } else {

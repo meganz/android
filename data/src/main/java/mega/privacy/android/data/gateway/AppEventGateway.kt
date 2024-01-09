@@ -13,16 +13,6 @@ import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 internal interface AppEventGateway {
 
     /**
-     * Monitor camera upload progress
-     *
-     * The value returned is a Pair of
-     *
-     * [Int] value representing progress between 0 and 100;
-     * [Int] value representing pending elements waiting for upload
-     */
-    val monitorCameraUploadProgress: Flow<Pair<Int, Int>>
-
-    /**
      * Monitor completed transfer
      */
     val monitorCompletedTransfer: Flow<CompletedTransfer>
@@ -40,15 +30,6 @@ internal interface AppEventGateway {
      * @param enabledCookieSettings set of enabled cookies of [CookieType]
      */
     suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>)
-
-    /**
-     * Broadcast camera upload progress
-     *
-     * @param progress represents progress between 0 and 100
-     * @param pending represents elements waiting for upload
-     */
-    suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int)
-
 
     /**
      * Set the status for SMSVerification

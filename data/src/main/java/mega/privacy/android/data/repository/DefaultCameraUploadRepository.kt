@@ -352,12 +352,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         megaApiGateway.base64ToHandle(base64)
     }
 
-    override fun monitorCameraUploadProgress(): Flow<Pair<Int, Int>> =
-        appEventGateway.monitorCameraUploadProgress
-
-    override suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int) =
-        appEventGateway.broadcastCameraUploadProgress(progress, pending)
-
     override fun monitorCameraUploadsFolderDestination(): Flow<CameraUploadsFolderDestinationUpdate> =
         appEventGateway.monitorCameraUploadsFolderDestination()
 

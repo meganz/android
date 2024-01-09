@@ -623,34 +623,6 @@ class DefaultCameraUploadRepositoryTest {
         }
 
         @Test
-        fun `test that the app event gateway is notified of the camera uploads progress`() {
-            runTest {
-                val expected = Pair(50, 25)
-
-                underTest.broadcastCameraUploadProgress(
-                    progress = expected.first,
-                    pending = expected.second,
-                )
-                verify(appEventGateway).broadcastCameraUploadProgress(
-                    progress = expected.first,
-                    pending = expected.second,
-                )
-            }
-        }
-
-        @Test
-        fun `test that the camera uploads progress is being observed`() {
-            runTest {
-                val progress1 = Pair(50, 25)
-                val progress2 = Pair(51, 24)
-                val expected = flowOf(progress1, progress2)
-
-                whenever(appEventGateway.monitorCameraUploadProgress).thenReturn(expected)
-                assertThat(underTest.monitorCameraUploadProgress()).isEqualTo(expected)
-            }
-        }
-
-        @Test
         fun `test that the camera uploads status info is being observed`() {
             runTest {
                 val progress = mock<Data> {
