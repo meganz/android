@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.CallParticipantData
+import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallStatus
 
 /**
  * Chat participant.
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.entity.meeting.CallParticipantData
  * @property avatarUpdateTimestamp      Timestamp for last avatar file update
  * @property privilegesUpdated          Check if privilege are updated.
  * @property isContact                  True, if it's my contact. False, if not.
+ * @property callStatus                 [MeetingParticipantNotInCallStatus]
  */
 data class ChatParticipant(
     val handle: Long,
@@ -36,4 +38,5 @@ data class ChatParticipant(
     val privilegesUpdated: Boolean = false,
     val callParticipantData: CallParticipantData = CallParticipantData(),
     val isContact: Boolean = false,
+    var callStatus: MeetingParticipantNotInCallStatus = MeetingParticipantNotInCallStatus.NotInCall,
 )

@@ -67,6 +67,7 @@ fun ParticipantsBottomPanelView(
     onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
     onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
+    onRingParticipantClicked: (ChatParticipant) -> Unit = {},
 ) {
 
     val listState = rememberLazyListState()
@@ -298,7 +299,8 @@ fun ParticipantsBottomPanelView(
                                             participant = state.chatParticipantsNotInCall[i],
                                             onAdmitParticipantClicked = onAdmitParticipantClicked,
                                             onDenyParticipantClicked = onDenyParticipantClicked,
-                                            onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
+                                            onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked,
+                                            onRingParticipantClicked = onRingParticipantClicked
                                         )
                                     }
                                 }

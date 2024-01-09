@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +38,7 @@ import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
+import mega.privacy.android.app.extensions.updateItemAt
 
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
@@ -73,6 +75,7 @@ import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
+import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
@@ -103,6 +106,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.RingIndividualInACallUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
@@ -113,6 +117,7 @@ import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -154,6 +159,7 @@ import javax.inject.Inject
  * @property getMyFullNameUseCase                           [GetMyFullNameUseCase]
  * @property deviceGateway                                  [DeviceGateway]
  * @property monitorUserUpdates                             [MonitorUserUpdates]
+ * @property ringIndividualInACallUseCase                   [RingIndividualInACallUseCase]
  * @property state                                          Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -195,6 +201,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorUserUpdates: MonitorUserUpdates,
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
     private val deviceGateway: DeviceGateway,
+    private val ringIndividualInACallUseCase: RingIndividualInACallUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -1584,7 +1591,7 @@ class MeetingActivityViewModel @Inject constructor(
     private fun checkParticipantLists() {
         val chatParticipantsInWaitingRoom = mutableListOf<ChatParticipant>()
         val chatParticipantsInCall = mutableListOf<ChatParticipant>()
-        val chatParticipantsNotInCall = mutableListOf<ChatParticipant>()
+        val chatParticipantsNotInCall = state.value.chatParticipantsNotInCall.toMutableList()
 
         state.value.chatParticipantList.forEach { chatParticipant ->
             var participantAdded = false
@@ -1598,10 +1605,12 @@ class MeetingActivityViewModel @Inject constructor(
                     chatParticipantsInCall.add(chatParticipantMapper(participant, chatParticipant))
                 }
 
-            if (!participantAdded) {
-                chatParticipantsNotInCall.add(chatParticipant)
-
-            }
+            chatParticipantsNotInCall.find { it.handle == chatParticipant.handle }
+                ?.let { participant ->
+                    if (participantAdded) {
+                        chatParticipantsNotInCall.remove(participant)
+                    }
+                } ?: run { if (!participantAdded) chatParticipantsNotInCall.add(chatParticipant) }
         }
 
         _state.update { state ->
@@ -1825,7 +1834,49 @@ class MeetingActivityViewModel @Inject constructor(
             broadcastCallRecordingConsentEventUseCase(isRecordingConsentAccepted)
         }
 
+    /**
+     * Ring a participant in chatroom with an ongoing call that they didn't pick up
+     *
+     * @param userId   The chat participant ID
+     */
+    fun ringParticipant(userId: Long) = viewModelScope.launch {
+        runCatching {
+            ringIndividualInACallUseCase(chatId = state.value.chatId, userId = userId)
+        }.onSuccess {
+            updateNotInCallParticipantStatus(userId, MeetingParticipantNotInCallStatus.Calling)
+            delay(TimeUnit.SECONDS.toMillis(DEFAULT_RING_TIMEOUT_SECONDS))
+            updateNotInCallParticipantStatus(userId, MeetingParticipantNotInCallStatus.NoResponse)
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
+
+    /**
+     * Update the status of a not in call participant
+     *
+     * @param userId    The not in call participant ID
+     * @param status    New [MeetingParticipantNotInCallStatus]
+     */
+    private fun updateNotInCallParticipantStatus(
+        userId: Long,
+        status: MeetingParticipantNotInCallStatus,
+    ) {
+        val index = state.value.chatParticipantsNotInCall.indexOfFirst { it.handle == userId }
+        if (index != INVALID_POSITION) {
+            val updatedParticipant =
+                state.value.chatParticipantsNotInCall[index].copy(callStatus = status)
+            val updatedList = state.value.chatParticipantsNotInCall.updateItemAt(
+                index, updatedParticipant
+            )
+            _state.update {
+                it.copy(chatParticipantsNotInCall = updatedList)
+            }
+        }
+    }
+
     companion object {
         private const val INVALID_CHAT_HANDLE = -1L
+        private const val INVALID_POSITION = -1
+        private const val DEFAULT_RING_TIMEOUT_SECONDS = 40L
     }
 }
