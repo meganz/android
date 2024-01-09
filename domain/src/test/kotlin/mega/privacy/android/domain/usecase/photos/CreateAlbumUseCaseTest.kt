@@ -41,6 +41,7 @@ class CreateAlbumUseCaseTest {
     private fun createUserSet(
         id: Long = 1L,
         name: String = "NewAlbum",
+        type: Int = 0,
         cover: Long = 10L,
         creationTime: Long = 2L,
         modificationTime: Long = 2L,
@@ -49,6 +50,8 @@ class CreateAlbumUseCaseTest {
         override val id: Long = id
 
         override val name: String = name
+
+        override val type: Int = type
 
         override val cover: Long = cover
 

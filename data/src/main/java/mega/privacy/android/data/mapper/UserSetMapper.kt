@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.set.UserSet
 typealias UserSetMapper = (
     @JvmSuppressWildcards Long,
     @JvmSuppressWildcards String,
+    @JvmSuppressWildcards Int,
     @JvmSuppressWildcards Long?,
     @JvmSuppressWildcards Long,
     @JvmSuppressWildcards Long,
@@ -17,6 +18,7 @@ typealias UserSetMapper = (
 internal fun toUserSet(
     id: Long,
     name: String,
+    type: Int,
     cover: Long?,
     creationTime: Long,
     modificationTime: Long,
@@ -25,6 +27,8 @@ internal fun toUserSet(
     override val id: Long = id
 
     override val name: String = name
+
+    override val type: Int = type
 
     override val cover: Long? = cover
 

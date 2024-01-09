@@ -52,6 +52,7 @@ class DefaultGetUserAlbumsTest {
     private fun createUserSet(
         id: Long = 0L,
         name: String = "",
+        type: Int = 0,
         cover: Long? = null,
         creationTime: Long = 0L,
         modificationTime: Long = 0L,
@@ -60,6 +61,8 @@ class DefaultGetUserAlbumsTest {
         override val id: Long = id
 
         override val name: String = name
+
+        override val type: Int = type
 
         override val cover: Long? = cover
 

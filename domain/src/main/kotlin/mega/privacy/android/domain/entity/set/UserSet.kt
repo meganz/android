@@ -16,6 +16,11 @@ interface UserSet {
     val name: String
 
     /**
+     * The Set type
+     */
+    val type: Int
+
+    /**
      * The Set cover
      */
     val cover: Long?

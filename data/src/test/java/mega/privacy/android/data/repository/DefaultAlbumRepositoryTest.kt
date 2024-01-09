@@ -71,6 +71,7 @@ class DefaultAlbumRepositoryTest {
         val userSet = createUserSet(
             testMegaSet.id(),
             testMegaSet.name(),
+            MegaSet.SET_TYPE_ALBUM,
             null,
             testMegaSet.cts(),
             testMegaSet.ts(),
@@ -185,17 +186,23 @@ class DefaultAlbumRepositoryTest {
     @Test
     fun `test that getUserSets returns a the correct number of values if multiple sets exist`() =
         runTest {
-            val expectedId = 1L
-            val expectedName = "Album 1"
-            val expectedSize = 5
+            val expectedId0 = 0L
+            val expectedId1 = 1L
+            val expectedName = "Album"
+            val expectedSize = 2
 
-            val megaSet = mock<MegaSet> {
-                on { id() }.thenReturn(expectedId)
+            val megaSet0 = mock<MegaSet> {
+                on { id() }.thenReturn(expectedId0)
+                on { name() }.thenReturn(expectedName)
+            }
+            val megaSet1 = mock<MegaSet> {
+                on { id() }.thenReturn(expectedId1)
                 on { name() }.thenReturn(expectedName)
             }
             val megaSetList = mock<MegaSetList> {
                 on { size() }.thenReturn(expectedSize.toLong())
-                on { get(any()) }.thenReturn(megaSet)
+                on { get(0) }.thenReturn(megaSet0)
+                on { get(1) }.thenReturn(megaSet1)
             }
             whenever(megaApiGateway.getSets()).thenReturn(megaSetList)
 
@@ -238,6 +245,7 @@ class DefaultAlbumRepositoryTest {
             createUserSet(
                 id = it,
                 name = "Album $it",
+                type = MegaSet.SET_TYPE_ALBUM,
                 cover = -1L,
                 creationTime = it,
                 modificationTime = it,
@@ -299,6 +307,7 @@ class DefaultAlbumRepositoryTest {
         val expectedUserSet = createUserSet(
             id = 1L,
             name = "Album 1",
+            type = MegaSet.SET_TYPE_ALBUM,
             cover = null,
             creationTime = 0L,
             modificationTime = 0L,
@@ -555,6 +564,7 @@ class DefaultAlbumRepositoryTest {
     private fun createUserSet(
         id: Long,
         name: String,
+        type: Int,
         cover: Long?,
         creationTime: Long,
         modificationTime: Long,
@@ -563,6 +573,8 @@ class DefaultAlbumRepositoryTest {
         override val id: Long = id
 
         override val name: String = name
+
+        override val type: Int = type
 
         override val cover: Long? = cover
 
