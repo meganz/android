@@ -2,9 +2,12 @@ package mega.privacy.android.app.presentation.imagepreview.menu
 
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.usecase.HasCredentials
 import javax.inject.Inject
 
-internal class FolderLinkImagePreviewMenu @Inject constructor() : ImagePreviewMenu {
+internal class FolderLinkImagePreviewMenu @Inject constructor(
+    private val hasCredentials: HasCredentials,
+) : ImagePreviewMenu {
     override suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {
         return false
     }
@@ -38,7 +41,7 @@ internal class FolderLinkImagePreviewMenu @Inject constructor() : ImagePreviewMe
     }
 
     override suspend fun isImportMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return hasCredentials()
     }
 
     override suspend fun isGetLinkMenuVisible(imageNode: ImageNode): Boolean {
