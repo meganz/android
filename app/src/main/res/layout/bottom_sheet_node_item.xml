@@ -32,6 +32,7 @@
             android:layout_marginHorizontal="12dp"
             android:layout_marginTop="4dp"
             android:ellipsize="middle"
+            android:maxLines="1"
             android:textAlignment="textStart"
             app:layout_constraintEnd_toStartOf="@+id/permissions_icon"
             app:layout_constraintHorizontal_bias="0.0"
