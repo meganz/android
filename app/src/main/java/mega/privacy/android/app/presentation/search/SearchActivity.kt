@@ -5,18 +5,15 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,14 +24,10 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
-import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
-import mega.privacy.android.app.presentation.node.view.NodeOptionsBottomSheet
 import mega.privacy.android.app.presentation.search.model.SearchFilter
-import mega.privacy.android.app.presentation.search.view.SearchComposeView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.domain.entity.ThemeMode
@@ -114,66 +107,26 @@ class SearchActivity : AppCompatActivity() {
     /**
      * onCreate
      */
-    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            val uiState by viewModel.state.collectAsStateWithLifecycle()
-            val modalSheetState = rememberModalBottomSheetState(
-                initialValue = ModalBottomSheetValue.Hidden,
-            )
-            var selectedNode: NodeUIItem<TypedNode>? by remember {
-                mutableStateOf(null)
-            }
-            val coroutineScope = rememberCoroutineScope()
-            BackHandler(enabled = modalSheetState.isVisible) {
-                selectedNode = null
-                coroutineScope.launch {
-                    modalSheetState.hide()
-                }
-            }
-            MegaAppTheme(isDark = themeMode.isDarkMode()) {
-                SearchComposeView(
-                    state = uiState,
-                    sortOrder = getString(
-                        SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
-                            ?: R.string.sortby_name
-                    ),
-                    onItemClick = viewModel::onItemClicked,
-                    onLongClick = viewModel::onLongItemClicked,
-                    onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
-                    onSortOrderClick = {
-                        showSortOrderBottomSheet()
-                    },
-                    onMenuClick = {
-                        hideKeyboard()
-                        selectedNode = it
-                        coroutineScope.launch {
-                            modalSheetState.show()
-                        }
-                    },
-                    onDisputeTakeDownClicked = ::navigateToLink,
-                    onLinkClicked = ::navigateToLink,
-                    onErrorShown = viewModel::errorMessageShown,
-                    updateFilter = viewModel::updateFilter,
-                    trackAnalytics = ::trackAnalytics,
-                    updateSearchQuery = viewModel::updateSearchQuery,
-                )
-                handleClick(uiState.lastSelectedNode)
 
-                selectedNode?.let {
-                    NodeOptionsBottomSheet(
-                        modalSheetState = modalSheetState,
-                        node = it.node,
-                        handler = NodeBottomSheetActionHandler(this),
-                    ) {
-                        selectedNode = null
-                        coroutineScope.launch {
-                            modalSheetState.hide()
-                        }
-                    }
+            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    scaffoldState = rememberScaffoldState(),
+                ) { padding ->
+                    SearchNavHostController(
+                        modifier = Modifier.padding(padding),
+                        viewModel = viewModel,
+                        handleClick = ::handleClick,
+                        navigateToLink = ::navigateToLink,
+                        showSortOrderBottomSheet = ::showSortOrderBottomSheet,
+                        trackAnalytics = ::trackAnalytics,
+                        nodeBottomSheetActionHandler = NodeBottomSheetActionHandler(this),
+                    )
                 }
             }
         }
@@ -197,7 +150,7 @@ class SearchActivity : AppCompatActivity() {
      */
     private fun navigateToLink(link: String) {
         val uriUrl = Uri.parse(link)
-        val launchBrowser = Intent(this@SearchActivity, WebViewActivity::class.java)
+        val launchBrowser = Intent(this, WebViewActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             .setData(uriUrl)
         startActivity(launchBrowser)

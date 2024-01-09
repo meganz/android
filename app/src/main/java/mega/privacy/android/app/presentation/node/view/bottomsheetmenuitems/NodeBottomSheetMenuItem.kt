@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -11,7 +12,7 @@ import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 /**
  * Bottom sheet click handler
  */
-typealias BottomSheetClickHandler = @Composable (onDismiss: () -> Unit, actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit) -> Unit
+typealias BottomSheetClickHandler = @Composable (onDismiss: () -> Unit, actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit, navController: NavHostController) -> Unit
 
 /**
  * Node bottom sheet menu item
@@ -24,7 +25,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
     fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler ->
+        { onDismiss, handler, navController ->
             MenuActionListTile(
                 text = menuAction.getDescription(),
                 icon = menuAction.getIconPainter(),
@@ -34,6 +35,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
                     node = selectedNode,
                     onDismiss = onDismiss,
                     actionHandler = handler,
+                    navController = navController,
                 ),
             )
         }
@@ -60,6 +62,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
+        navController: NavHostController,
     ): () -> Unit = {
         actionHandler(menuAction, node)
         onDismiss()

@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
@@ -40,8 +41,9 @@ internal fun NodeOptionsBottomSheet(
     modalSheetState: ModalBottomSheetState,
     node: TypedNode,
     handler: NodeBottomSheetActionHandler,
-    viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
+    navHostController: NavHostController,
     onDismiss: () -> Unit,
+    viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -73,7 +75,7 @@ internal fun NodeOptionsBottomSheet(
                     .values
                     .forEachIndexed { index, actions ->
                         items(actions) { item: BottomSheetMenuItem ->
-                            item.control(onDismiss, handler::handleAction)
+                            item.control(onDismiss, handler::handleAction, navHostController)
                         }
 
                         if (index < state.actions.size - 1 && index != groups.size - 1) {

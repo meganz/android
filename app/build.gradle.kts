@@ -361,6 +361,7 @@ dependencies {
     implementation(google.accompanist.flowlayout)
     implementation(google.accompanist.placeholder)
     implementation(google.accompanist.permissions)
+    implementation(google.accompanist.navigationmaterial)
     implementation(google.accompanist.navigationanimation)
     implementation(google.accompanist.systemui)
 

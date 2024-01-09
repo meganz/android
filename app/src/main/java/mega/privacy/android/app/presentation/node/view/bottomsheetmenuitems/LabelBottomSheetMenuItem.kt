@@ -26,17 +26,17 @@ class LabelBottomSheetMenuItem @Inject constructor(
     override fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler ->
-            val onClick = getOnClickFunction(
-                node = selectedNode,
-                onDismiss = onDismiss,
-                actionHandler = handler,
-            )
+        { onDismiss, handler, navController ->
             MenuActionListTile(
                 text = menuAction.getDescription(),
                 icon = menuAction.getIconPainter(),
                 isDestructive = isDestructiveAction,
-                onActionClicked = onClick,
+                onActionClicked = getOnClickFunction(
+                    node = selectedNode,
+                    onDismiss = onDismiss,
+                    actionHandler = handler,
+                    navController = navController,
+                ),
                 addSeparator = false,
                 trailingItem = {
                     val nodeLabel = nodeLabelMapper(selectedNode.label)

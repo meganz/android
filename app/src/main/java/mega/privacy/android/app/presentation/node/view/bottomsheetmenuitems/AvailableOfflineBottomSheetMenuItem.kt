@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOfflineMenuAction
@@ -30,11 +31,12 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
     override fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler ->
+        { onDismiss, handler, navController ->
             val onClick = getOnClickFunction(
                 node = selectedNode,
                 onDismiss = onDismiss,
                 actionHandler = handler,
+                navController = navController,
             )
             MenuActionListTile(
                 text = menuAction.getDescription(),
@@ -63,6 +65,7 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
+        navController: NavHostController,
     ): () -> Unit = {
         onDismiss()
         if (node.isAvailableOffline) {
