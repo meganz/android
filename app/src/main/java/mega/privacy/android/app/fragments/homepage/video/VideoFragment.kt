@@ -20,7 +20,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.R as CoreUiR
-import androidx.media3.common.util.UnstableApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -77,7 +76,6 @@ import javax.inject.Inject
 /**
  * [Fragment] that handles Video-related operations
  */
-@UnstableApi
 @AndroidEntryPoint
 class VideoFragment : Fragment(), HomepageSearchable {
 

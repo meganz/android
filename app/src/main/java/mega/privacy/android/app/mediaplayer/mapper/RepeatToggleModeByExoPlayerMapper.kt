@@ -1,6 +1,6 @@
 package mega.privacy.android.app.mediaplayer.mapper
 
-import androidx.media3.common.Player
+import com.google.android.exoplayer2.Player
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import javax.inject.Inject
 

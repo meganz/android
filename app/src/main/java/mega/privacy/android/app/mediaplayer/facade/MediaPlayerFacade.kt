@@ -8,25 +8,24 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MimeTypes
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.PlaybackParameters
-import androidx.media3.common.Player
-import androidx.media3.common.Player.STATE_ENDED
-import androidx.media3.common.Player.STATE_IDLE
-import androidx.media3.common.VideoSize
-import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
-import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.DefaultRenderersFactory
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.ShuffleOrder
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.exoplayer.util.EventLogger
-import androidx.media3.ui.PlayerNotificationManager
-import androidx.media3.ui.PlayerView
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.DefaultRenderersFactory
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.PlaybackParameters
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Player.STATE_ENDED
+import com.google.android.exoplayer2.Player.STATE_IDLE
+import com.google.android.exoplayer2.source.ShuffleOrder
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.google.android.exoplayer2.util.EventLogger
+import com.google.android.exoplayer2.util.MimeTypes
+import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
+import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
+import com.google.android.exoplayer2.video.VideoSize
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.flowOf
@@ -48,7 +47,6 @@ import javax.inject.Inject
 /**
  * The implementation of MediaPlayerGateway
  */
-@UnstableApi
 class MediaPlayerFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     private val crashReporter: CrashReporter,
@@ -342,7 +340,7 @@ class MediaPlayerFacade @Inject constructor(
     override fun getPlaybackState() = player?.playbackState
 
     override fun setupPlayerView(
-        playerView: PlayerView,
+        playerView: StyledPlayerView,
         useController: Boolean,
         controllerShowTimeoutMs: Int,
         controllerHideOnTouch: Boolean,

@@ -4,14 +4,8 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.DefaultLoadControl
-import androidx.media3.exoplayer.DefaultRenderersFactory
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -48,7 +42,6 @@ import javax.inject.Inject
 /**
  * ViewModel for track (audio node) info UI logic.
  */
-@UnstableApi
 @HiltViewModel
 class TrackInfoViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,

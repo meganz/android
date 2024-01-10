@@ -25,14 +25,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
-import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -72,7 +71,6 @@ import javax.inject.Inject
 /**
  * The Fragment for the video player
  */
-@UnstableApi
 @AndroidEntryPoint
 class VideoPlayerFragment : Fragment() {
     /**
@@ -96,7 +94,7 @@ class VideoPlayerFragment : Fragment() {
 
     private var delayHideToolbarCanceled = false
 
-    private var videoPlayerView: PlayerView? = null
+    private var videoPlayerView: StyledPlayerView? = null
 
     private var toolbarVisible = false
 
@@ -496,7 +494,7 @@ class VideoPlayerFragment : Fragment() {
     }
 
     private fun setupPlayerView(
-        playerView: PlayerView,
+        playerView: StyledPlayerView,
     ) {
         mediaPlayerGateway.setupPlayerView(
             playerView = playerView,

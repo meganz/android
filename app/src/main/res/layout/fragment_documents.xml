@@ -65,7 +65,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             tools:ignore="ContentDescription" />
 
-        <androidx.media3.ui.PlayerView
+        <com.google.android.exoplayer2.ui.StyledPlayerView
             android:id="@+id/mini_audio_player"
             android:layout_width="0dp"
             android:layout_height="@dimen/audio_player_mini_controller_height"

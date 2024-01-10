@@ -353,8 +353,8 @@ dependencies {
     // Google
     implementation(google.gson)
     implementation(google.material)
-    implementation(google.media3.exoplayer)
-    implementation(google.media3.ui)
+    implementation(google.exoplayer.core)
+    implementation(google.exoplayer.ui)
     implementation(google.flexbox)
     implementation(google.zxing)
     implementation(google.accompanist.pager)

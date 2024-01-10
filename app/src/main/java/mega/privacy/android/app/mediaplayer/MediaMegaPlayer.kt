@@ -1,9 +1,8 @@
 package mega.privacy.android.app.mediaplayer
 
-import androidx.media3.common.ForwardingPlayer
-import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.ForwardingPlayer
+import com.google.android.exoplayer2.Player
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -12,7 +11,6 @@ import mega.privacy.android.app.utils.CallUtil
 /**
  * Player which customized some behaviours in relation to the app needs.
  */
-@UnstableApi
 class MediaMegaPlayer(player: ExoPlayer) : ForwardingPlayer(player) {
 
     /**

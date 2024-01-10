@@ -209,7 +209,7 @@
                 app:layout_constraintTop_toTopOf="@id/exo_position"
                 tools:text="04:30" />
 
-            <androidx.media3.ui.DefaultTimeBar
+            <com.google.android.exoplayer2.ui.DefaultTimeBar
                 android:id="@id/exo_progress"
                 style="@style/Widget.Mega.TimeBar"
                 android:layout_width="0dp"

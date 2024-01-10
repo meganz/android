@@ -63,7 +63,6 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.core.R as CoreUiR
-import androidx.media3.common.util.UnstableApi
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -74,7 +73,6 @@ import javax.inject.Inject
 /**
  * [Fragment] that handles Documents-related operations
  */
-@UnstableApi
 @AndroidEntryPoint
 class DocumentsFragment : Fragment(), HomepageSearchable {
 

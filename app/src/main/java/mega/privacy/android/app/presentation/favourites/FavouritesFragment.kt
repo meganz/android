@@ -16,7 +16,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -71,7 +70,6 @@ import javax.inject.Inject
 /**
  * The Fragment for favourites
  */
-@UnstableApi
 @AndroidEntryPoint
 class FavouritesFragment : Fragment(), HomepageSearchable {
     private val viewModel by viewModels<FavouritesViewModel>()
@@ -88,7 +86,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
-
     /**
      * Used to access Open File functions
      */
@@ -127,7 +124,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         listLayoutManager = LinearLayoutManager(requireContext())
         setupAdapter()
 
-        binding.fastscroll.setUpScrollListener(object : FastScrollerScrollListener {
+        binding.fastscroll.setUpScrollListener(object : FastScrollerScrollListener{
             override fun onScrolled() {
                 hideFabButton()
             }
@@ -374,11 +371,9 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                         )
                     }
                 }
-
                 isURL -> {
                     megaUtilWrapper.manageURLNode(requireContext(), favourite.node)
                 }
-
                 isOpenableTextFile(favourite.typedNode.size) -> {
                     MegaNodeUtil.manageTextFileIntent(
                         requireContext(),
@@ -386,7 +381,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                         Constants.FAVOURITES_ADAPTER
                     )
                 }
-
                 else -> {
                     MegaNodeUtil.onNodeTapped(
                         context = requireActivity(),
@@ -581,7 +575,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                     switchToLinear()
                     adapter = listAdapter
                 }
-
                 ViewType.GRID -> {
                     switchBackToGrid()
                     adapter = gridAdapter
