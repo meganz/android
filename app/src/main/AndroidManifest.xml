@@ -633,6 +633,10 @@
                 android:name="mega.privacy.android.app.initializer.CameraUploadsWorkerNotificationInitializer"
                 android:value="androidx.startup" />
 
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.NotificationChannelsInitializer"
+                android:value="androidx.startup" />
+
 
         </provider>
 

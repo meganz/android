@@ -1,11 +1,15 @@
 package mega.privacy.android.app.di.chat
 
+import android.app.NotificationManager
+import androidx.core.app.NotificationChannelCompat
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -173,5 +177,84 @@ abstract class ChatModule {
         @Provides
         fun provideSignalChatPresenceActivity(chatRepository: ChatRepository): SignalChatPresenceActivity =
             SignalChatPresenceActivity(chatRepository::signalPresenceActivity)
+
+        /**
+         * Provides chat notification channel
+         */
+        @Provides
+        @IntoSet
+        fun provideChatNotificationChannel(): NotificationChannelCompat =
+            NotificationChannelCompat.Builder(
+                Constants.NOTIFICATION_CHANNEL_CHAT_ID,
+                NotificationManager.IMPORTANCE_HIGH
+            ).setName(Constants.NOTIFICATION_CHANNEL_CHAT_NAME).build()
+
+        /**
+         * Provides chat summary notification channel
+         */
+        @Provides
+        @IntoSet
+        fun provideChatSummaryNotificationChannel(): NotificationChannelCompat =
+            NotificationChannelCompat.Builder(
+                Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2,
+                NotificationManager.IMPORTANCE_HIGH
+            ).setName(Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME)
+                .setShowBadge(true)
+                .setVibrationEnabled(true)
+                .setVibrationPattern(longArrayOf(0, 500))
+                .setLightsEnabled(true)
+                .setLightColor(android.graphics.Color.rgb(0, 255, 0))
+                .build()
+
+        /**
+         * Provides chat summary without vibration notification channel
+         */
+        @Provides
+        @IntoSet
+        fun provideChatSummaryNoVibrationNotificationChannel(): NotificationChannelCompat =
+            NotificationChannelCompat.Builder(
+                Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID,
+                NotificationManager.IMPORTANCE_HIGH
+            ).setName(Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME)
+                .build()
+
+        /**
+         * Provides incoming calls notification channel
+         */
+        @Provides
+        @IntoSet
+        fun provideIncomingCallsNotificationChannel(): NotificationChannelCompat =
+            NotificationChannelCompat.Builder(
+                Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_ID,
+                NotificationManager.IMPORTANCE_HIGH
+            ).setName(Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME)
+                .setLightsEnabled(true)
+                .setVibrationEnabled(true)
+                .setVibrationPattern(longArrayOf(0, 1000, 1000, 1000, 1000, 1000, 1000))
+                .build()
+
+        /**
+         * Provides incoming calls without notification channel
+         */
+        @Provides
+        @IntoSet
+        fun provideIncomingCallsNoVibrationNotificationChannel(): NotificationChannelCompat =
+            NotificationChannelCompat.Builder(
+                Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_ID,
+                NotificationManager.IMPORTANCE_HIGH
+            ).setName(Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_NAME).build()
+
+        /**
+         * Provides in progress and missed calls notification channel
+         */
+        @Provides
+        @IntoSet
+        fun provideInProgressMissedCallsNotificationChannel(): NotificationChannelCompat =
+            NotificationChannelCompat.Builder(
+                Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID,
+                NotificationManager.IMPORTANCE_HIGH
+            ).setName(Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME).build()
+
+
     }
 }

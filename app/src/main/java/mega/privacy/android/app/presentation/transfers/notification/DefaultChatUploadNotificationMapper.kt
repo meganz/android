@@ -11,20 +11,21 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
+import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
+import mega.privacy.android.data.mapper.transfer.VideoCompressionProgress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import javax.inject.Inject
 
 /**
- * Default implementation of [DownloadNotificationMapper]
+ * Default implementation of [ChatUploadNotificationMapper]
  */
-class DefaultDownloadNotificationMapper @Inject constructor(
+class DefaultChatUploadNotificationMapper @Inject constructor(
     @ApplicationContext private val context: Context,
-) : DownloadNotificationMapper {
+) : ChatUploadNotificationMapper {
 
     override fun invoke(
         activeTransferTotals: ActiveTransferTotals?,
+        videoCompressionProgress: VideoCompressionProgress?,
         paused: Boolean,
     ): Notification {
         val intent = Intent(context, ManagerActivity::class.java)
@@ -36,38 +37,40 @@ class DefaultDownloadNotificationMapper @Inject constructor(
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val content = context.getString(R.string.download_touch_to_show)
-        val title =
-            if (activeTransferTotals == null || activeTransferTotals.totalBytes == 0L) {
+        val content = context.getString(R.string.chat_upload_title_notification)
+
+        val title = when {
+            videoCompressionProgress != null -> {
+                context.getString(
+                    R.string.title_compress_video,
+                    videoCompressionProgress.alreadyCompressed + 1,
+                    videoCompressionProgress.totalToCompress
+                )
+            }
+
+            (activeTransferTotals == null || activeTransferTotals.totalBytes == 0L) -> {
                 context.getString(R.string.download_preparing_files)
-            } else {
+            }
+
+            else -> {
                 val inProgress = activeTransferTotals.totalFinishedFileTransfers + 1
                 val totalTransfers = activeTransferTotals.totalFileTransfers
-                if (paused || activeTransferTotals.allPaused()) {
-                    context.getString(
-                        R.string.download_service_notification_paused,
-                        inProgress,
-                        totalTransfers
-                    )
-                } else {
-                    context.getString(
-                        R.string.download_service_notification,
-                        inProgress,
-                        totalTransfers
-                    )
-                }
+
+                context.getString(
+                    if (paused || activeTransferTotals.allPaused()) {
+                        R.string.upload_service_notification_paused
+                    } else {
+                        R.string.upload_service_notification
+                    },
+                    inProgress,
+                    totalTransfers
+                )
             }
-        val subText = activeTransferTotals?.let {
-            Util.getProgressSize(
-                context,
-                activeTransferTotals.transferredBytes,
-                activeTransferTotals.totalBytes
-            )
         }
 
         val builder = NotificationCompat.Builder(
             context,
-            Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+            Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID
         ).apply {
             setSmallIcon(iconPackR.drawable.ic_stat_notify)
             setOngoing(true)
@@ -78,7 +81,6 @@ class DefaultDownloadNotificationMapper @Inject constructor(
             setAutoCancel(false)
             setContentIntent(pendingIntent)
             activeTransferTotals?.progressPercent?.let { setProgress(100, it, false) }
-            subText?.let { setSubText(subText) }
         }
         return builder.build()
     }

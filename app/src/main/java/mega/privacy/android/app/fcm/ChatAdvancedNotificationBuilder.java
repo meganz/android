@@ -18,17 +18,9 @@ import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID_OF_CURRENT_CALL;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID_OF_INCOMING_CALL;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_ID;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_ID;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_NAME;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_GENERAL_PUSH_CHAT;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_MISSED_CALL;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_SUMMARY_CHAT;
@@ -36,15 +28,12 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.getCircleBitmap;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -91,8 +80,6 @@ public final class ChatAdvancedNotificationBuilder {
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
-    private final long[] patternIncomingCall = {0, 1000, 1000, 1000, 1000, 1000, 1000};
-
     private static final Set<Integer> notificationIds = new HashSet<>();
 
     private final ChatController chatC;
@@ -115,7 +102,6 @@ public final class ChatAdvancedNotificationBuilder {
         dbH = DbHandlerModuleKt.getDbHandler();
         megaApi = MegaApplication.getInstance().getMegaApi();
         megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        createChatSummaryChannel(context);
 
         chatC = new ChatController(context);
     }
@@ -153,33 +139,6 @@ public final class ChatAdvancedNotificationBuilder {
         }
 
         return getDefaultAvatar(color, getTitleChat(chat), AVATAR_SIZE, true, true);
-    }
-
-    @TargetApi(Build.VERSION_CODES.O)
-    public static void createChatSummaryChannel(Context context) {
-        NotificationChannel channelWithVibration = new NotificationChannel(NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2, NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME, NotificationManager.IMPORTANCE_HIGH);
-        channelWithVibration.setShowBadge(true);
-        channelWithVibration.setVibrationPattern(new long[]{0, 500});
-        //green light
-        channelWithVibration.enableLights(true);
-        channelWithVibration.setLightColor(Color.rgb(0, 255, 0));
-        //current ringtone for notification
-        channelWithVibration.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), Notification.AUDIO_ATTRIBUTES_DEFAULT);
-
-        NotificationChannel channelNoVibration = new NotificationChannel(NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID, NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME, NotificationManager.IMPORTANCE_HIGH);
-        channelNoVibration.setShowBadge(true);
-        channelNoVibration.enableVibration(false);
-
-        NotificationManager manager = context.getSystemService(NotificationManager.class);
-        if (manager != null) {
-            //delete old channel otherwise the new settings don't work.
-            NotificationChannel oldChannel = manager.getNotificationChannel(NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID);
-            if (oldChannel != null) {
-                manager.deleteNotificationChannel(NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID);
-            }
-            manager.createNotificationChannel(channelWithVibration);
-            manager.createNotificationChannel(channelNoVibration);
-        }
     }
 
     public void removeAllChatNotifications() {
@@ -351,20 +310,10 @@ public final class ChatAdvancedNotificationBuilder {
         String channelId = shouldVibrate ? NOTIFICATION_CHANNEL_INCOMING_CALLS_ID :
                 NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_ID;
 
-        String channelName = shouldVibrate ? NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME :
-                NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_NAME;
-
-        NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
-        channel.setVibrationPattern(shouldVibrate ? patternIncomingCall : new long[]{0L});
-        channel.enableLights(true);
-        channel.enableVibration(shouldVibrate);
-        channel.setDescription("");
 
         if (notificationManager == null) {
             notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         }
-
-        notificationManager.createNotificationChannel(channel);
 
         NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, channelId);
         notificationBuilderO
@@ -441,15 +390,9 @@ public final class ChatAdvancedNotificationBuilder {
 
         expandedView.setOnClickPendingIntent(R.id.answer_button_layout, intentAnswer);
 
-        NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_INCOMING_CALLS_ID, NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME, NotificationManager.IMPORTANCE_HIGH);
-        channel.setDescription("");
-        channel.enableLights(true);
-        channel.enableVibration(true);
-
         if (notificationManager == null) {
             notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         }
-        notificationManager.createNotificationChannel(channel);
 
         NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_INCOMING_CALLS_ID);
         notificationBuilderO
@@ -463,7 +406,6 @@ public final class ChatAdvancedNotificationBuilder {
                 .setShowWhen(true)
                 .setAutoCancel(false)
                 .setDeleteIntent(intentIgnore)
-                .setVibrate(patternIncomingCall)
                 .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                 .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
@@ -531,12 +473,9 @@ public final class ChatAdvancedNotificationBuilder {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID, NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME, NotificationManager.IMPORTANCE_HIGH);
-        channel.setShowBadge(true);
         if (notificationManager == null) {
             notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         }
-        notificationManager.createNotificationChannel(channel);
         NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID);
         notificationBuilderO
                 .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
