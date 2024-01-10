@@ -1420,7 +1420,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Der kostenlose Bonusspeicherplatz wird nur bei neuen Einladungen und bei Installation einer MEGA-Mobil-App oder der MEGA-Desktop-App gewährt.</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Einladung versandt</string>
+    <string name="subtitle_confirmation_invite_friends">Einladung gesendet</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Die E-Mail-Adresse hat ein falsches Format</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1539,7 +1539,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">Fehler beim Löschen des QR-Codes.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">Einladung versandt</string>
+    <string name="invite_sent">Einladung gesendet</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">Der Benutzer wurde eingeladen und erscheint nach Annahme der Einladung in Ihrer Kontaktliste.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1553,7 +1553,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">Der QR-Code wurde nach %s heruntergeladen</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">Einladung nicht versandt</string>
+    <string name="invite_not_sent">Einladung nicht gesendet</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">Link ungültig. Bitte scannen oder öffnen Sie einen gültigen Link.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -3363,7 +3363,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Sie haben %1$s bereits eingeladen</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Einladung versandt. Siehe Gesendete Anfragen.</string>
+    <string name="contact_invited">Einladung gesendet. Siehe Gesendete Anfragen.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Datei offline verfügbar</string>
     <!-- Message when file removed from offline. -->
@@ -4469,8 +4469,8 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Meeting beitreten</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">%1$d Einladung versendet.&#160;</item>
-        <item quantity="other">%1$d Einladungen versendet.&#160;</item>
+        <item quantity="one">%1$d Einladung gesendet.&#160;</item>
+        <item quantity="other">%1$d Einladungen gesendet.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4767,7 +4767,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatische Backups</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind – bis zu 90 Tage für Pro&#160;Lite und bis zu 180 Tage für Pro&#160;I, II und III (demnächst)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind – bis zu 90 Tage für Pro&#160;Lite und bis zu 180 Tage für Pro&#160;I, II und III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Planmäßige Leerung des Papierkorbs – Intervall 7 Tage bis 10 Jahre</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5009,7 +5009,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">Sie können alle Termine eines wiederkehrenden Meetings ansehen, absagen oder bearbeiten, indem Sie die drei Punkte auf der rechten Seite antippen und [A]Termine[/A] auswählen.</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Senden Sie per E-Mail eine Kalendereinladung an die Teilnehmer, damit diese das Meeting in ihrem Kalender speichern können.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Senden Sie per E-Mail eine Kalendereinladung an die Teilnehmer, damit diese das Meeting in ihren Kalender übernehmen können.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Meeting aktualisiert</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -5156,7 +5156,7 @@
         <item quantity="other">Kamera-Uploads abgeschlossen, %1$d Dateien hochgeladen</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA hat nur eingeschränkten Zugriff auf die Fotobibliothek und kann nicht alle Ihre Fotos sichern.</string>
+    <string name="camera_uploads_limited_access">MEGA hat nur eingeschränkten Zugriff auf Ihre Fotobibliothek und kann daher nicht alle Ihre Fotos sichern.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Antippen, um die Berechtigungen zu ändern.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5228,15 +5228,29 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Synchronisierung</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Werbefrei</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Einladung zu einem Meeting</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Einladung zu einem MEGA-Meeting</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s lädt Sie zu einem MEGA-Meeting ein</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">Name des Meetings: %1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">Meetinglink: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Datum und Uhrzeit: %1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">Alle eingeladenen Teilnehmer sind der Konferenz beigetreten</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">Der Warteraum ist leer</string>
+    <!-- Label of the button to call an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_button">Anrufen</string>
+    <!-- Default status label for an absent participant at the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">Nicht in Konferenz</string>
+    <!-- Status label when calling an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Verbinde&#8230;</string>
+    <!-- Status label after call an absent participant from the not in call participants list and get no response -->
+    <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Keine Antwort</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Alle anrufen</string>
 </resources>

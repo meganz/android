@@ -1217,7 +1217,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">接続中&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%sさんはすでに招待されました。あなたの保留中の要求を確認してください。</string>
+    <string name="context_contact_already_invited">%sさんはすでに招待されました。保留中の要求を確認してください。</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">メールアドレスのスペルを間違った場合、それを修正して[A]再送信[A]をタップしてください。</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1389,7 +1389,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">新規ご招待かつ、MEGAモバイルアプリかMEGAデスクトップアプリをインストールした場合に限り、無料ストレージボーナスが適用されます。</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">招待状が送信されました</string>
+    <string name="subtitle_confirmation_invite_friends">招待状が送られました</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">メールアドレスの形式が間違っています</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1505,7 +1505,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">エラーによりQRコードは削除されません。もう一度やり直してください。</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">招待状が送信されました</string>
+    <string name="invite_sent">招待状が送られました</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">そのユーザーさんは招待済みで、受け入れられ次第すぐにあなたの連絡先リストに表示されます。</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1519,7 +1519,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">QRコードが%sにダウンロードされました</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">招待状は未送信です</string>
+    <string name="invite_not_sent">招待状が送信されませんでした</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">QRコードまたは連絡先リンクが無効です。有効なコードをスキャンするか、有効なリンクを開いてみてください。</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -4554,7 +4554,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;自動バックアップ</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Liteでは最大90日、Pro&#160;I、II、IIIでは最大180日巻き戻し（近日公開予定）</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Liteでは最大90日、Pro&#160;I、II、IIIでは最大180日巻き戻し</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;ごみ箱を空にするのを7日から10年の間でスケジュールする</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4994,15 +4994,29 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">同期</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;広告&#160;なし</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">ミーティングへの招待</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGAミーティングへの招待</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$sさんがMEGAミーティングに招待しています</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">ミーティング名：%1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">ミーティングリンク：%1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">日付と時刻：%1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">招待された参加者全員が通話に参加しました</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">待合室に誰もいません</string>
+    <!-- Label of the button to call an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_button">通話</string>
+    <!-- Default status label for an absent participant at the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">通話中ではありません</string>
+    <!-- Status label when calling an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">通話中&#8230;</string>
+    <!-- Status label after call an absent participant from the not in call participants list and get no response -->
+    <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">応答なし</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">全員と通話</string>
 </resources>

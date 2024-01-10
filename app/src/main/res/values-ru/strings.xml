@@ -1301,7 +1301,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Соединение&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s уже приглашён. Посмотрите отправленные запросы.</string>
+    <string name="context_contact_already_invited">%s уже приглашён. Проверьте отправленные запросы.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">Если вы ввели неправильный адрес электронной почты, исправьте его и нажмите [A]«Отправить повторно»[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -5193,7 +5193,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Автоматическое резервное копирование</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Перемотка на период до 90 дней на Pro&#160;Lite и до 180 дней на Pro&#160;I, II и III (скоро)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Перемотка на период до 90 дней на Pro&#160;Lite и до 180 дней на Pro&#160;I, II и III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Срок очистки корзины от 7 дней до 10 лет</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5485,7 +5485,7 @@
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Чтобы подтвердить контакт, убедитесь, что учётные данные, которые вы видите выше, соответствуют его учётным данным. Вы можете попросить его поделиться с вами своими учётными данными.</string>
     <!-- Toolbar title text in approve credentials screen -->
-    <string name="contact_approve_credentials_toolbar_title">Подтвердите учётные данные</string>
+    <string name="contact_approve_credentials_toolbar_title">Подтверждение учётных данных</string>
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Комната ожидания</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
@@ -5586,7 +5586,7 @@
     <!-- Description text cloud drive screen when no items are available in cloud drive -->
     <string name="cloud_drive_empty_screen_message">Облачный диск пуст</string>
     <!-- Button text from verify credentials screen when contact is not verified -->
-    <string name="contact_verify_credentials_mark_as_verified_text">Отметить как прочитанное</string>
+    <string name="contact_verify_credentials_mark_as_verified_text">Отметить как подтверждённые</string>
     <!-- Description text from contact info screen when contact is verified -->
     <string name="contact_verify_credentials_verified_text">Проверены</string>
     <!-- Description text from contact info screen when contact is not verified -->
@@ -5620,7 +5620,7 @@
         <item quantity="other">Загрузка из камеры завершена, загружено %1$d файла</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA имеет ограниченный доступ к библиотеке фотографий и не может создавать резервные копии всех ваших фотографий.</string>
+    <string name="camera_uploads_limited_access">MEGA имеет ограниченный доступ к вашей библиотеке фотографий и не может создавать резервные копии всех ваших фотографий.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Нажмите, чтобы изменить разрешения.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5696,15 +5696,29 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Синхронизация</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Без&#160;рекламы</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Приглашение на встречу</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Приглашения на встречу MEGA</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s приглашает вас на MEGA-встречу</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">Название встречи: %1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">Ссылка на встречу: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Дата и время: %1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">Все приглашённые участники присоединились к звонку</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">В комнате ожидания никого нет</string>
+    <!-- Label of the button to call an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_button">Позвонить</string>
+    <!-- Default status label for an absent participant at the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">Не в звонке</string>
+    <!-- Status label when calling an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Вызов&#8230;</string>
+    <!-- Status label after call an absent participant from the not in call participants list and get no response -->
+    <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Не отвечает</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Позвонить всем</string>
 </resources>

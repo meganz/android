@@ -1273,7 +1273,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Se conectează&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s a fost invitat deja. Consultă cererile în așteptare.</string>
+    <string name="context_contact_already_invited">%s a fost deja invitat. Verificați cererile în așteptare.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">Dacă ți-ai scris greșit adresa de e-mail, corecteaz-o și atinge [A]Retrimite[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1421,7 +1421,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invită prieteni și obține recompense</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s spațiu de stocare pentru fiecare invitație completată. Valabili timp de 365 de zile.</string>
+    <string name="figures_achievements_text_referrals">%1$s spațiu de stocare pentru fiecare invitație. Valabil 365 de zile.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s spațiu de stocare. Valabili timp de 365 de zile.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1451,7 +1451,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bonusul pentru spațiul de stocare gratuit se aplică numai la noile invitații și în cazul în care este instalată Aplicația Mobilă MEGA sau Aplicația Desktop MEGA.</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Invitație trimisă</string>
+    <string name="subtitle_confirmation_invite_friends">Invitația a fost trimisă</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Adresa de e-mail este malformată</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1573,7 +1573,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">Codul QR nu a fost șters din cauza unei erori. Te rugăm să încerci din nou.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">Invitație trimisă</string>
+    <string name="invite_sent">Invitația a fost trimisă</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">Utilizatorul a fost invitat și va apărea în lista de contacte de îndată ce a acceptat invitația.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1587,7 +1587,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">Codul QR a fost descărcat în %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">Invitație netrimisă</string>
+    <string name="invite_not_sent">Invitația nu a fost trimisă</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">Codul QR sau linkul de contact este nevalid. Te rugăm să încerci să scanezi un cod valid sau să deschizi un link valid.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -3456,7 +3456,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Ați invitat deja pe %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invitație trimisă. Vezi Cererile trimise.</string>
+    <string name="contact_invited">Invitație a fost trimisă. Consultați Cereri trimise.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Fișier disponibil offline</string>
     <!-- Message when file removed from offline. -->
@@ -4653,9 +4653,9 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Alătură-te întâlnirii</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">A fost trimisă %1$d cerere de invitație.&#160;</item>
-        <item quantity="few">Au fost trimise %1$d cereri de invitație.&#160;</item>
-        <item quantity="other">Au fost trimise %1$d de cereri de invitație.&#160;</item>
+        <item quantity="one">%1$d&#160;invitație a fost trimisă.&#160;</item>
+        <item quantity="few">%1$d&#160;invitații au fost trimise.&#160;</item>
+        <item quantity="other">%1$d de invitații au fost trimise.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4980,7 +4980,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backupuri automate</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Derulați înapoi până la 90 de zile pe Pro&#160;Lite și până la 180 de zile pe Pro&#160;I, II și III (în curând)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Derulați înapoi până la 90 de zile pe Pro&#160;Lite și până la 180 de zile pe Pro&#160;I, II și III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Planifică golirea coșurilor de gunoi între 7 zile și 10 ani</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5236,7 +5236,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">Puteți vizualiza, anula sau edita orice ocurență a unei întâlniri recurente atingând cele trei puncte din dreapta și selectând [A]Ocurențe[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Trimită prin e-mail invitația pentru calendar participanților, astfel încât aceștia să poată adăuga întâlnirea în calendarele lor.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Trimiteți invitație pentru calendar participanților prin e-mail, astfel încât aceștia să poată adăuga întâlnirea în calendarele lor.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Întâlnire a fost actualizată</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -5388,7 +5388,7 @@
         <item quantity="other">Încărcări cameră complete, %1$d de fișiere încărcate</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA are acces limitat la biblioteca foto și nu poate face copii de rezervă pentru toate fotografiile.</string>
+    <string name="camera_uploads_limited_access">MEGA are acces limitat la biblioteca dvs. foto și nu poate face copii de rezervă pentru toate fotografiile.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Atinge pentru a modifica permisiunile.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5462,15 +5462,29 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sincronizează</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Fără&#160;reclame</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Invitație la o întâlnire</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Invitație la întâlnire MEGA</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s vă invită la o întâlnire MEGA</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">Numele întâlnirii: %1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">Link pentru întâlnire: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Data și ora: %1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">Toți participanții invitați s-au alăturat apelului</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">Nu este nimeni în sala de așteptare</string>
+    <!-- Label of the button to call an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_button">Apelează</string>
+    <!-- Default status label for an absent participant at the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">Nu în apel</string>
+    <!-- Status label when calling an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Se apelează&#8230;</string>
+    <!-- Status label after call an absent participant from the not in call participants list and get no response -->
+    <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Niciun răspuns</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Suna pe toți</string>
 </resources>

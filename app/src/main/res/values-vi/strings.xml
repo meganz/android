@@ -127,7 +127,7 @@
     <!-- Login button -->
     <string name="login_text">Đăng&#160;nhập</string>
     <!-- email label -->
-    <string name="email_text">Email</string>
+    <string name="email_text">Địa chỉ email</string>
     <!-- password label -->
     <string name="password_text">Mật khẩu</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -746,7 +746,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Đây là bước cuối cùng để hoàn tất việc xóa bỏ tài khoản. Bạn sẽ mất hoàn toàn tất cả dữ liệu bạn đã lưu trên ổ mây. Để tiến hành, xin nhập mật khẩu vào dưới đây.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Email address verification</string>
+    <string name="email_verification_title">Xác&#160;thực địa&#160;chỉ email</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Xin kiểm tra hộp thư e-mail để thục hiện bước kế tiếp.</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1217,7 +1217,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Đang kết nối&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s đã được mời rồi. Xem lại các lời yêu cầu đang chờ.</string>
+    <string name="context_contact_already_invited">%s was already invited. Check your pending requests.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">Nếu địa chỉ e-mail bị viết sai, sửa lại cho đúng và chạm vào [A]Gửi lại[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1345,9 +1345,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Chuyển vào Thùng Rác?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Bạn có muốn di&#160;chuyển thư&#160;mục này vào Thùng&#160;Rác không? Một thư&#160;mục mới sẽ được tự&#160;động tạo ra cho Đăng&#160;tải camêra.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Bạn có muốn di&#160;chuyển thư&#160;mục này vào Thùng&#160;Rác không? Một thư&#160;mục mới sẽ được tự&#160;động tạo ra cho Đăng&#160;tải phương&#160;tiện.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Bỏ vào Thùng Rác?</string>
     <!-- confirmation message before removing a file -->
@@ -1359,7 +1359,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Mời bạn bè tham gia và nhận thưởng</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s vào không&#160;gian lưu&#160;trữ cho mỗi lần mời. Hạn dùng là 365&#160;ngày.</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each invitation. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s vào không gian lưu trữ. Hạn dùng là 365 ngày.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1389,9 +1389,9 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Phần thưởng không gian lưu trữ miễn phí chỉ có áp dụng cho những lời mời mới và khi App MEGA cho Di Động hoặc App MEGA cho Máy Tính được cài đặt.</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Lời mời đã gửi đi</string>
+    <string name="subtitle_confirmation_invite_friends">Invitation sent</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Email address is malformed</string>
+    <string name="invalid_email_to_invite">Địa&#160;chỉ email không đúng cú&#160;pháp</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Sau khi cài đặt MEGA trên máy tính, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, có hạn sử dụng là 365 ngày. MEGA còn có apps dành cho Windows, macOS và đa số các máy Linux distros.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1505,7 +1505,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">Không xoá được mã ảnh QR vì xảy ra lỗi. Xin thử lại.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">Lời mời đã gửi đi</string>
+    <string name="invite_sent">Invitation sent</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">Đối tượng đã được mời và sẽ xuất hiện trong sổ liên lạc sau khi họ chấp nhận lời mời.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1519,7 +1519,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">Mã&#160;QR đã được tải&#160;xuống vào vị&#160;trí %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">Lời mời chưa được gửi</string>
+    <string name="invite_not_sent">Invitation not sent</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">Mã QR hoặc đường liên kết tên liên lạc không hợp lệ. Xin thử quét mã khác hoặc đường liên kết phù hợp.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -1960,7 +1960,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Kích hoạt hoặc tắt tính&#160;năng ghi nhật&#160;ký phiên&#160;bản tệp&#160;tin cho toàn bộ tài&#160;khoản.\nTắt đi tính&#160;năng ghi nhật&#160;ký phiên&#160;bản sẽ không ngăn&#160;cản các tên liên&#160;lạc trong tài&#160;khoản của bạn tạo ra phiên&#160;bản mới của thư&#160;mục chia&#160;sẻ chung.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Tap, enter name or email address</string>
+    <string name="type_mail">Chạm để nhập tên hay địa&#160;chỉ email</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Thêm %s vào sổ liên lạc?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2920,7 +2920,7 @@
     <!-- Title for Cookie dialog, visible for new users. -->
     <string name="dialog_cookie_alert_title">Quản&#160;lý cookies</string>
     <!-- Body for Cookie dialog, visible for new users. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Chúng&#160;tôi sử&#160;dụng cookies và các công&#160;nghệ tương&#160;tự để giúp chúng&#160;tôi cải&#160;thiện dịch&#160;vụ của mình. Tìm&#160;hiểu thêm về [A]Chính Sách Cookie[/A] của chúng&#160;tôi.</string>
+    <string name="dialog_cookie_alert_message">Chúng&#160;tôi sử&#160;dụng cookies và các công&#160;nghệ tương&#160;tự để giúp chúng&#160;tôi cải&#160;thiện dịch&#160;vụ của mình. Tìm&#160;hiểu thêm về [A]Chính&#160;Sách Cookie[/A] của chúng&#160;tôi.</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cài Đặt Cookie chưa được lưu lại.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -3270,7 +3270,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Bạn đã gửi cho %1$s rồi</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Lời&#160;mời đã được gửi. Xem các yêu&#160;cầu gửi&#160;đi.</string>
+    <string name="contact_invited">Invitation sent. See Sent requests.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Tệp đã được lưu về Ngoại Tuyến</string>
     <!-- Message when file removed from offline. -->
@@ -4285,7 +4285,8 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Tham&#160;gia cuộc&#160;họp</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="other">%1$d yêu&#160;cầu lời&#160;mời đã được gửi.&#160;</item>
+        <item quantity="one">%1$d invitation sent.&#160;</item>
+        <item quantity="other">%1$d invitations sent.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4378,7 +4379,7 @@
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">Tái diễn</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_send_calendar_invite_label">Gửi thư&#160;mời lịch</string>
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">Send calendar invitation</string>
     <!-- Title of option to add description in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_add_description_label">Thêm miêu&#160;tả</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
@@ -4554,7 +4555,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Sao&#160;lưu dự&#160;phòng tự&#160;động</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Tua lại phiên&#160;bản lên đến 90 ngày với hạng Pro&#160;Lite và đến 180 ngày với hạng Pro&#160;I, II, và III (sớm có mặt)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Lên lịch dọn dẹp thùng&#160;rác từ 7 ngày đến 10 năm</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4782,7 +4783,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">Bạn có thể xem qua, hủy bỏ hoặc chỉnh&#160;sửa bất&#160;kỳ thời&#160;điểm tái&#160;diễn nào của cuộc họp định&#160;kỳ bằng cách chạm vào dấu ba chấm ngay bên phải, sau đó chọn [A]Thời&#160;điểm tái&#160;diễn[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Gửi email lời mời lịch hẹn cho những người tham&#160;gia biết và thêm cuộc họp vào lịch của họ.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invitation to participants so they can add the meeting to their calendars.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Cuộc họp đã được cập&#160;nhật</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -4924,7 +4925,7 @@
         <item quantity="other">Đăng tải camêra hoàn tất, %1$d tệp tin đã được tải lên</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to the photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Chạm để đổi quyền&#160;hạn.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -4972,21 +4973,21 @@
     <!-- Title of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_title">Cuộc gọi này đang được ghi lại</string>
     <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">By staying in the call you give permission to be recorded. The recording is only stored on the device of the person who records it.</string>
+    <string name="meetings_call_recording_consent_dialog_message">Bằng cách tiếp&#160;tục tham&#160;gia cuộc gọi là bạn có cho phép được ghi âm và hình. Bản ghi chỉ được lưu&#160;trữ trong thiết&#160;bị của người ghi.</string>
     <!-- Label for the positive or confirm button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_positive_button">OK, hiểu rồi</string>
     <!-- Label for the negative or cancel button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_negative_button">Rời khỏi cuộc gọi</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Learn more[/A]</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Tìm&#160;hiểu thêm[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
-    <string name="meetings_call_recording_started_snackbar_message">%1$s started recording</string>
+    <string name="meetings_call_recording_started_snackbar_message">%1$s đã bắt&#160;đầu ghi âm hình</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
-    <string name="meetings_call_recording_stopped_snackbar_message">%1$s stopped recording</string>
+    <string name="meetings_call_recording_stopped_snackbar_message">%1$s đã chấm&#160;dứt ghi âm hình</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Thư Viện Phim Ảnh</string>
     <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">Cookies Quảng Cáo</string>
+    <string name="settings_cookies_settings_ads_title">Cookies Quảng&#160;Cáo</string>
     <!-- Preference screen item summary for Ads Cookie-->
     <string name="settings_cookies_settings_ads_summary">Được sử&#160;dụng bởi các đối&#160;tác quảng&#160;cáo đã được phê&#160;duyệt của chúng&#160;tôi để thu&#160;thập dữ&#160;liệu về các hoạt&#160;động duyệt web của bạn và tùy&#160;chỉnh quảng&#160;cáo bạn thấy trên các dịch&#160;vụ của chúng&#160;tôi và trên các trang web khác. Không chấp&#160;nhận các cookies này có nghĩa là bạn vẫn sẽ thấy quảng&#160;cáo nhưng nội&#160;dung sẽ không liên&#160;quan.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
@@ -4994,15 +4995,29 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Đồng bộ</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Không&#160;có quảng&#160;cáo</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Meeting invite</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA meeting invitation</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s mời bạn tham&#160;gia một cuộc họp MEGA</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">Tên cuộc họp: %1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">Đường liên&#160;kết cuộc họp: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Ngày và giờ: %1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">Tất cả thành&#160;viên được mời đã tham&#160;gia vào cuộc gọi</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">Không có ai ở trong phòng chờ</string>
+    <!-- Label of the button to call an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_button">Gọi</string>
+    <!-- Default status label for an absent participant at the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">Ở ngoài cuộc gọi</string>
+    <!-- Status label when calling an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Đang gọi&#8230;</string>
+    <!-- Status label after call an absent participant from the not in call participants list and get no response -->
+    <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Không có phản&#160;hồi</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Gọi tất cả</string>
 </resources>

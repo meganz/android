@@ -1273,7 +1273,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Connessione in corso&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s è già stato invitato. Consulta le tue richieste in sospeso.</string>
+    <string name="context_contact_already_invited">%s ha già ricevuto un tuo invito. Consulta le tue richieste in sospeso.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">Se hai scritto male il tuo indirizzo e-mail, correggilo e poi tocca su [A]Reinvia[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -3456,7 +3456,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Hai già invitato %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Richiesta inviata. Vedi le Richieste inviate.</string>
+    <string name="contact_invited">Invito spedito. Vedi le Richieste inviate.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File disponibile offline</string>
     <!-- Message when file removed from offline. -->
@@ -4653,9 +4653,9 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Unisciti al meeting</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">%1$d richiesta di invito spedita.&#160;</item>
-        <item quantity="many">%1$d di richieste di invito spedite.&#160;</item>
-        <item quantity="other">%1$d richieste di invito spedite.&#160;</item>
+        <item quantity="one">%1$d invito spedito.&#160;</item>
+        <item quantity="many">%1$d di inviti spediti.&#160;</item>
+        <item quantity="other">%1$d inviti spediti.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4776,7 +4776,7 @@
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">Evento</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_send_calendar_invite_label">Invia invito per calendario</string>
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">Spedisci invito per il calendario</string>
     <!-- Title of option to add description in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_add_description_label">Aggiungi descrizione</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
@@ -4980,7 +4980,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backup automatici</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Ripristina fino a 90 giorni su Pro&#160;Lite e fino a 180 giorni su Pro&#160;I, II, e III (in arrivo)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Ripristina fino a 90 giorni su Pro&#160;Lite e fino a 180 giorni su Pro&#160;I, II, e III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Pulizia regolare del Cestino programmabile tra 7 giorni e 10 anni</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5388,7 +5388,7 @@
         <item quantity="other">Caricamenti da fotocamera completati, %1$d file caricati</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA ha accesso limitato alla Galleria e non può effettuare il backup di tutte le tue foto.</string>
+    <string name="camera_uploads_limited_access">MEGA ha accesso limitato alla tua Galleria e non può effettuare il backup di tutte le tue foto.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Tocca per cambiare i permessi.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5462,15 +5462,29 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sincronizza</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Senza&#160;pubblicità</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Invito al meeting</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Invito al meeting MEGA</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s ti sta invitando ad un meeting MEGA</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">Nome del meeting: %1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">Link del meeting: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Data e ora: %1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">Tutti i partecipanti invitati si sono uniti alla chiamata</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">Non c\’è nessuno nella sala d\’attesa</string>
+    <!-- Label of the button to call an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_button">Chiama</string>
+    <!-- Default status label for an absent participant at the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">Non nella chiamata</string>
+    <!-- Status label when calling an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Chiamata in corso&#8230;</string>
+    <!-- Status label after call an absent participant from the not in call participants list and get no response -->
+    <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Nessuna risposta</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Chiama tutti</string>
 </resources>

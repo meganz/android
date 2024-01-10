@@ -1217,7 +1217,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">연결중&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s님이 이미 초대되었습니다. 보류중인 요청을 참조하세요.</string>
+    <string name="context_contact_already_invited">%s님이 이미 초대되었습니다. 보류중인 요청을 확인하세요.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">만약 이메일 주소를 잘못 입력하였다면, 수정하고 [A]재발송[A]을 탭하세요.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1389,7 +1389,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">무료 저장소 보너스는 새 초대에만 적용되며 MEGA 모바일 앱 또는 MEGA 데스크톱 앱이 설치되어야 합니다.</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">초대를 발송하였습니다</string>
+    <string name="subtitle_confirmation_invite_friends">초대장 발송됨</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">이메일 주소 형식이 이상합니다</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1505,7 +1505,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">오류로 인해 QR 코드가 삭제되지 않았습니다. 다시 시도하세요.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">초대를 발송하였습니다</string>
+    <string name="invite_sent">초대장 발송됨</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">이용자가 초대되었으며 수락되면 당신의 연락처 목록에 나타날 것입니다.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1519,7 +1519,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">QR 코드가 %s에 다운로드되었습니다</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">초대가 발송되지 않았습니다</string>
+    <string name="invite_not_sent">초대장 발송되지 않음</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">QR 코드 또는 연락처 링크가 잘못 되었습니다. 올바른 코드를 스캔하거나 올바른 링크를 여세요.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -3270,7 +3270,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">당신은 이미 %1$s님을 초대하였습니다</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">초대 발송됨. 보낸 요청을 보세요.</string>
+    <string name="contact_invited">초대장 발송됨. 보낸 요청을 보세요.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">파일을 오프라인에서 이용할 수 있음</string>
     <!-- Message when file removed from offline. -->
@@ -4285,7 +4285,7 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">회의 참여</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="other">%1$d개의 초대 요청이 발송 되었습니다.&#160;</item>
+        <item quantity="other">%1$d개의 초대장 발송됨.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4378,7 +4378,7 @@
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">되풀이</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_send_calendar_invite_label">달력 초대 보내기</string>
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">일정 초대장 보내기</string>
     <!-- Title of option to add description in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_add_description_label">설명 추가</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
@@ -4554,7 +4554,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;자동 백업</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite는 최대 90일, Pro&#160;I, II, 그리고 III은 최대 180일 되돌리기 기능 (출시 예정)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite는 최대 90일, Pro&#160;I, II, 그리고 III은 최대 180일 되돌리기</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;7일과 10년 사이의 휴지통 비우기 예약</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4782,7 +4782,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">반복 회의의 되풀이 항목의 오른쪽의 점 3개를 탭하고 [A]되풀이 항목[/A]을 선택하여 항목을 보거나, 취소하거나, 편집할 수 있습니다.</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">참여자들이 달력에 회의를 추가할 수 있도록 달력 초대를 이메일로 보냅니다.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">참여자들이 달력에 회의를 추가할 수 있도록 일정 초대장을 이메일로 보냅니다.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">회의 수정됨</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -4994,15 +4994,29 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sync</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;광고&#160;없음</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">회의 초대</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA 회의 초대장</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s 님이 당신을 MEGA 회의에 초대합니다</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">회의 이름: %1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">회의 링크: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">날짜와 시간: %1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">모든 초대된 참여자가 통화에 참여했습니다</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">대기실에 아무도 없습니다</string>
+    <!-- Label of the button to call an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_button">전화</string>
+    <!-- Default status label for an absent participant at the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">통화 중 아님</string>
+    <!-- Status label when calling an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">통화 중&#8230;</string>
+    <!-- Status label after call an absent participant from the not in call participants list and get no response -->
+    <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">응답 없음</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">모두 통화</string>
 </resources>

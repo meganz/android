@@ -1452,7 +1452,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Zaproś znajomych i odbierz nagrody</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s pamięci dla każdego zaproszenia. Ważny przez 365 dni.</string>
+    <string name="figures_achievements_text_referrals">%1$s miejsca za każde zaproszenie. Ważność przez 365 dni.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s przechowywania danych. Ważny przez 365 dni.</string>
     <!-- title of the section for unlocked rewards -->
@@ -3549,7 +3549,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Zaprosiłeś już %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Zaproszenie wysłane. Zobacz sekcję Wysłane żądania.</string>
+    <string name="contact_invited">Zaproszenie wysłane. Zobacz Wysłane zaproszenia.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Plik dostępny offline</string>
     <!-- Message when file removed from offline. -->
@@ -4837,10 +4837,10 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Dołącz do spotkania</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">%1$d zaproszenie wysłane.&#160;</item>
-        <item quantity="few">%1$d zaproszeń wysłanych.&#160;</item>
-        <item quantity="many">%1$d zaproszeń wysłanych.&#160;</item>
-        <item quantity="other">%1$d zaproszeń wysłanych.&#160;</item>
+        <item quantity="one">%1$d wysłane zaproszenie.&#160;</item>
+        <item quantity="few">%1$d wysłanych zaproszeń.&#160;</item>
+        <item quantity="many">%1$d wysłanych zaproszeń.&#160;</item>
+        <item quantity="other">%1$d wysłanych zaproszeń.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -5193,7 +5193,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">-&#160;Automatyczne kopie zapasowe</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">-&#160;Rewind do 90 dni na Pro&#160;Lite i do 180 dni na Pro&#160;I, II i III (wkrótce)</string>
+    <string name="account_upgrade_account_description_feature_rewind">-&#160;Przewijanie do 90 dni na Pro&#160;Lite i do 180 dni na Pro&#160;I, II i III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">-&#160;Zaplanuj czyszczenie pojemnika na śmieci od 7 dni do 10 lat</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5620,7 +5620,7 @@
         <item quantity="other">Przesyłanie kamery zakończone, przesłano %1$d plików</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA ma ograniczony dostęp do biblioteki zdjęć i nie może utworzyć kopii zapasowej wszystkich zdjęć.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Wybierz, aby zmienić uprawnienia.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5696,15 +5696,29 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sync</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Bez&#160;reklam</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Zaproszenie na spotkanie</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Zaproszenie na spotkanie MEGA</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s zaprasza na spotkanie na MEGA</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">Nazwa spotkania: %1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">Link do spotkania: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Data i godzina: %1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">Wszyscy zaproszeni uczestnicy dołączyli do rozmowy</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">W poczekalni nie ma nikogo</string>
+    <!-- Label of the button to call an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_button">Połączenie</string>
+    <!-- Default status label for an absent participant at the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">Nie w trakcie rozmowy</string>
+    <!-- Status label when calling an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Dzwonię&#8230;</string>
+    <!-- Status label after call an absent participant from the not in call participants list and get no response -->
+    <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Brak odpowiedzi</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Zadzwoń do wszystkich</string>
 </resources>

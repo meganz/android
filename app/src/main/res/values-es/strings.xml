@@ -203,7 +203,7 @@
     <!-- Label to reference a recents section -->
     <string name="section_recents">Recientes</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
-    <string name="section_secondary_media_uploads">Media uploads</string>
+    <string name="section_secondary_media_uploads">Subidas multimedia</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Sin conexión</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -1273,7 +1273,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Conectando&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s ya ha sido invitado. Consulta tus invitaciones pendientes.</string>
+    <string name="context_contact_already_invited">%s was already invited. Check your pending requests.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">Si has escrito mal tu dirección de correo electrónico, corrígela y pulsa en [A]Reenviar[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1421,7 +1421,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invita a tus amigos y gana bonos</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s de almacenamiento por cada invitación. Válido durante 365 días.</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each invitation. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s de almacenamiento. Válido durante 365 días.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1451,7 +1451,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bono de almacenamiento gratuito aplicable solo a usuarios nuevos que instalen la aplicación móvil o de escritorio de MEGA.</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Invitación enviada</string>
+    <string name="subtitle_confirmation_invite_friends">Invitation sent</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Correo electrónico no válido</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1573,7 +1573,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">No se ha podido eliminar el código QR. Inténtalo de nuevo.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">Invitación enviada</string>
+    <string name="invite_sent">Invitation sent</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">El usuario ha sido invitado y aparecerá en tu lista de contactos en cuanto acepte la invitación.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1587,7 +1587,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">El código QR se ha descargado en %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">Invitación no enviada</string>
+    <string name="invite_not_sent">Invitation not sent</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">El código QR o el enlace de contacto no son válidos. Intenta escanear un código válido o abrir un enlace válido.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -3456,7 +3456,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Ya has invitado a %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Se ha enviado la invitación. Ver las solicitudes enviadas.</string>
+    <string name="contact_invited">Invitation sent. See Sent requests.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Archivo disponible sin conexión</string>
     <!-- Message when file removed from offline. -->
@@ -4653,9 +4653,8 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Unirse a la reunión</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">Se ha enviado %1$d invitación.&#160;</item>
-        <item quantity="many">Se han enviado %1$d de invitaciones.&#160;</item>
-        <item quantity="other">Se han enviado %1$d invitaciones.&#160;</item>
+        <item quantity="one">%1$d invitation sent.&#160;</item>
+        <item quantity="other">%1$d invitations sent.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4776,7 +4775,7 @@
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">Repetir</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_send_calendar_invite_label">Enviar invitación al evento</string>
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">Send calendar invitation</string>
     <!-- Title of option to add description in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_add_description_label">Añadir descripción</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
@@ -4980,7 +4979,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backups automáticos</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rebobinado hasta 90 días en Pro&#160;Lite y hasta 180 días en Pro&#160;I, II y III (próximamente)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Limpieza automática de la papelera entre 7 días y 10 años</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5236,7 +5235,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">Puedes ver, cancelar o editar cualquier evento de una reunión periódica tocando los tres puntos a la derecha y seleccionando [A]Eventos[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Envía por correo electrónico una invitación a los participantes para que puedan añadir la reunión a sus calendarios.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invitation to participants so they can add the meeting to their calendars.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Reunión actualizada</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -5388,7 +5387,7 @@
         <item quantity="other">Subidas de la cámara completadas, %1$d archivos subidos</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA tiene acceso limitado a la biblioteca de fotos y no puede hacer un backup de todas tus fotos.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Pulsa para cambiar los permisos.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5462,9 +5461,9 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sincronizar</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad&#160;free</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Invitación a una reunión</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA meeting invitation</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
     <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
@@ -5473,4 +5472,18 @@
     <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
     <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">Todos los participantes invitados se han unido a la llamada</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">No hay nadie en la sala de espera</string>
+    <!-- Label of the button to call an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_button">Llamar</string>
+    <!-- Default status label for an absent participant at the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">Fuera de llamada</string>
+    <!-- Status label when calling an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Llamando&#8230;</string>
+    <!-- Status label after call an absent participant from the not in call participants list and get no response -->
+    <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Sin respuesta</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Llamar a todos</string>
 </resources>
