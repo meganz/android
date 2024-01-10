@@ -1273,7 +1273,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Conectando&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s já foi convidado. Consulte as suas solicitações pendentes.</string>
+    <string name="context_contact_already_invited">%s was already invited. Check your pending requests.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">Se você errou ao digitar o seu e-mail, corrija e pressione [A]Reenviar[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1421,7 +1421,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Convide amigos e ganhe bônus</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s de armazenamento por cada indicação. Válido por 365 dias.</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each invitation. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s de espaço de armazenamento. Válido por 365 dias.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1451,7 +1451,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">O bônus de armazenamento gratuito somente será concedido ao convidar novos usuários, os quais devem instalar o aplicativo do MEGA para dispositivos móveis ou para desktop.</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Convite enviado</string>
+    <string name="subtitle_confirmation_invite_friends">Invitation sent</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Formato de email incorreto</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1573,7 +1573,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">Não foi possível deletar o código QR devido a um erro. Por favor, tente novamente.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">Convite enviado</string>
+    <string name="invite_sent">Invitation sent</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">A solicitação de contato foi enviada e o usuário aparecerá na sua lista de contatos quando a aceitar.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1587,7 +1587,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">O código QR foi salvo em %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">Convite não enviado</string>
+    <string name="invite_not_sent">Invitation not sent</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">O código QR ou o link de contato é inválido. Por favor, tente escanear um código válido ou acessar um link válido.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -3456,7 +3456,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Você já convidou %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">O convite foi enviado. Ver as Solicitações enviadas.</string>
+    <string name="contact_invited">Invitation sent. See Sent requests.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Arquivo disponível offline</string>
     <!-- Message when file removed from offline. -->
@@ -4653,9 +4653,8 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Entrar na reunião</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">%1$d solicitaçao de contato foi enviada.&#160;</item>
-        <item quantity="many">%1$d de solicitações de contato foram enviadas.&#160;</item>
-        <item quantity="other">%1$d solicitações de contato foram enviadas.&#160;</item>
+        <item quantity="one">%1$d invitation sent.&#160;</item>
+        <item quantity="other">%1$d invitations sent.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4776,7 +4775,7 @@
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">Repetir</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_send_calendar_invite_label">Enviar convite de calendário</string>
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">Send calendar invitation</string>
     <!-- Title of option to add description in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_add_description_label">Adicionar descrição</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
@@ -4980,7 +4979,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backups automáticos</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Retroceder até 90 dias com o plano Pro&#160;Lite e até 180 dias com os planos Pro&#160;I, II e III (em breve)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Programação da limpeza da lixeira entre 7 dias e 10 anos</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5236,7 +5235,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">Você pode visualizar, cancelar ou editar qualquer agendamento de uma reunião periódica pressionando os três pontos à direita e selecionando [A]Agendamentos[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Envie por email um convite de calendário aos participantes para que possam adicionar a reunião aos seus calendários.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invitation to participants so they can add the meeting to their calendars.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Reunião atualizada</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -5388,7 +5387,7 @@
         <item quantity="other">Uploads da câmera concluídos, foi feito o upload de %1$d arquivos</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">O MEGA tem acesso limitado à biblioteca de fotos e não pode fazer backup de todas as suas fotos.</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Pressione para alterar as permissões.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5462,9 +5461,9 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sincronizar</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad&#160;free</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Meeting invite</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA meeting invitation</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
     <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
@@ -5473,4 +5472,18 @@
     <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
     <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">Todos os participantes convidados entraram na chamada</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">There is no one in the waiting room</string>
+    <!-- Label of the button to call an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_button">Chamar</string>
+    <!-- Default status label for an absent participant at the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">Fora da chamada</string>
+    <!-- Status label when calling an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Chamando&#8230;</string>
+    <!-- Status label after call an absent participant from the not in call participants list and get no response -->
+    <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Não há resposta</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Chamar a todos</string>
 </resources>

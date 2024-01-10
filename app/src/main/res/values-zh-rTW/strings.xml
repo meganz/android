@@ -1217,7 +1217,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">正在連線⋯</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s已經被邀請了。請與他聯絡以確認成為聯絡人。</string>
+    <string name="context_contact_already_invited">%s was already invited. Check your pending requests.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">如果您拼錯您的電子郵件地址，請更正它並點擊[A]重新發送[A]。</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1359,7 +1359,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">邀請朋友以獲得獎勵</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">每邀請1個可獲得%1$s儲存空間。有效期為365天。</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each invitation. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s儲存空間。有效期限365天。</string>
     <!-- title of the section for unlocked rewards -->
@@ -1519,7 +1519,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">二維條碼已下載到%s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">邀請未發送</string>
+    <string name="invite_not_sent">Invitation not sent</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">二維條碼或聯絡人連結無效。請嘗試掃描有效二維條碼或開啟有效連結。</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -3270,7 +3270,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">您已邀請過%1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">已發送邀請。查看已發送請求。</string>
+    <string name="contact_invited">Invitation sent. See Sent requests.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">檔案可離線使用</string>
     <!-- Message when file removed from offline. -->
@@ -4285,7 +4285,8 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">加入會議</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="other">已發送%1$d個邀請請求。&#160;</item>
+        <item quantity="one">%1$d invitation sent.&#160;</item>
+        <item quantity="other">%1$d invitations sent.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4554,7 +4555,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;自動備份</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite最多可回溯90天，Pro&#160;I、II和III最多可回溯180天（即將推出）</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;垃圾筒清理排程7天至10年</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4782,7 +4783,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">您現在可以點選右側的三個小圓點並選擇[A]事件[/A]來查看、取消、或編輯週期性會的任何事件。</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">透過電子郵件發送行事曆邀請給與會者，以便他們可以將會議加到他們的行事曆。</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">透過電子郵件向與會者發送行事曆邀請，以便他們可以將會議加到行事曆中。</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">會議已更新</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -4924,7 +4925,7 @@
         <item quantity="other">相機上傳已完成，%1$d個檔案已上傳</item>
     </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA對相簿的存取權限有限，無法備份您所的有照片。</string>
+    <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">點選以更改權限。</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -4994,15 +4995,29 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">同步</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad-free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226; 無&#160;廣告&#160;</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">會議邀請</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA meeting invitation</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s正在邀請你參加MEGA會議</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">會議名稱：%1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">會議連結：%1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">日期和時間：%1$s</string>
+    <!-- Text to show when the list of participants who are not in the call is empty -->
+    <string name="meetings_bottom_panel_participants_not_in_call_empty">所有受邀參與者都加入了通話</string>
+    <!-- Text to show when the list of participants who are in waiting room is empty -->
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">等候室裡沒有人</string>
+    <!-- Label of the button to call an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_button">通話</string>
+    <!-- Default status label for an absent participant at the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">不在通話中</string>
+    <!-- Status label when calling an absent participant from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">正在撥打⋯</string>
+    <!-- Status label after call an absent participant from the not in call participants list and get no response -->
+    <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">沒有回應</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">與所有人通話</string>
 </resources>
