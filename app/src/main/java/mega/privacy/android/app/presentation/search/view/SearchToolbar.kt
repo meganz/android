@@ -23,15 +23,20 @@ fun SearchToolBar(
     searchQuery: String,
     updateSearchQuery: (String) -> Unit,
     menuActions: List<MenuAction> = emptyList(),
+    onBackPressed: () -> Unit
 ) {
     if (selectionCount > 0) {
-        SelectModeAppBar(title = "$selectionCount", actions = menuActions)
+        SelectModeAppBar(
+            title = "$selectionCount",
+            actions = menuActions,
+            onNavigationPressed = { onBackPressed() }
+        )
     } else {
         ExpandedSearchAppBar(
             text = searchQuery,
             hintId = R.string.hint_action_search,
             onSearchTextChange = { updateSearchQuery(it) },
-            onCloseClicked = { updateSearchQuery("") },
+            onCloseClicked = { onBackPressed() },
             elevation = false
         )
     }
@@ -45,6 +50,7 @@ private fun PreviewSearchToolbar() {
             selectionCount = 10,
             searchQuery = "searchQuery",
             updateSearchQuery = {},
+            onBackPressed = {}
         )
     }
 }

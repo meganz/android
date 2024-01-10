@@ -1,13 +1,16 @@
 package mega.privacy.android.app.presentation.search
 
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -26,10 +29,12 @@ import mega.privacy.android.domain.entity.node.TypedNode
 @Composable
 fun SearchNavHostController(
     viewModel: SearchActivityViewModel,
+    moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel,
     handleClick: (TypedNode?) -> Unit,
     navigateToLink: (String) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
     trackAnalytics: (SearchFilter?) -> Unit,
+    onBackPressed: () -> Unit,
     nodeBottomSheetActionHandler: NodeBottomSheetActionHandler,
     modifier: Modifier = Modifier,
 ) {
@@ -49,6 +54,8 @@ fun SearchNavHostController(
                 navHostController = navHostController,
                 searchActivityViewModel = viewModel,
                 nodeBottomSheetActionHandler = nodeBottomSheetActionHandler,
+                onBackPressed = onBackPressed,
+                moveToRubbishOrDeleteNodeDialogViewModel = moveToRubbishOrDeleteNodeDialogViewModel
             )
         }
     }

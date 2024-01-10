@@ -52,7 +52,7 @@ class SearchNodesUseCase @Inject constructor(
         searchCategory: SearchCategory = SearchCategory.ALL,
     ): List<TypedNode> {
         val invalidNodeHandle = nodeRepository.getInvalidHandle()
-        if (query.isEmpty() && parentHandle != invalidNodeHandle) return getTypedChildrenNodeUseCase(
+        if (query.isEmpty() && parentHandle != invalidNodeHandle && searchCategory == SearchCategory.ALL) return getTypedChildrenNodeUseCase(
             parentNodeId = NodeId(longValue = parentHandle),
             order = getCloudSortOrder()
         )

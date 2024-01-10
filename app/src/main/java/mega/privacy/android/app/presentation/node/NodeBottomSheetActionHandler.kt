@@ -6,10 +6,13 @@ import android.net.Uri
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.main.VersionsFileActivity
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
+import mega.privacy.android.app.presentation.node.model.menuaction.DeletePermanentlyMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.DisputeTakeDownMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.GetLinkMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.InfoMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.TrashMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.model.MenuAction

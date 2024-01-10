@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.search
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
@@ -16,6 +17,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.ui.navigateUp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -37,6 +39,7 @@ fun SearchScreen(
     navigateToLink: (String) -> Unit,
     handleClick: (TypedNode?) -> Unit,
     navHostController: NavHostController,
+    onBackPressed: () -> Unit,
     searchActivityViewModel: SearchActivityViewModel,
     nodeBottomSheetActionHandler: NodeBottomSheetActionHandler,
     modifier: Modifier = Modifier,
@@ -82,6 +85,7 @@ fun SearchScreen(
         updateFilter = searchActivityViewModel::updateFilter,
         trackAnalytics = trackAnalytics,
         updateSearchQuery = searchActivityViewModel::updateSearchQuery,
+        onBackPressed = onBackPressed
     )
     handleClick(uiState.lastSelectedNode)
 

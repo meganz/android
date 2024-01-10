@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -27,6 +28,7 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -53,6 +55,7 @@ import javax.inject.Inject
 class SearchActivity : AppCompatActivity() {
 
     private val viewModel: SearchActivityViewModel by viewModels()
+    private val moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel by viewModels()
 
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
@@ -113,20 +116,39 @@ class SearchActivity : AppCompatActivity() {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
+            val moveToRubbishState by moveToRubbishOrDeleteNodeDialogViewModel.state.collectAsStateWithLifecycle()
+            val scaffoldState = rememberScaffoldState()
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    scaffoldState = rememberScaffoldState(),
+                    scaffoldState = scaffoldState,
                 ) { padding ->
                     SearchNavHostController(
                         modifier = Modifier.padding(padding),
                         viewModel = viewModel,
+                        moveToRubbishOrDeleteNodeDialogViewModel = moveToRubbishOrDeleteNodeDialogViewModel,
                         handleClick = ::handleClick,
                         navigateToLink = ::navigateToLink,
                         showSortOrderBottomSheet = ::showSortOrderBottomSheet,
                         trackAnalytics = ::trackAnalytics,
                         nodeBottomSheetActionHandler = NodeBottomSheetActionHandler(this),
+                        onBackPressed = {
+                            if (viewModel.state.value.selectedNodes.isNotEmpty()) {
+                                viewModel.clearSelection()
+                            } else {
+                                onBackPressedDispatcher.onBackPressed()
+                            }
+                        }
                     )
+                }
+
+                EventEffect(
+                    moveToRubbishState.deleteEvent,
+                    onConsumed = {
+                        moveToRubbishOrDeleteNodeDialogViewModel.consumeDeleteEvent()
+                    }
+                ) {
+                    scaffoldState.snackbarHostState.showSnackbar(it)
                 }
             }
         }
