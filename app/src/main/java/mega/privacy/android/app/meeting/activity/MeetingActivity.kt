@@ -739,10 +739,10 @@ class MeetingActivity : PasscodeActivity() {
             getString(R.string.meetings_sharing_meeting_link_meeting_link, meetingLink)
 
         val body = StringBuilder()
-        body.append(title)
+        body.append("\n")
+            .append(title)
             .append("\n\n")
             .append(meetingName)
-            .append("\n")
 
         chatScheduledMeeting?.let {
             val meetingDateAndTime = getString(
@@ -754,15 +754,15 @@ class MeetingActivity : PasscodeActivity() {
                 )
             )
             body.append(meetingDateAndTime)
-                .append("\n")
         }
 
-        body.append(meetingLink)
+        body.append("\n")
+            .append(meetingLink)
 
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = Constants.TYPE_TEXT_PLAIN
+            putExtra(Intent.EXTRA_SUBJECT, "\n${subject}")
             putExtra(Intent.EXTRA_TEXT, body.toString())
-            putExtra(Intent.EXTRA_SUBJECT, subject)
         }
 
         startActivity(Intent.createChooser(intent, " "))

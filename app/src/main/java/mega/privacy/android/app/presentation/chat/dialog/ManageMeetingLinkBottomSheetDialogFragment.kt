@@ -91,10 +91,10 @@ class ManageMeetingLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment
                 getString(R.string.meetings_sharing_meeting_link_meeting_link, link)
 
             val body = StringBuilder()
-            body.append(message)
+            body.append("\n")
+                .append(message)
                 .append("\n\n")
                 .append(meetingName)
-                .append("\n")
 
             chatScheduledMeeting?.let {
                 val meetingDateAndTime = getString(
@@ -106,15 +106,15 @@ class ManageMeetingLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment
                     )
                 )
                 body.append(meetingDateAndTime)
-                    .append("\n")
             }
 
-            body.append(meetingLink)
+            body.append("\n")
+                .append(meetingLink)
 
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = Constants.TYPE_TEXT_PLAIN
+                putExtra(Intent.EXTRA_SUBJECT, "\n${subject}")
                 putExtra(Intent.EXTRA_TEXT, body.toString())
-                putExtra(Intent.EXTRA_SUBJECT, subject)
             }
 
             startActivity(Intent.createChooser(intent, " "))

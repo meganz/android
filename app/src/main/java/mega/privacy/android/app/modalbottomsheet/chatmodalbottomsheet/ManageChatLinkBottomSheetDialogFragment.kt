@@ -89,13 +89,14 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
         }
 
         binding.shareManageChatLinkOption.setOnClickListener {
-            val subject =
-                if (isMeeting) getString(R.string.meetings_sharing_meeting_link_meeting_invite_subject) else chatTitle
+            val meetingSubject =
+                getString(R.string.meetings_sharing_meeting_link_meeting_invite_subject)
 
             val body = StringBuilder()
 
             if (isMeeting) {
-                body.append(getString(R.string.meetings_sharing_meeting_link_title, myFullName))
+                body.append("\n")
+                    .append(getString(R.string.meetings_sharing_meeting_link_title, myFullName))
                     .append("\n\n")
                     .append(
                         getString(
@@ -115,7 +116,7 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = Constants.TYPE_TEXT_PLAIN
                 putExtra(Intent.EXTRA_TEXT, if (isMeeting) body.toString() else chatLink)
-                putExtra(Intent.EXTRA_SUBJECT, subject)
+                putExtra(Intent.EXTRA_SUBJECT, if (isMeeting) "\n${meetingSubject}" else chatTitle)
             }
 
             startActivity(
