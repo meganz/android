@@ -441,8 +441,8 @@ dependencies {
     if (shouldUsePrebuiltSdk()) {
         // These 2 ExoPlayer libs are created by SDK build. If upgrading ExoPlayer version,
         // remember to upload these 2 files.
-        implementation(files("src/main/libs/exoplayer-extension-ffmpeg-2.18.1.aar"))
-        implementation(files("src/main/libs/exoplayer-extension-flac-2.18.1.aar"))
+        implementation(files("src/main/libs/exoplayer-extension-ffmpeg-2.19.1.aar"))
+        implementation(files("src/main/libs/exoplayer-extension-flac-2.19.1.aar"))
     } else {
         implementation(
             fileTree(
