@@ -36,7 +36,7 @@ class StartDownloadUseCase @Inject constructor(
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
-    private val ensureDownloadsWorkerHasStartedUseCase: EnsureDownloadsWorkerHasStartedUseCase,
+    private val isDownloadsWorkerStartedUseCase: IsDownloadsWorkerStartedUseCase,
 ) {
     /**
      * Invoke
@@ -92,7 +92,7 @@ class StartDownloadUseCase @Inject constructor(
                             startDownloadWorkerUseCase()
 
                             //ensure worker has started and is listening to global events so we can finish downloadNodesUseCase
-                            ensureDownloadsWorkerHasStartedUseCase()
+                            isDownloadsWorkerStartedUseCase()
                         }
                         emit(event)
                         return@transformWhile !finished

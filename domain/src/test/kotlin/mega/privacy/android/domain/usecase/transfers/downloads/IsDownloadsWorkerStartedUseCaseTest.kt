@@ -17,14 +17,14 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class EnsureDownloadsWorkerHasStartedUseCaseTest {
-    private lateinit var underTest: EnsureDownloadsWorkerHasStartedUseCase
+class IsDownloadsWorkerStartedUseCaseTest {
+    private lateinit var underTest: IsDownloadsWorkerStartedUseCase
 
     private val transferRepository = mock<TransferRepository>()
 
     @BeforeAll
     fun setup() {
-        underTest = EnsureDownloadsWorkerHasStartedUseCase(transferRepository)
+        underTest = IsDownloadsWorkerStartedUseCase(transferRepository)
     }
 
     @BeforeEach

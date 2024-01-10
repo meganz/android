@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.transfers.downloads
 
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +20,6 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -41,7 +39,6 @@ class DownloadNodesUseCase @Inject constructor(
     private val handleSDCardEventUseCase: HandleSDCardEventUseCase,
     private val transferRepository: TransferRepository,
     private val fileSystemRepository: FileSystemRepository,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
 ) {
     /**
@@ -66,7 +63,7 @@ class DownloadNodesUseCase @Inject constructor(
         val allIds = nodes.map { it.id.longValue }
         var finishProcessingSend = false
         return channelFlow {
-            monitorTransferEvents(this)
+            monitorTransferEvents()
             fileSystemRepository.createDirectory(destinationPath)
             //start all downloads in parallel
             nodes.map { node ->
@@ -128,8 +125,8 @@ class DownloadNodesUseCase @Inject constructor(
     /**
      * Monitors download child transfer global events and update the related active transfers
      */
-    private fun monitorTransferEvents(scope: CoroutineScope) =
-        scope.launch(ioDispatcher) {
+    private fun CoroutineScope.monitorTransferEvents() =
+        this.launch {
             monitorTransferEventsUseCase()
                 .filter { event ->
                     event.transfer.transferType == TransferType.DOWNLOAD

@@ -21,7 +21,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.EnsureDownloadsWorkerHasStartedUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.IsDownloadsWorkerStartedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -51,7 +51,7 @@ class StartDownloadUseCaseTest {
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase = mock()
-    private val ensureDownloadsWorkerHasStartedUseCase: EnsureDownloadsWorkerHasStartedUseCase =
+    private val isDownloadsWorkerStartedUseCase: IsDownloadsWorkerStartedUseCase =
         mock()
 
     @BeforeAll
@@ -63,7 +63,7 @@ class StartDownloadUseCaseTest {
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
                 fileSystemRepository = fileSystemRepository,
                 startDownloadWorkerUseCase = startDownloadWorkerUseCase,
-                ensureDownloadsWorkerHasStartedUseCase = ensureDownloadsWorkerHasStartedUseCase,
+                isDownloadsWorkerStartedUseCase = isDownloadsWorkerStartedUseCase,
             )
     }
 
@@ -75,7 +75,7 @@ class StartDownloadUseCaseTest {
             cancelCancelTokenUseCase,
             fileSystemRepository,
             startDownloadWorkerUseCase,
-            ensureDownloadsWorkerHasStartedUseCase,
+            isDownloadsWorkerStartedUseCase,
         )
         whenever(fileSystemRepository.isSDCardPath(any())).thenReturn(false)
     }
@@ -148,7 +148,7 @@ class StartDownloadUseCaseTest {
                 awaitCancellation()
             }
         )
-        whenever(ensureDownloadsWorkerHasStartedUseCase()).then(
+        whenever(isDownloadsWorkerStartedUseCase()).then(
             AdditionalAnswers.answersWithDelay(
                 10
             ) {
@@ -159,7 +159,7 @@ class StartDownloadUseCaseTest {
             awaitComplete()
             assertThat(workerStarted).isTrue()
         }
-        verify(ensureDownloadsWorkerHasStartedUseCase).invoke()
+        verify(isDownloadsWorkerStartedUseCase).invoke()
     }
 
     @Test

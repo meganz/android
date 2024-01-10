@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -71,8 +70,6 @@ class DownloadNodesUseCaseTest {
     private val handleSDCardEventUseCase: HandleSDCardEventUseCase = mock()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
 
-    private val ioDispatcher = UnconfinedTestDispatcher()
-
     private lateinit var underTest: DownloadNodesUseCase
 
     @BeforeAll
@@ -85,7 +82,6 @@ class DownloadNodesUseCaseTest {
                 handleSDCardEventUseCase = handleSDCardEventUseCase,
                 transferRepository = transferRepository,
                 fileSystemRepository = fileSystemRepository,
-                ioDispatcher = ioDispatcher,
                 monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             )
     }
