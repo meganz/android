@@ -110,8 +110,6 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     private val imageNodesDispatcher: CoroutineDispatcher = ioDispatcher.limitedParallelism(1)
 
-    private var monitorOfflineNodesJob: Job? = null
-
     private var populateNodesJob: Job? = null
 
     private var monitorNodeUpdatesJob: Job? = null
@@ -139,8 +137,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     }
 
     private fun monitorOfflineNodes() {
-        monitorOfflineNodesJob?.cancel()
-        monitorOfflineNodesJob = nodeRepository.monitorOfflineNodeUpdates()
+        nodeRepository.monitorOfflineNodeUpdates()
             .onEach(::handleOfflineNodes)
             .launchIn(appScope)
     }
@@ -857,9 +854,6 @@ internal class DefaultPhotosRepository @Inject constructor(
 
         monitorNodeUpdatesJob?.cancel()
         monitorNodeUpdatesJob = null
-
-        monitorOfflineNodesJob?.cancel()
-        monitorOfflineNodesJob = null
 
         offlineNodesCache = mapOf()
         photosCache.clear()
