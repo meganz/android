@@ -1134,10 +1134,10 @@ internal class ChatRepositoryImpl @Inject constructor(
                 val listener = continuation.getRequestListener("setRichLinkWarningCounterValue") {
                     richLinkConfig.update { config ->
                         config.copy(
-                            counterNotNowRichLinkWarning = it.number.toInt()
+                            counterNotNowRichLinkWarning = value
                         )
                     }
-                    it.number.toInt()
+                    value
                 }
                 megaApiGateway.setRichLinkWarningCounterValue(value, listener)
                 continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
@@ -1145,4 +1145,18 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
 
     override fun monitorRichLinkPreviewConfig(): Flow<RichLinkConfig> = richLinkConfig.asStateFlow()
+
+    override fun hasUrl(url: String): Boolean = megaChatApiGateway.hasUrl(url)
+
+    override suspend fun enableRichPreviews(enable: Boolean) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("enableRichLinkPreview") {
+                richLinkConfig.update { config ->
+                    config.copy(isRichLinkEnabled = enable)
+                }
+            }
+            megaApiGateway.enableRichPreviews(enable, listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
 }

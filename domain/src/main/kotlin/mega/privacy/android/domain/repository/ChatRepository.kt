@@ -844,4 +844,19 @@ interface ChatRepository {
      * @return number of rich link warning counter
      */
     suspend fun setRichLinkWarningCounterValue(value: Int): Int
+
+    /**
+     * Has url
+     *
+     * @param url
+     * @return true if has url, false otherwise
+     */
+    fun hasUrl(url: String): Boolean
+
+    /**
+     * Enable rich link preview
+     *
+     * @param enable
+     */
+    suspend fun enableRichPreviews(enable: Boolean)
 }

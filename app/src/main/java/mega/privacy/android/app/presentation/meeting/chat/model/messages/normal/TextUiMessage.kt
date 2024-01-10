@@ -19,7 +19,9 @@ data class TextUiMessage(
     override val showDate: Boolean,
 ) : AvatarMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
-        ChatMessageTextView(text = message.content.orEmpty(), isMe = message.isMine)
+        ChatMessageTextView(
+            message = message
+        )
     }
 
     override val displayAsMine = message.isMine

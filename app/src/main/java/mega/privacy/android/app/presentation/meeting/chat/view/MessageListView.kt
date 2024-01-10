@@ -53,6 +53,10 @@ internal fun MessageListView(
         }
     }
 
+    LaunchedEffect(pagingItems.itemSnapshotList) {
+        viewModel.updateLatestMessageId(pagingItems.itemSnapshotList.lastOrNull()?.id ?: -1L)
+    }
+
     LaunchedEffect(uiState.userUpdate) {
         if (uiState.userUpdate != null) {
             val newLastCacheUpdateTime = lastCacheUpdateTime.toMutableMap()

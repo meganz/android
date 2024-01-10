@@ -738,4 +738,6 @@ internal class MegaChatApiFacade @Inject constructor(
     override suspend fun closeChatPreview(chatId: Long) {
         chatApi.closeChatPreview(chatId)
     }
+
+    override fun hasUrl(content: String) = MegaChatApi.hasUrl(content)
 }

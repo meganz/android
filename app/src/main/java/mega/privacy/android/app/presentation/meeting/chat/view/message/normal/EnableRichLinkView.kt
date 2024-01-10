@@ -31,7 +31,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * Enable rich link view
  *
  * @param alwaysAllowClick Always allow click
- * @param notAllowClick Not allow click
+ * @param notNowClick Not now click
  * @param neverClick Never click after show confirmation
  * @param denyNeverClick Deny never click after show confirmation
  * @param isShowNeverButton Is show never button
@@ -39,7 +39,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 @Composable
 fun EnableRichLinkView(
     alwaysAllowClick: () -> Unit,
-    notAllowClick: () -> Unit,
+    notNowClick: () -> Unit,
     neverClick: () -> Unit,
     denyNeverClick: () -> Unit,
     isShowNeverButton: Boolean,
@@ -92,8 +92,8 @@ fun EnableRichLinkView(
             )
             TextMegaButton(
                 modifier = Modifier.padding(top = 12.dp),
-                text = stringResource(id = R.string.button_always_rich_links),
-                onClick = notAllowClick,
+                text = stringResource(id = R.string.button_not_now_rich_links),
+                onClick = notNowClick,
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
             )
             if (isShowNeverButton) {
@@ -114,7 +114,7 @@ private fun EnableRichLinkViewPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         EnableRichLinkView(
             alwaysAllowClick = {},
-            notAllowClick = {},
+            notNowClick = {},
             neverClick = {},
             denyNeverClick = {},
             isShowNeverButton = true,

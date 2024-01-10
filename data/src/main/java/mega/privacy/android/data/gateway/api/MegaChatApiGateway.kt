@@ -1389,4 +1389,12 @@ interface MegaChatApiGateway {
      * @param chatid MegaChatHandle that identifies the chat room
      */
     suspend fun closeChatPreview(chatId: Long)
+
+    /**
+     * Has url
+     *
+     * @param content
+     * @return
+     */
+    fun hasUrl(content: String): Boolean
 }

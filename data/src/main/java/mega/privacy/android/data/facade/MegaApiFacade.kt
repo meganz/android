@@ -1488,4 +1488,7 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.setRichLinkWarningCounterValue(value, listener)
     }
+
+    override fun enableRichPreviews(enable: Boolean, listener: MegaRequestListenerInterface) =
+        megaApi.enableRichPreviews(enable, listener)
 }

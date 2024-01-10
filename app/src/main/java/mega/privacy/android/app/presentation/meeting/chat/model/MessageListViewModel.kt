@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.model
 
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -46,6 +48,16 @@ class MessageListViewModel @Inject constructor(
 
     private val chatId = savedStateHandle.get<Long?>(Constants.CHAT_ID) ?: -1
 
+    /**
+     * Latest message time
+     */
+    val latestMessageId = mutableLongStateOf(-1L)
+
+    /**
+     * Asked enable rich link
+     */
+    val askedEnableRichLink = mutableStateOf(false)
+
     private val pagedFlow =
         Pager(
             PagingConfig(
@@ -80,4 +92,20 @@ class MessageListViewModel @Inject constructor(
             )
         }
 
+    /**
+     * Update latest message id
+     *
+     * @param id
+     */
+    fun updateLatestMessageId(id: Long) {
+        latestMessageId.longValue = id
+    }
+
+    /**
+     * On asked enable rich link
+     *
+     */
+    fun onAskedEnableRichLink() {
+        askedEnableRichLink.value = true
+    }
 }

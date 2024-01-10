@@ -362,7 +362,7 @@ class ChatViewModelTest {
         }
 
     @Test
-    fun `test that rich link config updated when monitorPausedTransfersUseCase emit value`() =
+    fun `test that rich link config updated when monitorRichLinkPreviewConfigUseCase emit value`() =
         runTest {
             val config = RichLinkConfig(
                 isShowRichLinkWarning = true,

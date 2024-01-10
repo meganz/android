@@ -1,11 +1,13 @@
 package mega.privacy.android.domain.usecase.chat.message
 
 import com.google.common.truth.Truth
+import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.LinkDetail
 import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.normal.ContactLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
-import mega.privacy.android.domain.usecase.link.ExtractContactLinkUseCase
+import mega.privacy.android.domain.usecase.chat.GetLinkTypesUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,21 +20,21 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CreateNormalChatMessageUseCaseTest {
     private lateinit var underTest: CreateNormalChatMessageUseCase
-    private val extractContactLinkUseCase: ExtractContactLinkUseCase = mock()
+    private val getLinkTypesUseCase: GetLinkTypesUseCase = mock()
 
     @BeforeEach
     internal fun setUp() {
-        underTest = CreateNormalChatMessageUseCase(extractContactLinkUseCase)
+        underTest = CreateNormalChatMessageUseCase(getLinkTypesUseCase)
     }
 
     @AfterEach
     internal fun tearDown() {
-        reset(extractContactLinkUseCase)
+        reset(getLinkTypesUseCase)
     }
 
     @Test
     fun `test that normal message is returned`() {
-        whenever(extractContactLinkUseCase(any())).thenReturn(null)
+        whenever(getLinkTypesUseCase(any())).thenReturn(emptyList())
         val message = mock(ChatMessage::class.java)
         Truth.assertThat(underTest.invoke(CreateTypedMessageRequest(message, true)))
             .isInstanceOf(TextMessage::class.java)
@@ -40,7 +42,14 @@ class CreateNormalChatMessageUseCaseTest {
 
     @Test
     fun `test that contact link message is returned`() {
-        whenever(extractContactLinkUseCase(any())).thenReturn("contactLink")
+        whenever(getLinkTypesUseCase(any())).thenReturn(
+            listOf(
+                LinkDetail(
+                    "link",
+                    RegexPatternType.CONTACT_LINK
+                )
+            )
+        )
         val message = mock(ChatMessage::class.java)
         Truth.assertThat(underTest.invoke(CreateTypedMessageRequest(message, true)))
             .isInstanceOf(ContactLinkMessage::class.java)

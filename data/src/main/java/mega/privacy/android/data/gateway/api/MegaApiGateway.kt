@@ -3262,4 +3262,17 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun setRichLinkWarningCounterValue(value: Int, listener: MegaRequestListenerInterface)
+
+    /**
+     * Enable or disable the generation of rich previews
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_RICH_PREVIEWS
+     *
+     * @param enable   True to enable the generation of rich previews
+     * @param listener MegaRequestListener to track this request
+     */
+    fun enableRichPreviews(enable: Boolean, listener: MegaRequestListenerInterface)
 }
