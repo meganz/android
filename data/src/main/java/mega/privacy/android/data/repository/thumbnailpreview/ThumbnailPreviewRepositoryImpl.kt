@@ -30,11 +30,10 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
 
     override suspend fun getThumbnailFromLocal(handle: Long): File? =
         withContext(ioDispatcher) {
-            megaApi.getMegaNodeByHandle(handle)?.run {
-                getThumbnailFile(this).takeIf {
-                    it?.exists() ?: false
-                }
-            }
+            cacheGateway.getCacheFile(
+                CacheFolderConstant.THUMBNAIL_FOLDER,
+                getThumbnailOrPreviewFileName(handle)
+            )?.takeIf { it.exists() }
         }
 
     override suspend fun getPublicNodeThumbnailFromLocal(handle: Long): File? =

@@ -15,8 +15,8 @@ class GetThumbnailUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param nodeId
-     * @return
+     * @param nodeId [Long]
+     * @return [File]
      */
     suspend operator fun invoke(nodeId: Long, allowThrow: Boolean = false): File? {
         runCatching {
