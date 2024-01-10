@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ContainsMeta
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
@@ -36,7 +37,9 @@ class CreateMetaMessageUseCaseTest {
         }
         val isMine = true
 
-        assertThat(underTest(chatMessage, isMine)).isInstanceOf(InvalidMetaMessage::class.java)
+        assertThat(underTest.invoke(CreateTypedMessageRequest(chatMessage, true))).isInstanceOf(
+            InvalidMetaMessage::class.java
+        )
     }
 
     @ParameterizedTest(name = "message type {0} is mapped correctly")
@@ -53,7 +56,9 @@ class CreateMetaMessageUseCaseTest {
         }
 
         val isMine = true
-        assertThat(underTest(chatMessage, isMine)).isInstanceOf(clazz)
+        assertThat(underTest.invoke(CreateTypedMessageRequest(chatMessage, true))).isInstanceOf(
+            clazz
+        )
     }
 
     private fun provideParameters(): Stream<Arguments> =

@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.chat.message
 
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import javax.inject.Inject
 
@@ -27,8 +28,9 @@ class MapChatMessageListUseCase @Inject constructor(
     ): List<TypedMessage> {
         return chatMessages.map { chatMessage ->
             val isMine = chatMessage.userHandle == currentUserHandle
-            createTypedMessageUseCases[chatMessage.type]?.invoke(chatMessage, isMine)
-                ?: createInvalidMessageUseCase(chatMessage, isMine)
+            val request = CreateTypedMessageRequest(chatMessage, isMine)
+            createTypedMessageUseCases[chatMessage.type]?.invoke(request)
+                ?: createInvalidMessageUseCase(request)
         }
     }
 }

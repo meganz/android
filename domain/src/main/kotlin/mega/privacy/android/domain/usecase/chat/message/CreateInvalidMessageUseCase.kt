@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.chat.message
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.SignatureInvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.UnrecognizableInvalidMessage
@@ -13,22 +14,24 @@ import javax.inject.Inject
  */
 class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
 
-    override fun invoke(message: ChatMessage, isMine: Boolean) =
-        when {
-            message.type == ChatMessageType.INVALID -> {
-                unrecognizableInvalidMessage(message, isMine)
-            }
+    override fun invoke(request: CreateTypedMessageRequest) =
+        with(request) {
+            when {
+                message.type == ChatMessageType.INVALID -> {
+                    unrecognizableInvalidMessage(message, isMine)
+                }
 
-            message.code == ChatMessageCode.INVALID_FORMAT -> {
-                formatInvalidMessage(message, isMine)
-            }
+                message.code == ChatMessageCode.INVALID_FORMAT -> {
+                    formatInvalidMessage(message, isMine)
+                }
 
-            message.code == ChatMessageCode.INVALID_SIGNATURE -> {
-                signatureInvalidMessage(message, isMine)
-            }
+                message.code == ChatMessageCode.INVALID_SIGNATURE -> {
+                    signatureInvalidMessage(message, isMine)
+                }
 
-            else -> {
-                unrecognizableInvalidMessage(message, isMine)
+                else -> {
+                    unrecognizableInvalidMessage(message, isMine)
+                }
             }
         }
 

@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.chat.message
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
 import org.junit.jupiter.api.BeforeEach
@@ -37,7 +38,7 @@ class MapChatMessageListUseCaseTest {
 
         val expectedMessage = mock<TypedMessage>()
         createTypedMessageUseCase.stub {
-            on { invoke(message, true) } doReturn expectedMessage
+            on { invoke(CreateTypedMessageRequest(message, true)) } doReturn expectedMessage
         }
 
         val result = underTest(list, 123L)
@@ -54,7 +55,7 @@ class MapChatMessageListUseCaseTest {
 
         val invalidMessage = mock<FormatInvalidMessage>()
         createInvalidMessageUseCase.stub {
-            on { invoke(message, true) } doReturn invalidMessage
+            on { invoke(CreateTypedMessageRequest(message, true)) } doReturn invalidMessage
         }
 
         val list = listOf(message)

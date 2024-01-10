@@ -71,7 +71,6 @@ import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRooms
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
-import mega.privacy.android.domain.usecase.chat.message.MonitorMessageLoadedUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
@@ -199,9 +198,6 @@ internal class ChatViewModelTest {
     private val startCallUseCase = mock<StartCallUseCase>()
     private val chatManagement = mock<ChatManagement>()
     private val loadMessagesUseCase = mock<LoadMessagesUseCase>()
-    private val monitorMessageLoadedUseCase = mock<MonitorMessageLoadedUseCase> {
-        onBlocking { invoke(chatId) } doReturn emptyFlow()
-    }
     private val muteChatNotificationForChatRoomsUseCase =
         mock<MuteChatNotificationForChatRoomsUseCase>()
     private val getChatMuteOptionListUseCase = mock<GetChatMuteOptionListUseCase>()
@@ -295,7 +291,6 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorCallInChatUseCase(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorParticipatingInACallInOtherChatUseCase(any()) } doReturn emptyFlow()
         whenever(monitorAllContactParticipantsInChatUseCase(any())) doReturn emptyFlow()
-        wheneverBlocking { (monitorMessageLoadedUseCase(chatId)) } doReturn emptyFlow()
         wheneverBlocking { monitorContactCacheUpdates() } doReturn emptyFlow()
     }
 

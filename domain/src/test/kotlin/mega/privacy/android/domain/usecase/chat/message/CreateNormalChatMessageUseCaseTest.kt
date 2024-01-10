@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.chat.message
 
 import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.normal.ContactLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.domain.usecase.link.ExtractContactLinkUseCase
@@ -33,14 +34,15 @@ class CreateNormalChatMessageUseCaseTest {
     fun `test that normal message is returned`() {
         whenever(extractContactLinkUseCase(any())).thenReturn(null)
         val message = mock(ChatMessage::class.java)
-        Truth.assertThat(underTest.invoke(message, true)).isInstanceOf(TextMessage::class.java)
+        Truth.assertThat(underTest.invoke(CreateTypedMessageRequest(message, true)))
+            .isInstanceOf(TextMessage::class.java)
     }
 
     @Test
     fun `test that contact link message is returned`() {
         whenever(extractContactLinkUseCase(any())).thenReturn("contactLink")
         val message = mock(ChatMessage::class.java)
-        Truth.assertThat(underTest.invoke(message, true))
+        Truth.assertThat(underTest.invoke(CreateTypedMessageRequest(message, true)))
             .isInstanceOf(ContactLinkMessage::class.java)
     }
 }
