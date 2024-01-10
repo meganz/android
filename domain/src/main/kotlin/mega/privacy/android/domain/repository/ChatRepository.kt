@@ -884,7 +884,7 @@ interface ChatRepository {
      * @param chatId
      * @return last history load status for the chat
      */
-    suspend fun getLastLoadResponse(chatId: Long): ChatHistoryLoadStatus
+    suspend fun getLastLoadResponse(chatId: Long): ChatHistoryLoadStatus?
 
     /**
      * Set last load response
