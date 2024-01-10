@@ -93,6 +93,7 @@ class MeetingActivity : PasscodeActivity() {
         const val CALL_ACTION = "call_action"
         const val MEETING_BOTTOM_PANEL_EXPANDED = "meeting_bottom_panel_expanded"
         const val MEETING_CALL_RECORDING = "meeting_call_recording"
+        const val MEETING_IS_RINGIN_ALL = "meeting_is_ringing_all"
 
         fun getIntentOngoingCall(context: Context, chatId: Long): Intent {
             return Intent(context, MeetingActivity::class.java).apply {
@@ -323,6 +324,12 @@ class MeetingActivity : PasscodeActivity() {
                             meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
                             meetingViewModel.onConsumeShouldInCallListBeShownEvent()
                             meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
+                        },
+                        onRingParticipantClicked = { chatParticipant ->
+                            meetingViewModel.ringParticipant(chatParticipant.handle)
+                        },
+                        onRingAllParticipantsClicked = {
+                            meetingViewModel.ringAllAbsentsParticipants()
                         }
                     )
                 }
@@ -490,6 +497,10 @@ class MeetingActivity : PasscodeActivity() {
             meetingViewModel.setIsSessionOnRecording(isSessionOnRecording)
             if (isSessionOnRecording) {
                 meetingViewModel.setIsRecordingConsentAccepted(value = true)
+            }
+
+            if (it.getBooleanExtra(MEETING_IS_RINGIN_ALL, false)) {
+                meetingViewModel.meetingStartedRingingAll()
             }
 
             // Cancel current notification if needed

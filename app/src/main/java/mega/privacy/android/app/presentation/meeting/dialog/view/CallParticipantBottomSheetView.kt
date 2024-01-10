@@ -242,7 +242,7 @@ private fun BottomSheetContent(
                     ChatDivider()
                 }
 
-                if (state.hasHostPermission && !participant.isMe && participant.privilege != ChatRoomPermission.Moderator) {
+                if (state.hasHostPermission() && !participant.isMe && participant.privilege != ChatRoomPermission.Moderator) {
                     BottomSheetMenuItemView(
                         modifier = Modifier,
                         res = R.drawable.ic_moderator,
@@ -257,7 +257,7 @@ private fun BottomSheetContent(
                     ChatDivider()
                 }
 
-                if (state.hasHostPermission && !participant.isMe && participant.privilege == ChatRoomPermission.Moderator) {
+                if (state.hasHostPermission() && !participant.isMe && participant.privilege == ChatRoomPermission.Moderator) {
                     BottomSheetMenuItemView(
                         modifier = Modifier,
                         res = R.drawable.ic_remove_moderator,
@@ -287,7 +287,7 @@ private fun BottomSheetContent(
                     ChatDivider()
                 }
 
-                if (state.hasHostPermission && !participant.isMe) {
+                if (state.hasHostPermission() && !participant.isMe) {
                     BottomSheetMenuItemView(
                         modifier = Modifier,
                         res = R.drawable.ic_remove,

@@ -100,8 +100,8 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 binding.copyLink.setOnClickListener { copyLink() }
             }
 
-            binding.edit.isVisible = state.hasHostPermission
-            binding.invite.isVisible = state.hasHostPermission
+            binding.edit.isVisible = state.hasHostPermission()
+            binding.invite.isVisible = state.hasHostPermission()
             binding.shareLink.isVisible = state.meetingLink.isNotEmpty()
         }
 

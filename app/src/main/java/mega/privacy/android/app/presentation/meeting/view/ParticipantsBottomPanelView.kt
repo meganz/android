@@ -68,12 +68,13 @@ fun ParticipantsBottomPanelView(
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
     onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
     onRingParticipantClicked: (ChatParticipant) -> Unit = {},
+    onRingAllParticipantsClicked: () -> Unit = {},
 ) {
 
     val listState = rememberLazyListState()
     val maxNumParticipantsNoSeeAllOption = 4
 
-    val shouldWaitingRoomSectionBeShown = state.hasWaitingRoom && state.hasHostPermission
+    val shouldWaitingRoomSectionBeShown = state.hasWaitingRoom && state.hasHostPermission()
 
     val shouldNumberOfParticipantsItemBeShown =
         state.participantsSection == ParticipantsSection.InCallSection ||
@@ -133,7 +134,7 @@ fun ParticipantsBottomPanelView(
                         }
                     }
                 }
-                if (state.hasHostPermission && state.participantsSection == ParticipantsSection.InCallSection) {
+                if (state.hasHostPermission() && state.participantsSection == ParticipantsSection.InCallSection) {
                     item(key = "Allow non-hosts add participants button") {
                         Row(
                             modifier = Modifier
@@ -226,11 +227,32 @@ fun ParticipantsBottomPanelView(
                                     }
                                 }
                             }
+
+                            if (state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly) {
+                                Box(
+                                    modifier = Modifier.wrapContentSize(Alignment.CenterEnd)
+                                ) {
+                                    Row(modifier = Modifier.align(Alignment.Center)) {
+                                        if (state.isRingingAll) {
+                                            Icon(
+                                                imageVector = ImageVector.vectorResource(id = R.drawable.ringing_all_icon),
+                                                contentDescription = "Call all icon",
+                                                tint = MaterialTheme.colors.secondary
+                                            )
+                                        } else {
+                                            TextMegaButton(
+                                                text = stringResource(id = R.string.meetings_bottom_panel_not_in_call_participants_call_all_button),
+                                                onClick = onRingAllParticipantsClicked,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
 
-                if (state.participantsSection == ParticipantsSection.InCallSection && !state.isGuest && (state.hasHostPermission || state.isOpenInvite)) {
+                if (state.participantsSection == ParticipantsSection.InCallSection && !state.isGuest && (state.hasHostPermission() || state.isOpenInvite)) {
                     item(key = "Invite participants button") {
                         Row(
                             modifier = Modifier
@@ -254,7 +276,7 @@ fun ParticipantsBottomPanelView(
                                     if (i < maxNumParticipantsNoSeeAllOption) {
                                         ParticipantInCallItem(
                                             section = state.participantsSection,
-                                            hasHostPermission = true,
+                                            myPermission = state.myPermission,
                                             isGuest = state.isGuest,
                                             participant = state.chatParticipantsInWaitingRoom[i],
                                             onAdmitParticipantClicked = onAdmitParticipantClicked,
@@ -278,7 +300,7 @@ fun ParticipantsBottomPanelView(
                             if (i < maxNumParticipantsNoSeeAllOption) {
                                 ParticipantInCallItem(
                                     section = state.participantsSection,
-                                    hasHostPermission = true,
+                                    myPermission = state.myPermission,
                                     isGuest = state.isGuest,
                                     participant = state.chatParticipantsInCall[i],
                                     onAdmitParticipantClicked = onAdmitParticipantClicked,
@@ -294,9 +316,10 @@ fun ParticipantsBottomPanelView(
                                     if (i < maxNumParticipantsNoSeeAllOption) {
                                         ParticipantInCallItem(
                                             section = state.participantsSection,
-                                            hasHostPermission = true,
+                                            myPermission = state.myPermission,
                                             isGuest = state.isGuest,
                                             participant = state.chatParticipantsNotInCall[i],
+                                            isRingingAll = state.isRingingAll,
                                             onAdmitParticipantClicked = onAdmitParticipantClicked,
                                             onDenyParticipantClicked = onDenyParticipantClicked,
                                             onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked,
@@ -364,7 +387,9 @@ private fun EmptyState(section: ParticipantsSection) {
         Image(
             painter = painterResource(id = R.drawable.ic_meeting_participants_list_empty),
             contentDescription = "Empty state",
-            modifier = Modifier.size(120.dp).padding(bottom = 16.dp)
+            modifier = Modifier
+                .size(120.dp)
+                .padding(bottom = 16.dp)
         )
         Text(
             text = when (section) {
@@ -479,7 +504,7 @@ fun PreviewParticipantsBottomPanelGuestInCallSection() {
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
-            hasHostPermission = false,
+            myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
             onWaitingRoomClick = {},
@@ -507,7 +532,7 @@ fun PreviewParticipantsBottomPanelGuestNotInCallSection() {
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
             hasWaitingRoom = true,
-            hasHostPermission = false,
+            myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
             onWaitingRoomClick = {},
@@ -535,7 +560,7 @@ fun PreviewParticipantsBottomPanelGuestNotInCallSectionEmptyState() {
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
             hasWaitingRoom = true,
-            hasHostPermission = false,
+            myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
             onWaitingRoomClick = {},
@@ -563,7 +588,7 @@ fun PreviewParticipantsBottomPanelNonHostInCallSection() {
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
-            hasHostPermission = false,
+            myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
             onWaitingRoomClick = {},
@@ -591,7 +616,7 @@ fun PreviewParticipantsBottomPanelNonHostAndOpenInviteInCallSection() {
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
-            hasHostPermission = false,
+            myPermission = ChatRoomPermission.Standard,
             isOpenInvite = true,
             isGuest = false
         ),
@@ -620,7 +645,7 @@ fun PreviewParticipantsBottomPanelNonHostNotInCallSection() {
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
             hasWaitingRoom = true,
-            hasHostPermission = false,
+            myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
             onWaitingRoomClick = {},
@@ -648,7 +673,7 @@ fun PreviewParticipantsBottomPanelNonHostNotInCallSectionEmptyState() {
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
             hasWaitingRoom = true,
-            hasHostPermission = false,
+            myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
             onWaitingRoomClick = {},
@@ -676,7 +701,7 @@ fun PreviewParticipantsBottomPanelInCallView4Participants() {
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
-            hasHostPermission = true,
+            myPermission = ChatRoomPermission.Moderator,
         ),
             onWaitingRoomClick = {},
             onInCallClick = {},
@@ -702,7 +727,7 @@ fun PreviewParticipantsBottomPanelInCallView6Participants() {
         ParticipantsBottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith6Participants(),
-            hasHostPermission = true,
+            myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
             onWaitingRoomClick = {},
@@ -729,7 +754,7 @@ fun PreviewParticipantsBottomPanelNotInCallViewEmptyState() {
         ParticipantsBottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
-            hasHostPermission = true,
+            myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
             onWaitingRoomClick = {},
@@ -757,7 +782,7 @@ fun PreviewParticipantsBottomPanelNotInCallView4Participants() {
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
             hasWaitingRoom = true,
-            hasHostPermission = true,
+            myPermission = ChatRoomPermission.Moderator,
         ),
             onWaitingRoomClick = {},
             onInCallClick = {},
@@ -783,7 +808,7 @@ fun PreviewParticipantsBottomPanelNotInCallView6Participants() {
         ParticipantsBottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith6Participants(),
-            hasHostPermission = true,
+            myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
             onWaitingRoomClick = {},
@@ -812,7 +837,7 @@ fun PreviewParticipantsBottomPanelWaitingRoomViewEmptyState() {
             chatParticipantsInWaitingRoom = emptyList(),
             usersInWaitingRoomIDs = emptyList(),
             hasWaitingRoom = true,
-            hasHostPermission = true,
+            myPermission = ChatRoomPermission.Moderator,
         ),
             onWaitingRoomClick = {},
             onInCallClick = {},
@@ -840,7 +865,7 @@ fun PreviewParticipantsBottomPanelWaitingRoomView4Participants() {
             chatParticipantsInWaitingRoom = getListWith4Participants(),
             usersInWaitingRoomIDs = get4UsersInWaitingRoomIDs(),
             hasWaitingRoom = true,
-            hasHostPermission = true,
+            myPermission = ChatRoomPermission.Moderator,
         ),
             onWaitingRoomClick = {},
             onInCallClick = {},
@@ -867,7 +892,7 @@ fun PreviewParticipantsBottomPanelWaitingRoomView4ParticipantsLand() {
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith4Participants(),
             usersInWaitingRoomIDs = get4UsersInWaitingRoomIDs(),
-            hasHostPermission = true,
+            myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
             onWaitingRoomClick = {},
@@ -896,7 +921,7 @@ fun PreviewParticipantsBottomPanelWaitingRoomView6Participants() {
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith6Participants(),
             usersInWaitingRoomIDs = get6UsersInWaitingRoomIDs(),
-            hasHostPermission = true,
+            myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
             onWaitingRoomClick = {},
@@ -924,7 +949,7 @@ fun PreviewParticipantsBottomPanelWaitingRoomView6ParticipantsLand() {
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith6Participants(),
             usersInWaitingRoomIDs = get6UsersInWaitingRoomIDs(),
-            hasHostPermission = true,
+            myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
             onWaitingRoomClick = {},

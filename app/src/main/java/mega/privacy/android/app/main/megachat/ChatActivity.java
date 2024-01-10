@@ -2116,6 +2116,7 @@ public class ChatActivity extends PasscodeActivity
                 intentMeeting.putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, chatState.getCurrentCallAudioStatus());
                 intentMeeting.putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, chatState.getCurrentCallVideoStatus());
                 intentMeeting.putExtra(MeetingActivity.MEETING_CALL_RECORDING, chatState.isSessionOnRecording());
+                intentMeeting.putExtra(MeetingActivity.MEETING_IS_RINGIN_ALL, chatState.isRingingAll());
                 startActivity(intentMeeting);
             }
 

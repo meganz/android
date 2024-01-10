@@ -425,7 +425,7 @@ class MeetingActivityViewModel @Inject constructor(
             chatRoom?.apply {
                 _state.update {
                     it.copy(
-                        hasHostPermission = ownPrivilege == ChatRoomPermission.Moderator,
+                        myPermission = ownPrivilege,
                         isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                         enabledAllowNonHostAddParticipantsOption = isOpenInvite,
                         hasWaitingRoom = isWaitingRoom,
@@ -1290,17 +1290,17 @@ class MeetingActivityViewModel @Inject constructor(
             monitorChatRoomUpdates(chatId).collectLatest { chat ->
                 _state.update { state ->
                     with(state) {
-                        val hostValue = if (chat.hasChanged(ChatRoomChange.OwnPrivilege)) {
+                        val permissionValue = if (chat.hasChanged(ChatRoomChange.OwnPrivilege)) {
                             Timber.d("Changes in own privilege")
-                            chat.ownPrivilege == ChatRoomPermission.Moderator
+                            chat.ownPrivilege
                         } else {
-                            hasHostPermission
+                            myPermission
                         }
 
                         val openInviteValue = if (chat.hasChanged(ChatRoomChange.OpenInvite)) {
                             Timber.d("Changes in OpenInvite")
 
-                            chat.isOpenInvite || hostValue
+                            chat.isOpenInvite || myPermission == ChatRoomPermission.Moderator
                         } else {
                             isOpenInvite
                         }
@@ -1320,7 +1320,7 @@ class MeetingActivityViewModel @Inject constructor(
                         }
 
                         copy(
-                            hasHostPermission = hostValue,
+                            myPermission = permissionValue,
                             isOpenInvite = openInviteValue,
                             enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite,
                             hasWaitingRoom = waitingRoomValue,
@@ -1384,7 +1384,7 @@ class MeetingActivityViewModel @Inject constructor(
                     runCatching {
                         queryChatLink(id)
                     }.onFailure {
-                        if (state.value.hasHostPermission && shouldShareMeetingLink) {
+                        if (state.value.hasHostPermission() && shouldShareMeetingLink) {
                             createChatLink()
                         }
                     }.onSuccess { request ->
@@ -1492,7 +1492,7 @@ class MeetingActivityViewModel @Inject constructor(
             }.onSuccess { isAllowAddParticipantsEnabled ->
                 _state.update { state ->
                     state.copy(
-                        isOpenInvite = isAllowAddParticipantsEnabled || state.hasHostPermission,
+                        isOpenInvite = isAllowAddParticipantsEnabled || state.hasHostPermission(),
                         enabledAllowNonHostAddParticipantsOption = isAllowAddParticipantsEnabled,
                     )
                 }
@@ -1791,6 +1791,21 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
+     * Method tod be called when the meeting has started ringing all absent participants
+     */
+    fun meetingStartedRingingAll() = viewModelScope.launch {
+        _state.update { state -> state.copy(isRingingAll = true) }
+        delay(TimeUnit.SECONDS.toMillis(DEFAULT_RING_TIMEOUT_SECONDS))
+        state.value.chatParticipantsNotInCall.forEach { chatParticipant ->
+            updateNotInCallParticipantStatus(
+                userId = chatParticipant.handle,
+                status = MeetingParticipantNotInCallStatus.NoResponse
+            )
+        }
+        _state.update { state -> state.copy(isRingingAll = false) }
+    }
+
+    /**
      * Hang chat call
      */
     fun hangChatCall() = viewModelScope.launch {
@@ -1848,6 +1863,24 @@ class MeetingActivityViewModel @Inject constructor(
             updateNotInCallParticipantStatus(userId, MeetingParticipantNotInCallStatus.NoResponse)
         }.onFailure { exception ->
             Timber.e(exception)
+        }
+    }
+
+    /**
+     * Ring all absents participants
+     */
+    fun ringAllAbsentsParticipants() = viewModelScope.launch {
+        _state.update {
+            it.copy(isRingingAll = true)
+        }
+        state.value.chatParticipantsNotInCall.forEach { chatParticipant ->
+            if (chatParticipant.callStatus != MeetingParticipantNotInCallStatus.Calling) {
+                ringParticipant(chatParticipant.handle)
+            }
+        }
+        delay(TimeUnit.SECONDS.toMillis(DEFAULT_RING_TIMEOUT_SECONDS))
+        _state.update {
+            it.copy(isRingingAll = false)
         }
     }
 

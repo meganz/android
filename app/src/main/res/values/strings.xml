@@ -5251,4 +5251,6 @@
     <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Calling&#8230;</string>
     <!-- Status label after call an absent participant from the not in call participants list and get no response -->
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">No response</string>
+    <!-- Label of the button to call all absent participants from the not in call participants list -->
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Call all</string>
 </resources>

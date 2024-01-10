@@ -78,6 +78,8 @@ fun ParticipantsFullListView(
     onBottomPanelHiddenClicked: () -> Unit,
     onRemoveParticipant: () -> Unit,
     onDismissRemoveParticipantDialog: () -> Unit,
+    onRingParticipantClicked: (ChatParticipant) -> Unit = {},
+    onRingAllParticipantsClicked: () -> Unit = {},
 ) {
     if ((state.participantsSection == ParticipantsSection.WaitingRoomSection &&
                 state.shouldWaitingRoomListBeShown &&
@@ -160,7 +162,7 @@ fun ParticipantsFullListView(
                                             state.chatParticipantsInWaitingRoom.indices.forEach { i ->
                                                 ParticipantInCallItem(
                                                     section = state.participantsSection,
-                                                    hasHostPermission = state.hasHostPermission,
+                                                    myPermission = state.myPermission,
                                                     isGuest = state.isGuest,
                                                     participant = state.chatParticipantsInWaitingRoom[i],
                                                     onAdmitParticipantClicked = onAdmitParticipantClicked,
@@ -173,7 +175,7 @@ fun ParticipantsFullListView(
                                             state.chatParticipantsInCall.indices.forEach { i ->
                                                 ParticipantInCallItem(
                                                     section = state.participantsSection,
-                                                    hasHostPermission = state.hasHostPermission,
+                                                    myPermission = state.myPermission,
                                                     isGuest = state.isGuest,
                                                     participant = state.chatParticipantsInCall[i],
                                                     onAdmitParticipantClicked = onAdmitParticipantClicked,
@@ -186,12 +188,14 @@ fun ParticipantsFullListView(
                                             state.chatParticipantsNotInCall.indices.forEach { i ->
                                                 ParticipantInCallItem(
                                                     section = state.participantsSection,
-                                                    hasHostPermission = state.hasHostPermission,
+                                                    myPermission = state.myPermission,
                                                     isGuest = state.isGuest,
                                                     participant = state.chatParticipantsNotInCall[i],
+                                                    isRingingAll = state.isRingingAll,
                                                     onAdmitParticipantClicked = onAdmitParticipantClicked,
                                                     onDenyParticipantClicked = onDenyParticipantClicked,
-                                                    onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
+                                                    onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked,
+                                                    onRingParticipantClicked = onRingParticipantClicked
                                                 )
                                             }
                                     }
@@ -201,27 +205,37 @@ fun ParticipantsFullListView(
                     }
                 }
 
-                if (state.participantsSection != ParticipantsSection.NotInCallSection || !state.hasHostPermission) {
-                    Row(
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(68.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RaisedDefaultMegaButton(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(68.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        RaisedDefaultMegaButton(
-                            modifier = Modifier
-                                .padding(start = 24.dp, end = 24.dp, bottom = 15.dp)
-                                .fillMaxWidth(),
-                            textId = when (state.participantsSection) {
-                                ParticipantsSection.WaitingRoomSection -> R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button
-                                else -> if (state.callType == CallType.Meeting) R.string.meetings_scheduled_meeting_info_share_meeting_link_label else R.string.meetings_group_call_bottom_panel_share_chat_link_button
-                            },
-                            onClick = when (state.participantsSection) {
-                                ParticipantsSection.WaitingRoomSection -> onAdmitAllClicked
-                                else -> onShareMeetingLink
+                            .padding(start = 24.dp, end = 24.dp, bottom = 15.dp)
+                            .fillMaxWidth(),
+                        textId = when {
+                            state.participantsSection == ParticipantsSection.WaitingRoomSection -> {
+                                R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button
                             }
-                        )
-                    }
+
+                            state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly -> {
+                                R.string.meetings_bottom_panel_not_in_call_participants_call_all_button
+                            }
+
+                            else -> if (state.callType == CallType.Meeting) R.string.meetings_scheduled_meeting_info_share_meeting_link_label else R.string.meetings_group_call_bottom_panel_share_chat_link_button
+                        },
+                        onClick = when {
+                            state.participantsSection == ParticipantsSection.WaitingRoomSection -> onAdmitAllClicked
+                            state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly -> onRingAllParticipantsClicked
+                            else -> onShareMeetingLink
+                        },
+                        enabled = when {
+                            state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly -> !state.isRingingAll
+                            else -> true
+                        }
+                    )
                 }
             }
         }

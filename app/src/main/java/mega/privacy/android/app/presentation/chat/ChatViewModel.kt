@@ -623,7 +623,7 @@ class ChatViewModel @Inject constructor(
         }.onSuccess { call ->
             call?.let {
                 Timber.d("Call started")
-                openCurrentCall(call = it)
+                openCurrentCall(call = it, isRinging = true)
             }
         }.onFailure {
             Timber.e("Exception opening or starting call: $it")
@@ -689,9 +689,10 @@ class ChatViewModel @Inject constructor(
     /**
      * Open current call
      *
-     * @param call  [ChatCall]
+     * @param call      [ChatCall]
+     * @param isRinging True if is ringing or False otherwise
      */
-    private fun openCurrentCall(call: ChatCall) {
+    private fun openCurrentCall(call: ChatCall, isRinging: Boolean = false) {
         chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
         chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
         passcodeManagement.showPasscodeScreen = true
@@ -700,7 +701,8 @@ class ChatViewModel @Inject constructor(
             it.copy(
                 currentCallChatId = call.chatId,
                 currentCallAudioStatus = call.hasLocalAudio,
-                currentCallVideoStatus = call.hasLocalVideo
+                currentCallVideoStatus = call.hasLocalVideo,
+                isRingingAll = isRinging
             )
         }
     }
@@ -713,7 +715,8 @@ class ChatViewModel @Inject constructor(
             it.copy(
                 currentCallChatId = INVALID_HANDLE,
                 currentCallVideoStatus = false,
-                currentCallAudioStatus = false
+                currentCallAudioStatus = false,
+                isRingingAll = false
             )
         }
     }
