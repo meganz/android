@@ -25,11 +25,16 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryScreen
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -38,10 +43,12 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -55,6 +62,9 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel by viewModels()
     private val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()
@@ -255,15 +265,32 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
     }
 
     private fun openPhoto(photo: Photo) {
-        ImageViewerActivity.getIntentForChildren(
-            this,
-            mediaDiscoveryViewModel.getAllPhotoIds().toLongArray(),
-            photo.id,
-            fromFolderLink = true,
-        ).run {
-            startActivity(this)
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                ImagePreviewActivity.createIntent(
+                    context = this@MediaDiscoveryActivity,
+                    imageSource = ImagePreviewFetcherSource.FOLDER_LINK,
+                    menuOptionsSource = ImagePreviewMenuSource.FOLDER_LINK,
+                    anchorImageNodeId = NodeId(photo.id),
+                    isForeign = true,
+                    params = mapOf(
+                        FolderLinkImageNodeFetcher.PARENT_ID to mediaHandle,
+                    ),
+                ).run {
+                    startActivity(this)
+                }
+            } else {
+                ImageViewerActivity.getIntentForChildren(
+                    this@MediaDiscoveryActivity,
+                    mediaDiscoveryViewModel.getAllPhotoIds().toLongArray(),
+                    photo.id,
+                    fromFolderLink = true,
+                ).run {
+                    startActivity(this)
+                }
+                overridePendingTransition(0, 0)
+            }
         }
-        overridePendingTransition(0, 0)
     }
 
     private fun onClick(photo: Photo) {

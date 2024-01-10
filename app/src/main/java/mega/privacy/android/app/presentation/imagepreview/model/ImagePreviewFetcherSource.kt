@@ -6,7 +6,6 @@ enum class ImagePreviewFetcherSource {
     ALBUM_CONTENT,
     ALBUM_SHARING,
     MEDIA_DISCOVERY,
-    MEDIA_DISCOVERY_FOLDER_LINK,
     CLOUD_DRIVE,
     CHAT,
     OFFLINE,
