@@ -650,7 +650,7 @@ class ChatViewModel @Inject constructor(
                     call.chatId.takeIf { it != INVALID_HANDLE }
                         ?.let {
                             Timber.d("Meeting started")
-                            openCurrentCall(call = call)
+                            openCurrentCall(call = call, isRinging = (schedIdWr == -1L))
                         }
                 }
             }.onFailure {
