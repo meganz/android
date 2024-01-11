@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.dialogs
+package mega.privacy.android.app.presentation.node.dialogs.renamenode
 
 import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEvent

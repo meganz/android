@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.dialogs
+package mega.privacy.android.app.presentation.node.dialogs.renamenode
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.dialogs
+package mega.privacy.android.app.presentation.node.dialogs.renamenode
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -13,16 +13,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.app.presentation.node.dialogs.RenameNodeDialogAction.OnLoadNodeNameDialog
-import mega.privacy.android.app.presentation.node.dialogs.RenameNodeDialogAction.OnRenameConfirmed
-import mega.privacy.android.app.presentation.node.dialogs.RenameNodeDialogAction.OnRenameSucceeded
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnLoadNodeNameDialog
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameConfirmed
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameSucceeded
 
 internal const val RENAME_NODE_DIALOG_TAG = "rename_node_dialog:input_dialog"
 internal const val NODE_NAME_INVALID_CHARACTERS = "\" * / : < > ? \\ |"

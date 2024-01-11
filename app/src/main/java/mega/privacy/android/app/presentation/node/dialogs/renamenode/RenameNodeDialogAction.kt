@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.dialogs
+package mega.privacy.android.app.presentation.node.dialogs.renamenode
 
 internal sealed class RenameNodeDialogAction {
 

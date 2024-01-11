@@ -5,8 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
-import mega.privacy.android.app.presentation.node.dialogs.RenameNodeDialog
-import mega.privacy.android.app.presentation.node.dialogs.RenameNodeDialogViewModel
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialog
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 
 internal fun NavGraphBuilder.renameDialogNavigation(
     navHostController: NavHostController,
