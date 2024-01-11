@@ -116,6 +116,7 @@ class ChatToolbarBottomSheetTest {
                 onPickLocation = onPickLocation,
                 isLoadingGalleryFiles = isLoadingGalleryFiles,
                 sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+                onTakePicture = {},
             )
         }
     }

@@ -309,4 +309,12 @@ interface FileSystemRepository {
      * @param sdCardUriString an uri pointing to the Sd card for permission reasons. It should point the same path than [targetPath] or an ancestor in its folder hierarchy. In android we can't access the Sd card directly (except cache folder)
      */
     suspend fun moveFileToSd(file: File, targetPath: String, sdCardUriString: String): Boolean
+
+    /**
+     * Create new image uri
+     *
+     * @param fileName file name
+     * @return uri string
+     */
+    suspend fun createNewImageUri(fileName: String): String?
 }

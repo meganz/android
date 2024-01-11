@@ -241,4 +241,9 @@ interface FileGateway {
      * Get offline folder
      */
     suspend fun getOfflineFolder(): File
+
+    /**
+     * Get offline file
+     */
+    suspend fun createNewImageUri(fileName: String): Uri?
 }

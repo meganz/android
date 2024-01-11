@@ -1,5 +1,6 @@
 package mega.privacy.android.data.facade
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.media.MediaScannerConnection
@@ -308,9 +309,23 @@ class FileFacade @Inject constructor(
     override suspend fun getOfflineFolder() =
         createDirectory(context.filesDir.toString() + File.separator + OFFLINE_DIR)
 
+    override suspend fun createNewImageUri(fileName: String): Uri? {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(
+                MediaStore.Images.Media.RELATIVE_PATH,
+                "${Environment.DIRECTORY_PICTURES}/$PHOTO_DIR"
+            )
+        }
+
+        val contentResolver = context.contentResolver
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+    }
 
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
+        const val PHOTO_DIR = "MEGA Photos"
         const val OFFLINE_DIR = "MEGA Offline"
         const val LAT_LNG = "0/1,0/1,0/1000"
         const val REF_LAT_LNG = "0"

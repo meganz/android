@@ -1,8 +1,9 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
 import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -38,12 +39,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.chat.attachpanel.ChatGalleryItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 
 internal const val TEST_TAG_CHAT_CAMERA_BUTTON = "chat_camera_button"
@@ -59,24 +62,29 @@ internal const val TEST_TAG_CHAT_CAMERA_BUTTON_ICON = "chat_camera_button:icon"
 fun ChatCameraButton(
     sheetState: ModalBottomSheetState,
     modifier: Modifier = Modifier,
+    onTakePicture: () -> Unit = {},
 ) {
     val context: Context = LocalContext.current
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     val cameraController: LifecycleCameraController =
         remember { LifecycleCameraController(context) }
+    var takePictureClicked by remember { mutableStateOf(false) }
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     val cameraPermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
             cameraController.bindToLifecycle(lifecycleOwner)
+            if (takePictureClicked) {
+                onTakePicture()
+                takePictureClicked = false
+            }
         }
     }
     var isFrameReady by remember { mutableStateOf(false) }
     DisposableEffect(sheetState.isVisible) {
         if (sheetState.isVisible) {
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
+            if (cameraPermissionState.status.isGranted.not()) {
                 cameraPermissionsLauncher.launch(Manifest.permission.CAMERA)
             } else {
                 cameraController.bindToLifecycle(lifecycleOwner)
@@ -87,15 +95,7 @@ fun ChatCameraButton(
         onDispose { }
     }
     Box(
-        modifier = modifier
-            .testTag(TEST_TAG_CHAT_CAMERA_BUTTON)
-            .clickable {
-                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
-                    cameraPermissionsLauncher.launch(Manifest.permission.CAMERA)
-                }
-            },
+        modifier = modifier.testTag(TEST_TAG_CHAT_CAMERA_BUTTON)
     ) {
         AndroidView(
             modifier = Modifier
@@ -133,7 +133,15 @@ fun ChatCameraButton(
         Image(
             modifier = Modifier
                 .align(Alignment.Center)
-                .testTag(TEST_TAG_CHAT_CAMERA_BUTTON_ICON),
+                .testTag(TEST_TAG_CHAT_CAMERA_BUTTON_ICON)
+                .clickable {
+                    if (cameraPermissionState.status.isGranted.not()) {
+                        takePictureClicked = true
+                        cameraPermissionsLauncher.launch(Manifest.permission.CAMERA)
+                    } else {
+                        onTakePicture()
+                    }
+                },
             painter = painterResource(id = R.drawable.ic_take_photo),
             contentDescription = "Take photo"
         )

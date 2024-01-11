@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.model
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -67,6 +68,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipants
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
@@ -78,7 +80,10 @@ import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChat
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
+import java.text.SimpleDateFormat
 import java.util.Collections
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.time.DurationUnit
@@ -157,6 +162,7 @@ internal class ChatViewModel @Inject constructor(
     private val openChatLinkUseCase: OpenChatLinkUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val closeChatPreviewUseCase: CloseChatPreviewUseCase,
+    private val createNewImageUriUseCase: CreateNewImageUriUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -958,6 +964,13 @@ internal class ChatViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
+    }
+
+    suspend fun createNewImageUri(): Uri? {
+        Timber.d("createNewImageUri")
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val imageFileName = "picture${timeStamp}_.jpg"
+        return createNewImageUriUseCase(imageFileName)?.let { Uri.parse(it) }
     }
 
     override fun onCleared() {

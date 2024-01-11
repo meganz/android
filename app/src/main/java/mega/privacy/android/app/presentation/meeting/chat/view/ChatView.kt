@@ -6,6 +6,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -128,6 +129,7 @@ internal fun ChatView(
         onUserUpdateHandled = viewModel::onUserUpdateHandled,
         onJoinChat = viewModel::onJoinChat,
         onSetPendingJoinLink = viewModel::onSetPendingJoinLink,
+        createNewImage = viewModel::createNewImageUri,
     )
 }
 
@@ -173,6 +175,7 @@ internal fun ChatView(
     onEndAndAnswerCall: () -> Unit = {},
     onJoinChat: () -> Unit = {},
     onSetPendingJoinLink: () -> Unit = {},
+    createNewImage: suspend () -> Uri? = { null },
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -286,6 +289,15 @@ internal fun ChatView(
                 // TODO attach contact to chat room
             }
 
+        val takePictureLauncher =
+            rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.TakePicture()
+            ) {
+                if (it) {
+
+                }
+            }
+
         val isFileModalShown = fileModalSheetState.currentValue != ModalBottomSheetValue.Hidden
 
         BottomSheet(
@@ -326,6 +338,11 @@ internal fun ChatView(
                                     openLocationPicker(context, locationPickerLauncher)
                                 }
                             )
+                        },
+                        onTakePicture = {
+                            coroutineScope.launch {
+                                createNewImage()?.let(takePictureLauncher::launch)
+                            }
                         },
                         isLoadingGalleryFiles = isLoadingGalleryFiles,
                         sheetState = toolbarModalSheetState

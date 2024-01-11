@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,6 +44,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
@@ -347,6 +349,16 @@ internal class FileSystemRepositoryImplTest {
             }
         }
     }
+
+    @Test
+    fun `test that create new image uri returns correct value`() =
+        runTest {
+            val uri = mock<Uri> {
+                on { toString() } doReturn "uri"
+            }
+            whenever(fileGateway.createNewImageUri(any())).thenReturn(uri)
+            assertThat(underTest.createNewImageUri("name")).isEqualTo("uri")
+        }
 
     @Nested
     @DisplayName("SD Card related methods")

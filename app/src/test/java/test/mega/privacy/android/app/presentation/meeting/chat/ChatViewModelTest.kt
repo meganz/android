@@ -79,6 +79,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipants
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
@@ -217,6 +218,7 @@ internal class ChatViewModelTest {
     private val joinPublicChatUseCase = mock<JoinPublicChatUseCase>()
     private val isAnonymousModeUseCase = mock<IsAnonymousModeUseCase>()
     private val closeChatPreviewUseCase : CloseChatPreviewUseCase = mock()
+    private val createNewImageUriUseCase: CreateNewImageUriUseCase = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeAll
@@ -267,7 +269,8 @@ internal class ChatViewModelTest {
             hangChatCallUseCase,
             joinPublicChatUseCase,
             isAnonymousModeUseCase,
-            closeChatPreviewUseCase
+            closeChatPreviewUseCase,
+            createNewImageUriUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -343,6 +346,7 @@ internal class ChatViewModelTest {
             joinPublicChatUseCase = joinPublicChatUseCase,
             isAnonymousModeUseCase = isAnonymousModeUseCase,
             closeChatPreviewUseCase = closeChatPreviewUseCase,
+            createNewImageUriUseCase = createNewImageUriUseCase,
             applicationScope = CoroutineScope(testDispatcher),
         )
     }

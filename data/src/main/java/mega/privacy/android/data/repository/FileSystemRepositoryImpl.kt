@@ -467,4 +467,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         folderDocument?.findFile(fileName)?.delete()
         return folderDocument?.createFile(mimeType, fileName)
     }
+
+    override suspend fun createNewImageUri(fileName: String): String? = withContext(ioDispatcher) {
+        fileGateway.createNewImageUri(fileName)?.toString()
+    }
 }

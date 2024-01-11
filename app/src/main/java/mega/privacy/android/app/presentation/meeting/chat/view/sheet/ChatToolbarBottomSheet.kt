@@ -48,6 +48,7 @@ import nz.mega.documentscanner.DocumentScannerActivity
 fun ChatToolbarBottomSheet(
     onAttachFileClicked: () -> Unit,
     onAttachContactClicked: () -> Unit,
+    onTakePicture: () -> Unit,
     onPickLocation: () -> Unit,
     isLoadingGalleryFiles: Boolean,
     modifier: Modifier = Modifier,
@@ -85,7 +86,8 @@ fun ChatToolbarBottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(4.dp),
-            sheetState = sheetState
+            sheetState = sheetState,
+            onTakePicture = onTakePicture
         )
 
         AnimatedVisibility(visible = isLoadingGalleryFiles) {
@@ -97,13 +99,15 @@ fun ChatToolbarBottomSheet(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().run {
-                if (isLoadingGalleryFiles) {
-                    padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 24.dp)
-                } else {
-                    padding(24.dp)
-                }
-            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .run {
+                    if (isLoadingGalleryFiles) {
+                        padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 24.dp)
+                    } else {
+                        padding(24.dp)
+                    }
+                },
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             AttachItem(
@@ -188,12 +192,17 @@ private fun openDocumentScanner(
 fun ChatGallery(
     sheetState: ModalBottomSheetState,
     modifier: Modifier = Modifier,
+    onTakePicture: () -> Unit = {},
 ) = LazyRow(
     modifier = modifier.testTag(TEST_TAG_GALLERY_LIST),
     horizontalArrangement = Arrangement.spacedBy(4.dp)
 ) {
     item("camera_button") {
-        ChatCameraButton(modifier = Modifier.size(88.dp), sheetState = sheetState)
+        ChatCameraButton(
+            modifier = Modifier.size(88.dp),
+            sheetState = sheetState,
+            onTakePicture = onTakePicture
+        )
     }
 }
 
@@ -206,6 +215,7 @@ private fun ChatToolbarBottomSheetPreview() {
             onAttachFileClicked = {},
             onAttachContactClicked = {},
             onPickLocation = {},
+            onTakePicture = {},
             isLoadingGalleryFiles = true,
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
         )
