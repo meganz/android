@@ -27,9 +27,10 @@ class FetchMessagePageUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         messageFlow: Flow<ChatMessage?>,
+        nextMessageUserHandle: Long?,
     ): List<TypedMessage> {
         val currentUserHandle = chatRepository.getMyUserHandle()
         val chatMessages = getMessageListUseCase(messageFlow)
-        return mapChatMessageListUseCase(chatMessages, currentUserHandle).sortedBy { it.time }
+        return mapChatMessageListUseCase(chatMessages, currentUserHandle, nextMessageUserHandle)
     }
 }

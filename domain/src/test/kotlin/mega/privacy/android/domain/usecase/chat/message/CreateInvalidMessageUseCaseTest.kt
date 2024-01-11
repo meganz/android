@@ -29,7 +29,15 @@ class CreateInvalidMessageUseCaseTest {
             on { type }.thenReturn(ChatMessageType.INVALID)
         }
         assertThat(
-            underTest.invoke(CreateTypedMessageRequest(message, true))
+            underTest.invoke(
+                CreateTypedMessageRequest(
+                    message = message,
+                    isMine = true,
+                    shouldShowAvatar = true,
+                    shouldShowTime = true,
+                    shouldShowDate = true,
+                )
+            )
         ).isInstanceOf(UnrecognizableInvalidMessage::class.java)
     }
 
@@ -43,7 +51,15 @@ class CreateInvalidMessageUseCaseTest {
             on { code }.thenReturn(ChatMessageCode.INVALID_FORMAT)
         }
         assertThat(
-            underTest.invoke(CreateTypedMessageRequest(message, true))
+            underTest.invoke(
+                CreateTypedMessageRequest(
+                    message = message,
+                    isMine = true,
+                    shouldShowAvatar = true,
+                    shouldShowTime = true,
+                    shouldShowDate = true,
+                )
+            )
         ).isInstanceOf(FormatInvalidMessage::class.java)
     }
 
@@ -57,7 +73,15 @@ class CreateInvalidMessageUseCaseTest {
             on { code }.thenReturn(ChatMessageCode.INVALID_SIGNATURE)
         }
         assertThat(
-            underTest.invoke(CreateTypedMessageRequest(message, true))
+            underTest.invoke(
+                CreateTypedMessageRequest(
+                    message = message,
+                    isMine = true,
+                    shouldShowAvatar = true,
+                    shouldShowTime = true,
+                    shouldShowDate = true,
+                )
+            )
         ).isInstanceOf(SignatureInvalidMessage::class.java)
     }
 
@@ -71,7 +95,15 @@ class CreateInvalidMessageUseCaseTest {
             on { code }.thenReturn(ChatMessageCode.INVALID_KEY)
         }
         assertThat(
-            underTest.invoke(CreateTypedMessageRequest(message, true))
+            underTest.invoke(
+                CreateTypedMessageRequest(
+                    message = message,
+                    isMine = true,
+                    shouldShowAvatar = true,
+                    shouldShowTime = true,
+                    shouldShowDate = true,
+                )
+            )
         ).isInstanceOf(UnrecognizableInvalidMessage::class.java)
     }
 }

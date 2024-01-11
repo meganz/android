@@ -52,7 +52,7 @@ class ChatMessagePagingSource(
         val typedMessages = scope.async {
             Timber.d("Paging fetch messages called with chat id: $chatId")
             val messageResponse = runCatching {
-                fetchMessages(messageFlow)
+                fetchMessages.invoke(messageFlow, pagingLoadResult?.nextMessageUserHandle)
             }.onFailure { exception ->
                 Timber.e(exception, "Paging fetchMessages failed with an exception")
             }.getOrDefault(emptyList())

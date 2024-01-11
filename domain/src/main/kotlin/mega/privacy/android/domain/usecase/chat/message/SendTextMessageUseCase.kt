@@ -21,7 +21,13 @@ class SendTextMessageUseCase @Inject constructor(
      * @return Temporal [] for showing in UI.
      */
     suspend operator fun invoke(chatId: Long, message: String): NormalMessage {
-        val request = CreateTypedMessageRequest(chatRepository.sendMessage(chatId, message), true)
+        val request = CreateTypedMessageRequest(
+            chatRepository.sendMessage(chatId, message),
+            true,
+            false,
+            false,
+            false
+        )
         return createNormalChatMessageUseCase(request)
     }
 }

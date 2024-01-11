@@ -32,12 +32,22 @@ class CreateMetaMessageUseCaseTest {
     @Test
     fun `test that InvalidMetaMessage is mapped when meta is null`() {
 
-        val chatMessage = mock<ChatMessage> {
+        val message = mock<ChatMessage> {
             on { containsMeta }.thenReturn(null)
         }
         val isMine = true
 
-        assertThat(underTest.invoke(CreateTypedMessageRequest(chatMessage, true))).isInstanceOf(
+        assertThat(
+            underTest.invoke(
+                CreateTypedMessageRequest(
+                    message = message,
+                    isMine = true,
+                    shouldShowAvatar = true,
+                    shouldShowTime = true,
+                    shouldShowDate = true,
+                )
+            )
+        ).isInstanceOf(
             InvalidMetaMessage::class.java
         )
     }
@@ -51,12 +61,22 @@ class CreateMetaMessageUseCaseTest {
         val mockContainsMeta = mock<ContainsMeta> {
             on { type }.thenReturn(metaType)
         }
-        val chatMessage = mock<ChatMessage> {
+        val message = mock<ChatMessage> {
             on { containsMeta }.thenReturn(mockContainsMeta)
         }
 
         val isMine = true
-        assertThat(underTest.invoke(CreateTypedMessageRequest(chatMessage, true))).isInstanceOf(
+        assertThat(
+            underTest.invoke(
+                CreateTypedMessageRequest(
+                    message = message,
+                    isMine = true,
+                    shouldShowAvatar = true,
+                    shouldShowTime = true,
+                    shouldShowDate = true,
+                )
+            )
+        ).isInstanceOf(
             clazz
         )
     }
