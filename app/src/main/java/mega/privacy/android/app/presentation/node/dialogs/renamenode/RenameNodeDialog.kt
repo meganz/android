@@ -19,9 +19,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnLoadNodeNameDialog
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnLoadNodeName
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameConfirmed
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameSucceeded
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameValidationPassed
 
 internal const val RENAME_NODE_DIALOG_TAG = "rename_node_dialog:input_dialog"
 internal const val NODE_NAME_INVALID_CHARACTERS = "\" * / : < > ? \\ |"
@@ -42,13 +42,13 @@ internal fun RenameNodeDialog(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.handleAction(OnLoadNodeNameDialog(nodeId))
+        viewModel.handleAction(OnLoadNodeName(nodeId))
     }
 
     EventEffect(
         event = uiState.renameValidationPassedEvent,
         onConsumed = {
-            viewModel.handleAction(OnRenameSucceeded)
+            viewModel.handleAction(OnRenameValidationPassed)
         },
         action = {
             onDismiss()
@@ -60,7 +60,7 @@ internal fun RenameNodeDialog(
             nodeName = nodeName,
             errorMessage = uiState.errorMessage,
             onRenameConfirmed = { newNodeName ->
-                viewModel.handleAction(OnRenameConfirmed(newNodeName))
+                viewModel.handleAction(OnRenameConfirmed(nodeId, newNodeName))
             },
             onRenameCancelled = {
                 onDismiss()

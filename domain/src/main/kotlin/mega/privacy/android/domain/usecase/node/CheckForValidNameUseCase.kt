@@ -22,7 +22,7 @@ class CheckForValidNameUseCase @Inject constructor(
      */
     suspend operator fun invoke(newName: String, node: Node): ValidNameType {
         return when {
-            newName.isBlank() -> ValidNameType.BLANk_NAME
+            newName.isBlank() -> ValidNameType.BLANK_NAME
             regexRepository.invalidNamePattern.matcher(newName).find() -> ValidNameType.INVALID_NAME
             nodeExistsInParentUseCase(node, newName) -> ValidNameType.NAME_ALREADY_EXISTS
             else -> checkForExtension(newName, node)
@@ -60,7 +60,7 @@ enum class ValidNameType {
     /**
      * When no name
      */
-    BLANk_NAME,
+    BLANK_NAME,
 
     /**
      * When name contains some invalid characters

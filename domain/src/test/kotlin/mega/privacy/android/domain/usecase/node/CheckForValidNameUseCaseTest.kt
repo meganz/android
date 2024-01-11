@@ -54,7 +54,7 @@ class CheckForValidNameUseCaseTest {
 
     private fun provideParams() =
         Stream.of(
-            Arguments.of(" ", mock<FileNode>(), ValidNameType.BLANk_NAME),
+            Arguments.of(" ", mock<FileNode>(), ValidNameType.BLANK_NAME),
             Arguments.of("SomeInvalidName/*", mock<FileNode>(), ValidNameType.INVALID_NAME),
             Arguments.of("Folder", mock<FolderNode>(), ValidNameType.NO_ERROR),
             Arguments.of("no extension", mock<FileNode>(), ValidNameType.NO_EXTENSION),

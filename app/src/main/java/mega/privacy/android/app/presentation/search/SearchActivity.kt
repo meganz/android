@@ -14,6 +14,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -161,13 +162,14 @@ class SearchActivity : AppCompatActivity() {
                     scaffoldState.snackbarHostState.showSnackbar(it)
                 }
 
+                val renameSuccessMessage = stringResource(R.string.context_correctly_renamed)
                 EventEffect(
                     event = renameFolderState.renameSuccessfulEvent,
                     onConsumed = {
                         renameNodeDialogViewModel.handleAction(OnRenameSucceeded)
                     }
                 ) {
-                    scaffoldState.snackbarHostState.showSnackbar(it)
+                    scaffoldState.snackbarHostState.showSnackbar(renameSuccessMessage)
                 }
 
                 EventEffect(
