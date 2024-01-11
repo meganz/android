@@ -188,8 +188,7 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun getContactItem(userId: UserId, skipCache: Boolean): ContactItem? =
         withContext(ioDispatcher) {
-            val email = getUserEmail(userId.id)
-            megaApiGateway.getContact(email)?.let {
+            megaApiGateway.getContact(userId.id.toBase64Handle())?.let {
                 getContactItem(it, skipCache)
             }
         }
@@ -787,7 +786,12 @@ internal class DefaultContactsRepository @Inject constructor(
                                         email = request.email,
                                         contactHandle = request.parentHandle,
                                         contactLinkHandle = request.nodeHandle,
-                                        fullName = "${request.name} ${request.text}"
+                                        fullName = "${request.name} ${request.text}",
+                                        status = userChatStatusMapper(
+                                            megaChatApiGateway.getUserOnlineStatus(
+                                                request.parentHandle
+                                            )
+                                        )
                                     )
                                 )
                             )

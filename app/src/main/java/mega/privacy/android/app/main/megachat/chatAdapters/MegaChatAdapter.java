@@ -6499,7 +6499,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     private void setContactLinkAvatar(ViewHolderMessageChat holder, boolean ownMessage, ContactLink result) {
         if (result == null
-                || result.getContactHandle() == null
+                || result.getContactHandle() != -1L
                 || result.getEmail() == null
                 || result.getFullName() == null) {
             return;

@@ -901,6 +901,7 @@ class DefaultContactsRepositoryTest {
         }
         val expected = mockContactItemForMegaUser(megaUser)
         whenever(megaApiGateway.getContact(any())).thenReturn(megaUser)
+        whenever(megaApiGateway.userHandleToBase64(userHandle)).thenReturn(userEmail)
         whenever(
             megaApiGateway.getUserAlias(anyLong(), any())
         ).thenAnswer {
