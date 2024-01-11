@@ -96,6 +96,7 @@ import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.meeting.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentEventUseCase
@@ -160,6 +161,7 @@ import javax.inject.Inject
  * @property deviceGateway                                  [DeviceGateway]
  * @property monitorUserUpdates                             [MonitorUserUpdates]
  * @property ringIndividualInACallUseCase                   [RingIndividualInACallUseCase]
+ * @property allowUsersJoinCallUseCase                      [AllowUsersJoinCallUseCase]
  * @property state                                          Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -202,6 +204,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
     private val deviceGateway: DeviceGateway,
     private val ringIndividualInACallUseCase: RingIndividualInACallUseCase,
+    private val allowUsersJoinCallUseCase: AllowUsersJoinCallUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -1851,16 +1854,42 @@ class MeetingActivityViewModel @Inject constructor(
 
     /**
      * Ring a participant in chatroom with an ongoing call that they didn't pick up
+     * If waiting room is enabled, it also allows the called participant to bypass it (will be future managed by API/SFU/chatd)
      *
      * @param userId   The chat participant ID
      */
     fun ringParticipant(userId: Long) = viewModelScope.launch {
+        if (state.value.hasWaitingRoom) {
+            runCatching {
+                allowUsersJoinCallUseCase(
+                    chatId = state.value.chatId, userList = listOf(userId), all = false
+                )
+            }.onSuccess {
+                ringIndividualInACall(userId = userId)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        } else {
+            ringIndividualInACall(userId = userId)
+        }
+    }
+
+    /**
+     * Ring a participant in chatroom with an ongoing call that they didn't pick up
+     *
+     * @param userId   The chat participant ID
+     */
+    private fun ringIndividualInACall(userId: Long) = viewModelScope.launch {
         runCatching {
             ringIndividualInACallUseCase(chatId = state.value.chatId, userId = userId)
         }.onSuccess {
-            updateNotInCallParticipantStatus(userId, MeetingParticipantNotInCallStatus.Calling)
+            updateNotInCallParticipantStatus(
+                userId = userId, status = MeetingParticipantNotInCallStatus.Calling
+            )
             delay(TimeUnit.SECONDS.toMillis(DEFAULT_RING_TIMEOUT_SECONDS))
-            updateNotInCallParticipantStatus(userId, MeetingParticipantNotInCallStatus.NoResponse)
+            updateNotInCallParticipantStatus(
+                userId = userId, status = MeetingParticipantNotInCallStatus.NoResponse
+            )
         }.onFailure { exception ->
             Timber.e(exception)
         }
