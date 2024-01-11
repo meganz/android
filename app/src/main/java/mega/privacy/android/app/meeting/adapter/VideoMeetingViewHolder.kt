@@ -166,12 +166,23 @@ class VideoMeetingViewHolder(
     private fun checkUI(participant: Participant) {
         Timber.d("Check the current UI status")
         inMeetingViewModel.getSession(participant.clientId)?.let {
-            if (it.hasVideo()) {
-                Timber.d("Check if video should be on")
-                checkVideoOn(participant)
-            } else {
-                Timber.d("Video should be off")
-                videoOffUI(participant)
+            when (isGrid) {
+                true -> if (it.hasVideo() && participant.isVideoOn) {
+                    Timber.d("Check if camera should be on")
+                    checkVideoOn(participant)
+                } else {
+                    Timber.d("Video should be off")
+                    videoOffUI(participant)
+                }
+
+
+                false -> if ((it.hasScreenShare() && participant.isScreenShared) || (it.hasCamera() && !participant.isScreenShared)) {
+                    Timber.d("Check if video should be on")
+                    checkVideoOn(participant)
+                } else {
+                    Timber.d("Video should be off")
+                    videoOffUI(participant)
+                }
             }
 
             updateAudioIcon(participant)
@@ -473,25 +484,33 @@ class VideoMeetingViewHolder(
     fun checkVideoOn(participant: Participant) {
         if (isInvalid(participant)) return
 
-        if (!isGrid) {
-            if (inMeetingViewModel.getSession(participant.clientId)
-                    ?.hasVideo() == true && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)
-            ) {
-                Timber.d("Video should be on")
-                videoOnUI(participant)
-                return
-            }
-        } else {
-            if (inMeetingViewModel.getSession(participant.clientId)
-                    ?.hasCamera() == true && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)
-            ) {
-                Timber.d("Video should be on")
-                videoOnUI(participant)
-                return
+        if (!inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)) {
+            inMeetingViewModel.getSession(participant.clientId)?.let { session ->
+                when (isGrid) {
+                    true -> {
+                        if (session.hasVideo() && participant.isVideoOn) {
+                            Timber.d("Grid video/screen share should be on")
+                            videoOnUI(participant)
+                            return
+                        }
+                    }
+
+                    false -> {
+                        if (participant.isScreenShared && session.hasScreenShare() && participant.isScreenShareOn) {
+                            Timber.d("Screen share should be on")
+                            videoOnUI(participant)
+                            return
+                        }
+
+                        if (!participant.isScreenShared && session.hasCamera() && participant.isCameraOn) {
+                            Timber.d("Video should be on")
+                            videoOnUI(participant)
+                            return
+                        }
+                    }
+                }
             }
         }
-
-
 
         Timber.d("Video should be off")
         videoOffUI(participant)

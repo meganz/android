@@ -31,6 +31,8 @@ import java.io.Serializable
  * @param hasOptionsAllowed     True if has options allowed. False if not.
  * @param isPresenting          True if the user is presenting. False if not.
  * @param isScreenShared        True if this participant is the screen shared. False, if not.
+ * @param isCameraOn            True if camera is on. False if camera is off.
+ * @param isScreenShareOn       True if screen share is on. False if screen share is off.
  */
 data class Participant(
     val peerId: Long,
@@ -51,6 +53,8 @@ data class Participant(
     var hasOptionsAllowed: Boolean = true,
     var isPresenting: Boolean = false,
     var isScreenShared: Boolean = false,
+    var isCameraOn: Boolean = false,
+    var isScreenShareOn: Boolean = false,
 ) : Serializable {
 
     /**
