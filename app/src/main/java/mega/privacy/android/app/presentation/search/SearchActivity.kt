@@ -28,6 +28,7 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.dialogs.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.utils.Constants
@@ -45,6 +46,7 @@ import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchResetFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchVideosFilterPressedEvent
+import mega.privacy.android.app.presentation.node.dialogs.RenameNodeDialogAction.OnRenameSucceeded
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -56,6 +58,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val viewModel: SearchActivityViewModel by viewModels()
     private val moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel by viewModels()
+    private val renameNodeDialogViewModel: RenameNodeDialogViewModel by viewModels()
 
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
@@ -117,6 +120,7 @@ class SearchActivity : AppCompatActivity() {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             val moveToRubbishState by moveToRubbishOrDeleteNodeDialogViewModel.state.collectAsStateWithLifecycle()
+            val renameFolderState by renameNodeDialogViewModel.state.collectAsStateWithLifecycle()
             val scaffoldState = rememberScaffoldState()
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 Scaffold(
@@ -127,6 +131,7 @@ class SearchActivity : AppCompatActivity() {
                         modifier = Modifier.padding(padding),
                         viewModel = viewModel,
                         moveToRubbishOrDeleteNodeDialogViewModel = moveToRubbishOrDeleteNodeDialogViewModel,
+                        renameNodeDialogViewModel = renameNodeDialogViewModel,
                         handleClick = ::handleClick,
                         navigateToLink = ::navigateToLink,
                         showSortOrderBottomSheet = ::showSortOrderBottomSheet,
@@ -146,6 +151,15 @@ class SearchActivity : AppCompatActivity() {
                     moveToRubbishState.deleteEvent,
                     onConsumed = {
                         moveToRubbishOrDeleteNodeDialogViewModel.consumeDeleteEvent()
+                    }
+                ) {
+                    scaffoldState.snackbarHostState.showSnackbar(it)
+                }
+
+                EventEffect(
+                    event = renameFolderState.renameSuccessfulEvent,
+                    onConsumed = {
+                        renameNodeDialogViewModel.handleAction(OnRenameSucceeded)
                     }
                 ) {
                     scaffoldState.snackbarHostState.showSnackbar(it)

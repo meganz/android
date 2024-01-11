@@ -13,6 +13,8 @@ import androidx.navigation.navArgument
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialog
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
+import mega.privacy.android.app.presentation.node.dialogs.RenameNodeDialog
+import mega.privacy.android.app.presentation.node.dialogs.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -29,7 +31,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param searchActivityViewModel Search activity view model
  * @param onBackPressed OnBackPressed
  */
-fun NavGraphBuilder.searchNavGraph(
+internal fun NavGraphBuilder.searchNavGraph(
     trackAnalytics: (SearchFilter?) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
     navigateToLink: (String) -> Unit,
@@ -38,6 +40,7 @@ fun NavGraphBuilder.searchNavGraph(
     nodeBottomSheetActionHandler: NodeBottomSheetActionHandler,
     searchActivityViewModel: SearchActivityViewModel,
     moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel,
+    renameNodeDialogViewModel: RenameNodeDialogViewModel,
     onBackPressed: () -> Unit,
 ) {
     composable(searchRoute) {
@@ -83,6 +86,21 @@ fun NavGraphBuilder.searchNavGraph(
             )
         }
     }
+
+    dialog(
+        "$searchRenameDialog/{$argumentNodeId}",
+        arguments = listOf(navArgument(argumentNodeId) { type = NavType.LongType }),
+    ) {
+        it.arguments?.getLong(argumentNodeId)?.let { nodeId ->
+            RenameNodeDialog(
+                nodeId = nodeId,
+                onDismiss = {
+                    navHostController.popBackStack()
+                },
+                viewModel = renameNodeDialogViewModel
+            )
+        }
+    }
 }
 
 /**
@@ -90,6 +108,7 @@ fun NavGraphBuilder.searchNavGraph(
  */
 internal const val searchRoute = "search/main"
 internal const val moveToRubbishOrDelete = "search/moveToRubbishOrDelete/isInRubbish"
+internal const val searchRenameDialog = "search/rename_dialog"
 internal const val argumentNodeId = "nodeId"
 internal const val argumentIsInRubbish = "isInRubbish"
 internal const val isFromToolbar = "isFromToolbar"
