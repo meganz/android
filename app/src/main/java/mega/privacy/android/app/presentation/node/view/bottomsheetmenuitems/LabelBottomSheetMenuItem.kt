@@ -2,9 +2,12 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.node.model.mapper.NodeLabelResourceMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.LabelMenuAction
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.components.LabelAccessoryView
+import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetRoute
+import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -66,6 +69,18 @@ class LabelBottomSheetMenuItem @Inject constructor(
             && isNodeInRubbish.not()
             && accessPermission in listOf(AccessPermission.FULL, AccessPermission.OWNER)
             && isInBackups.not()
+
+    override fun getOnClickFunction(
+        node: TypedNode,
+        onDismiss: () -> Unit,
+        actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
+        navController: NavHostController,
+    ): () -> Unit = {
+        onDismiss()
+        navController.navigate(
+            route = changeLabelBottomSheetRoute.plus("/${node.id.longValue}")
+        )
+    }
 
     override val groupId: Int
         get() = 3

@@ -25,8 +25,6 @@ import mega.privacy.android.domain.entity.search.SearchType
  * @property selectedNodes
  * @property lastSelectedNode
  * @property menuActions
- * @property nodeName
- * @property bottomSheetActions
  */
 data class SearchActivityState(
     val searchItemList: List<NodeUIItem<TypedNode>> = emptyList(),

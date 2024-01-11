@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.search
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
@@ -17,14 +16,12 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import androidx.navigation.ui.navigateUp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
-import mega.privacy.android.app.presentation.node.view.NodeOptionsBottomSheet
 import mega.privacy.android.app.presentation.search.model.SearchFilter
+import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRoute
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -41,7 +38,6 @@ fun SearchScreen(
     navHostController: NavHostController,
     onBackPressed: () -> Unit,
     searchActivityViewModel: SearchActivityViewModel,
-    nodeBottomSheetActionHandler: NodeBottomSheetActionHandler,
     modifier: Modifier = Modifier,
 ) {
     val uiState by searchActivityViewModel.state.collectAsStateWithLifecycle()
@@ -74,10 +70,9 @@ fun SearchScreen(
         },
         onMenuClick = {
             keyboardController?.hide()
-            selectedNode = it
-            coroutineScope.launch {
-                modalSheetState.show()
-            }
+            navHostController.navigate(
+                route = nodeBottomSheetRoute.plus("/${it.node.id.longValue}")
+            )
         },
         onDisputeTakeDownClicked = navigateToLink,
         onLinkClicked = navigateToLink,
@@ -88,19 +83,4 @@ fun SearchScreen(
         onBackPressed = onBackPressed
     )
     handleClick(uiState.lastSelectedNode)
-
-    selectedNode?.let {
-        NodeOptionsBottomSheet(
-            modalSheetState = modalSheetState,
-            node = it.node,
-            handler = nodeBottomSheetActionHandler,
-            navHostController = navHostController,
-            onDismiss = {
-                selectedNode = null
-                coroutineScope.launch {
-                    modalSheetState.hide()
-                }
-            },
-        )
-    }
 }

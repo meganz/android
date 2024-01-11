@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.search.searchRenameDialog
+import mega.privacy.android.app.presentation.search.navigation.searchRenameDialog
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode

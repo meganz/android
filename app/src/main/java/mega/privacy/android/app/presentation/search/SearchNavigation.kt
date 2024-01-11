@@ -1,21 +1,16 @@
 package mega.privacy.android.app.presentation.search
 
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
-import androidx.navigation.navArgument
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
-import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialog
-import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
-import mega.privacy.android.app.presentation.node.dialogs.RenameNodeDialog
 import mega.privacy.android.app.presentation.node.dialogs.RenameNodeDialogViewModel
+import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
+import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetNavigation
+import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDeleteNavigation
+import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetNavigation
+import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
 import mega.privacy.android.domain.entity.node.TypedNode
 
 
@@ -50,65 +45,22 @@ internal fun NavGraphBuilder.searchNavGraph(
             navigateToLink = navigateToLink,
             showSortOrderBottomSheet = showSortOrderBottomSheet,
             navHostController = navHostController,
-            nodeBottomSheetActionHandler = nodeBottomSheetActionHandler,
             searchActivityViewModel = searchActivityViewModel,
             onBackPressed = onBackPressed
         )
     }
-
-    dialog(
-        route = "$moveToRubbishOrDelete/{$argumentNodeId}/{$argumentIsInRubbish}/{$isFromToolbar}",
-        arguments = listOf(
-            navArgument(argumentNodeId) { type = NavType.LongType },
-            navArgument(argumentIsInRubbish) { type = NavType.BoolType },
-            navArgument(isFromToolbar) { type = NavType.BoolType },
-        )
-    ) {
-        if (it.arguments?.getBoolean(isFromToolbar) == false) {
-            it.arguments?.getLong(argumentNodeId)?.let { nodeId ->
-                MoveToRubbishOrDeleteNodeDialog(
-                    onDismiss = { navHostController.navigateUp() },
-                    nodesList = listOf(nodeId),
-                    isNodeInRubbish = it.arguments?.getBoolean(argumentIsInRubbish) ?: false,
-                    viewModel = moveToRubbishOrDeleteNodeDialogViewModel
-                )
-            }
-        } else {
-            val searchState by searchActivityViewModel.state.collectAsStateWithLifecycle()
-            val list = searchState.selectedNodes.map { node ->
-                node.id.longValue
-            }
-            MoveToRubbishOrDeleteNodeDialog(
-                onDismiss = { navHostController.navigateUp() },
-                nodesList = list,
-                isNodeInRubbish = it.arguments?.getBoolean(argumentIsInRubbish) ?: false,
-                viewModel = moveToRubbishOrDeleteNodeDialogViewModel
-            )
-        }
-    }
-
-    dialog(
-        "$searchRenameDialog/{$argumentNodeId}",
-        arguments = listOf(navArgument(argumentNodeId) { type = NavType.LongType }),
-    ) {
-        it.arguments?.getLong(argumentNodeId)?.let { nodeId ->
-            RenameNodeDialog(
-                nodeId = nodeId,
-                onDismiss = {
-                    navHostController.popBackStack()
-                },
-                viewModel = renameNodeDialogViewModel
-            )
-        }
-    }
+    moveToRubbishOrDeleteNavigation(
+        navHostController = navHostController,
+        moveToRubbishOrDeleteNodeDialogViewModel = moveToRubbishOrDeleteNodeDialogViewModel,
+        searchActivityViewModel = searchActivityViewModel
+    )
+    renameDialogNavigation(navHostController, renameNodeDialogViewModel)
+    nodeBottomSheetNavigation(nodeBottomSheetActionHandler, navHostController)
+    changeLabelBottomSheetNavigation(navHostController)
 }
+
 
 /**
  * Route for Search
  */
 internal const val searchRoute = "search/main"
-internal const val moveToRubbishOrDelete = "search/moveToRubbishOrDelete/isInRubbish"
-internal const val searchRenameDialog = "search/rename_dialog"
-internal const val argumentNodeId = "nodeId"
-internal const val argumentIsInRubbish = "isInRubbish"
-internal const val isFromToolbar = "isFromToolbar"
