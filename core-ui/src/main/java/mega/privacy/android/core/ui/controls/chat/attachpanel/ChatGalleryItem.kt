@@ -59,7 +59,7 @@ private fun ChatGalleryItemPreview() {
         ChatGalleryItem(modifier = Modifier.size(88.dp)) {
             Image(
                 modifier = Modifier.fillMaxSize(),
-                painter = painterResource(id = R.drawable.ic_emoji_smile),
+                painter = painterResource(id = R.drawable.ic_emoji_smile_medium_regular),
                 contentDescription = ""
             )
         }

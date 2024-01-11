@@ -1,14 +1,18 @@
 package mega.privacy.android.core.ui.controls.chat
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,10 +26,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.isVisible
+import androidx.emoji2.emojipicker.EmojiPickerView
+import androidx.emoji2.emojipicker.EmojiViewItem
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -57,24 +70,19 @@ const val TEST_TAG_SEND_ICON = "chat_input_text_toolbar:send_icon"
 fun ChatInputTextToolbar(
     text: String,
     placeholder: String,
+    showEmojiPicker: Boolean,
     onAttachmentClick: () -> Unit,
     onSendClick: (String) -> Unit,
+    onEmojiClick: () -> Unit,
     modifier: Modifier = Modifier,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    var input by rememberSaveable(text) {
-        mutableStateOf(text)
-    }
-    var isInputExpanded by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showExpandButton by remember {
-        mutableStateOf(false)
-    }
-    var isRoundedShape by remember {
-        mutableStateOf(false)
-    }
-    LaunchedEffect(input) {
-        if (input.isEmpty()) {
+    var isInputExpanded by rememberSaveable { mutableStateOf(false) }
+    var showExpandButton by remember { mutableStateOf(false) }
+    var isRoundedShape by remember { mutableStateOf(false) }
+    var textFieldValue by remember { mutableStateOf(TextFieldValue(text)) }
+    LaunchedEffect(textFieldValue.text) {
+        if (textFieldValue.text.isEmpty()) {
             isInputExpanded = false
         }
     }
@@ -101,80 +109,144 @@ fun ChatInputTextToolbar(
                 tint = MegaTheme.colors.icon.secondary,
             )
         }
-        Row {
-            Icon(
-                modifier = Modifier
-                    .align(Alignment.Bottom)
-                    .padding(end = 8.dp, top = 6.dp, bottom = 6.dp)
-                    .testTag(TEST_TAG_ATTACHMENT_ICON)
-                    .clickable(onClick = onAttachmentClick),
-                painter = painterResource(id = R.drawable.ic_plus),
-                contentDescription = "Attachment icon",
-                tint = MegaTheme.colors.icon.secondary,
-            )
-
-            ChatTextField(
-                text = input,
-                placeholder = placeholder,
-                onTextChange = { input = it },
-                modifier = Modifier
-                    .weight(1f)
-                    .conditional(isInputExpanded) {
-                        fillMaxHeight()
-                    },
-                isExpanded = isInputExpanded,
-                onTextLayout = {
-                    showExpandButton = it.lineCount >= 4
-                    isRoundedShape = it.lineCount == 1
-                },
-                shape = if (isRoundedShape) CircleShape else RoundedCornerShape(12.dp),
-            )
-
-            AnimatedVisibility(
-                modifier = Modifier
-                    .align(Alignment.Bottom)
-                    .padding(vertical = 6.dp),
-                visible = input.isNotEmpty()
-            ) {
+        Column {
+            Row {
                 Icon(
                     modifier = Modifier
+                        .align(Alignment.Bottom)
+                        .padding(end = 8.dp, top = 6.dp, bottom = 6.dp)
+                        .testTag(TEST_TAG_ATTACHMENT_ICON)
+                        .clickable(onClick = onAttachmentClick),
+                    painter = painterResource(id = R.drawable.ic_plus),
+                    contentDescription = "Attachment icon",
+                    tint = MegaTheme.colors.icon.secondary,
+                )
+
+                ChatTextField(
+                    textFieldValue = textFieldValue,
+                    placeholder = placeholder,
+                    onTextChange = { textFieldValue = it },
+                    onEmojiClick = onEmojiClick,
+                    isEmojiPickerShown = showEmojiPicker,
+                    modifier = Modifier
                         .weight(1f)
-                        .padding(start = 8.dp)
-                        .testTag(TEST_TAG_SEND_ICON)
-                        .clickable(onClick = {
-                            onSendClick(input)
-                            isInputExpanded = false
-                            input = ""
-                        }),
-                    painter = painterResource(id = R.drawable.ic_send),
-                    contentDescription = "Send icon",
-                    tint = MegaTheme.colors.icon.accent
+                        .conditional(isInputExpanded) {
+                            fillMaxHeight()
+                        },
+                    isExpanded = isInputExpanded,
+                    onTextLayout = {
+                        showExpandButton = it.lineCount >= 4
+                        isRoundedShape = it.lineCount == 1
+                    },
+                    shape = if (isRoundedShape) CircleShape else RoundedCornerShape(12.dp),
+                    interactionSource = interactionSource
+                )
+
+                AnimatedVisibility(
+                    modifier = Modifier
+                        .align(Alignment.Bottom)
+                        .padding(vertical = 6.dp),
+                    visible = textFieldValue.text.isNotEmpty()
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 8.dp)
+                            .testTag(TEST_TAG_SEND_ICON)
+                            .clickable(onClick = {
+                                onSendClick(textFieldValue.text)
+                                isInputExpanded = false
+                                textFieldValue = TextFieldValue("")
+                            }),
+                        painter = painterResource(id = R.drawable.ic_send),
+                        contentDescription = "Send icon",
+                        tint = MegaTheme.colors.icon.accent
+                    )
+                }
+            }
+            AnimatedVisibility(visible = showEmojiPicker) {
+                EmojiPickerView(
+                    onEmojiPicked = {
+                        textFieldValue = addPickedEmojiToInput(it.emoji, textFieldValue)
+                    },
+                    showEmojiPicker = showEmojiPicker,
                 )
             }
         }
     }
 }
 
+private fun addPickedEmojiToInput(
+    emoji: String,
+    textFieldValue: TextFieldValue,
+): TextFieldValue = with(textFieldValue) {
+    val start = selection.start
+    val end = selection.end
+
+    TextFieldValue(
+        text = if (start == end && end == text.length - 1) {
+            text + emoji
+        } else {
+            text.substring(0, start) + emoji + text.substring(end)
+        },
+        selection = TextRange(start + emoji.length)
+    )
+}
+
+@Composable
+private fun EmojiPickerView(
+    onEmojiPicked: (EmojiViewItem) -> Unit,
+    showEmojiPicker: Boolean,
+) = Column {
+    val isPortrait =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(if (isPortrait) 300.dp else 150.dp),
+        factory = { context ->
+            EmojiPickerView(context).apply {
+                emojiGridColumns = if (isPortrait) 9 else 18
+                setOnEmojiPickedListener { emoji -> onEmojiPicked(emoji) }
+            }
+        },
+        update = {
+            it.isVisible = showEmojiPicker
+        },
+    )
+}
+
 @CombinedThemePreviews
 @Composable
-private fun ChatInputTextToolbarPlaceholderPreview() {
+private fun ChatInputTextToolbarPlaceholderPreview(
+    @PreviewParameter(BooleanProvider::class) showEmojiPicker: Boolean,
+) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ChatInputTextToolbar(
             text = "",
             placeholder = "Very long long long long long long long long long long long long long long long long long long long long long long long long long long long ",
+            showEmojiPicker = showEmojiPicker,
             onAttachmentClick = {},
-            onSendClick = {})
+            onSendClick = {},
+            onEmojiClick = {},
+        )
     }
 }
 
 @CombinedThemePreviews
 @Composable
-private fun ChatInputTextToolbarLongTextPreview() {
+private fun ChatInputTextToolbarLongTextPreview(
+    @PreviewParameter(BooleanProvider::class) showEmojiPicker: Boolean,
+) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ChatInputTextToolbar(
             text = "abc ".repeat(30),
             placeholder = "",
+            showEmojiPicker = showEmojiPicker,
             onAttachmentClick = {},
-            onSendClick = {})
+            onSendClick = {},
+            onEmojiClick = {},
+        )
     }
 }

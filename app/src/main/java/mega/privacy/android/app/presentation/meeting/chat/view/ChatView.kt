@@ -15,6 +15,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +31,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -91,9 +94,11 @@ import mega.privacy.android.core.ui.controls.chat.ScrollToBottomFab
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
+import mega.privacy.android.core.ui.model.KeyboardState
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
@@ -139,7 +144,11 @@ internal fun ChatView(
  * @param uiState [ChatUiState]
  * @param onBackPressed Action to perform for back button.
  */
-@OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
+@OptIn(
+    ExperimentalMaterialApi::class,
+    ExperimentalPermissionsApi::class,
+    ExperimentalComposeUiApi::class
+)
 @Composable
 internal fun ChatView(
     uiState: ChatUiState,
@@ -189,6 +198,9 @@ internal fun ChatView(
     var muteNotificationDialogOptions by rememberSaveable { mutableStateOf(emptyList<ChatPushNotificationMuteOption>()) }
     var isSelectMode by rememberSaveable { mutableStateOf(false) }
     var showJoinAnswerCallDialog by rememberSaveable { mutableStateOf(false) }
+    var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
+    val keyboardState by keyboardAsState()
+    val isKeyboardShown = keyboardState == KeyboardState.Opened
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val keyboardController = LocalSoftwareKeyboardController.current
     val toolbarModalSheetState =
@@ -235,6 +247,8 @@ internal fun ChatView(
                     && scrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index != scrollState.layoutInfo.totalItemsCount - 1
         }
     }
+    val interactionSourceTextInput = remember { MutableInteractionSource() }
+    val isTextInputPressed by interactionSourceTextInput.collectIsPressedAsState()
     BackHandler(enabled = toolbarModalSheetState.isVisible) {
         coroutineScope.launch {
             toolbarModalSheetState.hide()
@@ -245,7 +259,17 @@ internal fun ChatView(
             fileModalSheetState.hide()
         }
     }
-
+    BackHandler(enabled = isKeyboardShown) {
+        keyboardController?.hide()
+    }
+    BackHandler(enabled = showEmojiPicker) {
+        showEmojiPicker = false
+    }
+    LaunchedEffect(isTextInputPressed) {
+        if (isTextInputPressed) {
+            showEmojiPicker = false
+        }
+    }
 
     val callPermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -432,7 +456,18 @@ internal fun ChatView(
                                     R.string.type_message_hint_with_customized_title,
                                     uiState.title.orEmpty()
                                 ),
-                                onSendClick = onSendClick
+                                showEmojiPicker = showEmojiPicker,
+                                onSendClick = onSendClick,
+                                onEmojiClick = {
+                                    showEmojiPicker = !showEmojiPicker
+
+                                    if (showEmojiPicker) {
+                                        keyboardController?.hide()
+                                    } else {
+                                        keyboardController?.show()
+                                    }
+                                },
+                                interactionSource = interactionSourceTextInput
                             )
                         }
                     }

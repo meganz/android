@@ -137,7 +137,7 @@ private fun TextMessageContainerPreview(
                     modifier = Modifier
                         .size(24.dp)
                         .align(Alignment.Bottom),
-                    painter = painterResource(id = R.drawable.ic_emoji_smile),
+                    painter = painterResource(id = R.drawable.ic_emoji_smile_medium_regular),
                     contentDescription = "Avatar",
                     tint = MegaTheme.colors.icon.secondary
                 )
@@ -171,7 +171,7 @@ private fun TextMessageContainerSendErrorPreview(
                     modifier = Modifier
                         .size(24.dp)
                         .align(Alignment.Bottom),
-                    painter = painterResource(id = R.drawable.ic_emoji_smile),
+                    painter = painterResource(id = R.drawable.ic_emoji_smile_medium_regular),
                     contentDescription = "Avatar",
                     tint = MegaTheme.colors.icon.secondary
                 )
