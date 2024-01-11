@@ -23,6 +23,7 @@ internal class ShouldShowCookieDialogWithAdsUseCaseTest {
     private lateinit var underTest: ShouldShowCookieDialogWithAdsUseCase
     private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val updateCookieSettingsUseCase = mock<UpdateCookieSettingsUseCase>()
 
     @AfterEach
     fun resetMocks() {
@@ -37,6 +38,7 @@ internal class ShouldShowCookieDialogWithAdsUseCaseTest {
         underTest = ShouldShowCookieDialogWithAdsUseCase(
             getFeatureFlagValueUseCase,
             getCookieSettingsUseCase,
+            updateCookieSettingsUseCase
         )
     }
 
@@ -66,6 +68,7 @@ internal class ShouldShowCookieDialogWithAdsUseCaseTest {
                 isExternalAdsEnabledFeature
             )
             whenever(getCookieSettingsUseCase.invoke()).thenReturn(cookieSettings)
+            whenever(updateCookieSettingsUseCase.invoke(any())).thenReturn(Unit)
             val result = underTest.invoke(
                 inAppAdvertisementFeature = mock(),
                 isAdsEnabledFeature = mock(),

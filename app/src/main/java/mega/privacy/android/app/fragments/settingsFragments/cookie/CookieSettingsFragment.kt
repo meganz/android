@@ -74,12 +74,14 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                if (getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement) &&
+                if (
+                    getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement) &&
                     getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
                     getFeatureFlagValueUseCase(ABTestFeatures.adse)
                 ) {
                     showAdsCookiePreference = true
                     adsCookiesPreference?.isVisible = true
+                    updateAcceptCookiesPreference(showAdsCookiePreference)
                 }
             }.onFailure {
                 Timber.e("Failed to fetch feature flag with error: ${it.message}")
@@ -113,19 +115,31 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     }
 
     /**
-     * Show current cookies configuration by toggling each cookie switch.
+     * Update the accept cookies preference based on the current state of the other cookies
+     * preferences.
      *
-     * @param cookies   Set of enabled cookies
+     * @param showAdsCookiePreference   True if the ads cookie preference should be taken into
+     *                                  account, false otherwise
      */
-    private fun showCookies(cookies: Set<CookieType>) {
-        analyticsCookiesPreference?.isChecked = cookies.contains(ANALYTICS) == true
-        adsCookiesPreference?.isChecked = cookies.contains(ADVERTISEMENT) == true
+    private fun updateAcceptCookiesPreference(showAdsCookiePreference: Boolean) {
         if (showAdsCookiePreference) {
             acceptCookiesPreference?.isChecked = analyticsCookiesPreference?.isChecked ?: false ||
                     adsCookiesPreference?.isChecked ?: false
         } else {
             acceptCookiesPreference?.isChecked = analyticsCookiesPreference?.isChecked ?: false
         }
+    }
+
+    /**
+     * Show current cookies configuration by toggling each cookie switch.
+     *
+     * @param cookies   Set of enabled cookies
+     */
+    private fun showCookies(cookies: Set<CookieType>) {
+        analyticsCookiesPreference?.isChecked = cookies.contains(ANALYTICS) == true
+        adsCookiesPreference?.isChecked =
+            cookies.contains(ADVERTISEMENT) == true
+        updateAcceptCookiesPreference(showAdsCookiePreference)
     }
 
     /**

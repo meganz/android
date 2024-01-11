@@ -102,9 +102,9 @@ class CookieDialogHandler @Inject constructor(
     }
 
     private fun createGenericCookieDialog(context: Context) {
+        isCookieDialogWithAds = false
         if (dialog?.isShowing == true || !context.isValid()) return
 
-        isCookieDialogWithAds = false
         dialog = MaterialAlertDialogBuilder(context)
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
@@ -136,9 +136,9 @@ class CookieDialogHandler @Inject constructor(
      * this dialog will be shown when the user will be part of Advertisement experiment and will see the external Ads
      */
     private fun createCookieDialogWithAds(context: Context) {
+        isCookieDialogWithAds = true
         if (dialog?.isShowing == true || !context.isValid()) return
 
-        isCookieDialogWithAds = true
         dialog = MaterialAlertDialogBuilder(context)
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
@@ -173,8 +173,7 @@ class CookieDialogHandler @Inject constructor(
                 if (isCookieDialogWithAds) {
                     updateCookieSettingsUseCase(CookieType.entries.toSet())
                 } else {
-                    updateCookieSettingsUseCase(CookieType.entries.filter { it != CookieType.ADS_CHECK }
-                        .toSet())
+                    updateCookieSettingsUseCase(CookieType.entries.toSet() - CookieType.ADS_CHECK)
                 }
                 updateCrashAndPerformanceReportersUseCase()
             }.onFailure { Timber.e("failed to accept all cookies: $it") }

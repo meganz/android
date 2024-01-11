@@ -50,10 +50,10 @@ class CookieSettingsViewModel @Inject constructor(
     }
 
     /**
-     * Change specific cookie state
+     * Change cookie state
      *
-     * @param cookie Cookie to be changed
-     * @param enable Flag to enable/disable specified cookie
+     * @param cookie Cookie type to change
+     * @param enable Flag to enable/disable cookie
      */
     fun changeCookie(cookie: CookieType, enable: Boolean) {
         if (enable) {
@@ -61,7 +61,6 @@ class CookieSettingsViewModel @Inject constructor(
         } else {
             enabledCookies.value?.remove(cookie)
         }
-
         enabledCookies.notifyObserver()
     }
 
@@ -80,9 +79,19 @@ class CookieSettingsViewModel @Inject constructor(
     }
 
     /**
+     * Add ads check cookie if cookies get changed
+     */
+    private fun addAdsCheckCookieIfNeeded() {
+        if (enabledCookies.value?.size != savedCookiesSize.value) {
+            enabledCookies.value?.add(CookieType.ADS_CHECK)
+        }
+    }
+
+    /**
      * Save cookie settings to SDK
      */
     fun saveCookieSettings() {
+        addAdsCheckCookieIfNeeded()
         viewModelScope.launch {
             enabledCookies.value?.let {
                 runCatching {

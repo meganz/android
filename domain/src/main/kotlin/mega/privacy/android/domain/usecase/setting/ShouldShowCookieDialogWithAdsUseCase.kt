@@ -14,6 +14,7 @@ import javax.inject.Inject
 class ShouldShowCookieDialogWithAdsUseCase @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
+    private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
 ) {
 
     /**
@@ -38,8 +39,13 @@ class ShouldShowCookieDialogWithAdsUseCase @Inject constructor(
         val featureFlags = features.map { feature ->
             async { getFeatureFlagValueUseCase(feature) }
         }
+        val cookieSettings = getCookieSettingsUseCase()
+        //ADVERTISEMENT cookie is not set, so we need to set it to false
+        if (!cookieSettings.contains(CookieType.ADS_CHECK)) {
+            updateCookieSettingsUseCase(cookieSettings - CookieType.ADVERTISEMENT)
+        }
 
         featureFlags.all { it.await() }
-                && !getCookieSettingsUseCase().contains(CookieType.ADS_CHECK)
+                && !cookieSettings.contains(CookieType.ADS_CHECK)
     }
 }
