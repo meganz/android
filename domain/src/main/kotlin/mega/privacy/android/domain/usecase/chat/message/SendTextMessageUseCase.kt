@@ -22,11 +22,11 @@ class SendTextMessageUseCase @Inject constructor(
      */
     suspend operator fun invoke(chatId: Long, message: String): NormalMessage {
         val request = CreateTypedMessageRequest(
-            chatRepository.sendMessage(chatId, message),
-            true,
-            false,
-            false,
-            false
+            message = chatRepository.sendMessage(chatId, message),
+            isMine = true,
+            shouldShowAvatar = false,
+            shouldShowTime = false,
+            shouldShowDate = false
         )
         return createNormalChatMessageUseCase(request)
     }
