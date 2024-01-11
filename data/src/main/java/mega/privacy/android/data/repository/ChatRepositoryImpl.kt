@@ -58,7 +58,8 @@ import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
-import mega.privacy.android.domain.entity.chat.messages.paging.PagedChatMessage
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.ChatSettings
@@ -1163,11 +1164,11 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getPagedMessages(chatId: Long): PagingSource<Int, PagedChatMessage> {
+    override fun getPagedMessages(chatId: Long): PagingSource<Int, TypedMessage> {
         throw NotImplementedError("Not implemented yet")
     }
 
-    override suspend fun storeMessages(chatId: Long, messages: List<PagedChatMessage>) {
+    override suspend fun storeMessages(chatId: Long, messages: List<CreateTypedMessageRequest>) {
         throw NotImplementedError("Not implemented yet")
     }
 

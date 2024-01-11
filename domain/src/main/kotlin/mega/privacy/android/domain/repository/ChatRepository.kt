@@ -16,7 +16,8 @@ import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
-import mega.privacy.android.domain.entity.chat.messages.paging.PagedChatMessage
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 
@@ -868,7 +869,7 @@ interface ChatRepository {
      * @param chatId
      * @return flow of paged messages
      */
-    fun getPagedMessages(chatId: Long): PagingSource<Int, PagedChatMessage>
+    fun getPagedMessages(chatId: Long): PagingSource<Int, TypedMessage>
 
     /**
      * Store messages
@@ -876,7 +877,7 @@ interface ChatRepository {
      * @param chatId
      * @param messages
      */
-    suspend fun storeMessages(chatId: Long, messages: List<PagedChatMessage>)
+    suspend fun storeMessages(chatId: Long, messages: List<CreateTypedMessageRequest>)
 
     /**
      * Get last load response
