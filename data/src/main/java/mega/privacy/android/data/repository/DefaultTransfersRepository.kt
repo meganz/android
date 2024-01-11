@@ -123,7 +123,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         parentNodeId: NodeId,
         fileName: String?,
         modificationTime: Long,
-        appData: String?,
+        appData: TransferAppData?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
     ) = callbackFlow {
@@ -136,7 +136,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             parentNode = parentNode,
             fileName = fileName,
             modificationTime = modificationTime,
-            appData = appData,
+            appData = appData?.let { transferAppDataStringMapper(listOf(it)) },
             isSourceTemporary = isSourceTemporary,
             shouldStartFirst = shouldStartFirst,
             cancelToken = null,

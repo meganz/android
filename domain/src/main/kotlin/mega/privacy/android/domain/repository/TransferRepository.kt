@@ -324,7 +324,7 @@ interface TransferRepository {
         parentNodeId: NodeId,
         fileName: String?,
         modificationTime: Long,
-        appData: String?,
+        appData: TransferAppData?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
     ): Flow<TransferEvent>

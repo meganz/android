@@ -22,8 +22,8 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferPro
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
@@ -220,7 +220,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
                 parentNodeId = uploadNodeId,
                 fileName = record.fileName,
                 modificationTime = record.timestamp / 1000,
-                appData = TransferType.CU_UPLOAD.name,
+                appData = TransferAppData.CameraUpload,
                 isSourceTemporary = false,
                 shouldStartFirst = false,
             )
@@ -399,7 +399,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
                     parentNodeId = uploadNodeId,
                     fileName = record.fileName,
                     modificationTime = record.timestamp / 1000,
-                    appData = TransferType.CU_UPLOAD.name,
+                    appData = TransferAppData.CameraUpload,
                     isSourceTemporary = false,
                     shouldStartFirst = false,
                 )
@@ -426,7 +426,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
                 parentNodeId = uploadNodeId,
                 fileName = record.fileName,
                 modificationTime = record.timestamp / 1000,
-                appData = TransferType.CU_UPLOAD.name,
+                appData = TransferAppData.CameraUpload,
                 isSourceTemporary = false,
                 shouldStartFirst = false,
             )
@@ -830,7 +830,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
                     parentNodeId = uploadNodeId,
                     fileName = record.fileName,
                     modificationTime = record.timestamp / 1000,
-                    appData = TransferType.CU_UPLOAD.name,
+                    appData = TransferAppData.CameraUpload,
                     isSourceTemporary = false,
                     shouldStartFirst = false,
                 )
@@ -1004,7 +1004,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
                 parentNodeId = uploadNodeId,
                 fileName = record.fileName,
                 modificationTime = record.timestamp / 1000,
-                appData = TransferType.CU_UPLOAD.name,
+                appData = TransferAppData.CameraUpload,
                 isSourceTemporary = false,
                 shouldStartFirst = false,
             )
@@ -1043,7 +1043,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
                     parentNodeId = uploadNodeId,
                     fileName = record.fileName,
                     modificationTime = record.timestamp / 1000,
-                    appData = TransferType.CU_UPLOAD.name,
+                    appData = TransferAppData.CameraUpload,
                     isSourceTemporary = false,
                     shouldStartFirst = false,
                 )
@@ -1235,7 +1235,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
                 parentNodeId = uploadNodeId,
                 fileName = record.fileName,
                 modificationTime = record.timestamp / 1000,
-                appData = TransferType.CU_UPLOAD.name,
+                appData = TransferAppData.CameraUpload,
                 isSourceTemporary = false,
                 shouldStartFirst = false,
             )

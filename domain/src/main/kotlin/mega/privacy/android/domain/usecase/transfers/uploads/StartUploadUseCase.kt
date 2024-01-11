@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers.uploads
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
@@ -35,7 +36,7 @@ class StartUploadUseCase @Inject constructor(
         parentNodeId: NodeId,
         fileName: String?,
         modificationTime: Long,
-        appData: String?,
+        appData: TransferAppData?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
     ): Flow<TransferEvent> =
