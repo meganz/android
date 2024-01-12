@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.managem
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.ChatGiphyUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.ChatRichLinkUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.LocationUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.ContactLinkUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextLinkUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.VoiceClipUiMessage
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
@@ -39,7 +39,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
-import mega.privacy.android.domain.entity.chat.messages.normal.ContactLinkMessage
+import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import javax.inject.Inject
 
@@ -145,7 +145,7 @@ class UiChatMessageMapper @Inject constructor() {
                 showAvatar = showAvatar
             )
 
-            is ContactLinkMessage -> ContactLinkUiMessage(
+            is TextLinkMessage -> TextLinkUiMessage(
                 message = message,
                 showDate = showDate,
                 showTime = showTime,

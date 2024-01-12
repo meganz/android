@@ -4,7 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
@@ -20,12 +24,20 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 
+/**
+ * Chat bubble
+ *
+ * @param isMe Whether the message is sent by me
+ * @param modifier Modifier
+ * @param subContent Sub content
+ * @param content Content
+ */
 @Composable
 fun ChatBubble(
     isMe: Boolean,
     modifier: Modifier = Modifier,
     subContent: @Composable () -> Unit = {},
-    content: @Composable () -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -34,7 +46,7 @@ fun ChatBubble(
                 shape = RoundedCornerShape(12.dp)
             )
     ) {
-        Column {
+        Column(modifier = Modifier.width(IntrinsicSize.Max)) {
             CompositionLocalProvider(
                 LocalContentColor provides if (isMe) MegaTheme.colors.text.inverse else MegaTheme.colors.text.primary,
                 LocalTextStyle provides MaterialTheme.typography.subtitle2,
@@ -44,8 +56,9 @@ fun ChatBubble(
             CompositionLocalProvider(
                 LocalContentColor provides MegaTheme.colors.text.primary,
             ) {
-                Box(
+                Column(
                     modifier = Modifier
+                        .fillMaxWidth()
                         .padding(1.dp)
                         .background(
                             color = MegaTheme.colors.background.pageBackground,

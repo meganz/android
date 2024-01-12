@@ -47,7 +47,7 @@ class ContactAttachmentMessageViewTest {
                 email = email,
                 avatar = { },
                 modifier = Modifier,
-                statusIcon = { },
+                status = null,
             )
         }
     }

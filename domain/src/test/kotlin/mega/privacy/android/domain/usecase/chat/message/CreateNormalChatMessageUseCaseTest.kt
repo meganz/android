@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.LinkDetail
 import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
-import mega.privacy.android.domain.entity.chat.messages.normal.ContactLinkMessage
+import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.domain.usecase.chat.GetLinkTypesUseCase
 import org.junit.jupiter.api.AfterEach
@@ -72,6 +72,6 @@ class CreateNormalChatMessageUseCaseTest {
                 )
             )
         )
-            .isInstanceOf(ContactLinkMessage::class.java)
+            .isInstanceOf(TextLinkMessage::class.java)
     }
 }

@@ -2,8 +2,8 @@ package mega.privacy.android.domain.usecase.chat.message
 
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
-import mega.privacy.android.domain.entity.chat.messages.normal.ContactLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.domain.usecase.chat.GetLinkTypesUseCase
 import javax.inject.Inject
@@ -18,15 +18,15 @@ class CreateNormalChatMessageUseCase @Inject constructor(
     override fun invoke(request: CreateTypedMessageRequest): NormalMessage {
         with(request) {
             val allLinks = getLinkTypesUseCase(message.content.orEmpty())
-            val contactLink = allLinks.find { it.type == RegexPatternType.CONTACT_LINK }?.link
+            val hasSupportedLink = allLinks.any { it.type in supportedTypes }
             return when {
-                !contactLink.isNullOrBlank() ->
-                    ContactLinkMessage(
+                hasSupportedLink ->
+                    TextLinkMessage(
                         msgId = message.msgId,
                         time = message.timestamp,
                         isMine = isMine,
                         userHandle = message.userHandle,
-                        contactLink = contactLink,
+                        links = allLinks,
                         content = message.content.orEmpty(),
                         tempId = message.tempId
                     )

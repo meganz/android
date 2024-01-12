@@ -11,20 +11,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.controls.chat.ChatStatusIcon
 import mega.privacy.android.core.ui.controls.chat.UiChatStatus
-import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
-import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 /**
  * Contact attachment message view
@@ -33,7 +34,7 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
  * @param userName User name
  * @param email Email
  * @param avatar Avatar
- * @param statusIcon Status icon
+ * @param status chat status
  * @param modifier Modifier
  */
 @Composable
@@ -41,40 +42,66 @@ fun ContactAttachmentMessageView(
     isMe: Boolean,
     userName: String,
     email: String,
+    status: UiChatStatus?,
     avatar: @Composable BoxScope.() -> Unit,
     modifier: Modifier = Modifier,
-    statusIcon: (@Composable BoxScope.() -> Unit)? = null,
 ) {
     ChatBubble(isMe = isMe, modifier = modifier) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 16.dp),
+        CompositionLocalProvider(
+            LocalContentColor provides if (isMe) MegaTheme.colors.text.inverse else MegaTheme.colors.text.primary,
         ) {
-            Box(modifier = Modifier.size(40.dp)) {
-                Box(
-                    modifier = Modifier.border(
-                        width = 1.dp,
-                        color = MegaTheme.colors.background.pageBackground,
-                        shape = CircleShape
-                    )
-                ) {
-                    avatar()
-                }
-                statusIcon?.invoke(this)
-            }
+            ContactMessageContentView(avatar, status, userName, email)
+        }
+    }
+}
 
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                MegaText(
-                    text = userName,
-                    style = MaterialTheme.typography.subtitle1,
-                    textColor = if (isMe) TextColor.Inverse else TextColor.Primary,
+/**
+ * Contact message content view
+ *
+ * @param avatar Avatar composable
+ * @param status chat status
+ * @param userName User name
+ * @param email
+ */
+@Composable
+fun ContactMessageContentView(
+    avatar: @Composable BoxScope.() -> Unit,
+    status: UiChatStatus?,
+    userName: String,
+    email: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier.padding(horizontal = 12.dp, vertical = 16.dp),
+    ) {
+        Box(modifier = Modifier.size(40.dp)) {
+            Box(
+                modifier = Modifier.border(
+                    width = 1.dp,
+                    color = MegaTheme.colors.background.pageBackground,
+                    shape = CircleShape
                 )
-                MegaText(
-                    text = email,
-                    style = MaterialTheme.typography.subtitle2,
-                    textColor = if (isMe) TextColor.Inverse else TextColor.Primary,
+            ) {
+                avatar()
+            }
+            status?.let {
+                ChatStatusIcon(
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    status = status
                 )
             }
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                text = userName,
+                style = MaterialTheme.typography.subtitle1,
+            )
+            Text(
+                text = email,
+                style = MaterialTheme.typography.subtitle2,
+            )
         }
     }
 }
@@ -99,12 +126,7 @@ private fun ContactAttachmentMessageViewPreview(
                         ),
                 )
             },
-            statusIcon = {
-                ChatStatusIcon(
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    status = UiChatStatus.Online,
-                )
-            },
+            status = UiChatStatus.Online,
         )
     }
 }

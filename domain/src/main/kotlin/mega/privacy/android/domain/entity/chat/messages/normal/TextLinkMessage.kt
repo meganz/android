@@ -1,16 +1,18 @@
 package mega.privacy.android.domain.entity.chat.messages.normal
 
+import mega.privacy.android.domain.entity.chat.LinkDetail
+
 /**
  * Contact link message
- * @property contactLink Contact link
+ * @property links all links in the message
  * @property content Link
  */
-data class ContactLinkMessage(
+data class TextLinkMessage(
     override val msgId: Long,
     override val time: Long,
     override val isMine: Boolean,
     override val userHandle: Long,
     override val tempId: Long,
-    val contactLink: String,
+    val links: List<LinkDetail>,
     val content: String,
 ) : NormalMessage

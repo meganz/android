@@ -8,14 +8,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import mega.privacy.android.app.presentation.extensions.isValid
+import mega.privacy.android.app.presentation.meeting.chat.extension.toUiChatStatus
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
-import mega.privacy.android.core.ui.controls.chat.ChatStatusIcon
-import mega.privacy.android.core.ui.controls.chat.UiChatStatus
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
@@ -48,22 +45,9 @@ fun ContactAttachmentMessageView(
         isMe = message.isMine,
         userName = userName,
         email = message.contactEmail,
+        status = status.toUiChatStatus(),
         avatar = {
             ChatAvatar(handle = message.contactHandle, modifier = Modifier.size(40.dp))
-        },
-        statusIcon = {
-            if (status?.isValid() == true) {
-                val chatStatus = when (status) {
-                    UserChatStatus.Online -> UiChatStatus.Online
-                    UserChatStatus.Away -> UiChatStatus.Away
-                    UserChatStatus.Busy -> UiChatStatus.Busy
-                    else -> UiChatStatus.Offline
-                }
-                ChatStatusIcon(
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    status = chatStatus
-                )
-            }
         },
     )
 }
