@@ -3682,15 +3682,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 if (!isInMDMode) {
                     selectDrawerItemCloudDrive()
                 } else {
-                    val mediaHandle: Long = fileBrowserViewModel.getSafeBrowserParentHandle()
-                    var mediaDiscoveryFragment =
-                        supportFragmentManager.findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.tag)
+                    Handler(Looper.getMainLooper()).post {
+                        val mediaHandle: Long =
+                            fileBrowserViewModel.getSafeBrowserParentHandle()
+                        var mediaDiscoveryFragment =
+                            supportFragmentManager.findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.tag)
 
-                    if (mediaDiscoveryFragment != null) removeFragment(mediaDiscoveryFragment)
-                    mediaDiscoveryFragment =
-                        MediaDiscoveryFragment.getNewInstance(mediaHandle, false)
+                        if (mediaDiscoveryFragment != null) removeFragment(
+                            mediaDiscoveryFragment
+                        )
+                        mediaDiscoveryFragment =
+                            MediaDiscoveryFragment.getNewInstance(mediaHandle, false)
 
-                    skipToMediaDiscoveryFragment(mediaDiscoveryFragment, mediaHandle)
+                        skipToMediaDiscoveryFragment(mediaDiscoveryFragment, mediaHandle)
+                    }
                 }
                 if (openFolderRefresh) {
                     onNodesCloudDriveUpdate()
