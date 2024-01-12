@@ -89,6 +89,8 @@ security-crypto = { module = "androidx.security:security-crypto", version.ref = 
 paging = { module = "androidx.paging:paging-runtime" , version.ref = "paging" }
 paging-core = { module = "androidx.paging:paging-common" , version.ref = "paging" }
 paging-compose = { module = "androidx.paging:paging-compose" , version.ref = "paging-compose" }
+paging-core = { module = "androidx.paging:paging-common" , version.ref = "paging" }
+paging-testing = { module = "androidx.paging:paging-testing" , version.ref = "paging" }
 
 [bundles]
 lifecycle = ["lifecycle-livedata", "lifecycle-viewmodel", "lifecycle-runtime", "lifecycle-reactivestreams", "lifecycle-common", "lifecycle-process", "lifecycle-service", "lifecycle-runtime-compose"]

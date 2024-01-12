@@ -894,4 +894,20 @@ interface ChatRepository {
      * @param status
      */
     suspend fun setLastLoadResponse(chatId: Long, status: ChatHistoryLoadStatus)
+
+    /**
+     * Clear chat messages
+     *
+     * @param chatId
+     */
+    suspend fun clearChatMessages(chatId: Long)
+
+    /**
+     * Get next message
+     *
+     * @param chatId
+     * @param timestamp
+     * @return next chronological message if it exists
+     */
+    suspend fun getNextMessage(chatId: Long, timestamp: Long): TypedMessage?
 }

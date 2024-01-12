@@ -1179,4 +1179,12 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun setLastLoadResponse(chatId: Long, status: ChatHistoryLoadStatus) {
         throw NotImplementedError("Not implemented yet")
     }
+
+    override suspend fun clearChatMessages(chatId: Long) {
+        throw NotImplementedError("Not implemented yet")
+    }
+
+    override suspend fun getNextMessage(chatId: Long, timestamp: Long): TypedMessage? {
+        throw NotImplementedError("Not implemented yet")
+    }
 }
