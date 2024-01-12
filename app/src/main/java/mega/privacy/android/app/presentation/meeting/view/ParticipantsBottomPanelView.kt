@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -397,7 +398,7 @@ private fun EmptyState(section: ParticipantsSection) {
                 ParticipantsSection.WaitingRoomSection -> stringResource(id = R.string.meetings_bottom_panel_participants_in_waiting_room_empty)
                 else -> ""
             },
-            modifier = Modifier.align(Alignment.CenterHorizontally),
+            textAlign = TextAlign.Center,
             style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary),
         )
     }
