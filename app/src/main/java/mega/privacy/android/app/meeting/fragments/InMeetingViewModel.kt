@@ -1689,7 +1689,8 @@ class InMeetingViewModel @Inject constructor(
             myTexture,
             participant.peerId,
             participant.clientId,
-            participant.isMe
+            participant.isMe,
+            participant.isScreenShared
         )
     }
 
@@ -1783,6 +1784,27 @@ class InMeetingViewModel @Inject constructor(
      */
     fun getParticipant(peerId: Long, clientId: Long): Participant? {
         participants.value?.filter { it.peerId == peerId && it.clientId == clientId && !it.isScreenShared }
+            ?.apply {
+                return if (isNotEmpty()) first() else null
+            }
+
+        return null
+    }
+
+    /**
+     * Get participant or screen share from peerId and clientId
+     *
+     * @param peerId peer ID of a participant
+     * @param clientId client ID of a participant
+     * @param isScreenShared True, it's the screen shared. False if not.
+     * @return The participant or screen shared from peerId and clientId.
+     */
+    fun getParticipantOrScreenShared(
+        peerId: Long,
+        clientId: Long,
+        isScreenShared: Boolean? = false,
+    ): Participant? {
+        participants.value?.filter { it.peerId == peerId && it.clientId == clientId && isScreenShared == it.isScreenShared }
             ?.apply {
                 return if (isNotEmpty()) first() else null
             }

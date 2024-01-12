@@ -14,6 +14,7 @@ class GroupVideoListener(
     peerId: Long,
     clientId: Long,
     isMe: Boolean,
+    isScreenShared: Boolean
 ) : MegaChatVideoListenerInterface {
 
     var width = 0
@@ -60,6 +61,6 @@ class GroupVideoListener(
         this.height = 0
         this.textureView = textureView
         this.isLocal = isMe
-        this.localRenderer = MegaSurfaceRenderer(textureView, peerId, clientId)
+        this.localRenderer = MegaSurfaceRenderer(textureView, peerId, clientId, isScreenShared)
     }
 }

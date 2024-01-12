@@ -278,7 +278,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * Monitor changes when updating the speaker participant
      */
     private fun updateSpeakerUser() {
-
         inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
             speaker.avatar?.let { bitmap ->
                 speakerAvatar.setImageBitmap(bitmap)
@@ -598,6 +597,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      */
     @SuppressLint("NotifyDataSetChanged")
     fun updateFullList() {
+
         listView.recycledViewPool.clear()
         adapter.submitList(participants) {
             adapter.notifyDataSetChanged()
@@ -611,9 +611,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      */
     private fun updateSpeakerPeers(listPeers: MutableSet<Participant>) {
         listPeers.forEach { peer ->
-            inMeetingViewModel.getParticipant(
+            inMeetingViewModel.getParticipantOrScreenShared(
                 peer.peerId,
-                peer.clientId
+                peer.clientId,
+                peer.isScreenShared
             )?.let { participant ->
                 Timber.d("Update the peer selected")
                 inMeetingViewModel.getSession(participant.clientId)?.let { session ->
@@ -660,6 +661,14 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
         //Participant in list
         inMeetingViewModel.getParticipant(
+            session.peerid,
+            session.clientid
+        )?.let {
+            Timber.d("Update remote A/V")
+            adapter.updateParticipantAudioVideo(type, it)
+        }
+
+        inMeetingViewModel.getScreenShared(
             session.peerid,
             session.clientid
         )?.let {
@@ -731,6 +740,14 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             Timber.d("Update session on hold status")
             adapter.updateSessionOnHold(it, session.isOnHold)
         }
+
+        inMeetingViewModel.getScreenShared(
+            session.peerid,
+            session.clientid
+        )?.let {
+            Timber.d("Update session on hold status")
+            adapter.updateSessionOnHold(it, session.isOnHold)
+        }
     }
 
     /**
@@ -763,9 +780,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     fun updateNameOrAvatar(listPeers: MutableSet<Participant>, typeChange: Int) {
         val iterator = listPeers.iterator()
         iterator.forEach { peer ->
-            inMeetingViewModel.getParticipant(
+            inMeetingViewModel.getParticipantOrScreenShared(
                 peer.peerId,
-                peer.clientId
+                peer.clientId,
+                peer.isScreenShared
             )?.let {
                 Timber.d("Update participant name")
                 adapter.updateNameOrAvatar(it, typeChange)
@@ -785,13 +803,15 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Method for resizing the listener
      *
-     * @param peerId User handle of a participant
-     * @param clientId Client ID of a participant
+     * @param peerId            User handle of a participant
+     * @param clientId          Client ID of a participant
+     * @param isScreenShared    True, if it's screen shared. False if not.
      */
-    override fun resetSize(peerId: Long, clientId: Long) {
-        inMeetingViewModel.getParticipant(
+    override fun resetSize(peerId: Long, clientId: Long, isScreenShared: Boolean) {
+        inMeetingViewModel.getParticipantOrScreenShared(
             peerId,
-            clientId
+            clientId,
+            isScreenShared
         )?.let {
             if (!it.isVideoOn || it.videoListener == null)
                 return
@@ -859,7 +879,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     override fun onDestroyView() {
-        Timber.d("View destroyed")
         removeTextureView()
         super.onDestroyView()
     }

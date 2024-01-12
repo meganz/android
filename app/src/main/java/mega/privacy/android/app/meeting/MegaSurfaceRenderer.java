@@ -55,6 +55,7 @@ public class MegaSurfaceRenderer implements TextureView.SurfaceTextureListener {
     private DisplayMetrics outMetrics;
     private long peerId = MEGACHAT_INVALID_HANDLE;
     private long clientId = MEGACHAT_INVALID_HANDLE;
+    private boolean isScreenShared = false;
     private final TextureView myTexture;
     protected List<MegaSurfaceRendererListener> listeners;
 
@@ -78,7 +79,7 @@ public class MegaSurfaceRenderer implements TextureView.SurfaceTextureListener {
         listeners = new ArrayList<>();
     }
 
-    public MegaSurfaceRenderer(TextureView view, long peerId, long clientId) {
+    public MegaSurfaceRenderer(TextureView view, long peerId, long clientId, boolean isScreenShared) {
         this.myTexture = view;
         myTexture.setSurfaceTextureListener(this);
         bitmap = myTexture.getBitmap();
@@ -89,6 +90,7 @@ public class MegaSurfaceRenderer implements TextureView.SurfaceTextureListener {
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
         this.peerId = peerId;
         this.clientId = clientId;
+        this.isScreenShared = isScreenShared;
         listeners = new ArrayList<>();
     }
 
@@ -216,7 +218,7 @@ public class MegaSurfaceRenderer implements TextureView.SurfaceTextureListener {
         if (listener == null)
             return;
 
-        listener.resetSize(peerId, clientId);
+        listener.resetSize(peerId, clientId, isScreenShared);
     }
 
     @Override
@@ -248,6 +250,6 @@ public class MegaSurfaceRenderer implements TextureView.SurfaceTextureListener {
     }
 
     public interface MegaSurfaceRendererListener {
-        void resetSize(long peerId, long clientId);
+        void resetSize(long peerId, long clientId, boolean isScreenShared);
     }
 }

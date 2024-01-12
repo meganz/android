@@ -46,6 +46,7 @@ class VideoMeetingViewHolder(
     private var avatarSize = BIG_AVATAR
     private var peerId = MEGACHAT_INVALID_HANDLE
     private var clientId = MEGACHAT_INVALID_HANDLE
+    private var isScreenShared: Boolean? = null
 
     private var isDrawing = true
 
@@ -64,10 +65,10 @@ class VideoMeetingViewHolder(
             Timber.e("Error. Peer id or client id invalid")
             return
         }
-
-
         peerId = participant.peerId
         clientId = participant.clientId
+        isScreenShared = participant.isScreenShared
+
         if (isGrid) {
             avatarSize = BIG_AVATAR
 
@@ -796,16 +797,17 @@ class VideoMeetingViewHolder(
         if (isGrid) return
 
         isDrawing = false
-        inMeetingViewModel.getParticipant(peerId, clientId)?.let { participant ->
-            inMeetingViewModel.removeParticipantVisible(participant)
+        inMeetingViewModel.getParticipantOrScreenShared(peerId, clientId, isScreenShared)
+            ?.let { participant ->
+                inMeetingViewModel.removeParticipantVisible(participant)
 
-            if (inMeetingViewModel.getSession(participant.clientId)?.hasVideo() == true) {
-                Timber.d("Recycle participant in the list, participant clientId is ${participant.clientId}")
-                participant.videoListener?.let {
-                    removeResolutionAndListener(participant)
+                if (inMeetingViewModel.getSession(participant.clientId)?.hasVideo() == true) {
+                    Timber.d("Recycle participant in the list, participant clientId is ${participant.clientId}")
+                    participant.videoListener?.let {
+                        removeResolutionAndListener(participant)
+                    }
                 }
             }
-        }
     }
 
     /**
@@ -815,7 +817,7 @@ class VideoMeetingViewHolder(
      * @return If the compared participants are different. False, if they are the same
      */
     private fun isInvalid(participant: Participant) =
-        (participant.peerId != peerId || participant.clientId != clientId)
+        (participant.peerId != peerId || participant.clientId != clientId || participant.isScreenShared != isScreenShared)
 
     /**
      * Set rounded corners for a view
