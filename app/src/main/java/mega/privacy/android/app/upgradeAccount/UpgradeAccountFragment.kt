@@ -29,7 +29,6 @@ import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.billing.PaymentUtils
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
@@ -37,6 +36,7 @@ import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -117,6 +117,7 @@ class UpgradeAccountFragment : Fragment() {
                         }
                     }
                 },
+                showBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(true) },
                 hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
                 onDialogConfirmButtonClicked = {
                     upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
@@ -132,6 +133,7 @@ class UpgradeAccountFragment : Fragment() {
                         showBuyNewSubscriptionDialog = false
                     )
                 },
+                showUpgradeWarningBanner = uiState.isCrossAccountMatch.not()
             )
         }
     }

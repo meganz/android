@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.upgradeAccount
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +13,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity.Companion.IS_CROSS_ACCOUNT_MATCH
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
@@ -61,6 +63,7 @@ import java.util.stream.Stream
 class UpgradeAccountViewModelTest {
     private lateinit var underTest: UpgradeAccountViewModel
 
+    private val savedStateHandle = SavedStateHandle()
     private val accountDetailFlow = MutableStateFlow(AccountDetail())
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val getMonthlySubscriptionsUseCase = mock<GetMonthlySubscriptionsUseCase>()
@@ -106,6 +109,7 @@ class UpgradeAccountViewModelTest {
 
     private fun initViewModel() {
         underTest = UpgradeAccountViewModel(
+            savedStateHandle = savedStateHandle,
             getMonthlySubscriptionsUseCase = getMonthlySubscriptionsUseCase,
             getYearlySubscriptionsUseCase = getYearlySubscriptionsUseCase,
             getCurrentSubscriptionPlanUseCase = getCurrentSubscriptionPlanUseCase,
@@ -121,6 +125,19 @@ class UpgradeAccountViewModelTest {
     @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `test that isCrossAccountMatch should be set based on savedStateHandle value`() = runTest {
+        savedStateHandle[IS_CROSS_ACCOUNT_MATCH] = false
+        whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+        whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+
+        initViewModel()
+
+        underTest.state.test {
+            assertThat(awaitItem().isCrossAccountMatch).isFalse()
+        }
     }
 
     @Test

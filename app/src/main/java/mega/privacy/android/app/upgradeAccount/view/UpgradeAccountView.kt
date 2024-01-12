@@ -1,5 +1,7 @@
 package mega.privacy.android.app.upgradeAccount.view
 
+import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -70,7 +72,6 @@ import mega.privacy.android.app.upgradeAccount.view.components.MonthlyYearlyTabs
 import mega.privacy.android.app.upgradeAccount.view.components.ProPlanInfoCard
 import mega.privacy.android.app.upgradeAccount.view.components.SaveUpToLabel
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.Typography
@@ -88,6 +89,7 @@ import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleNoTitleTopAppBar
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.legacy.core.ui.model.SpanStyleWithAnnotation
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 internal const val UPGRADE_ACCOUNT_SCREEN_TAG = "upgrade_account_screen:"
 internal const val TOS_TAG = "upgrade_account_screen:link_terms_of_service"
@@ -98,6 +100,7 @@ internal const val EMPTY_CARD_TAG = "upgrade_account_screen:card_empty_loading_p
 internal const val PRO_PLAN_CARD_TAG = "upgrade_account_screen:card_pro_plan_"
 internal const val PRICING_PAGE_LINK_TAG = "upgrade_account_screen:text_pricing_page_link"
 internal const val BUY_BUTTON_TAG = "upgrade_account_screen:button_buy_pro_plan_"
+internal const val UPGRADE_WARNING_BANNER_TAG = "upgrade_account_screen:upgrade_warning_banner"
 
 /**
  * Screen is shown when user taps on Upgrade button
@@ -114,8 +117,10 @@ fun UpgradeAccountView(
     onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit,
     onChoosingPlanType: (chosenPlan: AccountType) -> Unit,
     hideBillingWarning: () -> Unit,
+    showBillingWarning: () -> Unit,
     onDialogConfirmButtonClicked: (Int) -> Unit,
     onDialogDismissButtonClicked: () -> Unit,
+    showUpgradeWarningBanner: Boolean,
 ) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -126,8 +131,10 @@ fun UpgradeAccountView(
     var isClickedCurrentPlan by rememberSaveable { mutableStateOf(false) }
     var isPreselectedPlanOnce by rememberSaveable { mutableStateOf(false) }
     val isPaymentMethodAvailable = state.isPaymentMethodAvailable
-    var hideFloatButton by rememberSaveable { mutableStateOf(false) }
+    var hideFloatButton by rememberSaveable { mutableStateOf(showUpgradeWarningBanner) }
     val context = LocalContext.current
+    var isUpgradeWarningBannerVisible by rememberSaveable { mutableStateOf(showUpgradeWarningBanner) }
+
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
@@ -172,7 +179,20 @@ fun UpgradeAccountView(
                 .verticalScroll(state = scrollState)
         ) {
             if (state.showBillingWarning) {
-                BillingWarning(hideBillingWarning)
+                WarningBanner(
+                    textResId = R.string.upgrade_billing_warning,
+                    testTag = BILLING_WARNING_TAG,
+                    hideBillingWarning = hideBillingWarning
+                )
+            }
+            AnimatedVisibility(visible = isUpgradeWarningBannerVisible) {
+                WarningBanner(
+                    textResId = R.string.account_upgrade_vpn_wrong_account_upgrade_banner_description,
+                    testTag = UPGRADE_WARNING_BANNER_TAG
+                ) {
+                    isUpgradeWarningBannerVisible = false
+                    showBillingWarning()
+                }
             }
             Text(
                 text = stringResource(id = R.string.account_upgrade_account_title_choose_right_plan),
@@ -190,7 +210,7 @@ fun UpgradeAccountView(
                     isMonthly = it
                     onChoosingMonthlyYearlyPlan(it)
                     hideFloatButton =
-                        isClickedCurrentPlan && ((isMonthly && userSubscription == UserSubscription.MONTHLY_SUBSCRIBED) || (!isMonthly && userSubscription == UserSubscription.YEARLY_SUBSCRIBED))
+                        (isClickedCurrentPlan && ((isMonthly && userSubscription == UserSubscription.MONTHLY_SUBSCRIBED) || (!isMonthly && userSubscription == UserSubscription.YEARLY_SUBSCRIBED))) || showUpgradeWarningBanner
                 },
                 testTag = UPGRADE_ACCOUNT_SCREEN_TAG,
             )
@@ -242,7 +262,7 @@ fun UpgradeAccountView(
                                     onChoosingMonthlyYearlyPlan(isMonthly)
                                     onChoosingPlanType(it.accountType)
                                     isClickedCurrentPlan = isCurrentPlan
-                                    hideFloatButton = false
+                                    hideFloatButton = showUpgradeWarningBanner
                                 }
                             }
                         },
@@ -289,14 +309,18 @@ fun UpgradeAccountView(
 }
 
 @Composable
-fun BillingWarning(hideBillingWarning: () -> Unit) {
+fun WarningBanner(
+    @StringRes textResId: Int,
+    testTag: String,
+    hideBillingWarning: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colors.yellow_100_yellow_700_alpha_015
             )
-            .testTag(BILLING_WARNING_TAG)
+            .testTag(testTag)
     ) {
         Row(
             modifier = Modifier
@@ -312,7 +336,7 @@ fun BillingWarning(hideBillingWarning: () -> Unit) {
                     )
             ) {
                 Text(
-                    text = stringResource(id = R.string.upgrade_billing_warning),
+                    text = stringResource(id = textResId),
                     fontSize = 13.sp,
                     style = Typography.caption,
                     color = MaterialTheme.colors.black_yellow_700,
@@ -624,9 +648,11 @@ fun PreviewUpgradeAccountView(
             onPricingPageClicked = {},
             onChoosingMonthlyYearlyPlan = {},
             onChoosingPlanType = {},
+            showBillingWarning = {},
             hideBillingWarning = {},
             onDialogConfirmButtonClicked = {},
             onDialogDismissButtonClicked = {},
+            showUpgradeWarningBanner = true
         )
     }
 }

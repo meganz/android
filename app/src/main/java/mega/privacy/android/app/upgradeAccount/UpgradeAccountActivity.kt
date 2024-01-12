@@ -37,4 +37,8 @@ class UpgradeAccountActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    companion object {
+        const val IS_CROSS_ACCOUNT_MATCH = "is_cross_account_match"
+    }
 }

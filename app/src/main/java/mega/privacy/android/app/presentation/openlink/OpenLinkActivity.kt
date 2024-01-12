@@ -33,6 +33,7 @@ import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivit
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity.Companion.IS_CROSS_ACCOUNT_MATCH
 import mega.privacy.android.app.usecase.QuerySignupLinkUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
@@ -89,6 +90,7 @@ import mega.privacy.android.app.utils.isURLSanitized
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -127,6 +129,12 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      */
     @Inject
     lateinit var getUrlRegexPatternTypeUseCase: GetUrlRegexPatternTypeUseCase
+
+    /**
+     * Use case to check for current user's email
+     */
+    @Inject
+    lateinit var getCurrentUserEmail: GetCurrentUserEmail
 
     private var urlConfirmationLink: String? = null
 
@@ -481,11 +489,20 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_PAGE_LINK -> {
                 lifecycleScope.launch {
+                    // Check if the email passed in the intent matches the one currently logged in
+                    val isCrossAccountMatch =
+                        intent.extras?.getString("email") == getCurrentUserEmail(forceRefresh = false)
+
                     startActivity(
                         Intent(
                             this@OpenLinkActivity,
                             UpgradeAccountActivity::class.java
-                        )
+                        ).apply {
+                            putExtra(
+                                IS_CROSS_ACCOUNT_MATCH,
+                                isCrossAccountMatch
+                            )
+                        }
                     )
                     finish()
                 }

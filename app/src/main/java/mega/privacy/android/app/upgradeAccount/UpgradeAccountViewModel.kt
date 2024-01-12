@@ -1,6 +1,7 @@
 package mega.privacy.android.app.upgradeAccount
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity.Companion.IS_CROSS_ACCOUNT_MATCH
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
@@ -53,6 +55,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class UpgradeAccountViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val getMonthlySubscriptionsUseCase: GetMonthlySubscriptionsUseCase,
     private val getYearlySubscriptionsUseCase: GetYearlySubscriptionsUseCase,
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
@@ -68,7 +71,8 @@ class UpgradeAccountViewModel @Inject constructor(
             listOf(),
             AccountType.FREE,
             showBillingWarning = false,
-            currentPayment = UpgradePayment()
+            currentPayment = UpgradePayment(),
+            isCrossAccountMatch = savedStateHandle[IS_CROSS_ACCOUNT_MATCH] ?: true
         )
     )
     val state: StateFlow<UpgradeAccountState> = _state
