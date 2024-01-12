@@ -720,6 +720,7 @@ public class CallUtil {
         }
     }
 
+    @Deprecated  // This method is deprecated, use [GetDurationTextFromSecondsUseCase] instead
     public static String milliSecondsToTimer(long milliseconds) {
         String minutesString;
         String secondsString;

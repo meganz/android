@@ -18,8 +18,10 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.Ch
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.LocationUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.ContactLinkUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.VoiceClipUiMessage
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.SignatureInvalidMessage
@@ -144,6 +146,13 @@ class UiChatMessageMapper @Inject constructor() {
             )
 
             is ContactLinkMessage -> ContactLinkUiMessage(
+                message = message,
+                showDate = showDate,
+                showTime = showTime,
+                showAvatar = showAvatar
+            )
+
+            is VoiceClipMessage -> VoiceClipUiMessage(
                 message = message,
                 showDate = showDate,
                 showTime = showTime,
