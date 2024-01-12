@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.usecase.setting.BroadcastCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class CookieSettingsViewModel @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
+    private val broadcastCookieSettingsSavedUseCase: BroadcastCookieSettingsSavedUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
 ) : BaseRxViewModel() {
 
@@ -96,6 +98,7 @@ class CookieSettingsViewModel @Inject constructor(
             enabledCookies.value?.let {
                 runCatching {
                     updateCookieSettingsUseCase(it.toSet())
+                    broadcastCookieSettingsSavedUseCase((it.toSet()))
                     updateCrashAndPerformanceReportersUseCase()
                     updateResult.value = true
                 }.onFailure {

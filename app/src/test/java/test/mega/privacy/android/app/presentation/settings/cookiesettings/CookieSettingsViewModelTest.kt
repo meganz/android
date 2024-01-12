@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieSettingsViewModel
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.usecase.setting.BroadcastCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
@@ -32,6 +33,7 @@ class CookieSettingsViewModelTest {
     private lateinit var underTest: CookieSettingsViewModel
     private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
     private val updateCookieSettingsUseCase = mock<UpdateCookieSettingsUseCase>()
+    private val broadcastCookieSettingsSavedUseCase = mock<BroadcastCookieSettingsSavedUseCase>()
     private val updateCrashAndPerformanceReportersUseCase =
         mock<UpdateCrashAndPerformanceReportersUseCase>()
 
@@ -45,6 +47,7 @@ class CookieSettingsViewModelTest {
         underTest = CookieSettingsViewModel(
             getCookieSettingsUseCase = getCookieSettingsUseCase,
             updateCookieSettingsUseCase = updateCookieSettingsUseCase,
+            broadcastCookieSettingsSavedUseCase = broadcastCookieSettingsSavedUseCase,
             updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase
         )
     }
@@ -61,7 +64,9 @@ class CookieSettingsViewModelTest {
     @Test
     fun `test that updateCrashAndPerformanceReportersUseCase is invoked when updateCookieSettingsUseCase is successful`() =
         runTest {
-            whenever(updateCookieSettingsUseCase(setOf(CookieType.ESSENTIAL))).thenReturn(Unit)
+            val enabledCookies = setOf(CookieType.ESSENTIAL)
+            whenever(updateCookieSettingsUseCase(enabledCookies)).thenReturn(Unit)
+            whenever(broadcastCookieSettingsSavedUseCase(enabledCookies)).thenReturn(Unit)
             underTest.saveCookieSettings()
             verify(updateCrashAndPerformanceReportersUseCase).invoke()
         }

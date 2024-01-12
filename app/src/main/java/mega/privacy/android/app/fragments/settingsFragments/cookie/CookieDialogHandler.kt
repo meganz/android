@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.domain.usecase.setting.BroadcastCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.setting.ShouldShowCookieDialogWithAdsUseCase
 import mega.privacy.android.domain.usecase.setting.ShouldShowGenericCookieDialogUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
@@ -41,6 +42,7 @@ import javax.inject.Inject
  */
 class CookieDialogHandler @Inject constructor(
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
+    private val broadcastCookieSettingsSavedUseCase: BroadcastCookieSettingsSavedUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
     private val shouldShowCookieDialogWithAdsUseCase: ShouldShowCookieDialogWithAdsUseCase,
     private val shouldShowGenericCookieDialogUseCase: ShouldShowGenericCookieDialogUseCase,
@@ -170,11 +172,13 @@ class CookieDialogHandler @Inject constructor(
             runCatching {
                 // If the user accepts all cookies, we will enable all the cookies,
                 // including the Ads cookies else, enable all the cookies except the Ads cookies
-                if (isCookieDialogWithAds) {
-                    updateCookieSettingsUseCase(CookieType.entries.toSet())
+                val enabledCookies = if (isCookieDialogWithAds) {
+                    CookieType.entries.toSet()
                 } else {
-                    updateCookieSettingsUseCase(CookieType.entries.toSet() - CookieType.ADS_CHECK)
+                    CookieType.entries.toSet() - CookieType.ADS_CHECK
                 }
+                updateCookieSettingsUseCase(enabledCookies)
+                broadcastCookieSettingsSavedUseCase(enabledCookies)
                 updateCrashAndPerformanceReportersUseCase()
             }.onFailure { Timber.e("failed to accept all cookies: $it") }
         }

@@ -41,7 +41,9 @@ class ShouldShowCookieDialogWithAdsUseCase @Inject constructor(
         }
         val cookieSettings = getCookieSettingsUseCase()
         //ADVERTISEMENT cookie is not set, so we need to set it to false
-        if (!cookieSettings.contains(CookieType.ADS_CHECK)) {
+        if (!cookieSettings.contains(CookieType.ADS_CHECK) &&
+            cookieSettings.contains(CookieType.ADVERTISEMENT)
+        ) {
             updateCookieSettingsUseCase(cookieSettings - CookieType.ADVERTISEMENT)
         }
 

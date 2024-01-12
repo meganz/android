@@ -9,18 +9,14 @@ import javax.inject.Inject
  */
 class UpdateCookieSettingsUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val broadcastCookieSettingsSavedUseCase: BroadcastCookieSettingsSavedUseCase,
 ) {
 
     /**
-     * Updates cookie settings on SDK and broadcasts the event
+     * Updates cookie settings on SDK
      *
      * @param enabledCookieSettings Set of enabled cookie settings
      */
     suspend operator fun invoke(
         enabledCookieSettings: Set<CookieType>,
-    ) {
-        accountRepository.setCookieSettings(enabledCookieSettings)
-        broadcastCookieSettingsSavedUseCase(enabledCookieSettings)
-    }
+    ) = accountRepository.setCookieSettings(enabledCookieSettings)
 }
