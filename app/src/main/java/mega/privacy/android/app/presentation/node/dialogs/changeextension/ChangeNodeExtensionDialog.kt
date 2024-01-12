@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 
@@ -17,19 +17,17 @@ internal fun ChangeNodeExtensionDialog(
     onDismiss: () -> Unit,
     viewModel: ChangeNodeExtensionDialogViewModel,
 ) {
-
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-
         ChangeNodeExtensionDialogBody(
             modifier = modifier,
             onChangeNodeExtension = {
+                onDismiss()
                 viewModel.handleAction(
                     ChangeNodeExtensionAction.OnChangeExtensionConfirmed(
                         nodeId,
                         newNodeName
                     )
                 )
-                onDismiss()
             },
             onDismiss = {
                 onDismiss()
@@ -44,14 +42,14 @@ private fun ChangeNodeExtensionDialogBody(
     onChangeNodeExtension: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    MegaAlertDialog(
+    ConfirmationDialog(
         modifier = modifier,
-        text = stringResource(id = R.string.file_extension_change_title),
+        title = stringResource(id = R.string.file_extension_change_title),
+        text = stringResource(id = R.string.file_extension_change_warning),
         confirmButtonText = stringResource(id = R.string.action_change_anyway),
         cancelButtonText = stringResource(id = R.string.general_cancel),
         onConfirm = {
             onChangeNodeExtension()
-            onDismiss()
         },
         onDismiss = {
             onDismiss()

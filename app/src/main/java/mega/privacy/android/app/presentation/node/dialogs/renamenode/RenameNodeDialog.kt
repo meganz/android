@@ -31,8 +31,8 @@ internal const val NODE_NAME_INVALID_CHARACTERS = "\" * / : < > ? \\ |"
  * A Composable Dialog that allows the User to rename a Node
  *
  * @param nodeId The Node ID of the Node to rename
- * @param onRenameSuccessful Lambda that is triggered when a successful rename occurs
- * @param onRenameCancelled Lambda that is triggered when the User cancels the renaming procedure
+ * @param onDismiss Lambda that is triggered when the dialog is dismissed
+ * @param onOpenChangeExtensionDialog Lambda that is triggered when the User attempts to change the file extensions
  */
 @Composable
 internal fun RenameNodeDialog(
@@ -60,8 +60,8 @@ internal fun RenameNodeDialog(
     EventEffect(event = uiState.showChangeNodeExtensionDialogEvent, onConsumed = {
         viewModel.handleAction(OnChangeNodeExtensionDialogShown)
     }, action = { newName ->
-        onOpenChangeExtensionDialog(newName)
         onDismiss()
+        onOpenChangeExtensionDialog(newName)
     })
 
     uiState.nodeName?.let { nodeName ->

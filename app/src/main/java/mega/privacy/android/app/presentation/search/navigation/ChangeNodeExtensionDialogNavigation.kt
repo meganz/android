@@ -13,9 +13,9 @@ internal fun NavGraphBuilder.changeNodeExtensionDialogNavigation(
     changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel,
 ) {
     dialog(
-        "$searchChangeExtensionNodeDialog/{${searchChangeExtensionNodeDialog}}/{${searchChangeNodeExtensionDialogArgumentNodeNewName}}",
+        "$searchChangeExtensionNodeDialog/{${searchChangeNodeExtensionDialogArgumentNodeId}}/{${searchChangeNodeExtensionDialogArgumentNodeNewName}}",
         arguments = listOf(
-            navArgument(searchChangeExtensionNodeDialog) {
+            navArgument(searchChangeNodeExtensionDialogArgumentNodeId) {
                 type = NavType.LongType
             },
             navArgument(searchChangeNodeExtensionDialogArgumentNodeNewName) {

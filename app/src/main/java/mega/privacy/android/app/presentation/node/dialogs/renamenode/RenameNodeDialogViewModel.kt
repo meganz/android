@@ -40,7 +40,12 @@ internal class RenameNodeDialogViewModel @Inject constructor(
                     runCatching {
                         getNodeByHandleUseCase(action.nodeId)
                     }.onSuccess { node ->
-                        _state.update { it.copy(nodeName = node?.name) }
+                        _state.update {
+                            it.copy(
+                                nodeName = node?.name,
+                                errorMessage = null
+                            )
+                        }
                     }
                 }
             }
