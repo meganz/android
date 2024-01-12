@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialog
@@ -18,6 +19,7 @@ import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetNa
 import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.argumentNodeId
+import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.searchRenameDialog
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -45,6 +47,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel,
     renameNodeDialogViewModel: RenameNodeDialogViewModel,
     removeNodeLinkViewModel: RemoveNodeLinkViewModel,
+    changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel,
     onBackPressed: () -> Unit,
 ) {
     composable(searchRoute) {
@@ -66,21 +69,10 @@ internal fun NavGraphBuilder.searchNavGraph(
     renameDialogNavigation(navHostController, renameNodeDialogViewModel)
     nodeBottomSheetNavigation(nodeBottomSheetActionHandler, navHostController)
     changeLabelBottomSheetNavigation(navHostController)
-
-    dialog(
-        "$searchRenameDialog/{$argumentNodeId}",
-        arguments = listOf(navArgument(argumentNodeId) { type = NavType.LongType }),
-    ) {
-        it.arguments?.getLong(argumentNodeId)?.let { nodeId ->
-            RenameNodeDialog(
-                nodeId = nodeId,
-                onDismiss = {
-                    navHostController.popBackStack()
-                },
-                viewModel = renameNodeDialogViewModel
-            )
-        }
-    }
+    changeNodeExtensionDialogNavigation(
+        navHostController = navHostController,
+        changeNodeExtensionDialogViewModel = changeNodeExtensionDialogViewModel,
+    )
 
     removeNodeLinkDialogNavigation(
         navHostController = navHostController,

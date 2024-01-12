@@ -9,4 +9,6 @@ internal sealed class RenameNodeDialogAction {
     data object OnRenameValidationPassed : RenameNodeDialogAction()
 
     data object OnRenameSucceeded : RenameNodeDialogAction()
+
+    data object OnChangeNodeExtensionDialogShown : RenameNodeDialogAction()
 }

@@ -15,6 +15,11 @@ import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidNameType
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameConfirmed
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameSucceeded
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnLoadNodeName
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameValidationPassed
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,7 +35,7 @@ internal class RenameNodeDialogViewModel @Inject constructor(
 
     fun handleAction(action: RenameNodeDialogAction) {
         when (action) {
-            is RenameNodeDialogAction.OnLoadNodeName -> {
+            is OnLoadNodeName -> {
                 viewModelScope.launch {
                     runCatching {
                         getNodeByHandleUseCase(action.nodeId)
@@ -40,7 +45,7 @@ internal class RenameNodeDialogViewModel @Inject constructor(
                 }
             }
 
-            is RenameNodeDialogAction.OnRenameConfirmed -> {
+            is OnRenameConfirmed -> {
                 viewModelScope.launch {
                     getNodeByHandleUseCase(action.nodeId)?.let { currentNode ->
                         handleValidationResult(action, currentNode)
@@ -48,18 +53,22 @@ internal class RenameNodeDialogViewModel @Inject constructor(
                 }
             }
 
-            RenameNodeDialogAction.OnRenameSucceeded -> {
+            is OnRenameSucceeded -> {
                 _state.update { it.copy(renameSuccessfulEvent = consumed) }
             }
 
-            is RenameNodeDialogAction.OnRenameValidationPassed -> {
+            is OnRenameValidationPassed -> {
                 _state.update { it.copy(renameValidationPassedEvent = consumed) }
+            }
+
+            is OnChangeNodeExtensionDialogShown -> {
+                _state.update { it.copy(showChangeNodeExtensionDialogEvent = consumed()) }
             }
         }
     }
 
     private suspend fun handleValidationResult(
-        action: RenameNodeDialogAction.OnRenameConfirmed,
+        action: OnRenameConfirmed,
         currentNode: UnTypedNode,
     ) {
         when (checkForValidNameUseCase(action.newNodeName, currentNode)) {
@@ -80,7 +89,7 @@ internal class RenameNodeDialogViewModel @Inject constructor(
             }
 
             ValidNameType.DIFFERENT_EXTENSION -> {
-                // show another dialog here
+                _state.update { it.copy(showChangeNodeExtensionDialogEvent = triggered(action.newNodeName)) }
             }
 
             else -> {

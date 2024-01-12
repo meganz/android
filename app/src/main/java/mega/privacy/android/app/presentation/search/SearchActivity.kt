@@ -29,6 +29,8 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionAction
+import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
@@ -62,6 +64,7 @@ class SearchActivity : AppCompatActivity() {
     private val moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel by viewModels()
     private val renameNodeDialogViewModel: RenameNodeDialogViewModel by viewModels()
     private val removeNodeLinkViewModel: RemoveNodeLinkViewModel by viewModels()
+    private val changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel by viewModels()
 
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
@@ -125,6 +128,7 @@ class SearchActivity : AppCompatActivity() {
             val moveToRubbishState by moveToRubbishOrDeleteNodeDialogViewModel.state.collectAsStateWithLifecycle()
             val renameFolderState by renameNodeDialogViewModel.state.collectAsStateWithLifecycle()
             val removeLinkState by removeNodeLinkViewModel.state.collectAsStateWithLifecycle()
+            val changeNodeExtensionDialogViewModelState by changeNodeExtensionDialogViewModel.state.collectAsStateWithLifecycle()
 
             val scaffoldState = rememberScaffoldState()
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
@@ -138,6 +142,7 @@ class SearchActivity : AppCompatActivity() {
                         moveToRubbishOrDeleteNodeDialogViewModel = moveToRubbishOrDeleteNodeDialogViewModel,
                         renameNodeDialogViewModel = renameNodeDialogViewModel,
                         removeNodeLinkViewModel = removeNodeLinkViewModel,
+                        changeNodeExtensionDialogViewModel = changeNodeExtensionDialogViewModel,
                         handleClick = ::handleClick,
                         navigateToLink = ::navigateToLink,
                         showSortOrderBottomSheet = ::showSortOrderBottomSheet,
@@ -180,6 +185,20 @@ class SearchActivity : AppCompatActivity() {
                 ) {
                     scaffoldState.snackbarHostState.showSnackbar(it)
                 }
+
+                EventEffect(
+                    event = changeNodeExtensionDialogViewModelState.renameSuccessfulEvent,
+                    onConsumed = {
+                        changeNodeExtensionDialogViewModel.handleAction(
+                            ChangeNodeExtensionAction.OnChangeExtensionConsumed
+                        )
+                    },
+                    action = {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            renameSuccessMessage
+                        )
+                    }
+                )
             }
         }
 

@@ -8,6 +8,7 @@ import de.palm.composestateevents.consumed
 internal data class RenameNodeDialogState(
     val nodeName: String? = null,
     @StringRes val errorMessage: Int? = null,
+    val showChangeNodeExtensionDialogEvent: StateEventWithContent<String> = consumed(),
     val renameValidationPassedEvent: StateEvent = consumed,
     val renameSuccessfulEvent: StateEvent = consumed,
 )

@@ -8,6 +8,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
@@ -32,6 +33,7 @@ internal fun SearchNavHostController(
     moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel,
     renameNodeDialogViewModel: RenameNodeDialogViewModel,
     removeNodeLinkViewModel: RemoveNodeLinkViewModel,
+    changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel,
     handleClick: (TypedNode?) -> Unit,
     navigateToLink: (String) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
@@ -59,7 +61,8 @@ internal fun SearchNavHostController(
                 onBackPressed = onBackPressed,
                 moveToRubbishOrDeleteNodeDialogViewModel = moveToRubbishOrDeleteNodeDialogViewModel,
                 renameNodeDialogViewModel = renameNodeDialogViewModel,
-                removeNodeLinkViewModel = removeNodeLinkViewModel
+                removeNodeLinkViewModel = removeNodeLinkViewModel,
+                changeNodeExtensionDialogViewModel = changeNodeExtensionDialogViewModel,
             )
         }
     }

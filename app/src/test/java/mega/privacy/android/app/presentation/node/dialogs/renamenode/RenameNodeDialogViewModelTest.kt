@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.node.dialogs.renamenode
 
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
@@ -34,14 +36,14 @@ import org.mockito.kotlin.reset
 @OptIn(ExperimentalCoroutinesApi::class)
 class RenameNodeDialogViewModelTest {
 
-    private lateinit var viewModel: RenameNodeDialogViewModel
+    private lateinit var underTest: RenameNodeDialogViewModel
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
     private val checkForValidNameUseCase: CheckForValidNameUseCase = mock()
     private val renameNodeUseCase: RenameNodeUseCase = mock()
 
     @BeforeEach
     fun setup() {
-        viewModel = RenameNodeDialogViewModel(
+        underTest = RenameNodeDialogViewModel(
             getNodeByHandleUseCase,
             checkForValidNameUseCase,
             renameNodeUseCase
@@ -71,9 +73,9 @@ class RenameNodeDialogViewModelTest {
         whenever(node.name).thenReturn(nodeName)
         whenever(getNodeByHandleUseCase(nodeId)).thenReturn(node)
 
-        viewModel.handleAction(RenameNodeDialogAction.OnLoadNodeName(nodeId))
+        underTest.handleAction(RenameNodeDialogAction.OnLoadNodeName(nodeId))
 
-        assertThat(nodeName).isEqualTo(viewModel.state.value.nodeName)
+        assertThat(nodeName).isEqualTo(underTest.state.value.nodeName)
     }
 
 
@@ -89,7 +91,7 @@ class RenameNodeDialogViewModelTest {
             whenever(renameNodeUseCase(nodeId.longValue, newNodeName)).thenReturn(Unit)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
 
-            viewModel.handleAction(
+            underTest.handleAction(
                 RenameNodeDialogAction.OnRenameConfirmed(
                     nodeId.longValue,
                     newNodeName
@@ -97,7 +99,7 @@ class RenameNodeDialogViewModelTest {
             )
 
             verify(renameNodeUseCase).invoke(nodeId.longValue, newNodeName)
-            assertThat(viewModel.state.value.renameValidationPassedEvent).isEqualTo(triggered)
+            assertThat(underTest.state.value.renameValidationPassedEvent).isEqualTo(triggered)
         }
 
     @ParameterizedTest(name = "test {0} is mapped correctly")
@@ -113,21 +115,21 @@ class RenameNodeDialogViewModelTest {
             whenever(renameNodeUseCase(nodeId.longValue, newNodeName)).thenReturn(Unit)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
 
-            viewModel.handleAction(
+            underTest.handleAction(
                 RenameNodeDialogAction.OnRenameConfirmed(
                     nodeId.longValue,
                     newNodeName
                 )
             )
 
-            assertThat(viewModel.state.value.errorMessage).isEqualTo(validationTexts.second)
+            assertThat(underTest.state.value.errorMessage).isEqualTo(validationTexts.second)
         }
 
     @Test
     fun `test that OnRenameSucceeded updates state with success event`() = runTest {
-        viewModel.handleAction(RenameNodeDialogAction.OnRenameSucceeded)
+        underTest.handleAction(RenameNodeDialogAction.OnRenameSucceeded)
 
-        val currentState = viewModel.state.value
+        val currentState = underTest.state.value
         Truth.assertThat(currentState.renameSuccessfulEvent).isEqualTo(consumed)
 
     }
@@ -135,10 +137,49 @@ class RenameNodeDialogViewModelTest {
     @Test
     fun `test that OnRenameValidationPassed updates state with validation passed event`() =
         runTest {
-            viewModel.handleAction(RenameNodeDialogAction.OnRenameValidationPassed)
+            underTest.handleAction(RenameNodeDialogAction.OnRenameValidationPassed)
 
-            val currentState = viewModel.state.value
+            val currentState = underTest.state.value
             assertThat(currentState.renameValidationPassedEvent).isEqualTo(consumed)
+        }
+
+    @Test
+    fun `test that changing extension updates showChangeNodeExtensionDialog to triggered`() =
+        runTest {
+            val nodeId = NodeId(123L)
+            val newNodeName = "New Node Name"
+            val node: FileNode = mock()
+            whenever(node.name).thenReturn(newNodeName)
+            whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
+            whenever(
+                checkForValidNameUseCase(
+                    newNodeName,
+                    node
+                )
+            ).thenReturn(ValidNameType.DIFFERENT_EXTENSION)
+            whenever(renameNodeUseCase(nodeId.longValue, newNodeName)).thenReturn(Unit)
+            whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
+
+            underTest.handleAction(
+                RenameNodeDialogAction.OnRenameConfirmed(
+                    nodeId.longValue,
+                    newNodeName
+                )
+            )
+
+            assertThat(underTest.state.value.showChangeNodeExtensionDialogEvent).isInstanceOf(
+                StateEventWithContentTriggered::class.java
+            )
+        }
+
+    @Test
+    fun `test that OnChangeNodeExtensionDialogShown updates showChangeNodeExtensionDialog to consumed`() =
+        runTest {
+            underTest.handleAction(RenameNodeDialogAction.OnChangeNodeExtensionDialogShown)
+
+            assertThat(underTest.state.value.showChangeNodeExtensionDialogEvent).isInstanceOf(
+                StateEventWithContentConsumed::class.java
+            )
         }
 
     private fun provideValidationParameters(): List<Pair<ValidNameType, Int>> = listOf(

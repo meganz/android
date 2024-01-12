@@ -22,6 +22,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnLoadNodeName
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameConfirmed
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameValidationPassed
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
 
 internal const val RENAME_NODE_DIALOG_TAG = "rename_node_dialog:input_dialog"
 internal const val NODE_NAME_INVALID_CHARACTERS = "\" * / : < > ? \\ |"
@@ -37,6 +38,7 @@ internal const val NODE_NAME_INVALID_CHARACTERS = "\" * / : < > ? \\ |"
 internal fun RenameNodeDialog(
     nodeId: Long,
     onDismiss: () -> Unit,
+    onOpenChangeExtensionDialog: (newName: String) -> Unit,
     viewModel: RenameNodeDialogViewModel,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -54,6 +56,13 @@ internal fun RenameNodeDialog(
             onDismiss()
         }
     )
+
+    EventEffect(event = uiState.showChangeNodeExtensionDialogEvent, onConsumed = {
+        viewModel.handleAction(OnChangeNodeExtensionDialogShown)
+    }, action = { newName ->
+        onOpenChangeExtensionDialog(newName)
+        onDismiss()
+    })
 
     uiState.nodeName?.let { nodeName ->
         RenameNodeDialogBody(
