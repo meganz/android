@@ -222,30 +222,8 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun setBrowserParentHandle(handle: Long) = viewModelScope.launch {
         handleStack.push(handle)
-        _state.update {
-            it.copy(
-                fileBrowserHandle = handle,
-                mediaHandle = handle
-            )
-        }
+        _state.update { it.copy(fileBrowserHandle = handle) }
         refreshNodes()
-    }
-
-    /**
-     * handle logic if back from Media Discovery
-     */
-    suspend fun handleBackFromMD() {
-        handleStack.pop()
-        val currentParent =
-            _state.value.parentHandle ?: getRootNodeUseCase()?.id?.longValue
-            ?: MegaApiJava.INVALID_HANDLE
-        _state.update {
-            it.copy(
-                fileBrowserHandle = currentParent,
-                mediaHandle = currentParent
-            )
-        }
-        refreshNodesState()
     }
 
     /**
@@ -335,9 +313,9 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
-     * Handles back click of rubbishBinFragment
+     * Handles Back Navigation events
      */
-    fun onBackPressed() {
+    fun performBackNavigation() {
         _state.update {
             it.copy(showMediaDiscoveryIcon = false)
         }
@@ -363,8 +341,8 @@ class FileBrowserViewModel @Inject constructor(
             ) {
                 _state.update { state ->
                     state.copy(
-                        showMediaDiscovery = true,
-                        showMediaDiscoveryIcon = true
+                        showMediaDiscoveryEvent = triggered(handle),
+                        showMediaDiscoveryIcon = true,
                     )
                 }
             }
@@ -607,7 +585,6 @@ class FileBrowserViewModel @Inject constructor(
             it.copy(
                 currentFileNode = null,
                 itemIndex = -1,
-                showMediaDiscovery = false
             )
         }
     }
@@ -619,5 +596,12 @@ class FileBrowserViewModel @Inject constructor(
         _state.update {
             it.copy(downloadEvent = consumed())
         }
+    }
+
+    /**
+     * Consumes the Show Media Discovery Event
+     */
+    fun consumeShowMediaDiscoveryEvent() {
+        _state.update { it.copy(showMediaDiscoveryEvent = consumed()) }
     }
 }

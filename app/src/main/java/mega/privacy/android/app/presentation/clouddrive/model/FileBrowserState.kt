@@ -18,7 +18,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property fileBrowserHandle current file browser handle
  * @property mediaDiscoveryViewSettings current settings for displaying discovery view
  * @property parentHandle Parent Handle of current Node
- * @property mediaHandle MediaHandle of current Node
  * @property isPendingRefresh
  * @property nodesList list of [NodeUIItem]
  * @property isInSelection if list is in selection mode or not
@@ -30,10 +29,10 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property sortOrder [SortOrder] of current list
  * @property optionsItemInfo information when option selected clicked
  * @property isFileBrowserEmpty information about file browser empty
- * @property showMediaDiscovery shows Media discovery of Folder Node
  * @property shouldShowBannerVisibility
  * @property bannerTime timer
  * @property showMediaDiscoveryIcon showMediaDiscoveryIcon
+ * @property showMediaDiscoveryEvent State Event that shows the Media Discovery
  * @property isConnected is connected to internet
  * @property downloadEvent download event
  */
@@ -42,7 +41,6 @@ data class FileBrowserState(
     val fileBrowserHandle: Long = -1L,
     val mediaDiscoveryViewSettings: Int = MediaDiscoveryViewSettings.INITIAL.ordinal,
     val parentHandle: Long? = null,
-    val mediaHandle: Long = -1L,
     val isPendingRefresh: Boolean = false,
     val nodesList: List<NodeUIItem<TypedNode>> = emptyList(),
     val isInSelection: Boolean = false,
@@ -54,10 +52,10 @@ data class FileBrowserState(
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val optionsItemInfo: OptionsItemInfo? = null,
     val isFileBrowserEmpty: Boolean = false,
-    val showMediaDiscovery: Boolean = false,
     val shouldShowBannerVisibility: Boolean = false,
     val bannerTime: Long = 0L,
     val showMediaDiscoveryIcon: Boolean = false,
+    val showMediaDiscoveryEvent: StateEventWithContent<Long> = consumed(),
     val isConnected: Boolean = false,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
 )

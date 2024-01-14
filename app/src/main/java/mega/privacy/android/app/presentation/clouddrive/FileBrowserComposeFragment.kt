@@ -16,7 +16,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,6 +28,8 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEventWithContent
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -55,7 +56,6 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -191,7 +191,10 @@ class FileBrowserComposeFragment : Fragment() {
                         },
                         onEnterMediaDiscoveryClick = {
                             disableSelectMode()
-                            showMediaDiscovery(isOpenByMDIcon = true)
+                            showMediaDiscovery(
+                                mediaHandle = uiState.fileBrowserHandle,
+                                isAccessedByIconClick = true,
+                            )
                         },
                     )
                     //snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet
@@ -215,7 +218,9 @@ class FileBrowserComposeFragment : Fragment() {
                     folderCount = uiState.selectedFolderNodes
                 )
                 itemClickedEvenReceived(uiState.currentFileNode)
-                ShowMediaDiscovery(uiState.showMediaDiscovery)
+                ShowMediaDiscovery(uiState.showMediaDiscoveryEvent) {
+                    fileBrowserViewModel.consumeShowMediaDiscoveryEvent()
+                }
             }
         }
     }
@@ -230,16 +235,27 @@ class FileBrowserComposeFragment : Fragment() {
     }
 
     /**
-     * Displays if media discovery is to be shown or not
+     * A Composable that shows the Media Discovery
+     *
+     * @param event The State Event
+     * @param onConsumeEvent Executes specific action if [event] has been consumed
      */
     @Composable
-    private fun ShowMediaDiscovery(showMediaDiscovery: Boolean) {
-        if (showMediaDiscovery) {
-            SideEffect {
-                showMediaDiscovery()
-            }
-            fileBrowserViewModel.onItemPerformedClicked()
-        }
+    private fun ShowMediaDiscovery(
+        event: StateEventWithContent<Long>,
+        onConsumeEvent: () -> Unit,
+    ) {
+        EventEffect(
+            event = event,
+            onConsumed = onConsumeEvent,
+            action = { mediaHandle ->
+                showMediaDiscovery(
+                    mediaHandle = mediaHandle,
+                    isAccessedByIconClick = false,
+                )
+                fileBrowserViewModel.onItemPerformedClicked()
+            },
+        )
     }
 
     /**
@@ -350,7 +366,7 @@ class FileBrowserComposeFragment : Fragment() {
                 2
             } else {
                 fileBrowserViewModel.state.value.parentHandle?.let {
-                    fileBrowserViewModel.onBackPressed()
+                    fileBrowserViewModel.performBackNavigation()
                     invalidateOptionsMenu()
                     setToolbarTitle()
                     2
@@ -534,15 +550,16 @@ class FileBrowserComposeFragment : Fragment() {
     }
 
     /**
-     * Show Media discovery and launch [MediaDiscoveryFragment]
+     * Notifies [ManagerActivity] to open the Media Discovery
+     *
+     * @param mediaHandle The Folder Handle that contains the Media to be displayed on that page
+     * @param isAccessedByIconClick True if Media Discovery is accessed by clicking the Media
+     * Discovery Icon
      */
-    private fun showMediaDiscovery(isOpenByMDIcon: Boolean = false) {
-        (requireActivity() as? ManagerActivity)?.skipToMediaDiscoveryFragment(
-            fragment = MediaDiscoveryFragment.getNewInstance(
-                mediaHandle = fileBrowserViewModel.state.value.mediaHandle,
-                isOpenByMDIcon = isOpenByMDIcon,
-            ),
-            mediaHandle = fileBrowserViewModel.state.value.mediaHandle,
+    private fun showMediaDiscovery(mediaHandle: Long, isAccessedByIconClick: Boolean) {
+        (requireActivity() as? ManagerActivity)?.showMediaDiscovery(
+            mediaHandle = mediaHandle,
+            isAccessedByIconClick = isAccessedByIconClick,
         )
     }
 

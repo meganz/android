@@ -504,8 +504,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private var orientationSaved = 0
 
-    // Determine if in Media discovery page, if it is true, it must in CD drawerItem tab
-    private var isInMDMode = false
     private var isInFilterPage = false
     private var isInAlbumContent = false
     var fromAlbumContent = false
@@ -562,7 +560,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var chatTabsFragment: ChatTabsFragment? = null
     private var turnOnNotificationsFragment: TurnOnNotificationsFragment? = null
     private var permissionsFragment: PermissionsFragment? = null
-    private var mediaDiscoveryFragment: Fragment? = null
     private var mStopped = true
     private var bottomItemBeforeOpenFullscreenOffline = Constants.INVALID_VALUE
     private var fullscreenOfflineFragmentCompose: OfflineFragmentCompose? = null
@@ -838,16 +835,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         nodeSaver.saveState(outState)
         uploadBottomSheetDialogActionHandler.onSaveInstanceState(outState)
         outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog))
-        outState.putBoolean(STATE_KEY_IS_IN_MD_MODE, isInMDMode)
-        mediaDiscoveryFragment =
-            supportFragmentManager.findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.tag)
-        mediaDiscoveryFragment?.let {
-            supportFragmentManager.putFragment(
-                outState,
-                FragmentTag.MEDIA_DISCOVERY.tag,
-                it
-            )
-        }
         outState.putBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, isInAlbumContent)
         albumContentFragment =
             supportFragmentManager.findFragmentByTag(FragmentTag.ALBUM_CONTENT.tag)
@@ -1858,13 +1845,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         )
         joiningToChatLink = savedInstanceState.getBoolean(JOINING_CHAT_LINK, false)
         linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK)
-        isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false)
-        if (isInMDMode) {
-            mediaDiscoveryFragment = supportFragmentManager.getFragment(
-                savedInstanceState,
-                FragmentTag.MEDIA_DISCOVERY.tag
-            )
-        }
         isInAlbumContent = savedInstanceState.getBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, false)
         if (isInAlbumContent) {
             albumContentFragment = supportFragmentManager.getFragment(
@@ -2771,12 +2751,27 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         searchViewModel.cancelSearch()
     }
 
-    fun skipToMediaDiscoveryFragment(fragment: Fragment, mediaHandle: Long) {
-        mediaDiscoveryFragment = fragment
-        replaceFragment(fragment, FragmentTag.MEDIA_DISCOVERY.tag)
-        viewModel.onMediaDiscoveryOpened(mediaHandle)
-        isInMDMode = true
-        viewModel.setIsFirstNavigationLevel(false)
+    /**
+     * Displays the Media Discovery
+     *
+     * @param mediaHandle The Folder Handle containing Media to be displayed in that View
+     * @param isAccessedByIconClick True if Media Discovery is accessed by clicking the Media
+     * Discovery Icon
+     */
+    fun showMediaDiscovery(mediaHandle: Long, isAccessedByIconClick: Boolean) {
+        // Remove the existing Media Discovery View first
+        mediaDiscoveryFragment?.let { removeFragment(it) }
+        replaceFragment(
+            fragment = MediaDiscoveryFragment.newInstance(
+                mediaHandle = mediaHandle,
+                isAccessedByIconClick = isAccessedByIconClick,
+            ),
+            fragmentTag = FragmentTag.MEDIA_DISCOVERY.tag,
+        )
+        with(viewModel) {
+            onMediaDiscoveryOpened(mediaHandle)
+            setIsFirstNavigationLevel(false)
+        }
     }
 
     fun skipToAlbumContentFragment(fragment: Fragment) {
@@ -2912,7 +2907,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     if (megaApi.rootNode != null) {
                         if ((parentNode.handle == megaApi.rootNode?.handle
                                     || fileBrowserViewModel.state().fileBrowserHandle == -1L)
-                            && !isInMDMode
+                            && mediaDiscoveryFragment == null
                         ) {
                             supportActionBar?.title = getString(R.string.section_cloud_drive)
                             viewModel.setIsFirstNavigationLevel(true)
@@ -3502,11 +3497,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
+    /**
+     * Removes a [Fragment] from the FragmentManager
+     *
+     * @param fragment the [Fragment] to be removed
+     */
     private fun removeFragment(fragment: Fragment?) {
-        if (fragment != null && fragment.isAdded) {
-            val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
-            ft.remove(fragment)
-            ft.commitAllowingStateLoss()
+        fragment?.let { nonNullFragment ->
+            supportFragmentManager.apply {
+                beginTransaction().apply { remove(nonNullFragment) }.commit()
+                executePendingTransactions()
+            }
         }
     }
 
@@ -3679,22 +3680,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     // value, since it retrieves this ViewModel through activityViewModels
                     fileBrowserViewModel.setBrowserParentHandle(cloudDriveNodeHandle)
                 }
-                if (!isInMDMode) {
+                if (mediaDiscoveryFragment == null) {
                     selectDrawerItemCloudDrive()
                 } else {
                     Handler(Looper.getMainLooper()).post {
-                        val mediaHandle: Long =
-                            fileBrowserViewModel.getSafeBrowserParentHandle()
-                        var mediaDiscoveryFragment =
-                            supportFragmentManager.findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.tag)
-
-                        if (mediaDiscoveryFragment != null) removeFragment(
-                            mediaDiscoveryFragment
+                        showMediaDiscovery(
+                            mediaHandle = fileBrowserViewModel.getSafeBrowserParentHandle(),
+                            isAccessedByIconClick = false,
                         )
-                        mediaDiscoveryFragment =
-                            MediaDiscoveryFragment.getNewInstance(mediaHandle, false)
-
-                        skipToMediaDiscoveryFragment(mediaDiscoveryFragment, mediaHandle)
                     }
                 }
                 if (openFolderRefresh) {
@@ -3717,7 +3710,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     fileBrowserViewModel.refreshNodes()
                 }
                 handleShowingAds(TAB_CLOUD_SLOT_ID)
-                Timber.d("END for Cloud Drive")
             }
 
             DrawerItem.RUBBISH_BIN -> {
@@ -3884,7 +3876,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             DrawerItem.CHAT -> {
-                Timber.d("Chat selected")
                 selectDrawerItemChat(chatId)
                 supportInvalidateOptionsMenu()
                 showHideBottomNavigationView(false)
@@ -4136,6 +4127,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private val backupsFragment: BackupsFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
+
+    private val mediaDiscoveryFragment: MediaDiscoveryFragment?
+        get() = supportFragmentManager.findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.tag) as? MediaDiscoveryFragment
 
     private fun createBackupsFragment(backupsHandle: Long) = BackupsFragment.newInstance(
         // Default to the User's Root Backups Folder handle if no Backups Handle is passed
@@ -4479,7 +4473,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 DrawerItem.CLOUD_DRIVE -> {
                     openLinkMenuItem?.isVisible = isFirstNavigationLevel
                     moreMenuItem.isVisible = !isFirstNavigationLevel
-                    if (!isInMDMode && isCloudAdded && fileBrowserViewModel.state().nodesList.isNotEmpty()) {
+                    if (mediaDiscoveryFragment == null && isCloudAdded && fileBrowserViewModel.state().nodesList.isNotEmpty()
+                    ) {
                         searchMenuItem?.isVisible = true
                     }
                 }
@@ -4627,9 +4622,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        Timber.d("onOptionsItemSelected")
         typesCameraPermission = Constants.INVALID_TYPE_PERMISSIONS
-        Timber.d("retryPendingConnections")
         megaApi.retryPendingConnections()
         megaChatApi.retryPendingConnections(false, null)
         return when (item.itemId) {
@@ -4650,11 +4643,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         drawerLayout.openDrawer(navigationView)
                     }
                 } else {
-                    Timber.d("NOT firstNavigationLevel")
-                    if (drawerItem === DrawerItem.CLOUD_DRIVE) {
-                        //Check media discovery mode
-                        if (isInMDMode) {
-                            onBackPressedDispatcher.onBackPressed()
+                    if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+                        if (mediaDiscoveryFragment != null) {
+                            exitMediaDiscovery(performBackBehavior = true)
                         } else {
                             //Cloud Drive
                             if (isCloudAdded) {
@@ -4913,14 +4904,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun goBack() {
-        Timber.d("goBack")
         retryConnectionsAndSignalPresence()
         if (drawerLayout.isDrawerOpen(navigationView)) {
             drawerLayout.closeDrawer(GravityCompat.START)
             return
         }
         dismissAlertDialogIfExists(statusDialog)
-        Timber.d("DRAWERITEM: %s", drawerItem)
         if (turnOnNotifications) {
             deleteTurnOnNotificationsFragment()
             return
@@ -4935,12 +4924,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         }
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
-            if (isInMDMode) {
-                lifecycleScope.launch {
-                    isInMDMode = false
-                    fileBrowserViewModel.handleBackFromMD()
-                    goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-                }
+            if (mediaDiscoveryFragment != null) {
+                exitMediaDiscovery(performBackBehavior = true)
             } else {
                 if (!isCloudAdded || fileBrowserComposeFragment?.onBackPressed() == 0) {
                     performOnBack()
@@ -5004,11 +4989,23 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
+    /**
+     * Leaves the Media Discovery page
+     *
+     * @param performBackBehavior If true, a Back Navigation is performed to go back to the
+     * previous Node
+     */
+    fun exitMediaDiscovery(performBackBehavior: Boolean) {
+        removeFragment(mediaDiscoveryFragment)
+        if (performBackBehavior) {
+            fileBrowserViewModel.performBackNavigation()
+        }
+        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+    }
+
     private fun onBackPressedInSharedItemsDrawerItem() {
         lifecycleScope.launch {
-            if (isSharesTabComposeEnabled()) {
-
-            } else {
+            if (!isSharesTabComposeEnabled()) {
                 when (tabItemShares) {
                     SharesTab.INCOMING_TAB -> if (!isIncomingAdded || incomingSharesFragment?.onBackPressed() == 0) {
                         performOnBack()
@@ -5157,9 +5154,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         when (menuItem.itemId) {
             R.id.bottom_navigation_item_cloud_drive -> {
                 if (drawerItem === DrawerItem.CLOUD_DRIVE) {
-                    if (isInMDMode) {
-                        isInMDMode = false
-                    }
                     val rootNode = megaApi.rootNode
                     if (rootNode == null) {
                         Timber.e("Root node is null")
@@ -7460,7 +7454,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return@launch
         }
         when (drawerItem) {
-            DrawerItem.CLOUD_DRIVE -> if (!isInMDMode) {
+            DrawerItem.CLOUD_DRIVE -> if (mediaDiscoveryFragment == null) {
                 updateFabAndShow()
             }
 
@@ -8145,17 +8139,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *
      * @return True if the current screen is MD, false otherwise.
      */
-    fun isInMDMode(): Boolean {
-        return drawerItem === DrawerItem.CLOUD_DRIVE && isInMDMode
-    }
-
-    /**
-     * switch to Cloud Drive file list from media discovery
-     */
-    fun switchToCDFromMD() {
-        isInMDMode = false
-        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-    }
+    fun isInMediaDiscovery() =
+        drawerItem == DrawerItem.CLOUD_DRIVE && mediaDiscoveryFragment != null
 
     /**
      * Create the instance of FileBackupManager
@@ -8459,7 +8444,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
          */
         const val ELEVATION_SCROLL = 0x01
         const val ELEVATION_CALL_IN_PROGRESS = 0x02
-        private const val STATE_KEY_IS_IN_MD_MODE = "isInMDMode"
         private const val STATE_KEY_IS_IN_ALBUM_CONTENT = "isInAlbumContent"
         private const val STATE_KEY_IS_IN_PHOTOS_FILTER = "isInFilterPage"
         var drawerMenuItem: MenuItem? = null

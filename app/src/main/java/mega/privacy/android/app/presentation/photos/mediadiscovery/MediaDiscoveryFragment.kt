@@ -35,11 +35,11 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDis
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.theme.MegaAppTheme
 import javax.inject.Inject
 
 /**
@@ -65,25 +65,6 @@ class MediaDiscoveryFragment : Fragment() {
 
     @Inject
     lateinit var albumImportPreviewProvider: AlbumImportPreviewProvider
-
-    companion object {
-        @JvmStatic
-        fun getNewInstance(
-            mediaHandle: Long,
-            isOpenByMDIcon: Boolean = false,
-        ): MediaDiscoveryFragment {
-            return MediaDiscoveryFragment().apply {
-                arguments = bundleOf(
-                    INTENT_KEY_CURRENT_FOLDER_ID to mediaHandle,
-                    INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON to isOpenByMDIcon
-                )
-            }
-        }
-
-        internal const val INTENT_KEY_CURRENT_FOLDER_ID = "CURRENT_FOLDER_ID"
-        private const val INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON =
-            "OPEN_MEDIA_DISCOVERY_BY_MD_ICON"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,7 +92,7 @@ class MediaDiscoveryFragment : Fragment() {
                         mediaDiscoveryViewModel = mediaDiscoveryViewModel,
                         onOKButtonClicked = this@MediaDiscoveryFragment::onOKButtonClicked,
                         onSettingButtonClicked = this@MediaDiscoveryFragment::onSettingButtonClicked,
-                        showSettingDialog = showSettingDialog(uiState.mediaDiscoveryViewSettings),
+                        showSettingDialog = showSettingsDialog(uiState.mediaDiscoveryViewSettings),
                         onZoomIn = this@MediaDiscoveryFragment::handleZoomIn,
                         onZoomOut = this@MediaDiscoveryFragment::handleZoomOut,
                         onPhotoClicked = this@MediaDiscoveryFragment::onClick,
@@ -154,7 +135,7 @@ class MediaDiscoveryFragment : Fragment() {
     private fun onSwitchListView() {
         lifecycleScope.launch {
             mediaDiscoveryViewModel.setListViewTypeClicked()
-            managerActivity?.switchToCDFromMD()
+            managerActivity?.exitMediaDiscovery(performBackBehavior = false)
         }
     }
 
@@ -237,14 +218,9 @@ class MediaDiscoveryFragment : Fragment() {
         )
     }
 
-
-    private fun showSettingDialog(mediaDiscoveryViewSettings: Int?): Boolean {
-        return mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.INITIAL.ordinal
-                && arguments?.getBoolean(
-            INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON,
-            false
-        ) == false
-    }
+    private fun showSettingsDialog(mediaDiscoveryViewSettings: Int?): Boolean =
+        mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.INITIAL.ordinal
+                && arguments?.getBoolean(INTENT_KEY_IS_ACCESSED_BY_ICON_CLICK, false) == false
 
     private fun onClick(photo: Photo) {
         if (mediaDiscoveryViewModel.state.value.selectedPhotoIds.isEmpty()) {
@@ -294,7 +270,7 @@ class MediaDiscoveryFragment : Fragment() {
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
-                if (managerActivity?.isInMDMode() == false) {
+                if (managerActivity?.isInMediaDiscovery() == false) {
                     return
                 }
                 menuInflater.inflate(R.menu.fragment_media_discovery_toolbar, menu)
@@ -340,6 +316,30 @@ class MediaDiscoveryFragment : Fragment() {
                 sortAndFilterPhotos(state.value.sourcePhotos),
                 state.value.sourcePhotos
             )
+        }
+    }
+
+    companion object {
+        internal const val INTENT_KEY_CURRENT_FOLDER_ID = "CURRENT_FOLDER_ID"
+        private const val INTENT_KEY_IS_ACCESSED_BY_ICON_CLICK = "IS_ACCESSED_BY_ICON_CLICK"
+
+        /**
+         * Creates a new instance of [MediaDiscoveryFragment]
+         *
+         * @param mediaHandle The Folder Handle used to view its Media
+         * @param isAccessedByIconClick true if [MediaDiscoveryFragment] was accessed by clicking the Media
+         * Discovery icon
+         */
+        fun newInstance(
+            mediaHandle: Long,
+            isAccessedByIconClick: Boolean = false,
+        ): MediaDiscoveryFragment {
+            return MediaDiscoveryFragment().apply {
+                arguments = bundleOf(
+                    INTENT_KEY_CURRENT_FOLDER_ID to mediaHandle,
+                    INTENT_KEY_IS_ACCESSED_BY_ICON_CLICK to isAccessedByIconClick
+                )
+            }
         }
     }
 }
