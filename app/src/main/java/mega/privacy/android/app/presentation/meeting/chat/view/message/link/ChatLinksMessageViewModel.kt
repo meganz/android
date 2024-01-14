@@ -13,7 +13,7 @@ import javax.inject.Inject
  *
  */
 @HiltViewModel
-class ChatLinkMessageViewModel @Inject constructor(
+class ChatLinksMessageViewModel @Inject constructor(
     private val getContactFromLinkUseCase: GetContactFromLinkUseCase,
 ) : ViewModel() {
     // check link is expensive operation, so we cache it

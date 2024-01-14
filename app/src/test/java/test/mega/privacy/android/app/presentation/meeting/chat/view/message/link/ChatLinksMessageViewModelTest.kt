@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinkMessageViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinksMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ContactLinkContent
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.usecase.contact.GetContactFromLinkUseCase
@@ -23,8 +23,8 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class ChatLinkMessageViewModelTest {
-    private lateinit var underTest: ChatLinkMessageViewModel
+internal class ChatLinksMessageViewModelTest {
+    private lateinit var underTest: ChatLinksMessageViewModel
     private val getContactFromLinkUseCase: GetContactFromLinkUseCase = mock()
 
     @BeforeAll
@@ -39,7 +39,7 @@ internal class ChatLinkMessageViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        underTest = ChatLinkMessageViewModel(getContactFromLinkUseCase)
+        underTest = ChatLinksMessageViewModel(getContactFromLinkUseCase)
     }
 
     @Test

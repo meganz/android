@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinkMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinksMessageView
 import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 
 /**
@@ -19,7 +19,7 @@ data class TextLinkUiMessage(
     override val showDate: Boolean,
 ) : AvatarMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
-        ChatLinkMessageView(message = message)
+        ChatLinksMessageView(message = message)
     }
     override val displayAsMine = message.isMine
     override val canForward = message.canForward

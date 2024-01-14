@@ -1,97 +1,95 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.link
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import android.net.Uri
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import mega.privacy.android.app.presentation.meeting.chat.extension.toUiChatStatus
-import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
+import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
-import mega.privacy.android.core.ui.controls.chat.messages.ContactMessageContentView
-import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
+import mega.privacy.android.core.ui.controls.chat.messages.RichLinkContent
+import mega.privacy.android.core.ui.preview.BooleanProvider
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Chat link message view
  *
- * @param message Chat link message
- * @param modifier Modifier
- * @param viewModel Chat link message view model
+ * @param linkContent
+ * @param modifier
  */
 @Composable
 fun ChatLinkMessageView(
-    message: TextLinkMessage,
+    linkContent: ChatGroupLinkContent,
     modifier: Modifier = Modifier,
-    viewModel: ChatLinkMessageViewModel = hiltViewModel(),
 ) {
-    var contentLinks by remember {
-        mutableStateOf(listOf<LinkContent>())
+    if (linkContent.numberOfParticipants > 0) {
+        RichLinkContent(
+            modifier = modifier,
+            image = painterResource(R.drawable.ic_group_chat_link),
+            contentTitle = linkContent.name,
+            contentDescription = stringResource(
+                R.string.number_of_participants,
+                linkContent.numberOfParticipants
+            ),
+            icon = painterResource(R.drawable.ic_logo_notifications),
+            host = Uri.parse(linkContent.link).authority.orEmpty()
+        )
+    } else {
+        RichLinkContent(
+            modifier = modifier,
+            contentTitle = stringResource(id = R.string.invalid_chat_link),
+            icon = painterResource(R.drawable.ic_logo_notifications),
+            host = Uri.parse(linkContent.link).authority.orEmpty()
+        )
     }
-    LaunchedEffect(message.links) {
-        message.links.forEach {
-            when (it.type) {
-                RegexPatternType.CONTACT_LINK -> {
-                    val linkContent = viewModel.loadContactInfo(it.link)
-                    if (linkContent != null) {
-                        contentLinks = contentLinks + linkContent
-                    }
-                }
-                // other link type here
-                else -> Unit
-            }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ChatLinkMessageViewPreview(
+    @PreviewParameter(BooleanProvider::class) isMe: Boolean,
+) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        ChatBubble(isMe = isMe, subContent = {
+            ChatLinkMessageView(
+                linkContent = ChatGroupLinkContent(
+                    numberOfParticipants = 10,
+                    name = "Group name",
+                    link = "https://mega.nz/chat/1234567890#1234567890",
+                )
+            )
+        }) {
+            Text(
+                modifier = Modifier.padding(12.dp),
+                text = "https://mega.nz/chat/1234567890#1234567890"
+            )
         }
     }
+}
 
-    ChatBubble(
-        isMe = message.isMine,
-        modifier = modifier,
-        subContent = {
-            contentLinks.forEachIndexed { index, linkContent ->
-                when (linkContent) {
-                    is ContactLinkContent -> {
-                        key(linkContent.link) {
-                            ContactMessageContentView(
-                                userName = linkContent.content.fullName.orEmpty(),
-                                email = linkContent.content.email.orEmpty(),
-                                status = linkContent.content.status.toUiChatStatus(),
-                                avatar = {
-                                    ChatAvatar(
-                                        handle = linkContent.content.contactHandle,
-                                        modifier = Modifier.size(40.dp)
-                                    )
-                                },
-                            )
-                        }
-                    }
-                    // call other compose ui for other link type here
-                }
-
-                if (index != contentLinks.lastIndex) {
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                    )
-                }
-            }
-        },
-        content = {
-            Text(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                text = message.content,
+@CombinedThemePreviews
+@Composable
+private fun ChatInvalidLinkMessageViewPreview(
+    @PreviewParameter(BooleanProvider::class) isMe: Boolean,
+) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        ChatBubble(isMe = isMe, subContent = {
+            ChatLinkMessageView(
+                linkContent = ChatGroupLinkContent(
+                    link = "https://mega.nz/chat/1234567890#1234567890",
+                )
             )
-        },
-    )
+        }) {
+            Text(
+                modifier = Modifier.padding(12.dp),
+                text = "https://mega.nz/chat/1234567890#1234567890"
+            )
+        }
+    }
 }

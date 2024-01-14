@@ -4,11 +4,19 @@ import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.core.ui.controls.chat.messages.ChatRichLinkMessage
 import mega.privacy.android.domain.entity.chat.RichPreview
 
+/**
+ * Chat rich link message view
+ *
+ * @param isMe
+ * @param preview
+ * @param modifier
+ * @param viewModel
+ */
 @Composable
 fun ChatRichLinkMessageView(
     isMe: Boolean,
@@ -40,8 +48,8 @@ fun ChatRichLinkMessageView(
             contentDescription = preview.description,
             url = preview.url,
             host = preview.domainName,
-            image = image.value?.asImageBitmap(),
-            icon = icon.value?.asImageBitmap(),
+            image = image.value?.let { rememberAsyncImagePainter(it) },
+            icon = icon.value?.let { rememberAsyncImagePainter(it) },
         )
     }
 }
