@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.contact.authenticitycredendials
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,9 +14,9 @@ import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import javax.inject.Inject
 
 /**
@@ -33,6 +35,21 @@ class AuthenticityCredentialsActivity : ComponentActivity() {
     lateinit var getThemeMode: GetThemeMode
 
     private val viewModel by viewModels<AuthenticityCredentialsViewModel>()
+
+    companion object {
+
+        /**
+         * Intent to start [AuthenticityCredentialsActivity].
+         * @param context           current context.
+         * @param email             email of the contact.
+         * @param isIncomingShares  true if the contact is an incoming share.
+         */
+        fun getIntent(context: Context, email: String, isIncomingShares: Boolean) =
+            Intent(context, AuthenticityCredentialsActivity::class.java).apply {
+                putExtra(Constants.EMAIL, email)
+                putExtra(Constants.IS_NODE_INCOMING, isIncomingShares)
+            }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +77,8 @@ class AuthenticityCredentialsActivity : ComponentActivity() {
                 onButtonClicked = viewModel::actionClicked,
                 onBackPressed = { finish() },
                 onScrollChange = { scrolled -> onScrollChange(scrolled, isDark) },
-                onErrorShown = viewModel::errorShown)
+                onErrorShown = viewModel::errorShown
+            )
         }
     }
 

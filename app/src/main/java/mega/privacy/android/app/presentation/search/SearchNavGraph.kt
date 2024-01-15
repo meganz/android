@@ -9,12 +9,13 @@ import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbi
 import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
+import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.cannotVerifyUserNavigation
 import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetNavigation
+import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDeleteNavigation
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetNavigation
 import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
-import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
-import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
 import mega.privacy.android.domain.entity.node.TypedNode
 
 
@@ -68,6 +69,7 @@ internal fun NavGraphBuilder.searchNavGraph(
         changeNodeExtensionDialogViewModel = changeNodeExtensionDialogViewModel,
     )
     renameDialogNavigation(navHostController, renameNodeDialogViewModel)
+    cannotVerifyUserNavigation(navHostController)
     removeNodeLinkDialogNavigation(
         navHostController = navHostController,
         removeNodeLinkViewModel = removeNodeLinkViewModel,
