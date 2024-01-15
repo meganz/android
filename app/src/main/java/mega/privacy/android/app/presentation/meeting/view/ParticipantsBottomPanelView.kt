@@ -106,7 +106,9 @@ fun ParticipantsBottomPanelView(
                     ) {
                         if (shouldWaitingRoomSectionBeShown && state.usersInWaitingRoomIDs.isNotEmpty()) {
                             CallTextButtonChip(
-                                modifier = Modifier.padding(end = 8.dp),
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .fillParentMaxWidth(0.29F),
                                 text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
                                 onClick = onWaitingRoomClick,
                                 isChecked = state.participantsSection == ParticipantsSection.WaitingRoomSection
@@ -114,13 +116,24 @@ fun ParticipantsBottomPanelView(
                         }
 
                         CallTextButtonChip(
-                            modifier = Modifier.padding(end = 8.dp),
+                            modifier = if (shouldWaitingRoomSectionBeShown) {
+                                Modifier
+                                    .padding(end = 8.dp)
+                                    .fillParentMaxWidth(0.29F)
+                            } else {
+                                Modifier.padding(end = 8.dp)
+                            },
                             text = stringResource(id = R.string.meetings_bottom_panel_participants_in_call_button),
                             onClick = onInCallClick,
                             isChecked = state.participantsSection == ParticipantsSection.InCallSection
                         )
 
                         CallTextButtonChip(
+                            modifier = if (shouldWaitingRoomSectionBeShown) {
+                                Modifier.fillParentMaxWidth(0.29F)
+                            } else {
+                                Modifier
+                            },
                             text = stringResource(id = R.string.meetings_bottom_panel_participants_not_in_call_button),
                             onClick = onNotInCallClick,
                             isChecked = state.participantsSection == ParticipantsSection.NotInCallSection
@@ -128,7 +141,9 @@ fun ParticipantsBottomPanelView(
 
                         if (shouldWaitingRoomSectionBeShown && state.usersInWaitingRoomIDs.isEmpty()) {
                             CallTextButtonChip(
-                                modifier = Modifier.padding(start = 8.dp),
+                                modifier = Modifier
+                                    .padding(start = 8.dp)
+                                    .fillParentMaxWidth(0.29F),
                                 text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
                                 onClick = onWaitingRoomClick,
                                 isChecked = state.participantsSection == ParticipantsSection.WaitingRoomSection
