@@ -489,17 +489,17 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_PAGE_LINK -> {
                 lifecycleScope.launch {
+                    val email = intent.getStringExtra("email")
                     // Check if the app is updated to the latest version. This flag is used
                     // to preserve backward compatibility where the VPN app is not updated
                     // to the latest version. Email will be passed in the intent if the app
-                    // is updated to the latest version.
-                    val isVpnAppUpdated =
-                        intent.getStringExtra("email")?.isNotBlank() ?: false
+                    // is updated to the latest version v1.1
+                    val isVpnAppUpdated = email?.isNotBlank() ?: false
                     // Check if the email passed in the intent matches the one currently logged in
-                    // and make sure that the VPN app is updated to the latest version.
+                    // and make sure that the VPN app is updated to the latest version. If it's not
+                    // updated, then it will be considered as cross account match.
                     val isCrossAccountMatch =
-                        isVpnAppUpdated && intent.getStringExtra("email") ==
-                                getCurrentUserEmail(forceRefresh = false)
+                        !isVpnAppUpdated || email == getCurrentUserEmail(forceRefresh = false)
 
                     startActivity(
                         Intent(
