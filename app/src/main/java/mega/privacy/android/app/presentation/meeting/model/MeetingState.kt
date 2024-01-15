@@ -53,6 +53,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property myFullName                                 My full name
  * @property chatScheduledMeeting                       [ChatScheduledMeeting]
  * @property isRingingAll                               True if is ringing for all participants or False otherwise.
+ * @property newInvitedParticipants                     List of emails of the new invited participants.
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -93,7 +94,8 @@ data class MeetingState(
     val isScheduledMeeting: Boolean = false,
     val myFullName: String = "",
     val chatScheduledMeeting: ChatScheduledMeeting? = null,
-    val isRingingAll: Boolean = false
+    val isRingingAll: Boolean = false,
+    val newInvitedParticipants: List<String> = emptyList()
 ) {
     /**
      * Check if waiting room is opened

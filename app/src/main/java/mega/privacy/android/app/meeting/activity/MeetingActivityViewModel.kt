@@ -1147,6 +1147,14 @@ class MeetingActivityViewModel @Inject constructor(
             if (contactsData != null) {
                 InviteToChatRoomListener(context).inviteToChat(_state.value.chatId, contactsData)
                 _snackBarLiveData.value = context.getString(R.string.invite_sent)
+
+                val newInvitedParticipantsList = state.value.newInvitedParticipants.toMutableList()
+                for (contact in contactsData.indices) {
+                    newInvitedParticipantsList.add(contactsData[contact])
+                }
+                _state.update { state ->
+                    state.copy(newInvitedParticipants = newInvitedParticipantsList)
+                }
             }
         } else {
             Timber.e("Error adding participants")
@@ -1595,6 +1603,7 @@ class MeetingActivityViewModel @Inject constructor(
         val chatParticipantsInWaitingRoom = mutableListOf<ChatParticipant>()
         val chatParticipantsInCall = mutableListOf<ChatParticipant>()
         val chatParticipantsNotInCall = state.value.chatParticipantsNotInCall.toMutableList()
+        val chatNewInvitedParticipants = state.value.newInvitedParticipants.toMutableList()
 
         state.value.chatParticipantList.forEach { chatParticipant ->
             var participantAdded = false
@@ -1613,7 +1622,16 @@ class MeetingActivityViewModel @Inject constructor(
                     if (participantAdded) {
                         chatParticipantsNotInCall.remove(participant)
                     }
-                } ?: run { if (!participantAdded) chatParticipantsNotInCall.add(chatParticipant) }
+                } ?: run {
+                if (!participantAdded) {
+                    chatNewInvitedParticipants.find { it == chatParticipant.email }
+                        ?.let { participant ->
+                            ringIndividualInACall(chatParticipant.handle)
+                            chatNewInvitedParticipants.remove(participant)
+                        }
+                    chatParticipantsNotInCall.add(chatParticipant)
+                }
+            }
         }
 
         _state.update { state ->
