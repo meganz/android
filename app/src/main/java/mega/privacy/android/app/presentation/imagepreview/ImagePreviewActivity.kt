@@ -25,7 +25,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToImportActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -263,11 +262,7 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun moveNodeToRubbishBin(imageNode: ImageNode) {
-        ConfirmMoveToRubbishBinDialogFragment.newInstance(listOf(imageNode.id.longValue))
-            .show(
-                supportFragmentManager,
-                ConfirmMoveToRubbishBinDialogFragment.TAG
-            )
+        viewModel.moveToRubbishBin(imageNode.id)
     }
 
     private fun playSlideshow() {

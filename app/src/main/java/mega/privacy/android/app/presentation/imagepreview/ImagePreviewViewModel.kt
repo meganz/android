@@ -25,6 +25,7 @@ import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
+import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -38,6 +39,7 @@ import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
@@ -65,6 +67,8 @@ class ImagePreviewViewModel @Inject constructor(
     private val disableExportNodesUseCase: DisableExportNodesUseCase,
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper,
     private val checkUri: CheckFileUriUseCase,
+    private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
+    private val moveRequestMessageMapper: MoveRequestMessageMapper,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
@@ -525,6 +529,22 @@ class ImagePreviewViewModel @Inject constructor(
     suspend fun getLowestResolutionImagePath(imageResult: ImageResult?): String? {
         return imageResult?.run {
             checkUri(thumbnailUri) ?: checkUri(previewUri) ?: checkUri(fullSizeUri)
+        }
+    }
+
+    /**
+     * Move to rubbish
+     */
+    fun moveToRubbishBin(nodeId: NodeId) {
+        viewModelScope.launch {
+            runCatching {
+                moveNodesToRubbishUseCase(listOf(nodeId.longValue))
+            }.onSuccess { data ->
+                setResultMessage(moveRequestMessageMapper(data))
+            }.onFailure {
+                Timber.e(it)
+                setCopyMoveException(it)
+            }
         }
     }
 

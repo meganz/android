@@ -116,6 +116,7 @@ internal fun ImagePreviewScreen(
     viewState.currentImageNode?.let { currentImageNode ->
         val isCurrentImageNodeAvailableOffline = viewState.isCurrentImageNodeAvailableOffline
         var showRemoveLinkDialog by rememberSaveable { mutableStateOf(false) }
+        var showMoveToRubbishBinDialog by rememberSaveable { mutableStateOf(false) }
 
         val inFullScreenMode = viewState.inFullScreenMode
         val systemUiController = rememberSystemUiController()
@@ -180,11 +181,27 @@ internal fun ImagePreviewScreen(
                 cancelButtonText = stringResource(id = R.string.general_cancel),
                 onConfirm = {
                     viewModel.disableExport(currentImageNode)
+                    hideBottomSheet(coroutineScope, modalSheetState)
                     showRemoveLinkDialog = false
                 },
                 onDismiss = {
                     showRemoveLinkDialog = false
                 },
+            )
+        }
+
+        if (showMoveToRubbishBinDialog) {
+            MegaAlertDialog(
+                text = stringResource(id = R.string.confirmation_move_to_rubbish),
+                confirmButtonText = stringResource(id = R.string.general_move),
+                cancelButtonText = stringResource(id = R.string.general_cancel),
+                onConfirm = {
+                    onClickMoveToRubbishBin(currentImageNode)
+                    showMoveToRubbishBinDialog = false
+                },
+                onDismiss = {
+                    showMoveToRubbishBinDialog = false
+                }
             )
         }
 
@@ -325,7 +342,6 @@ internal fun ImagePreviewScreen(
                         if (!currentImageNode.isTakenDown) {
                             showRemoveLinkDialog = true
                         }
-                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickSendToChat = {
                         onClickSendTo(currentImageNode)
@@ -346,7 +362,7 @@ internal fun ImagePreviewScreen(
                     onClickRestore = {},
                     onClickRemove = {},
                     onClickMoveToRubbishBin = {
-                        onClickMoveToRubbishBin(currentImageNode)
+                        showMoveToRubbishBinDialog = true
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
                 )

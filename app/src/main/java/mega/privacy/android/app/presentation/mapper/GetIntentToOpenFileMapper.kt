@@ -22,6 +22,7 @@ import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
+import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_APP
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
@@ -236,7 +237,9 @@ class GetIntentToOpenFileMapper @Inject constructor(
             intentInternalIntentPair.first
 
         } else if (MimeTypeList.typeForName(fileNode.name).isImage) {
-            if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+            if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)
+                && viewType == FILE_BROWSER_ADAPTER
+            ) {
                 ImagePreviewActivity.createIntent(
                     context = activity,
                     imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
