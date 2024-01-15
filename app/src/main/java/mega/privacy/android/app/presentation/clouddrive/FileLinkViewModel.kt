@@ -33,8 +33,8 @@ import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
-import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -54,7 +54,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FileLinkViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
-    private val hasCredentials: HasCredentials,
+    private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
     private val checkPublicNodesNameCollisionUseCase: CheckPublicNodesNameCollisionUseCase,
@@ -84,7 +84,7 @@ class FileLinkViewModel @Inject constructor(
      */
     fun checkLoginRequired() {
         viewModelScope.launch {
-            val hasCredentials = hasCredentials()
+            val hasCredentials = hasCredentialsUseCase()
             val shouldLogin = hasCredentials && !rootNodeExistsUseCase()
             _state.update { it.copy(shouldLogin = shouldLogin, hasDbCredentials = hasCredentials) }
         }

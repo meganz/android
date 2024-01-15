@@ -35,8 +35,8 @@ import mega.privacy.android.domain.entity.photos.AlbumPhotoIds
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetUserAlbums
-import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
@@ -53,7 +53,7 @@ import kotlin.time.Duration.Companion.seconds
 @HiltViewModel
 internal class AlbumImportViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val hasCredentialsUseCase: HasCredentials,
+    private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getUserAlbums: GetUserAlbums,
     private val getPublicAlbumUseCase: GetPublicAlbumUseCase,
     private val getPublicAlbumPhotoUseCase: GetPublicAlbumPhotoUseCase,

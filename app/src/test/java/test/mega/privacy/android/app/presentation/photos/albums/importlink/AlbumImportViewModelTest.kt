@@ -20,8 +20,8 @@ import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetUserAlbums
-import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
@@ -43,7 +43,7 @@ class AlbumImportViewModelTest {
 
     private val mockSavedStateHandle: SavedStateHandle = mock()
 
-    private val mockHasCredentialsUseCase: HasCredentials = mock()
+    private val mockHasCredentialsUseCaseUseCase: HasCredentialsUseCase = mock()
 
     private val mockGetUserAlbums: GetUserAlbums = mock()
 
@@ -76,7 +76,7 @@ class AlbumImportViewModelTest {
 
         underTest = AlbumImportViewModel(
             savedStateHandle = mockSavedStateHandle,
-            hasCredentialsUseCase = mockHasCredentialsUseCase,
+            hasCredentialsUseCase = mockHasCredentialsUseCaseUseCase,
             getUserAlbums = mockGetUserAlbums,
             getPublicAlbumUseCase = mockGetPublicAlbumUseCase,
             getPublicAlbumPhotoUseCase = mockGetPublicAlbumPhotoUseCase,
@@ -101,7 +101,7 @@ class AlbumImportViewModelTest {
     @Test
     fun `test that show error access dialog if link is null`() = runTest {
         // given
-        whenever(mockHasCredentialsUseCase())
+        whenever(mockHasCredentialsUseCaseUseCase())
             .thenReturn(false)
 
         // when
@@ -124,7 +124,7 @@ class AlbumImportViewModelTest {
         whenever(mockSavedStateHandle.get<String>(ALBUM_LINK))
             .thenReturn(link)
 
-        whenever(mockHasCredentialsUseCase())
+        whenever(mockHasCredentialsUseCaseUseCase())
             .thenReturn(false)
 
         // when
@@ -148,7 +148,7 @@ class AlbumImportViewModelTest {
         whenever(mockSavedStateHandle.get<String>(ALBUM_LINK))
             .thenReturn(link)
 
-        whenever(mockHasCredentialsUseCase())
+        whenever(mockHasCredentialsUseCaseUseCase())
             .thenReturn(false)
 
         whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(link)))

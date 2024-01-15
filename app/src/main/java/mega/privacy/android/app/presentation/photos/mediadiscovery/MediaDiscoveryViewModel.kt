@@ -47,11 +47,11 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
-import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -88,7 +88,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val authorizeNode: AuthorizeNode,
     private val copyNodeListUseCase: CopyNodeListUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
-    private val hasCredentials: HasCredentials,
+    private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getPublicNodeListByIds: GetPublicNodeListByIds,
     private val setViewType: SetViewType,
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
@@ -596,7 +596,7 @@ class MediaDiscoveryViewModel @Inject constructor(
      */
     fun checkLoginRequired() {
         viewModelScope.launch {
-            val hasCredentials = hasCredentials()
+            val hasCredentials = hasCredentialsUseCase()
             _state.update {
                 it.copy(
                     hasDbCredentials = hasCredentials

@@ -63,10 +63,10 @@ import mega.privacy.android.domain.usecase.GetLocalFileForNode
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
@@ -98,7 +98,7 @@ class FolderLinkViewModel @Inject constructor(
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
-    private val hasCredentials: HasCredentials,
+    private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val setViewType: SetViewType,
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase,
@@ -384,7 +384,7 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun checkLoginRequired() {
         viewModelScope.launch {
-            val hasCredentials = hasCredentials()
+            val hasCredentials = hasCredentialsUseCase()
             _state.update {
                 it.copy(
                     shouldLogin = (hasCredentials && !rootNodeExistsUseCase()),

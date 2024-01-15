@@ -21,7 +21,6 @@ import mega.privacy.android.domain.usecase.DefaultIsNotEnoughQuota
 import mega.privacy.android.domain.usecase.DefaultSetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.DefaultSetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
@@ -38,13 +37,6 @@ import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 abstract class CameraUploadUseCases {
 
     companion object {
-        /**
-         * Provide the [HasCredentials] implementation
-         */
-        @Provides
-        fun provideHasCredentials(cameraUploadRepository: CameraUploadRepository): HasCredentials =
-            HasCredentials(cameraUploadRepository::doCredentialsExist)
-
         /**
          * Provide the [IsNodeInRubbish] implementation
          */

@@ -122,7 +122,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         )
     }
 
-    override suspend fun doCredentialsExist(): Boolean = withContext(ioDispatcher) {
+    override suspend fun hasCredentials(): Boolean = withContext(ioDispatcher) {
         localStorageGateway.doCredentialsExist()
     }
 

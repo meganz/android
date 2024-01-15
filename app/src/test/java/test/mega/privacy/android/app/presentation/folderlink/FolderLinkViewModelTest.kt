@@ -39,10 +39,10 @@ import mega.privacy.android.domain.usecase.GetLocalFileForNode
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
@@ -83,7 +83,7 @@ class FolderLinkViewModelTest {
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase = mock()
     private val copyRequestMessageMapper: CopyRequestMessageMapper = mock()
-    private val hasCredentials: HasCredentials = mock()
+    private val hasCredentialsUseCase: HasCredentialsUseCase = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val setViewType: SetViewType = mock()
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase = mock()
@@ -136,7 +136,7 @@ class FolderLinkViewModelTest {
             checkNameCollisionUseCase,
             legacyCopyNodeUseCase,
             copyRequestMessageMapper,
-            hasCredentials,
+            hasCredentialsUseCase,
             rootNodeExistsUseCase,
             setViewType,
             fetchFolderNodesUseCase,
@@ -171,7 +171,7 @@ class FolderLinkViewModelTest {
             checkNameCollisionUseCase,
             legacyCopyNodeUseCase,
             copyRequestMessageMapper,
-            hasCredentials,
+            hasCredentialsUseCase,
             rootNodeExistsUseCase,
             setViewType,
             fetchFolderNodesUseCase,
@@ -294,7 +294,7 @@ class FolderLinkViewModelTest {
     @Test
     fun `test that on valid credentials and no root node shouldShowLogin is returned true`() =
         runTest {
-            whenever(hasCredentials()).thenReturn(true)
+            whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(rootNodeExistsUseCase()).thenReturn(false)
             underTest.state.test {
                 underTest.checkLoginRequired()
@@ -307,7 +307,7 @@ class FolderLinkViewModelTest {
     @Test
     fun `test that on valid credentials and root node shouldShowLogin is returned false`() =
         runTest {
-            whenever(hasCredentials()).thenReturn(true)
+            whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(rootNodeExistsUseCase()).thenReturn(true)
             underTest.state.test {
                 underTest.checkLoginRequired()

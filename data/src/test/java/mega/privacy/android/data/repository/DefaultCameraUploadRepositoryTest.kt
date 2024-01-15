@@ -290,7 +290,7 @@ class DefaultCameraUploadRepositoryTest {
         @ValueSource(booleans = [true, false])
         fun `test that the credentials exist or not`(credentialsExist: Boolean) = runTest {
             whenever(localStorageGateway.doCredentialsExist()).thenReturn(credentialsExist)
-            assertThat(underTest.doCredentialsExist()).isEqualTo(credentialsExist)
+            assertThat(underTest.hasCredentials()).isEqualTo(credentialsExist)
         }
     }
 

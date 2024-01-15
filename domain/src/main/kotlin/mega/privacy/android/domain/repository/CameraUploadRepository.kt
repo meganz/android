@@ -99,7 +99,7 @@ interface CameraUploadRepository {
      *
      * @return true if user credentials exist
      */
-    suspend fun doCredentialsExist(): Boolean
+    suspend fun hasCredentials(): Boolean
 
     /**
      * Do preferences exist

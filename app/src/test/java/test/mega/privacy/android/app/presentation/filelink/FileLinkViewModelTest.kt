@@ -22,8 +22,8 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.exception.PublicNodeException
-import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -52,7 +52,7 @@ class FileLinkViewModelTest {
 
     private lateinit var underTest: FileLinkViewModel
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
-    private val hasCredentials = mock<HasCredentials>()
+    private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
     private val copyPublicNodeUseCase = mock<CopyPublicNodeUseCase>()
@@ -85,7 +85,7 @@ class FileLinkViewModelTest {
     fun resetMocks() {
         reset(
             isConnectedToInternetUseCase,
-            hasCredentials,
+            hasCredentialsUseCase,
             rootNodeExistsUseCase,
             getPublicNodeUseCase,
             copyPublicNodeUseCase,
@@ -102,7 +102,7 @@ class FileLinkViewModelTest {
     private fun initViewModel() {
         underTest = FileLinkViewModel(
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
-            hasCredentials = hasCredentials,
+            hasCredentialsUseCase = hasCredentialsUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             getPublicNodeUseCase = getPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
@@ -139,7 +139,7 @@ class FileLinkViewModelTest {
     @Test
     fun `test that login is not required when root node exists and db credentials are valid`() =
         runTest {
-            whenever(hasCredentials()).thenReturn(true)
+            whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(rootNodeExistsUseCase()).thenReturn(true)
 
             underTest.state.test {
@@ -153,7 +153,7 @@ class FileLinkViewModelTest {
     @Test
     fun `test that login is not required when db credentials are valid and rootnode does not exist`() =
         runTest {
-            whenever(hasCredentials()).thenReturn(true)
+            whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(rootNodeExistsUseCase()).thenReturn(false)
 
             underTest.state.test {

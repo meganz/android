@@ -14,7 +14,6 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
@@ -31,9 +30,6 @@ import org.mockito.kotlin.mock
 )
 @Module(includes = [TestGetNodeModule::class])
 object TestCameraUploadUseCases {
-
-    @Provides
-    fun provideHasCredentials() = mock<HasCredentials>()
 
     @Provides
     fun provideGetNodeByFingerprint() = mock<GetNodeByFingerprintUseCase>()
