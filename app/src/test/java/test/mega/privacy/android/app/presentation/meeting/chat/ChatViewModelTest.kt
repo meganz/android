@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -65,7 +66,7 @@ import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
@@ -145,7 +146,7 @@ internal class ChatViewModelTest {
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase = mock {
         onBlocking { invoke(any()) } doReturn emptyFlow()
     }
-    private val monitorParticipatingInACallInOtherChatUseCase: MonitorParticipatingInACallInOtherChatUseCase =
+    private val monitorParticipatingInACallInOtherChatsUseCase: MonitorParticipatingInACallInOtherChatsUseCase =
         mock {
             onBlocking { invoke(any()) } doReturn emptyFlow()
         }
@@ -217,7 +218,7 @@ internal class ChatViewModelTest {
     }
     private val joinPublicChatUseCase = mock<JoinPublicChatUseCase>()
     private val isAnonymousModeUseCase = mock<IsAnonymousModeUseCase>()
-    private val closeChatPreviewUseCase : CloseChatPreviewUseCase = mock()
+    private val closeChatPreviewUseCase: CloseChatPreviewUseCase = mock()
     private val createNewImageUriUseCase: CreateNewImageUriUseCase = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -292,7 +293,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorUserLastGreenUpdatesUseCase(userHandle) } doReturn emptyFlow()
         wheneverBlocking { monitorHasAnyContactUseCase() } doReturn emptyFlow()
         wheneverBlocking { monitorCallInChatUseCase(any()) } doReturn emptyFlow()
-        wheneverBlocking { monitorParticipatingInACallInOtherChatUseCase(any()) } doReturn emptyFlow()
+        wheneverBlocking { monitorParticipatingInACallInOtherChatsUseCase(any()) } doReturn emptyFlow()
         whenever(monitorAllContactParticipantsInChatUseCase(any())) doReturn emptyFlow()
         wheneverBlocking { monitorContactCacheUpdates() } doReturn emptyFlow()
     }
@@ -305,7 +306,7 @@ internal class ChatViewModelTest {
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
             monitorUserChatStatusByHandleUseCase = monitorUserChatStatusByHandleUseCase,
-            monitorParticipatingInACallInOtherChatUseCase = monitorParticipatingInACallInOtherChatUseCase,
+            monitorParticipatingInACallInOtherChatsUseCase = monitorParticipatingInACallInOtherChatsUseCase,
             monitorCallInChatUseCase = monitorCallInChatUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
@@ -573,17 +574,17 @@ internal class ChatViewModelTest {
     fun `test that is participating in a call has correct state if use case`(
         isParticipatingInChatCall: Long?,
     ) = runTest {
-        val flow = MutableSharedFlow<ChatCall?>()
-        whenever(monitorParticipatingInACallInOtherChatUseCase(any())).thenReturn(flow)
+        val flow = MutableSharedFlow<List<ChatCall>>()
+        whenever(monitorParticipatingInACallInOtherChatsUseCase(any())).thenReturn(flow)
         initTestClass()
         val expected = isParticipatingInChatCall?.let {
             mock<ChatCall> {
                 on { chatId } doReturn isParticipatingInChatCall
             }
-        }
+        }?.let { listOf(it) } ?: emptyList<ChatCall>()
         flow.emit(expected)
         underTest.state.test {
-            assertThat(awaitItem().callInOtherChat).isEqualTo(expected)
+            assertThat(awaitItem().callsInOtherChats).isEqualTo(expected)
         }
     }
 
@@ -2096,15 +2097,17 @@ internal class ChatViewModelTest {
             val otherChatId = 567L
             val initialCall = mock<ChatCall> {
                 on { chatId } doReturn otherChatId
+                on { status } doReturn ChatCallStatus.InProgress
             }
-            val flow = MutableSharedFlow<ChatCall?>()
-            whenever(monitorParticipatingInACallInOtherChatUseCase(any())).thenReturn(flow)
+            val flow = MutableSharedFlow<List<ChatCall>>()
+            whenever(monitorParticipatingInACallInOtherChatsUseCase(any())).thenReturn(flow)
             whenever(holdChatCallUseCase(otherChatId, true)).thenReturn(mock())
             whenever(answerChatCallUseCase(chatId, video = false, audio = true)).thenReturn(mock())
             initTestClass()
-            flow.emit(initialCall)
+            val list = listOf(initialCall)
+            flow.emit(list)
             underTest.state.test {
-                assertThat(awaitItem().callInOtherChat).isEqualTo(initialCall)
+                assertThat(awaitItem().callsInOtherChats).isEqualTo(list)
             }
             underTest.onHoldAndAnswerCall()
             verify(holdChatCallUseCase).invoke(otherChatId, true)
@@ -2126,20 +2129,45 @@ internal class ChatViewModelTest {
             val otherChatId = 567L
             val initialCall = mock<ChatCall> {
                 on { chatId } doReturn otherChatId
+                on { status } doReturn ChatCallStatus.InProgress
             }
-            val flow = MutableSharedFlow<ChatCall?>()
-            whenever(monitorParticipatingInACallInOtherChatUseCase(any())).thenReturn(flow)
+            val flow = MutableSharedFlow<List<ChatCall>>()
+            whenever(monitorParticipatingInACallInOtherChatsUseCase(any())).thenReturn(flow)
             whenever(holdChatCallUseCase(otherChatId, true)).thenAnswer {
                 throw Exception("hold call failed")
             }
             initTestClass()
-            flow.emit(initialCall)
+            val list = listOf(initialCall)
+            flow.emit(list)
             underTest.state.test {
-                assertThat(awaitItem().callInOtherChat).isEqualTo(initialCall)
+                assertThat(awaitItem().callsInOtherChats).isEqualTo(list)
             }
             underTest.onHoldAndAnswerCall()
             verify(holdChatCallUseCase).invoke(otherChatId, true)
             verifyNoInteractions(answerChatCallUseCase)
+        }
+
+    @Test
+    fun `test that hold and answer call does not invoke hold but answer if call in other chat exist in hold status`() =
+        runTest {
+            val otherChatId = 567L
+            val initialCall = mock<ChatCall> {
+                on { chatId } doReturn otherChatId
+                on { status } doReturn ChatCallStatus.InProgress
+                on { isOnHold } doReturn true
+            }
+            val flow = MutableSharedFlow<List<ChatCall>>()
+            whenever(monitorParticipatingInACallInOtherChatsUseCase(any())).thenReturn(flow)
+            whenever(answerChatCallUseCase(chatId, video = false, audio = true)).thenReturn(mock())
+            initTestClass()
+            val list = listOf(initialCall)
+            flow.emit(list)
+            underTest.state.test {
+                assertThat(awaitItem().callsInOtherChats).isEqualTo(list)
+            }
+            underTest.onHoldAndAnswerCall()
+            verifyNoInteractions(holdChatCallUseCase)
+            verify(answerChatCallUseCase).invoke(chatId, video = false, audio = true)
         }
 
     @Test
@@ -2148,15 +2176,17 @@ internal class ChatViewModelTest {
             val callId = 567L
             val initialCall = mock<ChatCall> {
                 on { this.callId } doReturn callId
+                on { status } doReturn ChatCallStatus.InProgress
             }
-            val flow = MutableSharedFlow<ChatCall?>()
-            whenever(monitorParticipatingInACallInOtherChatUseCase(any())).thenReturn(flow)
+            val flow = MutableSharedFlow<List<ChatCall>>()
+            whenever(monitorParticipatingInACallInOtherChatsUseCase(any())).thenReturn(flow)
             whenever(hangChatCallUseCase(callId)).thenReturn(mock())
             whenever(answerChatCallUseCase(chatId, video = false, audio = true)).thenReturn(mock())
             initTestClass()
-            flow.emit(initialCall)
+            val list = listOf(initialCall)
+            flow.emit(list)
             underTest.state.test {
-                assertThat(awaitItem().callInOtherChat).isEqualTo(initialCall)
+                assertThat(awaitItem().callsInOtherChats).isEqualTo(list)
             }
             underTest.onEndAndAnswerCall()
             verify(hangChatCallUseCase).invoke(callId)
@@ -2178,16 +2208,18 @@ internal class ChatViewModelTest {
             val callId = 567L
             val initialCall = mock<ChatCall> {
                 on { this.callId } doReturn callId
+                on { status } doReturn ChatCallStatus.InProgress
             }
-            val flow = MutableSharedFlow<ChatCall?>()
-            whenever(monitorParticipatingInACallInOtherChatUseCase(any())).thenReturn(flow)
+            val flow = MutableSharedFlow<List<ChatCall>>()
+            whenever(monitorParticipatingInACallInOtherChatsUseCase(any())).thenReturn(flow)
             whenever(hangChatCallUseCase(callId)).thenAnswer {
                 throw Exception("end call failed")
             }
             initTestClass()
-            flow.emit(initialCall)
+            val list = listOf(initialCall)
+            flow.emit(list)
             underTest.state.test {
-                assertThat(awaitItem().callInOtherChat).isEqualTo(initialCall)
+                assertThat(awaitItem().callsInOtherChats).isEqualTo(list)
             }
             underTest.onEndAndAnswerCall()
             verify(hangChatCallUseCase).invoke(callId)

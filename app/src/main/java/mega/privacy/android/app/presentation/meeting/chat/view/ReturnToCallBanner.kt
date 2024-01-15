@@ -15,24 +15,27 @@ internal fun ReturnToCallBanner(
     isAudioPermissionGranted: Boolean,
     onAnswerCall: () -> Unit,
 ) = with(uiState) {
-    if (!isConnected || (callInOtherChat == null && callInThisChat == null)) return@with null
+    if (!isConnected || (callsInOtherChats.isEmpty() && callInThisChat == null)) return@with null
 
     val context = LocalContext.current
 
-    val callInOtherChatAnswered = callInOtherChat?.status?.isJoined == true
-    val callInThisChatAnswered = callInThisChat?.status?.isJoined == true
+    val callInOtherChatAnswered =
+        callsInOtherChats.find { it.status?.isJoined == true && !it.isOnHold }
+            ?: callsInOtherChats.find { it.status?.isJoined == true }
+    val isCallInOtherChatAnswered = callInOtherChatAnswered != null
+    val isCallInThisChatAnswered = callInThisChat?.status?.isJoined == true
 
     when {
-        callInThisChat != null && callInOtherChat != null && (callInThisChatAnswered || callInOtherChatAnswered) -> {
+        callInThisChat != null && callsInOtherChats.isNotEmpty() && (isCallInThisChatAnswered || isCallInOtherChatAnswered) -> {
             // At least one call in which I am participating
             val bannerCall =
-                if ((callInThisChatAnswered && callInOtherChatAnswered && callInOtherChat.isOnHold)
-                    || (callInThisChatAnswered && !callInOtherChatAnswered)
+                if (isCallInThisChatAnswered && ((callInOtherChatAnswered != null && callInOtherChatAnswered.isOnHold)
+                            || !isCallInOtherChatAnswered)
                 ) {
                     callInThisChat
                 } else {
-                    callInOtherChat
-                }
+                    callInOtherChatAnswered
+                } ?: return@with null
 
             ReturnToCallBanner(
                 text = stringResource(id = R.string.call_in_progress_layout),
@@ -71,15 +74,13 @@ internal fun ReturnToCallBanner(
             )
         }
 
-        callInOtherChat != null -> {
-            val answered = callInOtherChat.status?.isJoined == true
-
-            if (!answered) return@with null
+        isCallInOtherChatAnswered -> {
+            if (callInOtherChatAnswered == null) return@with null
 
             ReturnToCallBanner(
                 text = stringResource(id = R.string.call_in_progress_layout),
-                onBannerClicked = { startMeetingActivity(context, callInOtherChat.chatId) },
-                duration = callInOtherChat.duration
+                onBannerClicked = { startMeetingActivity(context, callInOtherChatAnswered.chatId) },
+                duration = callInOtherChatAnswered.duration
             )
         }
 

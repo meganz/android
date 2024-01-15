@@ -21,9 +21,11 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_AT
 import mega.privacy.android.core.ui.controls.chat.TEST_TAG_ATTACHMENT_ICON
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import test.mega.privacy.android.app.onNodeWithText
 
@@ -41,7 +43,9 @@ class ChatViewTest {
             ChatUiState(
                 myPermission = ChatRoomPermission.Standard,
                 isConnected = true,
-                callInOtherChat = mock()
+                callsInOtherChats = listOf(mock {
+                    on { status } doReturn ChatCallStatus.InProgress
+                })
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_VIDEO_CALL_ACTION, true).apply {
@@ -57,7 +61,7 @@ class ChatViewTest {
         initComposeRuleContent(
             ChatUiState(
                 myPermission = ChatRoomPermission.Standard,
-                callInOtherChat = null,
+                callsInOtherChats = emptyList(),
                 isConnected = true,
             )
         )

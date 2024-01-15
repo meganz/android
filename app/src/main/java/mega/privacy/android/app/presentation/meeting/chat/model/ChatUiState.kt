@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property isPreviewMode True if the current logged in user is in a chat link in preview mode (not participating).
  * @property isJoining True if the current logged in user is joining this chat, false otherwise.
  * @property isLeaving True if the current logged in user is leaving this chat, false otherwise.
- * @property callInOtherChat [ChatCall] if I am already participating in a call in other chat. Null otherwise.
+ * @property callsInOtherChats [ChatCall] List of calls in other chats which are not finished yet. Empty otherwise.
  * @property callInThisChat [ChatCall] if the current logged in user has a call in this chat, null otherwise.
  * @property isGroup True if is a chat group, false otherwise.
  * @property storageState [StorageState] of the chat.
@@ -70,7 +70,7 @@ data class ChatUiState(
     val isPreviewMode: Boolean = false,
     val isJoining: Boolean = false,
     val isLeaving: Boolean = false,
-    val callInOtherChat: ChatCall? = null,
+    val callsInOtherChats: List<ChatCall> = emptyList(),
     val callInThisChat: ChatCall? = null,
     val isGroup: Boolean = false,
     val storageState: StorageState = StorageState.Unknown,

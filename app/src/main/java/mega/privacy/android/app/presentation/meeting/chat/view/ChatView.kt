@@ -59,6 +59,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
+import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
 import mega.privacy.android.app.presentation.meeting.chat.extension.toInfoText
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
@@ -540,7 +541,7 @@ internal fun ChatView(
                         onConfirm = {
                             showParticipatingInACallDialog = false
                             // return to active call
-                            callInOtherChat?.let {
+                            callsInOtherChats.find { it.status?.isJoined == true }?.let {
                                 enablePasscodeCheck()
                                 startMeetingActivity(context, it.chatId)
                             }
@@ -616,6 +617,7 @@ internal fun ChatView(
                 if (showJoinAnswerCallDialog) {
                     JoinAnswerCallDialog(
                         isGroup = isGroup,
+                        numberOfCallsInOtherChats = callsInOtherChats.size,
                         onHoldAndAnswer = {
                             showJoinAnswerCallDialog = false
                             onHoldAndAnswerCall()

@@ -27,7 +27,7 @@ internal fun BottomCallButton(
     enablePasscodeCheck: () -> Unit = {},
     onJoinAnswerCallClick: () -> Unit = {},
 ) = with(uiState) {
-    if (callInOtherChat == null) return@with
+    if (callsInOtherChats.isEmpty()) return@with
 
     val context = LocalContext.current
 

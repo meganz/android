@@ -43,7 +43,7 @@ class BottomCallButtonTest {
         initComposeRuleContent(
             ChatUiState(
                 callInThisChat = callOnHold,
-                callInOtherChat = mock()
+                callsInOtherChats = mock()
             )
         )
         with(composeRule) {
@@ -57,7 +57,7 @@ class BottomCallButtonTest {
         initComposeRuleContent(
             ChatUiState(
                 callInThisChat = callOnHold,
-                callInOtherChat = mock()
+                callsInOtherChats = mock()
             )
         )
         with(composeRule) {
@@ -74,7 +74,7 @@ class BottomCallButtonTest {
         initComposeRuleContent(
             ChatUiState(
                 callInThisChat = callNotParticipating,
-                callInOtherChat = callOnHold,
+                callsInOtherChats = listOf(callOnHold),
                 isGroup = true
             )
         )
@@ -89,7 +89,7 @@ class BottomCallButtonTest {
         initComposeRuleContent(
             ChatUiState(
                 callInThisChat = callNotParticipating,
-                callInOtherChat = callOnHold,
+                callsInOtherChats = listOf(callOnHold),
                 isGroup = false
             )
         )
@@ -104,7 +104,7 @@ class BottomCallButtonTest {
         initComposeRuleContent(
             ChatUiState(
                 callInThisChat = callNotParticipating,
-                callInOtherChat = callOnHold,
+                callsInOtherChats = listOf(callOnHold),
                 isGroup = true
             )
         )
@@ -122,7 +122,7 @@ class BottomCallButtonTest {
         initComposeRuleContent(
             ChatUiState(
                 callInThisChat = callNotParticipating,
-                callInOtherChat = callOnHold
+                callsInOtherChats = listOf(callOnHold)
             )
         )
         with(composeRule) {

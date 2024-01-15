@@ -28,6 +28,7 @@ import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
+import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -104,7 +105,7 @@ internal fun ChatAppBar(
             when (it) {
                 is ChatRoomMenuAction.AudioCall, is ChatRoomMenuAction.VideoCall -> {
                     isVideoCall = it is ChatRoomMenuAction.VideoCall
-                    if (uiState.callInOtherChat != null) {
+                    if (uiState.callsInOtherChats.any { call -> call.status?.isJoined == true }) {
                         showParticipatingInACallDialog()
                         return@onActionPressed
                     }

@@ -24,6 +24,7 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
+import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -54,7 +55,7 @@ import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
@@ -120,7 +121,7 @@ class ChatViewModel @Inject constructor(
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase,
-    private val monitorParticipatingInACallInOtherChatUseCase: MonitorParticipatingInACallInOtherChatUseCase,
+    private val monitorParticipatingInACallInOtherChatsUseCase: MonitorParticipatingInACallInOtherChatsUseCase,
     private val monitorCallInChatUseCase: MonitorCallInChatUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
@@ -574,11 +575,11 @@ class ChatViewModel @Inject constructor(
 
     private fun monitorParticipatingInACall() {
         viewModelScope.launch {
-            monitorParticipatingInACallInOtherChatUseCase(chatId)
+            monitorParticipatingInACallInOtherChatsUseCase(chatId)
                 .catch { Timber.e(it) }
                 .collect {
                     Timber.d("Monitor call in progress returned chat id: $it")
-                    _state.update { state -> state.copy(callInOtherChat = it) }
+                    _state.update { state -> state.copy(callsInOtherChats = it) }
                 }
         }
     }
@@ -922,11 +923,19 @@ class ChatViewModel @Inject constructor(
 
     fun onHoldAndAnswerCall() {
         viewModelScope.launch {
-            state.value.callInOtherChat?.chatId?.let {
-                runCatching {
-                    holdChatCallUseCase(chatId = it, setOnHold = true)
-                }.onFailure { Timber.e(it) }
-                    .onSuccess { onAnswerCall() }
+            val callToHold = state.value.callsInOtherChats
+                .find { it.status?.isJoined == true }
+
+            callToHold?.chatId?.let {
+                if (callToHold.isOnHold) {
+                    // The call is already on hold, just answer
+                    onAnswerCall()
+                } else {
+                    runCatching {
+                        holdChatCallUseCase(chatId = it, setOnHold = true)
+                    }.onFailure { Timber.e(it) }
+                        .onSuccess { onAnswerCall() }
+                }
             } ?: run {
                 // The call finished before setting on hold, just answer
                 onAnswerCall()
@@ -936,12 +945,13 @@ class ChatViewModel @Inject constructor(
 
     fun onEndAndAnswerCall() {
         viewModelScope.launch {
-            state.value.callInOtherChat?.callId?.let {
-                runCatching {
-                    hangChatCallUseCase(it)
-                }.onFailure { Timber.e(it) }
-                    .onSuccess { onAnswerCall() }
-            } ?: run {
+            state.value.callsInOtherChats
+                .find { it.status?.isJoined == true && !it.isOnHold }?.callId?.let {
+                    runCatching {
+                        hangChatCallUseCase(it)
+                    }.onFailure { Timber.e(it) }
+                        .onSuccess { onAnswerCall() }
+                } ?: run {
                 // The call finished before ending, just answer
                 onAnswerCall()
             }
