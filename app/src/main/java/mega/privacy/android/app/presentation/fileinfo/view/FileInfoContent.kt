@@ -28,10 +28,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.contacts.ContactPermission
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Content for FileInfo screen, all except toolbar, bottom sheets, dialogs
@@ -204,8 +204,11 @@ internal fun FileInfoContent(
     }
 }
 
+/**
+ * Add a border divider
+ */
 @Composable
-private fun FileInfoContentDivider(
+fun FileInfoContentDivider(
     paddingStart: Dp = paddingStartDefault.dp,
     paddingTop: Dp = 0.dp,
     paddingBottom: Dp = 0.dp,

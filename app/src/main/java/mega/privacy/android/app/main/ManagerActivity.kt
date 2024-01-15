@@ -3576,7 +3576,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     hideAdsView()
                 }
 
-                R.id.offline_file_info -> {
+                R.id.offline_file_info_compose -> {
                     homepageScreen = HomepageScreen.OFFLINE_FILE_INFO
                     updatePsaViewVisibility()
                     appBarLayout.visibility = View.GONE

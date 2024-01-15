@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -64,21 +66,33 @@ internal class OfflineFileInfoComposeViewModel @Inject constructor(
                     val totalSize = getOfflineFileTotalSizeUseCase(offlineFile)
                     val folderInfo = getFolderInfoOrNull(offlineNodeInfo)
                     val thumbnail = getThumbnailPathOrNull(offlineNodeInfo.isFolder, offlineFile)
+                    val addedTime = offlineNodeInfo.lastModifiedTime?.div(1000L)
 
                     _state.update {
                         it.copy(
                             title = offlineNodeInfo.name,
                             isFolder = offlineNodeInfo.isFolder,
-                            addedTime = offlineNodeInfo.lastModifiedTime,
+                            addedTime = addedTime,
                             totalSize = totalSize,
                             folderInfo = folderInfo,
                             thumbnail = thumbnail
                         )
                     }
+                } ?: run {
+                    handleError()
                 }
             }.onFailure {
+                handleError()
                 Timber.e(it)
             }
+        }
+    }
+
+    private fun handleError() {
+        _state.update {
+            it.copy(
+                errorEvent = triggered(true)
+            )
         }
     }
 
@@ -113,6 +127,9 @@ internal class OfflineFileInfoComposeViewModel @Inject constructor(
             }
         }
     }
+
+    fun onErrorEventConsumed() =
+        _state.update { state -> state.copy(errorEvent = consumed()) }
 
     companion object {
         const val NODE_HANDLE = "handle"

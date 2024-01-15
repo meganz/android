@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 
 /**
@@ -19,4 +21,5 @@ internal data class OfflineFileInfoUiState(
     val addedTime: Long? = null,
     val thumbnail: String? = null,
     val isFolder: Boolean = false,
+    val errorEvent: StateEventWithContent<Boolean> = consumed()
 )

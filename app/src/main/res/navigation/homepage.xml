@@ -17,7 +17,7 @@
             app:destination="@id/offlineFragmentCompose" />
         <action
             android:id="@+id/action_homepage_to_offline_file_info"
-            app:destination="@id/offline_file_info" />
+            app:destination="@id/offline_file_info_compose" />
         <action
             android:id="@+id/action_homepageFragment_to_documentsFragment"
             app:destination="@id/documentsFragment" />
@@ -72,17 +72,15 @@
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
-        <action
-            android:id="@+id/action_homepage_to_offline_file_info"
-            app:destination="@id/offline_file_info" />
     </fragment>
+
     <fragment
-        android:id="@+id/offline_file_info"
-        android:name="mega.privacy.android.app.presentation.offline.OfflineFileInfoFragment"
-        tools:layout="@layout/fragment_offline_file_info">
+        android:id="@+id/offline_file_info_compose"
+        android:name="mega.privacy.android.app.presentation.offline.offlinefileinfocompose.OfflineFileInfoComposeFragment"
+        android:label="OfflineFileInfoComposeFragment">
         <argument
             android:name="handle"
-            app:argType="string" />
+            app:argType="long" />
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
@@ -177,6 +175,6 @@
             app:destination="@id/offlineFragmentCompose" />
         <action
             android:id="@+id/action_homepage_to_offline_file_info"
-            app:destination="@id/offline_file_info" />
+            app:destination="@id/offline_file_info_compose" />
     </fragment>
 </navigation>

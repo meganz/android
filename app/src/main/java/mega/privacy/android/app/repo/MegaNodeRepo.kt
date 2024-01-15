@@ -102,10 +102,6 @@ class MegaNodeRepo @Inject constructor(
         return nodes
     }
 
-    fun findOfflineNode(handle: String): MegaOffline? {
-        return dbHandler.findByHandle(handle)
-    }
-
     fun loadOfflineNodes(path: String, order: SortOrder, searchQuery: String?): List<MegaOffline> {
         val nodes = if (searchQuery != null && searchQuery.isNotEmpty()) {
             searchOfflineNodes(path, searchQuery)

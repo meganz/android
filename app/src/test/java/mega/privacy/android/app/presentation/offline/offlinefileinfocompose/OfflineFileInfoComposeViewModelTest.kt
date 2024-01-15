@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.offline.offlinefileinfocompose
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -157,6 +158,17 @@ internal class OfflineFileInfoComposeViewModelTest {
 
             verify(removeOfflineNodeUseCase).invoke(NodeId(1))
         }
+
+    @Test
+    fun `test that error event is sent when node is null`() = runTest {
+        whenever(getOfflineNodeInformationByIdUseCase(NodeId(any()))) doReturn null
+
+        initUnderTest()
+        val event = underTest.state.value.errorEvent
+        assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+        val content = (event as StateEventWithContentTriggered).content
+        assertThat(content).isTrue()
+    }
 
     @AfterEach
     fun resetMocks() {
