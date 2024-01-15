@@ -4,7 +4,6 @@ bannerviewpager = "3.4.0"
 billing-client = "6.0.1"
 coil = "2.3.0"
 coroutines = "1.7.3"
-desugar = "2.0.3"
 fresco = "2.6.0"
 javax = "1"
 kotlin = "1.9.21"
@@ -41,7 +40,6 @@ collapsingtoolbar = 'net.opacapp:multiline-collapsingtoolbar:27.1.1'
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 documentscanner = 'com.github.meganz.AndroidDocumentScanner:documentscanner:2.0.12'
 facebook-inferannotation = "com.facebook.infer.annotation:infer-annotation:0.18.0"
 fresco = { module = "com.facebook.fresco:fresco", version.ref = "fresco" }

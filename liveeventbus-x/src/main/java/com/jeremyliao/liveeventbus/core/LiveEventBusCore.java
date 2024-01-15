@@ -118,7 +118,7 @@ public final class LiveEventBusCore {
         this.logger.setEnable(enable);
     }
 
-    @SuppressLint("WrongConstant")
+    @SuppressLint({"WrongConstant", "UnspecifiedRegisterReceiverFlag"})
     void registerReceiver() {
         if (isRegisterReceiver) {
             return;

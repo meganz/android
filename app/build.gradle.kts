@@ -215,8 +215,6 @@ android {
     }
 
     compileOptions {
-        // Flag to enable support for the new language APIs
-        isCoreLibraryDesugaringEnabled = true
         // Sets Java compatibility to JavaVersion in Project Root
         val javaVersion: JavaVersion by rootProject.extra
         sourceCompatibility = javaVersion
@@ -434,8 +432,6 @@ dependencies {
     implementation(lib.mega.analytics)
     debugImplementation(lib.nocturn)
     debugImplementation(lib.xray)
-
-    coreLibraryDesugaring(lib.desugar)
 
     val shouldUsePrebuiltSdk: Closure<Boolean> by rootProject.extra
     if (shouldUsePrebuiltSdk()) {

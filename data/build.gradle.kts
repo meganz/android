@@ -34,7 +34,6 @@ android {
     }
 
     compileOptions {
-        isCoreLibraryDesugaringEnabled = true
         val javaVersion: JavaVersion by rootProject.extra
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
@@ -119,8 +118,6 @@ dependencies {
 
     implementation(platform(google.firebase.bom))
     implementation(google.firebase.perf.ktx)
-
-    coreLibraryDesugaring(lib.desugar)
 
     // Logging
     implementation(lib.bundles.logging)
