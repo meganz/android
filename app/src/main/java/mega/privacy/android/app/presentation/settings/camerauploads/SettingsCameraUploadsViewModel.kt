@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
@@ -152,6 +153,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
     private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase,
+    private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -716,10 +718,13 @@ class SettingsCameraUploadsViewModel @Inject constructor(
         if (isCameraUploadsByWifiUseCase()) UploadConnectionType.WIFI else UploadConnectionType.WIFI_OR_MOBILE_DATA
 
     /**
-     *  Start camera upload
+     *  Start camera uploads
      */
-    fun startCameraUpload() = viewModelScope.launch {
-        startCameraUploadUseCase()
+    fun startCameraUploads() = viewModelScope.launch {
+        runCatching {
+            startCameraUploadUseCase()
+            listenToNewMediaUseCase(forceEnqueue = false)
+        }.onFailure { Timber.e(it) }
     }
 
     /**

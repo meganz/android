@@ -32,7 +32,6 @@ import mega.privacy.android.data.mapper.camerauploads.CameraUploadsStatusInfoMap
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
-import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
@@ -393,12 +392,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         workManagerGateway.cancelCameraUploadAndHeartbeatWorkRequest()
     }
 
-    override suspend fun listenToNewMedia() {
-        withContext(ioDispatcher) {
-            if (isCameraUploadsEnabled() == true) {
-                NewMediaWorker.scheduleWork(context, false)
-            }
-        }
+    override suspend fun listenToNewMedia(forceEnqueue: Boolean) = withContext(ioDispatcher) {
+        workManagerGateway.enqueueNewMediaWorkerRequest(forceEnqueue)
     }
 
     override suspend fun getCuBackUpId() = withContext(ioDispatcher) {

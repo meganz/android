@@ -215,7 +215,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     override fun onPause() {
         Timber.d("CameraUpload enabled through Settings - fireCameraUploadJob()")
         if (canStartCameraUploads)
-            viewModel.startCameraUpload()
+            viewModel.startCameraUploads()
         super.onPause()
     }
 

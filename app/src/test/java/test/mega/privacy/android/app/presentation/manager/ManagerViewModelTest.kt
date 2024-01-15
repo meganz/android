@@ -336,7 +336,6 @@ class ManagerViewModelTest {
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
-            listenToNewMediaUseCase = mock(),
             monitorUserUpdates = monitorUserUpdates,
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             startCameraUploadUseCase = startCameraUploadUseCase,

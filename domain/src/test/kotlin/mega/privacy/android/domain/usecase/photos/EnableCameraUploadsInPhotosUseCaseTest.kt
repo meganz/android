@@ -99,7 +99,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
         inOrder.verify(setVideoCompressionSizeLimitUseCase)
             .invoke(expectedVideoCompressionSizeLimit)
         inOrder.verify(setupCameraUploadsSettingUseCase).invoke(isEnabled = true)
-        inOrder.verify(listenToNewMediaUseCase).invoke()
+        inOrder.verify(listenToNewMediaUseCase).invoke(forceEnqueue = false)
 
         inOrder.verifyNoMoreInteractions()
     }

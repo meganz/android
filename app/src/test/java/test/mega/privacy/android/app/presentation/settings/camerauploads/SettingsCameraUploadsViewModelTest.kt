@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
@@ -138,6 +139,7 @@ class SettingsCameraUploadsViewModelTest {
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase = mock()
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase = mock()
     private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase = mock()
+    private val listenToNewMediaUseCase: ListenToNewMediaUseCase = mock()
 
     @BeforeAll
     fun setUp() {
@@ -252,6 +254,7 @@ class SettingsCameraUploadsViewModelTest {
             isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
             setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
             clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
+            listenToNewMediaUseCase = listenToNewMediaUseCase,
         )
     }
 
@@ -614,13 +617,23 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that when startCameraUpload is called, startCameraUploadUseCase is called`() =
+    fun `test that camera uploads is started when invoking startCameraUploads`() =
         runTest {
             setupUnderTest()
 
-            underTest.startCameraUpload()
+            underTest.startCameraUploads()
 
             verify(startCameraUploadUseCase).invoke()
+        }
+
+    @Test
+    fun `test that listening to new media is started when invoking startCameraUploads`() =
+        runTest {
+            setupUnderTest()
+
+            underTest.startCameraUploads()
+
+            verify(listenToNewMediaUseCase).invoke(forceEnqueue = false)
         }
 
     @Test

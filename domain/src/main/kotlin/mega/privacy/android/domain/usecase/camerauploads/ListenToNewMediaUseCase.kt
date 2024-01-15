@@ -14,6 +14,10 @@ class ListenToNewMediaUseCase @Inject constructor(
 
     /**
      * Invocation function
+     *
+     * @param forceEnqueue True if the worker should be enqueued even if it is already running
+     *                     Used for enqueueing the same worker from itself
      */
-    suspend operator fun invoke() = cameraUploadRepository.listenToNewMedia()
+    suspend operator fun invoke(forceEnqueue: Boolean) =
+        cameraUploadRepository.listenToNewMedia(forceEnqueue)
 }

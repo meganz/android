@@ -56,6 +56,6 @@ class EnableCameraUploadsInPhotosUseCase @Inject constructor(
         setChargingRequiredForVideoCompressionUseCase(true)
         setVideoCompressionSizeLimitUseCase(videoCompressionSizeLimit)
         setupCameraUploadsSettingUseCase(isEnabled = true)
-        listenToNewMediaUseCase()
+        listenToNewMediaUseCase(forceEnqueue = false)
     }
 }

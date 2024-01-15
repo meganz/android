@@ -2,6 +2,7 @@ package mega.privacy.android.data.gateway
 
 import androidx.work.WorkInfo
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.data.worker.NewMediaWorker
 
 /**
  *  Functions for starting work requests
@@ -17,6 +18,14 @@ interface WorkManagerGateway {
      * Enqueue unique work request to start download worker to monitor the download transfers as a foreground service
      */
     fun enqueueDownloadsWorkerRequest()
+
+    /**
+     * Enqueue unique work request to start new media worker
+     *
+     * @param forceEnqueue True if the worker should be enqueued even if it is already running
+     *                     Used for enqueueing the same worker from itself
+     */
+    suspend fun enqueueNewMediaWorkerRequest(forceEnqueue: Boolean)
 
     /**
      * Queue a one time work request of camera upload to upload immediately.

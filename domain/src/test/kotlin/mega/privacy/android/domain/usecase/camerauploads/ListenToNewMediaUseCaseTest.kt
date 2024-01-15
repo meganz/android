@@ -5,11 +5,11 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
 /**
@@ -35,10 +35,11 @@ class ListenToNewMediaUseCaseTest {
         reset(cameraUploadRepository)
     }
 
-    @Test
-    fun `test that listen to new media is invoked`() = runTest {
-        underTest()
+    @ParameterizedTest(name = "when forceEnqueue is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that listen to new media is invoked`(forceEnqueue: Boolean) = runTest {
+        underTest(forceEnqueue = forceEnqueue)
 
-        verify(cameraUploadRepository, times(1)).listenToNewMedia()
+        verify(cameraUploadRepository).listenToNewMedia(forceEnqueue = forceEnqueue)
     }
 }

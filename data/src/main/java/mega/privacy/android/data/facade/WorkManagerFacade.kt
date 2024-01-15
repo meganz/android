@@ -1,6 +1,8 @@
 package mega.privacy.android.data.facade
 
+import android.provider.MediaStore
 import androidx.work.BackoffPolicy
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
@@ -15,6 +17,7 @@ import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.worker.CameraUploadsWorker
 import mega.privacy.android.data.worker.DeleteOldestCompletedTransfersWorker
 import mega.privacy.android.data.worker.DownloadsWorker
+import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -66,9 +69,29 @@ internal class WorkManagerFacade @Inject constructor(
             )
     }
 
+    override suspend fun enqueueNewMediaWorkerRequest(forceEnqueue: Boolean) {
+        val tag = NewMediaWorker.NEW_MEDIA_WORKER_TAG
+        if (forceEnqueue || !(isWorkerEnqueuedOrRunning(tag))) {
+            val workRequest = OneTimeWorkRequest.Builder(NewMediaWorker::class.java)
+                .setConstraints(
+                    Constraints.Builder()
+                        .addContentUriTrigger(MediaStore.Images.Media.INTERNAL_CONTENT_URI, true)
+                        .addContentUriTrigger(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, true)
+                        .addContentUriTrigger(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, true)
+                        .addContentUriTrigger(MediaStore.Video.Media.INTERNAL_CONTENT_URI, true)
+                        .build()
+                )
+                .addTag(NewMediaWorker.NEW_MEDIA_WORKER_TAG)
+                .build()
+            workManager.enqueue(workRequest)
+        } else {
+            Timber.d("New media worker is already running, cannot proceed with one time request")
+        }
+    }
+
     override suspend fun startCameraUploads() {
         // Check if CU periodic worker is working. If yes, then don't start a single one
-        if (!checkWorkerRunning(CAMERA_UPLOAD_TAG)) {
+        if (!isWorkerRunning(CAMERA_UPLOAD_TAG)) {
             Timber.d("No CU periodic process currently running, proceed with one time request")
             val cameraUploadWorkRequest = OneTimeWorkRequest.Builder(
                 CameraUploadsWorker::class.java
@@ -172,7 +195,8 @@ internal class WorkManagerFacade @Inject constructor(
             CAMERA_UPLOAD_TAG,
             SINGLE_CAMERA_UPLOAD_TAG,
             HEART_BEAT_TAG,
-            SINGLE_HEART_BEAT_TAG
+            SINGLE_HEART_BEAT_TAG,
+            NewMediaWorker.NEW_MEDIA_WORKER_TAG,
         ).forEach {
             workManager.cancelAllWorkByTag(it).await()
         }
@@ -204,9 +228,21 @@ internal class WorkManagerFacade @Inject constructor(
      *
      * @param tag
      */
-    private fun checkWorkerRunning(tag: String): Boolean {
+    private fun isWorkerRunning(tag: String): Boolean {
         return workManager.getWorkInfosByTag(tag).get()
             ?.map { workInfo -> workInfo.state == WorkInfo.State.RUNNING }
+            ?.contains(true)
+            ?: false
+    }
+
+    /**
+     * Check if a worker is currently enqueued or running given his tag
+     *
+     * @param tag
+     */
+    private fun isWorkerEnqueuedOrRunning(tag: String): Boolean {
+        return workManager.getWorkInfosByTag(tag).get()
+            ?.map { workInfo -> workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING }
             ?.contains(true)
             ?: false
     }

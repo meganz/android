@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.cameraupload
+package test.mega.privacy.android.app.camerauploads
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
