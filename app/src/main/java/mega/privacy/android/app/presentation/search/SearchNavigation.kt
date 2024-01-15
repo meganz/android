@@ -2,15 +2,11 @@ package mega.privacy.android.app.presentation.search
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
-import androidx.navigation.navArgument
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialog
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetNavigation
@@ -18,9 +14,7 @@ import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDe
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetNavigation
 import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
-import mega.privacy.android.app.presentation.search.navigation.argumentNodeId
 import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
-import mega.privacy.android.app.presentation.search.navigation.searchRenameDialog
 import mega.privacy.android.domain.entity.node.TypedNode
 
 
@@ -73,7 +67,7 @@ internal fun NavGraphBuilder.searchNavGraph(
         navHostController = navHostController,
         changeNodeExtensionDialogViewModel = changeNodeExtensionDialogViewModel,
     )
-
+    renameDialogNavigation(navHostController, renameNodeDialogViewModel)
     removeNodeLinkDialogNavigation(
         navHostController = navHostController,
         removeNodeLinkViewModel = removeNodeLinkViewModel,

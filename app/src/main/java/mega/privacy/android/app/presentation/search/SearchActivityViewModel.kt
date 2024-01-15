@@ -182,11 +182,12 @@ class SearchActivityViewModel @Inject constructor(
 
     private fun onSearchFailure(ex: Throwable) {
         Timber.e(ex)
+        val emptyState = getEmptySearchState()
         _state.update {
             it.copy(
                 searchItemList = emptyList(),
                 isSearching = false,
-                emptyState = getEmptySearchState()
+                emptyState = emptyState
             )
         }
     }
@@ -194,18 +195,24 @@ class SearchActivityViewModel @Inject constructor(
     private suspend fun onSearchSuccess(searchResults: List<TypedNode>?) =
         coroutineScope {
             if (searchResults.isNullOrEmpty()) {
+                val emptyState = getEmptySearchState()
                 _state.update {
-                    it.copy(isSearching = false, emptyState = getEmptySearchState())
+                    it.copy(
+                        searchItemList = emptyList(),
+                        isSearching = false,
+                        emptyState = emptyState
+                    )
                 }
             } else {
                 val nodeUIItems = searchResults.map { typedNode ->
                     NodeUIItem(node = typedNode, isSelected = false)
                 }
                 _state.update { state ->
+                    val cloudSortOrder = getCloudSortOrder()
                     state.copy(
                         searchItemList = nodeUIItems,
                         isSearching = false,
-                        sortOrder = getCloudSortOrder()
+                        sortOrder = cloudSortOrder
                     )
                 }
             }

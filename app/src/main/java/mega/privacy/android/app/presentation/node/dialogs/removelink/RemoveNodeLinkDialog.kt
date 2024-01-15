@@ -25,30 +25,47 @@ fun RemoveNodeLinkDialog(
     onDismiss: () -> Unit,
     viewModel: RemoveNodeLinkViewModel,
 ) {
+    RemoveNodeLinkDialogBody(
+        modifier = modifier,
+        count = nodesList.size,
+        onConfirmClicked = {
+            viewModel.disableExport(nodesList)
+            onDismiss()
+        },
+        onCancelClicked = {
+            onDismiss()
+        }
+    )
+}
+
+@Composable
+private fun RemoveNodeLinkDialogBody(
+    modifier: Modifier = Modifier,
+    count: Int,
+    onConfirmClicked: () -> Unit,
+    onCancelClicked: () -> Unit,
+) {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MegaAlertDialog(
             modifier = modifier,
             text = pluralStringResource(
                 id = R.plurals.remove_links_warning_text,
-                count = nodesList.size
+                count = count
             ),
             confirmButtonText = stringResource(id = R.string.general_remove),
             cancelButtonText = stringResource(id = R.string.general_cancel),
-            onConfirm = {
-                viewModel.disableExport(nodesList)
-                onDismiss()
-            },
-            onDismiss = { onDismiss() },
+            onConfirm = onConfirmClicked,
+            onDismiss = onCancelClicked,
         )
     }
 }
 
 @CombinedThemePreviews
 @Composable
-private fun RemoveNodeLinkDialogPreview() {
-    RemoveNodeLinkDialog(
-        nodesList = listOf(1L, 2L),
-        onDismiss = {},
-        viewModel = hiltViewModel()
+private fun RemoveNodeLinkDialogBodyPreview() {
+    RemoveNodeLinkDialogBody(
+        count = 2,
+        onCancelClicked = {},
+        onConfirmClicked = {},
     )
 }
