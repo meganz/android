@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.transfers.startdownload.model.Start
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
+import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
@@ -191,10 +191,10 @@ class StartDownloadTransfersViewModel @Inject constructor(
                     }
                 }.last()
             }
-        if (terminalEvent == DownloadNodesEvent.FinishProcessingTransfers) toDoAfterProcessing?.invoke()
+        if (terminalEvent == MultiTransferEvent.ScanningFoldersFinished) toDoAfterProcessing?.invoke()
         _uiState.updateEventAndClearProgress(
             when (terminalEvent) {
-                DownloadNodesEvent.NotSufficientSpace -> StartDownloadTransferEvent.Message.NotSufficientSpace
+                MultiTransferEvent.InsufficientSpace -> StartDownloadTransferEvent.Message.NotSufficientSpace
                 else -> {
                     StartDownloadTransferEvent.FinishProcessing(
                         exception = lastError?.takeIf { terminalEvent == null },

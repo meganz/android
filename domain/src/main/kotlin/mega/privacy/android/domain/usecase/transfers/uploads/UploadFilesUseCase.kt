@@ -1,14 +1,10 @@
-package mega.privacy.android.domain.usecase.transfers.downloads
+package mega.privacy.android.domain.usecase.transfers.uploads
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
@@ -16,61 +12,65 @@ import mega.privacy.android.domain.usecase.transfers.AbstractTransferNodesUseCas
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
+import java.io.File
 import javax.inject.Inject
 
 /**
- * Downloads a list of nodes to the specified path and returns a Flow to monitor the progress
+ * Uploads a list of files to the specified destination folder and returns a Flow to monitor the progress
  */
-class DownloadNodesUseCase @Inject constructor(
+class UploadFilesUseCase @Inject constructor(
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
     addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase,
     handleSDCardEventUseCase: HandleSDCardEventUseCase,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val transferRepository: TransferRepository,
-    private val fileSystemRepository: FileSystemRepository,
-) : AbstractTransferNodesUseCase<TypedNode, NodeId>(
+) : AbstractTransferNodesUseCase<File, String>(
     cancelCancelTokenUseCase,
     invalidateCancelTokenUseCase,
     addOrUpdateActiveTransferUseCase,
     handleSDCardEventUseCase,
     monitorTransferEventsUseCase,
 ) {
+
     /**
      * Invoke
-     * @param nodes The desired nodes to download
-     * @param destinationPath Full destination path of the node, including file name if it's a file node. If this path does not exist it will try to create it
+     *
+     * @param files files and / or folders to be uploaded
+     * @param destination destination folder where [files] will be uploaded
      * @param appData Custom app data to save in the MegaTransfer object.
-     * @param isHighPriority Puts the transfer on top of the download queue.
+     * @param isSourceTemporary Whether the temporary file or folder that is created for upload should be deleted or not
+     * @param isHighPriority Whether the file or folder should be placed on top of the upload queue or not
      *
      * @return a flow of [MultiTransferEvent]s to monitor the download state and progress
      */
     operator fun invoke(
-        nodes: List<TypedNode>,
-        destinationPath: String,
+        files: List<File>,
+        destination: TypedFolderNode,
         appData: TransferAppData?,
+        isSourceTemporary: Boolean,
         isHighPriority: Boolean,
     ): Flow<MultiTransferEvent> {
-        if (destinationPath.isEmpty()) {
-            return nodes.asFlow().map { MultiTransferEvent.TransferNotStarted(it.id, null) }
-        }
         return super.commonInvoke(
-            items = nodes,
-            beforeStartTransfer = {
-                fileSystemRepository.createDirectory(destinationPath)
-            }) { node ->
-            transferRepository.startDownload(
-                node = node,
-                localPath = destinationPath,
+            items = files,
+            null,
+        ) { file ->
+            transferRepository.startUpload(
+                localPath = file.absolutePath,
+                parentNodeId = destination.id,
+                fileName = file.name,
+                modificationTime = file.lastModified() / 1000,
                 appData = appData,
+                isSourceTemporary = isSourceTemporary,
                 shouldStartFirst = isHighPriority,
             )
         }
     }
 
-    override fun generateIdFromItem(item: TypedNode) = item.id
-    override fun generateIdFromTransferEvent(transferEvent: TransferEvent): NodeId =
-        NodeId(transferEvent.transfer.nodeHandle)
+    override fun generateIdFromItem(item: File): String =
+        item.path + File.separator + item.name
+
+    override fun generateIdFromTransferEvent(transferEvent: TransferEvent) =
+        transferEvent.transfer.localPath + File.separator + transferEvent.transfer.fileName
 
 }
-

@@ -5,13 +5,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
+import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
@@ -111,39 +112,39 @@ class VoiceClipMessageViewModel @Inject constructor(
             destinationPath = destinationPath,
             appData = TransferAppData.VoiceClip,
             isHighPriority = true,
-        ).collect { downloadEvent ->
-            when (downloadEvent) {
-                is DownloadNodesEvent.TransferNotStarted -> {
-                    Timber.d("Transfer TransferNotStarted msgId($msgId) (${downloadEvent.exception})")
-                    updateUiWithError(msgId)
-                }
-
-                is DownloadNodesEvent.TransferFinishedProcessing -> {
-                    _uiStateFlowMap[msgId]?.update {
-                        it.copy(
-                            loadProgress = null,
-                            timestamp = secondsToDuration(it.voiceClipMessage?.duration ?: 0),
-                        )
-                    }
-                }
-
-                is DownloadNodesEvent.SingleTransferEvent -> {
-                    with(downloadEvent.transferEvent.transfer) {
-                        Timber.d(
-                            "DDD msgId($msgId) Transfer SingleTransferEvent" +
-                                    " event($transferredBytes/$totalBytes)"
-                        )
-                    }
-                }
-
-                is DownloadNodesEvent.FinishProcessingTransfers -> {
-                }
-
-                is DownloadNodesEvent.NotSufficientSpace -> {
-                    updateUiWithError(msgId)
+        )
+            .onCompletion {
+                _uiStateFlowMap[msgId]?.update {
+                    it.copy(
+                        loadProgress = null,
+                        timestamp = secondsToDuration(it.voiceClipMessage?.duration ?: 0),
+                    )
                 }
             }
-        }
+            .collect { downloadEvent ->
+                when (downloadEvent) {
+                    is MultiTransferEvent.TransferNotStarted<*> -> {
+                        Timber.d("Transfer TransferNotStarted msgId($msgId) (${downloadEvent.exception})")
+                        updateUiWithError(msgId)
+                    }
+
+                    is MultiTransferEvent.SingleTransferEvent -> {
+                        with(downloadEvent.transferEvent.transfer) {
+                            Timber.d(
+                                "DDD msgId($msgId) Transfer SingleTransferEvent" +
+                                        " event($transferredBytes/$totalBytes)"
+                            )
+                        }
+                    }
+
+                    is MultiTransferEvent.ScanningFoldersFinished -> {
+                    }
+
+                    is MultiTransferEvent.InsufficientSpace -> {
+                        updateUiWithError(msgId)
+                    }
+                }
+            }
     }
 
     private fun updateUiWithError(msgId: Long) {

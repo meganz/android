@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
+import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -44,15 +44,15 @@ class StartDownloadUseCase @Inject constructor(
      * @param destinationPath Full destination path of the node, including file name if it's a file node. If this path does not exist it will try to create it
      * @param isHighPriority Puts the transfer on top of the download queue.
      *
-     * @return a flow of [DownloadNodesEvent]s to monitor the download state and progress
+     * @return a flow of [MultiTransferEvent]s to monitor the download state and progress
      */
     operator fun invoke(
         nodes: List<TypedNode>,
         destinationPath: String,
         isHighPriority: Boolean,
-    ): Flow<DownloadNodesEvent> {
+    ): Flow<MultiTransferEvent> {
         if (destinationPath.isEmpty()) {
-            return nodes.asFlow().map { DownloadNodesEvent.TransferNotStarted(it.id, null) }
+            return nodes.asFlow().map { MultiTransferEvent.TransferNotStarted(it.id, null) }
         }
         //wrap the startDownloadFlow to be able to execute suspended functions
         return flow {
@@ -63,7 +63,7 @@ class StartDownloadUseCase @Inject constructor(
                     ?: run {
                         nodes.forEach {
                             emit(
-                                DownloadNodesEvent.TransferNotStarted(
+                                MultiTransferEvent.TransferNotStarted(
                                     it.id,
                                     LocalStorageException(null, null)
                                 )
@@ -84,9 +84,9 @@ class StartDownloadUseCase @Inject constructor(
                         appData = appData,
                         isHighPriority = isHighPriority
                     ).filter {
-                        it !is DownloadNodesEvent.SingleTransferEvent
+                        it !is MultiTransferEvent.SingleTransferEvent
                     }.transformWhile { event ->
-                        val finished = event is DownloadNodesEvent.FinishProcessingTransfers
+                        val finished = event is MultiTransferEvent.ScanningFoldersFinished
                         //emitting a FinishProcessingTransfers can cause a terminal event in the collector (firstOrNull for instance), so we need to start the worker before emitting it
                         if (finished) {
                             startDownloadWorkerUseCase()
@@ -110,7 +110,7 @@ class StartDownloadUseCase @Inject constructor(
                             }
                         }
                 } else {
-                    flowOf(DownloadNodesEvent.NotSufficientSpace)
+                    flowOf(MultiTransferEvent.InsufficientSpace)
                 }
             emitAll(startDownloadFlow)
         }

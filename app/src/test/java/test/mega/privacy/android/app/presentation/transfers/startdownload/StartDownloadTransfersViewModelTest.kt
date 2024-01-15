@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.transfers.startdownload.model.Trans
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
+import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
@@ -187,7 +187,7 @@ class StartDownloadTransfersViewModelTest {
             commonStub()
             stubStartDownload(flow {
                 delay(500)
-                emit(DownloadNodesEvent.FinishProcessingTransfers)
+                emit(MultiTransferEvent.ScanningFoldersFinished)
             })
             underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
             Truth.assertThat(underTest.uiState.value.jobInProgressState)
@@ -206,7 +206,7 @@ class StartDownloadTransfersViewModelTest {
     fun `test that NotSufficientSpace event is emitted if start download use case returns NotSufficientSpace`() =
         runTest {
             commonStub()
-            stubStartDownload(flowOf(DownloadNodesEvent.NotSufficientSpace))
+            stubStartDownload(flowOf(MultiTransferEvent.InsufficientSpace))
             underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
             assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.NotSufficientSpace)
         }
@@ -214,11 +214,11 @@ class StartDownloadTransfersViewModelTest {
     @ParameterizedTest(name = "when StartDownloadUseCase finishes with {0}, then {1} is emitted")
     @MethodSource("provideDownloadNodeParameters")
     fun `test that a specific StartDownloadTransferEvent is emitted`(
-        downloadNodesEvent: DownloadNodesEvent,
+        multiTransferEvent: MultiTransferEvent,
         startDownloadTransferEvent: StartDownloadTransferEvent,
     ) = runTest {
         commonStub()
-        stubStartDownload(flowOf(downloadNodesEvent))
+        stubStartDownload(flowOf(multiTransferEvent))
         underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
         assertCurrentEventIsEqualTo(startDownloadTransferEvent)
     }
@@ -261,11 +261,11 @@ class StartDownloadTransfersViewModelTest {
 
     private fun provideDownloadNodeParameters() = listOf(
         Arguments.of(
-            DownloadNodesEvent.FinishProcessingTransfers,
+            MultiTransferEvent.ScanningFoldersFinished,
             StartDownloadTransferEvent.FinishProcessing(null, 1),
         ),
         Arguments.of(
-            DownloadNodesEvent.NotSufficientSpace,
+            MultiTransferEvent.InsufficientSpace,
             StartDownloadTransferEvent.Message.NotSufficientSpace,
         ),
     )
@@ -292,10 +292,10 @@ class StartDownloadTransfersViewModelTest {
 
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(1)
-        stubStartDownload(flowOf(DownloadNodesEvent.FinishProcessingTransfers))
+        stubStartDownload(flowOf(MultiTransferEvent.ScanningFoldersFinished))
     }
 
-    private fun stubStartDownload(flow: Flow<DownloadNodesEvent>) {
+    private fun stubStartDownload(flow: Flow<MultiTransferEvent>) {
         whenever(
             startDownloadUseCase(
                 anyOrNull(),

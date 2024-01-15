@@ -1,12 +1,14 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.voiceclip
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -15,7 +17,8 @@ import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
-import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
+import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
@@ -61,7 +64,7 @@ class VoiceClipMessageViewModelTest {
     private val getChatFileUseCase: GetChatFileUseCase = mock()
     private val cacheFile: File = mock()
     private val getCacheFileUseCase: GetCacheFileUseCase = mock()
-    private val downloadNodeResultFlow: MutableSharedFlow<DownloadNodesEvent> = MutableSharedFlow()
+    private val downloadNodeResultFlow: MutableSharedFlow<MultiTransferEvent> = MutableSharedFlow()
     private val downloadNodesUseCase: DownloadNodesUseCase = mock()
 
     private val cacheFileParentPath = "parent path"
@@ -210,7 +213,7 @@ class VoiceClipMessageViewModelTest {
         underTest.addVoiceClip(voiceClipMessage, chatId)
         testScheduler.advanceUntilIdle()
         downloadNodeResultFlow.emit(
-            DownloadNodesEvent.TransferNotStarted(
+            MultiTransferEvent.TransferNotStarted(
                 NodeId(1L), Exception()
             )
         )
@@ -233,16 +236,17 @@ class VoiceClipMessageViewModelTest {
         initUiStateFlow()
         underTest.addVoiceClip(voiceClipMessage, chatId)
         testScheduler.advanceUntilIdle()
-        downloadNodeResultFlow.emit(DownloadNodesEvent.NotSufficientSpace)
+        downloadNodeResultFlow.emit(MultiTransferEvent.InsufficientSpace)
         underTest.getUiStateFlow(voiceClipMessage.msgId).test {
             assertThat(awaitItem().isError).isTrue()
         }
     }
 
     @Test
-    fun `test that loading state finishes properly when download returns TransferFinishedProcessing`() =
+    fun `test that loading state finishes properly when download completes`() =
         runTest {
             setCacheFileNotExists()
+            val endEvent = TransferEvent.TransferFinishEvent(mock(), null)
             whenever(
                 downloadNodesUseCase(
                     any(),
@@ -250,13 +254,16 @@ class VoiceClipMessageViewModelTest {
                     any(),
                     any()
                 )
-            ).thenReturn(downloadNodeResultFlow)
+            ).thenReturn(
+                flowOf(
+                    MultiTransferEvent.SingleTransferEvent(endEvent, 1L, 1L)
+                )
+            )
             initUiStateFlow()
             underTest.addVoiceClip(voiceClipMessage, chatId)
             testScheduler.advanceUntilIdle()
-            downloadNodeResultFlow.emit(DownloadNodesEvent.TransferFinishedProcessing(NodeId(1L)))
             underTest.getUiStateFlow(voiceClipMessage.msgId).test {
-                val state = awaitItem()
+                val state = (this.cancelAndConsumeRemainingEvents().last() as Event.Item).value
                 assertThat(state.loadProgress).isNull()
                 assertThat(state.timestamp).isEqualTo(mockTimestamp)
             }

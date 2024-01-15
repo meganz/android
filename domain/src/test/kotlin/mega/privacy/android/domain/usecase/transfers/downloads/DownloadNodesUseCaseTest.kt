@@ -2,13 +2,15 @@ package mega.privacy.android.domain.usecase.transfers.downloads
 
 import app.cash.turbine.Event
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -19,7 +21,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
+import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -80,9 +82,9 @@ class DownloadNodesUseCaseTest {
                 invalidateCancelTokenUseCase = invalidateCancelTokenUseCase,
                 addOrUpdateActiveTransferUseCase = addOrUpdateActiveTransferUseCase,
                 handleSDCardEventUseCase = handleSDCardEventUseCase,
+                monitorTransferEventsUseCase = monitorTransferEventsUseCase,
                 transferRepository = transferRepository,
                 fileSystemRepository = fileSystemRepository,
-                monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             )
     }
 
@@ -109,23 +111,24 @@ class DownloadNodesUseCaseTest {
 
     @ParameterizedTest(name = "priority: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that repository is called with the proper priority`(priority: Boolean) = runTest {
-        underTest(fileNodes, DESTINATION_PATH_FOLDER, null, priority).test {
-            fileNodes.forEach { nodeId ->
-                verify(transferRepository).startDownload(
-                    nodeId,
-                    DESTINATION_PATH_FOLDER,
-                    null,
-                    priority,
-                )
+    fun `test that repository start download is called with the proper priority`(priority: Boolean) =
+        runTest {
+            underTest(fileNodes, DESTINATION_PATH_FOLDER, null, priority).test {
+                fileNodes.forEach { nodeId ->
+                    verify(transferRepository).startDownload(
+                        nodeId,
+                        DESTINATION_PATH_FOLDER,
+                        null,
+                        priority,
+                    )
+                }
+                awaitComplete()
             }
-            awaitComplete()
         }
-    }
 
     @ParameterizedTest(name = "appdata: \"{0}\"")
     @MethodSource("provideAppData")
-    fun `test that repository is called with the proper appData`(
+    fun `test that repository start download is called with the proper appData`(
         appData: TransferAppData?,
     ) = runTest {
         underTest(listOf(node), DESTINATION_PATH_FOLDER, appData, false).test {
@@ -138,6 +141,20 @@ class DownloadNodesUseCaseTest {
             )
             awaitComplete()
         }
+    }
+
+    @Test
+    fun `test that flow is closed when all downloads are finished`() = runTest {
+        fileNodes.forEach { node ->
+            stubFinishScanningEvent(node)
+        }
+        whenever(monitorTransferEventsUseCase()).thenReturn(flow {
+            awaitCancellation()
+        })
+        underTest(fileNodes, DESTINATION_PATH_FOLDER, null, false)
+            .test {
+                assertThat(cancelAndConsumeRemainingEvents().last()).isInstanceOf(Event.Complete::class.java)
+            }
     }
 
     private fun provideAppData() = listOf(
@@ -240,13 +257,13 @@ class DownloadNodesUseCaseTest {
                 DESTINATION_PATH_FOLDER,
                 null,
                 false
-            ).filterIsInstance<DownloadNodesEvent.SingleTransferEvent>().test {
+            ).filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
                 repeat(nodeIds.size) {
-                    Truth.assertThat(awaitItem().transferEvent)
+                    assertThat(awaitItem().transferEvent)
                         .isInstanceOf(TransferEvent.TransferStartEvent::class.java)
-                    Truth.assertThat(awaitItem().transferEvent)
+                    assertThat(awaitItem().transferEvent)
                         .isInstanceOf(TransferEvent.TransferUpdateEvent::class.java)
-                    Truth.assertThat(awaitItem().transferEvent)
+                    assertThat(awaitItem().transferEvent)
                         .isInstanceOf(TransferEvent.TransferFinishEvent::class.java)
                 }
                 awaitComplete()
@@ -274,7 +291,7 @@ class DownloadNodesUseCaseTest {
                 DESTINATION_PATH_FOLDER,
                 null,
                 false
-            ).filterIsInstance<DownloadNodesEvent.SingleTransferEvent>().test {
+            ).filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
                 cancelAndConsumeRemainingEvents()
             }
             verify(
@@ -304,7 +321,7 @@ class DownloadNodesUseCaseTest {
                 DESTINATION_PATH_FOLDER,
                 null,
                 false
-            ).filterIsInstance<DownloadNodesEvent.SingleTransferEvent>().test {
+            ).filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
                 cancelAndConsumeRemainingEvents()
             }
             verify(
@@ -314,7 +331,7 @@ class DownloadNodesUseCaseTest {
         }
 
     @Test
-    fun `test that finished processing event is emitted when each node finishes its processing`() =
+    fun `test that single event with is finish scanning event flag to true is emitted when each node finishes it is scanned`() =
         runTest {
             val transfers = folderNodes.associateWith { node ->
                 val handle = node.id.longValue
@@ -342,29 +359,31 @@ class DownloadNodesUseCaseTest {
                 DESTINATION_PATH_FOLDER,
                 null,
                 false
-            ).filterIsInstance<DownloadNodesEvent.TransferFinishedProcessing>().test {
-                nodeIds.forEach {
-                    println("waiting nodeId $it")
-                    Truth.assertThat(awaitItem().nodeId).isEqualTo(it)
+            )
+                .filterIsInstance<MultiTransferEvent.SingleTransferEvent>()
+                .filter { it.isFinishScanningEvent }
+                .test {
+                    nodeIds.forEach {
+                        assertThat(awaitItem().transferEvent.transfer.nodeHandle).isEqualTo(it.longValue)
+                    }
+                    awaitComplete()
                 }
-                awaitComplete()
-            }
         }
 
 
     @Test
-    fun `test that finish processing is emitted when all transfers are processed`() = runTest {
+    fun `test that scanning folders finished event is emitted when all transfers are scanned`() =
+        runTest {
+            fileAndFolderNodes.forEach { node ->
+                stubFinishScanningEvent(node)
+            }
 
-        fileAndFolderNodes.forEach { node ->
-            stubFinishProcessingEvent(node)
+            underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
+                assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
+                    (event as? Event.Item)?.value?.takeIf { it is MultiTransferEvent.ScanningFoldersFinished }
+                }).hasSize(1)
+            }
         }
-
-        underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
-            Truth.assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
-                (event as? Event.Item)?.value?.takeIf { it is DownloadNodesEvent.FinishProcessingTransfers }
-            }).hasSize(1)
-        }
-    }
 
     @Test
     fun `test that startDownload runs in parallel when there are more than one node`() = runTest {
@@ -385,7 +404,7 @@ class DownloadNodesUseCaseTest {
     }
 
     @Test
-    fun `test that finish processing is emitted when all transfers are processed including not found nodes`() =
+    fun `test that scanning folders finished is emitted when all transfers are scanned including not found nodes`() =
         runTest {
             fileAndFolderNodes.forEachIndexed { index, node ->
                 if (index == 5) {
@@ -397,13 +416,13 @@ class DownloadNodesUseCaseTest {
                         flow<TransferEvent> { throw NodeDoesNotExistsException() }
                     }
                 } else {
-                    stubFinishProcessingEvent(node)
+                    stubFinishScanningEvent(node)
                 }
             }
 
             underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
-                Truth.assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
-                    (event as? Event.Item)?.value?.takeIf { it is DownloadNodesEvent.FinishProcessingTransfers }
+                assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
+                    (event as? Event.Item)?.value?.takeIf { it is MultiTransferEvent.ScanningFoldersFinished }
                 }).hasSize(1)
             }
         }
@@ -467,10 +486,10 @@ class DownloadNodesUseCaseTest {
         }
 
     @Test
-    fun `test that cancel token is invalidated when all transfers are processed`() = runTest {
+    fun `test that cancel token is invalidated when all transfers are scanned`() = runTest {
 
         fileAndFolderNodes.forEach { node ->
-            stubFinishProcessingEvent(node)
+            stubFinishScanningEvent(node)
         }
 
         underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
@@ -480,21 +499,21 @@ class DownloadNodesUseCaseTest {
     }
 
     @Test
-    fun `test that finish processing is not emitted if not all transfers are processed`() =
+    fun `test that scanning folders finished event is not emitted if not all transfers are scanned`() =
         runTest {
 
             fileAndFolderNodes.dropLast(1).forEach { node ->
-                stubFinishProcessingEvent(node)
+                stubFinishScanningEvent(node)
             }
 
             underTest(fileNodes, DESTINATION_PATH_FOLDER, null, false).test {
-                Truth.assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
-                    (event as? Event.Item)?.value?.takeIf { it is DownloadNodesEvent.FinishProcessingTransfers }
+                assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
+                    (event as? Event.Item)?.value?.takeIf { it is MultiTransferEvent.ScanningFoldersFinished }
                 }).isEmpty()
             }
         }
 
-    private fun stubFinishProcessingEvent(node: TypedNode) {
+    private fun stubFinishScanningEvent(node: TypedNode) {
         val handle = node.id.longValue
         whenever(
             transferRepository.startDownload(

@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
+import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -95,7 +95,7 @@ class StartDownloadUseCaseTest {
         runTest {
             whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(false)
             underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
-                assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.NotSufficientSpace)
+                assertThat(awaitItem()).isEqualTo(MultiTransferEvent.InsufficientSpace)
                 awaitComplete()
             }
         }
@@ -104,12 +104,12 @@ class StartDownloadUseCaseTest {
     fun `test that single events are filtered out`() = runTest {
         mockFlow(
             flowOf(
-                mock<DownloadNodesEvent.SingleTransferEvent>(),
-                DownloadNodesEvent.FinishProcessingTransfers,
+                mock<MultiTransferEvent.SingleTransferEvent>(),
+                MultiTransferEvent.ScanningFoldersFinished,
             )
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
-            assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.FinishProcessingTransfers)
+            assertThat(awaitItem()).isEqualTo(MultiTransferEvent.ScanningFoldersFinished)
             awaitComplete()
         }
     }
@@ -118,12 +118,12 @@ class StartDownloadUseCaseTest {
     fun `test that flow completes when finish processing transfers is emitted`() = runTest {
         mockFlow(
             flowOf(
-                DownloadNodesEvent.FinishProcessingTransfers,
-                mock<DownloadNodesEvent.SingleTransferEvent>(),
+                MultiTransferEvent.ScanningFoldersFinished,
+                mock<MultiTransferEvent.SingleTransferEvent>(),
             )
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
-            assertThat(awaitItem()).isEqualTo(DownloadNodesEvent.FinishProcessingTransfers)
+            assertThat(awaitItem()).isEqualTo(MultiTransferEvent.ScanningFoldersFinished)
             awaitComplete()
         }
     }
@@ -132,7 +132,7 @@ class StartDownloadUseCaseTest {
     fun `test that download worker is started when start download finish correctly`() = runTest {
         mockFlow(
             flowOf(
-                DownloadNodesEvent.FinishProcessingTransfers,
+                MultiTransferEvent.ScanningFoldersFinished,
             )
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).collect()
@@ -144,7 +144,7 @@ class StartDownloadUseCaseTest {
         var workerStarted = false
         mockFlow(
             flow {
-                emit(DownloadNodesEvent.FinishProcessingTransfers)
+                emit(MultiTransferEvent.ScanningFoldersFinished)
                 awaitCancellation()
             }
         )
@@ -167,7 +167,7 @@ class StartDownloadUseCaseTest {
         mockFlow(
             flow {
                 delay(1000)
-                emit(DownloadNodesEvent.FinishProcessingTransfers)
+                emit(MultiTransferEvent.ScanningFoldersFinished)
             }
         )
         val job =
@@ -210,7 +210,7 @@ class StartDownloadUseCaseTest {
         val cachePath = "cachePath"
         whenever(
             downloadNodesUseCase(any(), any(), anyOrNull(), any())
-        ).thenAnswer { emptyFlow<DownloadNodesEvent>() }
+        ).thenAnswer { emptyFlow<MultiTransferEvent>() }
         whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)
         whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
         whenever(fileSystemRepository.getOrCreateSDCardCacheFolder()).thenReturn(File(cachePath))
@@ -227,7 +227,7 @@ class StartDownloadUseCaseTest {
         val expectedAppData = TransferAppData.SdCardDownload(DESTINATION_PATH_FOLDER, null)
         whenever(
             downloadNodesUseCase(any(), any(), anyOrNull(), any())
-        ).thenAnswer { emptyFlow<DownloadNodesEvent>() }
+        ).thenAnswer { emptyFlow<MultiTransferEvent>() }
         whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)
         whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
         whenever(fileSystemRepository.getOrCreateSDCardCacheFolder()).thenReturn(File(cachePath))
@@ -240,7 +240,7 @@ class StartDownloadUseCaseTest {
 
     private fun mockNodes() = nodeIds.map { mock<TypedFileNode>() }
 
-    private suspend fun mockFlow(events: Flow<DownloadNodesEvent>) {
+    private suspend fun mockFlow(events: Flow<MultiTransferEvent>) {
         whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)
         whenever(
             downloadNodesUseCase(any(), any(), anyOrNull(), any())
