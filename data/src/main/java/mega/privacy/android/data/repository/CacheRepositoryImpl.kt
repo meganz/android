@@ -5,6 +5,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CacheRepository
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -21,4 +22,8 @@ internal class CacheRepositoryImpl @Inject constructor(
     override suspend fun clearCache() = withContext(ioDispatcher) {
         cacheFolderGateway.clearCache()
     }
+
+    override fun getCacheFile(folderName: String, fileName: String): File? =
+        cacheFolderGateway.getCacheFile(folderName, fileName)
+
 }

@@ -1,6 +1,5 @@
 package mega.privacy.android.core.ui.controls.chat.messages
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -49,16 +49,18 @@ internal const val VOICE_CLIP_MESSAGE_VIEW_LOAD_PROGRESS_INDICATOR_TEST_TAG =
  * @param timestamp timestamp of the voice clip. Show total duration of the voice clip when pause;
  *                  show elapsed time when playing.
  * @param modifier modifier
+ * @param isError whether message is in error status
  * @param loadProgress loading progress of the message. null if already loaded. The value can be 0-100.
  * @param playProgress playing progress of the audio. null if not playing. The value can be 0-100.
  * @param isPlaying Whether voice clip is playing. Default is false.
  * @param onPlayClicked Callback when play button is clicked.
  */
 @Composable
-fun VoiceClipMessageView(
+fun CoreVoiceClipMessageView(
     isMe: Boolean,
     timestamp: String,
     modifier: Modifier = Modifier,
+    isError: Boolean = false,
     loadProgress: Int? = null,
     playProgress: Int? = null,
     isPlaying: Boolean = false,
@@ -77,31 +79,37 @@ fun VoiceClipMessageView(
                     .fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                PlayButton(isPlaying = isPlaying, onPlayClicked = onPlayClicked)
+                PlayButton(
+                    isMe = isMe,
+                    enabled = !isError && loadProgress == null,
+                    isPlaying = isPlaying,
+                    onPlayClicked = onPlayClicked
+                )
                 PlayProgress(
                     isMe = isMe,
                     progress = playProgress,
                     modifier = Modifier.padding(start = 8.dp)
                 )
-                TimestampText(timestamp = timestamp, isMe = isMe)
+                TimestampText(isMe = isMe, timestamp = timestamp)
             }
-            LoadOverlay(loadProgress)
-            LoadProgress(loadProgress = loadProgress)
+            LoadOverlay(loadProgress = loadProgress, isError = isError)
+            LoadProgress(loadProgress = loadProgress, isError = isError)
         }
     }
 }
 
 @Composable
-private fun LoadProgress(loadProgress: Int?) {
+private fun LoadProgress(loadProgress: Int?, isError: Boolean) {
     loadProgress?.let {
-        MegaLinearProgressIndicator(
-            progress = loadProgress / 100f,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(4.dp)
-                .border(width = 0.dp, color = Color.Transparent)
-                .testTag(VOICE_CLIP_MESSAGE_VIEW_LOAD_PROGRESS_INDICATOR_TEST_TAG),
-        )
+        if (!isError) {
+            MegaLinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .border(width = 0.dp, color = Color.Transparent)
+                    .testTag(VOICE_CLIP_MESSAGE_VIEW_LOAD_PROGRESS_INDICATOR_TEST_TAG),
+            )
+        }
     }
 }
 
@@ -157,8 +165,10 @@ private fun TimestampText(isMe: Boolean, timestamp: String) {
 
 @Composable
 private fun PlayButton(
+    isMe: Boolean,
     isPlaying: Boolean,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onPlayClicked: () -> Unit = {},
 ) {
     Box(
@@ -168,15 +178,16 @@ private fun PlayButton(
                 color = MegaTheme.colors.background.blur,
                 shape = CircleShape
             )
-            .clickable { onPlayClicked() }
+            .clickable(enabled = enabled, onClick = onPlayClicked)
             .testTag(VOICE_CLIP_MESSAGE_VIEW_PLAY_BUTTON_TEST_TAG),
         contentAlignment = Alignment.Center,
     ) {
         val iconId =
             if (isPlaying) R.drawable.ic_pause_voice_clip else R.drawable.ic_play_voice_clip
-        Image(
+        Icon(
             imageVector = ImageVector.vectorResource(iconId),
-            contentDescription = "Play voice clip"
+            contentDescription = "Play voice clip",
+            tint = if (isMe) MegaTheme.colors.icon.inverse else MegaTheme.colors.icon.onColor
         )
     }
 }
@@ -187,8 +198,8 @@ private fun PlayButton(
  * @param loadProgress loading progress of the message. null if already loaded. The value can be 0-100.
  */
 @Composable
-private fun LoadOverlay(loadProgress: Int?) {
-    loadProgress?.let {
+private fun LoadOverlay(loadProgress: Int?, isError: Boolean) {
+    if (loadProgress != null || isError) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -206,7 +217,7 @@ private fun VoiceClipMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        VoiceClipMessageView(
+        CoreVoiceClipMessageView(
             isMe = isMe,
             timestamp = "00:49",
             loadProgress = null,
@@ -220,7 +231,7 @@ private fun LoadingVoiceClipMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        VoiceClipMessageView(
+        CoreVoiceClipMessageView(
             isMe = isMe,
             timestamp = "00:49",
             loadProgress = 50,
@@ -230,11 +241,11 @@ private fun LoadingVoiceClipMessageViewPreview(
 
 @CombinedThemePreviews
 @Composable
-private fun VoiceClipMessageViewPlaying20Preview(
+private fun Playing20VoiceClipMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        VoiceClipMessageView(
+        CoreVoiceClipMessageView(
             isMe = isMe,
             timestamp = "00:49",
             loadProgress = null,
@@ -246,11 +257,11 @@ private fun VoiceClipMessageViewPlaying20Preview(
 
 @CombinedThemePreviews
 @Composable
-private fun VoiceClipMessageViewPlaying50Preview(
+private fun Playing50VoiceClipMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        VoiceClipMessageView(
+        CoreVoiceClipMessageView(
             isMe = isMe,
             timestamp = "00:49",
             loadProgress = null,
@@ -262,16 +273,28 @@ private fun VoiceClipMessageViewPlaying50Preview(
 
 @CombinedThemePreviews
 @Composable
-private fun VoiceClipMessageViewPlaying80Preview(
+private fun Playing80VoiceClipMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        VoiceClipMessageView(
+        CoreVoiceClipMessageView(
             isMe = isMe,
             timestamp = "00:49",
             loadProgress = null,
             isPlaying = true,
             playProgress = 80,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun LoadingVoiceClipWithErrorPreview() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        CoreVoiceClipMessageView(
+            isMe = true,
+            timestamp = "--:--",
+            isError = true,
         )
     }
 }

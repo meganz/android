@@ -113,7 +113,7 @@ const val EXTRA_LINK = "LINK"
  */
 @OptIn(FlowPreview::class)
 @HiltViewModel
-internal class ChatViewModel @Inject constructor(
+class ChatViewModel @Inject constructor(
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,

@@ -70,7 +70,7 @@ class VoiceClipMessageViewTest {
         onPlayClicked: () -> Unit,
     ) {
         composeRule.setContent {
-            VoiceClipMessageView(
+            CoreVoiceClipMessageView(
                 isMe = true,
                 timestamp = "00:49",
                 modifier = Modifier,

@@ -159,6 +159,13 @@ class UiChatMessageMapper @Inject constructor() {
                 showAvatar = showAvatar
             )
 
+            is VoiceClipMessage -> VoiceClipUiMessage(
+                message = message,
+                showDate = showDate,
+                showTime = showTime,
+                showAvatar = showAvatar
+            )
+
             is InvalidMessage, is InvalidMetaMessage -> mapInvalidMessage(
                 message,
                 showAvatar,

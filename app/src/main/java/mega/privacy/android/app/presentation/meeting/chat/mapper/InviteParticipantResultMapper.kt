@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * Mapper to convert a result list of inviting participants into a [InviteContactToChatResult].
  */
-internal class InviteParticipantResultMapper @Inject constructor() {
+class InviteParticipantResultMapper @Inject constructor() {
 
     /**
      * Converts a result list of inviting participants into a [InviteContactToChatResult].
