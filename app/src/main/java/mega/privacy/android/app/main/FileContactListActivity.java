@@ -897,5 +897,11 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             }
         }
     }
+
+    public static Intent launchIntent(Context context, Long handle){
+        Intent intent = new Intent(context, FileContactListActivity.class);
+        intent.putExtra(NAME, handle);
+        return intent;
+    }
 }
 

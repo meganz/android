@@ -16,6 +16,9 @@ import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensi
 import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDeleteNavigation
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetNavigation
 import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
+import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.shareFolderDialogNavigation
 import mega.privacy.android.domain.entity.node.TypedNode
 
 
@@ -74,6 +77,9 @@ internal fun NavGraphBuilder.searchNavGraph(
         navHostController = navHostController,
         removeNodeLinkViewModel = removeNodeLinkViewModel,
         searchActivityViewModel = searchActivityViewModel
+    )
+    shareFolderDialogNavigation(
+        navHostController = navHostController
     )
 }
 
