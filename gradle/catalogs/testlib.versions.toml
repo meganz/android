@@ -16,7 +16,7 @@ test-parameter-injector = "1.8"
 truth = "1.1.3"
 turbine = "0.7.0"
 roboelectric = "4.7.3"
-room-test = "2.5.2"
+room-test = "2.6.1"
 runner = "1.5.2"
 
 [libraries]

@@ -15,14 +15,17 @@ import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.SQLCipherManager
+import mega.privacy.android.data.database.chat.InMemoryChatDatabase
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
+import mega.privacy.android.data.database.dao.ChatHistoryStateDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
+import mega.privacy.android.data.database.dao.TypedMessageDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import net.sqlcipher.database.SupportFactory
 import timber.log.Timber
@@ -57,6 +60,14 @@ internal object RoomDatabaseModule {
                 legacyDatabaseMigration
             )
         }
+    }
+
+    @Provides
+    @Singleton
+    internal fun provideChatDatabase(
+        @ApplicationContext applicationContext: Context,
+    ): InMemoryChatDatabase {
+        return InMemoryChatDatabase.create(applicationContext)
     }
 
     @Provides
@@ -142,4 +153,14 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideUserPausedSyncDao(database: MegaDatabase): UserPausedSyncsDao =
         database.userPausedSyncDao()
+
+    @Provides
+    @Singleton
+    internal fun provideTypedMessageRequestDao(chatDatabase: InMemoryChatDatabase): TypedMessageDao =
+        chatDatabase.typedMessageRequestDao()
+
+    @Provides
+    @Singleton
+    internal fun provideChatHistoryStateDao(chatDatabase: InMemoryChatDatabase): ChatHistoryStateDao =
+        chatDatabase.chatHistoryStateDao()
 }

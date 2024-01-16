@@ -1,0 +1,256 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "c4487daf38d9d7b16e481464f8a5f7a2",
+    "entities": [
+      {
+        "tableName": "typed_message_requests",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatId` INTEGER NOT NULL, `status` TEXT NOT NULL, `msgId` INTEGER NOT NULL, `tempId` INTEGER NOT NULL, `msgIndex` INTEGER NOT NULL, `userHandle` INTEGER NOT NULL, `type` TEXT NOT NULL, `hasConfirmedReactions` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `content` TEXT, `isEdited` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `isEditable` INTEGER NOT NULL, `isDeletable` INTEGER NOT NULL, `isManagementMessage` INTEGER NOT NULL, `handleOfAction` INTEGER NOT NULL, `privilege` TEXT NOT NULL, `code` TEXT NOT NULL, `usersCount` INTEGER NOT NULL, `userHandles` TEXT NOT NULL, `userNames` TEXT NOT NULL, `userEmails` TEXT NOT NULL, `nodeList` TEXT NOT NULL, `handleList` TEXT NOT NULL, `duration` INTEGER NOT NULL, `retentionTime` INTEGER NOT NULL, `termCode` TEXT NOT NULL, `rowId` INTEGER NOT NULL, `changes` TEXT NOT NULL, `containsMeta` TEXT, `isMine` INTEGER NOT NULL, `shouldShowAvatar` INTEGER NOT NULL, `shouldShowTime` INTEGER NOT NULL, `shouldShowDate` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "chatId",
+            "columnName": "chatId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "msgId",
+            "columnName": "msgId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tempId",
+            "columnName": "tempId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "msgIndex",
+            "columnName": "msgIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userHandle",
+            "columnName": "userHandle",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasConfirmedReactions",
+            "columnName": "hasConfirmedReactions",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "content",
+            "columnName": "content",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isEdited",
+            "columnName": "isEdited",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDeleted",
+            "columnName": "isDeleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isEditable",
+            "columnName": "isEditable",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDeletable",
+            "columnName": "isDeletable",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isManagementMessage",
+            "columnName": "isManagementMessage",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "handleOfAction",
+            "columnName": "handleOfAction",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "privilege",
+            "columnName": "privilege",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usersCount",
+            "columnName": "usersCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userHandles",
+            "columnName": "userHandles",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userNames",
+            "columnName": "userNames",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userEmails",
+            "columnName": "userEmails",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nodeList",
+            "columnName": "nodeList",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "handleList",
+            "columnName": "handleList",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "retentionTime",
+            "columnName": "retentionTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "termCode",
+            "columnName": "termCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rowId",
+            "columnName": "rowId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "changes",
+            "columnName": "changes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "containsMeta",
+            "columnName": "containsMeta",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isMine",
+            "columnName": "isMine",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shouldShowAvatar",
+            "columnName": "shouldShowAvatar",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shouldShowTime",
+            "columnName": "shouldShowTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shouldShowDate",
+            "columnName": "shouldShowDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": []
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "chat_history_load_status",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatId` INTEGER NOT NULL, `status` TEXT NOT NULL, PRIMARY KEY(`chatId`))",
+        "fields": [
+          {
+            "fieldPath": "chatId",
+            "columnName": "chatId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chatId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c4487daf38d9d7b16e481464f8a5f7a2')"
+    ]
+  }
+}

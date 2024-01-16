@@ -73,6 +73,7 @@ android {
 
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
+        arg("room.generateKotlin", "true")
     }
     sourceSets {
         // Adds exported schema location as test app assets.
@@ -101,7 +102,8 @@ dependencies {
     implementation(androidx.hilt.work)
     implementation(google.hilt.android)
     implementation(androidx.concurrent.futures)
-    implementation(androidx.paging.core)
+    implementation(androidx.paging)
+    implementation(androidx.room.paging)
     implementation(androidx.documentfile)
     ksp(androidx.room.compiler)
 
