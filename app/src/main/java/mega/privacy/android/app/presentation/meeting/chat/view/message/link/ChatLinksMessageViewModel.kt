@@ -6,6 +6,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromLinkUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
@@ -18,6 +19,7 @@ import kotlin.coroutines.cancellation.CancellationException
 class ChatLinksMessageViewModel @Inject constructor(
     private val getContactFromLinkUseCase: GetContactFromLinkUseCase,
     private val checkChatLinkUseCase: CheckChatLinkUseCase,
+    private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase,
 ) : ViewModel() {
     // check link is expensive operation, so we cache it
     private val contactLinks = mutableMapOf<String, LinkContent>()
@@ -74,6 +76,28 @@ class ChatLinksMessageViewModel @Inject constructor(
             Timber.d("loadChatLinkInfo: $it, link: $link")
         }
     }
+
+    /**
+     * Load folder link info
+     *
+     * @param link Link
+     * @return Folder link
+     */
+    suspend fun loadFolderLinkInfo(link: String) = runCatching {
+        getLinkContentFromCache(link)
+            ?: getPublicLinkInformationUseCase(link).let { folderInfo ->
+                FolderLinkContent(
+                    folderInfo = folderInfo,
+                    link = link
+                ).also {
+                    mutex.withLock {
+                        contactLinks[link] = it
+                    }
+                }
+            }
+    }.onFailure {
+        Timber.e(it, "Failed to get folder link info")
+    }.getOrNull()
 
     private suspend fun getLinkContentFromCache(link: String) = mutex.withLock {
         contactLinks[link]

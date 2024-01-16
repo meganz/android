@@ -10,10 +10,13 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatGroupLinkContent
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinksMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ContactLinkContent
+import mega.privacy.android.app.presentation.meeting.chat.view.message.link.FolderLinkContent
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromLinkUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -31,6 +34,7 @@ internal class ChatLinksMessageViewModelTest {
     private lateinit var underTest: ChatLinksMessageViewModel
     private val getContactFromLinkUseCase: GetContactFromLinkUseCase = mock()
     private val checkChatLinkUseCase: CheckChatLinkUseCase = mock()
+    private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase = mock()
 
     @BeforeAll
     fun setup() {
@@ -47,6 +51,7 @@ internal class ChatLinksMessageViewModelTest {
         underTest = ChatLinksMessageViewModel(
             getContactFromLinkUseCase,
             checkChatLinkUseCase,
+            getPublicLinkInformationUseCase,
         )
     }
 
@@ -94,5 +99,22 @@ internal class ChatLinksMessageViewModelTest {
                     link = link
                 )
             )
+    }
+
+    @Test
+    fun `test that load folder link info return correctly`() = runTest {
+        val link = "link"
+        val folderInfo = mock<FolderInfo>()
+        whenever(getPublicLinkInformationUseCase(link)).thenReturn(folderInfo)
+        Truth.assertThat(underTest.loadFolderLinkInfo(link))
+            .isEqualTo(
+                FolderLinkContent(
+                    folderInfo,
+                    link
+                )
+            )
+        underTest.loadFolderLinkInfo(link)
+        // make sure it is called only once because the other call we load from cache
+        verify(getPublicLinkInformationUseCase).invoke(link)
     }
 }

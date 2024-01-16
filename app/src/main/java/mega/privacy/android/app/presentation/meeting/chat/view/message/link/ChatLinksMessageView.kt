@@ -53,6 +53,12 @@ fun ChatLinksMessageView(
                     val linkContent = viewModel.loadChatLinkInfo(it.link)
                     contentLinks = contentLinks + linkContent
                 }
+
+                RegexPatternType.FOLDER_LINK -> {
+                    viewModel.loadFolderLinkInfo(it.link)?.let { linkContent ->
+                        contentLinks = contentLinks + linkContent
+                    }
+                }
                 // other link type here
                 else -> Unit
             }
