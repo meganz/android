@@ -102,6 +102,7 @@ dependencies {
     implementation(google.hilt.android)
     implementation(androidx.concurrent.futures)
     implementation(androidx.paging.core)
+    implementation(androidx.documentfile)
     ksp(androidx.room.compiler)
 
     val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
