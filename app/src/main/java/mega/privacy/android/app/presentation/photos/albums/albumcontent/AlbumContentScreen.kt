@@ -467,7 +467,7 @@ private fun List<Photo>.applyFilter(currentMediaType: FilterMediaType) =
 
 private fun List<Photo>.applySortBy(currentSort: Sort) =
     if (currentSort == Sort.NEWEST) {
-        this.sortedByDescending { it.modificationTime }
+        this.sortedWith(compareByDescending<Photo> { it.modificationTime }.thenByDescending { it.id })
     } else {
-        this.sortedBy { it.modificationTime }
+        this.sortedWith(compareBy<Photo> { it.modificationTime }.thenByDescending { it.id })
     }
