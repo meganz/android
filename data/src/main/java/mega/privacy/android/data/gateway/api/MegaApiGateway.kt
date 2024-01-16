@@ -111,6 +111,30 @@ interface MegaApiGateway {
     )
 
     /**
+     * Upload a file or folder.
+     *
+     * This method should be used ONLY to share by chat a local file
+     *
+     * @param localPath The local path of the file or folder
+     * @param parentNode The parent node for the file or folder
+     * @param fileName The custom file name for the file or folder. Leave the parameter as "null"
+     * if there are no changes
+     * seconds since the epoch
+     * @param appData The custom app data to save, which can be nullable
+     * @param isSourceTemporary Whether the temporary file or folder that is created for upload
+     * should be deleted or not
+     * @param listener The [MegaTransferListenerInterface] to track the upload
+     */
+    fun startUploadForChat(
+        localPath: String,
+        parentNode: MegaNode,
+        fileName: String?,
+        appData: String?,
+        isSourceTemporary: Boolean,
+        listener: MegaTransferListenerInterface,
+    )
+
+    /**
      * Adds a [MegaTransferListenerInterface] to listen for Transfer events
      *
      * @param listener [MegaTransferListenerInterface]

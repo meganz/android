@@ -115,8 +115,8 @@ class UploadFilesUseCaseTest {
         }
 
     @ParameterizedTest(name = "appdata: \"{0}\"")
-    @MethodSource("provideAppData")
-    fun `test that repository start upload is called with the proper appData`(
+    @MethodSource("provideAppDataExceptChat")
+    fun `test that repository start upload is called with the proper appData when appData is not a chat upload`(
         appData: TransferAppData?,
     ) = runTest {
         underTest(
@@ -137,13 +137,38 @@ class UploadFilesUseCaseTest {
         }
     }
 
-    private fun provideAppData() = listOf(
+    @ParameterizedTest(name = "appdata: \"{0}\"")
+    @MethodSource("provideChatAppData")
+    fun `test that repository start upload for chat is called when appData is chat transfer app data`(
+        appData: TransferAppData.ChatTransferAppData,
+    ) = runTest {
+        underTest(
+            listOf(file), parentFolder, appData,
+            isSourceTemporary = false,
+            isHighPriority = false
+        ).test {
+            verify(transferRepository).startUploadForChat(
+                DESTINATION_PATH_FOLDER,
+                parentId,
+                file.name,
+                appData,
+                isSourceTemporary = false,
+            )
+            awaitComplete()
+        }
+    }
+
+    private fun provideAppDataExceptChat() = listOf(
         TransferAppData.BackgroundTransfer,
         TransferAppData.SdCardDownload("target", null),
         TransferAppData.CameraUpload,
-        TransferAppData.VoiceClip,
         TransferAppData.TextFileUpload(TransferAppData.TextFileUpload.Mode.Create, false),
-        TransferAppData.ChatUpload(12345L)
+        null,
+    )
+
+    private fun provideChatAppData() = listOf(
+        TransferAppData.ChatUpload(12345L),
+        TransferAppData.VoiceClip,
     )
 
 

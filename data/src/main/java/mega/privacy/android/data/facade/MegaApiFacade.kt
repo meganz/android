@@ -109,6 +109,24 @@ internal class MegaApiFacade @Inject constructor(
         )
     }
 
+    override fun startUploadForChat(
+        localPath: String,
+        parentNode: MegaNode,
+        fileName: String?,
+        appData: String?,
+        isSourceTemporary: Boolean,
+        listener: MegaTransferListenerInterface,
+    ) {
+        megaApi.startUploadForChat(
+            localPath,
+            parentNode,
+            appData,
+            isSourceTemporary,
+            fileName,
+            listener,
+        )
+    }
+
     override fun addTransferListener(listener: MegaTransferListenerInterface) =
         megaApi.addTransferListener(listener)
 

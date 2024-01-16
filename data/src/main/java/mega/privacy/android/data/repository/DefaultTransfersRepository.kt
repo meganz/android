@@ -139,7 +139,34 @@ internal class DefaultTransfersRepository @Inject constructor(
             appData = appData?.let { transferAppDataStringMapper(listOf(it)) },
             isSourceTemporary = isSourceTemporary,
             shouldStartFirst = shouldStartFirst,
-            cancelToken = null,
+            cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+            listener = listener,
+        )
+
+        awaitClose {
+            megaApiGateway.removeTransferListener(listener)
+        }
+    }
+        .flowOn(ioDispatcher)
+        .cancellable()
+
+    override fun startUploadForChat(
+        localPath: String,
+        parentNodeId: NodeId,
+        fileName: String?,
+        appData: TransferAppData.ChatTransferAppData,
+        isSourceTemporary: Boolean,
+    ) = callbackFlow {
+        val parentNode = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
+        requireNotNull(parentNode)
+        val listener = transferListener(channel)
+
+        megaApiGateway.startUploadForChat(
+            localPath = localPath,
+            parentNode = parentNode,
+            fileName = fileName,
+            appData = transferAppDataStringMapper(listOf(appData)),
+            isSourceTemporary = isSourceTemporary,
             listener = listener,
         )
 

@@ -40,7 +40,7 @@ class UploadFilesUseCase @Inject constructor(
      * @param destination destination folder where [files] will be uploaded
      * @param appData Custom app data to save in the MegaTransfer object.
      * @param isSourceTemporary Whether the temporary file or folder that is created for upload should be deleted or not
-     * @param isHighPriority Whether the file or folder should be placed on top of the upload queue or not
+     * @param isHighPriority Whether the file or folder should be placed on top of the upload queue or not, chat uploads are always priority regardless of this parameter
      *
      * @return a flow of [MultiTransferEvent]s to monitor the download state and progress
      */
@@ -55,15 +55,25 @@ class UploadFilesUseCase @Inject constructor(
             items = files,
             null,
         ) { file ->
-            transferRepository.startUpload(
-                localPath = file.absolutePath,
-                parentNodeId = destination.id,
-                fileName = file.name,
-                modificationTime = file.lastModified() / 1000,
-                appData = appData,
-                isSourceTemporary = isSourceTemporary,
-                shouldStartFirst = isHighPriority,
-            )
+            if (appData is TransferAppData.ChatTransferAppData) {
+                transferRepository.startUploadForChat(
+                    localPath = file.absolutePath,
+                    parentNodeId = destination.id,
+                    fileName = file.name,
+                    appData = appData,
+                    isSourceTemporary = isSourceTemporary,
+                )
+            } else {
+                transferRepository.startUpload(
+                    localPath = file.absolutePath,
+                    parentNodeId = destination.id,
+                    fileName = file.name,
+                    modificationTime = file.lastModified() / 1000,
+                    appData = appData,
+                    isSourceTemporary = isSourceTemporary,
+                    shouldStartFirst = isHighPriority,
+                )
+            }
         }
     }
 

@@ -10,20 +10,26 @@ sealed interface TransferAppData {
     data object CameraUpload : TransferAppData
 
     /**
-     * Identify a voice clip transfer
+     * Common interface for chat transfers app data
      */
-    data object VoiceClip : TransferAppData
+    sealed interface ChatTransferAppData : TransferAppData
 
     /**
-     * Indicates the transfer should be transparent for the user and should not show any notification
+     * Identify a voice clip transfer
      */
-    data object BackgroundTransfer : TransferAppData
+    data object VoiceClip : ChatTransferAppData
 
     /**
      * Identify a chat transfer and its message
      * @param pendingMessageId the chat message Id related to this transfer
      */
-    data class ChatUpload(val pendingMessageId: Long) : TransferAppData
+    data class ChatUpload(val pendingMessageId: Long) : ChatTransferAppData
+
+
+    /**
+     * Indicates the transfer should be transparent for the user and should not show any notification
+     */
+    data object BackgroundTransfer : TransferAppData
 
     /**
      * Identify a download transfers that needs to be stored in the SD card.
