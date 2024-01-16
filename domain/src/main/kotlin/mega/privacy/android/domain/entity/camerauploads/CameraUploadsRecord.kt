@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property longitude the longitude coordinates extracted from the file. This value is computed during upload process
  * @property existsInTargetNode true if the file already exists in the target Node. This value is computed during upload process
  * @property existingNodeId nodeId that corresponds to the parent folder This value is computed during upload process
+ * @property generatedFileName the name of the file after renaming process. This value is computed during upload process
  */
 data class CameraUploadsRecord(
     val mediaId: Long,
@@ -38,4 +39,5 @@ data class CameraUploadsRecord(
     val longitude: Double? = null,
     val existsInTargetNode: Boolean? = null,
     val existingNodeId: NodeId? = null,
+    val generatedFileName: String? = null,
 )

@@ -277,7 +277,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                         startUploadUseCase(
                             localPath = path,
                             parentNodeId = parentNodeId,
-                            fileName = record.fileName,
+                            fileName = record.generatedFileName,
                             modificationTime = record.timestamp / 1000,
                             appData = TransferAppData.CameraUpload,
                             isSourceTemporary = false,
@@ -589,7 +589,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         copyNodeUseCase(
             nodeToCopy = existingNodeId,
             newNodeParent = parentNodeId,
-            newNodeName = record.fileName,
+            newNodeName = record.generatedFileName,
         ).let { newNodeId ->
             setGpsCoordinatesFromNode(
                 existingNodeId = existingNodeId,

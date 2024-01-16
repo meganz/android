@@ -14,6 +14,7 @@ import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -47,7 +48,8 @@ class RenameCameraUploadsRecordsUseCaseTest {
                 uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
                 originalFingerprint = "originalFingerprint",
                 generatedFingerprint = null,
-                tempFilePath = "tempFilePath"
+                tempFilePath = "tempFilePath",
+                existsInTargetNode = null,
             ),
             CameraUploadsRecord(
                 mediaId = 12345L,
@@ -59,8 +61,26 @@ class RenameCameraUploadsRecordsUseCaseTest {
                 uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
                 originalFingerprint = "originalFingerprint",
                 generatedFingerprint = null,
-                tempFilePath = "tempFilePath"
+                tempFilePath = "tempFilePath",
+                existsInTargetNode = null,
             )
+        )
+
+    private val getRecordAlreadyExistInTargetNode: List<CameraUploadsRecord> =
+        listOf(
+            CameraUploadsRecord(
+                mediaId = 1234L,
+                fileName = "picture.jpg",
+                filePath = "filepath",
+                timestamp = 1696294469,
+                folderType = CameraUploadFolderType.Primary,
+                type = CameraUploadsRecordType.TYPE_PHOTO,
+                uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
+                originalFingerprint = "originalFingerprint",
+                generatedFingerprint = null,
+                tempFilePath = "tempFilePath",
+                existsInTargetNode = true,
+            ),
         )
 
     private val primaryUploadNodeId = mock<NodeId>()
@@ -83,6 +103,19 @@ class RenameCameraUploadsRecordsUseCaseTest {
         )
     }
 
+    @Test
+    fun `test that the file name is not generated if the file already exists in the target node`() =
+        runTest {
+            val recordList = getRecordAlreadyExistInTargetNode
+            whenever(areUploadFileNamesKeptUseCase()).thenReturn(true)
+
+            val renamedList = underTest(recordList, primaryUploadNodeId, secondaryUploadNodeId)
+
+            val actual = renamedList[0].generatedFileName
+            val expected = null
+            assertThat(actual).isEqualTo(expected)
+        }
+
     @ParameterizedTest(name = "when folder type is {0}")
     @MethodSource("provideFolderTypeParameters")
     fun `test that if the user choose to keep name and the file name is not already used, the file name is kept`(
@@ -101,7 +134,7 @@ class RenameCameraUploadsRecordsUseCaseTest {
 
         val renamedList = underTest(recordList, primaryUploadNodeId, secondaryUploadNodeId)
 
-        val actual = renamedList[0].fileName
+        val actual = renamedList[0].generatedFileName
         val expected = recordList[0].fileName
         assertThat(actual).isEqualTo(expected)
     }
@@ -126,7 +159,7 @@ class RenameCameraUploadsRecordsUseCaseTest {
 
         val renamedList = underTest(recordList, primaryUploadNodeId, secondaryUploadNodeId)
 
-        val actual = renamedList[1].fileName
+        val actual = renamedList[1].generatedFileName
         val name = recordList[1].fileName.substringBeforeLast(".", "")
         val extension = recordList[1].fileName.substringAfterLast(".", "")
         val expected = "${name}_1.$extension"
@@ -151,7 +184,7 @@ class RenameCameraUploadsRecordsUseCaseTest {
 
         val renamedList = underTest(recordList, primaryUploadNodeId, secondaryUploadNodeId)
 
-        val actual = renamedList[0].fileName
+        val actual = renamedList[0].generatedFileName
         val name = recordList[0].fileName.substringBeforeLast(".", "")
         val extension = recordList[0].fileName.substringAfterLast(".", "")
         val expected = "${name}_1.$extension"
@@ -182,7 +215,7 @@ class RenameCameraUploadsRecordsUseCaseTest {
 
         val renamedList = underTest(recordList, primaryUploadNodeId, secondaryUploadNodeId)
 
-        val actual = renamedList[0].fileName
+        val actual = renamedList[0].generatedFileName
         assertThat(actual).isEqualTo(formattedName)
     }
 
@@ -210,7 +243,7 @@ class RenameCameraUploadsRecordsUseCaseTest {
 
         val renamedList = underTest(recordList, primaryUploadNodeId, secondaryUploadNodeId)
 
-        val actual = renamedList[1].fileName
+        val actual = renamedList[1].generatedFileName
         val name = formattedName.substringBeforeLast(".", "")
         val extension2 = formattedName.substringAfterLast(".", "")
         val expected = "${name}_1.$extension2"
@@ -242,7 +275,7 @@ class RenameCameraUploadsRecordsUseCaseTest {
 
         val renamedList = underTest(recordList, primaryUploadNodeId, secondaryUploadNodeId)
 
-        val actual = renamedList[0].fileName
+        val actual = renamedList[0].generatedFileName
         val name = formattedName.substringBeforeLast(".", "")
         val extension2 = formattedName.substringAfterLast(".", "")
         val expected = "${name}_1.$extension2"

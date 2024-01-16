@@ -15,6 +15,8 @@ import javax.inject.Inject
 
 /**
  * Rename the files if needed.
+ * The file will skip the renaming process if the file already exists in the target node,
+ * as it will be skipped during the upload process.
  * The file will be renamed if the user has not set the option to keep the file name.
  * A suffix will be added if the name already exists in the cloud
  */
@@ -41,27 +43,36 @@ class RenameCameraUploadsRecordsUseCase @Inject constructor(
         secondaryUploadNodeId: NodeId,
     ): List<CameraUploadsRecord> = withContext(ioDispatcher) {
         val keepName = areUploadFileNamesKeptUseCase()
-        val renamedRecordList = arrayListOf<CameraUploadsRecord>()
-        recordList.forEach { record ->
-            ensureActive()
-            val parentNodeId = when (record.folderType) {
-                CameraUploadFolderType.Primary -> primaryUploadNodeId
-                CameraUploadFolderType.Secondary -> secondaryUploadNodeId
-            }
+        return@withContext buildList renamedRecordList@{
+            recordList.map { record ->
+                if (record.existsInTargetNode == true) {
+                    add(record)
+                } else {
+                    ensureActive()
+                    val parentNodeId = when (record.folderType) {
+                        CameraUploadFolderType.Primary -> primaryUploadNodeId
+                        CameraUploadFolderType.Secondary -> secondaryUploadNodeId
+                    }
 
-            val originalFileName = getFileName(record, keepName)
-            var fileName = originalFileName
-            var photoIndex = 0
-            while (
-                fileNameAlreadyExists(fileName, parentNodeId, record.folderType, renamedRecordList)
-            ) {
-                ensureActive()
-                fileName = getFileNameWithIndex(originalFileName, photoIndex++)
-            }
+                    val originalFileName = getFileName(record, keepName)
+                    var generatedFileName = originalFileName
+                    var photoIndex = 0
+                    while (
+                        fileNameAlreadyExists(
+                            generatedFileName,
+                            parentNodeId,
+                            record.folderType,
+                            this@renamedRecordList
+                        )
+                    ) {
+                        ensureActive()
+                        generatedFileName = getFileNameWithIndex(originalFileName, photoIndex++)
+                    }
 
-            renamedRecordList.add(record.copy(fileName = fileName))
+                    add(record.copy(generatedFileName = generatedFileName))
+                }
+            }
         }
-        return@withContext renamedRecordList
     }
 
     /**
@@ -143,5 +154,6 @@ class RenameCameraUploadsRecordsUseCase @Inject constructor(
         recordList: List<CameraUploadsRecord>,
         folderType: CameraUploadFolderType
     ): Boolean =
-        recordList.any { it.folderType == folderType && it.fileName == fileName }
+        recordList
+            .any { it.folderType == folderType && it.generatedFileName == fileName }
 }

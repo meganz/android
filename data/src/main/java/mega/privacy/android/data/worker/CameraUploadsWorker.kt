@@ -726,25 +726,34 @@ class CameraUploadsWorker @AssistedInject constructor(
                 filterCameraUploadsRecords(pendingRecords)
             }
             ?.let { filteredRecords ->
-                Timber.d("Renaming ${filteredRecords.size} files")
-                renameCameraUploadsRecords(
+                Timber.d("Retrieve existence in target node for ${filteredRecords.size} files")
+                getExistenceInTargetNode(
                     filteredRecords,
                     primaryUploadNodeId,
-                    secondaryUploadNodeId,
+                    secondaryUploadNodeId
                 )
             }
-            ?.let { renamedRecords ->
-                Timber.d("Retrieve existence in target node for ${renamedRecords.size} files")
-                getExistenceInTargetNode(
-                    renamedRecords,
+            ?.let { recordsWithExistenceInTargetNode ->
+                Timber.d("Check renaming for ${recordsWithExistenceInTargetNode.size} files")
+                renameCameraUploadsRecords(
+                    recordsWithExistenceInTargetNode,
                     primaryUploadNodeId,
-                    secondaryUploadNodeId
+                    secondaryUploadNodeId,
                 )
             }
             ?.let { renamedRecordsWithExistenceInTargetNode ->
                 Timber.d("Retrieve gps coordinates for ${renamedRecordsWithExistenceInTargetNode.size} files")
                 getGpsCoordinates(renamedRecordsWithExistenceInTargetNode)
             }.also {
+                val existsInTargetNodeCount =
+                    it?.filter { record -> record.existsInTargetNode == true }?.size
+                val existsInCloudDriveCount =
+                    it?.filter { record -> record.existsInTargetNode == false && record.existingNodeId != null }?.size
+                val doesNotExistInCloudDriveCount =
+                    it?.filter { record -> record.existingNodeId == null }?.size
+                Timber.d("$existsInTargetNodeCount files already exist in target node")
+                Timber.d("$existsInCloudDriveCount files already exists in cloud drive")
+                Timber.d("$doesNotExistInCloudDriveCount files does not exist in target node")
                 if (it == null) Timber.d("No pending files to upload")
             }
     }

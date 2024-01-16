@@ -430,16 +430,16 @@ class CameraUploadsWorkerTest {
             val inOrder = inOrder(
                 processCameraUploadsMediaUseCase,
                 getPendingCameraUploadsRecordsUseCase,
-                renameCameraUploadsRecordsUseCase,
                 doesCameraUploadsRecordExistsInTargetNodeUseCase,
+                renameCameraUploadsRecordsUseCase,
                 extractGpsCoordinatesUseCase,
             )
 
             inOrder.verify(processCameraUploadsMediaUseCase).invoke(tempPath)
             inOrder.verify(getPendingCameraUploadsRecordsUseCase).invoke()
-            inOrder.verify(renameCameraUploadsRecordsUseCase)
-                .invoke(list, NodeId(primaryNodeHandle), NodeId(secondaryNodeHandle))
             inOrder.verify(doesCameraUploadsRecordExistsInTargetNodeUseCase)
+                .invoke(list, NodeId(primaryNodeHandle), NodeId(secondaryNodeHandle))
+            inOrder.verify(renameCameraUploadsRecordsUseCase)
                 .invoke(list, NodeId(primaryNodeHandle), NodeId(secondaryNodeHandle))
             inOrder.verify(extractGpsCoordinatesUseCase).invoke(list)
         }
@@ -945,7 +945,7 @@ class CameraUploadsWorkerTest {
 
             underTest.doWork()
 
-            verify(renameCameraUploadsRecordsUseCase)
+            verify(doesCameraUploadsRecordExistsInTargetNodeUseCase)
                 .invoke(expected, NodeId(primaryNodeHandle), NodeId(secondaryNodeHandle))
         }
 
@@ -976,7 +976,7 @@ class CameraUploadsWorkerTest {
 
             val expected = list.filter { it.type == CameraUploadsRecordType.TYPE_PHOTO }
             verify(underTest).setProgress(workDataOf(STATUS_INFO to COMPRESSION_ERROR))
-            verify(renameCameraUploadsRecordsUseCase)
+            verify(doesCameraUploadsRecordExistsInTargetNodeUseCase)
                 .invoke(expected, NodeId(primaryNodeHandle), NodeId(secondaryNodeHandle))
         }
 
@@ -1005,7 +1005,7 @@ class CameraUploadsWorkerTest {
 
             underTest.doWork()
 
-            verify(renameCameraUploadsRecordsUseCase)
+            verify(doesCameraUploadsRecordExistsInTargetNodeUseCase)
                 .invoke(expected, NodeId(primaryNodeHandle), NodeId(secondaryNodeHandle))
         }
 

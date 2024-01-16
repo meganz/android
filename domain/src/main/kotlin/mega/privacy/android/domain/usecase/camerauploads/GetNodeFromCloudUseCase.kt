@@ -13,7 +13,6 @@ import javax.inject.Inject
  * in that case also look for the node by attribute Fingerprint
  */
 class GetNodeFromCloudUseCase @Inject constructor(
-    private val getNodeByFingerprintUseCase: GetNodeByFingerprintUseCase,
     private val getNodeByOriginalFingerprintUseCase: GetNodeByOriginalFingerprintUseCase,
     private val getNodeByFingerprintAndParentNodeUseCase: GetNodeByFingerprintAndParentNodeUseCase,
     private val addNodeType: AddNodeType,
@@ -21,7 +20,6 @@ class GetNodeFromCloudUseCase @Inject constructor(
     /**
      * @param originalFingerprint Fingerprint of the local file
      * @param generatedFingerprint Generated fingerprint of the local file
-     * @param parentNodeId Preferred parent node, could be null for searching all the place in cloud drive
      *
      * @return A node with the same fingerprint, or null when not found
      * */
@@ -30,35 +28,19 @@ class GetNodeFromCloudUseCase @Inject constructor(
         generatedFingerprint: String? = null,
         parentNodeId: NodeId,
     ): TypedFileNode? {
-
-        // Try to find the node by original fingerprint from the selected parent folder
-        getNodeByOriginalFingerprintUseCase(originalFingerprint, parentNodeId)?.let {
-            return addNodeType(it) as? TypedFileNode
-        }
-
         // Try to find the node by original fingerprint in the account
         getNodeByOriginalFingerprintUseCase(originalFingerprint, null)?.let {
             return addNodeType(it) as? TypedFileNode
         }
 
-        // Try to find the node by original fingerprint from the selected parent folder
+        // Try to find the node by original fingerprint in the account
         getNodeByFingerprintAndParentNodeUseCase(originalFingerprint, parentNodeId)?.let {
             return addNodeType(it) as? TypedFileNode
         }
 
-        // Try to find the node by original fingerprint in the account
-        getNodeByFingerprintUseCase(originalFingerprint)?.let {
-            return addNodeType(it) as? TypedFileNode
-        }
-
         generatedFingerprint?.let { fingerprint ->
-            // Try to find the node by generated fingerprint from the selected parent folder
-            getNodeByFingerprintAndParentNodeUseCase(fingerprint, parentNodeId)?.let {
-                return addNodeType(it) as? TypedFileNode
-            }
-
             // Try to find the node by generated fingerprint in the account
-            getNodeByFingerprintUseCase(fingerprint)?.let {
+            getNodeByFingerprintAndParentNodeUseCase(fingerprint, parentNodeId)?.let {
                 return addNodeType(it) as? TypedFileNode
             }
         }
