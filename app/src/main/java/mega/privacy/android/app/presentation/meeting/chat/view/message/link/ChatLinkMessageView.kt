@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
-import mega.privacy.android.core.ui.controls.chat.messages.RichLinkContent
+import mega.privacy.android.core.ui.controls.chat.messages.RichLinkContentView
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -29,7 +29,7 @@ fun ChatLinkMessageView(
     modifier: Modifier = Modifier,
 ) {
     if (linkContent.numberOfParticipants > 0) {
-        RichLinkContent(
+        RichLinkContentView(
             modifier = modifier,
             image = painterResource(R.drawable.ic_group_chat_link),
             contentTitle = linkContent.name,
@@ -41,7 +41,7 @@ fun ChatLinkMessageView(
             host = Uri.parse(linkContent.link).authority.orEmpty()
         )
     } else {
-        RichLinkContent(
+        RichLinkContentView(
             modifier = modifier,
             contentTitle = stringResource(id = R.string.invalid_chat_link),
             icon = painterResource(R.drawable.ic_logo_notifications),

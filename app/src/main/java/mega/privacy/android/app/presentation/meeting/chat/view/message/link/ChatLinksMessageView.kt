@@ -86,6 +86,12 @@ fun ChatLinksMessageView(
                             ChatLinkMessageView(linkContent = linkContent)
                         }
                     }
+
+                    is FolderLinkContent -> {
+                        key(linkContent.link) {
+                            FolderLinkMessageView(linkContent = linkContent)
+                        }
+                    }
                 }
 
                 if (index != contentLinks.lastIndex) {
