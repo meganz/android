@@ -565,10 +565,14 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 }
             }
             setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-                override fun onMenuItemActionExpand(item: MenuItem): Boolean = true
+                override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                    playerServiceGateway?.setSearchMode(true)
+                    return true
+                }
 
                 override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
                     playerServiceGateway?.searchQueryUpdate(null)
+                    playerServiceGateway?.setSearchMode(false)
                     return true
                 }
             })

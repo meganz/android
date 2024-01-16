@@ -255,4 +255,10 @@ interface PlayerServiceViewModelGateway {
      * Reset retry state
      */
     fun resetRetryState()
+
+    /**
+     * Set the search mode
+     * @param value true is in search mode, otherwise is false
+     */
+    fun setSearchMode(value: Boolean)
 }
