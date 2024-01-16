@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.meeting.chat.mapper.DurationTextMapper
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
@@ -35,6 +36,8 @@ class VoiceClipMessageViewModel @Inject constructor(
     private val downloadNodesUseCase: DownloadNodesUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
     private val getCacheFileUseCase: GetCacheFileUseCase,
+    private val voiceClipPlayer: VoiceClipPlayer,
+    private val durationTextMapper: DurationTextMapper,
 ) : ViewModel() {
 
     // key: msgId, value: ui state flow
@@ -42,10 +45,18 @@ class VoiceClipMessageViewModel @Inject constructor(
         ConcurrentHashMap()
 
     /**
+     * Clear resources when view model is destroyed
+     */
+    override fun onCleared() {
+        voiceClipPlayer.releaseAll()
+        super.onCleared()
+    }
+
+    /**
      * Get the [StateFlow] for a given voice clip message which has [msgId]
      */
     fun getUiStateFlow(msgId: Long): StateFlow<VoiceClipMessageUiState> =
-        _uiStateFlowMap[msgId]
+        getMutableStateFlow(msgId)
             ?: MutableStateFlow(VoiceClipMessageUiState()).also { _uiStateFlowMap[msgId] = it }
 
     /**
@@ -53,7 +64,7 @@ class VoiceClipMessageViewModel @Inject constructor(
      */
     fun addVoiceClip(message: VoiceClipMessage, chatId: Long) = viewModelScope.launch {
 
-        _uiStateFlowMap[message.msgId]?.update {
+        getMutableStateFlow(message.msgId)?.update {
             it.copy(voiceClipMessage = message)
         }
 
@@ -63,42 +74,38 @@ class VoiceClipMessageViewModel @Inject constructor(
                     message.status == ChatMessageStatus.SENDING ||
                     message.duration == 0
         if (hasError) {
-            updateUiWithError(message.msgId)
+            updateUiToErrorState(message.msgId)
             return@launch
         }
+        runCatching {
+            val voiceClipFile: File =
+                getCacheFileUseCase(CacheFolderManager.VOICE_CLIP_FOLDER, message.name) ?: run {
+                    Timber.e("voice clip cache path is invalid for msgId(${message.msgId})")
+                    updateUiToErrorState(message.msgId)
+                    return@launch
+                }
 
-        val voiceClipFile: File =
-            getCacheFileUseCase(CacheFolderManager.VOICE_CLIP_FOLDER, message.name) ?: run {
-                Timber.e("voice clip cache path is invalid for msgId(${message.msgId})")
-                updateUiWithError(message.msgId)
+            if (isFileAlreadyDownloaded(voiceClipFile, message.size)) {
+                getMutableStateFlow(message.msgId)?.update {
+                    it.copy(
+                        loadProgress = null,
+                        timestamp = durationTextMapper(message.duration)
+                    )
+                }
                 return@launch
             }
 
-        if (isFileAlreadyDownloaded(voiceClipFile, message.size)) {
-            _uiStateFlowMap[message.msgId]?.update {
-                it.copy(
-                    loadProgress = null,
-                    timestamp = secondsToDuration(message.duration)
+            getChatFileUseCase(chatId = chatId, messageId = message.msgId)?.let { node ->
+                download(
+                    node = node,
+                    destinationPath = "${voiceClipFile.parent}${File.separator}",
+                    msgId = message.msgId
                 )
             }
-            return@launch
-        }
-
-        runCatching {
-            voiceClipFile.parent?.let { destination ->
-                getChatFileUseCase(chatId = chatId, messageId = message.msgId)?.let { node ->
-                    download(
-                        node = node,
-                        destinationPath = destination,
-                        msgId = message.msgId
-                    )
-                }
-                    ?: throw IllegalStateException("getChatFileUseCase return null for msgId(${message.msgId})")
-            }
-                ?: throw IllegalStateException("voice clip cache path is invalid for msgId(${message.msgId})")
+                ?: throw IllegalStateException("getChatFileUseCase return null for msgId(${message.msgId})")
         }.onFailure {
             Timber.e(it)
-            updateUiWithError(message.msgId)
+            updateUiToErrorState(message.msgId)
         }
     }
 
@@ -114,10 +121,10 @@ class VoiceClipMessageViewModel @Inject constructor(
             isHighPriority = true,
         )
             .onCompletion {
-                _uiStateFlowMap[msgId]?.update {
+                getMutableStateFlow(msgId)?.update {
                     it.copy(
                         loadProgress = null,
-                        timestamp = secondsToDuration(it.voiceClipMessage?.duration ?: 0),
+                        timestamp = durationTextMapper(it.voiceClipMessage?.duration ?: 0),
                     )
                 }
             }
@@ -125,15 +132,16 @@ class VoiceClipMessageViewModel @Inject constructor(
                 when (downloadEvent) {
                     is MultiTransferEvent.TransferNotStarted<*> -> {
                         Timber.d("Transfer TransferNotStarted msgId($msgId) (${downloadEvent.exception})")
-                        updateUiWithError(msgId)
+                        updateUiToErrorState(msgId)
                     }
 
                     is MultiTransferEvent.SingleTransferEvent -> {
                         with(downloadEvent.transferEvent.transfer) {
-                            Timber.d(
-                                "DDD msgId($msgId) Transfer SingleTransferEvent" +
-                                        " event($transferredBytes/$totalBytes)"
-                            )
+                            getMutableStateFlow(msgId)?.update {
+                                it.copy(
+                                    loadProgress = (transferredBytes * 100 / totalBytes).toInt()
+                                )
+                            }
                         }
                     }
 
@@ -141,14 +149,14 @@ class VoiceClipMessageViewModel @Inject constructor(
                     }
 
                     is MultiTransferEvent.InsufficientSpace -> {
-                        updateUiWithError(msgId)
+                        updateUiToErrorState(msgId)
                     }
                 }
             }
     }
 
-    private fun updateUiWithError(msgId: Long) {
-        _uiStateFlowMap[msgId]?.update {
+    private fun updateUiToErrorState(msgId: Long) {
+        getMutableStateFlow(msgId)?.update {
             it.copy(isError = true)
         }
     }
@@ -156,19 +164,108 @@ class VoiceClipMessageViewModel @Inject constructor(
     /**
      * Handle when user clicks the button in voice clip to play or pause.
      *
-     * @param msgId
+     * @param msgId of the clicked voice clip message.
      */
-    fun onPlayOrPauseClicked(msgId: Long) {
-        Timber.d("TODO onPlayOrPauseClicked msgId = $msgId")
-    }
+    fun onPlayOrPauseClicked(msgId: Long) = viewModelScope.launch {
+        runCatching {
+            if (voiceClipPlayer.isPlaying(msgId)) {
+                pauseVoiceClip(msgId)
+            } else {
+                val voiceClipFile = getVoiceClipFile(msgId) ?: run {
+                    Timber.e("voice clip cache path is invalid for msgId(${msgId})")
+                    updateUiToErrorState(msgId)
+                    return@launch
+                }
 
-    private fun secondsToDuration(seconds: Int): String {
-        val hours = (seconds / (60 * 60))
-        val minutes = (seconds % (60 * 60)) / 60
-        val sec = (seconds % (60 * 60) % 60)
-        return when {
-            hours > 0 -> "%02d:%02d:%02d".format(hours, minutes, sec)
-            else -> "%02d:%02d".format(minutes, sec)
+                pauseOngoingVoiceClip()
+
+                val currentPos = voiceClipPlayer.getCurrentPosition(msgId)
+                voiceClipPlayer.play(
+                    key = msgId,
+                    path = voiceClipFile.absolutePath,
+                    pos = currentPos
+                ).collect { state ->
+                    when (state) {
+                        is VoiceClipPlayState.Playing -> {
+                            updateUiToPlayingState(state, msgId)
+                        }
+
+                        is VoiceClipPlayState.Completed -> {
+                            updateUiToNormalState(msgId)
+                        }
+
+                        is VoiceClipPlayState.Error -> {
+                            Timber.e(" VoiceClipPlayState.Error(${state.error})")
+                            updateUiToNormalState(msgId)
+                        }
+
+                        else -> {
+                            Timber.d("VoiceClipPlayer Other state($state)")
+                        }
+                    }
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+            updateUiToErrorState(msgId)
         }
     }
+
+    private fun getVoiceClipFile(msgId: Long) =
+        getMutableStateFlow(msgId)?.value?.voiceClipMessage?.name?.let { name ->
+            getCacheFileUseCase(CacheFolderManager.VOICE_CLIP_FOLDER, name)
+        }?.takeIf {
+            it.exists()
+        }
+
+
+    private fun updateUiToPlayingState(
+        state: VoiceClipPlayState.Playing,
+        msgId: Long,
+    ) {
+        val timestamp = durationTextMapper(state.pos)
+        val playProgress =
+            getUiStateFlow(msgId).value.voiceClipMessage?.duration?.let { dur ->
+                (state.pos * 100L / dur).toInt()
+            }
+        getMutableStateFlow(msgId)?.update {
+            it.copy(
+                isPlaying = true,
+                playProgress = playProgress,
+                timestamp = timestamp,
+            )
+        }
+    }
+
+    private fun updateUiToNormalState(msgId: Long) {
+        getMutableStateFlow(msgId)?.update {
+            it.copy(
+                isPlaying = false,
+                playProgress = null,
+            )
+        }
+    }
+
+    private fun pauseOngoingVoiceClip() {
+        _uiStateFlowMap.values
+            .filter { it.value.isPlaying }
+            .map { it.value.voiceClipMessage }
+            .firstOrNull()?.let {
+                voiceClipPlayer.pause(it.msgId)
+                getMutableStateFlow(it.msgId)?.update { state ->
+                    state.copy(
+                        isPlaying = false,
+                    )
+                }
+            }
+    }
+
+    private fun pauseVoiceClip(msgId: Long) {
+        voiceClipPlayer.pause(msgId)
+        getMutableStateFlow(msgId)?.update {
+            it.copy(isPlaying = false)
+        }
+    }
+
+    private fun getMutableStateFlow(msgId: Long) = _uiStateFlowMap[msgId]
 }

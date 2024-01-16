@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageStatus
  * @property status Message status
  * @property name name of the voice clip
  * @property size size of the voice clip
- * @property duration duration of the voice clip
+ * @property duration duration of the voice clip in milliseconds
  */
 data class VoiceClipMessage(
     override val msgId: Long,

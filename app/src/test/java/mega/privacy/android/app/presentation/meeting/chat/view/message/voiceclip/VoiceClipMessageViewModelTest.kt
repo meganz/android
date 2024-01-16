@@ -9,10 +9,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.presentation.meeting.chat.mapper.DurationTextMapper
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.node.NodeId
@@ -53,7 +54,7 @@ class VoiceClipMessageViewModelTest {
         time = 1,
         status = ChatMessageStatus.SERVER_RECEIVED,
         size = 1,
-        duration = 3,
+        duration = 3000,
         userHandle = 1L,
         shouldShowAvatar = true,
         shouldShowTime = true,
@@ -62,10 +63,13 @@ class VoiceClipMessageViewModelTest {
 
     private val chatFileNode: ChatDefaultFile = mock()
     private val getChatFileUseCase: GetChatFileUseCase = mock()
+    private val voiceClipPlayer: VoiceClipPlayer = mock()
     private val cacheFile: File = mock()
     private val getCacheFileUseCase: GetCacheFileUseCase = mock()
     private val downloadNodeResultFlow: MutableSharedFlow<MultiTransferEvent> = MutableSharedFlow()
     private val downloadNodesUseCase: DownloadNodesUseCase = mock()
+    private val voiceClipPlayResultFlow: MutableSharedFlow<VoiceClipPlayState> = MutableSharedFlow()
+    private val durationTextMapper: DurationTextMapper = mock()
 
     private val cacheFileParentPath = "parent path"
     private val mockTimestamp = "00:03"
@@ -77,7 +81,7 @@ class VoiceClipMessageViewModelTest {
 
     @BeforeAll
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
+        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     @AfterAll
@@ -91,6 +95,8 @@ class VoiceClipMessageViewModelTest {
             downloadNodesUseCase,
             getChatFileUseCase,
             getCacheFileUseCase,
+            voiceClipPlayer,
+            durationTextMapper
         )
 
         whenever(getCacheFileUseCase(any(), any())).thenReturn(cacheFile)
@@ -109,14 +115,17 @@ class VoiceClipMessageViewModelTest {
             on { exists() }.thenReturn(true)
             on { length() }.thenReturn(voiceClipMessage.size)
         }
+        whenever(durationTextMapper(any())).thenReturn(mockTimestamp)
     }
 
     @BeforeEach
     fun setupUnderTest() {
         underTest = VoiceClipMessageViewModel(
-            downloadNodesUseCase,
-            getChatFileUseCase,
-            getCacheFileUseCase,
+            downloadNodesUseCase = downloadNodesUseCase,
+            getChatFileUseCase = getChatFileUseCase,
+            getCacheFileUseCase = getCacheFileUseCase,
+            voiceClipPlayer = voiceClipPlayer,
+            durationTextMapper = durationTextMapper,
         )
     }
 
@@ -169,20 +178,6 @@ class VoiceClipMessageViewModelTest {
                 assertThat(state.timestamp).isEqualTo(mockTimestamp)
             }
         }
-
-    @Test
-    fun `test that ui is updated with error if parent path of cache file is null`() = runTest {
-        cacheFile.stub {
-            on { exists() }.thenReturn(false)
-            on { parent }.thenReturn(null)
-        }
-        initUiStateFlow()
-        underTest.addVoiceClip(voiceClipMessage, chatId)
-        testScheduler.advanceUntilIdle()
-        underTest.getUiStateFlow(voiceClipMessage.msgId).test {
-            assertThat(awaitItem().isError).isTrue()
-        }
-    }
 
     @Test
     fun `test that ui is updated with error if it failed to get ChatFile node`() = runTest {
@@ -269,6 +264,95 @@ class VoiceClipMessageViewModelTest {
             }
         }
 
+    @Test
+    fun `test that voice clip is paused if it is playing and play button is clicked`() = runTest {
+        val msgId = 100L
+        whenever(voiceClipPlayer.isPlaying(msgId)).thenReturn(true)
+        initUiStateFlow()
+        testScheduler.advanceUntilIdle()
+        underTest.onPlayOrPauseClicked(msgId)
+        underTest.getUiStateFlow(msgId).test {
+            assertThat(awaitItem().isPlaying).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that voice clip message is played properly when play button is clicked`() = runTest {
+        val msgId = voiceClipMessage.msgId
+        whenever(voiceClipPlayer.isPlaying(msgId)).thenReturn(false)
+        whenever(getCacheFileUseCase(any(), any())).thenReturn(cacheFile)
+        initUiStateFlow()
+        setCacheFileExists()
+        whenever(
+            voiceClipPlayer.play(any(), any(), any())
+        ).thenReturn(voiceClipPlayResultFlow)
+        whenever(voiceClipPlayer.getCurrentPosition(msgId)).thenReturn(0)
+        underTest.addVoiceClip(voiceClipMessage, chatId)
+        testScheduler.advanceUntilIdle()
+
+        underTest.onPlayOrPauseClicked(msgId)
+
+        voiceClipPlayResultFlow.emit(VoiceClipPlayState.Prepared)
+        voiceClipPlayResultFlow.emit(VoiceClipPlayState.Playing(1))
+        underTest.getUiStateFlow(msgId).test {
+            assertThat(awaitItem().isPlaying).isTrue()
+        }
+
+        voiceClipPlayResultFlow.emit(VoiceClipPlayState.Playing(2))
+        underTest.getUiStateFlow(msgId).test {
+            assertThat(awaitItem().isPlaying).isTrue()
+        }
+
+        voiceClipPlayResultFlow.emit(VoiceClipPlayState.Completed)
+        underTest.getUiStateFlow(msgId).test {
+            assertThat(awaitItem().isPlaying).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that ui is updated to error state when voice clip cache file does not exist and play button is clicked`() =
+        runTest {
+            val msgId = voiceClipMessage.msgId
+            whenever(voiceClipPlayer.isPlaying(msgId)).thenReturn(false)
+            whenever(getCacheFileUseCase(any(), any())).thenReturn(null)
+            initUiStateFlow()
+            whenever(voiceClipPlayer.getCurrentPosition(msgId)).thenReturn(0)
+            underTest.addVoiceClip(voiceClipMessage, chatId)
+            testScheduler.advanceUntilIdle()
+
+            // action
+            underTest.onPlayOrPauseClicked(msgId)
+
+            // verify
+            underTest.getUiStateFlow(msgId).test {
+                assertThat(awaitItem().isError).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that ui is updated to error state when play throws exception and play button is clicked`() =
+        runTest {
+            val msgId = voiceClipMessage.msgId
+            whenever(voiceClipPlayer.isPlaying(msgId)).thenReturn(false)
+            whenever(getCacheFileUseCase(any(), any())).thenReturn(cacheFile)
+            initUiStateFlow()
+            setCacheFileExists()
+            whenever(
+                voiceClipPlayer.play(any(), any(), any())
+            ).thenAnswer { throw RuntimeException("voice clip play exception") }
+            whenever(voiceClipPlayer.getCurrentPosition(msgId)).thenReturn(0)
+            underTest.addVoiceClip(voiceClipMessage, chatId)
+            testScheduler.advanceUntilIdle()
+
+            // action
+            underTest.onPlayOrPauseClicked(msgId)
+
+            // verify
+            underTest.getUiStateFlow(msgId).test {
+                assertThat(awaitItem().isError).isTrue()
+            }
+        }
+
     private fun setCacheFileNotExists() {
         cacheFile.stub {
             on { exists() }.thenReturn(false)
@@ -276,6 +360,13 @@ class VoiceClipMessageViewModelTest {
         }
     }
 
+    private fun setCacheFileExists() {
+        cacheFile.stub {
+            on { exists() }.thenReturn(true)
+            on { parent }.thenReturn(cacheFileParentPath)
+            on { absolutePath }.thenReturn("absolute path")
+        }
+    }
 
     /**
      * Call the [VoiceClipMessageViewModel.getUiStateFlow] method to initialise the flow

@@ -66,35 +66,34 @@ fun CoreVoiceClipMessageView(
     isPlaying: Boolean = false,
     onPlayClicked: () -> Unit = {},
 ) {
-    ChatBubble(isMe = isMe, modifier = modifier.size(width = 209.dp, height = 56.dp)) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.BottomCenter,
+    Box(
+        modifier = modifier
+            .size(width = 209.dp, height = 56.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(color = if (isMe) MegaTheme.colors.button.primary else MegaTheme.colors.background.surface2),
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(start = 12.dp)
+                .fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(start = 12.dp)
-                    .fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                PlayButton(
-                    isMe = isMe,
-                    enabled = !isError && loadProgress == null,
-                    isPlaying = isPlaying,
-                    onPlayClicked = onPlayClicked
-                )
-                PlayProgress(
-                    isMe = isMe,
-                    progress = playProgress,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-                TimestampText(isMe = isMe, timestamp = timestamp)
-            }
-            LoadOverlay(loadProgress = loadProgress, isError = isError)
-            LoadProgress(loadProgress = loadProgress, isError = isError)
+            PlayButton(
+                isMe = isMe,
+                enabled = !isError && loadProgress == null,
+                isPlaying = isPlaying,
+                onPlayClicked = onPlayClicked
+            )
+            PlayProgress(
+                isMe = isMe,
+                progress = playProgress,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+            TimestampText(isMe = isMe, timestamp = timestamp)
         }
+        LoadOverlay(loadProgress = loadProgress, isError = isError)
+        LoadProgress(loadProgress = loadProgress, isError = isError)
     }
 }
 
@@ -103,6 +102,7 @@ private fun LoadProgress(loadProgress: Int?, isError: Boolean) {
     loadProgress?.let {
         if (!isError) {
             MegaLinearProgressIndicator(
+                progress = it / 100f,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(4.dp)
