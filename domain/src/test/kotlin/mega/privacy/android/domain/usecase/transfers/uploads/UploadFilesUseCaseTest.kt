@@ -13,7 +13,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -99,7 +98,7 @@ class UploadFilesUseCaseTest {
     @ValueSource(booleans = [true, false])
     fun `test that repository start upload is called with the proper priority`(priority: Boolean) =
         runTest {
-            underTest(listOf(file), parentFolder, null, false, priority).test {
+            underTest(listOf(file), parentId, null, priority, false).test {
 
                 verify(transferRepository).startUpload(
                     DESTINATION_PATH_FOLDER,
@@ -120,9 +119,9 @@ class UploadFilesUseCaseTest {
         appData: TransferAppData?,
     ) = runTest {
         underTest(
-            listOf(file), parentFolder, appData,
-            isSourceTemporary = false,
-            isHighPriority = false
+            listOf(file), parentId, appData,
+            isHighPriority = false,
+            isSourceTemporary = false
         ).test {
             verify(transferRepository).startUpload(
                 DESTINATION_PATH_FOLDER,
@@ -143,7 +142,7 @@ class UploadFilesUseCaseTest {
         appData: TransferAppData.ChatTransferAppData,
     ) = runTest {
         underTest(
-            listOf(file), parentFolder, appData,
+            listOf(file), parentId, appData,
             isSourceTemporary = false,
             isHighPriority = false
         ).test {
@@ -176,9 +175,9 @@ class UploadFilesUseCaseTest {
     fun `test that repository start upload is invoked for each nodeId when start upload is invoked`() =
         runTest {
             underTest(
-                fileNodes, parentFolder, null,
-                isSourceTemporary = false,
-                isHighPriority = false
+                fileNodes, parentId, null,
+                isHighPriority = false,
+                isSourceTemporary = false
             ).test {
                 fileNodes.forEach { file ->
                     verify(transferRepository).startUpload(
@@ -201,8 +200,8 @@ class UploadFilesUseCaseTest {
         runTest {
             stubDelay()
             underTest(
-                fileNodes, parentFolder, null,
-                isSourceTemporary = false, isHighPriority = false
+                fileNodes, parentId, null,
+                isHighPriority = false, isSourceTemporary = false
             ).test {
                 cancel()
                 verify(cancelCancelTokenUseCase).invoke()
@@ -215,9 +214,9 @@ class UploadFilesUseCaseTest {
         runTest {
             stubDelay()
             underTest(
-                fileNodes, parentFolder, null,
-                isSourceTemporary = false,
-                isHighPriority = false
+                fileNodes, parentId, null,
+                isHighPriority = false,
+                isSourceTemporary = false
             ).test {
                 cancel()
                 verify(invalidateCancelTokenUseCase, never()).invoke()
@@ -230,9 +229,9 @@ class UploadFilesUseCaseTest {
         runTest {
             stubDelay()
             underTest(
-                fileNodes, parentFolder, null,
-                isSourceTemporary = false,
-                isHighPriority = false
+                fileNodes, parentId, null,
+                isHighPriority = false,
+                isSourceTemporary = false
             ).test {
                 verify(cancelCancelTokenUseCase, never()).invoke()
                 cancelAndIgnoreRemainingEvents()
@@ -244,9 +243,9 @@ class UploadFilesUseCaseTest {
         runTest {
             stubSingleEvents()
             underTest(
-                fileNodes, parentFolder, null,
-                isSourceTemporary = false,
-                isHighPriority = false
+                fileNodes, parentId, null,
+                isHighPriority = false,
+                isSourceTemporary = false
             )
                 .filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
                     repeat(fileNodes.size) {
@@ -267,9 +266,9 @@ class UploadFilesUseCaseTest {
         runTest {
             stubSingleEvents()
             underTest(
-                fileNodes, parentFolder, null,
-                isSourceTemporary = false,
-                isHighPriority = false
+                fileNodes, parentId, null,
+                isHighPriority = false,
+                isSourceTemporary = false
             )
                 .filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
                     cancelAndConsumeRemainingEvents()
@@ -285,9 +284,9 @@ class UploadFilesUseCaseTest {
         runTest {
             stubSingleEvents()
             underTest(
-                fileNodes, parentFolder, null,
-                isSourceTemporary = false,
-                isHighPriority = false
+                fileNodes, parentId, null,
+                isHighPriority = false,
+                isSourceTemporary = false
             )
                 .filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
                     cancelAndConsumeRemainingEvents()
@@ -353,9 +352,6 @@ class UploadFilesUseCaseTest {
             }
         }
         private val parentId = NodeId(1L)
-        private val parentFolder = mock<TypedFolderNode> {
-            on { id }.thenReturn(parentId)
-        }
 
         private const val DESTINATION_PATH_FOLDER = "root/parent/destination"
         private const val FILE_NAME = "File"

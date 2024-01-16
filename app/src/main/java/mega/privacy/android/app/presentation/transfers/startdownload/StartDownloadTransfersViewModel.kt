@@ -33,7 +33,7 @@ import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSett
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetDownloadLocationForNodeUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,7 +44,7 @@ import javax.inject.Inject
 class StartDownloadTransfersViewModel @Inject constructor(
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase,
     private val getDownloadLocationForNodeUseCase: GetDownloadLocationForNodeUseCase,
-    private val startDownloadUseCase: StartDownloadUseCase,
+    private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase,
     private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase,
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
@@ -178,7 +178,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
             }
         }.onFailure { lastError = it }
             .getOrNull()?.let { path ->
-                startDownloadUseCase(
+                startDownloadsWithWorkerUseCase(
                     destinationPath = path,
                     nodes = nodes,
                     isHighPriority = false

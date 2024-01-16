@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.transfers
+package mega.privacy.android.domain.usecase.transfers.downloads
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -20,10 +20,6 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.IsDownloadsWorkerStartedUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -41,9 +37,9 @@ import java.util.concurrent.CancellationException
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class StartDownloadUseCaseTest {
+class StartDownloadsWithWorkerUseCaseTest {
 
-    private lateinit var underTest: StartDownloadUseCase
+    private lateinit var underTest: StartDownloadsWithWorkerUseCase
 
     private val doesPathHaveSufficientSpaceForNodesUseCase: DoesPathHaveSufficientSpaceForNodesUseCase =
         mock()
@@ -57,13 +53,13 @@ class StartDownloadUseCaseTest {
     @BeforeAll
     fun setup() {
         underTest =
-            StartDownloadUseCase(
+            StartDownloadsWithWorkerUseCase(
                 doesPathHaveSufficientSpaceForNodesUseCase = doesPathHaveSufficientSpaceForNodesUseCase,
                 downloadNodesUseCase = downloadNodesUseCase,
-                cancelCancelTokenUseCase = cancelCancelTokenUseCase,
                 fileSystemRepository = fileSystemRepository,
                 startDownloadWorkerUseCase = startDownloadWorkerUseCase,
                 isDownloadsWorkerStartedUseCase = isDownloadsWorkerStartedUseCase,
+                cancelCancelTokenUseCase = cancelCancelTokenUseCase,
             )
     }
 
@@ -77,12 +73,16 @@ class StartDownloadUseCaseTest {
             startDownloadWorkerUseCase,
             isDownloadsWorkerStartedUseCase,
         )
+        commonStub()
+    }
+
+    private suspend fun commonStub() {
         whenever(fileSystemRepository.isSDCardPath(any())).thenReturn(false)
+        whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)
     }
 
     @Test
     fun `test that file system create destination folder is launched`() = runTest {
-        whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(false)
         val nodes = nodeIds.map { mock<TypedFileNode>() }
         underTest(nodes, DESTINATION_PATH_FOLDER, false).test {
             cancelAndIgnoreRemainingEvents()
@@ -211,7 +211,6 @@ class StartDownloadUseCaseTest {
         whenever(
             downloadNodesUseCase(any(), any(), anyOrNull(), any())
         ).thenAnswer { emptyFlow<MultiTransferEvent>() }
-        whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)
         whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
         whenever(fileSystemRepository.getOrCreateSDCardCacheFolder()).thenReturn(File(cachePath))
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
@@ -228,7 +227,6 @@ class StartDownloadUseCaseTest {
         whenever(
             downloadNodesUseCase(any(), any(), anyOrNull(), any())
         ).thenAnswer { emptyFlow<MultiTransferEvent>() }
-        whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)
         whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
         whenever(fileSystemRepository.getOrCreateSDCardCacheFolder()).thenReturn(File(cachePath))
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {

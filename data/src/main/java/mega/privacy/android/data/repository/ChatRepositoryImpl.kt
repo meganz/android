@@ -1187,4 +1187,8 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getNextMessage(chatId: Long, timestamp: Long): TypedMessage? {
         throw NotImplementedError("Not implemented yet")
     }
+
+    override suspend fun getMyChatsFilesFolderId(): NodeId {
+        throw NotImplementedError("Not implemented yet")
+    }
 }

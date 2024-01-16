@@ -910,4 +910,9 @@ interface ChatRepository {
      * @return next chronological message if it exists
      */
     suspend fun getNextMessage(chatId: Long, timestamp: Long): TypedMessage?
+
+    /**
+     * Returns the folder for saving chat files in user attributes, null if it's not configured yet
+     */
+    suspend fun getMyChatsFilesFolderId(): NodeId
 }

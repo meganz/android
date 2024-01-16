@@ -12,10 +12,10 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
-import mega.privacy.android.domain.usecase.transfers.AbstractTransferNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
+import mega.privacy.android.domain.usecase.transfers.shared.AbstractTransferNodesUseCase
 import javax.inject.Inject
 
 /**

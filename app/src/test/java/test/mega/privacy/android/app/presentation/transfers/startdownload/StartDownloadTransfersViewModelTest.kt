@@ -32,7 +32,7 @@ import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSett
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetDownloadLocationForNodeUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -57,7 +57,7 @@ class StartDownloadTransfersViewModelTest {
 
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase = mock()
     private val getDownloadLocationForNodeUseCase: GetDownloadLocationForNodeUseCase = mock()
-    private val startDownloadUseCase: StartDownloadUseCase = mock()
+    private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase = mock()
     private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase = mock()
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase =
         mock()
@@ -82,7 +82,7 @@ class StartDownloadTransfersViewModelTest {
         underTest = StartDownloadTransfersViewModel(
             getOfflinePathForNodeUseCase,
             getDownloadLocationForNodeUseCase,
-            startDownloadUseCase,
+            startDownloadsWithWorkerUseCase,
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
             clearActiveTransfersIfFinishedUseCase,
@@ -99,7 +99,7 @@ class StartDownloadTransfersViewModelTest {
     fun resetMocks() {
         reset(
             getDownloadLocationForNodeUseCase,
-            startDownloadUseCase,
+            startDownloadsWithWorkerUseCase,
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
             isConnectedToInternetUseCase,
@@ -138,7 +138,7 @@ class StartDownloadTransfersViewModelTest {
             whenever(getOfflinePathForNodeUseCase(any())).thenReturn(destination)
         }
         underTest.startDownload(startEvent)
-        verify(startDownloadUseCase).invoke(nodes, destination, false)
+        verify(startDownloadsWithWorkerUseCase).invoke(nodes, destination, false)
     }
 
     @Test
@@ -297,7 +297,7 @@ class StartDownloadTransfersViewModelTest {
 
     private fun stubStartDownload(flow: Flow<MultiTransferEvent>) {
         whenever(
-            startDownloadUseCase(
+            startDownloadsWithWorkerUseCase(
                 anyOrNull(),
                 anyOrNull(),
                 anyOrNull(),

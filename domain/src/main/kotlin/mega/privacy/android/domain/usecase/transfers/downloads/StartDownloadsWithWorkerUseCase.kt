@@ -1,17 +1,9 @@
 package mega.privacy.android.domain.usecase.transfers.downloads
 
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.transformWhile
-import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -19,24 +11,26 @@ import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
+import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
 import java.io.File
 import javax.inject.Inject
-import kotlin.coroutines.cancellation.CancellationException
 
 
 /**
- * Start downloading a list of nodes to the specified path and returns a Flow to monitor the progress until the nodes are processed.
+ * Start downloading a list of nodes to the specified path and returns a Flow to monitor the progress until the nodes are scanned.
  * While the returned flow is not completed the app should be blocked to avoid other interaction with the sdk to avoid issues
  * Once the flow is completed the sdk will keep downloading and a DownloadWorker will monitor updates globally.
  * If cancelled before completion the processing of the nodes will be cancelled
  */
-class StartDownloadUseCase @Inject constructor(
+class StartDownloadsWithWorkerUseCase @Inject constructor(
     private val doesPathHaveSufficientSpaceForNodesUseCase: DoesPathHaveSufficientSpaceForNodesUseCase,
     private val downloadNodesUseCase: DownloadNodesUseCase,
-    private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
     private val isDownloadsWorkerStartedUseCase: IsDownloadsWorkerStartedUseCase,
+    cancelCancelTokenUseCase: CancelCancelTokenUseCase,
+) : AbstractStartTransfersWithWorkerUseCase(
+    cancelCancelTokenUseCase,
 ) {
     /**
      * Invoke
@@ -76,43 +70,25 @@ class StartDownloadUseCase @Inject constructor(
                 destinationPath
             }
             fileSystemRepository.createDirectory(finalDestinationPath)
-            val startDownloadFlow =
-                if (doesPathHaveSufficientSpaceForNodesUseCase(finalDestinationPath, nodes)) {
-                    downloadNodesUseCase(
-                        nodes,
-                        finalDestinationPath,
-                        appData = appData,
-                        isHighPriority = isHighPriority
-                    ).filter {
-                        it !is MultiTransferEvent.SingleTransferEvent
-                    }.transformWhile { event ->
-                        val finished = event is MultiTransferEvent.ScanningFoldersFinished
-                        //emitting a FinishProcessingTransfers can cause a terminal event in the collector (firstOrNull for instance), so we need to start the worker before emitting it
-                        if (finished) {
-                            startDownloadWorkerUseCase()
-
-                            //ensure worker has started and is listening to global events so we can finish downloadNodesUseCase
-                            isDownloadsWorkerStartedUseCase()
-                        }
-                        emit(event)
-                        return@transformWhile !finished
-                    }
-                        .cancellable()
-                        .onCompletion { error ->
-                            if (error != null) {
-                                //if the start download is canceled before finishing processing we need to cancel the processing operation
-                                withContext(NonCancellable) {
-                                    cancelCancelTokenUseCase()
-                                }
-                                if (error !is CancellationException) {
-                                    throw error
-                                }
-                            }
-                        }
-                } else {
-                    flowOf(MultiTransferEvent.InsufficientSpace)
-                }
-            emitAll(startDownloadFlow)
+            if (!doesPathHaveSufficientSpaceForNodesUseCase(finalDestinationPath, nodes)) {
+                emit(MultiTransferEvent.InsufficientSpace)
+            } else {
+                startTransfersAndWorker(
+                    doTransfers = {
+                        downloadNodesUseCase(
+                            nodes,
+                            finalDestinationPath,
+                            appData = appData,
+                            isHighPriority = isHighPriority
+                        )
+                    },
+                    startWorker = {
+                        startDownloadWorkerUseCase()
+                        //ensure worker has started and is listening to global events so we can finish downloadNodesUseCase
+                        isDownloadsWorkerStartedUseCase()
+                    },
+                )
+            }
         }
     }
 }
