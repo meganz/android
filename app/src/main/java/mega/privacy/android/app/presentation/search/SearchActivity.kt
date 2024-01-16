@@ -31,9 +31,10 @@ import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionAction
 import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameSucceeded
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -50,7 +51,6 @@ import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchResetFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchVideosFilterPressedEvent
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameSucceeded
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -301,7 +301,7 @@ class SearchActivity : AppCompatActivity() {
         } else {
             when (selectedFilter?.filter) {
                 SearchCategory.IMAGES -> SearchImageFilterPressedEvent
-                SearchCategory.DOCUMENTS -> SearchDocsFilterPressedEvent
+                SearchCategory.ALL_DOCUMENTS -> SearchDocsFilterPressedEvent
                 SearchCategory.AUDIO -> SearchAudioFilterPressedEvent
                 SearchCategory.VIDEO -> SearchVideosFilterPressedEvent
                 else -> SearchResetFilterPressedEvent

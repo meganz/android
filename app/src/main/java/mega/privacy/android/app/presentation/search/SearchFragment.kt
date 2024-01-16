@@ -82,7 +82,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDow
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import mega.privacy.android.app.utils.displayMetrics
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -91,6 +90,7 @@ import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
@@ -1191,7 +1191,7 @@ class SearchFragment : RotatableFragment() {
                         SearchAudioFilterPressedEvent
                     )
 
-                    SearchCategory.DOCUMENTS -> Analytics.tracker.trackEvent(
+                    SearchCategory.ALL_DOCUMENTS -> Analytics.tracker.trackEvent(
                         SearchDocsFilterPressedEvent
                     )
 

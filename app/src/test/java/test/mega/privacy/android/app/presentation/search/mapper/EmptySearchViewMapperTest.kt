@@ -57,7 +57,7 @@ class EmptySearchViewMapperTest {
     fun `test that when search query is null and user has selected documents then No documents message is shown to the user`() {
         val actual = underTest(
             isSearchChipEnabled = true,
-            category = SearchCategory.DOCUMENTS
+            category = SearchCategory.ALL_DOCUMENTS
         )
         Truth.assertThat(actual.second)
             .isEqualTo(context.getString(R.string.search_empty_screen_no_documents))
