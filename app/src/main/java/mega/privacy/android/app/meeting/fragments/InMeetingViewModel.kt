@@ -176,16 +176,32 @@ class InMeetingViewModel @Inject constructor(
      */
     fun onItemClick(participant: Participant) {
         onSnackbarMessageConsumed()
+
+        _pinItemEvent.value = Event(participant)
         getSession(participant.clientId)?.let {
-            if (it.hasScreenShare() && _state.value.callUIStatus == CallUIStatusType.SpeakerView && !participant.isScreenShared) {
-                _state.update { state ->
-                    state.copy(
-                        snackbarMessage = triggered(R.string.meetings_meeting_screen_main_view_participant_is_sharing_screen_warning),
-                    )
+            if (it.hasScreenShare() && _state.value.callUIStatus == CallUIStatusType.SpeakerView) {
+                if (!participant.isScreenShared) {
+                    _state.update { state ->
+                        state.copy(
+                            snackbarMessage = triggered(R.string.meetings_meeting_screen_main_view_participant_is_sharing_screen_warning),
+                        )
+                    }
                 }
+
+                Timber.d("Participant clicked: $participant")
+                sortParticipantsListForSpeakerView(participant)
             }
         }
+    }
+
+    /**
+     * Pin speaker and sort the participants list
+     *
+     * @param participant   [Participant]
+     */
+    private fun pinSpeaker(participant: Participant) {
         _pinItemEvent.value = Event(participant)
+        sortParticipantsListForSpeakerView(participant)
     }
 
     /**
@@ -1920,8 +1936,7 @@ class InMeetingViewModel @Inject constructor(
 
         participantSharingScreen?.let {
             if (_state.value.callUIStatus == CallUIStatusType.SpeakerView) {
-                _pinItemEvent.value = Event(it)
-                sortParticipantsListForSpeakerView(it)
+                pinSpeaker(it)
             }
         } ?: run {
             speakerParticipants.value = speakerParticipants.value?.map { speakerParticipant ->
@@ -1944,8 +1959,7 @@ class InMeetingViewModel @Inject constructor(
 
         participantSharingScreenForSpeaker?.let {
             if (_state.value.callUIStatus == CallUIStatusType.SpeakerView) {
-                _pinItemEvent.value = Event(it)
-                sortParticipantsListForSpeakerView(it)
+                pinSpeaker(it)
             }
         }
 
@@ -2897,6 +2911,7 @@ class InMeetingViewModel @Inject constructor(
      * @param participantAtTheBeginning [Participant] to be placed first in the carousel
      */
     private fun sortParticipantsListForSpeakerView(participantAtTheBeginning: Participant? = null) {
+        Timber.d("Sort participant list")
         participantAtTheBeginning?.apply {
             participants.value?.sortByDescending { it.peerId == peerId }
         }
