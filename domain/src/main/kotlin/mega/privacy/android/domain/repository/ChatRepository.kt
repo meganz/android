@@ -118,11 +118,8 @@ interface ChatRepository {
      * Leave chat
      *
      * @param chatId    The Chat id.
-     * @return          [ChatRequest]
      */
-    suspend fun leaveChat(
-        chatId: Long,
-    ): ChatRequest
+    suspend fun leaveChat(chatId: Long)
 
     /**
      * Update chat title.
@@ -915,4 +912,14 @@ interface ChatRepository {
      * Returns the folder for saving chat files in user attributes, null if it's not configured yet
      */
     suspend fun getMyChatsFilesFolderId(): NodeId
+
+    /**
+     * Monitor if chat is in joining state.
+     */
+    fun monitorJoiningChat(chatId: Long): Flow<Boolean>
+
+    /**
+     * Monitor if chat is in leaving state.
+     */
+    fun monitorLeavingChat(chatId: Long): Flow<Boolean>
 }

@@ -20,7 +20,6 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -88,7 +87,6 @@ import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
-import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.ChatObserverIndicator
 import mega.privacy.android.core.ui.controls.chat.ScrollToBottomFab
@@ -472,21 +470,13 @@ internal fun ChatView(
                             )
                         }
                     }
-                    if (isPreviewMode) {
-                        RaisedDefaultMegaButton(
-                            textId = R.string.action_join,
-                            onClick = {
-                                if (isAnonymousMode) {
-                                    onSetPendingJoinLink()
-                                    startLoginActivity(context, chatLink)
-                                } else {
-                                    onJoinChat()
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                        )
+                    JoinChatButton(isPreviewMode = isPreviewMode, isJoining = isJoining) {
+                        if (isAnonymousMode) {
+                            onSetPendingJoinLink()
+                            startLoginActivity(context, chatLink)
+                        } else {
+                            onJoinChat()
+                        }
                     }
                 },
                 floatingActionButton = {

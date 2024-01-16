@@ -66,12 +66,14 @@ import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorLeavingChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
+import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
@@ -220,6 +222,8 @@ internal class ChatViewModelTest {
     private val isAnonymousModeUseCase = mock<IsAnonymousModeUseCase>()
     private val closeChatPreviewUseCase: CloseChatPreviewUseCase = mock()
     private val createNewImageUriUseCase: CreateNewImageUriUseCase = mock()
+    private val monitorJoiningChatUseCase = mock<MonitorJoiningChatUseCase>()
+    private val monitorLeavingChatUseCase = mock<MonitorLeavingChatUseCase>()
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeAll
@@ -296,6 +300,8 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorParticipatingInACallInOtherChatsUseCase(any()) } doReturn emptyFlow()
         whenever(monitorAllContactParticipantsInChatUseCase(any())) doReturn emptyFlow()
         wheneverBlocking { monitorContactCacheUpdates() } doReturn emptyFlow()
+        wheneverBlocking { monitorJoiningChatUseCase(any()) } doReturn emptyFlow()
+        wheneverBlocking { monitorLeavingChatUseCase(any()) } doReturn emptyFlow()
     }
 
     private fun initTestClass() {
@@ -348,6 +354,8 @@ internal class ChatViewModelTest {
             isAnonymousModeUseCase = isAnonymousModeUseCase,
             closeChatPreviewUseCase = closeChatPreviewUseCase,
             createNewImageUriUseCase = createNewImageUriUseCase,
+            monitorJoiningChatUseCase = monitorJoiningChatUseCase,
+            monitorLeavingChatUseCase = monitorLeavingChatUseCase,
             applicationScope = CoroutineScope(testDispatcher),
         )
     }
@@ -2279,6 +2287,38 @@ internal class ChatViewModelTest {
         underTest.onSetPendingJoinLink()
         verify(chatManagement).pendingJoinLink = link
         verifyNoMoreInteractions(chatManagement)
+    }
+
+    @Test
+    fun `test that isJoining is updated`() = runTest {
+        val updatedFlow = MutableSharedFlow<Boolean>()
+        whenever(monitorJoiningChatUseCase(chatId)).thenReturn(updatedFlow)
+        initTestClass()
+        updatedFlow.emit(true)
+        advanceUntilIdle()
+        underTest.state.test {
+            assertThat(awaitItem().isJoining).isTrue()
+        }
+        updatedFlow.emit(false)
+        underTest.state.test {
+            assertThat(awaitItem().isJoining).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isLeaving is updated`() = runTest {
+        val updatedFlow = MutableSharedFlow<Boolean>()
+        whenever(monitorLeavingChatUseCase(chatId)).thenReturn(updatedFlow)
+        initTestClass()
+        updatedFlow.emit(true)
+        advanceUntilIdle()
+        underTest.state.test {
+            assertThat(awaitItem().isLeaving).isTrue()
+        }
+        updatedFlow.emit(false)
+        underTest.state.test {
+            assertThat(awaitItem().isLeaving).isFalse()
+        }
     }
 
     private fun ChatRoom.getNumberParticipants() =

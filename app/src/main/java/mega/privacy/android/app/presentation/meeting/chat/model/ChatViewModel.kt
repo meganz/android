@@ -14,6 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
@@ -55,12 +56,14 @@ import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorLeavingChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
+import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
@@ -164,6 +167,8 @@ class ChatViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val closeChatPreviewUseCase: CloseChatPreviewUseCase,
     private val createNewImageUriUseCase: CreateNewImageUriUseCase,
+    private val monitorJoiningChatUseCase: MonitorJoiningChatUseCase,
+    private val monitorLeavingChatUseCase: MonitorLeavingChatUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -184,6 +189,12 @@ class ChatViewModel @Inject constructor(
                 && ownPrivilege != ChatRoomPermission.Removed
 
     private var monitorAllContactParticipantsInChatJob: Job? = null
+    private var monitorChatRoomUpdatesJob: Job? = null
+    private var monitorHasAnyContactJob: Job? = null
+    private var monitorCallInChatJob: Job? = null
+    private var monitorParticipatingInACallInOtherChatsJob: Job? = null
+    private var monitorChatConnectionStateJob: Job? = null
+    private var monitorConnectivityJob: Job? = null
 
     init {
         checkGeolocation()
@@ -191,6 +202,9 @@ class ChatViewModel @Inject constructor(
         loadChatOrPreview()
         checkAnonymousMode()
         monitorContactCacheUpdate()
+        monitorNotificationMute()
+        monitorJoiningChat()
+        monitorLeavingChat()
     }
 
     private fun loadChatOrPreview() {
@@ -250,9 +264,28 @@ class ChatViewModel @Inject constructor(
         monitorACallInThisChat()
         monitorParticipatingInACall()
         monitorChatRoom()
-        monitorNotificationMute()
         monitorChatConnectionState()
         monitorNetworkConnectivity()
+    }
+
+    private fun monitorJoiningChat() {
+        viewModelScope.launch {
+            monitorJoiningChatUseCase(chatId)
+                .collectLatest { isJoining ->
+                    if (!isJoining) {
+                        loadChatRoom()
+                    } else {
+                        _state.update { state -> state.copy(isJoining = true) }
+                    }
+                }
+        }
+    }
+
+    private fun monitorLeavingChat() {
+        viewModelScope.launch {
+            monitorLeavingChatUseCase(chatId)
+                .collectLatest { _state.update { state -> state.copy(isLeaving = it) } }
+        }
     }
 
     private fun monitorAllContactParticipantsInChat(peerHandles: List<Long>) {
@@ -288,7 +321,8 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun monitorNetworkConnectivity() {
-        viewModelScope.launch {
+        monitorConnectivityJob?.cancel()
+        monitorConnectivityJob = viewModelScope.launch {
             monitorConnectivityUseCase()
                 .collect { networkConnected ->
                     val isChatConnected = if (networkConnected) {
@@ -311,7 +345,8 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun monitorChatConnectionState() {
-        viewModelScope.launch {
+        monitorChatConnectionStateJob?.cancel()
+        monitorChatConnectionStateJob = viewModelScope.launch {
             monitorChatConnectionStateUseCase()
                 .filter { it.chatId == chatId }
                 .collect { state ->
@@ -358,11 +393,13 @@ class ChatViewModel @Inject constructor(
                     with(chatRoom) {
                         checkCustomTitle()
                         _state.update { state ->
+                            val isJoining = false.takeIf { !isPreview } ?: state.isJoining
                             state.copy(
                                 title = title,
                                 isPrivateChat = chatRoom.isPrivateRoom,
                                 myPermission = ownPrivilege,
                                 isPreviewMode = isPreview,
+                                isJoining = isJoining,
                                 isGroup = isGroup,
                                 isOpenInvite = isOpenInvite,
                                 isActive = isActive,
@@ -434,7 +471,8 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun monitorChatRoom() {
-        viewModelScope.launch {
+        monitorChatRoomUpdatesJob?.cancel()
+        monitorChatRoomUpdatesJob = viewModelScope.launch {
             monitorChatRoomUpdates(chatId)
                 .collect { chat ->
                     with(chat) {
@@ -574,7 +612,8 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun monitorParticipatingInACall() {
-        viewModelScope.launch {
+        monitorParticipatingInACallInOtherChatsJob?.cancel()
+        monitorParticipatingInACallInOtherChatsJob = viewModelScope.launch {
             monitorParticipatingInACallInOtherChatsUseCase(chatId)
                 .catch { Timber.e(it) }
                 .collect {
@@ -585,7 +624,8 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun monitorACallInThisChat() {
-        viewModelScope.launch {
+        monitorCallInChatJob?.cancel()
+        monitorCallInChatJob = viewModelScope.launch {
             monitorCallInChatUseCase(chatId)
                 .catch { Timber.e(it) }
                 .collect {
@@ -606,7 +646,8 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun monitorHasAnyContact() {
-        viewModelScope.launch {
+        monitorHasAnyContactJob?.cancel()
+        monitorHasAnyContactJob = viewModelScope.launch {
             monitorHasAnyContactUseCase().conflate()
                 .collect { hasAnyContact ->
                     _state.update { state -> state.copy(hasAnyContact = hasAnyContact) }

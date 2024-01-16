@@ -3,13 +3,16 @@ package mega.privacy.android.data.repository
 import androidx.paging.PagingSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
@@ -133,6 +136,9 @@ internal class ChatRepositoryImpl @Inject constructor(
     private var chatRoomUpdates: HashMap<Long, Flow<ChatRoomUpdate>> = hashMapOf()
     private val chatRoomUpdatesMutex = Mutex()
     private val joiningIds = mutableSetOf<Long>()
+    private val joiningIdsFlow = MutableSharedFlow<MutableSet<Long>>()
+    private val leavingIds = mutableSetOf<Long>()
+    private val leavingIdsFlow = MutableSharedFlow<MutableSet<Long>>()
 
     override suspend fun getChatInitState(): ChatInitState = withContext(ioDispatcher) {
         chatInitStateMapper(megaChatApiGateway.initState)
@@ -480,9 +486,10 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun autojoinPublicChat(chatId: Long) = withContext(ioDispatcher) {
+    override suspend fun autojoinPublicChat(chatId: Long) = withContext(NonCancellable) {
         if (joiningIds.contains(chatId)) return@withContext
         joiningIds.add(chatId)
+        joiningIdsFlow.emit(joiningIds)
         runCatching {
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getChatRequestListener("autojoinPublicChat") {}
@@ -495,16 +502,18 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }.also {
             joiningIds.remove(chatId)
+            joiningIdsFlow.emit(joiningIds)
         }.getOrThrow()
     }
 
     override suspend fun autorejoinPublicChat(
         chatId: Long,
         publicHandle: Long,
-    ) = withContext(ioDispatcher) {
+    ) = withContext(NonCancellable) {
         if (joiningIds.contains(chatId) && joiningIds.contains(publicHandle)) return@withContext
         joiningIds.add(chatId)
         joiningIds.add(publicHandle)
+        joiningIdsFlow.emit(joiningIds)
         runCatching {
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getChatRequestListener("autorejoinPublicChat") {}
@@ -517,6 +526,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }.also {
             joiningIds.remove(chatId)
+            joiningIdsFlow.emit(joiningIds)
         }.getOrThrow()
     }
 
@@ -609,21 +619,27 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun leaveChat(
-        chatId: Long,
-    ): ChatRequest = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val callback = continuation.getChatRequestListener(
-                methodName = "leaveChat",
-                chatRequestMapper::invoke
-            )
-            megaChatApiGateway.leaveChat(
-                chatId,
-                callback
-            )
+    override suspend fun leaveChat(chatId: Long): Unit = withContext(NonCancellable) {
+        if (leavingIds.contains(chatId)) return@withContext
+        leavingIds.add(chatId)
+        leavingIdsFlow.emit(leavingIds)
+        runCatching {
+            suspendCancellableCoroutine { continuation ->
+                val callback = continuation.getChatRequestListener(
+                    methodName = "leaveChat",
+                    chatRequestMapper::invoke
+                )
+                megaChatApiGateway.leaveChat(
+                    chatId,
+                    callback
+                )
 
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
-        }
+                continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
+            }
+        }.also {
+            leavingIds.remove(chatId)
+            leavingIdsFlow.emit(leavingIds)
+        }.getOrThrow()
     }
 
     override fun monitorChatRoomUpdates(chatId: Long) = flow {
@@ -1191,4 +1207,14 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getMyChatsFilesFolderId(): NodeId {
         throw NotImplementedError("Not implemented yet")
     }
+
+    override fun monitorJoiningChat(chatId: Long) = joiningIdsFlow
+        .map { it.contains(chatId) }
+        .distinctUntilChanged()
+        .flowOn(ioDispatcher)
+
+    override fun monitorLeavingChat(chatId: Long) = leavingIdsFlow
+        .map { it.contains(chatId) }
+        .distinctUntilChanged()
+        .flowOn(ioDispatcher)
 }

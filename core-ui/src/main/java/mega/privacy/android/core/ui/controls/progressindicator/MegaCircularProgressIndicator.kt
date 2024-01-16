@@ -12,7 +12,6 @@ import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
-import mega.privacy.android.core.ui.theme.white
 
 /**
  * Wrapper for [CircularProgressIndicator] to set default parameters to better represent the project theme
@@ -21,13 +20,13 @@ import mega.privacy.android.core.ui.theme.white
 @Composable
 fun MegaCircularProgressIndicator(
     modifier: Modifier = Modifier,
-    useWhiteColor: Boolean = false,
+    useInverseColor: Boolean = false,
     strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth,
     strokeCap: StrokeCap = StrokeCap.Square,
 ) =
     CircularProgressIndicator(
         modifier = modifier,
-        color = white.takeIf { useWhiteColor }
+        color = MegaTheme.colors.icon.inverse.takeIf { useInverseColor }
             ?: MegaTheme.colors.icon.accent,
         strokeWidth = strokeWidth,
         strokeCap = strokeCap,
@@ -40,7 +39,7 @@ private fun MegaCircularProgressIndicatorPreview(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MegaCircularProgressIndicator(
-            useWhiteColor = initialValue
+            useInverseColor = initialValue
         )
     }
 }

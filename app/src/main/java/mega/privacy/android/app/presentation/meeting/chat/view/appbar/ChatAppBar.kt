@@ -244,10 +244,14 @@ private fun getSubtitle(uiState: ChatUiState) = with(uiState) {
         }
 
         participantsCount != null -> {
+            val participants =
+                if (isPreviewMode) participantsCount.toInt() - 1
+                else participantsCount.toInt()
+
             pluralStringResource(
                 id = R.plurals.subtitle_of_group_chat,
-                participantsCount.toInt(),
-                participantsCount.toInt()
+                participants,
+                participants
             )
         }
 

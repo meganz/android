@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.chat
 
-import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
@@ -17,9 +16,5 @@ class LeaveChatUseCase @Inject constructor(
      *
      * @param chatId    Chat id
      */
-    suspend operator fun invoke(
-        chatId: Long,
-    ): ChatRequest = chatRepository.leaveChat(
-        chatId,
-    )
+    suspend operator fun invoke(chatId: Long) = chatRepository.leaveChat(chatId)
 }

@@ -560,7 +560,7 @@ class ChatAppBarTest {
                 participantsCount = count.toLong()
             )
         )
-        composeTestRule.onNodeWithPlural(R.plurals.subtitle_of_group_chat, count)
+        composeTestRule.onNodeWithPlural(R.plurals.subtitle_of_group_chat, count - 1)
             .assertExists()
     }
 
