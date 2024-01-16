@@ -101,7 +101,6 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -135,7 +134,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSt
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.DeletePlaybackInformationUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
@@ -150,6 +148,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodes
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
@@ -280,6 +279,8 @@ class VideoPlayerViewModel @Inject constructor(
     internal var videoPlayType = VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG
         private set
 
+    private var isSearchMode = false
+
     private val _metadataState = MutableStateFlow(Metadata(null, null, null, ""))
     internal val metadataState: StateFlow<Metadata> = _metadataState
 
@@ -358,6 +359,10 @@ class VideoPlayerViewModel @Inject constructor(
 
     internal fun setPlayingReverted(value: Boolean) {
         isPlayingReverted = value
+    }
+
+    internal fun setSearchMode(value: Boolean) {
+        isSearchMode = value
     }
 
     internal fun isPlayingReverted() = isPlayingReverted
@@ -1371,48 +1376,51 @@ class VideoPlayerViewModel @Inject constructor(
                 index in originalItems.indices
             } ?: 0
 
+            val searchQuery = playlistSearchQuery
             val recreatedItems = items.toMutableList()
 
-            val searchQuery = playlistSearchQuery
-            if (!TextUtil.isTextEmpty(searchQuery)) {
-                filterPlaylistItems(recreatedItems, searchQuery ?: return@launch)
-                return@launch
-            }
-            for ((index, item) in recreatedItems.withIndex()) {
-                val type = when {
-                    index < playingPosition -> TYPE_PREVIOUS
-                    playingPosition == index -> TYPE_PLAYING
-                    else -> TYPE_NEXT
+            if (isSearchMode && !searchQuery.isNullOrEmpty()) {
+                filterPlaylistItems(recreatedItems, searchQuery)
+            } else {
+                for ((index, item) in recreatedItems.withIndex()) {
+                    val type = when {
+                        index < playingPosition -> TYPE_PREVIOUS
+                        playingPosition == index -> TYPE_PLAYING
+                        else -> TYPE_NEXT
+                    }
+                    recreatedItems[index] =
+                        item.finalizeItem(
+                            index = index,
+                            type = type,
+                            isSelected = item.isSelected,
+                            duration = item.duration,
+                        )
                 }
-                recreatedItems[index] =
-                    item.finalizeItem(
-                        index = index,
-                        type = type,
-                        isSelected = item.isSelected,
-                        duration = item.duration,
-                    )
-            }
-            val hasPrevious = playingPosition > 0
-            var scrollPosition = playingPosition
-            if (hasPrevious) {
-                recreatedItems[0] = recreatedItems[0].copy(headerIsVisible = true)
-            }
-            recreatedItems[playingPosition] =
-                recreatedItems[playingPosition].copy(headerIsVisible = true)
+                if (playingPosition > 0) {
+                    recreatedItems[0] = recreatedItems[0].copy(headerIsVisible = true)
+                }
+                recreatedItems[playingPosition] =
+                    recreatedItems[playingPosition].copy(headerIsVisible = true)
 
-            Timber.d("recreateAndUpdatePlaylistItems post ${recreatedItems.size} items")
-            if (!isScroll) {
-                scrollPosition = -1
-            }
-            _playlistItemsState.update {
-                it.copy(recreatedItems, scrollPosition)
+                recreatedItems
+            }.let { updatedList ->
+                Timber.d("recreateAndUpdatePlaylistItems post ${updatedList.size} items")
+                val scrollPosition = if (isScroll) {
+                    playingPosition
+                } else {
+                    -1
+                }
+                _playlistItemsState.update {
+                    it.copy(updatedList, scrollPosition)
+                }
             }
         }
     }
 
-    private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
-        if (items.isEmpty()) return
-
+    private fun filterPlaylistItems(
+        items: List<PlaylistItem>,
+        filter: String,
+    ): MutableList<PlaylistItem> {
         val filteredItems = ArrayList<PlaylistItem>()
         items.forEachIndexed { index, item ->
             if (item.nodeName.contains(filter, true)) {
@@ -1421,10 +1429,7 @@ class VideoPlayerViewModel @Inject constructor(
                 filteredItems.add(item.finalizeItem(index, TYPE_PREVIOUS))
             }
         }
-
-        _playlistItemsState.update {
-            it.copy(filteredItems, 0)
-        }
+        return filteredItems.toMutableList()
     }
 
     /**
@@ -1434,9 +1439,7 @@ class VideoPlayerViewModel @Inject constructor(
      */
     internal fun searchQueryUpdate(newText: String?) {
         playlistSearchQuery = newText
-        recreateAndUpdatePlaylistItems(
-            originalItems = _playlistItemsState.value.first
-        )
+        recreateAndUpdatePlaylistItems()
     }
 
     /**
@@ -1737,7 +1740,7 @@ class VideoPlayerViewModel @Inject constructor(
         playlistItems.indexOfFirst {
             it.nodeHandle == item.nodeHandle
         }.takeIf { index ->
-            index in _playlistItemsState.value.first.indices
+            index in playlistItems.indices
         }
 
     /**

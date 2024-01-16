@@ -996,11 +996,13 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             }
             setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
                 override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                    videoViewModel.setSearchMode(true)
                     return true
                 }
 
                 override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
                     videoViewModel.searchQueryUpdate(null)
+                    videoViewModel.setSearchMode(false)
                     return true
                 }
             })
