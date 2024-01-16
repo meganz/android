@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
@@ -22,8 +23,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.setting.BroadcastCookieSettingsSavedUseCase
-import mega.privacy.android.domain.usecase.setting.ShouldShowCookieDialogWithAdsUseCase
-import mega.privacy.android.domain.usecase.setting.ShouldShowGenericCookieDialogUseCase
+import mega.privacy.android.domain.usecase.setting.GetCookieDialogTypeUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import timber.log.Timber
@@ -33,9 +33,9 @@ import javax.inject.Inject
  * Class to handle cookie dialog.
  *
  * @property updateCookieSettingsUseCase                Use Case to update cookie settings.
+ * @property broadcastCookieSettingsSavedUseCase        Use Case to broadcast cookie settings saved.
  * @property updateCrashAndPerformanceReportersUseCase  Use Case to update crash and performance reporters.
- * @property shouldShowCookieDialogWithAdsUseCase           Use Case to check if the cookie dialog with Ads should be shown.
- * @property shouldShowGenericCookieDialogUseCase           Use Case to check if the generic cookie dialog should be shown.
+ * @property getCookieDialogTypeUseCase                 Use Case to get cookie dialog type.
  * @property applicationScope                           Scope for the Coroutine launched by the Use Case.
  * @property ioDispatcher                              Dispatcher for the Coroutine launched by the Use Case to perform background operations.
  * @property mainDispatcher                            Dispatcher for the Coroutine launched by the Use Case to perform operations on the main thread.
@@ -44,8 +44,7 @@ class CookieDialogHandler @Inject constructor(
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
     private val broadcastCookieSettingsSavedUseCase: BroadcastCookieSettingsSavedUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
-    private val shouldShowCookieDialogWithAdsUseCase: ShouldShowCookieDialogWithAdsUseCase,
-    private val shouldShowGenericCookieDialogUseCase: ShouldShowGenericCookieDialogUseCase,
+    private val getCookieDialogTypeUseCase: GetCookieDialogTypeUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
@@ -53,16 +52,15 @@ class CookieDialogHandler @Inject constructor(
 
     private var dialog: AlertDialog? = null
     private var isCookieDialogWithAds = false
+    private var getCookieDialogTypeJob: Job? = null
 
     /**
      * Show cookie dialog if needed.
      *
      * @param context   View context for the Dialog to be shown.
-     * @param recreate  Dismiss current dialog and create a new instance.
      */
     @JvmOverloads
-    fun showDialogIfNeeded(context: Context, recreate: Boolean = false) {
-        if (recreate) dialog?.dismiss()
+    fun showDialogIfNeeded(context: Context) {
 
         checkDialogSettings { state ->
             when (state) {
@@ -74,28 +72,16 @@ class CookieDialogHandler @Inject constructor(
     }
 
     private fun checkDialogSettings(action: (CookieDialogType) -> Unit) {
-        applicationScope.launch(ioDispatcher) {
+        getCookieDialogTypeJob?.cancel()
+        getCookieDialogTypeJob = applicationScope.launch(ioDispatcher) {
             runCatching {
-                val shouldShowCookieDialogWithAds = shouldShowCookieDialogWithAdsUseCase(
+                val cookieDialogType = getCookieDialogTypeUseCase(
                     AppFeatures.InAppAdvertisement,
                     ABTestFeatures.ads,
                     ABTestFeatures.adse
                 )
-                if (shouldShowCookieDialogWithAds) {
-                    withContext(mainDispatcher) {
-                        action.invoke(CookieDialogType.CookieDialogWithAds)
-                    }
-                } else {
-                    val shouldShowGenericCookieDialog = shouldShowGenericCookieDialogUseCase()
-                    if (shouldShowGenericCookieDialog) {
-                        withContext(mainDispatcher) {
-                            action.invoke(CookieDialogType.GenericCookieDialog)
-                        }
-                    } else {
-                        withContext(mainDispatcher) {
-                            action.invoke(CookieDialogType.None)
-                        }
-                    }
+                withContext(mainDispatcher) {
+                    action(cookieDialogType)
                 }
             }.onFailure {
                 Timber.e("failed to check cookie dialog settings: $it")
@@ -201,6 +187,7 @@ class CookieDialogHandler @Inject constructor(
      * Dismiss dialog when view is destroyed.
      */
     fun onDestroy() {
+        getCookieDialogTypeJob?.cancel()
         dialog?.dismiss()
         dialog = null
     }
