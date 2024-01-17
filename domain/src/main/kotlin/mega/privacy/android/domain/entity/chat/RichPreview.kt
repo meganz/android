@@ -13,12 +13,12 @@ package mega.privacy.android.domain.entity.chat
  * @property domainName Domain name from rich preview url.
  */
 data class RichPreview(
-    val title: String,
-    val description: String,
-    val image: String?,
-    val imageFormat: String?,
-    val icon: String?,
-    val iconFormat: String?,
-    val url: String,
-    val domainName: String,
-)
+    override val title: String,
+    override val description: String,
+    override val image: String?,
+    override val imageFormat: String?,
+    override val icon: String?,
+    override val iconFormat: String?,
+    override val url: String,
+    override val domainName: String,
+) : ChatRichPreviewInfo
