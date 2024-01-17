@@ -16,7 +16,7 @@ import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncGetStartedButtonEvent
 
-const val syncRoute = "sync"
+internal const val syncRoute = "sync"
 
 private const val syncEmptyRoute = "sync/empty"
 private const val syncNewFolderRoute = "sync/new-folder"

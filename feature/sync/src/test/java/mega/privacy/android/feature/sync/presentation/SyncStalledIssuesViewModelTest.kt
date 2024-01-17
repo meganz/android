@@ -15,8 +15,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
-import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
-import mega.privacy.android.feature.sync.ui.mapper.StalledIssueItemMapper
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
+import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueItemMapper
 import mega.privacy.android.feature.sync.ui.model.StalledIssueDetailedInfo
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesState

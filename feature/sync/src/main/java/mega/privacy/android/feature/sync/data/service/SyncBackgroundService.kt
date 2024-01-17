@@ -21,13 +21,13 @@ import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.IsSyncPausedByTheUserUseCase
-import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.PauseResumeSyncsBasedOnWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.PauseSyncUseCase
-import mega.privacy.android.feature.sync.domain.usecase.ResumeSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import timber.log.Timber
 import javax.inject.Inject
 

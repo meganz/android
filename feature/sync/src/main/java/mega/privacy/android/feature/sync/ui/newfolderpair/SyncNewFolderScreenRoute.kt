@@ -27,27 +27,6 @@ internal fun SyncNewFolderScreenRoute(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
-
-    var showAllFilesAccessBanner by remember {
-        mutableStateOf(!syncPermissionsManager.isManageExternalStoragePermissionGranted())
-    }
-    var showDisableBatteryOptimizationsBanner by remember {
-        mutableStateOf(
-            !showAllFilesAccessBanner && !syncPermissionsManager.isDisableBatteryOptimizationGranted()
-        )
-    }
-
-    val permissionsLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { _ ->
-        showAllFilesAccessBanner =
-            !syncPermissionsManager.isManageExternalStoragePermissionGranted()
-        showDisableBatteryOptimizationsBanner =
-            !showAllFilesAccessBanner &&
-                    !syncPermissionsManager.isDisableBatteryOptimizationGranted()
-    }
-
     SyncNewFolderScreen(
         folderPairName = state.value.folderPairName,
         selectedLocalFolder = state.value.selectedLocalFolder,

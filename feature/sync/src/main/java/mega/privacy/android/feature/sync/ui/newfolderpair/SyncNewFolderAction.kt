@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.sync.ui.newfolderpair
 
 import android.net.Uri
-import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
 internal sealed interface SyncNewFolderAction {
 

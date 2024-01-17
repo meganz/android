@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.domain.usecase.notifications.GetFeatureNotificationCountUseCase
-import mega.privacy.android.feature.sync.domain.usecase.GetStalledNotificationCountUseCase
+import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.GetStalledNotificationCountUseCase
 
 @Module
 @InstallIn(SingletonComponent::class)

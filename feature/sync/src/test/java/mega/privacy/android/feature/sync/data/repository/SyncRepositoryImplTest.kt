@@ -13,8 +13,8 @@ import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
-import mega.privacy.android.feature.sync.data.mapper.StalledIssueTypeMapper
-import mega.privacy.android.feature.sync.data.mapper.StalledIssuesMapper
+import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssueTypeMapper
+import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssuesMapper
 import mega.privacy.android.feature.sync.data.mapper.SyncStatusMapper
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import nz.mega.sdk.MegaSyncList

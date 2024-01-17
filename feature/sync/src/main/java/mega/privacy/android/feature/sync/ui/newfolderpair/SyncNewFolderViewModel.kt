@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
-import mega.privacy.android.feature.sync.domain.usecase.MonitorSelectedMegaFolderUseCase
-import mega.privacy.android.feature.sync.domain.usecase.SyncFolderPairUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import javax.inject.Inject
 
 @HiltViewModel

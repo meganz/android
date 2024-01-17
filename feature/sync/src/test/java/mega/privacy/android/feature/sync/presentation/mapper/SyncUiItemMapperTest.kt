@@ -6,7 +6,7 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
-import mega.privacy.android.feature.sync.ui.mapper.SyncUiItemMapper
+import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

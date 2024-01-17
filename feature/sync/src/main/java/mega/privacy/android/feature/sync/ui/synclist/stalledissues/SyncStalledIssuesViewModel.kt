@@ -7,13 +7,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
-import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncStalledIssuesUseCase
-import mega.privacy.android.feature.sync.ui.mapper.StalledIssueItemMapper
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
+import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueItemMapper
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -5,9 +5,8 @@ import mega.privacy.android.core.R
 import mega.privacy.android.domain.entity.node.FolderNode
 
 /**
- * Get the icon for the folder node
+ * Get the icon resource associated to the [FolderNode]
  */
-@Composable
 fun FolderNode.getIcon(): Int = when {
     isIncomingShare -> R.drawable.ic_folder_incoming
     isShared || isPendingShare -> R.drawable.ic_folder_outgoing

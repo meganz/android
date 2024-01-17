@@ -5,6 +5,7 @@ import com.google.common.truth.Truth
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
+import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueDetailInfoMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest

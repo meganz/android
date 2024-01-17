@@ -10,9 +10,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
-import mega.privacy.android.feature.sync.domain.usecase.solvedissues.MonitorSyncSolvedIssuesUseCase
-import mega.privacy.android.feature.sync.ui.mapper.ResolutionActionTypeToResolutionNameMapper
-import mega.privacy.android.feature.sync.ui.mapper.SolvedIssueItemMapper
+import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
+import mega.privacy.android.feature.sync.ui.mapper.solvedissue.SolvedIssueItemMapper
 import javax.inject.Inject
 
 @HiltViewModel

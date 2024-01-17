@@ -18,7 +18,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
-import mega.privacy.android.feature.sync.domain.usecase.SetSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerState
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerViewModel
