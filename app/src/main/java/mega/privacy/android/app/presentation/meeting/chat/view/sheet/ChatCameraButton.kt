@@ -29,6 +29,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +44,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.chat.attachpanel.ChatGalleryItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -62,6 +64,7 @@ internal const val TEST_TAG_CHAT_CAMERA_BUTTON_ICON = "chat_camera_button:icon"
 fun ChatCameraButton(
     sheetState: ModalBottomSheetState,
     modifier: Modifier = Modifier,
+    onCameraPermissionDenied: () -> Unit = {},
     onTakePicture: () -> Unit = {},
 ) {
     val context: Context = LocalContext.current
@@ -69,6 +72,7 @@ fun ChatCameraButton(
     val cameraController: LifecycleCameraController =
         remember { LifecycleCameraController(context) }
     var takePictureClicked by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     val cameraPermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -79,6 +83,10 @@ fun ChatCameraButton(
                 onTakePicture()
                 takePictureClicked = false
             }
+        } else if (takePictureClicked) {
+            coroutineScope.launch { sheetState.hide() }
+            onCameraPermissionDenied()
+            takePictureClicked = false
         }
     }
     var isFrameReady by remember { mutableStateOf(false) }

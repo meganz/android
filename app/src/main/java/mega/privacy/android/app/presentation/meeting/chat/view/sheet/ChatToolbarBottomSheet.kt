@@ -52,6 +52,7 @@ fun ChatToolbarBottomSheet(
     onPickLocation: () -> Unit,
     isLoadingGalleryFiles: Boolean,
     modifier: Modifier = Modifier,
+    onCameraPermissionDenied: () -> Unit = {},
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
 ) {
     val context = LocalContext.current
@@ -87,7 +88,8 @@ fun ChatToolbarBottomSheet(
                 .fillMaxWidth()
                 .padding(4.dp),
             sheetState = sheetState,
-            onTakePicture = onTakePicture
+            onTakePicture = onTakePicture,
+            onCameraPermissionDenied = onCameraPermissionDenied,
         )
 
         AnimatedVisibility(visible = isLoadingGalleryFiles) {
@@ -193,6 +195,7 @@ fun ChatGallery(
     sheetState: ModalBottomSheetState,
     modifier: Modifier = Modifier,
     onTakePicture: () -> Unit = {},
+    onCameraPermissionDenied: () -> Unit = {},
 ) = LazyRow(
     modifier = modifier.testTag(TEST_TAG_GALLERY_LIST),
     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -201,7 +204,8 @@ fun ChatGallery(
         ChatCameraButton(
             modifier = Modifier.size(88.dp),
             sheetState = sheetState,
-            onTakePicture = onTakePicture
+            onTakePicture = onTakePicture,
+            onCameraPermissionDenied = onCameraPermissionDenied,
         )
     }
 }

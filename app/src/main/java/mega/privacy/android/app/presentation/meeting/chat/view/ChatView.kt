@@ -11,6 +11,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -52,6 +53,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -232,11 +234,17 @@ internal fun ChatView(
         }
     val locationPermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { permissionsResult ->
-        if (permissionsResult) {
+    ) { isGranted ->
+        if (isGranted) {
             openLocationPicker(context, locationPickerLauncher)
         } else {
-            //TODO show snackbar when string is approved by content team
+            coroutineScope.launch { toolbarModalSheetState.hide() }
+            showPermissionNotAllowedSnackbar(
+                context,
+                coroutineScope,
+                snackBarHostState,
+                R.string.chat_attach_location_deny_permission
+            )
         }
     }
     val scrollState = rememberLazyListState()
@@ -277,15 +285,12 @@ internal fun ChatView(
             val isStarted = uiState.callInThisChat?.status?.isStarted == true
             onStartOrJoinMeeting(isStarted)
         } else {
-            coroutineScope.launch {
-                val result = snackBarHostState.showSnackbar(
-                    context.getString(R.string.allow_acces_calls_subtitle_microphone),
-                    context.getString(R.string.general_allow),
-                )
-                if (result == SnackbarResult.ActionPerformed) {
-                    context.navigateToAppSettings()
-                }
-            }
+            showPermissionNotAllowedSnackbar(
+                context,
+                coroutineScope,
+                snackBarHostState,
+                R.string.allow_acces_calls_subtitle_microphone
+            )
         }
     }
 
@@ -368,7 +373,15 @@ internal fun ChatView(
                             }
                         },
                         isLoadingGalleryFiles = isLoadingGalleryFiles,
-                        sheetState = toolbarModalSheetState
+                        sheetState = toolbarModalSheetState,
+                        onCameraPermissionDenied = {
+                            showPermissionNotAllowedSnackbar(
+                                context,
+                                coroutineScope,
+                                snackBarHostState,
+                                R.string.chat_attach_pick_from_camera_deny_permission
+                            )
+                        },
                     )
                 }
             },
@@ -689,6 +702,23 @@ private fun checkLocationPicker(
 
         else -> {
             onPickLocation()
+        }
+    }
+}
+
+private fun showPermissionNotAllowedSnackbar(
+    context: Context,
+    coroutineScope: CoroutineScope,
+    snackBarHostState: SnackbarHostState,
+    @StringRes permissionStringId: Int,
+) {
+    coroutineScope.launch {
+        val result = snackBarHostState.showSnackbar(
+            context.getString(permissionStringId),
+            context.getString(R.string.general_allow),
+        )
+        if (result == SnackbarResult.ActionPerformed) {
+            context.navigateToAppSettings()
         }
     }
 }
