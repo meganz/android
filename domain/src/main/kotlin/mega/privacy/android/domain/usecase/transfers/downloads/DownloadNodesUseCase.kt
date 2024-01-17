@@ -39,7 +39,7 @@ class DownloadNodesUseCase @Inject constructor(
     /**
      * Invoke
      * @param nodes The desired nodes to download
-     * @param destinationPath Full destination path of the node, including file name if it's a file node. If this path does not exist it will try to create it
+     * @param destinationPath Full path to the destination folder of [nodes]. If this path does not exist it will try to create it.
      * @param appData Custom app data to save in the MegaTransfer object.
      * @param isHighPriority Puts the transfer on top of the download queue.
      *

@@ -7,9 +7,8 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
-import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
+import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
-import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -21,14 +20,13 @@ import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfe
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 
 /**
- * Worker that will monitor current active downloads transfers while there are some.
- * This should be used once the downloads are actually started, it won't start any download.
+ * Worker that will monitor current active chat upload transfers while there are some.
+ * This should be used once the uploads are actually started, it won't start any upload.
  */
 @HiltWorker
-class DownloadsWorker @AssistedInject constructor(
+class ChatUploadsWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -42,13 +40,11 @@ class DownloadsWorker @AssistedInject constructor(
     areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase,
     correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
-    private val downloadNotificationMapper: DownloadNotificationMapper,
-    private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
-    private val handleSDCardEventUseCase: HandleSDCardEventUseCase,
+    private val chatUploadNotificationMapper: ChatUploadNotificationMapper,
 ) : AbstractTransfersWorker(
     context,
     workerParams,
-    TransferType.DOWNLOAD,
+    TransferType.CHAT_UPLOAD,
     ioDispatcher,
     monitorTransferEventsUseCase,
     addOrUpdateActiveTransferUseCase,
@@ -61,29 +57,23 @@ class DownloadsWorker @AssistedInject constructor(
     correctActiveTransfersUseCase,
     clearActiveTransfersIfFinishedUseCase,
 ) {
-
-    override val finalNotificationId = DOWNLOAD_NOTIFICATION_ID
-    override val updateNotificationId = NOTIFICATION_DOWNLOAD_FINAL
+    override val updateNotificationId = NOTIFICATION_CHAT_UPLOAD
 
     override suspend fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
-    ) = downloadNotificationMapper(activeTransferTotals, paused)
-
-    override suspend fun createFinishNotification(activeTransferTotals: ActiveTransferTotals) =
-        transfersFinishedNotificationMapper(activeTransferTotals)
+    ) = chatUploadNotificationMapper(activeTransferTotals, null, paused)
 
     override suspend fun onTransferEventReceived(event: TransferEvent) {
-        handleSDCardEventUseCase(event)
+        // call the use case to send the node to the chat when upload is finished in AND-17905
     }
 
     companion object {
         /**
          * Tag for enqueue the worker to work manager
          */
-        const val SINGLE_DOWNLOAD_TAG = "MEGA_DOWNLOAD_TAG"
-        private const val DOWNLOAD_NOTIFICATION_ID = 2
-        private const val NOTIFICATION_DOWNLOAD_FINAL = 4
+        const val SINGLE_CHAT_UPLOAD_TAG = "MEGA_CHAT_UPLOAD_TAG"
+        private const val NOTIFICATION_CHAT_UPLOAD = 15
     }
 }
 

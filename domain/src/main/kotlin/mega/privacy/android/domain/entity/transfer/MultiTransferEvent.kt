@@ -20,7 +20,7 @@ sealed interface MultiTransferEvent {
      * Wraps a [TransferEvent] for a single node event
      * @param transferEvent wrapped [TransferEvent]
      * @param totalBytesTransferred the total amount of bytes already transferred in all involved transfers.
-     * @param totalBytesToTransfer the total amount of bytes to be transferred in all involved transfers. May be inaccurate as some nodes may not have been processed yet
+     * @param totalBytesToTransfer the total amount of bytes to be transferred in all involved transfers. May be inaccurate since some nodes may not have been processed yet
      */
     data class SingleTransferEvent(
         val transferEvent: TransferEvent,
@@ -47,9 +47,9 @@ sealed interface MultiTransferEvent {
         }
 
         /**
-         * Current progress of the initiated transfer in [0,100] range. May be inaccurate as some nodes may not have been processed yet
+         * Current overall progress of all the initiated transfers in [0,100] range. May be inaccurate since some nodes may not have been processed yet, and therefore, totalBytesToTransfer could be inaccurate.
          */
-        val progress =
+        val overallProgress =
             if (totalBytesToTransfer == 0L) {
                 0
             } else {

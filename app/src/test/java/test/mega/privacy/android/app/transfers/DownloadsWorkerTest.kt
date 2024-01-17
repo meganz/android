@@ -26,6 +26,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
+import mega.privacy.android.data.worker.AbstractTransfersWorker
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -105,7 +106,8 @@ class DownloadsWorkerTest {
                 workExecutor,
                 WorkerFactory.getDefaultWorkerFactory(),
                 workProgressUpdater,
-                WorkForegroundUpdater(workDatabase,
+                WorkForegroundUpdater(
+                    workDatabase,
                     { _, _ -> }, workExecutor
                 )
             ),
@@ -269,7 +271,7 @@ class DownloadsWorkerTest {
         whenever(transferTotal.progressPercent).thenReturn(expectedProgress)
         commonStub(transferTotals = listOf(transferTotal))
         underTest.doWork()
-        val expectedData = workDataOf(DownloadsWorker.Progress to expectedProgress)
+        val expectedData = workDataOf(AbstractTransfersWorker.PROGRESS to expectedProgress)
         verify(workProgressUpdater).updateProgress(eq(context), any(), eq(expectedData))
     }
 

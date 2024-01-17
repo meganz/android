@@ -284,7 +284,7 @@ interface TransferRepository {
      * Start downloading a node to desired destination and returns a flow to expose download progress
      *
      * @param node              The node we want to download, it can be a folder
-     * @param localPath         Full destination path of the node, including file name if it's a file node. All nested folders must exist.
+     * @param localPath         Full path to the destination folder of [node]. If this path does not exist it will try to create it.
      * @param appData           Custom app data to save in the MegaTransfer object.
      * @param shouldStartFirst  Puts the transfer on top of the download queue.
      */
