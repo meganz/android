@@ -1,21 +1,21 @@
 package mega.privacy.android.domain.usecase.chat.message
 
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import javax.inject.Inject
 
 internal class CreateContactAttachmentMessageUseCase @Inject constructor() :
     CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageRequest) = with(request) {
+    override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         ContactAttachmentMessage(
-            msgId = message.msgId,
-            time = message.timestamp,
+            msgId = msgId,
+            time = timestamp,
             isMine = isMine,
-            userHandle = message.userHandle,
-            contactEmail = message.userEmails.firstOrNull().orEmpty(),
-            contactUserName = message.userNames.firstOrNull().orEmpty(),
-            contactHandle = message.userHandles.firstOrNull() ?: -1,
+            userHandle = userHandle,
+            contactEmail = userEmails.firstOrNull().orEmpty(),
+            contactUserName = userNames.firstOrNull().orEmpty(),
+            contactHandle = userHandles.firstOrNull() ?: -1,
             shouldShowAvatar = shouldShowAvatar,
             shouldShowTime = shouldShowTime,
             shouldShowDate = shouldShowDate,

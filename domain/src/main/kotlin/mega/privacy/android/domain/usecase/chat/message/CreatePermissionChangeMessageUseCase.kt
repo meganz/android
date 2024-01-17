@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.chat.message
 
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.management.PermissionChangeMessage
 import javax.inject.Inject
 
@@ -8,14 +8,14 @@ import javax.inject.Inject
 internal class CreatePermissionChangeMessageUseCase @Inject constructor() :
     CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageRequest) = with(request) {
+    override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         PermissionChangeMessage(
-            msgId = message.msgId,
-            time = message.timestamp,
+            msgId = msgId,
+            time = timestamp,
             isMine = isMine,
-            userHandle = message.userHandle,
-            privilege = message.privilege,
-            handleOfAction = message.handleOfAction,
+            userHandle = userHandle,
+            privilege = privilege,
+            handleOfAction = handleOfAction,
             shouldShowAvatar = shouldShowAvatar,
             shouldShowTime = shouldShowTime,
             shouldShowDate = shouldShowDate,

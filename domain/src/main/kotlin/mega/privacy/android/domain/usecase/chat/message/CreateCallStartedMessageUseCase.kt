@@ -1,18 +1,18 @@
 package mega.privacy.android.domain.usecase.chat.message
 
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.management.CallStartedMessage
 import javax.inject.Inject
 
 internal class CreateCallStartedMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageRequest) =
+    override fun invoke(request: CreateTypedMessageInfo) =
         with(request) {
             CallStartedMessage(
-                msgId = message.msgId,
-                time = message.timestamp,
+                msgId = msgId,
+                time = timestamp,
                 isMine = isMine,
-                userHandle = message.userHandle,
+                userHandle = userHandle,
                 shouldShowAvatar = shouldShowAvatar,
                 shouldShowTime = shouldShowTime,
                 shouldShowDate = shouldShowDate,

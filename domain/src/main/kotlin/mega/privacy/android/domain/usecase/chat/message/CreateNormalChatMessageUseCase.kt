@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.chat.message
 
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
@@ -15,32 +15,32 @@ class CreateNormalChatMessageUseCase @Inject constructor(
     private val getLinkTypesUseCase: GetLinkTypesUseCase,
 ) : CreateTypedMessageUseCase {
     //To be implemented the different type of normal messages. Check [NormalMessage].
-    override fun invoke(request: CreateTypedMessageRequest): NormalMessage {
+    override fun invoke(request: CreateTypedMessageInfo): NormalMessage {
         with(request) {
-            val allLinks = getLinkTypesUseCase(message.content.orEmpty())
+            val allLinks = getLinkTypesUseCase(content.orEmpty())
             val hasSupportedLink = allLinks.any { it.type in supportedTypes }
             return when {
                 hasSupportedLink ->
                     TextLinkMessage(
-                        msgId = message.msgId,
-                        time = message.timestamp,
+                        msgId = msgId,
+                        time = timestamp,
                         isMine = isMine,
-                        userHandle = message.userHandle,
+                        userHandle = userHandle,
                         links = allLinks,
-                        content = message.content.orEmpty(),
-                        tempId = message.tempId,
+                        content = content.orEmpty(),
+                        tempId = tempId,
                         shouldShowAvatar = shouldShowAvatar,
                         shouldShowTime = shouldShowTime,
                         shouldShowDate = shouldShowDate,
                     )
 
                 else -> TextMessage(
-                    msgId = message.msgId,
-                    time = message.timestamp,
+                    msgId = msgId,
+                    time = timestamp,
                     isMine = isMine,
-                    userHandle = message.userHandle,
-                    tempId = message.tempId,
-                    content = message.content,
+                    userHandle = userHandle,
+                    tempId = tempId,
+                    content = content,
                     hasOtherLink = allLinks.any { it.type !in supportedTypes },
                     shouldShowAvatar = shouldShowAvatar,
                     shouldShowTime = shouldShowTime,

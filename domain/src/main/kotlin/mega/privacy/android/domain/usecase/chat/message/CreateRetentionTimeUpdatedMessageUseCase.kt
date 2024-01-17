@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.chat.message
 
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.management.RetentionTimeUpdatedMessage
 import javax.inject.Inject
 
@@ -8,13 +8,13 @@ import javax.inject.Inject
 internal class CreateRetentionTimeUpdatedMessageUseCase @Inject constructor() :
     CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageRequest) = with(request) {
+    override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         RetentionTimeUpdatedMessage(
-            msgId = message.msgId,
-            time = message.timestamp,
+            msgId = msgId,
+            time = timestamp,
             isMine = isMine,
-            userHandle = message.userHandle,
-            retentionTime = message.retentionTime,
+            userHandle = userHandle,
+            retentionTime = retentionTime,
             shouldShowAvatar = shouldShowAvatar,
             shouldShowTime = shouldShowTime,
             shouldShowDate = shouldShowDate,

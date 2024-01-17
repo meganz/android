@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.chat.message
 
-import mega.privacy.android.domain.entity.chat.ChatMessage
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
@@ -12,10 +11,9 @@ interface CreateTypedMessageUseCase {
     /**
      * Invoke
      *
-     * @param message [ChatMessage]
-     * @param isMine True if the message is mine.
+     * @param request [CreateTypedMessageInfo]
      * @return [TypedMessage]
      */
-    operator fun invoke(request: CreateTypedMessageRequest): TypedMessage
+    operator fun invoke(request: CreateTypedMessageInfo): TypedMessage
 }
 

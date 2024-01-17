@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.entity.chat.message.request
 
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.ChatMessageInfo
+import mega.privacy.android.domain.entity.node.Node
 
 /**
  * Create typed message request
@@ -13,8 +15,15 @@ import mega.privacy.android.domain.entity.chat.ChatMessage
  */
 data class CreateTypedMessageRequest(
     val message: ChatMessage,
-    val isMine: Boolean,
-    val shouldShowAvatar: Boolean,
-    val shouldShowTime: Boolean,
-    val shouldShowDate: Boolean,
-)
+    override val isMine: Boolean,
+    override val shouldShowAvatar: Boolean,
+    override val shouldShowTime: Boolean,
+    override val shouldShowDate: Boolean,
+) : ChatMessageInfo by message, CreateTypedMessageInfo {
+    override val metaType = message.containsMeta?.type
+    override val textMessage = message.containsMeta?.textMessage
+    override val richPreview = message.containsMeta?.richPreview
+    override val geolocation = message.containsMeta?.geolocation
+    override val giphy = message.containsMeta?.giphy
+    override val nodeList: List<Node> = message.nodeList
+}

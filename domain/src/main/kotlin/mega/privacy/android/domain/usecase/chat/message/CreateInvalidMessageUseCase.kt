@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.chat.message
 
 import mega.privacy.android.domain.entity.chat.ChatMessageCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.SignatureInvalidMessage
@@ -14,7 +14,7 @@ import javax.inject.Inject
  */
 class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageRequest) =
+    override fun invoke(request: CreateTypedMessageInfo) =
         with(request) {
             val constructor: (
                 Long,
@@ -25,15 +25,15 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
                 Boolean,
                 Boolean,
             ) -> InvalidMessage = when {
-                message.type == ChatMessageType.INVALID -> {
+                type == ChatMessageType.INVALID -> {
                     ::UnrecognizableInvalidMessage
                 }
 
-                message.code == ChatMessageCode.INVALID_FORMAT -> {
+                code == ChatMessageCode.INVALID_FORMAT -> {
                     ::FormatInvalidMessage
                 }
 
-                message.code == ChatMessageCode.INVALID_SIGNATURE -> {
+                code == ChatMessageCode.INVALID_SIGNATURE -> {
                     ::SignatureInvalidMessage
                 }
 
@@ -43,15 +43,13 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
             }
 
             constructor(
-                message.msgId,
-                message.timestamp,
+                msgId,
+                timestamp,
                 isMine,
-                message.userHandle,
+                userHandle,
                 shouldShowAvatar,
                 shouldShowTime,
                 shouldShowDate,
             )
         }
-
-
 }
