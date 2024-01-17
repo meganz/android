@@ -29,6 +29,7 @@ import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -93,6 +94,11 @@ class FileBrowserComposeFragment : Fragment() {
     private var actionMode: ActionMode? = null
 
     /**
+     * Interface that notifies the attached Activity to execute specific functions
+     */
+    private var fileBrowserActionListener: FileBrowserActionListener? = null
+
+    /**
      * Application Theme Mode
      */
     @Inject
@@ -120,6 +126,7 @@ class FileBrowserComposeFragment : Fragment() {
         Timber.d("onAttach")
         super.onAttach(context)
 
+        fileBrowserActionListener = requireActivity() as FileBrowserActionListener
         fileBackupManager = FileBackupManager(
             activity = requireActivity(),
             actionBackupListener = object : ActionBackupListener {
@@ -191,7 +198,7 @@ class FileBrowserComposeFragment : Fragment() {
                         },
                         onEnterMediaDiscoveryClick = {
                             disableSelectMode()
-                            showMediaDiscovery(
+                            fileBrowserActionListener?.showMediaDiscoveryFromCloudDrive(
                                 mediaHandle = uiState.fileBrowserHandle,
                                 isAccessedByIconClick = true,
                             )
@@ -217,9 +224,15 @@ class FileBrowserComposeFragment : Fragment() {
                     fileCount = uiState.selectedFileNodes,
                     folderCount = uiState.selectedFolderNodes
                 )
-                itemClickedEvenReceived(uiState.currentFileNode)
+                onItemClick(uiState.currentFileNode)
                 ShowMediaDiscovery(uiState.showMediaDiscoveryEvent) {
                     fileBrowserViewModel.consumeShowMediaDiscoveryEvent()
+                }
+                UpdateToolbarTitle(uiState.updateToolbarTitleEvent) {
+                    fileBrowserViewModel.consumeUpdateToolbarTitleEvent()
+                }
+                ExitFileBrowser(uiState.exitFileBrowserEvent) {
+                    fileBrowserViewModel.consumeExitFileBrowserEvent()
                 }
             }
         }
@@ -235,7 +248,7 @@ class FileBrowserComposeFragment : Fragment() {
     }
 
     /**
-     * A Composable that shows the Media Discovery
+     * A Composable [EventEffect] to show the Media Discovery
      *
      * @param event The State Event
      * @param onConsumeEvent Executes specific action if [event] has been consumed
@@ -249,7 +262,7 @@ class FileBrowserComposeFragment : Fragment() {
             event = event,
             onConsumed = onConsumeEvent,
             action = { mediaHandle ->
-                showMediaDiscovery(
+                fileBrowserActionListener?.showMediaDiscoveryFromCloudDrive(
                     mediaHandle = mediaHandle,
                     isAccessedByIconClick = false,
                 )
@@ -259,16 +272,54 @@ class FileBrowserComposeFragment : Fragment() {
     }
 
     /**
+     * A Composable [EventEffect] to refresh the Toolbar Title
+     *
+     * @param event The State Event
+     * @param onConsumeEvent Executes specific action if [event] has been consumed
+     */
+    @Composable
+    private fun UpdateToolbarTitle(
+        event: StateEvent,
+        onConsumeEvent: () -> Unit,
+    ) {
+        EventEffect(
+            event = event,
+            onConsumed = onConsumeEvent,
+            action = {
+                fileBrowserActionListener?.updateCloudDriveToolbarTitle(invalidateOptionsMenu = true)
+            },
+        )
+    }
+
+    /**
+     * A Composable [EventEffect] to exit the Cloud Drive
+     *
+     * @param event The State Event
+     * @param onConsumeEvent Executes specific action if [event] has been consumed
+     */
+    @Composable
+    private fun ExitFileBrowser(
+        event: StateEvent,
+        onConsumeEvent: () -> Unit,
+    ) {
+        EventEffect(
+            event = event,
+            onConsumed = onConsumeEvent,
+            action = { fileBrowserActionListener?.exitCloudDrive() },
+        )
+    }
+
+    /**
      * On Item click event received from [FileBrowserViewModel]
      *
      * @param currentFileNode [FileNode]
      */
-    private fun itemClickedEvenReceived(currentFileNode: FileNode?) {
+    private fun onItemClick(currentFileNode: FileNode?) {
         currentFileNode?.let {
             openFile(fileNode = it)
             fileBrowserViewModel.onItemPerformedClicked()
         } ?: run {
-            (activity as? ManagerActivity)?.setToolbarTitle()
+            fileBrowserActionListener?.updateCloudDriveToolbarTitle(invalidateOptionsMenu = false)
         }
     }
 
@@ -314,7 +365,7 @@ class FileBrowserComposeFragment : Fragment() {
 
         viewLifecycleOwner.collectFlow(fileBrowserViewModel.state.map { it.nodesList.isEmpty() }
             .distinctUntilChanged()) {
-            setupToolbar()
+            fileBrowserActionListener?.updateCloudDriveToolbarTitle(invalidateOptionsMenu = true)
         }
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
@@ -343,37 +394,6 @@ class FileBrowserComposeFragment : Fragment() {
                     R.drawable.ic_zero_portrait_empty_folder
                 }, R.string.file_browser_empty_folder_new
             )
-        }
-    }
-
-    /**
-     * Establishes the Toolbar
-     */
-    private fun setupToolbar() {
-        (requireActivity() as ManagerActivity).run {
-            this.setToolbarTitle()
-            this.invalidateOptionsMenu()
-        }
-    }
-
-    /**
-     * On back pressed from ManagerActivity
-     */
-    fun onBackPressed(): Int {
-        return with(requireActivity() as ManagerActivity) {
-            if (comesFromNotifications && comesFromNotificationHandle == fileBrowserViewModel.getSafeBrowserParentHandle()) {
-                restoreFileBrowserAfterComingFromNotification()
-                2
-            } else {
-                fileBrowserViewModel.state.value.parentHandle?.let {
-                    fileBrowserViewModel.performBackNavigation()
-                    invalidateOptionsMenu()
-                    setToolbarTitle()
-                    2
-                } ?: run {
-                    0
-                }
-            }
         }
     }
 
@@ -547,20 +567,6 @@ class FileBrowserComposeFragment : Fragment() {
                 }
             }
         }
-    }
-
-    /**
-     * Notifies [ManagerActivity] to open the Media Discovery
-     *
-     * @param mediaHandle The Folder Handle that contains the Media to be displayed on that page
-     * @param isAccessedByIconClick True if Media Discovery is accessed by clicking the Media
-     * Discovery Icon
-     */
-    private fun showMediaDiscovery(mediaHandle: Long, isAccessedByIconClick: Boolean) {
-        (requireActivity() as? ManagerActivity)?.showMediaDiscovery(
-            mediaHandle = mediaHandle,
-            isAccessedByIconClick = isAccessedByIconClick,
-        )
     }
 
     /**

@@ -135,7 +135,7 @@ class MediaDiscoveryFragment : Fragment() {
     private fun onSwitchListView() {
         lifecycleScope.launch {
             mediaDiscoveryViewModel.setListViewTypeClicked()
-            managerActivity?.exitMediaDiscovery(performBackBehavior = false)
+            managerActivity?.handleCloudDriveBackNavigation(performBackBehavior = false)
         }
     }
 

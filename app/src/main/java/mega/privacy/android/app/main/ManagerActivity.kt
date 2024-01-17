@@ -166,6 +166,7 @@ import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialog
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
 import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
+import mega.privacy.android.app.presentation.clouddrive.FileBrowserActionListener
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserComposeFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
@@ -350,7 +351,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
     ChatManagementCallback, ActionNodeCallback, SnackbarShower,
     MeetingBottomSheetDialogActionListener, NotificationNavigationHandler,
-    ParentNodeManager, CameraPermissionManager, NavigationDrawerManager {
+    ParentNodeManager, CameraPermissionManager, NavigationDrawerManager, FileBrowserActionListener {
     /**
      * The cause bitmap of elevating the app bar
      */
@@ -2751,6 +2752,23 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         searchViewModel.cancelSearch()
     }
 
+    override fun exitCloudDrive() = performOnBack()
+
+    override fun updateCloudDriveToolbarTitle(invalidateOptionsMenu: Boolean) {
+        if (invalidateOptionsMenu) {
+            invalidateOptionsMenu()
+        }
+        setToolbarTitle()
+    }
+
+    override fun showMediaDiscoveryFromCloudDrive(
+        mediaHandle: Long,
+        isAccessedByIconClick: Boolean,
+    ) = showMediaDiscovery(
+        mediaHandle = mediaHandle,
+        isAccessedByIconClick = isAccessedByIconClick,
+    )
+
     /**
      * Displays the Media Discovery
      *
@@ -2758,7 +2776,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param isAccessedByIconClick True if Media Discovery is accessed by clicking the Media
      * Discovery Icon
      */
-    fun showMediaDiscovery(mediaHandle: Long, isAccessedByIconClick: Boolean) {
+    private fun showMediaDiscovery(mediaHandle: Long, isAccessedByIconClick: Boolean) {
         // Remove the existing Media Discovery View first
         mediaDiscoveryFragment?.let { removeFragment(it) }
         replaceFragment(
@@ -4644,14 +4662,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 } else {
                     if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-                        if (mediaDiscoveryFragment != null) {
-                            exitMediaDiscovery(performBackBehavior = true)
-                        } else {
-                            //Cloud Drive
-                            if (isCloudAdded) {
-                                fileBrowserComposeFragment?.onBackPressed()
-                            }
-                        }
+                        handleCloudDriveBackNavigation(performBackBehavior = true)
                     } else if (drawerItem == DrawerItem.SYNC || drawerItem == DrawerItem.DEVICE_CENTER) {
                         onBackPressedDispatcher.onBackPressed()
                     } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
@@ -4924,13 +4935,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         }
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
-            if (mediaDiscoveryFragment != null) {
-                exitMediaDiscovery(performBackBehavior = true)
-            } else {
-                if (!isCloudAdded || fileBrowserComposeFragment?.onBackPressed() == 0) {
-                    performOnBack()
-                }
-            }
+            handleCloudDriveBackNavigation(performBackBehavior = true)
         } else if (drawerItem == DrawerItem.SYNC) {
             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
         } else if (drawerItem == DrawerItem.DEVICE_CENTER) {
@@ -4990,17 +4995,38 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
-     * Leaves the Media Discovery page
+     * Handles Back Navigation logic for when the User is in Cloud Drive or Media Discovery
      *
-     * @param performBackBehavior If true, a Back Navigation is performed to go back to the
-     * previous Node
+     * @param performBackBehavior If true, a Back Navigation is performed in Cloud Drive
      */
-    fun exitMediaDiscovery(performBackBehavior: Boolean) {
-        removeFragment(mediaDiscoveryFragment)
-        if (performBackBehavior) {
+    fun handleCloudDriveBackNavigation(performBackBehavior: Boolean) {
+        mediaDiscoveryFragment?.let {
+            // Exits Media Discovery and goes back to Cloud Drive
+            removeFragment(it)
+            if (performBackBehavior) {
+                checkCloudDriveAccessFromNotification()
+            }
+            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+        } ?: run {
+            // User is currently in Cloud Drive
+            checkCloudDriveAccessFromNotification()
+        }
+    }
+
+    /**
+     * Checks if Cloud Drive was accessed from a Notification and executes specific logic
+     */
+    private fun checkCloudDriveAccessFromNotification() {
+        if (comesFromNotifications && comesFromNotificationHandle ==
+            fileBrowserViewModel.getSafeBrowserParentHandle()
+        ) {
+            // This is called when the User accesses this page through a
+            // Notification click
+            restoreFileBrowserAfterComingFromNotification()
+        } else {
+            // Otherwise, simply perform a regular Back event in Cloud Drive
             fileBrowserViewModel.performBackNavigation()
         }
-        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
     }
 
     private fun onBackPressedInSharedItemsDrawerItem() {
@@ -5039,7 +5065,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Closes the app if the current DrawerItem is the same as the preferred one.
      * If not, sets the current DrawerItem as the preferred one.
      */
-    private fun performOnBack() {
+    fun performOnBack() {
         val startItem: Int = getStartBottomNavigationItem()
         if (drawerItem?.let { shouldCloseApp(startItem, it) } == true) {
             handleSuperBackPressed()

@@ -313,15 +313,20 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
-     * Handles Back Navigation events
+     * Performs specific actions for Back Navigation events
      */
     fun performBackNavigation() {
         _state.update {
             it.copy(showMediaDiscoveryIcon = false)
         }
-        _state.value.parentHandle?.let {
-            setBrowserParentHandle(it)
+        _state.value.parentHandle?.let { parentHandle ->
+            setBrowserParentHandle(parentHandle)
             handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
+            // Update the Toolbar Title
+            _state.update { it.copy(updateToolbarTitleEvent = triggered) }
+        } ?: run {
+            // Exit File Browser if there is nothing left in the Back Stack
+            _state.update { it.copy(exitFileBrowserEvent = triggered) }
         }
     }
 
@@ -603,5 +608,19 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun consumeShowMediaDiscoveryEvent() {
         _state.update { it.copy(showMediaDiscoveryEvent = consumed()) }
+    }
+
+    /**
+     * Consumes the Exit File Browser Event
+     */
+    fun consumeExitFileBrowserEvent() {
+        _state.update { it.copy(exitFileBrowserEvent = consumed) }
+    }
+
+    /**
+     * Consumes the Update Toolbar Title Event
+     */
+    fun consumeUpdateToolbarTitleEvent() {
+        _state.update { it.copy(updateToolbarTitleEvent = consumed) }
     }
 }
