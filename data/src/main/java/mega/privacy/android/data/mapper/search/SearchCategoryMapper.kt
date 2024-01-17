@@ -18,7 +18,7 @@ internal class SearchCategoryMapper @Inject constructor() {
     operator fun invoke(filter: Int): SearchCategory = when (filter) {
         MegaApiAndroid.FILE_TYPE_AUDIO -> SearchCategory.AUDIO
         MegaApiAndroid.FILE_TYPE_VIDEO -> SearchCategory.VIDEO
-        MegaApiAndroid.FILE_TYPE_DOCUMENT -> SearchCategory.DOCUMENTS
+        MegaApiAndroid.FILE_TYPE_ALL_DOCS -> SearchCategory.ALL_DOCUMENTS
         MegaApiAndroid.FILE_TYPE_PHOTO -> SearchCategory.IMAGES
         else -> SearchCategory.ALL
     }

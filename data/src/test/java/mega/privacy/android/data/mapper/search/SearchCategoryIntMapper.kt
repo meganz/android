@@ -24,7 +24,7 @@ class SearchCategoryIntMapperTest {
         Arguments.of(MegaApiAndroid.FILE_TYPE_DEFAULT, SearchCategory.ALL),
         Arguments.of(MegaApiAndroid.FILE_TYPE_AUDIO, SearchCategory.AUDIO),
         Arguments.of(MegaApiAndroid.FILE_TYPE_VIDEO, SearchCategory.VIDEO),
-        Arguments.of(MegaApiAndroid.FILE_TYPE_DOCUMENT, SearchCategory.DOCUMENTS),
+        Arguments.of(MegaApiAndroid.FILE_TYPE_ALL_DOCS, SearchCategory.ALL_DOCUMENTS),
         Arguments.of(MegaApiAndroid.FILE_TYPE_PHOTO, SearchCategory.IMAGES),
     )
 }

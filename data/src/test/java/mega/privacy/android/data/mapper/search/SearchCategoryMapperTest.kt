@@ -32,7 +32,7 @@ class SearchCategoryMapperTest {
         Arguments.of(SearchCategory.ALL, MegaApiAndroid.FILE_TYPE_DEFAULT),
         Arguments.of(SearchCategory.AUDIO, MegaApiAndroid.FILE_TYPE_AUDIO),
         Arguments.of(SearchCategory.VIDEO, MegaApiAndroid.FILE_TYPE_VIDEO),
-        Arguments.of(SearchCategory.DOCUMENTS, MegaApiAndroid.FILE_TYPE_DOCUMENT),
+        Arguments.of(SearchCategory.ALL_DOCUMENTS, MegaApiAndroid.FILE_TYPE_ALL_DOCS),
         Arguments.of(SearchCategory.IMAGES, MegaApiAndroid.FILE_TYPE_PHOTO),
     )
 }

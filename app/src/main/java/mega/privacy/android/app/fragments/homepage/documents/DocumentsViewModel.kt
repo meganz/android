@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
-import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.search.callback.SearchCallback
@@ -22,6 +20,8 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import timber.log.Timber
@@ -82,7 +82,7 @@ class DocumentsViewModel @Inject constructor(
                 cancelToken?.let {
                     repository.getFiles(
                         it,
-                        MegaApiJava.FILE_TYPE_DOCUMENT,
+                        MegaApiJava.FILE_TYPE_ALL_DOCS,
                         sortOrder
                     )
                 }

@@ -252,7 +252,7 @@ class SearchActivity : AppCompatActivity() {
         } else {
             when (selectedFilter?.filter) {
                 SearchCategory.IMAGES -> SearchImageFilterPressedEvent
-                SearchCategory.DOCUMENTS -> SearchDocsFilterPressedEvent
+                SearchCategory.ALL_DOCUMENTS -> SearchDocsFilterPressedEvent
                 SearchCategory.AUDIO -> SearchAudioFilterPressedEvent
                 SearchCategory.VIDEO -> SearchVideosFilterPressedEvent
                 else -> SearchResetFilterPressedEvent

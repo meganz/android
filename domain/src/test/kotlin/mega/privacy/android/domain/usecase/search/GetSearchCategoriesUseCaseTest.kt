@@ -18,7 +18,7 @@ class GetSearchCategoriesUseCaseTest {
     fun `test that GetSearchCategoriesUseCase returns list of search categories`() {
         val expected = listOf(
             SearchCategory.AUDIO,
-            SearchCategory.DOCUMENTS
+            SearchCategory.ALL_DOCUMENTS
         )
         whenever(searchRepository.getSearchCategories()).thenReturn(expected)
         val actual = underTest()

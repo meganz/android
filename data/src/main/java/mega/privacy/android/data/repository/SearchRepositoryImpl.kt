@@ -36,7 +36,7 @@ internal class SearchRepositoryImpl @Inject constructor(
     override fun getSearchCategories(): List<SearchCategory> = listOf(
         MegaApiAndroid.FILE_TYPE_DEFAULT,
         MegaApiAndroid.FILE_TYPE_PHOTO,
-        MegaApiAndroid.FILE_TYPE_DOCUMENT,
+        MegaApiAndroid.FILE_TYPE_ALL_DOCS,
         MegaApiAndroid.FILE_TYPE_AUDIO,
         MegaApiAndroid.FILE_TYPE_VIDEO,
     ).map {

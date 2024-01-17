@@ -4,11 +4,11 @@ import android.content.Context
 import android.content.res.Configuration
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.search.SearchCategory
-import mega.privacy.android.domain.entity.search.SearchCategory.*
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.entity.search.SearchCategory.ALL_DOCUMENTS
+import mega.privacy.android.domain.entity.search.SearchCategory.AUDIO
+import mega.privacy.android.domain.entity.search.SearchCategory.IMAGES
+import mega.privacy.android.domain.entity.search.SearchCategory.VIDEO
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
 
@@ -76,7 +76,7 @@ class EmptySearchViewMapper @Inject constructor(
                     context.getString(R.string.search_empty_screen_no_images)
                 )
 
-                category == DOCUMENTS -> Pair(
+                category == ALL_DOCUMENTS -> Pair(
                     R.drawable.ic_homepage_empty_document,
                     context.getString(R.string.search_empty_screen_no_documents)
                 )

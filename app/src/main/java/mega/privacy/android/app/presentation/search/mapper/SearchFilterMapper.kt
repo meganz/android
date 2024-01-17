@@ -32,8 +32,8 @@ class SearchFilterMapper @Inject constructor(
             context.getString(R.string.section_images)
         )
 
-        SearchCategory.DOCUMENTS -> SearchFilter(
-            SearchCategory.DOCUMENTS,
+        SearchCategory.ALL_DOCUMENTS -> SearchFilter(
+            SearchCategory.ALL_DOCUMENTS,
             context.getString(R.string.section_documents)
         )
 

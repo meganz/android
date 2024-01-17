@@ -24,7 +24,7 @@ enum class SearchCategory {
      *
      * shows only documents which is matching the search keyword
      */
-    DOCUMENTS,
+    ALL_DOCUMENTS,
 
     /**
      * AUDIO
