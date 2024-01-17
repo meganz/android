@@ -125,7 +125,7 @@ private fun DisableBatteryOptimizationDialog(
     onDismiss: () -> Unit,
 ) {
     ConfirmationDialog(
-        text = stringResource(id = R.string.sync_dialog_battery_optimization_message),
+        text = stringResource(id = R.string.sync_battery_optimisation_banner),
         confirmButtonText = stringResource(id = R.string.sync_dialog_battery_optimization_positive_button),
         cancelButtonText = stringResource(id = R.string.sync_dialog_battery_optimization_negative_button),
         onConfirm = onConfirm,
