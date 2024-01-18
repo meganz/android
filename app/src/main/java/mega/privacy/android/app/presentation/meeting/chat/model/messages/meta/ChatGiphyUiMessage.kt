@@ -25,7 +25,7 @@ class ChatGiphyUiMessage(
     override val showTime: Boolean,
 ) : AvatarMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
-        message.giphy?.let { giphy ->
+        message.chatGifInfo?.let { giphy ->
             GiphyMessageView(
                 url = giphy.webpSrc?.let { GiphyUtil.getOriginalGiphySrc(it) }?.toString() ?: "",
                 width = giphy.width,

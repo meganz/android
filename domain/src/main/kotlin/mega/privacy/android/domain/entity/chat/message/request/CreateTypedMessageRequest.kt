@@ -22,8 +22,8 @@ data class CreateTypedMessageRequest(
 ) : ChatMessageInfo by message, CreateTypedMessageInfo {
     override val metaType = message.containsMeta?.type
     override val textMessage = message.containsMeta?.textMessage
-    override val richPreview = message.containsMeta?.richPreview
-    override val geolocation = message.containsMeta?.geolocation
-    override val giphy = message.containsMeta?.giphy
+    override val chatRichPreviewInfo = message.containsMeta?.richPreview
+    override val chatGeolocationInfo = message.containsMeta?.geolocation
+    override val chatGifInfo = message.containsMeta?.giphy
     override val nodeList: List<Node> = message.nodeList
 }

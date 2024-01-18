@@ -1,7 +1,10 @@
 package mega.privacy.android.domain.entity.chat.message.request
 
 import mega.privacy.android.domain.entity.chat.ChatGeolocation
+import mega.privacy.android.domain.entity.chat.ChatGeolocationInfo
+import mega.privacy.android.domain.entity.chat.ChatGifInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageInfo
+import mega.privacy.android.domain.entity.chat.ChatRichPreviewInfo
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.chat.Giphy
 import mega.privacy.android.domain.entity.chat.RichPreview
@@ -16,9 +19,9 @@ import mega.privacy.android.domain.entity.node.Node
  * @property shouldShowDate True if the date should be shown.
  * @property metaType [ContainsMetaType]
  * @property textMessage
- * @property richPreview [RichPreview]
- * @property geolocation [ChatGeolocation]
- * @property giphy [Giphy]
+ * @property chatRichPreviewInfo [RichPreview]
+ * @property chatGeolocationInfo [ChatGeolocation]
+ * @property chatGifInfo [Giphy]
  * @property nodeList List of nodes
  */
 interface CreateTypedMessageInfo : ChatMessageInfo {
@@ -28,8 +31,8 @@ interface CreateTypedMessageInfo : ChatMessageInfo {
     val shouldShowDate: Boolean
     val metaType: ContainsMetaType?
     val textMessage: String?
-    val richPreview: RichPreview?
-    val geolocation: ChatGeolocation?
-    val giphy: Giphy?
+    val chatRichPreviewInfo: ChatRichPreviewInfo?
+    val chatGeolocationInfo: ChatGeolocationInfo?
+    val chatGifInfo: ChatGifInfo?
     val nodeList: List<Node>
 }

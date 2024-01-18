@@ -29,7 +29,7 @@ data class ChatRichLinkUiMessage(
         ChatRichLinkMessageView(
             modifier = Modifier.weight(1f),
             isMe = message.isMine,
-            preview = message.preview,
+            preview = message.chatRichPreviewInfo,
         )
     }
 

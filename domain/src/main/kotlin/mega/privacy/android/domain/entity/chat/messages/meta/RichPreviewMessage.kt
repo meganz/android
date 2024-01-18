@@ -1,9 +1,11 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
-import mega.privacy.android.domain.entity.chat.RichPreview
+import mega.privacy.android.domain.entity.chat.ChatRichPreviewInfo
 
 /**
  * Rich preview message
+ *
+ * @property chatRichPreviewInfo [ChatRichPreviewInfo]
  */
 data class RichPreviewMessage(
     override val msgId: Long,
@@ -13,5 +15,5 @@ data class RichPreviewMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val shouldShowDate: Boolean,
-    val preview: RichPreview?
+    val chatRichPreviewInfo: ChatRichPreviewInfo?,
 ) : MetaMessage

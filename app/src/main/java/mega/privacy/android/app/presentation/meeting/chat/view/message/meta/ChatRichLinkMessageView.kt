@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.core.ui.controls.chat.messages.ChatRichLinkMessage
-import mega.privacy.android.domain.entity.chat.RichPreview
+import mega.privacy.android.domain.entity.chat.ChatRichPreviewInfo
 
 /**
  * Chat rich link message view
@@ -20,7 +20,7 @@ import mega.privacy.android.domain.entity.chat.RichPreview
 @Composable
 fun ChatRichLinkMessageView(
     isMe: Boolean,
-    preview: RichPreview?,
+    preview: ChatRichPreviewInfo?,
     modifier: Modifier = Modifier,
     viewModel: MetaViewModel = hiltViewModel(),
 ) {
