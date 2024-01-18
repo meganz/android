@@ -35,13 +35,18 @@ import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
@@ -666,4 +671,39 @@ class DefaultLoginRepositoryTest {
 
         verify(setLogoutFlagWrapper).invoke(inProgress)
     }
+
+    @ParameterizedTest(name = "return session transfer url {0}")
+    @MethodSource("provideSessionTransferURLParameters")
+    fun `test that get session transfer url returns successfully if no error is thrown`(
+        url: String?,
+    ) =
+        runTest {
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_GET_SESSION_TRANSFER_URL)
+                on { link }.thenReturn(url)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+
+            whenever(megaApiGateway.getSessionTransferURL(any(), any())).thenAnswer {
+                (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+
+            val actual = underTest.getSessionTransferURL("test")
+            assertThat(actual).isEqualTo(url)
+        }
+
+        companion object{
+            @JvmStatic
+            fun provideSessionTransferURLParameters() = listOf(
+                Arguments.of("https://mega.nz/test"),
+                Arguments.of(null),
+            )
+        }
 }

@@ -1509,4 +1509,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun enableRichPreviews(enable: Boolean, listener: MegaRequestListenerInterface) =
         megaApi.enableRichPreviews(enable, listener)
+
+    override fun getSessionTransferURL(path: String, listener: MegaRequestListenerInterface) {
+        megaApi.getSessionTransferURL(path, listener)
+    }
 }

@@ -3299,4 +3299,18 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun enableRichPreviews(enable: Boolean, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get an URL to transfer the current session to the webclient
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_SESSION_TRANSFER_URL
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getLink - URL to open the desired page with the same account
+     *
+     * @param path Path inside https://mega.nz/# that we want to open with the current session
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getSessionTransferURL(path: String, listener: MegaRequestListenerInterface)
 }

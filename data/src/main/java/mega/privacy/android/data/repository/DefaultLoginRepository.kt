@@ -22,6 +22,7 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.listener.SessionTransferURLListenerInterface
 import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
@@ -382,6 +383,20 @@ internal class DefaultLoginRepository @Inject constructor(
         }
 
     override fun setLogoutInProgressFlag(inProgress: Boolean) = setLogoutFlagWrapper(inProgress)
+
+    override suspend fun getSessionTransferURL(path: String): String? {
+        return withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = SessionTransferURLListenerInterface { link ->
+                    continuation.resumeWith(Result.success(link))
+                }
+                megaApiGateway.getSessionTransferURL(path, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+    }
 
     companion object {
         internal const val FETCH_NODES_ERROR_TIMER = 10000L

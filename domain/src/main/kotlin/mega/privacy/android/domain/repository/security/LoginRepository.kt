@@ -143,4 +143,9 @@ interface LoginRepository {
      * @param inProgress
      */
     fun setLogoutInProgressFlag(inProgress: Boolean)
+
+    /**
+     * Get the link to open on webclient with transferred session
+     */
+    suspend fun getSessionTransferURL(path: String): String?
 }
