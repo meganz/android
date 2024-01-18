@@ -1,6 +1,5 @@
 package mega.privacy.android.data.repository
 
-import androidx.paging.PagingSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
@@ -27,6 +26,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.database.entity.chat.ChatHistoryLoadStatusEntity
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.extensions.getRequestListener
@@ -35,6 +35,7 @@ import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
@@ -49,6 +50,13 @@ import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.PendingMessageListMapper
+import mega.privacy.android.data.mapper.chat.paging.ChatGeolocationEntityMapper
+import mega.privacy.android.data.mapper.chat.paging.ChatNodeEntityListMapper
+import mega.privacy.android.data.mapper.chat.paging.GiphyEntityMapper
+import mega.privacy.android.data.mapper.chat.paging.MessagePagingInfoMapper
+import mega.privacy.android.data.mapper.chat.paging.RichPreviewEntityMapper
+import mega.privacy.android.data.mapper.chat.paging.TypedMessageEntityMapper
+import mega.privacy.android.data.mapper.chat.paging.TypedMessagePagingSourceMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
@@ -61,8 +69,8 @@ import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
+import mega.privacy.android.domain.entity.chat.message.MessagePagingInfo
 import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.ChatSettings
@@ -89,24 +97,37 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * Default implementation of [ChatRepository]
+ * Chat repository impl
  *
- * @property megaChatApiGateway                     [MegaChatApiGateway]
- * @property megaApiGateway                         [MegaApiGateway]
- * @property chatRequestMapper                      [ChatRequestMapper]
- * @property localStorageGateway                    [MegaLocalStorageGateway]
- * @property chatRoomMapper                         [ChatRoomMapper]
- * @property combinedChatRoomMapper                 [CombinedChatRoomMapper]
- * @property chatListItemMapper                     [ChatListItemMapper]
- * @property megaChatPeerListMapper                 [MegaChatPeerListMapper]
- * @property chatConnectionStatusMapper             [ChatConnectionStatusMapper]
- * @property connectionStateMapper                  [ConnectionStateMapper]
- * @property chatMessageMapper                      [ChatMessageMapper]
- * @property chatMessageNotificationBehaviourMapper [ChatMessageNotificationBehaviourMapper]
- * @property chatHistoryLoadStatusMapper            [ChatHistoryLoadStatusMapper]
- * @property sharingScope                           [CoroutineScope]
- * @property ioDispatcher                           [CoroutineDispatcher]
- * @property appEventGateway                        [AppEventGateway]
+ * @property megaChatApiGateway
+ * @property megaApiGateway
+ * @property chatRequestMapper
+ * @property chatPreviewMapper
+ * @property localStorageGateway
+ * @property chatRoomMapper
+ * @property combinedChatRoomMapper
+ * @property chatListItemMapper
+ * @property megaChatPeerListMapper
+ * @property chatConnectionStatusMapper
+ * @property connectionStateMapper
+ * @property chatMessageMapper
+ * @property chatMessageNotificationBehaviourMapper
+ * @property chatHistoryLoadStatusMapper
+ * @property chatInitStateMapper
+ * @property sharingScope
+ * @property ioDispatcher
+ * @property appEventGateway
+ * @property pendingMessageListMapper
+ * @property megaLocalRoomGateway
+ * @property databaseHandler
+ * @property chatStorageGateway
+ * @property typedMessagePagingSourceMapper
+ * @property typedMessageEntityMapper
+ * @property messagePagingInfoMapper
+ * @property richPreviewEntityMapper
+ * @property giphyEntityMapper
+ * @property chatGeolocationEntityMapper
+ * @property chatNodeEntityListMapper
  */
 @Singleton
 internal class ChatRepositoryImpl @Inject constructor(
@@ -131,6 +152,14 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val pendingMessageListMapper: PendingMessageListMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val databaseHandler: DatabaseHandler,
+    private val chatStorageGateway: ChatStorageGateway,
+    private val typedMessagePagingSourceMapper: TypedMessagePagingSourceMapper,
+    private val typedMessageEntityMapper: TypedMessageEntityMapper,
+    private val messagePagingInfoMapper: MessagePagingInfoMapper,
+    private val richPreviewEntityMapper: RichPreviewEntityMapper,
+    private val giphyEntityMapper: GiphyEntityMapper,
+    private val chatGeolocationEntityMapper: ChatGeolocationEntityMapper,
+    private val chatNodeEntityListMapper: ChatNodeEntityListMapper,
 ) : ChatRepository {
     private val richLinkConfig = MutableStateFlow(RichLinkConfig())
     private var chatRoomUpdates: HashMap<Long, Flow<ChatRoomUpdate>> = hashMapOf()
@@ -1182,29 +1211,75 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getPagedMessages(chatId: Long): PagingSource<Int, TypedMessage> {
-        throw NotImplementedError("Not implemented yet")
-    }
+    override fun getPagedMessages(chatId: Long) =
+        typedMessagePagingSourceMapper(chatStorageGateway.getTypedMessageRequestPagingSource(chatId))
 
     override suspend fun storeMessages(chatId: Long, messages: List<CreateTypedMessageRequest>) {
-        throw NotImplementedError("Not implemented yet")
+        withContext(ioDispatcher) {
+            chatStorageGateway.storeMessages(
+                messages = messages.map {
+                    typedMessageEntityMapper(it, chatId)
+                },
+                richPreviews = messages.mapNotNull { request ->
+                    request.chatRichPreviewInfo?.let {
+                        richPreviewEntityMapper(
+                            messageId = request.msgId,
+                            info = it,
+                        )
+                    }
+                },
+                giphys = messages.mapNotNull { request ->
+                    request.chatGifInfo?.let {
+                        giphyEntityMapper(
+                            messageId = request.msgId,
+                            info = it,
+                        )
+                    }
+                },
+                geolocations = messages.mapNotNull { request ->
+                    request.chatGeolocationInfo?.let {
+                        chatGeolocationEntityMapper(
+                            messageId = request.msgId,
+                            info = it,
+                        )
+                    }
+                },
+                chatNodes = messages.map { request ->
+                    chatNodeEntityListMapper(
+                        messageId = request.msgId,
+                        nodes = request.nodeList,
+                    )
+                }.flatten(),
+            )
+        }
     }
 
-    override suspend fun getLastLoadResponse(chatId: Long): ChatHistoryLoadStatus {
-        throw NotImplementedError("Not implemented yet")
-    }
+    override suspend fun getLastLoadResponse(chatId: Long): ChatHistoryLoadStatus? =
+        withContext(ioDispatcher) {
+            chatStorageGateway.getLastLoadResponse(chatId)?.status
+        }
 
     override suspend fun setLastLoadResponse(chatId: Long, status: ChatHistoryLoadStatus) {
-        throw NotImplementedError("Not implemented yet")
+        withContext(ioDispatcher) {
+            chatStorageGateway.setLastLoadResponse(ChatHistoryLoadStatusEntity(chatId, status))
+        }
     }
 
     override suspend fun clearChatMessages(chatId: Long) {
-        throw NotImplementedError("Not implemented yet")
+        withContext(ioDispatcher) {
+            chatStorageGateway.clearChatMessages(chatId)
+        }
     }
 
-    override suspend fun getNextMessage(chatId: Long, timestamp: Long): TypedMessage? {
-        throw NotImplementedError("Not implemented yet")
-    }
+    override suspend fun getNextMessagePagingInfo(
+        chatId: Long,
+        timestamp: Long,
+    ): MessagePagingInfo? =
+        withContext(ioDispatcher) {
+            chatStorageGateway.getNextMessage(chatId, timestamp)?.let {
+                messagePagingInfoMapper(it)
+            }
+        }
 
     override suspend fun getMyChatsFilesFolderId(): NodeId {
         throw NotImplementedError("Not implemented yet")

@@ -138,6 +138,14 @@ class ChatRepositoryImplTest {
             chatPreviewMapper = chatPreviewMapper,
             databaseHandler = databaseHandler,
             megaLocalRoomGateway = megaLocalRoomGateway,
+            chatStorageGateway = mock(),
+            typedMessagePagingSourceMapper = mock(),
+            typedMessageEntityMapper = mock(),
+            messagePagingInfoMapper = mock(),
+            richPreviewEntityMapper = mock(),
+            giphyEntityMapper = mock(),
+            chatGeolocationEntityMapper = mock(),
+            chatNodeEntityListMapper = mock(),
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)

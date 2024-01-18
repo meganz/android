@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
+import mega.privacy.android.domain.entity.chat.message.MessagePagingInfo
 import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -906,7 +907,7 @@ interface ChatRepository {
      * @param timestamp
      * @return next chronological message if it exists
      */
-    suspend fun getNextMessage(chatId: Long, timestamp: Long): TypedMessage?
+    suspend fun getNextMessagePagingInfo(chatId: Long, timestamp: Long): MessagePagingInfo?
 
     /**
      * Returns the folder for saving chat files in user attributes, null if it's not configured yet
