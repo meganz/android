@@ -21,6 +21,8 @@ import javax.inject.Inject
 class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val uploadFilesUseCase: UploadFilesUseCase,
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
+    private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
+    private val isChatUploadsWorkerStartedUseCase: IsChatUploadsWorkerStartedUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : AbstractStartTransfersWithWorkerUseCase(cancelCancelTokenUseCase) {
 
@@ -57,7 +59,9 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                 )
             },
             startWorker = {
-                //this will be implemented in AND-17904
+                startChatUploadsWorkerUseCase()
+                //ensure worker has started and is listening to global events so we can finish uploadFilesUseCase
+                isChatUploadsWorkerStartedUseCase()
             }
         )
     }

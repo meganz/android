@@ -4,6 +4,11 @@ import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
@@ -14,7 +19,9 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.AdditionalAnswers
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -30,12 +37,16 @@ class StartChatUploadsWithWorkerUseCaseTest {
     private val uploadFilesUseCase = mock<UploadFilesUseCase>()
     private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
     private val cancelCancelTokenUseCase = mock<CancelCancelTokenUseCase>()
+    private val startChatUploadsWorkerUseCase = mock<StartChatUploadsWorkerUseCase>()
+    private val isChatUploadsWorkerStartedUseCase = mock<IsChatUploadsWorkerStartedUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = StartChatUploadsWithWorkerUseCase(
             uploadFilesUseCase,
             getMyChatsFilesFolderIdUseCase,
+            startChatUploadsWorkerUseCase,
+            isChatUploadsWorkerStartedUseCase,
             cancelCancelTokenUseCase,
         )
     }
@@ -45,6 +56,8 @@ class StartChatUploadsWithWorkerUseCaseTest {
         reset(
             uploadFilesUseCase,
             getMyChatsFilesFolderIdUseCase,
+            startChatUploadsWorkerUseCase,
+            isChatUploadsWorkerStartedUseCase,
             cancelCancelTokenUseCase,
         )
         commonStub()
@@ -57,16 +70,8 @@ class StartChatUploadsWithWorkerUseCaseTest {
     @Test
     fun `test that files are filtered and send to upload files use case`() = runTest {
 
-        val files: List<File> = (0..10).map {
-            mock { _ ->
-                on { isFile }.thenReturn(true)
-            }
-        }
-        val folders: List<File> = (0..10).map {
-            mock { _ ->
-                on { isFile }.thenReturn(false)
-            }
-        }
+        val files: List<File> = (0..10).map { mockFile() }
+        val folders: List<File> = (0..10).map { mockFolder() }
         underTest((files + folders), 1L).test {
             verify(uploadFilesUseCase).invoke(eq(files), NodeId(any()), any(), any(), any())
             cancelAndIgnoreRemainingEvents()
@@ -124,5 +129,55 @@ class StartChatUploadsWithWorkerUseCaseTest {
             )
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that download worker is started when start download finish correctly`() = runTest {
+        mockFlow(
+            flowOf(
+                MultiTransferEvent.ScanningFoldersFinished,
+            )
+        )
+        underTest(listOf(mock()), 1L).collect()
+        verify(startChatUploadsWorkerUseCase).invoke()
+    }
+
+    @Test
+    fun `test that flow is not finished until the worker is started`() = runTest {
+        var workerStarted = false
+        mockFlow(
+            flow {
+                emit(MultiTransferEvent.ScanningFoldersFinished)
+                awaitCancellation()
+            }
+        )
+        whenever(isChatUploadsWorkerStartedUseCase()).then(
+            AdditionalAnswers.answersWithDelay(
+                10
+            ) {
+                workerStarted = true
+            })
+        underTest(listOf(mockFile()), 1L).test {
+            val a = awaitItem()
+            println(a)
+            awaitComplete()
+            assertThat(workerStarted).isTrue()
+        }
+        verify(isChatUploadsWorkerStartedUseCase).invoke()
+    }
+
+    private fun mockFile() = mock<File> {
+        on { isFile }.thenReturn(true)
+        on { isDirectory }.thenReturn(false)
+    }
+
+    private fun mockFolder() = mock<File> {
+        on { isFile }.thenReturn(false)
+        on { isDirectory }.thenReturn(true)
+    }
+
+    private fun mockFlow(flow: Flow<MultiTransferEvent>) {
+        whenever(uploadFilesUseCase(any(), NodeId(any()), anyOrNull(), any(), any()))
+            .thenReturn(flow)
     }
 }

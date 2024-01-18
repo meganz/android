@@ -256,6 +256,11 @@ interface TransferRepository {
     fun startDownloadWorker()
 
     /**
+     * Starts the chat uploads worker to monitor the chat uploads transfers as a foreground service
+     */
+    fun startChatUploadsWorker()
+
+    /**
      * Monitors transfers finished.
      */
     fun monitorTransfersFinished(): Flow<TransfersFinishedState>
@@ -521,4 +526,9 @@ interface TransferRepository {
      * @return a flow that emits true if DownloadsWorker is enqueued. false otherwise
      */
     fun isDownloadsWorkerEnqueuedFlow(): Flow<Boolean>
+
+    /**
+     * @return a flow that emits true if ChatUploadsWorker is enqueued. false otherwise
+     */
+    fun isChatUploadsWorkerEnqueuedFlow(): Flow<Boolean>
 }

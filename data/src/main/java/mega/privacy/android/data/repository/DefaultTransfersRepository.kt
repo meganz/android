@@ -488,8 +488,17 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.enqueueDownloadsWorkerRequest()
     }
 
+    override fun startChatUploadsWorker() {
+        workerManagerGateway.enqueueChatUploadsWorkerRequest()
+    }
+
     override fun isDownloadsWorkerEnqueuedFlow() =
         workerManagerGateway.monitorDownloadsStatusInfo().map { workInfos ->
+            workInfos.any { it.state == WorkInfo.State.ENQUEUED }
+        }
+
+    override fun isChatUploadsWorkerEnqueuedFlow() =
+        workerManagerGateway.monitorChatUploadsStatusInfo().map { workInfos ->
             workInfos.any { it.state == WorkInfo.State.ENQUEUED }
         }
 

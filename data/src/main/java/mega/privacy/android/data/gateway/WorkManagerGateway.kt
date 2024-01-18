@@ -2,7 +2,6 @@ package mega.privacy.android.data.gateway
 
 import androidx.work.WorkInfo
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.data.worker.NewMediaWorker
 
 /**
  *  Functions for starting work requests
@@ -18,6 +17,11 @@ interface WorkManagerGateway {
      * Enqueue unique work request to start download worker to monitor the download transfers as a foreground service
      */
     fun enqueueDownloadsWorkerRequest()
+
+    /**
+     * Enqueue unique work request to start chat uploads worker to monitor the chat upload transfers as a foreground service
+     */
+    fun enqueueChatUploadsWorkerRequest()
 
     /**
      * Enqueue unique work request to start new media worker
@@ -58,4 +62,9 @@ interface WorkManagerGateway {
      * Get DownloadsWorker Info
      */
     fun monitorDownloadsStatusInfo(): Flow<List<WorkInfo>>
+
+    /**
+     * Get DownloadsWorker Info
+     */
+    fun monitorChatUploadsStatusInfo(): Flow<List<WorkInfo>>
 }

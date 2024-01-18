@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.worker.CameraUploadsWorker
+import mega.privacy.android.data.worker.ChatUploadsWorker
 import mega.privacy.android.data.worker.DeleteOldestCompletedTransfersWorker
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.data.worker.NewMediaWorker
@@ -64,6 +65,18 @@ internal class WorkManagerFacade @Inject constructor(
         workManager
             .enqueueUniqueWork(
                 DownloadsWorker.SINGLE_DOWNLOAD_TAG,
+                ExistingWorkPolicy.KEEP,
+                request
+            )
+    }
+
+    override fun enqueueChatUploadsWorkerRequest() {
+        val request = OneTimeWorkRequest.Builder(ChatUploadsWorker::class.java)
+            .addTag(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
+            .build()
+        workManager
+            .enqueueUniqueWork(
+                ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG,
                 ExistingWorkPolicy.KEEP,
                 request
             )
@@ -258,4 +271,7 @@ internal class WorkManagerFacade @Inject constructor(
 
     override fun monitorDownloadsStatusInfo() =
         workManager.getWorkInfosByTagFlow(DownloadsWorker.SINGLE_DOWNLOAD_TAG)
+
+    override fun monitorChatUploadsStatusInfo() =
+        workManager.getWorkInfosByTagFlow(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
 }
