@@ -4,14 +4,11 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,14 +17,11 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
@@ -35,7 +29,6 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,22 +40,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -76,26 +62,23 @@ import mega.privacy.android.app.presentation.changepassword.view.Constants.CHANG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.CONFIRM_PASSWORD_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.DISABLED_BUTTON_ALPHA
 import mega.privacy.android.app.presentation.changepassword.view.Constants.ENABLED_BUTTON_ALPHA
-import mega.privacy.android.app.presentation.changepassword.view.Constants.ERROR_FOOTER_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.LOADING_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_STRENGTH_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_STRENGTH_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_TEST_TAG
-import mega.privacy.android.app.presentation.changepassword.view.Constants.SEE_PASSWORD_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.SNACKBAR_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.TNC_CHECKBOX_TEST_TAG
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
+import mega.privacy.android.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.extensions.autofill
 import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import nz.mega.sdk.MegaApiJava
 
 internal object Constants {
@@ -126,11 +109,6 @@ internal object Constants {
      * Test tag for terms and condition checkbox
      */
     const val TNC_CHECKBOX_TEST_TAG = "tnc_cb_test_tag"
-
-    /**
-     * Test tag for error footer
-     */
-    const val ERROR_FOOTER_TEST_TAG = "error_footer_test_tag"
 
     /**
      * Test tag for password strength
@@ -204,10 +182,8 @@ fun ChangePasswordView(
         }
     ) { padding ->
         val context = LocalContext.current
-        var passwordText by remember { mutableStateOf("") }
-        var confirmPasswordText by remember { mutableStateOf("") }
-        var isShowPasswordChar by remember { mutableStateOf(false) }
-        var isShowConfirmPasswordChar by remember { mutableStateOf(false) }
+        var passwordText: String? by remember { mutableStateOf(null) }
+        var confirmPasswordText: String? by remember { mutableStateOf(null) }
         var isTnCChecked by remember { mutableStateOf(false) }
         val coroutineScope = rememberCoroutineScope()
         val keyboardController = LocalSoftwareKeyboardController.current
@@ -230,7 +206,7 @@ fun ChangePasswordView(
                 }
 
                 else -> {
-                    onValidateOnSave(passwordText, confirmPasswordText)
+                    onValidateOnSave(passwordText.orEmpty(), confirmPasswordText.orEmpty())
                 }
             }
         }
@@ -250,7 +226,7 @@ fun ChangePasswordView(
 
         LaunchedEffect(uiState.isPromptedMultiFactorAuth) {
             if (uiState.isPromptedMultiFactorAuth) {
-                onPromptedMultiFactorAuth(passwordText)
+                onPromptedMultiFactorAuth(passwordText.orEmpty())
             }
         }
 
@@ -288,25 +264,26 @@ fun ChangePasswordView(
                     .fillMaxWidth()
                     .padding(top = 17.dp)
                     .testTag(PASSWORD_TEST_TAG),
-                label = stringResource(id = passwordLabel),
-                isShowPassword = isShowPasswordChar,
-                focusedColor = strengthAttribute.color,
-                onValueChange = { value, isAutofill ->
+                hint = stringResource(id = passwordLabel),
+                onTextChange = { value ->
                     passwordText = value
                     onPasswordTextChanged(value)
-                    if (isAutofill) confirmPasswordText = value
                 },
-                isError = uiState.isCurrentPassword || uiState.passwordError != null,
-                errorFooterText = uiState.passwordError?.let { res ->
-                    stringResource(id = res)
-                }.takeIf { uiState.isCurrentPassword.not() },
-                onClickShowPassword = { isShowPasswordChar = !isShowPasswordChar },
+                text = passwordText.orEmpty(),
+                errorText = if (passwordText != null && (uiState.isCurrentPassword || uiState.passwordError != null)) {
+                    uiState.passwordError?.let { res ->
+                        stringResource(id = res)
+                    }.takeIf {
+                        uiState.isCurrentPassword.not()
+                    }
+                } else null,
+                imeAction = ImeAction.Next,
+                keyboardActions = KeyboardActions(onNext = { confirmPasswordFocusRequester.requestFocus() }),
                 onFocusChanged = { hasFocus ->
                     if (hasFocus.not() && uiState.isResetPasswordMode.not()) {
-                        onValidatePassword(passwordText)
+                        onValidatePassword(passwordText.orEmpty())
                     }
-                },
-                onKeyboardNext = { confirmPasswordFocusRequester.requestFocus() }
+                }
             )
 
             if (uiState.passwordStrength > PasswordStrength.INVALID && (uiState.passwordError == null || uiState.isCurrentPassword)) {
@@ -319,18 +296,16 @@ fun ChangePasswordView(
                     .padding(top = 24.dp)
                     .testTag(CONFIRM_PASSWORD_TEST_TAG)
                     .focusRequester(confirmPasswordFocusRequester),
-                label = stringResource(id = R.string.my_account_change_password_newPassword2),
-                isShowPassword = isShowConfirmPasswordChar,
-                onValueChange = { value, isAutofill ->
+                hint = stringResource(id = R.string.my_account_change_password_newPassword2),
+                onTextChange = { value ->
                     confirmPasswordText = value
                     onConfirmPasswordTextChanged()
-                    if (isAutofill) passwordText = value
                 },
-                onClickShowPassword = { isShowConfirmPasswordChar = !isShowConfirmPasswordChar },
-                isError = uiState.confirmPasswordError != null,
-                errorFooterText = uiState.confirmPasswordError?.let { res -> stringResource(id = res) },
-                focusedColor = MaterialTheme.colors.secondary,
-                onKeyboardNext = { onConfirmPasswordChange() }
+                text = confirmPasswordText.orEmpty(),
+                imeAction = ImeAction.Done,
+                errorText = uiState.confirmPasswordError?.let { res -> stringResource(id = res) }
+                    .takeIf { uiState.confirmPasswordError != null },
+                keyboardActions = KeyboardActions(onNext = { onConfirmPasswordChange() }),
             )
 
             TnCCheckboxDescription(
@@ -349,7 +324,7 @@ fun ChangePasswordView(
                 isEnabled = uiState.isCurrentPassword.not(),
                 isResetPasswordMode = uiState.isResetPasswordMode,
                 isPasswordValidated = uiState.isSaveValidationSuccessful,
-                passwordText = passwordText,
+                passwordText = passwordText.orEmpty(),
                 onTriggerResetPassword = onTriggerResetPassword,
                 onTriggerChangePassword = onTriggerChangePassword,
                 onAfterPasswordChanged = onResetValidationState,
@@ -367,134 +342,6 @@ fun ChangePasswordView(
         }
     }
 }
-
-/**
- * Password Text Field for Password and Confirm Password
- */
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-@Deprecated(
-    message = "This has been deprecated in favour of PasswordTextField base component of core-ui",
-    replaceWith = ReplaceWith("mega.privacy.android.core.ui.controls.textfields.PasswordTextField")
-)
-fun PasswordTextField(
-    modifier: Modifier,
-    label: String,
-    focusedColor: Color = MaterialTheme.colors.secondary,
-    isShowPassword: Boolean = false,
-    isError: Boolean = false,
-    errorFooterText: String? = null,
-    onValueChange: (value: String, isAutoFill: Boolean) -> Unit,
-    onClickShowPassword: () -> Unit,
-    onFocusChanged: (Boolean) -> Unit = {},
-    onKeyboardNext: (KeyboardActionScope) -> Unit,
-) {
-    var passwordText by remember { mutableStateOf("") }
-    val interactionSource = remember { MutableInteractionSource() }
-    var isFocused by remember { mutableStateOf(false) }
-    val indicatorColor = when {
-        isError || errorFooterText.isNullOrBlank().not() -> {
-            MaterialTheme.colors.error
-        }
-
-        isFocused -> focusedColor
-        passwordText.isBlank() -> MaterialTheme.colors.grey_alpha_012_white_alpha_038
-        else -> focusedColor
-    }
-
-    MegaTextField(
-        modifier = modifier
-            .onFocusChanged {
-                if (isFocused != it.isFocused) {
-                    isFocused = it.isFocused
-                    onFocusChanged(isFocused)
-                }
-            }
-            .autofill(
-                autofillTypes = listOf(AutofillType.Password, AutofillType.NewPassword),
-                onAutoFilled = {
-                    passwordText = it
-                    onValueChange(it, true)
-                }
-            ),
-        value = passwordText,
-        onValueChange = { text ->
-            passwordText = text
-            onValueChange(text, false)
-        },
-        label = { Text(text = label) },
-        textStyle = TextStyle.Default.copy(fontSize = 16.sp),
-        visualTransformation = if (isShowPassword) VisualTransformation.None else PasswordVisualTransformation(),
-        trailingIcon = {
-            if (isFocused) {
-                Icon(
-                    modifier = Modifier
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = onClickShowPassword,
-                        )
-                        .testTag(SEE_PASSWORD_TEST_TAG),
-                    painter = painterResource(id = R.drawable.ic_see),
-                    tint = if (isShowPassword) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_alpha_012_white_alpha_038,
-                    contentDescription = "see"
-                )
-            }
-        },
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = MaterialTheme.colors.surface,
-            textColor = MaterialTheme.colors.onSurface,
-            cursorColor = MaterialTheme.colors.secondary,
-            focusedLabelColor = indicatorColor,
-            unfocusedLabelColor = indicatorColor,
-            focusedIndicatorColor = indicatorColor,
-            unfocusedIndicatorColor = indicatorColor,
-        ),
-        isError = errorFooterText.isNullOrBlank().not(),
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        keyboardActions = KeyboardActions(onNext = onKeyboardNext)
-    )
-
-    if (errorFooterText.isNullOrBlank().not()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ErrorFooterTextView(
-                text = errorFooterText.orEmpty(),
-                color = MaterialTheme.colors.error
-            )
-            Spacer(
-                Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-            )
-            Icon(
-                modifier = Modifier.padding(end = 2.dp),
-                painter = painterResource(id = R.drawable.ic_input_warning),
-                tint = MaterialTheme.colors.error,
-                contentDescription = "error"
-            )
-        }
-    }
-}
-
-
-/**
- * Footer text for PasswordTextField
- */
-@Composable
-fun ErrorFooterTextView(text: String, color: Color) {
-    Text(
-        modifier = Modifier.testTag(ERROR_FOOTER_TEST_TAG),
-        text = text,
-        color = color,
-        style = MaterialTheme.typography.caption
-    )
-}
-
 
 /**
  * Password Strength Bar for PasswordTextField
@@ -598,15 +445,15 @@ fun TnCCheckboxDescription(
 @Composable
 fun ChangePasswordActionButtonGroup(
     modifier: Modifier,
-    isEnabled: Boolean = true,
-    isResetPasswordMode: Boolean = false,
-    isPasswordValidated: Boolean = false,
     passwordText: String,
     onTriggerChangePassword: (String) -> Unit,
     onTriggerResetPassword: (String) -> Unit,
     onAfterPasswordChanged: () -> Unit,
     onFinishActivity: () -> Unit,
     onConfirmButtonClick: () -> Unit,
+    isEnabled: Boolean = true,
+    isResetPasswordMode: Boolean = false,
+    isPasswordValidated: Boolean = false,
 ) {
     val buttonAlpha = if (isEnabled) ENABLED_BUTTON_ALPHA else DISABLED_BUTTON_ALPHA
 

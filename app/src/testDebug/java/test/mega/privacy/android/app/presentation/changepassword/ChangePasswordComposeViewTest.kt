@@ -18,9 +18,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.extensions.toStrengthAttribute
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
-import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.changepassword.view.Constants.CHANGE_PASSWORD_BUTTON_TEST_TAG
-import mega.privacy.android.app.presentation.changepassword.view.Constants.ERROR_FOOTER_TEST_TAG
+import mega.privacy.android.app.presentation.changepassword.view.Constants.CONFIRM_PASSWORD_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.LOADING_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_STRENGTH_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_STRENGTH_TEST_TAG
@@ -81,9 +80,11 @@ class ChangePasswordComposeViewTest {
         setComposeContent()
 
         composeTestRule.onNodeWithTag(PASSWORD_TEST_TAG)
-            .assert(hasText(fromId(R.string.my_account_change_password_newPassword1)))
-        composeTestRule.onNodeWithTag(Constants.CONFIRM_PASSWORD_TEST_TAG)
-            .assert(hasText(fromId(R.string.my_account_change_password_newPassword2)))
+            .assert(hasAnyChild(hasText(fromId(R.string.my_account_change_password_newPassword1))))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CONFIRM_PASSWORD_TEST_TAG)
+            .assert(hasAnyChild(hasText(fromId(R.string.my_account_change_password_newPassword2))))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithTag(SEE_PASSWORD_TEST_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PASSWORD_STRENGTH_TEST_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(TNC_CHECKBOX_TEST_TAG).assertIsDisplayed()
@@ -126,37 +127,10 @@ class ChangePasswordComposeViewTest {
     fun `test that when password is current password should change password text field hint`() {
         setComposeContent(ChangePasswordUIState(isCurrentPassword = true))
 
-        composeTestRule.onNodeWithTag(PASSWORD_TEST_TAG)
+        composeTestRule
+            .onNodeWithTag(PASSWORD_TEST_TAG)
+            .assert(hasAnyChild(hasText(fromId(R.string.error_same_password))))
             .assertIsDisplayed()
-            .assert(hasText(fromId(R.string.error_same_password)))
-    }
-
-    @Test
-    fun `test that when an error found but not current password should show error footer text`() {
-        setComposeContent(
-            ChangePasswordUIState(
-                isCurrentPassword = false,
-                passwordError = R.string.general_text_error
-            )
-        )
-
-        composeTestRule.onNodeWithTag(ERROR_FOOTER_TEST_TAG)
-            .assertIsDisplayed()
-            .assert(hasText(fromId(R.string.general_text_error)))
-    }
-
-    @Test
-    fun `test that when confirm password has an error found but not current password should show error footer text`() {
-        setComposeContent(
-            ChangePasswordUIState(
-                isCurrentPassword = false,
-                confirmPasswordError = R.string.general_text_error
-            )
-        )
-
-        composeTestRule.onNodeWithTag(ERROR_FOOTER_TEST_TAG)
-            .assertIsDisplayed()
-            .assert(hasText(fromId(R.string.general_text_error)))
     }
 
     @Test
@@ -168,18 +142,10 @@ class ChangePasswordComposeViewTest {
             )
         )
 
-        composeTestRule.onNodeWithTag(PASSWORD_TEST_TAG)
+        composeTestRule
+            .onNodeWithTag(PASSWORD_TEST_TAG)
+            .assert(hasAnyChild(hasText(fromId(R.string.error_same_password))))
             .assertIsDisplayed()
-            .assert(hasText(fromId(R.string.error_same_password)))
-        composeTestRule.onNodeWithTag(ERROR_FOOTER_TEST_TAG).assertDoesNotExist()
-    }
-
-    @Test
-    fun `test that when text field is on focus should show see password icon`() {
-        setComposeContent()
-
-        composeTestRule.onNodeWithTag(PASSWORD_TEST_TAG).performClick()
-        composeTestRule.onNodeWithTag(SEE_PASSWORD_TEST_TAG).assertIsDisplayed()
     }
 
     @Test

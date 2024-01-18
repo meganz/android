@@ -66,6 +66,7 @@ fun PasswordTextField(
     text: String = "",
     errorText: String? = null,
     hint: String? = null,
+    onFocusChanged: (Boolean) -> Unit = {},
 ) = Column(modifier = modifier) {
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isError = errorText != null
@@ -96,14 +97,19 @@ fun PasswordTextField(
                 .background(Color.Transparent)
                 .indicatorLine(true, isError, interactionSource, colors)
                 .fillMaxWidth()
-                .onFocusChanged { isFocused = it.isFocused }
+                .onFocusChanged {
+                    isFocused = it.isFocused
+                    onFocusChanged(it.isFocused)
+                }
                 .autofill(
                     autofillTypes = listOf(AutofillType.Password), onAutoFilled = onTextChange
                 ),
             textStyle = MaterialTheme.typography.subtitle1.copy(color = MegaTheme.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password, imeAction = imeAction
+                keyboardType = KeyboardType.Password,
+                imeAction = imeAction,
+                autoCorrect = false,
             ),
             keyboardActions = keyboardActions,
             visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
