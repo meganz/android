@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
@@ -51,6 +52,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     shareFolderDialogViewModel: ShareFolderDialogViewModel,
     changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel,
     removeShareFolderViewModel: RemoveShareFolderViewModel,
+    nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
     onBackPressed: () -> Unit,
 ) {
     composable(searchRoute) {
@@ -70,7 +72,11 @@ internal fun NavGraphBuilder.searchNavGraph(
         searchActivityViewModel = searchActivityViewModel
     )
     renameDialogNavigation(navHostController, renameNodeDialogViewModel)
-    nodeBottomSheetNavigation(nodeBottomSheetActionHandler, navHostController)
+    nodeBottomSheetNavigation(
+        nodeBottomSheetActionHandler,
+        navHostController,
+        nodeOptionsBottomSheetViewModel
+    )
     changeLabelBottomSheetNavigation(navHostController)
     changeNodeExtensionDialogNavigation(
         navHostController = navHostController,

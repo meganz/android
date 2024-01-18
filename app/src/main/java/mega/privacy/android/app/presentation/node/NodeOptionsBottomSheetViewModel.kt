@@ -1,11 +1,11 @@
 package mega.privacy.android.app.presentation.node
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,15 +14,20 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.node.model.NodeBottomSheetState
 import mega.privacy.android.app.presentation.node.model.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.NodeBottomSheetMenuItem
-import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRouteNodeIdArg
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -43,7 +48,10 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    stateHandle: SavedStateHandle,
+    private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
+    private val moveNodesUseCase: MoveNodesUseCase,
+    private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NodeBottomSheetState())
@@ -61,10 +69,6 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
                 }
             }
         }
-        viewModelScope.launch {
-            val nodeId = stateHandle.get<Long>(nodeBottomSheetRouteNodeIdArg) ?: return@launch
-            getBottomSheetOptions(nodeId)
-        }
     }
 
     /**
@@ -73,7 +77,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
      * @param nodeId [TypedNode]
      * @return state
      */
-    private fun getBottomSheetOptions(nodeId: Long) = viewModelScope.launch {
+    fun getBottomSheetOptions(nodeId: Long) = viewModelScope.launch {
         val node = async { runCatching { getNodeByIdUseCase(NodeId(nodeId)) }.getOrNull() }
         val isNodeInRubbish =
             async { runCatching { isNodeInRubbish(nodeId) }.getOrDefault(false) }
@@ -111,5 +115,73 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
      */
     fun onConsumeErrorState() {
         _state.update { it.copy(error = consumed()) }
+    }
+
+
+    /**
+     * Check move nodes name collision
+     *
+     * @param nodes
+     * @param targetNode
+     */
+    fun checkNodesNameCollision(
+        nodes: List<Long>,
+        targetNode: Long,
+        type: NodeNameCollisionType,
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                checkNodesNameCollisionUseCase(
+                    nodes.associateWith { targetNode },
+                    type
+                )
+            }.onSuccess { result ->
+                _state.update { it.copy(nodeNameCollisionResult = triggered(result)) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Move nodes
+     *
+     * @param nodes
+     */
+    fun moveNodes(nodes: Map<Long, Long>) {
+        applicationScope.launch {
+            val result = runCatching {
+                moveNodesUseCase(nodes)
+            }.onSuccess {
+                setMoveTargetPath(nodes.values.first())
+            }.onFailure {
+                Timber.e(it)
+            }
+            _state.update { state -> state.copy(moveRequestResult = triggered(result)) }
+        }
+    }
+
+    /**
+     * Set last used path of move as target path for next move
+     */
+    private fun setMoveTargetPath(path: Long) {
+        viewModelScope.launch {
+            runCatching { setMoveLatestTargetPathUseCase(path) }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Mark handle node name collision result
+     */
+    fun markHandleNodeNameCollisionResult() {
+        _state.update { it.copy(nodeNameCollisionResult = consumed()) }
+    }
+
+    /**
+     * Mark handle move request result
+     */
+    fun markHandleMoveRequestResult() {
+        _state.update { it.copy(moveRequestResult = consumed()) }
     }
 }

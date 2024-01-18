@@ -8,6 +8,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
@@ -36,6 +37,7 @@ internal fun SearchNavHostController(
     renameNodeDialogViewModel: RenameNodeDialogViewModel,
     removeNodeLinkViewModel: RemoveNodeLinkViewModel,
     changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel,
+    nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
     shareFolderDialogViewModel: ShareFolderDialogViewModel,
     removeShareFolderViewModel: RemoveShareFolderViewModel,
     handleClick: (TypedNode?) -> Unit,
@@ -68,7 +70,8 @@ internal fun SearchNavHostController(
                 removeNodeLinkViewModel = removeNodeLinkViewModel,
                 shareFolderDialogViewModel = shareFolderDialogViewModel,
                 changeNodeExtensionDialogViewModel = changeNodeExtensionDialogViewModel,
-                removeShareFolderViewModel = removeShareFolderViewModel
+                removeShareFolderViewModel = removeShareFolderViewModel,
+                nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
             )
         }
     }

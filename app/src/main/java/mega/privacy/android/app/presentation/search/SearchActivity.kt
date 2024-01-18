@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
@@ -21,14 +20,18 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
+import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionAction
 import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
@@ -42,6 +45,8 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
@@ -60,9 +65,9 @@ import javax.inject.Inject
  * Search activity to search Nodes and display
  */
 @AndroidEntryPoint
-class SearchActivity : AppCompatActivity() {
-
+class SearchActivity : BaseActivity() {
     private val viewModel: SearchActivityViewModel by viewModels()
+    private val nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel by viewModels()
     private val moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel by viewModels()
     private val renameNodeDialogViewModel: RenameNodeDialogViewModel by viewModels()
     private val removeNodeLinkViewModel: RemoveNodeLinkViewModel by viewModels()
@@ -76,6 +81,12 @@ class SearchActivity : AppCompatActivity() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * Move request message mapper
+     */
+    @Inject
+    lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
 
     companion object {
         /**
@@ -124,6 +135,9 @@ class SearchActivity : AppCompatActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //Should be done in onCreate to avoid the issue that the activity is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED.
+        val bottomSheetActionHandler =
+            NodeBottomSheetActionHandler(this, nodeOptionsBottomSheetViewModel)
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -133,6 +147,7 @@ class SearchActivity : AppCompatActivity() {
             val removeLinkState by removeNodeLinkViewModel.state.collectAsStateWithLifecycle()
             val changeNodeExtensionDialogViewModelState by changeNodeExtensionDialogViewModel.state.collectAsStateWithLifecycle()
             val removeFolderShareState by removeShareFolderViewModel.state.collectAsStateWithLifecycle()
+            val nodeOptionsBottomSheetState by nodeOptionsBottomSheetViewModel.state.collectAsStateWithLifecycle()
 
             val scaffoldState = rememberScaffoldState()
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
@@ -147,13 +162,14 @@ class SearchActivity : AppCompatActivity() {
                         renameNodeDialogViewModel = renameNodeDialogViewModel,
                         removeNodeLinkViewModel = removeNodeLinkViewModel,
                         changeNodeExtensionDialogViewModel = changeNodeExtensionDialogViewModel,
+                        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
                         shareFolderDialogViewModel = shareFolderDialogViewModel,
                         removeShareFolderViewModel = removeShareFolderViewModel,
                         handleClick = ::handleClick,
                         navigateToLink = ::navigateToLink,
                         showSortOrderBottomSheet = ::showSortOrderBottomSheet,
                         trackAnalytics = ::trackAnalytics,
-                        nodeBottomSheetActionHandler = NodeBottomSheetActionHandler(this),
+                        nodeBottomSheetActionHandler = bottomSheetActionHandler,
                         onBackPressed = {
                             if (viewModel.state.value.selectedNodes.isNotEmpty()) {
                                 viewModel.clearSelection()
@@ -211,6 +227,27 @@ class SearchActivity : AppCompatActivity() {
                     onConsumed = { removeShareFolderViewModel.consumeRemoveShareEvent() },
                     action = {
                         scaffoldState.snackbarHostState.showSnackbar(it)
+                    }
+                )
+                EventEffect(
+                    event = nodeOptionsBottomSheetState.moveRequestResult,
+                    onConsumed = nodeOptionsBottomSheetViewModel::markHandleMoveRequestResult,
+                    action = {
+                        if (it.isSuccess) {
+                            val data = it.getOrThrow()
+                            scaffoldState.snackbarHostState.showSnackbar(
+                                moveRequestMessageMapper(data)
+                            )
+                        } else {
+                            manageCopyMoveException(it.exceptionOrNull())
+                        }
+                    }
+                )
+                EventEffect(
+                    event = nodeOptionsBottomSheetState.nodeNameCollisionResult,
+                    onConsumed = nodeOptionsBottomSheetViewModel::markHandleNodeNameCollisionResult,
+                    action = {
+                        handleNodesNameCollisionResult(it)
                     }
                 )
             }
@@ -322,5 +359,30 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         Analytics.tracker.trackEvent(event)
+    }
+
+    private fun handleNodesNameCollisionResult(result: NodeNameCollisionResult) {
+        if (result.conflictNodes.isNotEmpty()) {
+            nameCollisionActivityContract
+                ?.launch(
+                    ArrayList(
+                        result.conflictNodes.values.map {
+                            when (result.type) {
+                                NodeNameCollisionType.RESTORE,
+                                NodeNameCollisionType.MOVE,
+                                -> NameCollision.Movement.getMovementCollision(it)
+
+                                NodeNameCollisionType.COPY -> NameCollision.Copy.getCopyCollision(it)
+                            }
+                        },
+                    )
+                )
+        }
+        if (result.noConflictNodes.isNotEmpty()) {
+            when (result.type) {
+                NodeNameCollisionType.MOVE -> nodeOptionsBottomSheetViewModel.moveNodes(result.noConflictNodes)
+                else -> Timber.d("Not implemented")
+            }
+        }
     }
 }

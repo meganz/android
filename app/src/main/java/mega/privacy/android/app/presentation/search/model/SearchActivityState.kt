@@ -5,6 +5,8 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchType
@@ -20,11 +22,13 @@ import mega.privacy.android.domain.entity.search.SearchType
  * @property errorMessageId error message id to be shown on UI
  * @property filters search filter categories
  * @property selectedFilter selected filter which is enabled on chips
- * @property searchType
- * @property emptyState
- * @property selectedNodes
- * @property lastSelectedNode
- * @property menuActions
+ * @property searchType type of search
+ * @property emptyState empty state to be shown on UI
+ * @property selectedNodes selected nodes
+ * @property lastSelectedNode last selected node
+ * @property menuActions list of [MenuAction] to be shown on toolbar
+ * @property nodeNameCollisionResult result of node name collision
+ * @property moveRequestResult result of move request
  */
 data class SearchActivityState(
     val searchItemList: List<NodeUIItem<TypedNode>> = emptyList(),
@@ -41,4 +45,6 @@ data class SearchActivityState(
     val emptyState: Pair<Int, String>? = null,
     val searchType: SearchType = SearchType.OTHER,
     val menuActions: List<MenuAction> = emptyList(),
+    val nodeNameCollisionResult: NodeNameCollisionResult? = null,
+    val moveRequestResult: Result<MoveRequestResult>? = null,
 )
