@@ -1,8 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.link
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
@@ -20,6 +17,8 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.toUiChatStat
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.core.ui.controls.chat.messages.ContactMessageContentView
+import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
+import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 
@@ -56,6 +55,12 @@ fun ChatLinksMessageView(
 
                 RegexPatternType.FOLDER_LINK -> {
                     viewModel.loadFolderLinkInfo(it.link)?.let { linkContent ->
+                        contentLinks = contentLinks + linkContent
+                    }
+                }
+
+                RegexPatternType.FILE_LINK -> {
+                    viewModel.loadFileLinkInfo(it.link)?.let { linkContent ->
                         contentLinks = contentLinks + linkContent
                     }
                 }
@@ -107,11 +112,7 @@ fun ChatLinksMessageView(
                 }
 
                 if (index != contentLinks.lastIndex) {
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                    )
+                    MegaDivider(dividerSpacing = DividerSpacing.Full)
                 }
             }
         },

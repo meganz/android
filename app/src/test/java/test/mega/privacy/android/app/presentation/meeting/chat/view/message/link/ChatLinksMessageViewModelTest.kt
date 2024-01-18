@@ -10,13 +10,16 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatGroupLinkContent
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinksMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ContactLinkContent
+import mega.privacy.android.app.presentation.meeting.chat.view.message.link.FileLinkContent
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.FolderLinkContent
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -35,6 +38,7 @@ internal class ChatLinksMessageViewModelTest {
     private val getContactFromLinkUseCase: GetContactFromLinkUseCase = mock()
     private val checkChatLinkUseCase: CheckChatLinkUseCase = mock()
     private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase = mock()
+    private val getPublicNodeUseCase: GetPublicNodeUseCase = mock()
 
     @BeforeAll
     fun setup() {
@@ -52,6 +56,7 @@ internal class ChatLinksMessageViewModelTest {
             getContactFromLinkUseCase,
             checkChatLinkUseCase,
             getPublicLinkInformationUseCase,
+            getPublicNodeUseCase
         )
     }
 
@@ -116,5 +121,22 @@ internal class ChatLinksMessageViewModelTest {
         underTest.loadFolderLinkInfo(link)
         // make sure it is called only once because the other call we load from cache
         verify(getPublicLinkInformationUseCase).invoke(link)
+    }
+
+    @Test
+    fun `test that load file link info return correctly`() = runTest {
+        val link = "link"
+        val fileNode = mock<TypedFileNode>()
+        whenever(getPublicNodeUseCase(link)).thenReturn(fileNode)
+        Truth.assertThat(underTest.loadFileLinkInfo(link))
+            .isEqualTo(
+                FileLinkContent(
+                    fileNode,
+                    link
+                )
+            )
+        underTest.loadFileLinkInfo(link)
+        // make sure it is called only once because the other call we load from cache
+        verify(getPublicNodeUseCase).invoke(link)
     }
 }
