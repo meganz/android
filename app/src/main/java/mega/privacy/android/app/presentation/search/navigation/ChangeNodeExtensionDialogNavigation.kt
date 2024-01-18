@@ -28,14 +28,14 @@ internal fun NavGraphBuilder.changeNodeExtensionDialogNavigation(
         val nodeNewName =
             backStackEntry.arguments?.getString(searchChangeNodeExtensionDialogArgumentNodeNewName)
         if (nodeId == null || nodeNewName == null) {
-            navHostController.popBackStack()
+            navHostController.navigateUp()
             return@dialog
         }
         ChangeNodeExtensionDialog(
             nodeId = nodeId,
             newNodeName = nodeNewName,
             onDismiss = {
-                navHostController.popBackStack()
+                navHostController.navigateUp()
             },
             viewModel = changeNodeExtensionDialogViewModel
         )

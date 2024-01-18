@@ -39,19 +39,17 @@ class ShareFolderDialogViewModelTest {
     }
 
     @Test
-    fun `test that backup type is not root node then state has shouldHandlePositiveClick value to truetest that the share folder dialog returns the correct information when the BackupNodeType is a RootNode`() =
+    fun `test that the share folder dialog returns the correct information when the BackupNodeType is a RootNode`() =
         runTest {
             val handle = 1234L
             val node: TypedFolderNode = mock()
             whenever(getNodeByHandleUseCase(handle)).thenReturn(node)
-            whenever(checkBackupNodeTypeByHandleUseCase(node)).thenReturn(BackupNodeType.RootNode)
-            underTest.getDialogContents(listOf(NodeId(handle), NodeId(2345L)))
+            whenever(checkBackupNodeTypeByHandleUseCase(node)).thenReturn(BackupNodeType.FolderNode)
+            underTest.getDialogContents(listOf(NodeId(handle)))
             val state = underTest.state.value
-            Truth.assertThat(state.title).isEqualTo(R.string.backup_share_permission_title)
-            Truth.assertThat(state.info).isEqualTo(R.string.backup_multi_share_permission_text)
-            Truth.assertThat(state.positiveButton).isEqualTo(R.string.general_positive_button)
-            Truth.assertThat(state.negativeButton).isEqualTo(R.string.general_cancel)
-            Truth.assertThat(state.shouldHandlePositiveClick).isEqualTo(true)
+            Truth.assertThat(state.info).isEqualTo(R.string.backup_share_permission_text)
+            Truth.assertThat(state.positiveButton).isEqualTo(R.string.button_permission_info)
+            Truth.assertThat(state.negativeButton).isEqualTo(null)
         }
 
     @Test
@@ -60,14 +58,12 @@ class ShareFolderDialogViewModelTest {
             val handle = 1234L
             val node: TypedFolderNode = mock()
             whenever(getNodeByHandleUseCase(handle)).thenReturn(node)
-            whenever(checkBackupNodeTypeByHandleUseCase(node)).thenReturn(BackupNodeType.NonBackupNode)
+            whenever(checkBackupNodeTypeByHandleUseCase(node)).thenReturn(BackupNodeType.RootNode)
             underTest.getDialogContents(listOf(NodeId(handle), NodeId(2345L)))
             val state = underTest.state.value
-            Truth.assertThat(state.title).isEqualTo(R.string.backup_share_permission_title)
-            Truth.assertThat(state.info).isEqualTo(R.string.backup_share_with_root_permission_text)
-            Truth.assertThat(state.positiveButton).isEqualTo(R.string.button_permission_info)
-            Truth.assertThat(state.negativeButton).isEqualTo(null)
-            Truth.assertThat(state.shouldHandlePositiveClick).isEqualTo(false)
+            Truth.assertThat(state.info).isEqualTo(R.string.backup_multi_share_permission_text)
+            Truth.assertThat(state.positiveButton).isEqualTo(R.string.general_positive_button)
+            Truth.assertThat(state.negativeButton).isEqualTo(R.string.general_cancel)
         }
 
     @AfterEach

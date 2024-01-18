@@ -7,7 +7,9 @@ import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
+import mega.privacy.android.app.presentation.node.dialogs.removesharefolder.RemoveShareFolderViewModel
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
+import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.cannotVerifyUserNavigation
@@ -18,6 +20,7 @@ import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetNa
 import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.removeShareFolderDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.shareFolderDialogNavigation
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -45,7 +48,9 @@ internal fun NavGraphBuilder.searchNavGraph(
     moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel,
     renameNodeDialogViewModel: RenameNodeDialogViewModel,
     removeNodeLinkViewModel: RemoveNodeLinkViewModel,
+    shareFolderDialogViewModel: ShareFolderDialogViewModel,
     changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel,
+    removeShareFolderViewModel: RemoveShareFolderViewModel,
     onBackPressed: () -> Unit,
 ) {
     composable(searchRoute) {
@@ -79,7 +84,14 @@ internal fun NavGraphBuilder.searchNavGraph(
         searchActivityViewModel = searchActivityViewModel
     )
     shareFolderDialogNavigation(
-        navHostController = navHostController
+        navHostController = navHostController,
+        shareFolderDialogViewModel = shareFolderDialogViewModel,
+        searchActivityViewModel = searchActivityViewModel
+    )
+    removeShareFolderDialogNavigation(
+        navHostController = navHostController,
+        removeShareFolderViewModel = removeShareFolderViewModel,
+        searchActivityViewModel = searchActivityViewModel
     )
 }
 

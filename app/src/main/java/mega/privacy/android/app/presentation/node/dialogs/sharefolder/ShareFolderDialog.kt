@@ -6,7 +6,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
@@ -25,14 +24,15 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 fun ShareFolderDialog(
     nodeIds: List<NodeId>,
     modifier: Modifier = Modifier,
-    shareFolderDialogViewModel: ShareFolderDialogViewModel = hiltViewModel(),
+    shareFolderDialogViewModel: ShareFolderDialogViewModel,
     onDismiss: () -> Unit,
     onOkClicked: () -> Unit,
 ) {
+    val shareFolderState by shareFolderDialogViewModel.state.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         shareFolderDialogViewModel.getDialogContents(nodeIds)
     }
-    val shareFolderState by shareFolderDialogViewModel.state.collectAsStateWithLifecycle()
 
     ShareFolderDialogBody(
         modifier = modifier,
@@ -49,25 +49,24 @@ private fun ShareFolderDialogBody(
     onDismiss: () -> Unit,
     onOkClicked: () -> Unit,
 ) {
-
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-        MegaAlertDialog(
-            title = stringResource(id = state.title),
-            body = stringResource(id = state.info),
-            icon = R.drawable.il_serious_warning,
-            modifier = modifier,
-            confirmButtonText = stringResource(id = state.positiveButton),
-            cancelButtonText = state.negativeButton?.let { stringResource(id = it) },
-            onConfirm = {
-                onDismiss()
-                if (state.shouldHandlePositiveClick) {
+        state.info?.let { infoRes ->
+            MegaAlertDialog(
+                title = stringResource(id = R.string.backup_share_permission_title),
+                body = stringResource(id = infoRes),
+                icon = R.drawable.il_serious_warning,
+                modifier = modifier,
+                confirmButtonText = stringResource(id = state.positiveButton),
+                cancelButtonText = state.negativeButton?.let { stringResource(id = it) },
+                onConfirm = {
+                    onDismiss()
                     onOkClicked()
-                }
-            },
-            onDismiss = onDismiss,
-            dismissOnClickOutside = false,
-            dismissOnBackPress = false
-        )
+                },
+                onDismiss = onDismiss,
+                dismissOnClickOutside = false,
+                dismissOnBackPress = false
+            )
+        }
     }
 }
 
@@ -77,11 +76,9 @@ private fun ShareFolderDialogBodyPreview() {
     ShareFolderDialogBody(
         modifier = Modifier,
         state = ShareFolderDialogState(
-            title = R.string.backup_share_permission_title,
             info = R.string.backup_multi_share_permission_text,
             positiveButton = R.string.button_permission_info,
             negativeButton = null,
-            shouldHandlePositiveClick = false
         ),
         onOkClicked = {},
         onDismiss = {}

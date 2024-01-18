@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node.dialogs.sharefolder
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +17,10 @@ import javax.inject.Inject
 
 /**
  * View model for share folder dialog
+ * @property getNodeByHandleUseCase [GetNodeByHandleUseCase]
+ * @property checkBackupNodeTypeByHandleUseCase [CheckBackupNodeTypeByHandleUseCase]
  */
+@HiltViewModel
 class ShareFolderDialogViewModel @Inject constructor(
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase,
@@ -25,7 +29,7 @@ class ShareFolderDialogViewModel @Inject constructor(
     private val _state = MutableStateFlow(ShareFolderDialogState())
 
     /**
-     * state for MoveToRubbishOrDeleteNodeDialog
+     * state for ShareFolderDialog
      */
     val state: StateFlow<ShareFolderDialogState> = _state.asStateFlow()
 
@@ -38,25 +42,20 @@ class ShareFolderDialogViewModel @Inject constructor(
             nodeIdList.firstOrNull()?.let {
                 getNodeByHandleUseCase(it.longValue)?.let { node ->
                     val nodeType = checkBackupNodeTypeByHandleUseCase(node)
-                    val title = R.string.backup_share_permission_title
                     if (nodeIdList.size > 1 && nodeType == BackupNodeType.RootNode) {
                         _state.update { state ->
                             state.copy(
-                                title = title,
                                 info = R.string.backup_multi_share_permission_text,
                                 positiveButton = R.string.general_positive_button,
                                 negativeButton = R.string.general_cancel,
-                                shouldHandlePositiveClick = true
                             )
                         }
                     } else {
                         _state.update { state ->
                             state.copy(
-                                title = title,
-                                info = R.string.backup_share_with_root_permission_text,
+                                info = R.string.backup_share_permission_text,
                                 positiveButton = R.string.button_permission_info,
                                 negativeButton = null,
-                                shouldHandlePositiveClick = false
                             )
                         }
                     }

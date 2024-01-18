@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.search.navigation
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -10,12 +12,15 @@ import androidx.navigation.navArgument
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialog
+import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
+import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
 
 internal fun NavGraphBuilder.shareFolderDialogNavigation(
     navHostController: NavHostController,
-    nodeHandles: List<NodeId> = emptyList(),
+    shareFolderDialogViewModel: ShareFolderDialogViewModel,
+    searchActivityViewModel: SearchActivityViewModel,
 ) {
     dialog(
         route = "$searchFolderShareDialog/{$searchFolderShareDialogArgumentNodeId}/{$isFolderShareFromToolbar}",
@@ -28,8 +33,9 @@ internal fun NavGraphBuilder.shareFolderDialogNavigation(
             it.arguments?.getLong(searchFolderShareDialogArgumentNodeId)?.let { handle ->
                 ShareFolderDialog(
                     nodeIds = listOf(NodeId(handle)),
+                    shareFolderDialogViewModel = shareFolderDialogViewModel,
                     onDismiss = {
-                        navHostController.popBackStack()
+                        navHostController.navigateUp()
                     },
                     onOkClicked = {
                         launchFileContactListActivity(
@@ -40,15 +46,20 @@ internal fun NavGraphBuilder.shareFolderDialogNavigation(
                 )
             }
         } else {
+            val searchState by searchActivityViewModel.state.collectAsStateWithLifecycle()
+            val nodeIds = searchState.selectedNodes.map { typedNode ->
+                typedNode.id
+            }
             ShareFolderDialog(
-                nodeIds = nodeHandles,
+                nodeIds = nodeIds,
+                shareFolderDialogViewModel = shareFolderDialogViewModel,
                 onDismiss = {
-                    navHostController.popBackStack()
+                    navHostController.navigateUp()
                 },
                 onOkClicked = {
                     launchMultipleShareFolder(
                         navHostController.context,
-                        nodeHandles
+                        nodeIds
                     )
                 }
             )
@@ -57,9 +68,13 @@ internal fun NavGraphBuilder.shareFolderDialogNavigation(
 }
 
 private fun launchFileContactListActivity(context: Context, nodeId: NodeId) {
-    val intent = Intent(context, FileContactListActivity::class.java).apply {
-        putExtra(Constants.NAME, nodeId.longValue)
-    }
+    val intent = Intent()
+        .apply {
+            setClass(context, AddContactActivity::class.java)
+            putExtra("contactType", Constants.CONTACT_TYPE_BOTH)
+            putExtra("MULTISELECT", 0)
+            putExtra(AddContactActivity.EXTRA_NODE_HANDLE, nodeId.longValue)
+        }
     context.startActivity(intent)
 }
 
@@ -73,6 +88,7 @@ private fun launchMultipleShareFolder(context: Context, nodeId: List<NodeId>) {
         putExtra(AddContactActivity.EXTRA_NODE_HANDLE, handles)
         putExtra("MULTISELECT", 1)
     }
+    context.startActivity(intent)
 }
 
 internal const val searchFolderShareDialog = "search/folder_share"

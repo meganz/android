@@ -62,27 +62,19 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
             val context = navController.context
             if (node is TypedFolderNode) {
                 createShareKeyUseCase(node)
-                if (node.isOutShare()) {
-                    val intent = FileContactListActivity.launchIntent(
-                        context,
-                        node.id.longValue
+                val backupType = checkBackupNodeTypeByHandleUseCase(node)
+                if (backupType != BackupNodeType.NonBackupNode) {
+                    navController.navigate(
+                        searchFolderShareDialog.plus("/${node.id.longValue}").plus("/${false}")
                     )
-                    context.startActivity(intent)
                 } else {
-                    val backupType = checkBackupNodeTypeByHandleUseCase(node)
-                    if (backupType != BackupNodeType.NonBackupNode) {
-                        navController.navigate(
-                            searchFolderShareDialog.plus(node.id.longValue).plus(false)
-                        )
-                    } else {
-                        val intent = Intent().apply {
-                            setClass(context, AddContactActivity::class.java)
-                            putExtra("contactType", Constants.CONTACT_TYPE_BOTH)
-                            putExtra("MULTISELECT", 0)
-                            putExtra(AddContactActivity.EXTRA_NODE_HANDLE, node.id.longValue)
-                        }
-                        context.startActivity(intent)
+                    val intent = Intent().apply {
+                        setClass(context, AddContactActivity::class.java)
+                        putExtra("contactType", Constants.CONTACT_TYPE_BOTH)
+                        putExtra("MULTISELECT", 0)
+                        putExtra(AddContactActivity.EXTRA_NODE_HANDLE, node.id.longValue)
                     }
+                    context.startActivity(intent)
                 }
             }
         }

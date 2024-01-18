@@ -22,7 +22,7 @@ internal fun NavGraphBuilder.renameDialogNavigation(
             RenameNodeDialog(
                 nodeId = nodeId,
                 onDismiss = {
-                    navHostController.popBackStack()
+                    navHostController.navigateUp()
                 },
                 onOpenChangeExtensionDialog = { newNodeName ->
                     navHostController.navigate("$searchChangeExtensionNodeDialog/$nodeId/$newNodeName")

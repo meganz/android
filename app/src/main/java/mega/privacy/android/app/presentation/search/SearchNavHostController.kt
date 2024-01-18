@@ -12,6 +12,8 @@ import mega.privacy.android.app.presentation.node.dialogs.changeextension.Change
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
+import mega.privacy.android.app.presentation.node.dialogs.removesharefolder.RemoveShareFolderViewModel
+import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -34,6 +36,8 @@ internal fun SearchNavHostController(
     renameNodeDialogViewModel: RenameNodeDialogViewModel,
     removeNodeLinkViewModel: RemoveNodeLinkViewModel,
     changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel,
+    shareFolderDialogViewModel: ShareFolderDialogViewModel,
+    removeShareFolderViewModel: RemoveShareFolderViewModel,
     handleClick: (TypedNode?) -> Unit,
     navigateToLink: (String) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
@@ -62,7 +66,9 @@ internal fun SearchNavHostController(
                 moveToRubbishOrDeleteNodeDialogViewModel = moveToRubbishOrDeleteNodeDialogViewModel,
                 renameNodeDialogViewModel = renameNodeDialogViewModel,
                 removeNodeLinkViewModel = removeNodeLinkViewModel,
+                shareFolderDialogViewModel = shareFolderDialogViewModel,
                 changeNodeExtensionDialogViewModel = changeNodeExtensionDialogViewModel,
+                removeShareFolderViewModel = removeShareFolderViewModel
             )
         }
     }
