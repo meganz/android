@@ -74,6 +74,7 @@ import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
@@ -224,6 +225,7 @@ internal class ChatViewModelTest {
     private val createNewImageUriUseCase: CreateNewImageUriUseCase = mock()
     private val monitorJoiningChatUseCase = mock<MonitorJoiningChatUseCase>()
     private val monitorLeavingChatUseCase = mock<MonitorLeavingChatUseCase>()
+    private val sendLocationMessageUseCase = mock<SendLocationMessageUseCase>()
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeAll
@@ -276,6 +278,7 @@ internal class ChatViewModelTest {
             isAnonymousModeUseCase,
             closeChatPreviewUseCase,
             createNewImageUriUseCase,
+            sendLocationMessageUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -357,6 +360,7 @@ internal class ChatViewModelTest {
             monitorJoiningChatUseCase = monitorJoiningChatUseCase,
             monitorLeavingChatUseCase = monitorLeavingChatUseCase,
             applicationScope = CoroutineScope(testDispatcher),
+            sendLocationMessageUseCase = sendLocationMessageUseCase,
         )
     }
 

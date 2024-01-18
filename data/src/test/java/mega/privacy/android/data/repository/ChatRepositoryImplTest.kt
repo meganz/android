@@ -939,4 +939,32 @@ class ChatRepositoryImplTest {
         underTest.closeChatPreview(chatId)
         verify(megaChatApiGateway).closeChatPreview(chatId)
     }
+
+    @Test
+    fun `test that send geolocation invokes chat api`() = runTest {
+        val chatId = 123L
+        val longitude = 1.0F
+        val latitude = 1.0F
+        val image = "image"
+        whenever(
+            megaChatApiGateway.sendGeolocation(
+                chatId = chatId,
+                longitude = longitude,
+                latitude = latitude,
+                image = image
+            )
+        ).thenReturn(mock())
+        underTest.sendGeolocation(
+            chatId = chatId,
+            longitude = longitude,
+            latitude = latitude,
+            image = image
+        )
+        verify(megaChatApiGateway).sendGeolocation(
+            chatId = chatId,
+            longitude = longitude,
+            latitude = latitude,
+            image = image
+        )
+    }
 }

@@ -8,7 +8,10 @@ import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import javax.inject.Inject
 
-internal class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
+/**
+ * Create meta message use case.
+ */
+class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
 
     override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         when (metaType) {

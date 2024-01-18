@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.meeting.chat.model
 
+import android.content.Intent
 import android.net.Uri
+import android.util.Base64
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.main.megachat.MapsActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
@@ -64,6 +67,7 @@ import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
@@ -169,6 +173,7 @@ class ChatViewModel @Inject constructor(
     private val createNewImageUriUseCase: CreateNewImageUriUseCase,
     private val monitorJoiningChatUseCase: MonitorJoiningChatUseCase,
     private val monitorLeavingChatUseCase: MonitorLeavingChatUseCase,
+    private val sendLocationMessageUseCase: SendLocationMessageUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1022,6 +1027,27 @@ class ChatViewModel @Inject constructor(
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val imageFileName = "picture${timeStamp}_.jpg"
         return createNewImageUriUseCase(imageFileName)?.let { Uri.parse(it) }
+    }
+
+    /**
+     * Send location message.
+     */
+    fun sendLocationMessage(data: Intent?) {
+        data?.let {
+            val byteArray = data.getByteArrayExtra(MapsActivity.SNAPSHOT) ?: return
+            val latitude = data.getDoubleExtra(MapsActivity.LATITUDE, 0.0).toFloat()
+            val longitude = data.getDoubleExtra(MapsActivity.LONGITUDE, 0.0).toFloat()
+
+            viewModelScope.launch {
+                val encodedSnapshot = Base64.encodeToString(byteArray, Base64.DEFAULT)
+                val tempMessage = sendLocationMessageUseCase(
+                    chatId = chatId,
+                    latitude = latitude,
+                    longitude = longitude,
+                    image = encodedSnapshot
+                )
+            }
+        }
     }
 
     override fun onCleared() {

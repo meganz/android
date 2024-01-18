@@ -740,4 +740,11 @@ internal class MegaChatApiFacade @Inject constructor(
     }
 
     override fun hasUrl(content: String) = MegaChatApi.hasUrl(content)
+
+    override fun sendGeolocation(
+        chatId: Long,
+        longitude: Float,
+        latitude: Float,
+        image: String,
+    ): MegaChatMessage = chatApi.sendGeolocation(chatId, longitude, latitude, image)
 }

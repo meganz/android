@@ -634,7 +634,9 @@ internal class ChatRepositoryImpl @Inject constructor(
                     callback
                 )
 
-                continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(callback)
+                }
             }
         }.also {
             leavingIds.remove(chatId)
@@ -1217,4 +1219,13 @@ internal class ChatRepositoryImpl @Inject constructor(
         .map { it.contains(chatId) }
         .distinctUntilChanged()
         .flowOn(ioDispatcher)
+
+    override suspend fun sendGeolocation(
+        chatId: Long,
+        longitude: Float,
+        latitude: Float,
+        image: String,
+    ) = withContext(ioDispatcher) {
+        chatMessageMapper(megaChatApiGateway.sendGeolocation(chatId, longitude, latitude, image))
+    }
 }

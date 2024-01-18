@@ -136,6 +136,7 @@ internal fun ChatView(
         onJoinChat = viewModel::onJoinChat,
         onSetPendingJoinLink = viewModel::onSetPendingJoinLink,
         createNewImage = viewModel::createNewImageUri,
+        onSendLocationMessage = viewModel::sendLocationMessage,
     )
 }
 
@@ -186,6 +187,7 @@ internal fun ChatView(
     onJoinChat: () -> Unit = {},
     onSetPendingJoinLink: () -> Unit = {},
     createNewImage: suspend () -> Uri? = { null },
+    onSendLocationMessage: (Intent?) -> Unit = { _ -> },
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -229,7 +231,7 @@ internal fun ChatView(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
         ) {
-            // Manage picked location here
+            onSendLocationMessage(it.data)
             coroutineScope.launch { toolbarModalSheetState.hide() }
         }
     val locationPermissionsLauncher = rememberLauncherForActivityResult(
