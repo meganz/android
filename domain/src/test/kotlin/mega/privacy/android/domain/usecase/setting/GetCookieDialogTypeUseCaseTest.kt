@@ -1,10 +1,7 @@
 package mega.privacy.android.domain.usecase.setting
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.Feature
-import mega.privacy.android.domain.entity.featureflag.ABTestFeature
 import mega.privacy.android.domain.entity.settings.cookie.CookieDialogType
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -22,12 +19,16 @@ internal class GetCookieDialogTypeUseCaseTest {
     private lateinit var underTest: GetCookieDialogTypeUseCase
     private val shouldShowCookieDialogWithAdsUseCase = mock<ShouldShowCookieDialogWithAdsUseCase>()
     private val shouldShowGenericCookieDialogUseCase = mock<ShouldShowGenericCookieDialogUseCase>()
+    private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
+    private val updateCookieSettingsUseCase = mock<UpdateCookieSettingsUseCase>()
 
     @BeforeEach
     fun setUp() {
         underTest = GetCookieDialogTypeUseCase(
             shouldShowCookieDialogWithAdsUseCase,
-            shouldShowGenericCookieDialogUseCase
+            shouldShowGenericCookieDialogUseCase,
+            getCookieSettingsUseCase,
+            updateCookieSettingsUseCase
         )
     }
 
@@ -36,14 +37,19 @@ internal class GetCookieDialogTypeUseCaseTest {
         reset(
             shouldShowCookieDialogWithAdsUseCase,
             shouldShowGenericCookieDialogUseCase,
+            getCookieSettingsUseCase,
+            updateCookieSettingsUseCase
         )
     }
 
     @Test
     fun `Test that Cookie dialog type should be CookieDialogWithAds when shouldShowCookieDialogWithAdsUseCase return true`() =
         runTest {
+            whenever(getCookieSettingsUseCase()).thenReturn(emptySet())
+            whenever(updateCookieSettingsUseCase(any())).thenReturn(Unit)
             whenever(
                 shouldShowCookieDialogWithAdsUseCase(
+                    any(),
                     any(),
                     any(),
                     any()
@@ -62,14 +68,17 @@ internal class GetCookieDialogTypeUseCaseTest {
     @Test
     fun `Test that Cookie dialog type should be GenericCookieDialog when shouldShowCookieDialogWithAdsUseCase return false and shouldShowGenericCookieDialogUseCase return true`() =
         runTest {
+            whenever(getCookieSettingsUseCase()).thenReturn(emptySet())
+            whenever(updateCookieSettingsUseCase(any())).thenReturn(Unit)
             whenever(
                 shouldShowCookieDialogWithAdsUseCase(
+                    any(),
                     any(),
                     any(),
                     any()
                 )
             ).thenReturn(false)
-            whenever(shouldShowGenericCookieDialogUseCase()).thenReturn(true)
+            whenever(shouldShowGenericCookieDialogUseCase(any())).thenReturn(true)
 
             val result = underTest(
                 mock(),
@@ -83,14 +92,17 @@ internal class GetCookieDialogTypeUseCaseTest {
     @Test
     fun `Test that Cookie dialog type should be None when shouldShowCookieDialogWithAdsUseCase and shouldShowGenericCookieDialogUseCase return false`() =
         runTest {
+            whenever(getCookieSettingsUseCase()).thenReturn(emptySet())
+            whenever(updateCookieSettingsUseCase(any())).thenReturn(Unit)
             whenever(
                 shouldShowCookieDialogWithAdsUseCase(
+                    any(),
                     any(),
                     any(),
                     any()
                 )
             ).thenReturn(false)
-            whenever(shouldShowGenericCookieDialogUseCase()).thenReturn(false)
+            whenever(shouldShowGenericCookieDialogUseCase(any())).thenReturn(false)
 
             val result = underTest(
                 mock(),

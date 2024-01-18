@@ -3,41 +3,30 @@ package mega.privacy.android.app.fragments.settingsFragments.cookie
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.TwoButtonsPreference
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ACCEPT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ADS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ANALYTICS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_POLICIES
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.settings.cookie.CookieType.ADVERTISEMENT
 import mega.privacy.android.domain.entity.settings.cookie.CookieType.ANALYTICS
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class CookieSettingsFragment : SettingsBaseFragment(),
     Preference.OnPreferenceChangeListener {
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val viewModel by activityViewModels<CookieSettingsViewModel>()
 
@@ -56,40 +45,18 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         policiesPreference = findPreference(KEY_COOKIE_POLICIES)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        checkForInAppAdvertisement()
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupObservers()
         setupView()
     }
 
-    private fun checkForInAppAdvertisement() {
-        lifecycleScope.launch {
-            runCatching {
-                if (
-                    getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement) &&
-                    getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
-                    getFeatureFlagValueUseCase(ABTestFeatures.adse)
-                ) {
-                    showAdsCookiePreference = true
-                    adsCookiesPreference?.isVisible = true
-                    updateAcceptCookiesPreference(showAdsCookiePreference)
-                }
-            }.onFailure {
-                Timber.e("Failed to fetch feature flag with error: ${it.message}")
-            }
-        }
-    }
-
     private fun setupObservers() {
+        collectFlow(viewModel.uiState) { uiState ->
+            showAdsCookiePreference = uiState.showAdsCookiePreference
+            adsCookiesPreference?.isVisible = showAdsCookiePreference
+            updateAcceptCookiesPreference(showAdsCookiePreference)
+        }
         viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showCookies)
         viewModel.onUpdateResult().observe(viewLifecycleOwner) { success ->
             if (success) {

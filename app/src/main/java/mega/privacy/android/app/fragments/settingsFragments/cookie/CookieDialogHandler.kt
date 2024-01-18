@@ -161,7 +161,7 @@ class CookieDialogHandler @Inject constructor(
                 val enabledCookies = if (isCookieDialogWithAds) {
                     CookieType.entries.toSet()
                 } else {
-                    CookieType.entries.toSet() - CookieType.ADS_CHECK
+                    CookieType.entries.toSet() - CookieType.ADS_CHECK - CookieType.ADVERTISEMENT
                 }
                 updateCookieSettingsUseCase(enabledCookies)
                 broadcastCookieSettingsSavedUseCase(enabledCookies)

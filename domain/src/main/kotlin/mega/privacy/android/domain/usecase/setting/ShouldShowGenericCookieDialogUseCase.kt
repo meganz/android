@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.setting
 
+import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import javax.inject.Inject
 
 /**
@@ -7,14 +8,13 @@ import javax.inject.Inject
  */
 class ShouldShowGenericCookieDialogUseCase @Inject constructor(
     private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCase,
-    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
 ) {
 
     /**
      * Check if the generic cookie dialog should be shown.
-     *
+     * @param cookieSettings    Set of cookie settings.
      * @return True if the generic cookie dialog should be shown, false otherwise.
      */
-    suspend operator fun invoke() =
-        checkCookieBannerEnabledUseCase() && getCookieSettingsUseCase().isEmpty()
+    suspend operator fun invoke(cookieSettings: Set<CookieType>) =
+        checkCookieBannerEnabledUseCase() && cookieSettings.isEmpty()
 }

@@ -5,10 +5,17 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.fragments.settingsFragments.cookie.model.CookieSettingsUIState
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
@@ -21,8 +28,16 @@ class CookieSettingsViewModel @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
     private val broadcastCookieSettingsSavedUseCase: BroadcastCookieSettingsSavedUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
 ) : BaseRxViewModel() {
+
+    private val _uiState = MutableStateFlow(CookieSettingsUIState())
+
+    /**
+     * CookieSettings state
+     */
+    val uiState = _uiState.asStateFlow()
 
     private val enabledCookies = MutableLiveData(mutableSetOf(CookieType.ESSENTIAL))
     private val updateResult = MutableLiveData<Boolean>()
@@ -37,6 +52,11 @@ class CookieSettingsViewModel @Inject constructor(
         }
     }
 
+    init {
+        loadCookieSettings()
+        checkForInAppAdvertisement()
+    }
+
     fun onEnabledCookies(): LiveData<MutableSet<CookieType>> = enabledCookies
     fun onUpdateResult(): LiveData<Boolean> = updateResult
 
@@ -46,10 +66,6 @@ class CookieSettingsViewModel @Inject constructor(
      * @return livedata to enable/disable back pressed handler
      */
     fun onEnableBackPressedHandler(): LiveData<Boolean> = enableBackPressedHandler
-
-    init {
-        getCookieSettings()
-    }
 
     /**
      * Change cookie state
@@ -73,10 +89,31 @@ class CookieSettingsViewModel @Inject constructor(
      */
     fun toggleCookies(enable: Boolean) {
         if (enable) {
-            enabledCookies.value?.addAll(CookieType.values())
+            enabledCookies.value?.addAll(CookieType.entries.toTypedArray())
             enabledCookies.notifyObserver()
         } else {
             resetCookies()
+        }
+    }
+
+
+    /**
+     * Check if showAdsCookiePreference is enabled
+     */
+    private fun checkForInAppAdvertisement() {
+        viewModelScope.launch {
+            runCatching {
+                val showAdsCookiePreference =
+                    getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement) &&
+                            getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
+                            getFeatureFlagValueUseCase(ABTestFeatures.adse)
+                _uiState.update { state ->
+                    state.copy(showAdsCookiePreference = showAdsCookiePreference)
+                }
+
+            }.onFailure {
+                Timber.e("Failed to fetch feature flag with error: ${it.message}")
+            }
         }
     }
 
@@ -93,7 +130,9 @@ class CookieSettingsViewModel @Inject constructor(
      * Save cookie settings to SDK
      */
     fun saveCookieSettings() {
-        addAdsCheckCookieIfNeeded()
+        if (uiState.value.showAdsCookiePreference) {
+            addAdsCheckCookieIfNeeded()
+        }
         viewModelScope.launch {
             enabledCookies.value?.let {
                 runCatching {
@@ -104,7 +143,7 @@ class CookieSettingsViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e(it)
                     updateResult.value = false
-                    getCookieSettings()
+                    loadCookieSettings()
                 }
             }
         }
@@ -113,7 +152,7 @@ class CookieSettingsViewModel @Inject constructor(
     /**
      * Retrieve current cookie settings from SDK
      */
-    private fun getCookieSettings() {
+    private fun loadCookieSettings() {
         viewModelScope.launch {
             runCatching {
                 val settings = getCookieSettingsUseCase()

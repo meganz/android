@@ -19,14 +19,12 @@ import org.mockito.kotlin.whenever
 internal class ShouldShowGenericCookieDialogUseCaseTest {
 
     private lateinit var underTest: ShouldShowGenericCookieDialogUseCase
-    private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
     private val checkCookieBannerEnabledUseCase = mock<CheckCookieBannerEnabledUseCase>()
 
     @AfterEach
     fun resetMocks() {
         reset(
             checkCookieBannerEnabledUseCase,
-            getCookieSettingsUseCase,
         )
     }
 
@@ -34,7 +32,6 @@ internal class ShouldShowGenericCookieDialogUseCaseTest {
     fun initTestClass() {
         underTest = ShouldShowGenericCookieDialogUseCase(
             checkCookieBannerEnabledUseCase,
-            getCookieSettingsUseCase,
         )
     }
 
@@ -54,9 +51,8 @@ internal class ShouldShowGenericCookieDialogUseCaseTest {
     ) {
         runTest {
             whenever(checkCookieBannerEnabledUseCase()).thenReturn(cookieBannerEnabled)
-            whenever(getCookieSettingsUseCase()).thenReturn(cookieSettings)
 
-            val result = underTest.invoke()
+            val result = underTest.invoke(cookieSettings)
             assertThat(result).isEqualTo(expected)
         }
     }

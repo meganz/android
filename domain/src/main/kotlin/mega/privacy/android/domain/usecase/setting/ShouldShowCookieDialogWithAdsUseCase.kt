@@ -13,19 +13,19 @@ import javax.inject.Inject
  */
 class ShouldShowCookieDialogWithAdsUseCase @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
-    private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
 ) {
 
     /**
      *  Check if the cookie dialog should be shown with ads.
      *
+     * @param cookieSettings Cookie settings.
      * @param inAppAdvertisementFeature Feature flag to check if in-app ads are enabled.
      * @param isAdsEnabledFeature Feature flag to check if ads are enabled.
      * @param isExternalAdsEnabledFeature Feature flag to check if external ads are enabled.
      * @return True if cookie dialog should be shown with ads, false otherwise.
      */
     suspend operator fun invoke(
+        cookieSettings: Set<CookieType>,
         inAppAdvertisementFeature: Feature,
         isAdsEnabledFeature: ABTestFeature,
         isExternalAdsEnabledFeature: ABTestFeature,
@@ -38,13 +38,6 @@ class ShouldShowCookieDialogWithAdsUseCase @Inject constructor(
 
         val featureFlags = features.map { feature ->
             async { getFeatureFlagValueUseCase(feature) }
-        }
-        val cookieSettings = getCookieSettingsUseCase()
-        //ADVERTISEMENT cookie is not set, so we need to set it to false
-        if (!cookieSettings.contains(CookieType.ADS_CHECK) &&
-            cookieSettings.contains(CookieType.ADVERTISEMENT)
-        ) {
-            updateCookieSettingsUseCase(cookieSettings - CookieType.ADVERTISEMENT)
         }
 
         featureFlags.all { it.await() }
