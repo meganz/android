@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.entity.chat
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import mega.privacy.android.domain.entity.chat.ChatGeolocationInfo
 
 /**
  * Entity to store a geolocation message.
@@ -16,7 +17,7 @@ import androidx.room.PrimaryKey
 data class ChatGeolocationEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val messageId: Long,
-    val longitude: Float,
-    val latitude: Float,
-    val image: String?,
-)
+    override val longitude: Float,
+    override val latitude: Float,
+    override val image: String?,
+) : ChatGeolocationInfo

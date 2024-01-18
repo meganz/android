@@ -9,7 +9,7 @@ import androidx.room.Relation
  * @property typedMessageEntity Typed message request entity
  * @property nodeList List of nodes
  * @property richPreviewEntity Rich preview entity
- * @property chatGeolocationEntity Chat geolocation entity
+ * @property geolocationEntity Chat geolocation entity
  * @property giphyEntity Giphy entity
  */
 data class MetaTypedMessageEntity(
@@ -31,7 +31,7 @@ data class MetaTypedMessageEntity(
         entityColumn = "messageId",
         entity = ChatGeolocationEntity::class
     )
-    val chatGeolocationEntity: ChatGeolocationEntity?,
+    val geolocationEntity: ChatGeolocationEntity?,
     @Relation(
         parentColumn = "msgId",
         entityColumn = "messageId",

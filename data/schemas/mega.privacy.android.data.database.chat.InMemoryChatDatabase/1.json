@@ -2,12 +2,18 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c4487daf38d9d7b16e481464f8a5f7a2",
+    "identityHash": "2b33d137ac4ff634a6aa0e7039afce4e",
     "entities": [
       {
-        "tableName": "typed_message_requests",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatId` INTEGER NOT NULL, `status` TEXT NOT NULL, `msgId` INTEGER NOT NULL, `tempId` INTEGER NOT NULL, `msgIndex` INTEGER NOT NULL, `userHandle` INTEGER NOT NULL, `type` TEXT NOT NULL, `hasConfirmedReactions` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `content` TEXT, `isEdited` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `isEditable` INTEGER NOT NULL, `isDeletable` INTEGER NOT NULL, `isManagementMessage` INTEGER NOT NULL, `handleOfAction` INTEGER NOT NULL, `privilege` TEXT NOT NULL, `code` TEXT NOT NULL, `usersCount` INTEGER NOT NULL, `userHandles` TEXT NOT NULL, `userNames` TEXT NOT NULL, `userEmails` TEXT NOT NULL, `nodeList` TEXT NOT NULL, `handleList` TEXT NOT NULL, `duration` INTEGER NOT NULL, `retentionTime` INTEGER NOT NULL, `termCode` TEXT NOT NULL, `rowId` INTEGER NOT NULL, `changes` TEXT NOT NULL, `containsMeta` TEXT, `isMine` INTEGER NOT NULL, `shouldShowAvatar` INTEGER NOT NULL, `shouldShowTime` INTEGER NOT NULL, `shouldShowDate` INTEGER NOT NULL)",
+        "tableName": "typed_messages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`msgId` INTEGER NOT NULL, `chatId` INTEGER NOT NULL, `status` TEXT NOT NULL, `tempId` INTEGER NOT NULL, `msgIndex` INTEGER NOT NULL, `userHandle` INTEGER NOT NULL, `type` TEXT NOT NULL, `hasConfirmedReactions` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `content` TEXT, `isEdited` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `isEditable` INTEGER NOT NULL, `isDeletable` INTEGER NOT NULL, `isManagementMessage` INTEGER NOT NULL, `handleOfAction` INTEGER NOT NULL, `privilege` TEXT NOT NULL, `code` TEXT NOT NULL, `usersCount` INTEGER NOT NULL, `userHandles` TEXT NOT NULL, `userNames` TEXT NOT NULL, `userEmails` TEXT NOT NULL, `handleList` TEXT NOT NULL, `duration` INTEGER NOT NULL, `retentionTime` INTEGER NOT NULL, `termCode` TEXT NOT NULL, `rowId` INTEGER NOT NULL, `changes` TEXT NOT NULL, `isMine` INTEGER NOT NULL, `shouldShowAvatar` INTEGER NOT NULL, `shouldShowTime` INTEGER NOT NULL, `shouldShowDate` INTEGER NOT NULL, `textMessage` TEXT, PRIMARY KEY(`msgId`))",
         "fields": [
+          {
+            "fieldPath": "msgId",
+            "columnName": "msgId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
           {
             "fieldPath": "chatId",
             "columnName": "chatId",
@@ -18,12 +24,6 @@
             "fieldPath": "status",
             "columnName": "status",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "msgId",
-            "columnName": "msgId",
-            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -141,12 +141,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "nodeList",
-            "columnName": "nodeList",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "handleList",
             "columnName": "handleList",
             "affinity": "TEXT",
@@ -183,12 +177,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "containsMeta",
-            "columnName": "containsMeta",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
             "fieldPath": "isMine",
             "columnName": "isMine",
             "affinity": "INTEGER",
@@ -211,11 +199,19 @@
             "columnName": "shouldShowDate",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "textMessage",
+            "columnName": "textMessage",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
           "autoGenerate": false,
-          "columnNames": []
+          "columnNames": [
+            "msgId"
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -245,12 +241,308 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "rich_preview",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `messageId` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `image` TEXT, `imageFormat` TEXT, `icon` TEXT, `iconFormat` TEXT, `url` TEXT NOT NULL, `domainName` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "image",
+            "columnName": "image",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "imageFormat",
+            "columnName": "imageFormat",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "icon",
+            "columnName": "icon",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "iconFormat",
+            "columnName": "iconFormat",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "domainName",
+            "columnName": "domainName",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "giphy",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `messageId` INTEGER NOT NULL, `mp4Src` TEXT, `webpSrc` TEXT, `title` TEXT, `mp4Size` INTEGER NOT NULL, `webpSize` INTEGER NOT NULL, `width` INTEGER NOT NULL, `height` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mp4Src",
+            "columnName": "mp4Src",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "webpSrc",
+            "columnName": "webpSrc",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mp4Size",
+            "columnName": "mp4Size",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "webpSize",
+            "columnName": "webpSize",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "width",
+            "columnName": "width",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "height",
+            "columnName": "height",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "chat_geolocation",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `messageId` INTEGER NOT NULL, `longitude` REAL NOT NULL, `latitude` REAL NOT NULL, `image` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "image",
+            "columnName": "image",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "chat_node",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL, `base64Id` TEXT NOT NULL, `label` INTEGER NOT NULL, `isFavourite` INTEGER NOT NULL, `isTakenDown` INTEGER NOT NULL, `isIncomingShare` INTEGER NOT NULL, `isNodeKeyDecrypted` INTEGER NOT NULL, `creationTime` INTEGER NOT NULL, `serializedData` TEXT, `isAvailableOffline` INTEGER NOT NULL, `versionCount` INTEGER NOT NULL, `publicLink` TEXT, `publicLinkCreationTime` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentId",
+            "columnName": "parentId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "base64Id",
+            "columnName": "base64Id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "label",
+            "columnName": "label",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFavourite",
+            "columnName": "isFavourite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isTakenDown",
+            "columnName": "isTakenDown",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isIncomingShare",
+            "columnName": "isIncomingShare",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isNodeKeyDecrypted",
+            "columnName": "isNodeKeyDecrypted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creationTime",
+            "columnName": "creationTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serializedData",
+            "columnName": "serializedData",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isAvailableOffline",
+            "columnName": "isAvailableOffline",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "versionCount",
+            "columnName": "versionCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exportedData.publicLink",
+            "columnName": "publicLink",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "exportedData.publicLinkCreationTime",
+            "columnName": "publicLinkCreationTime",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c4487daf38d9d7b16e481464f8a5f7a2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b33d137ac4ff634a6aa0e7039afce4e')"
     ]
   }
 }

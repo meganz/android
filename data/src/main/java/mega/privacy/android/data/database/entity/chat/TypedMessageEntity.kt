@@ -7,6 +7,7 @@ import mega.privacy.android.data.database.converter.TypedMessageEntityConverters
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatMessageChange
 import mega.privacy.android.domain.entity.chat.ChatMessageCode
+import mega.privacy.android.domain.entity.chat.ChatMessageInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
@@ -51,38 +52,38 @@ import mega.privacy.android.domain.entity.chat.ChatMessageType
 @Entity(tableName = "typed_messages")
 @TypeConverters(TypedMessageEntityConverters::class)
 data class TypedMessageEntity(
-    @PrimaryKey val msgId: Long,
+    @PrimaryKey override val msgId: Long,
     val chatId: Long,
-    val status: ChatMessageStatus,
-    val tempId: Long,
-    val msgIndex: Int,
-    val userHandle: Long,
-    val type: ChatMessageType,
-    val hasConfirmedReactions: Boolean,
-    val timestamp: Long,
-    val content: String?,
-    val isEdited: Boolean,
-    val isDeleted: Boolean,
-    val isEditable: Boolean,
-    val isDeletable: Boolean,
-    val isManagementMessage: Boolean,
-    val handleOfAction: Long,
-    val privilege: ChatRoomPermission,
-    val code: ChatMessageCode,
-    val usersCount: Long,
-    val userHandles: List<Long>,
-    val userNames: List<String>,
-    val userEmails: List<String>,
-    val handleList: List<Long>,
-    val duration: Int,
-    val retentionTime: Long,
-    val termCode: ChatMessageTermCode,
-    val rowId: Long,
-    val changes: List<ChatMessageChange>,
+    override val status: ChatMessageStatus,
+    override val tempId: Long,
+    override val msgIndex: Int,
+    override val userHandle: Long,
+    override val type: ChatMessageType,
+    override val hasConfirmedReactions: Boolean,
+    override val timestamp: Long,
+    override val content: String?,
+    override val isEdited: Boolean,
+    override val isDeleted: Boolean,
+    override val isEditable: Boolean,
+    override val isDeletable: Boolean,
+    override val isManagementMessage: Boolean,
+    override val handleOfAction: Long,
+    override val privilege: ChatRoomPermission,
+    override val code: ChatMessageCode,
+    override val usersCount: Long,
+    override val userHandles: List<Long>,
+    override val userNames: List<String>,
+    override val userEmails: List<String>,
+    override val handleList: List<Long>,
+    override val duration: Int,
+    override val retentionTime: Long,
+    override val termCode: ChatMessageTermCode,
+    override val rowId: Long,
+    override val changes: List<ChatMessageChange>,
     val isMine: Boolean,
     val shouldShowAvatar: Boolean,
     val shouldShowTime: Boolean,
     val shouldShowDate: Boolean,
     val textMessage: String?,
-)
+) : ChatMessageInfo
 

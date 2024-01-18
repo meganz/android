@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.entity.chat
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import mega.privacy.android.domain.entity.chat.ChatRichPreviewInfo
 
 /**
  * Entity to store a rich preview.
@@ -21,12 +22,12 @@ import androidx.room.PrimaryKey
 data class RichPreviewEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val messageId: Long,
-    val title: String,
-    val description: String,
-    val image: String?,
-    val imageFormat: String?,
-    val icon: String?,
-    val iconFormat: String?,
-    val url: String,
-    val domainName: String,
-)
+    override val title: String,
+    override val description: String,
+    override val image: String?,
+    override val imageFormat: String?,
+    override val icon: String?,
+    override val iconFormat: String?,
+    override val url: String,
+    override val domainName: String,
+) : ChatRichPreviewInfo

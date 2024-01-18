@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.entity.chat
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import mega.privacy.android.domain.entity.chat.ChatGifInfo
 
 /**
  * Entity to store a giphy.
@@ -20,11 +21,11 @@ import androidx.room.PrimaryKey
 data class GiphyEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val messageId: Long,
-    val mp4Src: String?,
-    val webpSrc: String?,
-    val title: String?,
-    val mp4Size: Int,
-    val webpSize: Int,
-    val width: Int,
-    val height: Int,
-)
+    override val mp4Src: String?,
+    override val webpSrc: String?,
+    override val title: String?,
+    override val mp4Size: Int,
+    override val webpSize: Int,
+    override val width: Int,
+    override val height: Int,
+) : ChatGifInfo

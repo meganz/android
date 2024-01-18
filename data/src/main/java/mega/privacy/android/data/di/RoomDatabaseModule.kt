@@ -157,7 +157,7 @@ internal object RoomDatabaseModule {
     @Provides
     @Singleton
     internal fun provideTypedMessageRequestDao(chatDatabase: InMemoryChatDatabase): TypedMessageDao =
-        chatDatabase.typedMessageRequestDao()
+        chatDatabase.typedMessageDao()
 
     @Provides
     @Singleton
