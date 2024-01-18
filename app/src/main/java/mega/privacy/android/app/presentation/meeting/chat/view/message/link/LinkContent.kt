@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.link
 
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.node.TypedFileNode
 
 /**
  * Link content
@@ -38,5 +39,16 @@ data class ChatGroupLinkContent(
  */
 data class FolderLinkContent(
     val folderInfo: FolderInfo,
+    override val link: String,
+) : LinkContent
+
+/**
+ * File link content
+ *
+ * @property node
+ * @property link
+ */
+data class FileLinkContent(
+    val node: TypedFileNode,
     override val link: String,
 ) : LinkContent

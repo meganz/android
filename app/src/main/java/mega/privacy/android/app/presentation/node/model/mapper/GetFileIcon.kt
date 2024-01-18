@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.node.model.mapper
 
-import androidx.annotation.DrawableRes
 import mega.privacy.android.core.R as CoreUiR
+import androidx.annotation.DrawableRes
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.node.TypedFileNode
 

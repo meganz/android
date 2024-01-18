@@ -3,6 +3,7 @@ package mega.privacy.android.core.ui.controls.chat.messages
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -43,6 +44,7 @@ fun RichLinkContentView(
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
     image: Painter? = null,
+    isFullImage: Boolean = true,
 ) {
     Column(modifier = modifier.padding(12.dp)) {
         Row(
@@ -50,14 +52,17 @@ fun RichLinkContentView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             image?.let {
-                Image(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(RoundedCornerShape(6.dp)),
-                    painter = it,
-                    contentDescription = "Image",
-                    contentScale = ContentScale.Crop
-                )
+                Box(modifier = Modifier.size(80.dp)) {
+                    Image(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(if (isFullImage) 80.dp else 48.dp)
+                            .clip(RoundedCornerShape(6.dp)),
+                        painter = it,
+                        contentDescription = "Image",
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
             Column(
                 modifier = Modifier,
