@@ -39,7 +39,7 @@ class CreateNormalChatMessageUseCaseTest {
         Truth.assertThat(
             underTest.invoke(
                 CreateTypedMessageRequest(
-                    message = message,
+                    chatMessage = message,
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,
@@ -64,7 +64,7 @@ class CreateNormalChatMessageUseCaseTest {
         Truth.assertThat(
             underTest.invoke(
                 CreateTypedMessageRequest(
-                    message = message,
+                    chatMessage = message,
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,

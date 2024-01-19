@@ -53,7 +53,7 @@ class MapChatMessageListUseCase @Inject constructor(
                 )
 
                 val request = CreateTypedMessageRequest(
-                    message = chatMessage,
+                    chatMessage = chatMessage,
                     isMine = isMine,
                     shouldShowAvatar = shouldShowAvatar,
                     shouldShowTime = shouldShowTime,

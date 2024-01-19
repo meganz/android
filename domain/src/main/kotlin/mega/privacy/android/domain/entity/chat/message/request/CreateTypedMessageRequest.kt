@@ -1,29 +1,58 @@
 package mega.privacy.android.domain.entity.chat.message.request
 
+import mega.privacy.android.domain.entity.chat.ChatGeolocationInfo
+import mega.privacy.android.domain.entity.chat.ChatGifInfo
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageInfo
+import mega.privacy.android.domain.entity.chat.ChatRichPreviewInfo
+import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.node.Node
 
 /**
  * Create typed message request
  *
- * @property message [ChatMessage]
- * @property isMine True if the message is mine.
- * @property shouldShowAvatar True if the avatar should be shown.
- * @property shouldShowTime True if the time should be shown.
- * @property shouldShowDate True if the date should be shown.
+ * @property message
+ * @property isMine
+ * @property shouldShowAvatar
+ * @property shouldShowTime
+ * @property shouldShowDate
+ * @property metaType
+ * @property textMessage
+ * @property chatRichPreviewInfo
+ * @property chatGeolocationInfo
+ * @property chatGifInfo
+ * @property nodeList
  */
 data class CreateTypedMessageRequest(
-    val message: ChatMessage,
+    val message: ChatMessageInfo,
     override val isMine: Boolean,
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val shouldShowDate: Boolean,
+    override val metaType: ContainsMetaType?,
+    override val textMessage: String?,
+    override val chatRichPreviewInfo: ChatRichPreviewInfo?,
+    override val chatGeolocationInfo: ChatGeolocationInfo?,
+    override val chatGifInfo: ChatGifInfo?,
+    override val nodeList: List<Node>,
 ) : ChatMessageInfo by message, CreateTypedMessageInfo {
-    override val metaType = message.containsMeta?.type
-    override val textMessage = message.containsMeta?.textMessage
-    override val chatRichPreviewInfo = message.containsMeta?.richPreview
-    override val chatGeolocationInfo = message.containsMeta?.geolocation
-    override val chatGifInfo = message.containsMeta?.giphy
-    override val nodeList: List<Node> = message.nodeList
+    constructor(
+        chatMessage: ChatMessage,
+        isMine: Boolean,
+        shouldShowAvatar: Boolean,
+        shouldShowTime: Boolean,
+        shouldShowDate: Boolean,
+    ) : this(
+        message = chatMessage,
+        isMine = isMine,
+        shouldShowAvatar = shouldShowAvatar,
+        shouldShowTime = shouldShowTime,
+        shouldShowDate = shouldShowDate,
+        metaType = chatMessage.containsMeta?.type,
+        textMessage = chatMessage.containsMeta?.textMessage,
+        chatRichPreviewInfo = chatMessage.containsMeta?.richPreview,
+        chatGeolocationInfo = chatMessage.containsMeta?.geolocation,
+        chatGifInfo = chatMessage.containsMeta?.giphy,
+        nodeList = chatMessage.nodeList,
+    )
 }

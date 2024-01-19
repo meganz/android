@@ -43,7 +43,7 @@ class SendLocationMessageUseCaseTest {
             val image = "image"
             val message = mock<ChatMessage>()
             val request = CreateTypedMessageRequest(
-                message = message,
+                chatMessage = message,
                 isMine = true,
                 shouldShowAvatar = false,
                 shouldShowTime = false,

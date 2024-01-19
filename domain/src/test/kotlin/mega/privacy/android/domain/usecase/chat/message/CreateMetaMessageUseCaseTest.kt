@@ -40,7 +40,7 @@ class CreateMetaMessageUseCaseTest {
         assertThat(
             underTest.invoke(
                 CreateTypedMessageRequest(
-                    message = message,
+                    chatMessage = message,
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,
@@ -69,7 +69,7 @@ class CreateMetaMessageUseCaseTest {
         assertThat(
             underTest.invoke(
                 CreateTypedMessageRequest(
-                    message = message,
+                    chatMessage = message,
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,

@@ -29,7 +29,7 @@ class SendLocationMessageUseCase @Inject constructor(
         image: String,
     ): MetaMessage {
         val request = CreateTypedMessageRequest(
-            message = chatRepository.sendGeolocation(chatId, longitude, latitude, image),
+            chatMessage = chatRepository.sendGeolocation(chatId, longitude, latitude, image),
             isMine = true,
             shouldShowAvatar = false,
             shouldShowTime = false,
