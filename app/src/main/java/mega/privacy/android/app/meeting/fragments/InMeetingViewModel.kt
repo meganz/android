@@ -1869,18 +1869,24 @@ class InMeetingViewModel @Inject constructor(
     fun changesInRemoteVideoFlag(session: MegaChatSession): Boolean {
         var hasChanged = false
         participants.value = participants.value?.map { participant ->
-            if (participant.peerId == session.peerid && participant.clientId == session.clientid &&
-                (participant.isVideoOn != session.hasVideo() ||
+            return@map when {
+                participant.peerId == session.peerid && participant.clientId == session.clientid -> {
+                    if (participant.isVideoOn != session.hasVideo() ||
                         participant.isCameraOn != session.hasCamera() ||
-                        participant.isScreenShareOn != session.hasScreenShare())
-            ) {
-                hasChanged = true
+                        participant.isScreenShareOn != session.hasScreenShare()
+                    ) {
+                        hasChanged = true
+                    }
+
+                    return@map participant.copy(
+                        isVideoOn = session.hasVideo(),
+                        isCameraOn = session.hasCamera(),
+                        isScreenShareOn = session.hasScreenShare()
+                    )
+                }
+
+                else -> participant
             }
-            return@map participant.copy(
-                isVideoOn = session.hasVideo(),
-                isCameraOn = session.hasCamera(),
-                isScreenShareOn = session.hasScreenShare()
-            )
         }?.toMutableList()
 
         speakerParticipants.value = speakerParticipants.value?.map { participant ->
