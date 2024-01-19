@@ -535,6 +535,12 @@ interface AccountRepository {
     suspend fun isCookieBannerEnabled(): Boolean
 
     /**
+     * Fetch miscellaneous flags when not logged in
+     * The associated request type with this request is MegaRequest::TYPE_GET_MISC_FLAGS.
+     * */
+    suspend fun getMiscFlags()
+
+    /**
      * Get cookie settings
      *
      * @return Set of CookieType

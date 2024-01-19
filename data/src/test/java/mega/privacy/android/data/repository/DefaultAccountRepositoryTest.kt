@@ -1158,7 +1158,7 @@ class DefaultAccountRepositoryTest {
             }
 
             whenever(
-                megaApiGateway.getMiscFlags(listener = any())
+                megaApiGateway.getUserData(listener = any())
             ).thenAnswer {
                 ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                     mock(),
@@ -1229,22 +1229,14 @@ class DefaultAccountRepositoryTest {
             }
         }
 
-    private fun provideGetMiscFlagsMegaErrors() = listOf(
-        Arguments.of(MegaError.API_OK),
-        Arguments.of(MegaError.API_EACCESS),
-    )
-
-    @ParameterizedTest(name = "MegaApi returns error code: {0}")
-    @MethodSource("provideGetMiscFlagsMegaErrors")
-    fun `test that isCookieBannerEnabled returns success when MegaApi returns specific Mega Errors`(
-        input: Int,
-    ) = runTest {
+    @Test
+    fun `test that isCookieBannerEnabled returns success when MegaApi returns API_OK`() = runTest {
         val megaError = mock<MegaError> {
-            on { errorCode }.thenReturn(input)
+            on { errorCode }.thenReturn(MegaError.API_OK)
         }
 
         whenever(
-            megaApiGateway.getMiscFlags(listener = any())
+            megaApiGateway.getUserData(listener = any())
         ).thenAnswer {
             ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                 mock(),

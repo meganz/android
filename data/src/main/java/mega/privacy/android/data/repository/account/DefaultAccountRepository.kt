@@ -988,7 +988,7 @@ internal class DefaultAccountRepository @Inject constructor(
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {
-                        MegaError.API_OK, MegaError.API_EACCESS -> {
+                        MegaError.API_OK -> {
                             continuation.resume(megaApiGateway.isCookieBannerEnabled())
                         }
 
@@ -1001,9 +1001,13 @@ internal class DefaultAccountRepository @Inject constructor(
                     }
                 }
             )
-            megaApiGateway.getMiscFlags(listener)
+            megaApiGateway.getUserData(listener)
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
+    }
+
+    override suspend fun getMiscFlags() = withContext(ioDispatcher) {
+        megaApiGateway.getMiscFlags()
     }
 
     override suspend fun getCookieSettings() = withContext(ioDispatcher) {

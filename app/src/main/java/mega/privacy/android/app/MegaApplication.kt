@@ -52,8 +52,9 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
-import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
+import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -72,7 +73,8 @@ import javax.inject.Provider
  * @property megaApiFolder
  * @property megaChatApi
  * @property dbH
- * @property getCookieSettingsUseCase
+ * @property getMiscFlagsUseCase
+ * @property isUserLoggedIn
  * @property myAccountInfo
  * @property passcodeManagement
  * @property crashReporter
@@ -111,7 +113,10 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var dbH: LegacyDatabaseHandler
 
     @Inject
-    lateinit var getCookieSettingsUseCase: GetCookieSettingsUseCase
+    lateinit var getMiscFlagsUseCase: GetMiscFlagsUseCase
+
+    @Inject
+    lateinit var isUserLoggedIn: IsUserLoggedIn
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
@@ -220,6 +225,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         isVerifySMSShowed = false
 
         setupMegaChatApi()
+        getMiscFlagsIfNeeded()
 
         //Logout check resumed pending transfers
         transfersManagement.apply {
@@ -355,6 +361,22 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             .subscribe { next: CallSoundType ->
                 soundsController.playSound(next)
             }
+    }
+
+    /**
+     * Get the misc flags
+     */
+    private fun getMiscFlagsIfNeeded() {
+        applicationScope.launch {
+            runCatching {
+                val isUserLoggedOut = isUserLoggedIn().not()
+                if (isUserLoggedOut) {
+                    getMiscFlagsUseCase()
+                }
+            }.onFailure {
+                Timber.e("Failed to get misc flags: $it")
+            }
+        }
     }
 
     /**
