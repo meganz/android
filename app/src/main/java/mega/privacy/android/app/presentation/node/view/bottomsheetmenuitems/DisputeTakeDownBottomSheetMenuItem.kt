@@ -1,6 +1,12 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
+import android.content.Intent
+import android.net.Uri
+import androidx.navigation.NavHostController
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.presentation.node.model.menuaction.DisputeTakeDownMenuAction
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -22,6 +28,20 @@ class DisputeTakeDownBottomSheetMenuItem @Inject constructor(
         isConnected: Boolean,
     ) = node.isTakenDown
 
+
+    override fun getOnClickFunction(
+        node: TypedNode,
+        onDismiss: () -> Unit,
+        actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
+        navController: NavHostController,
+    ): () -> Unit = {
+        onDismiss()
+        navController.context.startActivity(
+            Intent(navController.context, WebViewActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .setData(Uri.parse(Constants.DISPUTE_URL))
+        )
+    }
 
     override val groupId = 4
 }

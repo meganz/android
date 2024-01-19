@@ -1,20 +1,11 @@
 package mega.privacy.android.app.presentation.node
 
 import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
-import mega.privacy.android.app.getLink.GetLinkActivity
-import mega.privacy.android.app.main.VersionsFileActivity
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
-import mega.privacy.android.app.presentation.node.model.menuaction.DisputeTakeDownMenuAction
-import mega.privacy.android.app.presentation.node.model.menuaction.GetLinkMenuAction
-import mega.privacy.android.app.presentation.node.model.menuaction.InfoMenuAction
+import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
 import mega.privacy.android.app.presentation.node.model.menuaction.MoveMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -50,6 +41,15 @@ class NodeBottomSheetActionHandler(
             }
         }
 
+    private val versionsActivityLauncher =
+        (activity as? AppCompatActivity)?.registerForActivityResult(
+            VersionsFileActivityContract()
+        ) { result ->
+            result?.let {
+                nodeOptionsBottomSheetViewModel.deleteVersionHistory(it)
+            }
+        }
+
     /**
      * handles actions
      *
@@ -58,36 +58,7 @@ class NodeBottomSheetActionHandler(
      */
     fun handleAction(action: MenuAction, node: TypedNode) {
         when (action) {
-            is VersionsMenuAction -> {
-                val version = Intent(activity, VersionsFileActivity::class.java)
-                version.putExtra(Constants.HANDLE, node.id.longValue)
-                activity.startActivityForResult(
-                    version,
-                    Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY
-                )
-            }
-
-            is InfoMenuAction -> {
-                val fileInfoIntent = Intent(activity, FileInfoActivity::class.java)
-                fileInfoIntent.putExtra(Constants.HANDLE, node.id.longValue)
-                activity.startActivity(fileInfoIntent)
-            }
-
-            is GetLinkMenuAction -> {
-                activity.startActivity(
-                    Intent(activity, GetLinkActivity::class.java)
-                        .putExtra(Constants.HANDLE, node.id.longValue)
-                )
-            }
-
-            is DisputeTakeDownMenuAction -> {
-                activity.startActivity(
-                    Intent(activity, WebViewActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        .setData(Uri.parse(Constants.DISPUTE_URL))
-                )
-            }
-
+            is VersionsMenuAction -> versionsActivityLauncher?.launch(node.id.longValue)
             is MoveMenuAction -> selectMoveNodeActivityLauncher?.launch(longArrayOf(node.id.longValue))
 
             else -> throw NotImplementedError("Action $action does not have a handler.")

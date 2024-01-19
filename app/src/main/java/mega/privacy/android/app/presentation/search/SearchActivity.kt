@@ -50,6 +50,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
+import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
@@ -250,11 +251,50 @@ class SearchActivity : BaseActivity() {
                         handleNodesNameCollisionResult(it)
                     }
                 )
+                EventEffect(
+                    event = nodeOptionsBottomSheetState.deleteVersionsResult,
+                    onConsumed = nodeOptionsBottomSheetViewModel::markHandleDeleteVersionsResult,
+                    action = {
+                        val snackBarMessage = handleVersionHistoryRemoveEvent(it)
+                        scaffoldState.snackbarHostState.showSnackbar(snackBarMessage)
+                    }
+                )
             }
         }
 
         sortByHeaderViewModel.orderChangeEvent.observe(this) {
             viewModel.onSortOrderChanged()
+        }
+    }
+
+    private fun handleVersionHistoryRemoveEvent(
+        it: Throwable?,
+    ): String {
+        return if (it == null) {
+            getString(R.string.version_history_deleted)
+        } else {
+            when (it) {
+                is VersionsNotDeletedException -> {
+                    val versionsDeleted =
+                        it.totalRequestedToDelete - it.totalNotDeleted
+                    val firstLine = getString(
+                        R.string.version_history_deleted_erroneously
+                    )
+                    val secondLine = resources.getQuantityString(
+                        R.plurals.versions_deleted_succesfully,
+                        versionsDeleted,
+                        versionsDeleted
+                    )
+                    val thirdLine = resources.getQuantityString(
+                        R.plurals.versions_not_deleted,
+                        it.totalNotDeleted,
+                        it.totalNotDeleted
+                    )
+                    "$firstLine\n$secondLine\n$thirdLine"
+                }
+
+                else -> getString(R.string.general_text_error)
+            }
         }
     }
 

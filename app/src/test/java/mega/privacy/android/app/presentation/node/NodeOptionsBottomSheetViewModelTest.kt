@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
@@ -49,6 +50,7 @@ class NodeOptionsBottomSheetViewModelTest {
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
     private val moveNodesUseCase = mock<MoveNodesUseCase>()
     private val setMoveLatestTargetPathUseCase = mock<SetMoveLatestTargetPathUseCase>()
+    private val deleteNodeVersionsUseCase = mock<DeleteNodeVersionsUseCase>()
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
     }
@@ -72,6 +74,7 @@ class NodeOptionsBottomSheetViewModelTest {
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             moveNodesUseCase = moveNodesUseCase,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
+            deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
             applicationScope = applicationScope,
         )
     }
@@ -152,5 +155,27 @@ class NodeOptionsBottomSheetViewModelTest {
         viewModel.moveNodes(mapOf(sampleNode.id.longValue to sampleNode.id.longValue))
         verify(setMoveLatestTargetPathUseCase).invoke(sampleNode.id.longValue)
     }
+
+    @Test
+    fun `test that deleteNodeVersionsUseCase is triggered when delete node history is called`() =
+        runTest {
+            whenever(deleteNodeVersionsUseCase(sampleNode.id)).thenReturn(Unit)
+            initViewModel()
+            viewModel.deleteVersionHistory(sampleNode.id.longValue)
+            viewModel.state.test {
+                val stateOne = awaitItem()
+                assertThat(stateOne.deleteVersionsResult).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+            verify(deleteNodeVersionsUseCase).invoke(sampleNode.id)
+            viewModel.markHandleDeleteVersionsResult()
+            viewModel.state.test {
+                val stateTwo = awaitItem()
+                assertThat(stateTwo.deleteVersionsResult).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+            }
+        }
 
 }

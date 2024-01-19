@@ -22,6 +22,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
@@ -51,6 +52,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val moveNodesUseCase: MoveNodesUseCase,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
+    private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -183,5 +185,24 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
      */
     fun markHandleMoveRequestResult() {
         _state.update { it.copy(moveRequestResult = consumed()) }
+    }
+
+    /**
+     * Delete version history of selected node
+     */
+    fun deleteVersionHistory(it: Long) = applicationScope.launch {
+        val result = runCatching {
+            deleteNodeVersionsUseCase(NodeId(it))
+        }
+        _state.update { state ->
+            state.copy(deleteVersionsResult = triggered(result.exceptionOrNull()))
+        }
+    }
+
+    /**
+     * Mark handle delete versions result
+     */
+    fun markHandleDeleteVersionsResult() {
+        _state.update { it.copy(deleteVersionsResult = consumed()) }
     }
 }

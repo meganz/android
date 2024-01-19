@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @property error
  * @property nodeNameCollisionResult
  * @property moveRequestResult
+ * @property deleteVersionsResult
  */
 data class NodeBottomSheetState(
     val name: String = "",
@@ -26,4 +27,5 @@ data class NodeBottomSheetState(
     val error: StateEventWithContent<Throwable> = consumed(),
     val nodeNameCollisionResult: StateEventWithContent<NodeNameCollisionResult> = consumed(),
     val moveRequestResult: StateEventWithContent<Result<MoveRequestResult>> = consumed(),
+    val deleteVersionsResult: StateEventWithContent<Throwable?> = consumed(),
 )
