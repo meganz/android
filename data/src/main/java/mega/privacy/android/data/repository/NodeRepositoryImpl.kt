@@ -901,4 +901,19 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getContactVerificationEnabledWarning() = withContext(ioDispatcher) {
         megaApiGateway.getContactVerificationWarningEnabled()
     }
+
+    @Throws(IllegalArgumentException::class)
+    override suspend fun leaveShareByHandle(nodeToLeaveShare: NodeId) = withContext(ioDispatcher) {
+        val node = getMegaNodeByHandle(nodeToLeaveShare, true)
+            ?: throw IllegalArgumentException("Node to delete with handle $nodeToLeaveShare not found")
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("deleteNodeByHandle") {}
+            megaApiGateway.deleteNode(
+                node = node,
+                listener = listener
+            )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
+
 }

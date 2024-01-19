@@ -628,4 +628,10 @@ interface NodeRepository {
      * @return list of [NodeLabel]
      */
     fun getNodeLabelList(): List<NodeLabel>
+
+    /**
+     * Leaves Share folder
+     * @param nodeToLeaveShare [NodeId]
+     */
+    suspend fun leaveShareByHandle(nodeToLeaveShare: NodeId)
 }
