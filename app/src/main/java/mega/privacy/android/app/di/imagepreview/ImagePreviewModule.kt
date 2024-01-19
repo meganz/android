@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImag
 import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkMediaDiscoveryImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
@@ -70,4 +71,9 @@ internal interface ImagePreviewModule {
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.FOLDER_LINK)
     fun FolderLinkImageNodeFetcher.bindFolderLinkFetcher(): ImageNodeFetcher
+
+    @Binds
+    @IntoMap
+    @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.FOLDER_LINK_MEDIA_DISCOVERY)
+    fun FolderLinkMediaDiscoveryImageNodeFetcher.bindFolderLinkMediaDiscoveryFetcher(): ImageNodeFetcher
 }

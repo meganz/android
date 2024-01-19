@@ -197,6 +197,7 @@ internal fun ImagePreviewScreen(
                 cancelButtonText = stringResource(id = R.string.general_cancel),
                 onConfirm = {
                     onClickMoveToRubbishBin(currentImageNode)
+                    hideBottomSheet(coroutineScope, modalSheetState)
                     showMoveToRubbishBinDialog = false
                 },
                 onDismiss = {
@@ -363,7 +364,6 @@ internal fun ImagePreviewScreen(
                     onClickRemove = {},
                     onClickMoveToRubbishBin = {
                         showMoveToRubbishBinDialog = true
-                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                 )
             },
@@ -482,7 +482,7 @@ private fun ImageContent(
     PhotoBox(
         modifier = Modifier.fillMaxSize(),
         state = photoState,
-        enabled = enableZoom,
+        enableZoom = enableZoom,
         onTap = {
             onImageTap()
         }

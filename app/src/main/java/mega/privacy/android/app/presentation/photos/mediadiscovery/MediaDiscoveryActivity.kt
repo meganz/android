@@ -32,7 +32,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
-import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkMediaDiscoveryImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryScreen
@@ -269,12 +269,12 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
             if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
                 ImagePreviewActivity.createIntent(
                     context = this@MediaDiscoveryActivity,
-                    imageSource = ImagePreviewFetcherSource.FOLDER_LINK,
+                    imageSource = ImagePreviewFetcherSource.FOLDER_LINK_MEDIA_DISCOVERY,
                     menuOptionsSource = ImagePreviewMenuSource.FOLDER_LINK,
                     anchorImageNodeId = NodeId(photo.id),
                     isForeign = true,
                     params = mapOf(
-                        FolderLinkImageNodeFetcher.PARENT_ID to mediaHandle,
+                        FolderLinkMediaDiscoveryImageNodeFetcher.PARENT_ID to mediaHandle,
                     ),
                 ).run {
                     startActivity(this)

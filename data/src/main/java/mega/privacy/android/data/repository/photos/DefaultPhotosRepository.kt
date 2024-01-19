@@ -322,6 +322,10 @@ internal class DefaultPhotosRepository @Inject constructor(
         return megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
     }
 
+    private suspend fun getMegaNodeByFolderApi(nodeId: NodeId): MegaNode? {
+        return megaApiFolder.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
+    }
+
     override suspend fun getPublicLinksCount(): Int = withContext(ioDispatcher) {
         megaApiFacade.getPublicLinks().size
     }
@@ -796,6 +800,46 @@ internal class DefaultPhotosRepository @Inject constructor(
             },
             async {
                 megaApiFacade.searchByType(
+                    parentNode = parentNode,
+                    searchString = "*",
+                    cancelToken = token,
+                    recursive = recursive,
+                    order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+                    type = MegaApiAndroid.FILE_TYPE_VIDEO,
+                ).filter { isVideoNodeValid(it) }
+            },
+        ).flatten()
+
+        nodes.map { megaNode ->
+            imageNodeMapper(
+                megaNode = megaNode,
+                requireSerializedData = true,
+                offline = offlineNodesCache[megaNode.handle.toString()],
+                numVersion = megaApiFacade::getNumVersions
+            )
+        }
+    }
+
+    override suspend fun getPublicMediaDiscoveryNodes(
+        parentId: NodeId,
+        recursive: Boolean,
+    ): List<ImageNode> = withContext(ioDispatcher) {
+        val parentNode = getMegaNodeByFolderApi(parentId) ?: return@withContext emptyList()
+
+        val token = MegaCancelToken.createInstance()
+        val nodes = awaitAll(
+            async {
+                megaApiFolder.searchByType(
+                    parentNode = parentNode,
+                    searchString = "*",
+                    cancelToken = token,
+                    recursive = recursive,
+                    order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+                    type = MegaApiAndroid.FILE_TYPE_PHOTO,
+                ).filter { isImageNodeValid(it) }
+            },
+            async {
+                megaApiFolder.searchByType(
                     parentNode = parentNode,
                     searchString = "*",
                     cancelToken = token,

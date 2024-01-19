@@ -23,7 +23,8 @@ import kotlinx.coroutines.launch
 fun PhotoBox(
     modifier: Modifier = Modifier,
     state: PhotoState = rememberPhotoState(),
-    enabled: Boolean = true,
+    enableZoom: Boolean = true,
+    enableTap: Boolean = true,
     contentAlignment: Alignment = Alignment.Center,
     propagateMinConstraints: Boolean = false,
     onTap: ((Offset) -> Unit) = {},
@@ -34,7 +35,7 @@ fun PhotoBox(
         modifier = modifier
             .onSizeChanged { state.layoutSize = it.toSize() }
             .pointerDragInputs(
-                enabled = enabled && state.isScaled,
+                enabled = enableZoom && state.isScaled,
                 onDrag = { dragAmount ->
                     state.currentOffset += dragAmount
                 },
@@ -45,7 +46,7 @@ fun PhotoBox(
                 },
             )
             .pointerTapInputs(
-                enabled = enabled,
+                enabled = enableTap,
                 onDoubleTap = {
                     if (state.isScaled) {
                         coroutineScope.launch {
@@ -67,7 +68,7 @@ fun PhotoBox(
                 translationY = state.currentOffset.y
             }
             .pointerInput(Unit) {
-                if (enabled) {
+                if (enableZoom) {
                     detectTransformGestures(
                         onGestureStart = { },
                         onGesture = { _, pan, zoom, _ ->
