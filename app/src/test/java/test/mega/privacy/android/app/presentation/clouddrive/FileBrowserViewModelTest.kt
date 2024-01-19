@@ -137,12 +137,12 @@ class FileBrowserViewModelTest {
 
 
     @Test
-    fun `test that browser parent handle is updated if new value provided`() = runTest {
+    fun `test that the file browser handle is updated if new value provided`() = runTest {
         underTest.state.map { it.fileBrowserHandle }.distinctUntilChanged()
             .test {
                 val newValue = 123456789L
                 Truth.assertThat(awaitItem()).isEqualTo(-1L)
-                underTest.setBrowserParentHandle(newValue)
+                underTest.setFileBrowserHandle(newValue)
                 Truth.assertThat(awaitItem()).isEqualTo(newValue)
             }
     }
@@ -156,15 +156,15 @@ class FileBrowserViewModelTest {
         }
 
     @Test
-    fun `test that the safe browser parent handle is set`() =
+    fun `test that the file browser handle is set`() =
         runTest {
             val expectedHandle = 123456789L
-            underTest.setBrowserParentHandle(expectedHandle)
+            underTest.setFileBrowserHandle(expectedHandle)
             Truth.assertThat(underTest.getSafeBrowserParentHandle()).isEqualTo(expectedHandle)
         }
 
     @Test
-    fun `test that the nodes are returned when setting the browser parent handle`() =
+    fun `test that the nodes are returned when setting the file browser handle`() =
         runTest {
             val newValue = 123456789L
             whenever(getFileBrowserNodeChildrenUseCase(newValue)).thenReturn(
@@ -176,16 +176,16 @@ class FileBrowserViewModelTest {
                 mock<Node>() to emptyList()
             )
             monitorNodeUpdatesFakeFlow.emit(NodeUpdate(update))
-            underTest.setBrowserParentHandle(newValue)
+            underTest.setFileBrowserHandle(newValue)
             Truth.assertThat(underTest.state.value.nodesList.size).isEqualTo(2)
         }
 
     @Test
-    fun `test that no nodes are returned when setting the browser parent handle and the file browser node is null`() =
+    fun `test that no nodes are returned when setting the file browser handle and the file browser node is null`() =
         runTest {
             val newValue = 123456789L
             whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(emptyList())
-            underTest.setBrowserParentHandle(newValue)
+            underTest.setFileBrowserHandle(newValue)
             Truth.assertThat(underTest.state.value.nodesList.size).isEqualTo(0)
             verify(getFileBrowserNodeChildrenUseCase).invoke(newValue)
         }
@@ -194,7 +194,7 @@ class FileBrowserViewModelTest {
     fun `test that media discovery cannot be entered when there are no nodes`() = runTest {
         val newValue = 123456789L
         whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(emptyList())
-        underTest.setBrowserParentHandle(newValue)
+        underTest.setFileBrowserHandle(newValue)
 
         val shouldEnter =
             underTest.shouldEnterMediaDiscoveryMode(
@@ -210,7 +210,7 @@ class FileBrowserViewModelTest {
             val newValue = 123456789L
             val list = listOf<TypedFileNode>(mock(), mock())
             whenever(getFileBrowserNodeChildrenUseCase(newValue)).thenReturn(list)
-            underTest.setBrowserParentHandle(newValue)
+            underTest.setFileBrowserHandle(newValue)
 
             val shouldEnter =
                 underTest.shouldEnterMediaDiscoveryMode(
@@ -231,7 +231,7 @@ class FileBrowserViewModelTest {
                 )
             )
 
-            underTest.setBrowserParentHandle(newValue)
+            underTest.setFileBrowserHandle(newValue)
 
             val shouldEnter =
                 underTest.shouldEnterMediaDiscoveryMode(
@@ -257,7 +257,7 @@ class FileBrowserViewModelTest {
             whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(
                 listOf<TypedFolderNode>(mock(), mock())
             )
-            underTest.setBrowserParentHandle(newValue)
+            underTest.setFileBrowserHandle(newValue)
             underTest.performBackNavigation()
             verify(getFileBrowserNodeChildrenUseCase).invoke(newValue)
         }

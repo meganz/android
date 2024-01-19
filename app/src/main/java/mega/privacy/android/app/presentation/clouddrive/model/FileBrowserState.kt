@@ -33,7 +33,9 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property shouldShowBannerVisibility
  * @property bannerTime timer
  * @property showMediaDiscoveryIcon showMediaDiscoveryIcon
- * @property showMediaDiscoveryEvent State Event that shows the Media Discovery
+ * @property isMediaDiscoveryOpen If true, this indicates that Media Discovery is open
+ * @property isMediaDiscoveryOpenedByIconClick true if Media Discovery was accessed by clicking the
+ * Media Discovery Icon
  * @property isConnected is connected to internet
  * @property downloadEvent download event
  * @property updateToolbarTitleEvent State Event that refreshes the Toolbar Title
@@ -58,7 +60,8 @@ data class FileBrowserState(
     val shouldShowBannerVisibility: Boolean = false,
     val bannerTime: Long = 0L,
     val showMediaDiscoveryIcon: Boolean = false,
-    val showMediaDiscoveryEvent: StateEventWithContent<Long> = consumed(),
+    val isMediaDiscoveryOpen: Boolean = false,
+    val isMediaDiscoveryOpenedByIconClick: Boolean = false,
     val isConnected: Boolean = false,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val updateToolbarTitleEvent: StateEvent = consumed,

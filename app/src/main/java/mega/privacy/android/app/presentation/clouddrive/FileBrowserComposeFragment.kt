@@ -16,6 +16,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,7 +31,6 @@ import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
-import de.palm.composestateevents.StateEventWithContent
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -198,9 +198,9 @@ class FileBrowserComposeFragment : Fragment() {
                         },
                         onEnterMediaDiscoveryClick = {
                             disableSelectMode()
-                            fileBrowserActionListener?.showMediaDiscoveryFromCloudDrive(
-                                mediaHandle = uiState.fileBrowserHandle,
-                                isAccessedByIconClick = true,
+                            fileBrowserViewModel.setMediaDiscoveryVisibility(
+                                isMediaDiscoveryOpen = true,
+                                isMediaDiscoveryOpenedByIconClick = true,
                             )
                         },
                     )
@@ -225,9 +225,11 @@ class FileBrowserComposeFragment : Fragment() {
                     folderCount = uiState.selectedFolderNodes
                 )
                 onItemClick(uiState.currentFileNode)
-                ShowMediaDiscovery(uiState.showMediaDiscoveryEvent) {
-                    fileBrowserViewModel.consumeShowMediaDiscoveryEvent()
-                }
+                HandleMediaDiscoveryVisibility(
+                    isMediaDiscoveryOpen = uiState.isMediaDiscoveryOpen,
+                    isMediaDiscoveryOpenedByIconClick = uiState.isMediaDiscoveryOpenedByIconClick,
+                    mediaHandle = uiState.fileBrowserHandle,
+                )
                 UpdateToolbarTitle(uiState.updateToolbarTitleEvent) {
                     fileBrowserViewModel.consumeUpdateToolbarTitleEvent()
                 }
@@ -248,27 +250,28 @@ class FileBrowserComposeFragment : Fragment() {
     }
 
     /**
-     * A Composable [EventEffect] to show the Media Discovery
+     * A Composable that checks if Media Discovery should be shown or not
      *
-     * @param event The State Event
-     * @param onConsumeEvent Executes specific action if [event] has been consumed
+     * @param isMediaDiscoveryOpen If true, this indicates that Media Discovery is open
+     * @param isMediaDiscoveryOpenedByIconClick true if Media Discovery was accessed by clicking the
+     * Media Discovery Icon
+     * @param mediaHandle The Handle used to display content in Media Discovery
      */
     @Composable
-    private fun ShowMediaDiscovery(
-        event: StateEventWithContent<Long>,
-        onConsumeEvent: () -> Unit,
+    private fun HandleMediaDiscoveryVisibility(
+        isMediaDiscoveryOpen: Boolean,
+        isMediaDiscoveryOpenedByIconClick: Boolean,
+        mediaHandle: Long,
     ) {
-        EventEffect(
-            event = event,
-            onConsumed = onConsumeEvent,
-            action = { mediaHandle ->
+        if (isMediaDiscoveryOpen) {
+            SideEffect {
                 fileBrowserActionListener?.showMediaDiscoveryFromCloudDrive(
                     mediaHandle = mediaHandle,
-                    isAccessedByIconClick = false,
+                    isAccessedByIconClick = isMediaDiscoveryOpenedByIconClick,
                 )
                 fileBrowserViewModel.onItemPerformedClicked()
-            },
-        )
+            }
+        }
     }
 
     /**

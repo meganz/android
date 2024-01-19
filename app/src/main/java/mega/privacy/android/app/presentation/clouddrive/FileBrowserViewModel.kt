@@ -202,7 +202,7 @@ class FileBrowserViewModel @Inject constructor(
                         handleStack.pop()
                     }
                     handleStack.takeIf { stack -> stack.isNotEmpty() }?.peek()?.let { parent ->
-                        setBrowserParentHandle(parent)
+                        setFileBrowserHandle(parent)
                         return
                     }
                 }
@@ -216,15 +216,16 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
-     * Set the current browser handle to the UI state
+     * Updates the current File Browser Handle [FileBrowserState.fileBrowserHandle]
      *
-     * @param handle the id of the current browser handle to set
+     * @param handle The new File Browser Handle to be set
      */
-    fun setBrowserParentHandle(handle: Long) = viewModelScope.launch {
-        handleStack.push(handle)
-        _state.update { it.copy(fileBrowserHandle = handle) }
-        refreshNodes()
-    }
+    fun setFileBrowserHandle(handle: Long) =
+        viewModelScope.launch {
+            handleStack.push(handle)
+            _state.update { it.copy(fileBrowserHandle = handle) }
+            refreshNodes()
+        }
 
     /**
      * Get the browser parent handle
@@ -234,7 +235,7 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun getSafeBrowserParentHandle(): Long = runBlocking {
         if (_state.value.fileBrowserHandle == -1L) {
-            setBrowserParentHandle(
+            setFileBrowserHandle(
                 getRootNodeUseCase()?.id?.longValue ?: MegaApiJava.INVALID_HANDLE
             )
         }
@@ -268,7 +269,7 @@ class FileBrowserViewModel @Inject constructor(
         }
 
     /**
-     * This will refresh file browser nodes and update [FileBrowserState.nodesList]
+     * Refreshes the File Browser Nodes
      */
     fun refreshNodes() {
         viewModelScope.launch {
@@ -277,18 +278,24 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     private suspend fun refreshNodesState() {
-        val typedNodeList = getFileBrowserNodeChildrenUseCase(_state.value.fileBrowserHandle)
-        val nodeList = getNodeUiItems(typedNodeList)
-        val hasMediaFile: Boolean = containsMediaItemUseCase(typedNodeList)
-        val isRootNode = getRootNodeUseCase()?.id?.longValue == _state.value.fileBrowserHandle
+        val fileBrowserHandle = _state.value.fileBrowserHandle
+        val parentHandle = getParentNodeUseCase(NodeId(fileBrowserHandle))?.id?.longValue
+        val rootNode = getRootNodeUseCase()?.id?.longValue
+        val isRootNode = fileBrowserHandle == rootNode
+
+        val childrenNodes = getFileBrowserNodeChildrenUseCase(fileBrowserHandle)
+        val showMediaDiscoveryIcon = !isRootNode && containsMediaItemUseCase(childrenNodes)
+        val nodeUIItems = getNodeUiItems(childrenNodes)
+        val sortOrder = getCloudSortOrder()
+        val isFileBrowserEmpty = isRootNode || (fileBrowserHandle == MegaApiJava.INVALID_HANDLE)
+
         _state.update {
             it.copy(
-                showMediaDiscoveryIcon = !isRootNode && hasMediaFile,
-                parentHandle = getParentNodeUseCase(NodeId(_state.value.fileBrowserHandle))?.id?.longValue,
-                nodesList = nodeList,
-                sortOrder = getCloudSortOrder(),
-                isFileBrowserEmpty = MegaApiJava.INVALID_HANDLE == _state.value.fileBrowserHandle ||
-                        getRootNodeUseCase()?.id?.longValue == _state.value.fileBrowserHandle
+                showMediaDiscoveryIcon = showMediaDiscoveryIcon,
+                parentHandle = parentHandle,
+                nodesList = nodeUIItems,
+                sortOrder = sortOrder,
+                isFileBrowserEmpty = isFileBrowserEmpty,
             )
         }
     }
@@ -313,14 +320,61 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
-     * Performs specific actions for Back Navigation events
+     * Checks if Media Discovery is open or not
+     *
+     * @return true if Media Discovery is indicated to be open
+     */
+    fun isMediaDiscoveryOpen() = _state.value.isMediaDiscoveryOpen
+
+    /**
+     * Sets the Media Discovery Visibility
+     *
+     * @param isMediaDiscoveryOpen If true, this indicates that Media Discovery is open
+     * @param isMediaDiscoveryOpenedByIconClick true if Media Discovery was accessed by clicking the
+     * Media Discovery Icon
+     */
+    fun setMediaDiscoveryVisibility(
+        isMediaDiscoveryOpen: Boolean,
+        isMediaDiscoveryOpenedByIconClick: Boolean,
+    ) {
+        _state.update {
+            it.copy(
+                isMediaDiscoveryOpen = isMediaDiscoveryOpen,
+                isMediaDiscoveryOpenedByIconClick = isMediaDiscoveryOpenedByIconClick,
+            )
+        }
+    }
+
+    /**
+     * Exits the Media Discovery
+     *
+     * @param performBackNavigation If true, goes back one level from the Cloud Drive hierarchy
+     */
+    suspend fun exitMediaDiscovery(performBackNavigation: Boolean) {
+        if (performBackNavigation) {
+            handleStack.pop()
+            val currentParent = _state.value.parentHandle ?: getRootNodeUseCase()?.id?.longValue
+            ?: MegaApiJava.INVALID_HANDLE
+            _state.update { it.copy(fileBrowserHandle = currentParent) }
+            setMediaDiscoveryVisibility(
+                isMediaDiscoveryOpen = false,
+                isMediaDiscoveryOpenedByIconClick = false,
+            )
+            refreshNodesState()
+        } else {
+            setMediaDiscoveryVisibility(
+                isMediaDiscoveryOpen = false,
+                isMediaDiscoveryOpenedByIconClick = false,
+            )
+        }
+    }
+
+    /**
+     * Goes back one level from the Cloud Drive hierarchy
      */
     fun performBackNavigation() {
-        _state.update {
-            it.copy(showMediaDiscoveryIcon = false)
-        }
         _state.value.parentHandle?.let { parentHandle ->
-            setBrowserParentHandle(parentHandle)
+            setFileBrowserHandle(parentHandle)
             handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
             // Update the Toolbar Title
             _state.update { it.copy(updateToolbarTitleEvent = triggered) }
@@ -334,22 +388,18 @@ class FileBrowserViewModel @Inject constructor(
      * Performs action when folder is clicked from adapter
      * @param handle node handle
      */
-    private fun onFolderItemClicked(
-        handle: Long,
-    ) {
+    private fun onFolderItemClicked(handle: Long) {
         viewModelScope.launch {
-            setBrowserParentHandle(handle)
+            setFileBrowserHandle(handle)
             if (shouldEnterMediaDiscoveryMode(
                     parentHandle = handle,
-                    mediaDiscoveryViewSettings = state.value.mediaDiscoveryViewSettings
+                    mediaDiscoveryViewSettings = state.value.mediaDiscoveryViewSettings,
                 )
             ) {
-                _state.update { state ->
-                    state.copy(
-                        showMediaDiscoveryEvent = triggered(handle),
-                        showMediaDiscoveryIcon = true,
-                    )
-                }
+                setMediaDiscoveryVisibility(
+                    isMediaDiscoveryOpen = true,
+                    isMediaDiscoveryOpenedByIconClick = false,
+                )
             }
         }
     }
@@ -601,13 +651,6 @@ class FileBrowserViewModel @Inject constructor(
         _state.update {
             it.copy(downloadEvent = consumed())
         }
-    }
-
-    /**
-     * Consumes the Show Media Discovery Event
-     */
-    fun consumeShowMediaDiscoveryEvent() {
-        _state.update { it.copy(showMediaDiscoveryEvent = consumed()) }
     }
 
     /**
