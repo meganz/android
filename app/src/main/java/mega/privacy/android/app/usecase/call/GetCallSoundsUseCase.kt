@@ -9,7 +9,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.CoroutineScope
@@ -79,7 +78,6 @@ class GetCallSoundsUseCase @Inject constructor(
 
     val participants = ArrayList<ParticipantInfo>()
     val disposable = CompositeDisposable()
-    var disposableCountDownTimer: Disposable? = null
 
     /**
      * Method to get the appropriate sound
@@ -227,7 +225,6 @@ class GetCallSoundsUseCase @Inject constructor(
                                     }
 
                                     else -> {}
-
                                 }
                             }
 
