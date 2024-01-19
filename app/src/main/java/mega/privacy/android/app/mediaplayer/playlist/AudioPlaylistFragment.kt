@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -42,6 +43,7 @@ import mega.privacy.android.app.utils.autoCleared
 /**
  * Playlist fragment for displaying the playlist of audios
  */
+@UnstableApi
 class AudioPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
     private var binding by autoCleared<FragmentMediaPlaylistBinding>()
 

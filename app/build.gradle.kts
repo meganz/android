@@ -351,8 +351,8 @@ dependencies {
     // Google
     implementation(google.gson)
     implementation(google.material)
-    implementation(google.exoplayer.core)
-    implementation(google.exoplayer.ui)
+    implementation(google.media3.exoplayer)
+    implementation(google.media3.ui)
     implementation(google.flexbox)
     implementation(google.zxing)
     implementation(google.accompanist.pager)
@@ -434,21 +434,7 @@ dependencies {
     debugImplementation(lib.xray)
 
     val shouldUsePrebuiltSdk: Closure<Boolean> by rootProject.extra
-    if (shouldUsePrebuiltSdk()) {
-        // These 2 ExoPlayer libs are created by SDK build. If upgrading ExoPlayer version,
-        // remember to upload these 2 files.
-        implementation(files("src/main/libs/exoplayer-extension-ffmpeg-2.19.1.aar"))
-        implementation(files("src/main/libs/exoplayer-extension-flac-2.19.1.aar"))
-    } else {
-        implementation(
-            fileTree(
-                mapOf(
-                    "dir" to "${rootProject.projectDir}/sdk/src/main/jni/ExoPlayer/",
-                    "include" to listOf("*.aar")
-                )
-            )
-        )
-
+    if (!shouldUsePrebuiltSdk()) {
         implementation(files("../sdk/src/main/jni/megachat/webrtc/libwebrtc.jar"))
     }
 

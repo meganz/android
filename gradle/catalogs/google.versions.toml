@@ -4,7 +4,6 @@ accompanist-pager = "0.30.1"
 accompanist-systemui = "0.23.1"
 app-update = "2.1.0"
 autovalue = "1.9"
-exoplayer = "2.18.7"
 firebase = "32.2.0"
 firebase-app-distribution = "16.0.0-beta09"
 flexbox = "2.0.1"
@@ -19,6 +18,7 @@ services-location = "21.0.1"
 services-maps = "18.1.0"
 zxing = "3.4.0"
 code-scanner = "16.1.0"
+media3 = "1.2.0"
 
 [libraries]
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist-pager" }
@@ -32,8 +32,6 @@ app-update = { module = "com.google.android.play:app-update", version.ref = "app
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "app-update" }
 autovalue = { module = "com.google.auto.value:auto-value", version.ref = "autovalue" }
 autovalue-annotations = { module = "com.google.auto.value:auto-value-annotations", version.ref = "autovalue" }
-exoplayer-core = { module = "com.google.android.exoplayer:exoplayer-core", version.ref = "exoplayer" }
-exoplayer-ui = { module = "com.google.android.exoplayer:exoplayer-ui", version.ref = "exoplayer" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
 firebase-app-distribution = { module = "com.google.firebase:firebase-appdistribution", version.ref = "firebase-app-distribution" }
 firebase-crashlytics-ndk = { group = "com.google.firebase", name = "firebase-crashlytics-ndk" }
@@ -55,6 +53,8 @@ services-location = { module = "com.google.android.gms:play-services-location", 
 services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "services-maps" }
 zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
 code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "code-scanner"}
+media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
+media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 
 [bundles]
 firebase-bom = ["firebase-crashlytics-ndk", "firebase-crashlytics-ktx", "firebase-messaging-ktx", "firebase-perf-ktx"]

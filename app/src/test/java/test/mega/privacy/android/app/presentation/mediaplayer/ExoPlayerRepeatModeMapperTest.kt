@@ -1,6 +1,6 @@
 package test.mega.privacy.android.app.presentation.mediaplayer
 
-import com.google.android.exoplayer2.Player
+import androidx.media3.common.Player
 import com.google.common.truth.Truth
 import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode

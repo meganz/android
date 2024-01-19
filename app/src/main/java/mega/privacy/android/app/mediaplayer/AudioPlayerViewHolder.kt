@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import com.google.android.exoplayer2.Player
+import androidx.media3.common.Player
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.mediaplayer.playlist.AudioPlaylistFragment.Companion.SINGLE_PLAYLIST_SIZE
@@ -31,7 +31,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     private val artistName = binding.root.findViewById<TextView>(R.id.artist_name)
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
     private val shuffle =
-        binding.root.findViewById<ImageView>(com.google.android.exoplayer2.ui.R.id.exo_shuffle)
+        binding.root.findViewById<ImageView>(androidx.media3.ui.R.id.exo_shuffle)
 
     /**
      * Update the layout param of artwork of player view.

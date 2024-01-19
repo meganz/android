@@ -1,6 +1,6 @@
 package mega.privacy.android.app.mediaplayer.gateway
 
-import com.google.android.exoplayer2.source.ShuffleOrder
+import androidx.media3.exoplayer.source.ShuffleOrder
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 
 /**

@@ -668,51 +668,6 @@ if [ ! -f ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready ]; then
 fi
 echo "* PdfViewer is ready"
 
-echo "* Setting up ExoPlayer"
-if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
-    downloadCheckAndUnpack ${EXOPLAYER_DOWNLOAD_URL} ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE} ${EXOPLAYER_SHA1} ${EXOPLAYER}
-    pushd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER} &>> ${LOG_FILE}
-    EXOPLAYER_ROOT="$(pwd)"
-    FFMPEG_EXT_PATH="$(pwd)/extensions/ffmpeg/src/main"
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        HOST_PLATFORM="darwin-x86_64"
-    else
-        HOST_PLATFORM="linux-x86_64"
-    fi
-    ENABLED_DECODERS=(ac3)
-    pushd "${FFMPEG_EXT_PATH}/jni" &>> ${LOG_FILE}
-    (git -C ffmpeg pull || git clone git://source.ffmpeg.org/ffmpeg ffmpeg) &>> ${LOG_FILE}
-    pushd ffmpeg &>> ${LOG_FILE}
-    git checkout release/${FFMPEG_VERSION} &>> ${LOG_FILE}
-    popd &>> ${LOG_FILE}
-    echo "* Building FFMPEG"
-    ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" &>> ${LOG_FILE}
-    popd &>> ${LOG_FILE}
-    echo "* Building ExoPlayer FFMPEG extension"
-    NDK_REVISION=$(cat ${NDK_ROOT}/source.properties | grep Revision | cut -d " " -f 3)
-    sed -i "s/android {/android {\n    ndkVersion '${NDK_REVISION}'/" common_library_config.gradle
-    ./gradlew :extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
-    cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../${FFMPEG_EXT_LIBRARY}
-    popd &>> ${LOG_FILE}
-
-    FLAC_EXT_PATH=${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER}/extensions/flac/src/main/jni
-    downloadCheckAndUnpack ${FLAC_DOWNLOAD_URL} ${EXOPLAYER}/${FLAC_SOURCE_FILE} ${FLAC_SHA1} ${EXOPLAYER}
-    rm -rf ${FLAC_EXT_PATH}/flac
-    mv ${EXOPLAYER}/flac-${FLAC_VERSION} ${FLAC_EXT_PATH}/flac
-    echo "* Building FLAC"
-    pushd ${FLAC_EXT_PATH} &>> ${LOG_FILE}
-    ${NDK_BUILD} APP_ABI=all -j${JOBS} &>> ${LOG_FILE}
-    popd &>> ${LOG_FILE}
-    echo "* Building ExoPlayer FLAC extension"
-    pushd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER} &>> ${LOG_FILE}
-    ./gradlew :extension-flac:assembleRelease &>> ${LOG_FILE}
-    cp extensions/flac/buildout/outputs/aar/extension-flac-release.aar ../${FLAC_EXT_LIBRARY}
-    popd &>> ${LOG_FILE}
-
-    touch ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
-fi
-echo "* ExoPlayer is ready"
-
 echo "* Setting up ICU"
 if [ ! -f ${ICU}/${ICU_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${ICU_DOWNLOAD_URL} ${ICU}/${ICU_SOURCE_FILE} ${ICU_SHA1} ${ICU}/${ICU_SOURCE_VERSION}

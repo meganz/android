@@ -70,12 +70,14 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import mega.privacy.android.core.R as CoreUiR
+import androidx.media3.common.util.UnstableApi
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * [Fragment] that handles Audio-related operations
  */
+@UnstableApi
 @AndroidEntryPoint
 class AudioFragment : Fragment(), HomepageSearchable {
 
