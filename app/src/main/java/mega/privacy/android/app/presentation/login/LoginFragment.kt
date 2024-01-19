@@ -58,11 +58,11 @@ import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 import javax.inject.Inject
@@ -600,7 +600,7 @@ class LoginFragment : Fragment() {
                     }
 
                     if (viewModel.getStorageState() === StorageState.PayWall) {
-                        showOverDiskQuotaPaywallWarning(true)
+                        showOverDiskQuotaPaywallWarning(activity, true)
                     } else {
                         loginActivity.startActivity(intent)
                     }

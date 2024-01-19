@@ -42,11 +42,11 @@ class ActivityLifecycleHandler @Inject constructor(
      * @param activity
      */
     override fun onActivityStarted(activity: Activity) {
-        currentActivity = activity
+        Timber.d("onActivityStarted: %s", activity.javaClass.simpleName)
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
             Timber.i("App enters foreground")
             if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
-                showOverDiskQuotaPaywallWarning()
+                showOverDiskQuotaPaywallWarning(activity, false)
             }
         }
     }
@@ -57,6 +57,7 @@ class ActivityLifecycleHandler @Inject constructor(
      * @param activity
      */
     override fun onActivityResumed(activity: Activity) {
+        Timber.d("onActivityResumed: %s", activity.javaClass.simpleName)
         currentActivity = activity
     }
 
@@ -66,6 +67,7 @@ class ActivityLifecycleHandler @Inject constructor(
      * @param activity
      */
     override fun onActivityPaused(activity: Activity) {
+        Timber.d("onActivityPaused: %s", activity.javaClass.simpleName)
         currentActivity = null
     }
 
@@ -75,11 +77,11 @@ class ActivityLifecycleHandler @Inject constructor(
      * @param activity
      */
     override fun onActivityStopped(activity: Activity) {
+        Timber.d("onActivityStopped: %s", activity.javaClass.simpleName)
         isActivityChangingConfigurations = activity.isChangingConfigurations
         if (--activityReferences == 0 && !isActivityChangingConfigurations) {
             Timber.i("App enters background")
         }
-        currentActivity = null
     }
 
     /**

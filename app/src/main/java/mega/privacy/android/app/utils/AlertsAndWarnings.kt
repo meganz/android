@@ -34,7 +34,7 @@ object AlertsAndWarnings {
      */
     @JvmStatic
     fun showOverDiskQuotaPaywallWarning() {
-        showOverDiskQuotaPaywallWarning(false)
+        showOverDiskQuotaPaywallWarning(MegaApplication.getInstance().currentActivity, false)
     }
 
     /**
@@ -44,21 +44,22 @@ object AlertsAndWarnings {
      * @param loginFinished Indicates if the login process has already finished.
      */
     @JvmStatic
-    fun showOverDiskQuotaPaywallWarning(loginFinished: Boolean) {
-        val app = MegaApplication.getInstance()
-
+    fun showOverDiskQuotaPaywallWarning(activity: Activity?, loginFinished: Boolean) {
         // If app is doing login, the ODQ will be displayed at login finish
-        if (app.currentActivity is LoginActivity && !loginFinished) {
+        if (activity is LoginActivity && !loginFinished) {
             return
         }
 
-        if (app.currentActivity is OverDiskQuotaPaywallActivity) {
+        if (activity is OverDiskQuotaPaywallActivity) {
             return
         }
 
-        val intent = Intent(app.applicationContext, OverDiskQuotaPaywallActivity::class.java)
+        val intent = Intent(
+            MegaApplication.getInstance().applicationContext,
+            OverDiskQuotaPaywallActivity::class.java
+        )
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        app.startActivity(intent)
+        MegaApplication.getInstance().startActivity(intent)
     }
 
     /**
