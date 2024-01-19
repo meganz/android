@@ -17,9 +17,6 @@ import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
  */
 class VoiceClipUiMessage(
     val message: VoiceClipMessage,
-    override val showAvatar: Boolean,
-    override val showTime: Boolean,
-    override val showDate: Boolean,
 ) : AvatarMessage() {
 
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
@@ -28,6 +25,9 @@ class VoiceClipUiMessage(
         )
     }
 
+    override val showAvatar = message.shouldShowAvatar
+    override val showTime = message.shouldShowTime
+    override val showDate = message.shouldShowDate
     override val displayAsMine = message.isMine
     override val canForward = message.canForward
     override val timeSent = message.time

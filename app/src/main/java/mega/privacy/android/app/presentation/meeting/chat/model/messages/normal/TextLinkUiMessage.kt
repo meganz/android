@@ -15,9 +15,6 @@ import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
  */
 data class TextLinkUiMessage(
     val message: TextLinkMessage,
-    override val showAvatar: Boolean,
-    override val showTime: Boolean,
-    override val showDate: Boolean,
 ) : AvatarMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         ChatLinksMessageView(
@@ -25,6 +22,9 @@ data class TextLinkUiMessage(
             message = message
         )
     }
+    override val showAvatar = message.shouldShowAvatar
+    override val showTime = message.shouldShowTime
+    override val showDate = message.shouldShowDate
     override val displayAsMine = message.isMine
     override val canForward = message.canForward
     override val timeSent = message.time

@@ -55,166 +55,113 @@ class UiChatMessageMapper @Inject constructor() {
      */
     operator fun invoke(
         message: TypedMessage,
-        showAvatar: Boolean,
-        showTime: Boolean,
-        showDate: Boolean,
     ): UiChatMessage {
         return when (message) {
             is TextMessage -> TextUiMessage(
                 message = message,
-                showAvatar = showAvatar,
-                showTime = showTime,
-                showDate = showDate
             )
 
             is CallMessage -> CallUiMessage(
                 message = message,
-                showDate = showDate
             )
 
             is RichPreviewMessage -> ChatRichLinkUiMessage(
                 message = message,
-                showDate = showDate,
-                showAvatar = showAvatar,
-                showTime = showTime
             )
 
             is GiphyMessage -> ChatGiphyUiMessage(
                 message = message,
-                showDate = showDate,
-                showAvatar = showAvatar,
-                showTime = showTime
             )
 
             is AlterParticipantsMessage -> AlterParticipantsUiMessage(
                 message = message,
-                showDate = showDate,
+                showDate = message.shouldShowDate,
             )
 
             is PermissionChangeMessage -> PermissionChangeUiMessage(
                 message = message,
-                showDate = showDate
+                showDate = message.shouldShowDate,
             )
 
             is TitleChangeMessage -> TitleChangeUiMessage(
                 message = message,
-                showDate = showDate
+                showDate = message.shouldShowDate,
             )
 
             is TruncateHistoryMessage -> TruncateHistoryUiMessage(
                 message = message,
-                showDate = showDate
+                showDate = message.shouldShowDate,
             )
 
             is ChatLinkCreatedMessage -> ChatLinkCreatedUiMessage(
                 message = message,
-                showDate = showDate
+                showDate = message.shouldShowDate,
             )
 
             is ChatLinkRemovedMessage -> ChatLinkRemovedUiMessage(
                 message = message,
-                showDate = showDate
+                showDate = message.shouldShowDate,
             )
 
             is ScheduledMeetingUpdatedMessage -> ScheduledMeetingUpdateUiMessage(
                 message = message,
-                showDate = showDate
+                showDate = message.shouldShowDate,
             )
 
             is PrivateModeSetMessage -> PrivateModeSetUiMessage(
                 message = message,
-                showDate = showDate
+                showDate = message.shouldShowDate,
             )
 
             is RetentionTimeUpdatedMessage -> RetentionTimeUpdatedUiMessage(
                 message = message,
-                showDate = showDate
+                showDate = message.shouldShowDate,
             )
 
             is ContactAttachmentMessage -> ContactAttachmentUiMessage(
                 message = message,
-                showDate = showDate,
-                showAvatar = showAvatar,
-                showTime = showTime
             )
 
             is LocationMessage -> LocationUiMessage(
                 message = message,
-                showDate = showDate,
-                showTime = showTime,
-                showAvatar = showAvatar
             )
 
             is TextLinkMessage -> TextLinkUiMessage(
                 message = message,
-                showDate = showDate,
-                showTime = showTime,
-                showAvatar = showAvatar
             )
 
             is VoiceClipMessage -> VoiceClipUiMessage(
                 message = message,
-                showDate = showDate,
-                showTime = showTime,
-                showAvatar = showAvatar
-            )
-
-            is VoiceClipMessage -> VoiceClipUiMessage(
-                message = message,
-                showDate = showDate,
-                showTime = showTime,
-                showAvatar = showAvatar
             )
 
             is InvalidMessage, is InvalidMetaMessage -> mapInvalidMessage(
-                message,
-                showAvatar,
-                showTime,
-                showDate
+                message = message,
             )
 
             else -> InvalidUiMessage.UnrecognizableInvalidUiMessage(
                 message = message,
-                showAvatar = showAvatar,
-                showTime = showTime,
-                showDate = showDate,
             )
         }
     }
 
     private fun mapInvalidMessage(
         message: TypedMessage,
-        showAvatar: Boolean,
-        showTime: Boolean,
-        showDate: Boolean,
     ): InvalidUiMessage {
         return when (message) {
             is SignatureInvalidMessage -> InvalidUiMessage.SignatureInvalidUiMessage(
                 message = message,
-                showAvatar = showAvatar,
-                showTime = showTime,
-                showDate = showDate
             )
 
             is FormatInvalidMessage -> InvalidUiMessage.FormatInvalidUiMessage(
                 message = message,
-                showAvatar = showAvatar,
-                showTime = showTime,
-                showDate = showDate
             )
 
             is InvalidMetaMessage -> InvalidUiMessage.MetaInvalidUiMessage(
                 message = message,
-                showAvatar = showAvatar,
-                showTime = showTime,
-                showDate = showDate
             )
 
             else -> InvalidUiMessage.UnrecognizableInvalidUiMessage(
                 message = message,
-                showAvatar = showAvatar,
-                showTime = showTime,
-                showDate = showDate
             )
         }
     }

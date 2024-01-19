@@ -5,7 +5,7 @@ import androidx.paging.PagingState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.app.presentation.meeting.chat.mapper.PagedTypedMessageResultUiMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatMessage
@@ -29,7 +29,7 @@ class ChatMessagePagingSource(
     private val fetchMessages: FetchMessagePageUseCase,
     private val messageFlow: Flow<ChatMessage?>,
     private val scope: CoroutineScope,
-    private val pagedTypedMessageResultUiMapper: PagedTypedMessageResultUiMapper,
+    private val uiChatMessageMapper: UiChatMessageMapper,
 ) : PagingSource<PagingLoadResult, UiChatMessage>() {
 
     override fun getRefreshKey(state: PagingState<PagingLoadResult, UiChatMessage>): PagingLoadResult? {
@@ -78,10 +78,7 @@ class ChatMessagePagingSource(
             )
 
         return LoadResult.Page(
-            data = pagedTypedMessageResultUiMapper(
-                pagingLoadResult = pagingLoadResult,
-                typedMessages = messages,
-            ),
+            data = messages.map { uiChatMessageMapper(it) },
             prevKey = prevKey,
             nextKey = null,
         )

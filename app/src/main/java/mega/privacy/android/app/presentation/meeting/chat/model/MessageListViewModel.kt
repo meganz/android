@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
-import mega.privacy.android.app.presentation.meeting.chat.mapper.PagedTypedMessageResultUiMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.paging.ChatMessagePagingSource
@@ -33,7 +33,7 @@ import javax.inject.Inject
  * @property loadMessagesUseCase
  * @property fetchMessagePageUseCase
  * @property monitorChatRoomMessagesUseCase
- * @property pagedTypedMessageResultUiMapper
+ * @property uiChatMessageMapper
  *
  * @param savedStateHandle
  */
@@ -42,7 +42,7 @@ class MessageListViewModel @Inject constructor(
     private val loadMessagesUseCase: LoadMessagesUseCase,
     private val fetchMessagePageUseCase: FetchMessagePageUseCase,
     private val monitorChatRoomMessagesUseCase: MonitorChatRoomMessagesUseCase,
-    private val pagedTypedMessageResultUiMapper: PagedTypedMessageResultUiMapper,
+    private val uiChatMessageMapper: UiChatMessageMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -76,7 +76,7 @@ class MessageListViewModel @Inject constructor(
                 ).onEach {
                     Timber.d("Paging monitorChatRoomMessagesUseCase returned with message: $it")
                 },
-                pagedTypedMessageResultUiMapper = pagedTypedMessageResultUiMapper,
+                uiChatMessageMapper = uiChatMessageMapper,
             )
         }.flow
             .cachedIn(viewModelScope)

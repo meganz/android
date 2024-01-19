@@ -20,9 +20,6 @@ import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
  */
 data class ContactAttachmentUiMessage(
     val message: ContactAttachmentMessage,
-    override val showDate: Boolean,
-    override val showAvatar: Boolean,
-    override val showTime: Boolean,
 ) : AvatarMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         ContactAttachmentMessageView(
@@ -42,6 +39,9 @@ data class ContactAttachmentUiMessage(
                 .fillMaxWidth()
         }
 
+    override val showAvatar = message.shouldShowAvatar
+    override val showTime = message.shouldShowTime
+    override val showDate = message.shouldShowDate
     override val displayAsMine = message.isMine
     override val canForward = message.canForward
     override val timeSent = message.time

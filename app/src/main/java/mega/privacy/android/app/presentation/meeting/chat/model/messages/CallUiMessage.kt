@@ -16,8 +16,9 @@ import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
  */
 data class CallUiMessage(
     private val message: CallMessage,
-    override val showDate: Boolean,
 ) : UiChatMessage {
+
+    override val showDate = message.shouldShowDate
 
     override val showTime: Boolean = true
 

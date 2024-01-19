@@ -20,9 +20,6 @@ private const val MAX_SIZE_FOR_AUTO_PLAY = 1024 * 1024 * 4  // 4MB
  */
 class ChatGiphyUiMessage(
     val message: GiphyMessage,
-    override val showDate: Boolean,
-    override val showAvatar: Boolean,
-    override val showTime: Boolean,
 ) : AvatarMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         message.chatGifInfo?.let { giphy ->
@@ -36,6 +33,10 @@ class ChatGiphyUiMessage(
             )
         }
     }
+
+    override val showAvatar = message.shouldShowAvatar
+    override val showTime = message.shouldShowTime
+    override val showDate = message.shouldShowDate
     override val displayAsMine = message.isMine
     override val canForward = message.canForward
     override val timeSent = message.time

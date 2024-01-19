@@ -21,9 +21,6 @@ import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
  */
 data class ChatRichLinkUiMessage(
     val message: RichPreviewMessage,
-    override val showDate: Boolean,
-    override val showAvatar: Boolean,
-    override val showTime: Boolean,
 ) : AvatarMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         ChatRichLinkMessageView(
@@ -44,6 +41,9 @@ data class ChatRichLinkUiMessage(
                 .fillMaxWidth()
         }
 
+    override val showAvatar = message.shouldShowAvatar
+    override val showTime = message.shouldShowTime
+    override val showDate = message.shouldShowDate
     override val displayAsMine = message.isMine
     override val canForward = message.canForward
     override val timeSent = message.time

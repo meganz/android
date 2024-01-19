@@ -16,9 +16,6 @@ import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
  */
 class LocationUiMessage(
     val message: LocationMessage,
-    override val showDate: Boolean,
-    override val showAvatar: Boolean,
-    override val showTime: Boolean,
 ) : AvatarMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         ChatLocationMessageView(
@@ -38,6 +35,9 @@ class LocationUiMessage(
                 .fillMaxWidth()
         }
 
+    override val showAvatar = message.shouldShowAvatar
+    override val showTime = message.shouldShowTime
+    override val showDate = message.shouldShowDate
     override val displayAsMine = message.isMine
     override val canForward = message.canForward
     override val timeSent = message.time

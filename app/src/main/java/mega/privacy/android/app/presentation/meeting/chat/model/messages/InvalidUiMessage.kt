@@ -29,6 +29,15 @@ sealed class InvalidUiMessage : AvatarMessage() {
         ChatErrorBubble(errorText = getErrorMessage())
     }
 
+    override val showAvatar: Boolean
+        get() = message.shouldShowAvatar
+
+    override val showTime: Boolean
+        get() = message.shouldShowTime
+
+    override val showDate: Boolean
+        get() = message.shouldShowDate
+
     override val displayAsMine: Boolean
         get() = message.isMine
     override val canForward: Boolean
@@ -52,9 +61,6 @@ sealed class InvalidUiMessage : AvatarMessage() {
      */
     data class FormatInvalidUiMessage(
         override val message: InvalidMessage,
-        override val showAvatar: Boolean,
-        override val showTime: Boolean,
-        override val showDate: Boolean,
     ) : InvalidUiMessage() {
         @Composable
         override fun getErrorMessage() =
@@ -71,9 +77,6 @@ sealed class InvalidUiMessage : AvatarMessage() {
      */
     data class SignatureInvalidUiMessage(
         override val message: InvalidMessage,
-        override val showAvatar: Boolean,
-        override val showTime: Boolean,
-        override val showDate: Boolean,
     ) : InvalidUiMessage() {
 
         @Composable
@@ -91,9 +94,6 @@ sealed class InvalidUiMessage : AvatarMessage() {
      */
     data class MetaInvalidUiMessage(
         override val message: TypedMessage,
-        override val showAvatar: Boolean,
-        override val showTime: Boolean,
-        override val showDate: Boolean,
     ) : InvalidUiMessage() {
 
         @Composable
@@ -111,9 +111,6 @@ sealed class InvalidUiMessage : AvatarMessage() {
      */
     data class UnrecognizableInvalidUiMessage(
         override val message: TypedMessage,
-        override val showAvatar: Boolean,
-        override val showTime: Boolean,
-        override val showDate: Boolean,
     ) : InvalidUiMessage() {
 
         @Composable
