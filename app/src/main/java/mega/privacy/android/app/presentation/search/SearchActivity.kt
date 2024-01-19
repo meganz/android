@@ -7,15 +7,19 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
@@ -39,6 +43,7 @@ import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeL
 import mega.privacy.android.app.presentation.node.dialogs.removesharefolder.RemoveShareFolderViewModel
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameSucceeded
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
+import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -58,7 +63,6 @@ import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchResetFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchVideosFilterPressedEvent
-import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -136,6 +140,7 @@ class SearchActivity : BaseActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         //Should be done in onCreate to avoid the issue that the activity is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED.
         val bottomSheetActionHandler =
             NodeBottomSheetActionHandler(this, nodeOptionsBottomSheetViewModel)
@@ -150,14 +155,24 @@ class SearchActivity : BaseActivity() {
             val removeFolderShareState by removeShareFolderViewModel.state.collectAsStateWithLifecycle()
             val nodeOptionsBottomSheetState by nodeOptionsBottomSheetViewModel.state.collectAsStateWithLifecycle()
 
+            // Remember a SystemUiController
+            val systemUiController = rememberSystemUiController()
+            val useDarkIcons = themeMode.isDarkMode().not()
+            systemUiController.setSystemBarsColor(
+                color = Color.Transparent,
+                darkIcons = useDarkIcons
+            )
             val scaffoldState = rememberScaffoldState()
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 Scaffold(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier,
                     scaffoldState = scaffoldState,
                 ) { padding ->
                     SearchNavHostController(
-                        modifier = Modifier.padding(padding),
+                        modifier = Modifier
+                            .padding(padding)
+                            .statusBarsPadding()
+                            .navigationBarsPadding(),
                         viewModel = viewModel,
                         moveToRubbishOrDeleteNodeDialogViewModel = moveToRubbishOrDeleteNodeDialogViewModel,
                         renameNodeDialogViewModel = renameNodeDialogViewModel,

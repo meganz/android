@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.search
 
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -10,10 +12,10 @@ import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removesharefolder.RemoveShareFolderViewModel
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -50,9 +52,13 @@ internal fun SearchNavHostController(
 ) {
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navHostController = rememberNavController(bottomSheetNavigator)
-    ModalBottomSheetLayout(bottomSheetNavigator) {
+    ModalBottomSheetLayout(
+        modifier = modifier.navigationBarsPadding(),
+        bottomSheetNavigator = bottomSheetNavigator,
+        scrimColor = Color.Black.copy(alpha = 0.5f)
+    ) {
         NavHost(
-            modifier = modifier,
+            modifier = modifier.navigationBarsPadding(),
             navController = navHostController,
             startDestination = searchRoute
         ) {

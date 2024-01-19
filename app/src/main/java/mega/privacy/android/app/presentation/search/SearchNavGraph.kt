@@ -18,10 +18,8 @@ import mega.privacy.android.app.presentation.search.navigation.changeLabelBottom
 import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDeleteNavigation
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetNavigation
-import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
-import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
-import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.removeShareFolderDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.shareFolderDialogNavigation
 import mega.privacy.android.domain.entity.node.TypedNode
 

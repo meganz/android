@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.search.navigation
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,7 +16,7 @@ import mega.privacy.android.app.presentation.node.view.NodeOptionsBottomSheetCon
 internal const val nodeBottomSheetRoute = "search/node_bottom_sheet"
 internal const val nodeBottomSheetRouteNodeIdArg = "node_id"
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalComposeUiApi::class)
 internal fun NavGraphBuilder.nodeBottomSheetNavigation(
     nodeBottomSheetActionHandler: NodeBottomSheetActionHandler,
     navHostController: NavHostController,
@@ -28,8 +30,10 @@ internal fun NavGraphBuilder.nodeBottomSheetNavigation(
             },
         ),
     ) {
+        val keyboardController = LocalSoftwareKeyboardController.current
         it.arguments?.getLong(nodeBottomSheetRouteNodeIdArg)?.let { nodeId ->
             LaunchedEffect(Unit) {
+                keyboardController?.hide()
                 nodeOptionsBottomSheetViewModel.getBottomSheetOptions(nodeId)
             }
             NodeOptionsBottomSheetContent(

@@ -24,6 +24,7 @@ import mega.privacy.android.app.presentation.view.extension.getIcon
 import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -66,6 +67,7 @@ internal fun NodeOptionsBottomSheetContent(
 
     NodeListViewItem(
         title = node?.name.orEmpty(),
+        titleColor = if (node?.isTakenDown == true) TextColor.Error else TextColor.Primary,
         subtitle = when (node) {
             is FileNode -> node.fileInfo()
             is FolderNode -> node.folderInfo()

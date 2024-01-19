@@ -20,7 +20,7 @@ class OpenLocationBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
-    ) = isInBackups.not()
+    ) = false
 
     override val groupId = 5
 }

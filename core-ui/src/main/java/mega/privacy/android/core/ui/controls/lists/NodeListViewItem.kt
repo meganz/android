@@ -51,6 +51,8 @@ fun NodeListViewItem(
     @DrawableRes icon: Int,
     modifier: Modifier = Modifier,
     thumbnailData: Any? = null,
+    titleColor: TextColor = TextColor.Primary,
+    subtitleColor: TextColor = TextColor.Secondary,
     @DrawableRes accessPermissionIcon: Int? = null,
     titleOverflow: LongTextBehaviour = LongTextBehaviour.Clip(),
     subTitleOverflow: LongTextBehaviour = LongTextBehaviour.Clip(),
@@ -80,7 +82,7 @@ fun NodeListViewItem(
             MegaText(
                 text = title,
                 overflow = titleOverflow,
-                textColor = TextColor.Primary,
+                textColor = titleColor,
                 modifier = Modifier.testTag(TITLE_TAG),
             )
         },
@@ -127,7 +129,7 @@ fun NodeListViewItem(
         subtitle = {
             MegaText(
                 text = subtitle,
-                textColor = TextColor.Secondary,
+                textColor = subtitleColor,
                 overflow = subTitleOverflow,
                 modifier = Modifier.testTag(SUBTITLE_TAG),
             )
