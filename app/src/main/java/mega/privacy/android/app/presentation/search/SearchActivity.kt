@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -63,6 +65,8 @@ import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchResetFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchVideosFilterPressedEvent
+import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
+import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -70,7 +74,7 @@ import javax.inject.Inject
  * Search activity to search Nodes and display
  */
 @AndroidEntryPoint
-class SearchActivity : BaseActivity() {
+class SearchActivity : BaseActivity(), MegaSnackbarShower {
     private val viewModel: SearchActivityViewModel by viewModels()
     private val nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel by viewModels()
     private val moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel by viewModels()
@@ -92,6 +96,8 @@ class SearchActivity : BaseActivity() {
      */
     @Inject
     lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
+
+    private val snackbarHostState = SnackbarHostState()
 
     companion object {
         /**
@@ -162,7 +168,9 @@ class SearchActivity : BaseActivity() {
                 color = Color.Transparent,
                 darkIcons = useDarkIcons
             )
-            val scaffoldState = rememberScaffoldState()
+
+            val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
+
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 Scaffold(
                     modifier = Modifier,
@@ -438,6 +446,24 @@ class SearchActivity : BaseActivity() {
                 NodeNameCollisionType.MOVE -> nodeOptionsBottomSheetViewModel.moveNodes(result.noConflictNodes)
                 else -> Timber.d("Not implemented")
             }
+        }
+    }
+
+    override fun showMegaSnackbar(
+        message: String,
+        actionLabel: String?,
+        duration: MegaSnackbarDuration,
+    ) {
+        lifecycleScope.launch {
+            snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = actionLabel,
+                duration = when (duration) {
+                    MegaSnackbarDuration.Short -> SnackbarDuration.Short
+                    MegaSnackbarDuration.Long -> SnackbarDuration.Long
+                    MegaSnackbarDuration.Indefinite -> SnackbarDuration.Indefinite
+                }
+            )
         }
     }
 }
