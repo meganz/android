@@ -101,7 +101,8 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
             "cs",
             "sh",
             "vb",
-            "swift"
+            "swift",
+            "org"
         )
 
         private val resourcesCache = mutableMapOf<String, Int>()
@@ -160,7 +161,10 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
                     "pkg",
                 )
             )
-            put(iconPackR.drawable.ic_database_list, arrayOf("accdb", "db", "dbf", "mdb", "pdb", "sql"))
+            put(
+                iconPackR.drawable.ic_database_list,
+                arrayOf("accdb", "db", "dbf", "mdb", "pdb", "sql")
+            )
             put(iconPackR.drawable.ic_dmg_list, arrayOf("dmg"))
             put(iconPackR.drawable.ic_dreamweaver_list, arrayOf("dwt"))
             put(
@@ -176,7 +180,10 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
             put(iconPackR.drawable.ic_font_list, arrayOf("fnt", "fon", "otf", "ttf"))
             put(iconPackR.drawable.ic_gis_list, arrayOf("gpx", "kml", "kmz"))
             put(iconPackR.drawable.ic_html_list, arrayOf("dhtml", "htm", "html", "shtml", "xhtml"))
-            put(iconPackR.drawable.ic_illustrator_list, arrayOf("ai", "aia", "aip", "ait", "art", "irs"))
+            put(
+                iconPackR.drawable.ic_illustrator_list,
+                arrayOf("ai", "aia", "aip", "ait", "art", "irs")
+            )
             put(
                 iconPackR.drawable.ic_image_list,
                 arrayOf("jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png")
@@ -246,7 +253,10 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
             )
             put(iconPackR.drawable.ic_subtitles_list, arrayOf("srt"))
             put(iconPackR.drawable.ic_swf_list, arrayOf("swf", "flv"))
-            put(iconPackR.drawable.ic_text_list, arrayOf("ans", "ascii", "log", "rtf", "txt", "wpd"))
+            put(
+                iconPackR.drawable.ic_text_list,
+                arrayOf("ans", "ascii", "log", "rtf", "txt", "wpd", "org")
+            )
             put(iconPackR.drawable.ic_torrent_list, arrayOf("torrent"))
             put(iconPackR.drawable.ic_vcard_list, arrayOf("vcard", "vcf"))
             put(iconPackR.drawable.ic_vector_list, arrayOf("cdr", "eps", "ps", "svg", "svgz"))
@@ -305,7 +315,10 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
                     "xml",
                 )
             )
-            put(iconPackR.drawable.ic_word_list, arrayOf("doc", "docm", "docx", "dot", "dotx", "wps"))
+            put(
+                iconPackR.drawable.ic_word_list,
+                arrayOf("doc", "docm", "docx", "dot", "dotx", "wps")
+            )
             put(iconPackR.drawable.ic_pages_list, arrayOf("pages"))
             put(iconPackR.drawable.ic_experiencedesign_list, arrayOf("Xd"))
             put(iconPackR.drawable.ic_keynote_list, arrayOf("key"))
