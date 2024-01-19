@@ -136,12 +136,10 @@ class VoiceClipMessageViewModel @Inject constructor(
                     }
 
                     is MultiTransferEvent.SingleTransferEvent -> {
-                        with(downloadEvent.transferEvent.transfer) {
-                            getMutableStateFlow(msgId)?.update {
-                                it.copy(
-                                    loadProgress = (transferredBytes * 100 / totalBytes).toInt()
-                                )
-                            }
+                        getMutableStateFlow(msgId)?.update {
+                            it.copy(
+                                loadProgress = downloadEvent.overallProgress
+                            )
                         }
                     }
 
