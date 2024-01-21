@@ -24,7 +24,8 @@ class TypedMessageEntityConverters {
      * @return List of longs.
      */
     @TypeConverter
-    fun convertToLongList(string: String): List<Long> = string.split(",").map { it.toLong() }
+    fun convertToLongList(string: String): List<Long> =
+        string.split(",").mapNotNull { it.toLongOrNull() }
 
     /**
      * Convert a list of strings to a string.
@@ -42,7 +43,8 @@ class TypedMessageEntityConverters {
      * @return List of strings.
      */
     @TypeConverter
-    fun convertToStringList(string: String): List<String> = string.split(",")
+    fun convertToStringList(string: String): List<String> =
+        string.takeUnless { it.isBlank() }?.split(",") ?: emptyList()
 
     /**
      * Convert a list of chat message changes to a string.
@@ -63,5 +65,5 @@ class TypedMessageEntityConverters {
      */
     @TypeConverter
     fun convertToChatMessageChangeList(string: String): List<ChatMessageChange> =
-        string.split(",").map { ChatMessageChange.valueOf(it) }
+        string.split(",").mapNotNull { runCatching { ChatMessageChange.valueOf(it) }.getOrNull() }
 }

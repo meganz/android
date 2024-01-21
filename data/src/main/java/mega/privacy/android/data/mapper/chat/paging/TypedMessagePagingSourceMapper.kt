@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import mega.privacy.android.data.database.entity.chat.MetaTypedMessageEntity
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -44,14 +45,26 @@ class TypedMessagePagingSourceMapper @Inject constructor(
         }
 
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TypedMessage> {
+            Timber.d("Paging mediator mapper load: params : $params")
             return when (val originalResult = originalSource.load(params)) {
-                is LoadResult.Error -> LoadResult.Error(originalResult.throwable)
-                is LoadResult.Invalid -> LoadResult.Invalid()
-                is LoadResult.Page -> LoadResult.Page(
-                    data = originalResult.data.map { metaTypedMessageEntityMapper(it) },
-                    prevKey = originalResult.prevKey,
-                    nextKey = originalResult.nextKey,
-                )
+                is LoadResult.Error -> {
+                    Timber.e(originalResult.throwable, "Paging mediator mapper load: error")
+                    LoadResult.Error(originalResult.throwable)
+                }
+
+                is LoadResult.Invalid -> {
+                    Timber.e("Paging mediator mapper load: invalid")
+                    LoadResult.Invalid()
+                }
+
+                is LoadResult.Page -> {
+                    Timber.d("Paging mediator mapper load: page : ${originalResult.data}")
+                    LoadResult.Page(
+                        data = originalResult.data.map { metaTypedMessageEntityMapper(it) },
+                        prevKey = originalResult.prevKey,
+                        nextKey = originalResult.nextKey,
+                    )
+                }
             }
         }
     }
