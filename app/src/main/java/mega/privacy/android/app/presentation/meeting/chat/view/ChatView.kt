@@ -85,6 +85,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startM
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startWaitingRoom
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatAttachFileBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageOptionsBottomSheet
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -206,6 +207,7 @@ internal fun ChatView(
     var isSelectMode by rememberSaveable { mutableStateOf(false) }
     var showJoinAnswerCallDialog by rememberSaveable { mutableStateOf(false) }
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
+    var showReactionPicker by rememberSaveable { mutableStateOf(false) }
     val keyboardState by keyboardAsState()
     val isKeyboardShown = keyboardState == KeyboardState.Opened
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
@@ -220,6 +222,15 @@ internal fun ChatView(
             }
         )
     val fileModalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = {
+            if (it != ModalBottomSheetValue.Hidden) {
+                keyboardController?.hide()
+            }
+            true
+        }
+    )
+    val messageOptionsModalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         confirmValueChange = {
             if (it != ModalBottomSheetValue.Hidden) {
@@ -333,71 +344,98 @@ internal fun ChatView(
                 takePictureUri = Uri.EMPTY
             }
 
-        val isFileModalShown = fileModalSheetState.currentValue != ModalBottomSheetValue.Hidden
+        val isFileModalShown by derivedStateOf { fileModalSheetState.currentValue != ModalBottomSheetValue.Hidden }
+        val isMessageOptionsModalShown by derivedStateOf {
+            messageOptionsModalSheetState.currentValue != ModalBottomSheetValue.Hidden
+        }
+
+        if (!isMessageOptionsModalShown) {
+            showReactionPicker = false
+        }
 
         BottomSheet(
-            modalSheetState = if (isFileModalShown) fileModalSheetState else toolbarModalSheetState,
+            modalSheetState = when {
+                isFileModalShown -> fileModalSheetState
+                isMessageOptionsModalShown -> messageOptionsModalSheetState
+                else -> toolbarModalSheetState
+            },
             sheetBody = {
-                if (isFileModalShown) {
-                    ChatAttachFileBottomSheet(
-                        onAttachFiles = onAttachFiles,
-                        sheetState = fileModalSheetState,
-                    )
-                } else {
-                    ChatToolbarBottomSheet(
-                        onAttachFileClicked = {
-                            onBackPressed()
-                            coroutineScope.launch {
-                                fileModalSheetState.show()
-                            }
-                        },
-                        onAttachContactClicked = {
-                            if (uiState.hasAnyContact) {
-                                openAttachContactActivity(context, attachContactLauncher)
-                            } else {
+                when {
+                    isFileModalShown -> {
+                        ChatAttachFileBottomSheet(
+                            onAttachFiles = onAttachFiles,
+                            sheetState = fileModalSheetState,
+                        )
+                    }
+
+                    isMessageOptionsModalShown -> {
+                        MessageOptionsBottomSheet(
+                            showReactionPicker = showReactionPicker,
+                            onReactionClicked = {
+                                // Add reaction
+                            },
+                            onMoreReactionsClicked = { showReactionPicker = true },
+                            sheetState = messageOptionsModalSheetState,
+                        )
+                    }
+
+                    else -> {
+                        ChatToolbarBottomSheet(
+                            onAttachFileClicked = {
+                                onBackPressed()
                                 coroutineScope.launch {
-                                    snackBarHostState.showSnackbar(context.getString(R.string.no_contacts_invite))
+                                    fileModalSheetState.show()
                                 }
-                            }
-                        },
-                        onPickLocation = {
-                            checkLocationPicker(
-                                isGeolocationEnabled = isGeolocationEnabled,
-                                isPermissionGranted = locationPermissionState.status.isGranted,
-                                onShowEnableGeolocationDialog = {
-                                    showEnableGeolocationDialog = true
-                                },
-                                onAskForLocationPermission = {
-                                    locationPermissionsLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                                },
-                                onPickLocation = {
-                                    openLocationPicker(context, locationPickerLauncher)
+                            },
+                            onAttachContactClicked = {
+                                if (uiState.hasAnyContact) {
+                                    openAttachContactActivity(context, attachContactLauncher)
+                                } else {
+                                    coroutineScope.launch {
+                                        snackBarHostState.showSnackbar(context.getString(R.string.no_contacts_invite))
+                                    }
                                 }
-                            )
-                        },
-                        onTakePicture = {
-                            coroutineScope.launch {
-                                createNewImage()?.let {
-                                    takePictureUri = it
-                                    takePictureLauncher.launch(it)
+                            },
+                            onPickLocation = {
+                                checkLocationPicker(
+                                    isGeolocationEnabled = isGeolocationEnabled,
+                                    isPermissionGranted = locationPermissionState.status.isGranted,
+                                    onShowEnableGeolocationDialog = {
+                                        showEnableGeolocationDialog = true
+                                    },
+                                    onAskForLocationPermission = {
+                                        locationPermissionsLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                    },
+                                    onPickLocation = {
+                                        openLocationPicker(context, locationPickerLauncher)
+                                    }
+                                )
+                            },
+                            onTakePicture = {
+                                coroutineScope.launch {
+                                    createNewImage()?.let {
+                                        takePictureUri = it
+                                        takePictureLauncher.launch(it)
+                                    }
+                                    toolbarModalSheetState.hide()
                                 }
-                                toolbarModalSheetState.hide()
-                            }
-                        },
-                        isLoadingGalleryFiles = isLoadingGalleryFiles,
-                        sheetState = toolbarModalSheetState,
-                        onCameraPermissionDenied = {
-                            showPermissionNotAllowedSnackbar(
-                                context,
-                                coroutineScope,
-                                snackBarHostState,
-                                R.string.chat_attach_pick_from_camera_deny_permission
-                            )
-                        },
-                        onAttachFiles = onAttachFiles
-                    )
+                            },
+                            isLoadingGalleryFiles = isLoadingGalleryFiles,
+                            sheetState = toolbarModalSheetState,
+                            onCameraPermissionDenied = {
+                                showPermissionNotAllowedSnackbar(
+                                    context,
+                                    coroutineScope,
+                                    snackBarHostState,
+                                    R.string.chat_attach_pick_from_camera_deny_permission
+                                )
+                            },
+                            onAttachFiles = onAttachFiles
+                        )
+                    }
                 }
             },
+            sheetGesturesEnabled = !showReactionPicker,
         ) {
             MegaScaffold(
                 topBar = {
@@ -464,7 +502,7 @@ internal fun ChatView(
                     }
                 },
                 bottomBar = {
-                    if (myPermission == ChatRoomPermission.Standard || myPermission == ChatRoomPermission.Moderator) {
+                    if (haveWritePermission) {
                         Column {
                             UserTypingView(
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -547,7 +585,10 @@ internal fun ChatView(
                                 scrollState,
                                 bottomPadding
                             ) { message ->
-                                // Show message options
+                                // Use message for showing correct available options
+                                coroutineScope.launch {
+                                    messageOptionsModalSheetState.show()
+                                }
                             }
                         },
                     )
