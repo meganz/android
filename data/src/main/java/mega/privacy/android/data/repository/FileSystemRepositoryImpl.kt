@@ -471,4 +471,32 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun createNewImageUri(fileName: String): String? = withContext(ioDispatcher) {
         fileGateway.createNewImageUri(fileName)?.toString()
     }
+
+    override suspend fun isFileUri(uriString: String) = withContext(ioDispatcher) {
+        fileGateway.isFileUri(uriString)
+    }
+
+    override suspend fun getFileFromFileUri(uriString: String) = withContext(ioDispatcher) {
+        fileGateway.getFileFromUriFile(uriString)
+    }
+
+    override suspend fun isContentUri(uriString: String): Boolean = withContext(ioDispatcher) {
+        fileGateway.isContentUri(uriString)
+    }
+
+    override suspend fun getFileNameFromUri(uriString: String): String? =
+        withContext(ioDispatcher) {
+            fileGateway.getFileNameFromUri(uriString)
+        }
+
+    override suspend fun getFileExtensionFromUri(uriString: String) =
+        withContext(ioDispatcher) {
+            fileGateway.getFileExtensionFromUri(uriString)
+        }
+
+    override suspend fun copyContentUriToFile(uriString: String, file: File) {
+        withContext(ioDispatcher) {
+            fileGateway.copyContentUriToFile(uriString, file)
+        }
+    }
 }

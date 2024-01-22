@@ -360,6 +360,40 @@ internal class FileSystemRepositoryImplTest {
             assertThat(underTest.createNewImageUri("name")).isEqualTo("uri")
         }
 
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that isContentUri returns correct value`(
+        expected: Boolean,
+    ) = runTest {
+        val uri = "uri//:example.txt"
+        whenever(fileGateway.isContentUri(uri)).thenReturn(expected)
+        assertThat(underTest.isContentUri(uri)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that getFileNameFromUri returns correct value`() = runTest {
+        val uri = "uri//:example.txt"
+        val expected = "example"
+        whenever(fileGateway.getFileNameFromUri(any())).thenReturn(expected)
+        assertThat(underTest.getFileNameFromUri(uri)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that getFileExtensionFromUri returns correct value`() = runTest {
+        val uri = "uri//:example.txt"
+        val expected = "txt"
+        whenever(fileGateway.getFileExtensionFromUri(any())).thenReturn(expected)
+        assertThat(underTest.getFileExtensionFromUri(uri)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that copyContentUriToFile calls gateway method`() = runTest {
+        val uri = "uri//:example.txt"
+        val file = mock<File>()
+        underTest.copyContentUriToFile(uri, file)
+        verify(fileGateway).copyContentUriToFile(uri, file)
+    }
+
     @Nested
     @DisplayName("SD Card related methods")
     inner class SDCard {

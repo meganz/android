@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.meeting.chat
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -74,6 +75,7 @@ import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -226,6 +228,7 @@ internal class ChatViewModelTest {
     private val monitorJoiningChatUseCase = mock<MonitorJoiningChatUseCase>()
     private val monitorLeavingChatUseCase = mock<MonitorLeavingChatUseCase>()
     private val sendLocationMessageUseCase = mock<SendLocationMessageUseCase>()
+    private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeAll
@@ -279,6 +282,7 @@ internal class ChatViewModelTest {
             closeChatPreviewUseCase,
             createNewImageUriUseCase,
             sendLocationMessageUseCase,
+            sendChatAttachmentsUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -361,6 +365,7 @@ internal class ChatViewModelTest {
             monitorLeavingChatUseCase = monitorLeavingChatUseCase,
             applicationScope = CoroutineScope(testDispatcher),
             sendLocationMessageUseCase = sendLocationMessageUseCase,
+            sendChatAttachmentsUseCase = sendChatAttachmentsUseCase
         )
     }
 
@@ -2324,6 +2329,20 @@ internal class ChatViewModelTest {
             assertThat(awaitItem().isLeaving).isFalse()
         }
     }
+
+    @Test
+    fun `test that correct files are sent to SendChatAttachmentsUseCase when on attach files is invoked`() =
+        runTest {
+            initTestClass()
+            val files = List(5) { index ->
+                mock<Uri> {
+                    on { toString() } doReturn "file$index"
+                }
+            }
+            val expected = files.map { it.toString() }
+            underTest.onAttachFiles(files)
+            verify(sendChatAttachmentsUseCase).invoke(chatId, expected)
+        }
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

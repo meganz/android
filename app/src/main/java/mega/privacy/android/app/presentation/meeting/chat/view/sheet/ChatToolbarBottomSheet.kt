@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -54,6 +55,7 @@ fun ChatToolbarBottomSheet(
     modifier: Modifier = Modifier,
     onCameraPermissionDenied: () -> Unit = {},
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
+    onAttachFiles: (List<Uri>) -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -62,7 +64,9 @@ fun ChatToolbarBottomSheet(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.PickMultipleVisualMedia()
         ) {
-            //Manage gallery picked files here
+            if (it.isNotEmpty()) {
+                onAttachFiles(it)
+            }
             coroutineScope.launch { sheetState.hide() }
         }
 

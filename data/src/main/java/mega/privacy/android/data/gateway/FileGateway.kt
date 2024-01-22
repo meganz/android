@@ -246,4 +246,38 @@ interface FileGateway {
      * Get offline file
      */
     suspend fun createNewImageUri(fileName: String): Uri?
+
+    /**
+     * @return true if the [uriString] represents a file Uri
+     */
+    suspend fun isFileUri(uriString: String): Boolean
+
+    /**
+     * Get the file represented by [uriString]
+     *
+     * @param uriString must be a file uri (file://...)
+     */
+    suspend fun getFileFromUriFile(uriString: String): File
+
+    /**
+     * @return true if the [uriString] represents a content Uri
+     */
+    suspend fun isContentUri(uriString: String): Boolean
+
+    /**
+     * @return the file name of the file represented by [uriString]
+     */
+    suspend fun getFileNameFromUri(uriString: String): String?
+
+    /**
+     * @return the extension of the file represented by [uriString]
+     */
+    suspend fun getFileExtensionFromUri(uriString: String): String?
+
+    /**
+     * Copies the file represented by a content [uriString] to the destination File. Usually, it is to make a content file returned by a share intent usable by the SDK.
+     * @param uriString the string representing the file, it must be a "content" uri
+     * @param file the destination file where the original file will be copied
+     */
+    suspend fun copyContentUriToFile(uriString: String, file: File)
 }

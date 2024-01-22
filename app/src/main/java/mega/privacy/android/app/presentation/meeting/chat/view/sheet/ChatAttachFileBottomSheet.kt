@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -33,6 +35,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 fun ChatAttachFileBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
+    onAttachFiles: (List<Uri>) -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -48,8 +51,19 @@ fun ChatAttachFileBottomSheet(
     val localLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
-        ) {
-            // Manage local files here
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val attachedFiles =
+                    result.data?.clipData?.takeIf { it.itemCount > 0 }?.let { clipData ->
+                        buildList {
+                            for (i in 0 until clipData.itemCount) {
+                                add(clipData.getItemAt(i).uri)
+                            }
+                        }
+                    } ?: listOfNotNull(result.data?.data).takeIf { it.isNotEmpty() }
+                attachedFiles?.let(onAttachFiles)
+
+            }
             coroutineScope.launch { sheetState.hide() }
         }
 

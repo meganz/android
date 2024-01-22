@@ -39,6 +39,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
+import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -67,6 +68,7 @@ import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -174,6 +176,7 @@ class ChatViewModel @Inject constructor(
     private val monitorJoiningChatUseCase: MonitorJoiningChatUseCase,
     private val monitorLeavingChatUseCase: MonitorLeavingChatUseCase,
     private val sendLocationMessageUseCase: SendLocationMessageUseCase,
+    private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1010,6 +1013,18 @@ class ChatViewModel @Inject constructor(
 
     fun onSetPendingJoinLink() {
         chatManagement.pendingJoinLink = savedStateHandle[EXTRA_LINK]
+    }
+
+    fun onAttachFiles(files: List<Uri>) {
+        viewModelScope.launch {
+            sendChatAttachmentsUseCase(chatId, files.map { it.toString() })
+                .catch { Timber.e(it) }
+                .collect {
+                    if (it is MultiTransferEvent.TransferNotStarted<*>) {
+                        Timber.e(it.exception, "${it.item} not attached")
+                    }
+                }
+        }
     }
 
     fun onJoinChat() {

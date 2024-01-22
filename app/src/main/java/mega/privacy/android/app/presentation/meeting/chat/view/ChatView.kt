@@ -137,6 +137,7 @@ internal fun ChatView(
         onSetPendingJoinLink = viewModel::onSetPendingJoinLink,
         createNewImage = viewModel::createNewImageUri,
         onSendLocationMessage = viewModel::sendLocationMessage,
+        onAttachFiles = viewModel::onAttachFiles,
     )
 }
 
@@ -188,6 +189,7 @@ internal fun ChatView(
     onSetPendingJoinLink: () -> Unit = {},
     createNewImage: suspend () -> Uri? = { null },
     onSendLocationMessage: (Intent?) -> Unit = { _ -> },
+    onAttachFiles: (List<Uri>) -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -318,14 +320,15 @@ internal fun ChatView(
             ) { result ->
                 // TODO attach contact to chat room
             }
-
+        var takePictureUri by remember { mutableStateOf(Uri.EMPTY) }
         val takePictureLauncher =
             rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.TakePicture()
-            ) {
-                if (it) {
-
+            ) { resultOk ->
+                if (resultOk) {
+                    onAttachFiles(listOf(takePictureUri))
                 }
+                takePictureUri = Uri.EMPTY
             }
 
         val isFileModalShown = fileModalSheetState.currentValue != ModalBottomSheetValue.Hidden
@@ -335,7 +338,8 @@ internal fun ChatView(
             sheetBody = {
                 if (isFileModalShown) {
                     ChatAttachFileBottomSheet(
-                        sheetState = fileModalSheetState
+                        onAttachFiles = onAttachFiles,
+                        sheetState = fileModalSheetState,
                     )
                 } else {
                     ChatToolbarBottomSheet(
@@ -371,7 +375,11 @@ internal fun ChatView(
                         },
                         onTakePicture = {
                             coroutineScope.launch {
-                                createNewImage()?.let(takePictureLauncher::launch)
+                                createNewImage()?.let {
+                                    takePictureUri = it
+                                    takePictureLauncher.launch(it)
+                                }
+                                toolbarModalSheetState.hide()
                             }
                         },
                         isLoadingGalleryFiles = isLoadingGalleryFiles,
@@ -384,6 +392,7 @@ internal fun ChatView(
                                 R.string.chat_attach_pick_from_camera_deny_permission
                             )
                         },
+                        onAttachFiles = onAttachFiles
                     )
                 }
             },

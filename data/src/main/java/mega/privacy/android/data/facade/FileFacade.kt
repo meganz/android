@@ -14,7 +14,10 @@ import android.provider.MediaStore.MediaColumns.DISPLAY_NAME
 import android.provider.MediaStore.MediaColumns.SIZE
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.provider.MediaStore.VOLUME_INTERNAL
+import android.provider.OpenableColumns
+import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.exifinterface.media.ExifInterface
@@ -321,6 +324,36 @@ class FileFacade @Inject constructor(
 
         val contentResolver = context.contentResolver
         return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+    }
+
+    override suspend fun isFileUri(uriString: String) = uriString.toUri().scheme == "file"
+    override suspend fun getFileFromUriFile(uriString: String): File =
+        uriString.toUri().toFile()
+
+    override suspend fun isContentUri(uriString: String) = uriString.toUri().scheme == "content"
+
+    override suspend fun getFileNameFromUri(uriString: String): String? {
+        val cursor = context.contentResolver.query(uriString.toUri(), null, null, null, null)
+        return cursor?.use {
+            if (cursor.moveToFirst()) {
+                cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME).takeIf { it >= 0 }
+                    ?.let { cursor.getString(it) }
+            } else null
+        }
+    }
+
+    override suspend fun getFileExtensionFromUri(uriString: String) =
+        MimeTypeMap.getSingleton()
+            .getExtensionFromMimeType(context.contentResolver.getType(uriString.toUri()))
+
+    override suspend fun copyContentUriToFile(uriString: String, file: File) {
+        val uri = uriString.toUri()
+        require(uri.scheme == "content")
+        context.contentResolver.openInputStream(uri)?.use { inputStream ->
+            file.outputStream().use { output ->
+                inputStream.copyTo(output)
+            }
+        }
     }
 
     private companion object {
