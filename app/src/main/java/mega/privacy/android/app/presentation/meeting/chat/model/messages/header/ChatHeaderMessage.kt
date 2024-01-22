@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
  * Chat header message
@@ -16,21 +17,17 @@ class ChatHeaderMessage : UiChatMessage {
         lastUpdatedCache: Long,
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
+        onLongClick: (TypedMessage) -> Unit,
     ) {
         FirstMessageHeader(uiState.title, uiState.scheduledMeeting)
     }
 
-    override val id: Long
-        get() = -1L
-    override val displayAsMine: Boolean
-        get() = false
-    override val canForward: Boolean
-        get() = false
-    override val timeSent: Long? = null
-    override val userHandle: Long = -1L
-    override val showTime: Boolean
-        get() = false
-    override val showDate: Boolean
-        get() = false
-
+    override val id = -1L
+    override val displayAsMine = false
+    override val canForward = false
+    override val timeSent = null
+    override val userHandle = -1L
+    override val showTime = false
+    override val showDate = false
+    override val canLongClick = false
 }

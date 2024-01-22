@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
+import mega.privacy.android.app.presentation.meeting.chat.extension.canLongClick
 import mega.privacy.android.core.ui.controls.chat.messages.ChatErrorBubble
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
@@ -47,6 +48,9 @@ sealed class InvalidUiMessage : AvatarMessage() {
 
     override val userHandle: Long
         get() = message.userHandle
+
+    override val canLongClick: Boolean
+        get() = message.canLongClick
 
     override val id: Long
         get() = message.msgId

@@ -1,8 +1,12 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.meta
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
+import mega.privacy.android.app.presentation.meeting.chat.extension.canLongClick
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.GiphyMessageView
 import mega.privacy.android.app.utils.GiphyUtil
@@ -21,6 +25,7 @@ private const val MAX_SIZE_FOR_AUTO_PLAY = 1024 * 1024 * 4  // 4MB
 class ChatGiphyUiMessage(
     val message: GiphyMessage,
 ) : AvatarMessage() {
+    @OptIn(ExperimentalFoundationApi::class)
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         message.chatGifInfo?.let { giphy ->
             GiphyMessageView(
@@ -29,7 +34,11 @@ class ChatGiphyUiMessage(
                 height = giphy.height,
                 title = giphy.title,
                 autoPlayGif = if (autoPlay) true else giphy.webpSize < MAX_SIZE_FOR_AUTO_PLAY,
-                onLoaded = { autoPlay = true }
+                onLoaded = { autoPlay = true },
+                modifier = Modifier.combinedClickable(
+                    onClick = {},
+                    onLongClick = { longClick?.let { it(message) } }
+                ),
             )
         }
     }
@@ -41,6 +50,7 @@ class ChatGiphyUiMessage(
     override val canForward = message.canForward
     override val timeSent = message.time
     override val userHandle = message.userHandle
+    override val canLongClick = message.canLongClick
     override val id = message.msgId
     private var autoPlay: Boolean = false
 }

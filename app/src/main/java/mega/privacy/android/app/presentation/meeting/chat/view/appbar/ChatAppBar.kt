@@ -154,7 +154,7 @@ private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> =
 
         val hasModeratorPermission = myPermission == ChatRoomPermission.Moderator
 
-        if (hasModeratorPermission || myPermission == ChatRoomPermission.Standard) {
+        if (haveWritePermission) {
             add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat && (!isWaitingRoom || hasModeratorPermission)))
 
             if (!isGroup) {

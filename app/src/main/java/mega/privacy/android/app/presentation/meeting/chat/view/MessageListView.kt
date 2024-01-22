@@ -27,6 +27,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewM
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ParticipantUiMessage
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import timber.log.Timber
 
 @Composable
@@ -36,6 +37,7 @@ internal fun MessageListView(
     bottomPadding: Dp,
     viewModel: MessageListViewModel = hiltViewModel(),
     onUserUpdateHandled: () -> Unit = {},
+    onMessageLongClick: (TypedMessage) -> Unit = {},
 ) {
     val pagingItems = viewModel.pagedMessages.collectAsLazyPagingItems()
     Timber.d("Paging pagingItems load state ${pagingItems.loadState}")
@@ -119,7 +121,8 @@ internal fun MessageListView(
             },
             contentType = pagingItems.itemContentType()
         ) { index ->
-            pagingItems[index]?.MessageListItem(uiState = uiState,
+            pagingItems[index]?.MessageListItem(
+                uiState = uiState,
                 lastUpdatedCache = lastCacheUpdateTime[pagingItems[index]?.userHandle] ?: 0L,
                 timeFormatter = TimeUtils::formatTime,
                 dateFormatter = {
@@ -128,7 +131,11 @@ internal fun MessageListView(
                         TimeUtils.DATE_SHORT_FORMAT,
                         context
                     )
-                })
+                },
+                onLongClick = {
+                    if (uiState.haveWritePermission) onMessageLongClick(it)
+                },
+            )
         }
     }
 }

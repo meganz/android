@@ -9,10 +9,10 @@ import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.MetaMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.ChatLinkMessage
-import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.FileLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.FolderLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 
 /**
  * Is selectable
@@ -31,6 +31,20 @@ val TypedMessage.canForward: Boolean
         is RichPreviewMessage, is GiphyMessage, is LocationMessage, is ChatLinkMessage,
         is TextLinkMessage, is FolderLinkMessage, is FileLinkMessage, is ContactAttachmentMessage,
         is NodeAttachmentMessage, is VoiceClipMessage,
-        -> true  //add more types in next MR
+        -> true
+
+        else -> false
+    }
+
+/**
+ * Can long click
+ */
+val TypedMessage.canLongClick: Boolean
+    get() = when (this) {
+        is RichPreviewMessage, is GiphyMessage, is LocationMessage, is ChatLinkMessage,
+        is TextLinkMessage, is FolderLinkMessage, is FileLinkMessage, is ContactAttachmentMessage,
+        is NodeAttachmentMessage, is VoiceClipMessage, is NormalMessage,
+        -> true
+
         else -> false
     }

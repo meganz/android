@@ -170,7 +170,7 @@ class ChatViewTest {
                 uiState = state,
                 onBackPressed = {},
                 onMenuActionPressed = actionPressed,
-                messageListView = { _, _, _ -> }
+                messageListView = { _, _, _, _ -> }
             )
         }
     }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
  * UI chat message
@@ -29,6 +30,7 @@ interface UiChatMessage {
         lastUpdatedCache: Long,
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
+        onLongClick: (TypedMessage) -> Unit,
     )
 
     /**
@@ -87,6 +89,18 @@ interface UiChatMessage {
      * Show date
      */
     val showDate: Boolean
+
+    /**
+     * Can long click
+     */
+    val canLongClick: Boolean
+
+    /**
+     * Get long click or null
+     */
+    fun getLongClickOrNull(
+        onLongClick: (TypedMessage) -> Unit,
+    ) = if (canLongClick) onLongClick else null
 
     /**
      * Key

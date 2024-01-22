@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.meta
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -7,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
+import mega.privacy.android.app.presentation.meeting.chat.extension.canLongClick
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.ChatRichLinkMessageView
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
@@ -22,9 +25,15 @@ import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 data class ChatRichLinkUiMessage(
     val message: RichPreviewMessage,
 ) : AvatarMessage() {
+    @OptIn(ExperimentalFoundationApi::class)
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         ChatRichLinkMessageView(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick = { longClick?.let { it(message) } }
+                ),
             isMe = message.isMine,
             preview = message.chatRichPreviewInfo,
         )
@@ -48,5 +57,6 @@ data class ChatRichLinkUiMessage(
     override val canForward = message.canForward
     override val timeSent = message.time
     override val userHandle = message.userHandle
+    override val canLongClick = message.canLongClick
     override val id = message.msgId
 }

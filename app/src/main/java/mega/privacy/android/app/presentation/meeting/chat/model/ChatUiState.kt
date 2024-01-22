@@ -112,4 +112,10 @@ data class ChatUiState(
      * True if the current logged in user is joining or leaving this chat, false otherwise.
      */
     val isJoiningOrLeaving = isJoining || isLeaving
+
+    /**
+     * True if I am a moderator or standard participant, false otherwise.
+     */
+    val haveWritePermission =
+        myPermission == ChatRoomPermission.Standard || myPermission == ChatRoomPermission.Moderator
 }

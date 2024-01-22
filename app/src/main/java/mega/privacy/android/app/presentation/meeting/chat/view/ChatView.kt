@@ -98,6 +98,7 @@ import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.model.KeyboardState
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -174,12 +175,13 @@ internal fun ChatView(
     onAnswerCall: () -> Unit = {},
     onEnableGeolocation: () -> Unit = {},
     onUserUpdateHandled: () -> Unit = {},
-    messageListView: @Composable (ChatUiState, LazyListState, Dp) -> Unit = { state, listState, bottomPadding ->
+    messageListView: @Composable (ChatUiState, LazyListState, Dp, (TypedMessage) -> Unit) -> Unit = { state, listState, bottomPadding, onMessageLongClick ->
         MessageListView(
             uiState = state,
             scrollState = listState,
             bottomPadding = bottomPadding,
             onUserUpdateHandled = onUserUpdateHandled,
+            onMessageLongClick = onMessageLongClick,
         )
     },
     onSendClick: (String) -> Unit = {},
@@ -544,7 +546,9 @@ internal fun ChatView(
                                 uiState,
                                 scrollState,
                                 bottomPadding
-                            )
+                            ) { message ->
+                                // Show message options
+                            }
                         },
                     )
                 }

@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
  * Avatar message
@@ -20,6 +21,11 @@ abstract class AvatarMessage : UiChatMessage {
      * Content composable
      */
     abstract val contentComposable: @Composable() (RowScope.() -> Unit)
+
+    /**
+     * Long click
+     */
+    var longClick: ((TypedMessage) -> Unit)? = null
 
     /**
      * Avatar composable
@@ -48,7 +54,9 @@ abstract class AvatarMessage : UiChatMessage {
         lastUpdatedCache: Long,
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
+        onLongClick: (TypedMessage) -> Unit,
     ) {
+        longClick = this.getLongClickOrNull(onLongClick)
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),
             isMine = displayAsMine,

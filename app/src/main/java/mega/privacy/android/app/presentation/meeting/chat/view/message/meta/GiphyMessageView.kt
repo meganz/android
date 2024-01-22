@@ -43,6 +43,7 @@ fun GiphyMessageView(
     width: Int,
     height: Int,
     autoPlayGif: Boolean,
+    modifier: Modifier = Modifier,
     title: String? = null,
     onLoaded: () -> Unit = {},
     onClick: () -> Unit = {},
@@ -56,7 +57,7 @@ fun GiphyMessageView(
     var autoPlay: Boolean by remember { mutableStateOf(autoPlayGif) }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(width = actualWidth.dp, height = actualHeight.dp)
             .clip(RoundedCornerShape(12.dp))
             .clickable {
