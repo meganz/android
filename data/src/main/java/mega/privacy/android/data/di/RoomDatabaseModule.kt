@@ -20,6 +20,7 @@ import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatHistoryStateDao
+import mega.privacy.android.data.database.dao.ChatRoomPreferenceDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
@@ -103,6 +104,11 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideCameraUploadsRecordDao(database: MegaDatabase): CameraUploadsRecordDao =
         database.cameraUploadsRecordDao()
+
+    @Provides
+    @Singleton
+    internal fun provideChatRoomPreferenceDao(database: MegaDatabase): ChatRoomPreferenceDao =
+        database.chatRoomPreferenceDao()
 
     @Provides
     @Singleton

@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.chat.ChatRoomPreference
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.chat.PendingMessage
@@ -953,4 +954,20 @@ interface ChatRepository {
         latitude: Float,
         image: String,
     ): ChatMessage
+
+    /**
+     * Set chat room preference
+     *
+     * @param chatId   Chat id
+     * @param draftMessage Draft message
+     */
+    suspend fun setChatDraftMessage(chatId: Long, draftMessage: String)
+
+    /**
+     * Get chat room preference
+     *
+     * @param chatId   Chat id
+     * @return         Chat room preference
+     */
+    fun getChatRoomPreference(chatId: Long): Flow<ChatRoomPreference>
 }

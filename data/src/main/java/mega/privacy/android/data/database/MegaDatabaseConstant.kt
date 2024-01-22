@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 83
+    const val DATABASE_VERSION = 84
 
     /**
      * Database Name
@@ -59,6 +59,11 @@ object MegaDatabaseConstant {
      * Table For Android Sync paused syncs list
      */
     const val TABLE_USER_PAUSED_SYNCS = "userpausedsyncs"
+
+    /**
+     * Table Chat Room Perference
+     */
+    const val TABLE_CHAT_ROOM_PREFERENCE = "chatroompreference"
 
     /**
      * Passphrase File Name

@@ -1,5 +1,6 @@
 package mega.privacy.android.data.facade
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -10,12 +11,14 @@ import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
+import mega.privacy.android.data.database.dao.ChatRoomPreferenceDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
+import mega.privacy.android.data.database.entity.ChatRoomPreferenceEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
@@ -23,6 +26,8 @@ import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.data.mapper.backup.BackupModelMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordEntityMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordModelMapper
+import mega.privacy.android.data.mapper.chat.ChatRoomPreferenceEntityMapper
+import mega.privacy.android.data.mapper.chat.ChatRoomPreferenceModelMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
@@ -32,13 +37,14 @@ import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEnti
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
-import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
+import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
+import mega.privacy.android.domain.entity.chat.ChatRoomPreference
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -84,6 +90,9 @@ internal class MegaLocalRoomFacadeTest {
     private val cameraUploadsRecordDao: CameraUploadsRecordDao = mock()
     private val cameraUploadsRecordEntityMapper: CameraUploadsRecordEntityMapper = mock()
     private val cameraUploadsRecordModelMapper: CameraUploadsRecordModelMapper = mock()
+    private val chatRoomPreferenceDao: ChatRoomPreferenceDao = mock()
+    private val chatRoomPreferenceEntityMapper: ChatRoomPreferenceEntityMapper = mock()
+    private val chatRoomPreferenceModelMapper: ChatRoomPreferenceModelMapper = mock()
 
     @BeforeAll
     fun setUp() {
@@ -111,6 +120,9 @@ internal class MegaLocalRoomFacadeTest {
             cameraUploadsRecordDao = cameraUploadsRecordDao,
             cameraUploadsRecordEntityMapper = cameraUploadsRecordEntityMapper,
             cameraUploadsRecordModelMapper = cameraUploadsRecordModelMapper,
+            chatRoomPreferenceDao = chatRoomPreferenceDao,
+            chatRoomPreferenceEntityMapper = chatRoomPreferenceEntityMapper,
+            chatRoomPreferenceModelMapper = chatRoomPreferenceModelMapper,
         )
     }
 
@@ -132,6 +144,9 @@ internal class MegaLocalRoomFacadeTest {
             cameraUploadsRecordDao,
             cameraUploadsRecordEntityMapper,
             cameraUploadsRecordModelMapper,
+            chatRoomPreferenceDao,
+            chatRoomPreferenceEntityMapper,
+            chatRoomPreferenceModelMapper,
         )
     }
 
@@ -585,5 +600,37 @@ internal class MegaLocalRoomFacadeTest {
             ).thenReturn(entities)
 
             assertThat(underTest.getAllCameraUploadsRecords()).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that setChatRoomPreference invokes correctly when call setChatRoomPreference`() =
+        runTest {
+            val chatRoomPreferenceEntity = mock<ChatRoomPreferenceEntity>()
+            val chatRoomPreferenceModel = mock<ChatRoomPreference>()
+            whenever(chatRoomPreferenceEntityMapper(chatRoomPreferenceModel)).thenReturn(
+                chatRoomPreferenceEntity
+            )
+            underTest.setChatRoomPreference(chatRoomPreferenceModel)
+            verify(chatRoomPreferenceDao).upsertChatRoomPreference(chatRoomPreferenceEntity)
+        }
+
+    @Test
+    fun `test that getChatRoomPreference returns correctly when call getChatRoomPreference`() =
+        runTest {
+            val chatId = 1L
+            val chatRoomPreferenceEntity = mock<ChatRoomPreferenceEntity>()
+            val chatRoomPreferenceModel = mock<ChatRoomPreference>()
+            whenever(chatRoomPreferenceDao.getChatRoomPreference(chatId)).thenReturn(
+                flowOf(
+                    chatRoomPreferenceEntity
+                )
+            )
+            whenever(chatRoomPreferenceModelMapper(chatRoomPreferenceEntity)).thenReturn(
+                chatRoomPreferenceModel
+            )
+            underTest.getChatRoomPreference(chatId).test {
+                assertThat(awaitItem()).isEqualTo(chatRoomPreferenceModel)
+                awaitComplete()
+            }
         }
 }

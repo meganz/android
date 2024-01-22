@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -67,6 +69,7 @@ import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatInitState
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.chat.ChatRoomPreference
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
 import mega.privacy.android.domain.entity.chat.message.MessagePagingInfo
@@ -1302,5 +1305,20 @@ internal class ChatRepositoryImpl @Inject constructor(
         image: String,
     ) = withContext(ioDispatcher) {
         chatMessageMapper(megaChatApiGateway.sendGeolocation(chatId, longitude, latitude, image))
+    }
+
+    override suspend fun setChatDraftMessage(chatId: Long, draftMessage: String) {
+        val preference = megaLocalRoomGateway.getChatRoomPreference(chatId).firstOrNull()
+            ?: ChatRoomPreference(chatId = chatId,)
+        megaLocalRoomGateway.setChatRoomPreference(
+            preference.copy(
+                draftMessage = draftMessage
+            )
+        )
+    }
+
+    override fun getChatRoomPreference(chatId: Long): Flow<ChatRoomPreference> {
+        return megaLocalRoomGateway.getChatRoomPreference(chatId)
+            .filterNotNull()
     }
 }

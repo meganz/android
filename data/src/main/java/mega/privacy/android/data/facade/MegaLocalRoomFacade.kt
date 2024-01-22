@@ -1,5 +1,6 @@
 package mega.privacy.android.data.facade
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.cryptography.DecryptData
@@ -7,6 +8,7 @@ import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
+import mega.privacy.android.data.database.dao.ChatRoomPreferenceDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
@@ -17,6 +19,8 @@ import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.data.mapper.backup.BackupModelMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordEntityMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsRecordModelMapper
+import mega.privacy.android.data.mapper.chat.ChatRoomPreferenceEntityMapper
+import mega.privacy.android.data.mapper.chat.ChatRoomPreferenceModelMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
@@ -35,6 +39,7 @@ import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
+import mega.privacy.android.domain.entity.chat.ChatRoomPreference
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -64,6 +69,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val offlineDao: OfflineDao,
     private val offlineModelMapper: OfflineModelMapper,
     private val offlineEntityMapper: OfflineEntityMapper,
+    private val chatRoomPreferenceDao: ChatRoomPreferenceDao,
+    private val chatRoomPreferenceEntityMapper: ChatRoomPreferenceEntityMapper,
+    private val chatRoomPreferenceModelMapper: ChatRoomPreferenceModelMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.insertOrUpdateContact(contactEntityMapper(contact))
@@ -400,6 +408,16 @@ internal class MegaLocalRoomFacade @Inject constructor(
             completedTransferDao.deleteCompletedTransferByIds(it)
         }
     }
+
+    override suspend fun setChatRoomPreference(chatRoomPreference: ChatRoomPreference) {
+        chatRoomPreferenceDao.upsertChatRoomPreference(
+            chatRoomPreferenceEntityMapper(chatRoomPreference)
+        )
+    }
+
+    override fun getChatRoomPreference(chatId: Long): Flow<ChatRoomPreference?> =
+        chatRoomPreferenceDao.getChatRoomPreference(chatId)
+            .map { entity -> entity?.let { chatRoomPreferenceModelMapper(it) } }
 
     companion object {
         private const val MAX_COMPLETED_TRANSFER_ROWS = 100
