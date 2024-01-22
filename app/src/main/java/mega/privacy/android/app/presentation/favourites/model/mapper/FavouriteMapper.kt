@@ -55,6 +55,7 @@ internal fun toFavourite(
             isSelected,
         )
     }
+
     is TypedFileNode -> {
         nodeInfo.createFile(
             node,
@@ -64,6 +65,8 @@ internal fun toFavourite(
             isSelected,
         )
     }
+
+    else -> throw IllegalStateException("Invalid type")
 }
 
 

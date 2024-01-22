@@ -235,6 +235,7 @@ class FavouritesViewModel @Inject constructor(
         return when (this) {
             is TypedFileNode -> this.compareToFile(other, order)
             is TypedFolderNode -> this.compareToFolder(other, order)
+            else -> throw IllegalStateException("Invalid type")
         }
     }
 

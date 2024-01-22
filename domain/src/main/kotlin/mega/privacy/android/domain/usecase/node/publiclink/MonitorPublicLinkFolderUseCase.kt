@@ -16,7 +16,6 @@ import javax.inject.Inject
  * Monitor public link folder use case
  *
  * @property getCloudSortOrder
- * @property mapNodeToPublicLinkUseCase
  * @property nodeRepository
  * @constructor Create empty Monitor public link folder use case
  */
@@ -34,9 +33,10 @@ class MonitorPublicLinkFolderUseCase @Inject constructor(
     operator fun invoke(parentFolder: FolderNode) = nodeRepository.monitorNodeUpdates()
         .filter { update ->
             isPublicLinkUpdate(update) || update.changes.keys.map { it.id }.intersect(
-                nodeIds
+                nodeIds + parentFolder.id
             ).isNotEmpty()
-        }.map {
+        }
+        .map {
             getPublicLinks(parentFolder)
         }.onStart {
             emit(getPublicLinks(parentFolder))

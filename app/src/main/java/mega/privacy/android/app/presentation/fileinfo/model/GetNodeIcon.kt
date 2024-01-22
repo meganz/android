@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.fileinfo.model
 
-import androidx.annotation.DrawableRes
 import mega.privacy.android.core.R as CoreUiR
+import androidx.annotation.DrawableRes
 import mega.privacy.android.app.presentation.node.model.mapper.getDefaultFolderIcon
 import mega.privacy.android.app.presentation.node.model.mapper.getFileIcon
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -30,4 +30,6 @@ fun getNodeIcon(typedNode: TypedNode, originShares: Boolean) = when (typedNode) 
             getDefaultFolderIcon(typedNode) //in other cases, default icon
         }
     }
+
+    else -> throw IllegalStateException("Invalid type")
 }

@@ -1,11 +1,9 @@
 package mega.privacy.android.domain.usecase.node.publiclink
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
@@ -21,7 +19,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class MonitorPublicLinkFolderUseCaseTest {
     private lateinit var underTest: MonitorPublicLinkFolderUseCase
 
@@ -46,8 +43,8 @@ internal class MonitorPublicLinkFolderUseCaseTest {
 
 
         underTest(parent).test {
-            Truth.assertThat(awaitItem()).hasSize(children.size)
-            Truth.assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
+            assertThat(awaitItem()).hasSize(children.size)
+            assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
         }
     }
 
@@ -58,16 +55,16 @@ internal class MonitorPublicLinkFolderUseCaseTest {
             val parent = mock<FolderNode> {
                 onBlocking { fetchChildren }.thenReturn({ emptyList() }, { children })
             }
-            val nodeUpdateChannel = Channel<NodeUpdate>()
+            val nodeUpdateFlow = MutableSharedFlow<NodeUpdate>()
             nodeRepository.stub {
-                on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
+                on { monitorNodeUpdates() }.thenReturn(nodeUpdateFlow)
             }
 
             underTest(parent).test {
-                Truth.assertThat(awaitItem()).isEmpty()
-                nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Public_link))))
-                Truth.assertThat(awaitItem()).isEqualTo(children)
-                Truth.assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
+                assertThat(awaitItem()).isEmpty()
+                nodeUpdateFlow.emit(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Public_link))))
+                assertThat(awaitItem()).isEqualTo(children)
+                assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
             }
 
         }
@@ -78,16 +75,17 @@ internal class MonitorPublicLinkFolderUseCaseTest {
             val children = listOf<FileNode>(mock(), mock())
             val parent = mock<FolderNode> {
                 onBlocking { fetchChildren }.thenReturn({ emptyList() }, { children })
+                on { id }.thenReturn(NodeId(1))
             }
-            val nodeUpdateChannel = Channel<NodeUpdate>()
+            val nodeUpdateFlow = MutableSharedFlow<NodeUpdate>()
             nodeRepository.stub {
-                on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
+                on { monitorNodeUpdates() }.thenReturn(nodeUpdateFlow)
             }
 
             underTest(parent).test {
-                Truth.assertThat(awaitItem()).isEmpty()
-                nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Favourite))))
-                Truth.assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
+                assertThat(awaitItem()).isEmpty()
+                nodeUpdateFlow.emit(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Favourite))))
+                assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
             }
 
         }
@@ -100,9 +98,9 @@ internal class MonitorPublicLinkFolderUseCaseTest {
             val parent = mock<FolderNode> {
                 onBlocking { fetchChildren }.thenReturn({ children }, { emptyList() })
             }
-            val nodeUpdateChannel = Channel<NodeUpdate>()
+            val nodeUpdateFlow = MutableSharedFlow<NodeUpdate>()
             nodeRepository.stub {
-                on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
+                on { monitorNodeUpdates() }.thenReturn(nodeUpdateFlow)
             }
 
             val update = NodeUpdate(
@@ -116,10 +114,10 @@ internal class MonitorPublicLinkFolderUseCaseTest {
             )
 
             underTest(parent).test {
-                Truth.assertThat(awaitItem()).isEqualTo(children)
-                nodeUpdateChannel.send(update)
-                Truth.assertThat(awaitItem()).isEmpty()
-                Truth.assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
+                assertThat(awaitItem()).isEqualTo(children)
+                nodeUpdateFlow.emit(update)
+                assertThat(awaitItem()).isEmpty()
+                assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
             }
         }
 
@@ -131,9 +129,9 @@ internal class MonitorPublicLinkFolderUseCaseTest {
             val parent = mock<FolderNode> {
                 onBlocking { fetchChildren }.thenReturn({ children }, { emptyList() })
             }
-            val nodeUpdateChannel = Channel<NodeUpdate>()
+            val nodeUpdateFlow = MutableSharedFlow<NodeUpdate>()
             nodeRepository.stub {
-                on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
+                on { monitorNodeUpdates() }.thenReturn(nodeUpdateFlow)
             }
 
             val update = NodeUpdate(
@@ -147,11 +145,32 @@ internal class MonitorPublicLinkFolderUseCaseTest {
             )
 
             underTest(parent).test {
-                Truth.assertThat(awaitItem()).isEqualTo(children)
-                nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Public_link))))
-                Truth.assertThat(awaitItem()).isEmpty()
-                nodeUpdateChannel.send(update)
-                Truth.assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
+                assertThat(awaitItem()).isEqualTo(children)
+                nodeUpdateFlow.emit(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Public_link))))
+                assertThat(awaitItem()).isEmpty()
+                nodeUpdateFlow.emit(update)
+                assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
+            }
+        }
+
+    @Test
+    internal fun `test that new items are emitted if a node update contains parent folder ID`() =
+        runTest {
+            val children = listOf<FileNode>(mock(), mock())
+            val parent = mock<FolderNode> {
+                onBlocking { fetchChildren }.thenReturn({ emptyList() }, { children })
+                on { id }.thenReturn(NodeId(1))
+            }
+            val nodeUpdateFlow = MutableSharedFlow<NodeUpdate>()
+            nodeRepository.stub {
+                on { monitorNodeUpdates() }.thenReturn(nodeUpdateFlow)
+            }
+
+            underTest(parent).test {
+                assertThat(awaitItem()).isEmpty()
+                nodeUpdateFlow.emit(NodeUpdate(mapOf(parent to listOf(NodeChanges.Public_link))))
+                assertThat(awaitItem()).isEqualTo(children)
+                assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
             }
         }
 }

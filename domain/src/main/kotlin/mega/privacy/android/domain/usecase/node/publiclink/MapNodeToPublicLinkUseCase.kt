@@ -39,6 +39,8 @@ class MapNodeToPublicLinkUseCase @Inject constructor(
                 parent = parent,
                 monitorChildren = getFetchMethod()
             )
+
+            else -> throw IllegalStateException("Invalid type")
         }
 
     private fun getFetchMethod(): (PublicLinkFolder) -> Flow<List<PublicLinkNode>> =

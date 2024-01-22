@@ -46,6 +46,8 @@ internal class MegaNodeMapper @Inject constructor(
         is PublicLinkFolder -> getPublicLink(typedNode.id)
 
         is TypedFileNode, is TypedFolderNode -> megaApiGateway.getMegaNodeByHandle(typedNode.id.longValue)
+
+        else -> throw IllegalStateException("Invalid type")
     }
 
     private suspend fun getPublicLink(nodeId: NodeId) =
