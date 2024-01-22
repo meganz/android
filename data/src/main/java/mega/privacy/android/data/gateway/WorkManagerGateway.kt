@@ -16,7 +16,7 @@ interface WorkManagerGateway {
     /**
      * Enqueue unique work request to start download worker to monitor the download transfers as a foreground service
      */
-    fun enqueueDownloadsWorkerRequest()
+    suspend fun enqueueDownloadsWorkerRequest()
 
     /**
      * Queue a one time work request of camera upload to upload immediately.

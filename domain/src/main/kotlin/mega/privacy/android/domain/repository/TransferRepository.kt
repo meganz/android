@@ -253,7 +253,7 @@ interface TransferRepository {
     /**
      * Starts the download worker to monitor the download transfers as a foreground service
      */
-    fun startDownloadWorker()
+    suspend fun startDownloadWorker()
 
     /**
      * Monitors transfers finished.

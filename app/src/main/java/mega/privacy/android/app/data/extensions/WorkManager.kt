@@ -7,13 +7,16 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import mega.privacy.android.app.fcm.NewTokenWorker
 import mega.privacy.android.app.fcm.PushMessageWorker
+import mega.privacy.android.data.facade.debugWorkInfo
 
 /**
  * Enqueues a [PushMessageWorker] request to manage a push notification.
  *
  * @param data  [Data] containing the push information.
  */
-fun WorkManager.enqueuePushMessage(data: Data) {
+suspend fun WorkManager.enqueuePushMessage(data: Data) {
+    debugWorkInfo()
+
     enqueue(
         OneTimeWorkRequestBuilder<PushMessageWorker>()
             .setInputData(data)
@@ -28,7 +31,9 @@ fun WorkManager.enqueuePushMessage(data: Data) {
  * @param newToken      Required token for register pushes.
  * @param deviceType    Type of device.
  */
-fun WorkManager.enqueueUniqueWorkNewToken(newToken: String, deviceType: Int) {
+suspend fun WorkManager.enqueueUniqueWorkNewToken(newToken: String, deviceType: Int) {
+    debugWorkInfo()
+
     enqueueUniqueWork(
         NewTokenWorker.WORK_NAME,
         ExistingWorkPolicy.REPLACE,

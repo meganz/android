@@ -12,6 +12,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import mega.privacy.android.data.facade.debugWorkInfo
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import timber.log.Timber
@@ -46,6 +47,8 @@ internal class NewMediaWorker @AssistedInject constructor(
             if (isForce
                 || isQueuedOrRunning(workManager)
             ) {
+                workManager.debugWorkInfo()
+
                 val photoCheckBuilder =
                     OneTimeWorkRequest.Builder(NewMediaWorker::class.java)
                 photoCheckBuilder.setConstraints(
