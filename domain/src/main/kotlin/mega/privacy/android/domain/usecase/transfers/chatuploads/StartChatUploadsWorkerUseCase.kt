@@ -16,5 +16,5 @@ class StartChatUploadsWorkerUseCase @Inject constructor(
      * Invoke.
      *
      */
-    operator fun invoke() = transferRepository.startChatUploadsWorker()
+    suspend operator fun invoke() = transferRepository.startChatUploadsWorker()
 }

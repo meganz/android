@@ -16,5 +16,5 @@ class StartDownloadWorkerUseCase @Inject constructor(
      * Invoke.
      *
      */
-    operator fun invoke() = transferRepository.startDownloadWorker()
+    suspend operator fun invoke() = transferRepository.startDownloadWorker()
 }

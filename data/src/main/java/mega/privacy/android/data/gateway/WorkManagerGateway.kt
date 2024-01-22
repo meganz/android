@@ -16,12 +16,12 @@ interface WorkManagerGateway {
     /**
      * Enqueue unique work request to start download worker to monitor the download transfers as a foreground service
      */
-    fun enqueueDownloadsWorkerRequest()
+    suspend fun enqueueDownloadsWorkerRequest()
 
     /**
      * Enqueue unique work request to start chat uploads worker to monitor the chat upload transfers as a foreground service
      */
-    fun enqueueChatUploadsWorkerRequest()
+    suspend fun enqueueChatUploadsWorkerRequest()
 
     /**
      * Enqueue unique work request to start new media worker

@@ -253,12 +253,12 @@ interface TransferRepository {
     /**
      * Starts the download worker to monitor the download transfers as a foreground service
      */
-    fun startDownloadWorker()
+    suspend fun startDownloadWorker()
 
     /**
      * Starts the chat uploads worker to monitor the chat uploads transfers as a foreground service
      */
-    fun startChatUploadsWorker()
+    suspend fun startChatUploadsWorker()
 
     /**
      * Monitors transfers finished.

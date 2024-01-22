@@ -9,8 +9,10 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import androidx.work.WorkQuery
 import androidx.work.await
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import mega.privacy.android.data.gateway.WorkManagerGateway
@@ -45,6 +47,8 @@ internal class WorkManagerFacade @Inject constructor(
 ) : WorkManagerGateway {
 
     override suspend fun enqueueDeleteOldestCompletedTransfersWorkRequest() {
+        workManager.debugWorkInfo()
+
         val workRequest =
             OneTimeWorkRequest.Builder(DeleteOldestCompletedTransfersWorker::class.java)
                 .addTag(DeleteOldestCompletedTransfersWorker.DELETE_OLDEST_TRANSFERS_WORKER_TAG)
@@ -58,7 +62,9 @@ internal class WorkManagerFacade @Inject constructor(
             )
     }
 
-    override fun enqueueDownloadsWorkerRequest() {
+    override suspend fun enqueueDownloadsWorkerRequest() {
+        workManager.debugWorkInfo()
+
         val request = OneTimeWorkRequest.Builder(DownloadsWorker::class.java)
             .addTag(DownloadsWorker.SINGLE_DOWNLOAD_TAG)
             .build()
@@ -70,7 +76,9 @@ internal class WorkManagerFacade @Inject constructor(
             )
     }
 
-    override fun enqueueChatUploadsWorkerRequest() {
+    override suspend fun enqueueChatUploadsWorkerRequest() {
+        workManager.debugWorkInfo()
+
         val request = OneTimeWorkRequest.Builder(ChatUploadsWorker::class.java)
             .addTag(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
             .build()
@@ -83,6 +91,8 @@ internal class WorkManagerFacade @Inject constructor(
     }
 
     override suspend fun enqueueNewMediaWorkerRequest(forceEnqueue: Boolean) {
+        workManager.debugWorkInfo()
+
         val tag = NewMediaWorker.NEW_MEDIA_WORKER_TAG
         if (forceEnqueue || !(isWorkerEnqueuedOrRunning(tag))) {
             val workRequest = OneTimeWorkRequest.Builder(NewMediaWorker::class.java)
@@ -105,6 +115,8 @@ internal class WorkManagerFacade @Inject constructor(
     override suspend fun startCameraUploads() {
         // Check if CU periodic worker is working. If yes, then don't start a single one
         if (!isWorkerRunning(CAMERA_UPLOAD_TAG)) {
+            workManager.debugWorkInfo()
+
             Timber.d("No CU periodic process currently running, proceed with one time request")
             val cameraUploadWorkRequest = OneTimeWorkRequest.Builder(
                 CameraUploadsWorker::class.java
@@ -147,6 +159,9 @@ internal class WorkManagerFacade @Inject constructor(
 
     override suspend fun scheduleCameraUploads() {
         scheduleCameraUploadSyncActiveHeartbeat()
+
+        workManager.debugWorkInfo()
+
         // periodic work that runs during the last 10 minutes of every one hour period
         val cameraUploadWorkRequest = PeriodicWorkRequest.Builder(
             CameraUploadsWorker::class.java,
@@ -175,6 +190,8 @@ internal class WorkManagerFacade @Inject constructor(
      * Schedule camera uploads active heartbeat worker
      */
     private suspend fun scheduleCameraUploadSyncActiveHeartbeat() {
+        workManager.debugWorkInfo()
+
         // periodic work that runs during the last 10 minutes of every half an hour period
         val cuSyncActiveHeartbeatWorkRequest = PeriodicWorkRequest.Builder(
             SyncHeartbeatCameraUploadWorker::class.java,
@@ -274,4 +291,18 @@ internal class WorkManagerFacade @Inject constructor(
 
     override fun monitorChatUploadsStatusInfo() =
         workManager.getWorkInfosByTagFlow(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
+}
+
+/**
+ * Prints the list of pending [WorkInfo] in the log.
+ */
+suspend fun WorkManager.debugWorkInfo() {
+    getWorkInfosFlow(
+        WorkQuery.fromStates(
+            WorkInfo.State.ENQUEUED,
+        )
+    ).firstOrNull()
+        ?.map { it.tags }
+        ?.let { Timber.d("Worker pending list: $it") }
+        ?: Timber.d("Worker pending list: empty")
 }

@@ -1087,10 +1087,11 @@ class DefaultTransfersRepositoryTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class WorkerTests {
         @Test
-        fun `test that workerManagerGateway enqueueDownloadsWorkerRequest is called when startDownloadWorker is called`() {
-            underTest.startDownloadWorker()
-            verify(workerManagerGateway).enqueueDownloadsWorkerRequest()
-        }
+        fun `test that workerManagerGateway enqueueDownloadsWorkerRequest is called when startDownloadWorker is called`() =
+            runTest {
+                underTest.startDownloadWorker()
+                verify(workerManagerGateway).enqueueDownloadsWorkerRequest()
+            }
 
         @ParameterizedTest
         @EnumSource(WorkInfo.State::class)

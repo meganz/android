@@ -484,11 +484,11 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.enqueueDeleteOldestCompletedTransfersWorkRequest()
     }
 
-    override fun startDownloadWorker() {
+    override suspend fun startDownloadWorker() = withContext(ioDispatcher) {
         workerManagerGateway.enqueueDownloadsWorkerRequest()
     }
 
-    override fun startChatUploadsWorker() {
+    override suspend fun startChatUploadsWorker() = withContext(ioDispatcher) {
         workerManagerGateway.enqueueChatUploadsWorkerRequest()
     }
 
