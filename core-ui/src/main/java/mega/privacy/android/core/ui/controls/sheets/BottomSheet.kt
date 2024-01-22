@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
-import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -35,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
@@ -93,6 +91,7 @@ fun BottomSheet(
     modalSheetState: ModalBottomSheetState,
     sheetBody: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
+    sheetGesturesEnabled: Boolean = true,
     scrimColor: Color = Color.Black.copy(alpha = 0.5f),
     content: (@Composable () -> Unit)? = null,
 ) {
@@ -133,6 +132,7 @@ fun BottomSheet(
             topEnd = roundedCornerRadius
         ),
         sheetState = modalSheetState,
+        sheetGesturesEnabled = sheetGesturesEnabled,
         scrimColor = scrimColor,
         sheetContent = sheetBody,
     ) {
