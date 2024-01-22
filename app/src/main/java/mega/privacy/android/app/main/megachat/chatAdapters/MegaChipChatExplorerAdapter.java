@@ -120,30 +120,41 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             holder.textViewName.setText(item.getTitle());
         } else {
             String name;
-            String[] s;
             if (item.getContact() != null) {
-                s = item.getContact().getFullName().split(" ");
-                if (s != null && s.length > 0) {
-                    name = s[0];
-                } else {
-                    s = item.getTitle().split(" ");
-                    if (s != null && s.length > 0) {
+                String fullName = item.getContact().getFullName();
+                if (fullName != null) {
+                    String[] s = fullName.split(" ");
+                    if (s.length > 0) {
                         name = s[0];
                     } else {
-                        name = item.getTitle();
+                        name = getName(item.getTitle());
                     }
+                } else {
+                    name = getName(item.getTitle());
                 }
             } else {
-                s = item.getTitle().split(" ");
-                if (s != null && s.length > 0) {
-                    name = s[0];
-                } else {
-                    name = item.getTitle();
-                }
+                name = getName(item.getTitle());
             }
             holder.textViewName.setText(name);
         }
         setUserAvatar(holder, item);
+    }
+
+    /**
+     * Get name
+     *
+     * @param title chat title
+     * @return Name
+     */
+    private String getName(String title) {
+        String name = " ";
+        if (title != null) {
+            String[] splitTitle = title.split(" ");
+            if (splitTitle.length > 0) name = splitTitle[0];
+            else name = title;
+        }
+
+        return name;
     }
 
     @Override
