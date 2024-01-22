@@ -9,14 +9,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
+import mega.privacy.android.app.presentation.videosection.mapper.UIVideoPlaylistMapper
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionState
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
@@ -34,7 +35,9 @@ import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
+import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -56,6 +59,8 @@ class VideoSectionViewModel @Inject constructor(
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getVideoPlaylistsUseCase: GetVideoPlaylistsUseCase,
+    private val uiVideoPlaylistMapper: UIVideoPlaylistMapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -75,6 +80,11 @@ class VideoSectionViewModel @Inject constructor(
     private val originalData = mutableListOf<UIVideo>()
 
     init {
+        refreshNodesIfAnyUpdates()
+        loadVideoPlaylists()
+    }
+
+    private fun refreshNodesIfAnyUpdates() {
         viewModelScope.launch {
             merge(
                 monitorNodeUpdatesUseCase(),
@@ -84,6 +94,20 @@ class VideoSectionViewModel @Inject constructor(
                     Timber.e(it)
                 }.collect {
                     setPendingRefreshNodes()
+                }
+        }
+    }
+
+    private fun loadVideoPlaylists() {
+        viewModelScope.launch {
+            getVideoPlaylistsUseCase()
+                .catch { exception -> Timber.e(exception) }
+                .collectLatest { videoPlaylists ->
+                    _state.update {
+                        it.copy(videoPlaylists = videoPlaylists.map { videoPlaylist ->
+                            uiVideoPlaylistMapper(videoPlaylist)
+                        })
+                    }
                 }
         }
     }

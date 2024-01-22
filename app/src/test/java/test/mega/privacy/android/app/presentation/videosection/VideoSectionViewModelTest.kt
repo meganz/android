@@ -6,14 +6,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
+import mega.privacy.android.app.presentation.videosection.mapper.UIVideoPlaylistMapper
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
@@ -26,7 +28,9 @@ import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
+import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
@@ -58,6 +62,8 @@ class VideoSectionViewModelTest {
     private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
     private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val getVideoPlaylistsUseCase = mock<GetVideoPlaylistsUseCase>()
+    private val uiVideoPlaylistMapper = mock<UIVideoPlaylistMapper>()
 
     private val expectedVideo = mock<UIVideo> { on { name }.thenReturn("video name") }
 
@@ -72,6 +78,11 @@ class VideoSectionViewModelTest {
         wheneverBlocking { monitorOfflineNodeUpdatesUseCase() }.thenReturn(
             fakeMonitorOfflineNodeUpdatesFlow
         )
+        wheneverBlocking { getVideoPlaylistsUseCase() }.thenReturn(flowOf(listOf()))
+        initUnderTest()
+    }
+
+    private fun initUnderTest() {
         underTest = VideoSectionViewModel(
             getAllVideosUseCase = getAllVideosUseCase,
             uiVideoMapper = uiVideoMapper,
@@ -83,7 +94,9 @@ class VideoSectionViewModelTest {
             megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
             megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
             getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
-            getNodeByIdUseCase = getNodeByIdUseCase
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            getVideoPlaylistsUseCase = getVideoPlaylistsUseCase,
+            uiVideoPlaylistMapper = uiVideoPlaylistMapper
         )
     }
 
@@ -99,6 +112,8 @@ class VideoSectionViewModelTest {
             megaApiHttpServerStartUseCase,
             getFileUrlByNodeHandleUseCase,
             getNodeByIdUseCase,
+            getVideoPlaylistsUseCase,
+            uiVideoPlaylistMapper
         )
     }
 
@@ -115,6 +130,7 @@ class VideoSectionViewModelTest {
             assertThat(initial.isPendingRefresh).isFalse()
             assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
             assertThat(initial.progressBarShowing).isEqualTo(true)
+            assertThat(initial.videoPlaylists).isEmpty()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -288,4 +304,28 @@ class VideoSectionViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that an error would return an empty list`() = runTest {
+        whenever(getVideoPlaylistsUseCase()).thenReturn(flow { throw Exception("Error") })
+
+        underTest.state.test {
+            assertThat(awaitItem().videoPlaylists).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that the playlists are returned correctly`() = runTest {
+        initVideoPlaylistsReturned()
+        initUnderTest()
+
+        underTest.state.drop(1).test {
+            assertThat(awaitItem().videoPlaylists.size).isEqualTo(2)
+        }
+    }
+
+    private fun initVideoPlaylistsReturned() {
+        whenever(getVideoPlaylistsUseCase()).thenReturn(flowOf(listOf(mock(), mock())))
+        whenever(uiVideoPlaylistMapper(any())).thenReturn(mock())
+    }
 }

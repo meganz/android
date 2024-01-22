@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property scrollToTop the scroll to top state
  * @property selectedVideoHandles the selected video handles
  * @property isInSelection if list is in selection mode or not
+ * @property videoPlaylists the video playlists
  */
 data class VideoSectionState(
     val allVideos: List<UIVideo> = emptyList(),
@@ -23,4 +24,5 @@ data class VideoSectionState(
     val scrollToTop: Boolean = false,
     val selectedVideoHandles: List<Long> = emptyList(),
     val isInSelection: Boolean = false,
+    val videoPlaylists: List<UIVideoPlaylist> = emptyList()
 )
