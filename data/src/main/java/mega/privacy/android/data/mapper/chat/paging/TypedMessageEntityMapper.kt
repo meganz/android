@@ -1,7 +1,7 @@
 package mega.privacy.android.data.mapper.chat.paging
 
 import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import javax.inject.Inject
 
 /**

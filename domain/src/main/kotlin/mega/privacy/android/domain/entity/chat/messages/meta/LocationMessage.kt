@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
 import mega.privacy.android.domain.entity.chat.ChatGeolocation
-import mega.privacy.android.domain.entity.chat.ChatGeolocationInfo
+import mega.privacy.android.domain.entity.chat.messages.ChatGeolocationInfo
 
 /**
  * Location message

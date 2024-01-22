@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.entity.chat.message
+package mega.privacy.android.domain.entity.chat.messages.paging
 
 /**
  * Message paging info

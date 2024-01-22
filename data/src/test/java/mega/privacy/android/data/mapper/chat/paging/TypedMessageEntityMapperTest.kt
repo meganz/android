@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.ContainsMeta
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock

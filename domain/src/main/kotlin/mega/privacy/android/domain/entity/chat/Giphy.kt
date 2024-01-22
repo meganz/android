@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.chat
 
+import mega.privacy.android.domain.entity.chat.messages.ChatGifInfo
+
 /**
  * Data class for storing giphy data.
  *

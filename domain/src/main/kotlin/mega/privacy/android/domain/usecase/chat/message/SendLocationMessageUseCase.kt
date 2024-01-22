@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.chat.message
 
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.meta.MetaMessage
+import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 

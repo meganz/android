@@ -3,8 +3,8 @@ package mega.privacy.android.data.mapper.chat.paging
 import mega.privacy.android.data.database.entity.chat.MetaTypedMessageEntity
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.usecase.chat.message.CreateInvalidMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CreateTypedMessageUseCase
 import javax.inject.Inject

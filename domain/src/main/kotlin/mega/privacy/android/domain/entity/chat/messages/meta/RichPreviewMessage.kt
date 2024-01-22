@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
-import mega.privacy.android.domain.entity.chat.ChatRichPreviewInfo
+import mega.privacy.android.domain.entity.chat.messages.ChatRichPreviewInfo
 
 /**
  * Rich preview message

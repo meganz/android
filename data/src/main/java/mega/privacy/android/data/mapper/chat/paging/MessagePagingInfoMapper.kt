@@ -1,7 +1,7 @@
 package mega.privacy.android.data.mapper.chat.paging
 
 import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
-import mega.privacy.android.domain.entity.chat.message.MessagePagingInfo
+import mega.privacy.android.domain.entity.chat.messages.paging.MessagePagingInfo
 import javax.inject.Inject
 
 /**

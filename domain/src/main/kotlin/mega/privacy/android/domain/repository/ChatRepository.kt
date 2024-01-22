@@ -17,9 +17,9 @@ import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
-import mega.privacy.android.domain.entity.chat.message.MessagePagingInfo
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.messages.paging.MessagePagingInfo
+import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 

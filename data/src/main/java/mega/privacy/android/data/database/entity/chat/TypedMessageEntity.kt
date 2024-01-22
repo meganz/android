@@ -7,10 +7,10 @@ import mega.privacy.android.data.database.converter.TypedMessageEntityConverters
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatMessageChange
 import mega.privacy.android.domain.entity.chat.ChatMessageCode
-import mega.privacy.android.domain.entity.chat.ChatMessageInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
+import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
 
 /**
  * Entity to store a typed message request.

@@ -1,7 +1,7 @@
 package mega.privacy.android.data.mapper.chat.paging
 
 import mega.privacy.android.data.database.entity.chat.GiphyEntity
-import mega.privacy.android.domain.entity.chat.ChatGifInfo
+import mega.privacy.android.domain.entity.chat.messages.ChatGifInfo
 import javax.inject.Inject
 
 /**

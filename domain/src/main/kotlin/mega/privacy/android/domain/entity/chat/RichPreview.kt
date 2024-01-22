@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.chat
 
+import mega.privacy.android.domain.entity.chat.messages.ChatRichPreviewInfo
+
 /**
  * Data class for storing rich preview data.
  *

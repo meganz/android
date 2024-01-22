@@ -1,7 +1,7 @@
 package mega.privacy.android.data.mapper.chat.paging
 
 import mega.privacy.android.data.database.entity.chat.ChatGeolocationEntity
-import mega.privacy.android.domain.entity.chat.ChatGeolocationInfo
+import mega.privacy.android.domain.entity.chat.messages.ChatGeolocationInfo
 import javax.inject.Inject
 
 /**

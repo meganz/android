@@ -1,6 +1,11 @@
-package mega.privacy.android.domain.entity.chat
+package mega.privacy.android.domain.entity.chat.messages
 
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatMessageChange
+import mega.privacy.android.domain.entity.chat.ChatMessageCode
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
+import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
+import mega.privacy.android.domain.entity.chat.ChatMessageType
 
 /**
  * @property status
@@ -24,7 +29,6 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  * @property userHandles
  * @property userNames
  * @property userEmails
- * @property nodeList
  * @property handleList
  * @property duration
  * @property retentionTime

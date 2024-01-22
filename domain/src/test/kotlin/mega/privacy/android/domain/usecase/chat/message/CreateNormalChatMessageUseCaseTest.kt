@@ -4,9 +4,9 @@ import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.LinkDetail
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
+import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.usecase.chat.GetLinkTypesUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

@@ -4,12 +4,12 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ContainsMeta
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.MetaMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
+import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

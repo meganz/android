@@ -2,7 +2,7 @@ package mega.privacy.android.data.database.entity.chat
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import mega.privacy.android.domain.entity.chat.ChatGeolocationInfo
+import mega.privacy.android.domain.entity.chat.messages.ChatGeolocationInfo
 
 /**
  * Entity to store a geolocation message.

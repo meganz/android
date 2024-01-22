@@ -1,10 +1,10 @@
 package mega.privacy.android.domain.usecase.chat.message
 
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
+import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.usecase.chat.GetLinkTypesUseCase
 import javax.inject.Inject
 

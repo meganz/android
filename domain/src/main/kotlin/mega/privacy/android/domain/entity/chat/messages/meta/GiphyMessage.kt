@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
-import mega.privacy.android.domain.entity.chat.ChatGifInfo
+import mega.privacy.android.domain.entity.chat.messages.ChatGifInfo
 
 /**
  * Giphy message

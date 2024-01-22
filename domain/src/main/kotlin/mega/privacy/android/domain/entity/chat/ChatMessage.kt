@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.chat
 
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
 import mega.privacy.android.domain.entity.node.Node
 
 /**

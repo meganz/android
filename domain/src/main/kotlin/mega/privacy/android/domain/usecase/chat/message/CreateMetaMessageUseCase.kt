@@ -1,11 +1,11 @@
 package mega.privacy.android.domain.usecase.chat.message
 
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
+import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageInfo
 import javax.inject.Inject
 
 /**

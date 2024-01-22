@@ -2,8 +2,8 @@ package mega.privacy.android.domain.usecase.chat.message
 
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

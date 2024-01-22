@@ -3,8 +3,8 @@ package mega.privacy.android.domain.usecase.chat.message
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
-import mega.privacy.android.domain.entity.chat.message.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.meta.MetaMessage
+import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.repository.ChatRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
