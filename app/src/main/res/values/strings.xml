@@ -5230,5 +5230,11 @@
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA needs access to your camera to capture photos and videos.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
-    <string name="chat_attach_location_deny_permission">You denied MEGA access to your location. If you’d like to share your location, allow MEGA permission.</string>
+    <string name="chat_attach_location_deny_permission">You denied MEGA access to your location. If you’d like to share your location, allow MEGA permission to do so.</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">Large download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">“Always download and don’t ask again”</string>
 </resources>

@@ -208,10 +208,10 @@ private fun StartDownloadTransferComponent(
     showConfirmLargeTransfer.value?.let {
         // texts of this dialog will be updated in TRAN-280
         ConfirmationDialog(
-            title = stringResource(id = R.string.general_save_to_device),
+            title = stringResource(id = R.string.transfers_confirm_large_download_title),
             text = stringResource(id = R.string.alert_larger_file, it.sizeString),
-            buttonOption1Text = stringResource(id = R.string.general_save_to_device),
-            buttonOption2Text = stringResource(id = R.string.checkbox_not_show_again),
+            buttonOption1Text = stringResource(id = R.string.transfers_confirm_large_download_button_start),
+            buttonOption2Text = stringResource(id = R.string.transfers_confirm_large_download_button_start_always),
             cancelButtonText = stringResource(id = R.string.general_cancel),
             onOption1 = {
                 onDownloadConfirmed(it.transferTriggerEvent, false)

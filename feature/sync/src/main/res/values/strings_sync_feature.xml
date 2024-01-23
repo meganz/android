@@ -7,7 +7,7 @@
     <!-- Sync text of sync-->
     <string name="sync">Sync</string>
     <!-- Sync spannable section to show sync count with notification count-->
-    <string name="section_sync_with_notification">Sync [A](%1$d)[/A]</string>
+    <string name="section_sync_with_notification">Syncs [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap to grant access</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
@@ -51,7 +51,7 @@
     <!-- Sync to resolve conflict Choose remote file -->
     <string name="sync_stalled_issue_choose_remote_file">Choose remote file</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
-    <string name="sync_stalled_issue_choose_latest_modified_time">Choose the one with the latest modified time</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time">Choose the last modified file</string>
     <!-- Sync message when conflict resolved -->
     <string name="sync_stalled_issue_conflict_resolved">Conflict resolved</string>
     <!-- Sync message to access storage permission on device -->
@@ -63,9 +63,9 @@
     <!-- Sync dialog title for storage access -->
     <string name="sync_dialog_storage_access_title">Access to all files</string>
     <!-- Sync dialog title for battery optimization -->
-    <string name="sync_dialog_battery_optimization_title">Battery optimization</string>
+    <string name="sync_dialog_battery_optimization_title">Battery optimisation</string>
     <!-- Sync dialog cancel button text -->
-    <string name="sync_dialog_battery_optimization_negative_button">Cancel</string>
+    <string name="sync_dialog_battery_optimization_negative_button">Don’t allow</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">Allow</string>
     <!-- Sync dialog battery optimization message -->
@@ -99,7 +99,7 @@
     <!-- Sync Pause -->
     <string name="sync_card_pause_sync">Pause</string>
     <!-- Sync Run -->
-    <string name="sync_card_run_sync">Run</string>
+    <string name="sync_card_run_sync">Resume</string>
     <!-- Sync Remove -->
     <string name="sync_card_remove_sync">Remove</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
@@ -107,9 +107,9 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Wi-Fi only</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">You’ill need to set up a local folder on your\ndevice that will sync with a chosen folder on\nyour Cloud drive.</string>
+    <string name="sync_empty_state_message">You’ll need to set up a local folder on your\ndevice that will sync with a chosen folder on\nyour Cloud drive.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_notification_monitoring_description">Sync monitoring</string>
+    <string name="sync_notification_monitoring_description">Monitoring syncs</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
     <string name="sync_options_changed_to_wifi_only">Sync options changed to: Wi-Fi only</string>
     <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
@@ -117,7 +117,7 @@
     <!-- Sync stalled issue reason is no reason-->
     <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
-    <string name="sync_stalled_issue_file_issue">File issue</string>
+    <string name="sync_stalled_issue_file_issue">File or folder issue</string>
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Can’t move or rename</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
@@ -139,7 +139,7 @@
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
     <string name="sync_stalled_issue_local_and_remote_change_last_sync">Local and remote changed since last sync</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
-    <string name="sync_stalled_issue_local_and_remote_not_synced">Local and remote previously not synced</string>
+    <string name="sync_stalled_issue_local_and_remote_not_synced">File or folder conflict</string>
     <!-- Sync stalled issue reason is Name clash-->
     <string name="sync_stalled_issue_name_clash">File or folder name conflict</string>
     <!-- Sync stalled issue reason is Last PlusOne-->
@@ -173,7 +173,7 @@
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
     <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
-    <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Target is too deep on your folder structure.\nPlease move it to a location that is less than 64 folders deep.</string>
+    <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Target is too deep on your folder structure.\nMove it to a location that is less than 64 folders deep.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
     <string name="sync_stalled_issue_folder_matched_against_file_detail">The file you’re attempting to sync has no extension and has the same name as an existing folder</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync detailed description-->
