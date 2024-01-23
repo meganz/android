@@ -14,6 +14,7 @@ import kotlinx.coroutines.tasks.await
 import mega.privacy.android.app.data.extensions.enqueuePushMessage
 import mega.privacy.android.app.data.extensions.enqueueUniqueWorkNewToken
 import mega.privacy.android.app.utils.Constants.DEVICE_ANDROID
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,6 +29,9 @@ class MegaMessageService : FirebaseMessagingService() {
     @Inject
     lateinit var workManager: WorkManager
 
+    @Inject
+    lateinit var crashReporter: CrashReporter
+
     override fun onDestroy() {
         Timber.d("onDestroy")
         super.onDestroy()
@@ -39,7 +43,7 @@ class MegaMessageService : FirebaseMessagingService() {
         val workerData = remoteMessage.data.toWorkerData()
 
         applicationScope.launch {
-            workManager.enqueuePushMessage(workerData)
+            workManager.enqueuePushMessage(workerData, crashReporter)
         }
     }
 
@@ -47,7 +51,7 @@ class MegaMessageService : FirebaseMessagingService() {
         Timber.d("New token: $token")
 
         applicationScope.launch {
-            workManager.enqueueUniqueWorkNewToken(token, DEVICE_ANDROID)
+            workManager.enqueueUniqueWorkNewToken(token, DEVICE_ANDROID, crashReporter)
         }
     }
 
@@ -71,15 +75,19 @@ class MegaMessageService : FirebaseMessagingService() {
          * Request push service token, then register it in API as an identifier of the device.
          */
         @JvmStatic
-        suspend fun getToken(workManager: WorkManager) {
+        suspend fun getToken(workManager: WorkManager, crashReporter: CrashReporter) {
             //project number from google-service.json
             mutex.withLock {
-                val token = FirebaseMessaging.getInstance().token.await()
+                runCatching {
+                    val token = FirebaseMessaging.getInstance().token.await()
 
-                token?.let {
-                    Timber.d("Get token succeeded")
-                    workManager.enqueueUniqueWorkNewToken(token, DEVICE_ANDROID)
-                } ?: Timber.w("Get token failed.")
+                    token?.let {
+                        Timber.d("Get token succeeded")
+                        workManager.enqueueUniqueWorkNewToken(token, DEVICE_ANDROID, crashReporter)
+                    } ?: Timber.w("Get token failed.")
+                }.onFailure {
+                    Timber.e(it)
+                }
             }
         }
     }

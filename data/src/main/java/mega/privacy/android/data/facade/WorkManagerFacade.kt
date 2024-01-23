@@ -22,6 +22,7 @@ import mega.privacy.android.data.worker.DeleteOldestCompletedTransfersWorker
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
+import mega.privacy.android.domain.monitoring.CrashReporter
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -44,10 +45,11 @@ private const val SCHEDULER_FLEX_INTERVAL: Long = 50 // Minutes
 
 internal class WorkManagerFacade @Inject constructor(
     private val workManager: WorkManager,
+    private val crashReporter: CrashReporter,
 ) : WorkManagerGateway {
 
     override suspend fun enqueueDeleteOldestCompletedTransfersWorkRequest() {
-        workManager.debugWorkInfo()
+        workManager.debugWorkInfo(crashReporter)
 
         val workRequest =
             OneTimeWorkRequest.Builder(DeleteOldestCompletedTransfersWorker::class.java)
@@ -63,7 +65,7 @@ internal class WorkManagerFacade @Inject constructor(
     }
 
     override suspend fun enqueueDownloadsWorkerRequest() {
-        workManager.debugWorkInfo()
+        workManager.debugWorkInfo(crashReporter)
 
         val request = OneTimeWorkRequest.Builder(DownloadsWorker::class.java)
             .addTag(DownloadsWorker.SINGLE_DOWNLOAD_TAG)
@@ -77,7 +79,7 @@ internal class WorkManagerFacade @Inject constructor(
     }
 
     override suspend fun enqueueChatUploadsWorkerRequest() {
-        workManager.debugWorkInfo()
+        workManager.debugWorkInfo(crashReporter)
 
         val request = OneTimeWorkRequest.Builder(ChatUploadsWorker::class.java)
             .addTag(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
@@ -91,7 +93,7 @@ internal class WorkManagerFacade @Inject constructor(
     }
 
     override suspend fun enqueueNewMediaWorkerRequest(forceEnqueue: Boolean) {
-        workManager.debugWorkInfo()
+        workManager.debugWorkInfo(crashReporter)
 
         val tag = NewMediaWorker.NEW_MEDIA_WORKER_TAG
         if (forceEnqueue || !(isWorkerEnqueuedOrRunning(tag))) {
@@ -115,7 +117,7 @@ internal class WorkManagerFacade @Inject constructor(
     override suspend fun startCameraUploads() {
         // Check if CU periodic worker is working. If yes, then don't start a single one
         if (!isWorkerRunning(CAMERA_UPLOAD_TAG)) {
-            workManager.debugWorkInfo()
+            workManager.debugWorkInfo(crashReporter)
 
             Timber.d("No CU periodic process currently running, proceed with one time request")
             val cameraUploadWorkRequest = OneTimeWorkRequest.Builder(
@@ -160,7 +162,7 @@ internal class WorkManagerFacade @Inject constructor(
     override suspend fun scheduleCameraUploads() {
         scheduleCameraUploadSyncActiveHeartbeat()
 
-        workManager.debugWorkInfo()
+        workManager.debugWorkInfo(crashReporter)
 
         // periodic work that runs during the last 10 minutes of every one hour period
         val cameraUploadWorkRequest = PeriodicWorkRequest.Builder(
@@ -190,7 +192,7 @@ internal class WorkManagerFacade @Inject constructor(
      * Schedule camera uploads active heartbeat worker
      */
     private suspend fun scheduleCameraUploadSyncActiveHeartbeat() {
-        workManager.debugWorkInfo()
+        workManager.debugWorkInfo(crashReporter)
 
         // periodic work that runs during the last 10 minutes of every half an hour period
         val cuSyncActiveHeartbeatWorkRequest = PeriodicWorkRequest.Builder(
@@ -296,13 +298,18 @@ internal class WorkManagerFacade @Inject constructor(
 /**
  * Prints the list of pending [WorkInfo] in the log.
  */
-suspend fun WorkManager.debugWorkInfo() {
+suspend fun WorkManager.debugWorkInfo(crashReporter: CrashReporter) {
     getWorkInfosFlow(
         WorkQuery.fromStates(
             WorkInfo.State.ENQUEUED,
         )
     ).firstOrNull()
         ?.map { it.tags }
-        ?.let { Timber.d("Worker pending list: $it") }
+        ?.groupBy { it }
+        ?.mapValues { it.value.size }
+        ?.let {
+            Timber.d("Worker pending list: $it")
+            crashReporter.log("Worker pending list: $it")
+        }
         ?: Timber.d("Worker pending list: empty")
 }
