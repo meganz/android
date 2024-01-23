@@ -16,7 +16,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -71,7 +70,6 @@ import javax.inject.Inject
 /**
  * The Fragment for favourites
  */
-@UnstableApi
 @AndroidEntryPoint
 class FavouritesFragment : Fragment(), HomepageSearchable {
     private val viewModel by viewModels<FavouritesViewModel>()

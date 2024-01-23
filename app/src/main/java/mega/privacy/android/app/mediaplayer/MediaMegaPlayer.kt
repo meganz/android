@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import androidx.annotation.OptIn
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -12,7 +13,7 @@ import mega.privacy.android.app.utils.CallUtil
 /**
  * Player which customized some behaviours in relation to the app needs.
  */
-@UnstableApi
+@OptIn(UnstableApi::class)
 class MediaMegaPlayer(player: ExoPlayer) : ForwardingPlayer(player) {
 
     /**

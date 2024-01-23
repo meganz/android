@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import androidx.annotation.OptIn
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import androidx.media3.common.C
@@ -136,7 +137,6 @@ import javax.inject.Inject
  * A class containing audio player service logic, because using ViewModel in Service
  * is not the standard scenario, so this class is actually not a subclass of ViewModel.
  */
-@UnstableApi
 class AudioPlayerServiceViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
@@ -998,6 +998,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
      * @param isScroll true is scroll to target position, otherwise is false.
      * @param isBuildPlaySources true is building play sources, otherwise is false.
      */
+    @OptIn(UnstableApi::class)
     private fun recreateAndUpdatePlaylistItems(
         originalItems: List<PlaylistItem?> = playlistItems,
         isScroll: Boolean = true,
@@ -1393,6 +1394,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     /**
      * onShuffleChanged
      */
+    @OptIn(UnstableApi::class)
     override fun onShuffleChanged(newShuffle: ShuffleOrder) {
         shuffleOrder = newShuffle
         if (shuffleEnabled.value && shuffleOrder.length != 0 && shuffleOrder.length == playlistItems.size) {

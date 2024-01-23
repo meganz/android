@@ -56,7 +56,6 @@ import androidx.core.app.NotificationCompat
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import mega.privacy.android.domain.monitoring.CrashReporter
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import timber.log.Timber
 import javax.inject.Inject
@@ -64,7 +63,6 @@ import javax.inject.Inject
 /**
  * The service for playing audio
  */
-@UnstableApi
 @AndroidEntryPoint
 class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlayerServiceGateway {
     /**

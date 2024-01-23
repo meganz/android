@@ -85,7 +85,6 @@ import timber.log.Timber
  * Extending MediaPlayerActivity is to declare portrait in manifest,
  * to avoid crash when set requestedOrientation.
  */
-@UnstableApi
 class AudioPlayerActivity : MediaPlayerActivity() {
     private lateinit var binding: ActivityAudioPlayerBinding
 
@@ -163,6 +162,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         }
     }
 
+    @androidx.annotation.OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

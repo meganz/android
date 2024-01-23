@@ -1,6 +1,6 @@
 package mega.privacy.android.app.mediaplayer.service;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.media3.common.C;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.source.ShuffleOrder;
@@ -12,7 +12,7 @@ import java.util.Random;
  * This class is barely a copy of {@link ShuffleOrder.DefaultShuffleOrder}, only expose
  * the shuffled index.
  */
-@UnstableApi
+@OptIn(markerClass = UnstableApi.class)
 public class ExposedShuffleOrder implements ShuffleOrder {
     private final Random random;
     private final int[] shuffled;

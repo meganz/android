@@ -14,6 +14,7 @@ import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.OptIn
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -72,7 +73,6 @@ import javax.inject.Inject
 /**
  * The Fragment for the video player
  */
-@UnstableApi
 @AndroidEntryPoint
 class VideoPlayerFragment : Fragment() {
     /**
@@ -200,6 +200,7 @@ class VideoPlayerFragment : Fragment() {
         mediaPlayerGateway.removeListener(playerListener)
     }
 
+    @OptIn(UnstableApi::class)
     private fun observeFlow() {
         if (view != null) {
             with(viewModel) {
@@ -395,6 +396,7 @@ class VideoPlayerFragment : Fragment() {
         }
     }
 
+    @OptIn(UnstableApi::class)
     private fun screenshotButtonClicked() {
         binding.playerView.videoSurfaceView?.let { view ->
             viewModel.screenshotWhenVideoPlaying(captureView = view) { bitmap ->
@@ -495,9 +497,8 @@ class VideoPlayerFragment : Fragment() {
         layout.startAnimation(anim)
     }
 
-    private fun setupPlayerView(
-        playerView: PlayerView,
-    ) {
+    @OptIn(UnstableApi::class)
+    private fun setupPlayerView(playerView: PlayerView) {
         mediaPlayerGateway.setupPlayerView(
             playerView = playerView,
             controllerHideOnTouch = true,
@@ -587,6 +588,7 @@ class VideoPlayerFragment : Fragment() {
      * @param dragToExit DragToExitSupport
      * @param activated true is activated, otherwise is false
      */
+    @OptIn(UnstableApi::class)
     fun onDragActivated(dragToExit: DragToExitSupport, activated: Boolean) {
         if (activated) {
             delayHideToolbarCanceled = true

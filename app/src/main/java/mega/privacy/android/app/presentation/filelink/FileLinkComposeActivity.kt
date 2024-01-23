@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.media3.common.util.UnstableApi
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
@@ -61,7 +60,6 @@ import javax.inject.Inject
 /**
  * FileLinkActivity with compose view
  */
-@UnstableApi
 @AndroidEntryPoint
 class FileLinkComposeActivity : TransfersManagementActivity(),
     DecryptAlertDialog.DecryptDialogListener {

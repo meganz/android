@@ -1,13 +1,13 @@
 package mega.privacy.android.app.mediaplayer
 
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.DrawableRes
+import androidx.annotation.OptIn
 import androidx.compose.ui.platform.ComposeView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
@@ -25,7 +25,6 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
  *
  * @property container view for VideoPlayerFragment
  */
-@UnstableApi
 class VideoPlayerViewHolder(val container: ViewGroup) {
 
     private val playlist = container.findViewById<ImageButton>(R.id.playlist)
@@ -239,11 +238,13 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
     /**
      * Hide player controller.
      */
+    @OptIn(UnstableApi::class)
     fun hideController() = playerView.hideController()
 
     /**
      * Show player controller.
      */
+    @OptIn(UnstableApi::class)
     fun showController() = playerView.showController()
 
     /**

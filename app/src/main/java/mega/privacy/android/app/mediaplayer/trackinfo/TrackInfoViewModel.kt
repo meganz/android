@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer.trackinfo
 
 import android.content.Context
+import androidx.annotation.OptIn
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -48,7 +49,6 @@ import javax.inject.Inject
 /**
  * ViewModel for track (audio node) info UI logic.
  */
-@UnstableApi
 @HiltViewModel
 class TrackInfoViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
@@ -90,6 +90,7 @@ class TrackInfoViewModel @Inject constructor(
         )
     }
 
+    @OptIn(UnstableApi::class)
     private fun loadMetadata(args: TrackInfoFragmentArgs) {
         val trackSelector = DefaultTrackSelector(context)
         val exoPlayer = ExoPlayer.Builder(context, DefaultRenderersFactory(context))

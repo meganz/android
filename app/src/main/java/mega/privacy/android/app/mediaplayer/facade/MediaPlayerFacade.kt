@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.media3.common.C
@@ -48,7 +49,7 @@ import javax.inject.Inject
 /**
  * The implementation of MediaPlayerGateway
  */
-@UnstableApi
+@OptIn(UnstableApi::class)
 class MediaPlayerFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     private val crashReporter: CrashReporter,

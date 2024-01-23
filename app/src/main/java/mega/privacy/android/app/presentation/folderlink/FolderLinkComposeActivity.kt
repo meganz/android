@@ -23,7 +23,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.media3.common.util.UnstableApi
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -81,7 +80,6 @@ import javax.inject.Inject
 /**
  * FolderLinkActivity with compose view
  */
-@UnstableApi
 @AndroidEntryPoint
 class FolderLinkComposeActivity : TransfersManagementActivity(),
     DecryptAlertDialog.DecryptDialogListener {
