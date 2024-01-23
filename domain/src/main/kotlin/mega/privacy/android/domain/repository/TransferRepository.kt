@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.MegaException
+import java.io.File
 
 /**
  * Transfer repository of Domain Module
@@ -488,6 +489,14 @@ interface TransferRepository {
      * @return Current download speed.
      */
     suspend fun getCurrentDownloadSpeed(): Int
+
+    /**
+     * Get or create a folder for transfers in the cache of SD Card if any
+     *
+     * @return the File corresponding to the folder in cache in the SD
+     *         Return null if the folder cannot be created or there's no SD card
+     */
+    suspend fun getOrCreateSDCardTransfersCacheFolder(): File?
 
     /**
      * Get current downloaded bytes.

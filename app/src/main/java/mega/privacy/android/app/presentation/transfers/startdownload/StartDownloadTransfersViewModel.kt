@@ -32,9 +32,10 @@ import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUse
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.GetDownloadLocationForNodeUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -43,7 +44,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StartDownloadTransfersViewModel @Inject constructor(
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase,
-    private val getDownloadLocationForNodeUseCase: GetDownloadLocationForNodeUseCase,
+    private val getOrCreateStorageDownloadLocationUseCase: GetOrCreateStorageDownloadLocationUseCase,
     private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase,
     private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase,
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase,
@@ -131,7 +132,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
                 startDownloadNodes(
                     siblingNodes,
                     getPath = {
-                        getDownloadLocationForNodeUseCase(firstSibling)
+                        getOrCreateStorageDownloadLocationUseCase()?.ensureSuffix(File.separator)
                     },
                 )
             }
@@ -256,4 +257,6 @@ class StartDownloadTransfersViewModel @Inject constructor(
                 jobInProgressState = null,
             )
         }
+
+    private fun String.ensureSuffix(suffix: String) = this.removeSuffix(suffix).plus(suffix)
 }

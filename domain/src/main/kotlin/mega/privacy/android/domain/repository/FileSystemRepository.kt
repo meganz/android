@@ -294,14 +294,6 @@ interface FileSystemRepository {
     suspend fun isSDCardCachePath(localPath: String): Boolean
 
     /**
-     * Get or create a folder with current timestamp name in the cache of SD Card if any
-     *
-     * @return the File corresponding to the folder in cache in the SD
-     *         Return null if the folder cannot be created or there's no SD card
-     */
-    suspend fun getOrCreateSDCardCacheFolder(): File?
-
-    /**
      * Moves a [file] to a [targetPath] on the sd. It first copies the file to the [targetPath] and then deletes the original one
      *
      * @param file the file to be moved

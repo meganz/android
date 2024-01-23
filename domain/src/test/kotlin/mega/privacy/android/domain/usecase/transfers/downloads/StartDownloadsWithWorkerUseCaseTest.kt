@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -49,6 +50,7 @@ class StartDownloadsWithWorkerUseCaseTest {
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase = mock()
     private val isDownloadsWorkerStartedUseCase: IsDownloadsWorkerStartedUseCase =
         mock()
+    private val transferRepository = mock<TransferRepository>()
 
     @BeforeAll
     fun setup() {
@@ -60,6 +62,7 @@ class StartDownloadsWithWorkerUseCaseTest {
                 startDownloadWorkerUseCase = startDownloadWorkerUseCase,
                 isDownloadsWorkerStartedUseCase = isDownloadsWorkerStartedUseCase,
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
+                transferRepository = transferRepository
             )
     }
 
@@ -72,6 +75,7 @@ class StartDownloadsWithWorkerUseCaseTest {
             fileSystemRepository,
             startDownloadWorkerUseCase,
             isDownloadsWorkerStartedUseCase,
+            transferRepository,
         )
         commonStub()
     }
@@ -212,7 +216,8 @@ class StartDownloadsWithWorkerUseCaseTest {
             downloadNodesUseCase(any(), any(), anyOrNull(), any())
         ).thenAnswer { emptyFlow<MultiTransferEvent>() }
         whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
-        whenever(fileSystemRepository.getOrCreateSDCardCacheFolder()).thenReturn(File(cachePath))
+        whenever(transferRepository.getOrCreateSDCardTransfersCacheFolder())
+            .thenReturn(File(cachePath))
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
             awaitComplete()
         }
@@ -228,7 +233,8 @@ class StartDownloadsWithWorkerUseCaseTest {
             downloadNodesUseCase(any(), any(), anyOrNull(), any())
         ).thenAnswer { emptyFlow<MultiTransferEvent>() }
         whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
-        whenever(fileSystemRepository.getOrCreateSDCardCacheFolder()).thenReturn(File(cachePath))
+        whenever(transferRepository.getOrCreateSDCardTransfersCacheFolder())
+            .thenReturn(File(cachePath))
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
             awaitComplete()
         }

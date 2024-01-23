@@ -32,6 +32,7 @@ import mega.privacy.android.data.extensions.isBackgroundTransfer
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -99,6 +100,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val completedTransferMapper: CompletedTransferMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val megaNodeMapper: MegaNodeMapper,
+    private val sdCardGateway: SDCardGateway,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
@@ -656,6 +658,13 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaApiGateway.currentDownloadSpeed
     }
 
+    override suspend fun getOrCreateSDCardTransfersCacheFolder() =
+        withContext(ioDispatcher) {
+            sdCardGateway.getOrCreateCacheFolder(
+                TRANSFERS_SD_TEMPORARY_FOLDER
+            )
+        }
+
     @Deprecated(
         "This value is deprecated in SDK. " +
                 "Replace with the corresponding value get from ActiveTransfers when ready"
@@ -686,6 +695,10 @@ internal class DefaultTransfersRepository @Inject constructor(
                     transferredBytesFlows[transferType] = it
                 }
         }
+    }
+
+    companion object {
+        internal const val TRANSFERS_SD_TEMPORARY_FOLDER = "transfersSdTempMEGA"
     }
 }
 

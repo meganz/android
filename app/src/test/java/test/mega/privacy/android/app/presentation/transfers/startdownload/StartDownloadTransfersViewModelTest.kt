@@ -31,7 +31,7 @@ import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUse
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.GetDownloadLocationForNodeUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -56,7 +56,6 @@ class StartDownloadTransfersViewModelTest {
     lateinit var underTest: StartDownloadTransfersViewModel
 
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase = mock()
-    private val getDownloadLocationForNodeUseCase: GetDownloadLocationForNodeUseCase = mock()
     private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase = mock()
     private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase = mock()
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase =
@@ -70,6 +69,8 @@ class StartDownloadTransfersViewModelTest {
         mock<IsAskBeforeLargeDownloadsSettingUseCase>()
     private val setAskBeforeLargeDownloadsSettingUseCase =
         mock<SetAskBeforeLargeDownloadsSettingUseCase>()
+    private val getOrCreateStorageDownloadLocationUseCase =
+        mock<GetOrCreateStorageDownloadLocationUseCase>()
 
 
     private val node: TypedFileNode = mock()
@@ -81,7 +82,7 @@ class StartDownloadTransfersViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = StartDownloadTransfersViewModel(
             getOfflinePathForNodeUseCase,
-            getDownloadLocationForNodeUseCase,
+            getOrCreateStorageDownloadLocationUseCase,
             startDownloadsWithWorkerUseCase,
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
@@ -98,7 +99,7 @@ class StartDownloadTransfersViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            getDownloadLocationForNodeUseCase,
+            getOrCreateStorageDownloadLocationUseCase,
             startDownloadsWithWorkerUseCase,
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
@@ -288,7 +289,7 @@ class StartDownloadTransfersViewModelTest {
         whenever(node.parentId).thenReturn(parentId)
         whenever(parentNode.id).thenReturn(parentId)
 
-        whenever(getDownloadLocationForNodeUseCase(node)).thenReturn(destination)
+        whenever(getOrCreateStorageDownloadLocationUseCase()).thenReturn(destination)
 
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(1)
@@ -310,6 +311,6 @@ class StartDownloadTransfersViewModelTest {
         private const val PARENT_NODE_HANDLE = 12L
         private val nodeId = NodeId(NODE_HANDLE)
         private val parentId = NodeId(PARENT_NODE_HANDLE)
-        private const val destination = "/destination"
+        private const val destination = "/destination/"
     }
 }

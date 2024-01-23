@@ -8,7 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
-import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
@@ -81,7 +80,6 @@ internal class FileSystemRepositoryImplTest {
     private val deviceGateway = mock<DeviceGateway>()
     private val sdCardGateway = mock<SDCardGateway>()
     private val fileAttributeGateway = mock<FileAttributeGateway>()
-    private val androidDeviceGateway = mock<AndroidDeviceGateway>()
 
     @BeforeAll
     fun setUp() {
@@ -106,7 +104,6 @@ internal class FileSystemRepositoryImplTest {
             deviceGateway = deviceGateway,
             sdCardGateway = sdCardGateway,
             fileAttributeGateway = fileAttributeGateway,
-            androidDeviceGateway = androidDeviceGateway
         )
     }
 
@@ -131,7 +128,6 @@ internal class FileSystemRepositoryImplTest {
             streamingGateway,
             deviceGateway,
             sdCardGateway,
-            androidDeviceGateway,
         )
     }
 
@@ -410,15 +406,5 @@ internal class FileSystemRepositoryImplTest {
             whenever(sdCardGateway.isSDCardCachePath(any())).thenReturn(expected)
             assertThat(underTest.isSDCardCachePath("something")).isEqualTo(expected)
         }
-
-        @Test
-        fun `test that getOrCreateSDCardCacheFolder returns gateway value`() =
-            runTest {
-                val result = File("path")
-                val time = 11L
-                whenever(androidDeviceGateway.getCurrentTimeInMillis()).thenReturn(time)
-                whenever(sdCardGateway.getOrCreateCacheFolder(time.toString())).thenReturn(result)
-                assertThat(underTest.getOrCreateSDCardCacheFolder()).isEqualTo(result)
-            }
     }
 }

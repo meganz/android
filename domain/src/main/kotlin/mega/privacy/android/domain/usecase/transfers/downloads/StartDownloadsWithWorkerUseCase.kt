@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
@@ -26,6 +27,7 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
     private val doesPathHaveSufficientSpaceForNodesUseCase: DoesPathHaveSufficientSpaceForNodesUseCase,
     private val downloadNodesUseCase: DownloadNodesUseCase,
     private val fileSystemRepository: FileSystemRepository,
+    private val transferRepository: TransferRepository,
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
     private val isDownloadsWorkerStartedUseCase: IsDownloadsWorkerStartedUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
@@ -53,7 +55,7 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
             val appData: TransferAppData?
             val finalDestinationPath = if (fileSystemRepository.isSDCardPath(destinationPath)) {
                 appData = TransferAppData.SdCardDownload(destinationPath, null)
-                fileSystemRepository.getOrCreateSDCardCacheFolder()?.path?.plus(File.separator)
+                transferRepository.getOrCreateSDCardTransfersCacheFolder()?.path?.plus(File.separator)
                     ?: run {
                         nodes.forEach {
                             emit(

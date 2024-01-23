@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -29,6 +30,7 @@ import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.RequestEvent
+import mega.privacy.android.data.repository.DefaultTransfersRepository.Companion.TRANSFERS_SD_TEMPORARY_FOLDER
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -62,6 +64,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 
 /**
  * Test class for [DefaultTransfersRepository]
@@ -85,6 +88,7 @@ class DefaultTransfersRepositoryTest {
     private val cancelTokenProvider = mock<CancelTokenProvider>()
     private val activeTransferTotalsMapper = mock<ActiveTransferTotalsMapper>()
     private val megaNodeMapper = mock<MegaNodeMapper>()
+    private val sdCardGateway = mock<SDCardGateway>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -114,6 +118,7 @@ class DefaultTransfersRepositoryTest {
             cancelTokenProvider = cancelTokenProvider,
             scope = testScope,
             megaNodeMapper = megaNodeMapper,
+            sdCardGateway = sdCardGateway,
         )
     }
 
@@ -132,6 +137,7 @@ class DefaultTransfersRepositoryTest {
             cancelTokenProvider,
             completedTransferMapper,
             megaNodeMapper,
+            sdCardGateway,
         )
     }
 
@@ -860,6 +866,15 @@ class DefaultTransfersRepositoryTest {
             val id = 1
             underTest.getCompletedTransferById(id)
             verify(megaLocalRoomGateway).getCompletedTransferById(id)
+        }
+
+    @Test
+    fun `test that getOrCreateSDCardCacheFolder returns gateway value`() =
+        runTest {
+            val result = File("path")
+            whenever(sdCardGateway.getOrCreateCacheFolder(TRANSFERS_SD_TEMPORARY_FOLDER))
+                .thenReturn(result)
+            assertThat(underTest.getOrCreateSDCardTransfersCacheFolder()).isEqualTo(result)
         }
 
     @Nested

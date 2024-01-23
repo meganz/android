@@ -18,7 +18,6 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getAllFolders
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getRequestListener
-import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
@@ -100,7 +99,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val sdCardGateway: SDCardGateway,
     private val fileAttributeGateway: FileAttributeGateway,
-    private val androidDeviceGateway: AndroidDeviceGateway,
 ) : FileSystemRepository {
 
     override val localDCIMFolderPath: String
@@ -403,13 +401,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun isSDCardCachePath(localPath: String) = withContext(ioDispatcher) {
         sdCardGateway.isSDCardCachePath(localPath)
     }
-
-    override suspend fun getOrCreateSDCardCacheFolder() =
-        withContext(ioDispatcher) {
-            sdCardGateway.getOrCreateCacheFolder(
-                androidDeviceGateway.getCurrentTimeInMillis().toString()
-            )
-        }
 
     override suspend fun moveFileToSd(file: File, targetPath: String, sdCardUriString: String) =
         withContext(ioDispatcher) {
