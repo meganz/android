@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_AT
 import mega.privacy.android.core.ui.controls.chat.TEST_TAG_ATTACHMENT_ICON
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +41,7 @@ class ChatViewTest {
     fun `test that participating in a call dialog show when click to audio call and user is in another call`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Standard,
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Standard },
                 isConnected = true,
                 callsInOtherChats = listOf(mock {
                     on { status } doReturn ChatCallStatus.InProgress
@@ -59,7 +60,7 @@ class ChatViewTest {
     fun `test that participating in a call dialog doesn't show when click to audio call and user is in another call`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Standard,
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Standard },
                 callsInOtherChats = emptyList(),
                 isConnected = true,
             )
@@ -76,9 +77,11 @@ class ChatViewTest {
     fun `test that no contact to add dialog shows when hasAnyContact is false and user clicks add participant menu action`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                    on { isGroup } doReturn true
+                },
                 hasAnyContact = false,
-                myPermission = ChatRoomPermission.Moderator,
-                isGroup = true,
                 isConnected = true,
             )
         )
@@ -92,9 +95,11 @@ class ChatViewTest {
     fun `test that all contacts added in a call dialog show when click to add participants to call`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Moderator,
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                    on { isGroup } doReturn true
+                },
                 allContactsParticipateInChat = true,
-                isGroup = true,
                 hasAnyContact = true,
                 isConnected = true,
             )
@@ -114,9 +119,11 @@ class ChatViewTest {
     fun `test that clear chat confirmation dialog show when click clear`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                    on { isGroup } doReturn true
+                },
                 isConnected = true,
-                myPermission = ChatRoomPermission.Moderator,
-                isGroup = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).apply {
@@ -131,9 +138,11 @@ class ChatViewTest {
     fun `test that end call for all dialog show when click to end call for all menu option`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Moderator,
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                    on { isGroup } doReturn true
+                },
                 callInThisChat = mock(),
-                isGroup = true,
                 isConnected = true,
             )
         )
@@ -152,7 +161,7 @@ class ChatViewTest {
     fun `test that enable geolocation dialog shows when geolocation is not enabled and user clicks on location`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Standard,
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Standard },
                 isGeolocationEnabled = false,
             )
         )

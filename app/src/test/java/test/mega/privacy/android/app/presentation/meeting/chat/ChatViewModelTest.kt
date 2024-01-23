@@ -1064,15 +1064,6 @@ internal class ChatViewModelTest {
         Arguments.of(UserChatStatus.Invalid, UserChatStatus.Offline),
     )
 
-    @Test
-    fun `test that chat ID is saved in state when it is passed in`() = runTest {
-        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
-        initTestClass()
-        underTest.state.test {
-            assertThat(awaitItem().chatId).isEqualTo(chatId)
-        }
-    }
-
     @ParameterizedTest(name = " {0} when isChatStatusConnectedForCallUseCase is {0}")
     @ValueSource(booleans = [true, false])
     fun `test that chat connected state is `(connected: Boolean) = runTest {
@@ -2065,9 +2056,11 @@ internal class ChatViewModelTest {
     fun `test that join chat successfully when open by chat link`() = runTest {
         val chatLink = "https://mega.nz/chat/123456789"
         val action = "action"
+        val chat = mock<ChatRoom> { on { this.chatId } doReturn chatId }
         whenever(savedStateHandle.get<String?>(EXTRA_LINK)).thenReturn(chatLink)
         whenever(savedStateHandle.get<String?>(EXTRA_ACTION)).thenReturn(action)
         whenever(openChatLinkUseCase(chatLink, chatId, false)).thenReturn(chatId)
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chat)
         whenever(savedStateHandle.get<Long?>(Constants.CHAT_ID)).thenReturn(chatId)
         initTestClass()
         underTest.state.test {

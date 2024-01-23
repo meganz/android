@@ -12,6 +12,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.ReturnToCallBanne
 import mega.privacy.android.core.ui.controls.chat.TEST_TAG_RETURN_TO_CALL
 import mega.privacy.android.core.ui.controls.chat.TEST_TAG_RETURN_TO_CALL_CHRONOMETER
 import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import org.junit.Rule
 import org.junit.Test
@@ -52,8 +53,8 @@ class ReturnToCallBannerTest {
         }
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn false },
                 isConnected = true,
-                isGroup = false,
                 callInThisChat = callInThisChat,
             )
         )
@@ -71,9 +72,11 @@ class ReturnToCallBannerTest {
         }
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { isGroup } doReturn true
+                    on { isMeeting } doReturn true
+                },
                 isConnected = true,
-                isGroup = true,
-                isMeeting = true,
                 callInThisChat = callInThisChat,
             )
         )
@@ -112,8 +115,8 @@ class ReturnToCallBannerTest {
         }
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn true },
                 isConnected = true,
-                isGroup = true,
                 callInThisChat = callInThisChat,
             )
         )

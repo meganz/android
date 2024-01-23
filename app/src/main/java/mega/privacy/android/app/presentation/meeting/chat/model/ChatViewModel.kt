@@ -189,9 +189,6 @@ class ChatViewModel @Inject constructor(
     private val usersTyping = Collections.synchronizedMap(mutableMapOf<Long, String?>())
     private val jobs = mutableMapOf<Long, Job>()
 
-    private val ChatRoom.isPrivateRoom: Boolean
-        get() = !isGroup || !isPublic
-
     private val ChatRoom.haveAtLeastReadPermission: Boolean
         get() = ownPrivilege != ChatRoomPermission.Unknown
                 && ownPrivilege != ChatRoomPermission.Removed
@@ -264,7 +261,6 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun loadChatRoom() {
-        updateChatId()
         getChatRoom()
         getNotificationMute()
         getChatConnectionState()
@@ -346,12 +342,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun updateChatId() {
-        viewModelScope.launch {
-            _state.update { it.copy(chatId = chatId) }
-        }
-    }
-
     private fun monitorChatConnectionState() {
         monitorChatConnectionStateJob?.cancel()
         monitorChatConnectionStateJob = viewModelScope.launch {
@@ -400,22 +390,13 @@ class ChatViewModel @Inject constructor(
                 chatRoom?.let {
                     with(chatRoom) {
                         checkCustomTitle()
+                        val participantsCount = getNumberParticipants()
                         _state.update { state ->
                             val isJoining = false.takeIf { !isPreview } ?: state.isJoining
                             state.copy(
-                                title = title,
-                                isPrivateChat = chatRoom.isPrivateRoom,
-                                myPermission = ownPrivilege,
-                                isPreviewMode = isPreview,
+                                chat = chatRoom,
                                 isJoining = isJoining,
-                                isGroup = isGroup,
-                                isOpenInvite = isOpenInvite,
-                                isActive = isActive,
-                                isArchived = isArchived,
-                                isMeeting = isMeeting,
-                                participantsCount = getNumberParticipants(),
-                                isWaitingRoom = isWaitingRoom,
-                                numPreviewers = numPreviewers
+                                participantsCount = participantsCount,
                             )
                         }
                         if (peerHandlesList.isNotEmpty()) {
@@ -484,39 +465,22 @@ class ChatViewModel @Inject constructor(
             monitorChatRoomUpdates(chatId)
                 .collect { chat ->
                     with(chat) {
+                        _state.update { state -> state.copy(chat = chat) }
+
                         changes?.forEach { change ->
                             when (change) {
                                 ChatRoomChange.Title -> {
                                     checkCustomTitle()
-                                    _state.update { state -> state.copy(title = title) }
                                 }
 
-                                ChatRoomChange.ChatMode -> _state.update { state ->
-                                    state.copy(isPrivateChat = !isPublic)
-                                }
-
-                                ChatRoomChange.OwnPrivilege -> _state.update { state ->
-                                    state.copy(
-                                        myPermission = ownPrivilege,
-                                        isActive = isActive,
-                                        participantsCount = getNumberParticipants()
-                                    )
-                                }
-
-                                ChatRoomChange.OpenInvite -> _state.update { state ->
-                                    state.copy(isOpenInvite = isOpenInvite)
-                                }
-
-                                ChatRoomChange.Closed -> _state.update { state ->
-                                    state.copy(
-                                        myPermission = ownPrivilege,
-                                        isActive = isActive,
-                                        participantsCount = getNumberParticipants()
-                                    )
-                                }
-
-                                ChatRoomChange.Archive -> _state.update { state ->
-                                    state.copy(isArchived = isArchived)
+                                ChatRoomChange.OwnPrivilege,
+                                ChatRoomChange.Closed,
+                                -> {
+                                    _state.update { state ->
+                                        state.copy(
+                                            participantsCount = getNumberParticipants()
+                                        )
+                                    }
                                 }
 
                                 ChatRoomChange.UserTyping -> {
@@ -525,7 +489,9 @@ class ChatViewModel @Inject constructor(
                                     }
                                 }
 
-                                ChatRoomChange.UserStopTyping -> handleUserStopTyping(userTyping)
+                                ChatRoomChange.UserStopTyping -> {
+                                    handleUserStopTyping(userTyping)
+                                }
 
                                 ChatRoomChange.Participants -> {
                                     checkCustomTitle()
@@ -535,17 +501,8 @@ class ChatViewModel @Inject constructor(
                                     monitorAllContactParticipantsInChat(peerHandlesList)
                                 }
 
-                                ChatRoomChange.WaitingRoom -> {
-                                    _state.update { state ->
-                                        state.copy(isWaitingRoom = isWaitingRoom)
-                                    }
+                                else -> {
                                 }
-
-                                ChatRoomChange.UpdatePreviewers -> {
-                                    _state.update { state -> state.copy(numPreviewers = numPreviewers) }
-                                }
-
-                                else -> {}
                             }
                         }
                     }
@@ -713,6 +670,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Consume the event of showing the dialog of selecting chat mute options.
+     */
     fun onShowMutePushNotificationDialogConsumed() {
         _state.update { state -> state.copy(mutePushNotificationDialogEvent = consumed()) }
     }
@@ -740,6 +700,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Invite contacts to chat.
+     */
     fun inviteContactsToChat(chatId: Long, contactsData: List<String>) =
         viewModelScope.launch {
             runCatching {
@@ -759,6 +722,9 @@ class ChatViewModel @Inject constructor(
             }
         }
 
+    /**
+     * Clear chat history.
+     */
     fun clearChatHistory() {
         viewModelScope.launch {
             runCatching { clearChatHistoryUseCase(chatId) }
@@ -780,10 +746,16 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Consumes the event of showing info.
+     */
     fun onInfoToShowEventConsumed() {
         _state.update { state -> state.copy(infoToShowEvent = consumed()) }
     }
 
+    /**
+     * Ends a call.
+     */
     fun endCall() {
         viewModelScope.launch {
             runCatching {
@@ -795,6 +767,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Archive chat.
+     */
     fun archiveChat() {
         viewModelScope.launch {
             runCatching { archiveChatUseCase(chatId, true) }
@@ -814,6 +789,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Unarchive chat.
+     */
     fun unarchiveChat() {
         viewModelScope.launch {
             runCatching { archiveChatUseCase(chatId, false) }
@@ -833,6 +811,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Start a call.
+     */
     fun startCall(video: Boolean) {
         viewModelScope.launch {
             runCatching { startCallUseCase(chatId, video) }
@@ -867,6 +848,9 @@ class ChatViewModel @Inject constructor(
         _state.update { state -> state.copy(openWaitingRoomScreen = false) }
     }
 
+    /**
+     * Start or join a meeting.
+     */
     fun onStartOrJoinMeeting(isStarted: Boolean) {
         val isWaitingRoom = state.value.isWaitingRoom
         if (isStarted) {
@@ -924,6 +908,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Answers a call.
+     */
     fun onAnswerCall() {
         viewModelScope.launch {
             chatManagement.addJoiningCallChatId(chatId)
@@ -953,6 +940,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Enables geolocation.
+     */
     fun onEnableGeolocation() {
         viewModelScope.launch {
             runCatching { enableGeolocationUseCase() }
@@ -964,12 +954,18 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(message: String) {
+    /**
+     * Sends a text message.
+     */
+    fun sendTextMessage(message: String) {
         viewModelScope.launch {
             val tempMessage = sendTextMessageUseCase(chatId, message)
         }
     }
 
+    /**
+     * Holds an existing in progress call and answers a new one.
+     */
     fun onHoldAndAnswerCall() {
         viewModelScope.launch {
             val callToHold = state.value.callsInOtherChats
@@ -992,6 +988,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Ends an existing in progress call and answers a new one.
+     */
     fun onEndAndAnswerCall() {
         viewModelScope.launch {
             state.value.callsInOtherChats
@@ -1007,14 +1006,23 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * On user update handled.
+     */
     fun onUserUpdateHandled() {
         _state.update { state -> state.copy(userUpdate = null) }
     }
 
+    /**
+     * Sets pending link to join.
+     */
     fun onSetPendingJoinLink() {
         chatManagement.pendingJoinLink = savedStateHandle[EXTRA_LINK]
     }
 
+    /**
+     * Attaches files.
+     */
     fun onAttachFiles(files: List<Uri>) {
         viewModelScope.launch {
             sendChatAttachmentsUseCase(chatId, files.map { it.toString() })
@@ -1027,6 +1035,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Joins a public chat.
+     */
     fun onJoinChat() {
         viewModelScope.launch {
             runCatching {
@@ -1037,6 +1048,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Creates a new image uri.
+     */
     suspend fun createNewImageUri(): Uri? {
         Timber.d("createNewImageUri")
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())

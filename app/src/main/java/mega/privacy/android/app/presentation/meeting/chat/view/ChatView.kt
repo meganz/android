@@ -97,7 +97,6 @@ import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.model.KeyboardState
-import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -131,7 +130,7 @@ internal fun ChatView(
         onStartOrJoinMeeting = viewModel::onStartOrJoinMeeting,
         onAnswerCall = viewModel::onAnswerCall,
         onEnableGeolocation = viewModel::onEnableGeolocation,
-        onSendClick = viewModel::sendMessage,
+        onSendClick = viewModel::sendTextMessage,
         onHoldAndAnswerCall = viewModel::onHoldAndAnswerCall,
         onEndAndAnswerCall = viewModel::onEndAndAnswerCall,
         onUserUpdateHandled = viewModel::onUserUpdateHandled,
@@ -785,11 +784,8 @@ private fun showPermissionNotAllowedSnackbar(
 private fun ChatViewPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         val uiState = ChatUiState(
-            title = "My Name",
             userChatStatus = UserChatStatus.Away,
             isChatNotificationMute = true,
-            isPrivateChat = true,
-            myPermission = ChatRoomPermission.Standard,
         )
         ChatView(
             uiState = uiState,

@@ -23,11 +23,13 @@ import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_U
 import mega.privacy.android.core.ui.controls.appbar.TEST_TAG_APP_BAR
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -46,7 +48,7 @@ class ChatAppBarTest {
     fun `test that title shows correctly when passing title to uiState`() {
         val title = "my chat room title"
         initComposeRuleContent(
-            ChatUiState(title = title)
+            ChatUiState(chat = mock<ChatRoom> { on { this.title } doReturn title })
         )
         composeTestRule.onAllNodesWithText(title).onFirst().assertIsDisplayed()
     }
@@ -95,7 +97,7 @@ class ChatAppBarTest {
     @Test
     fun `test that private icon is visible when chat room is private`() {
         initComposeRuleContent(
-            ChatUiState(isPrivateChat = true)
+            ChatUiState(chat = mock<ChatRoom> { on { isPublic } doReturn false })
         )
         composeTestRule.onNodeWithTag(TEST_TAG_PRIVATE_ICON, true).assertIsDisplayed()
     }
@@ -103,7 +105,7 @@ class ChatAppBarTest {
     @Test
     fun `test that private icon is hidden when chat room is public`() {
         initComposeRuleContent(
-            ChatUiState(isPrivateChat = false)
+            ChatUiState(chat = mock<ChatRoom> { on { isPublic } doReturn true })
         )
         composeTestRule.onNodeWithTag(TEST_TAG_PRIVATE_ICON).assertDoesNotExist()
     }
@@ -118,14 +120,14 @@ class ChatAppBarTest {
 
     @Test
     fun `test that audio call is hidden when my permission is removed`() {
-        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Removed))
+        initComposeRuleContent(ChatUiState(chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Removed }))
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION)
             .assertDoesNotExist()
     }
 
     @Test
     fun `test that audio call is hidden when my permission is read only`() {
-        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.ReadOnly))
+        initComposeRuleContent(ChatUiState(chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.ReadOnly }))
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION)
             .assertDoesNotExist()
     }
@@ -139,7 +141,7 @@ class ChatAppBarTest {
 
     @Test
     fun `test that audio call is hidden when is preview mode`() {
-        initComposeRuleContent(ChatUiState(isPreviewMode = true))
+        initComposeRuleContent(ChatUiState(chat = mock<ChatRoom> { on { isPreview } doReturn true }))
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_AUDIO_CALL_ACTION)
             .assertDoesNotExist()
     }
@@ -148,7 +150,7 @@ class ChatAppBarTest {
     fun `test that audio call is shown and enabled when my permission is standard`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Standard,
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Standard },
                 isConnected = true,
             )
         )
@@ -160,7 +162,7 @@ class ChatAppBarTest {
     fun `test that audio call is shown and enabled when my permission is moderator`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Moderator,
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Moderator },
                 isConnected = true,
             )
         )
@@ -172,7 +174,7 @@ class ChatAppBarTest {
     fun `test that audio call is shown but disabled when my permission is moderator and this chat has a call`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Moderator,
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Moderator },
                 callInThisChat = mock(),
                 isConnected = true,
             )
@@ -194,14 +196,14 @@ class ChatAppBarTest {
 
     @Test
     fun `test that video call is hidden when my permission is removed`() {
-        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.Removed))
+        initComposeRuleContent(ChatUiState(chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Removed }))
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION)
             .assertDoesNotExist()
     }
 
     @Test
     fun `test that video call is hidden when my permission is read only`() {
-        initComposeRuleContent(ChatUiState(myPermission = ChatRoomPermission.ReadOnly))
+        initComposeRuleContent(ChatUiState(chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.ReadOnly }))
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION)
             .assertDoesNotExist()
     }
@@ -215,14 +217,14 @@ class ChatAppBarTest {
 
     @Test
     fun `test that video call is hidden when is preview mode`() {
-        initComposeRuleContent(ChatUiState(isPreviewMode = true))
+        initComposeRuleContent(ChatUiState(chat = mock<ChatRoom> { on { isPreview } doReturn true }))
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION)
             .assertDoesNotExist()
     }
 
     @Test
     fun `test that video call is hidden when the chat is a group`() {
-        initComposeRuleContent(ChatUiState(isGroup = true))
+        initComposeRuleContent(ChatUiState(chat = mock<ChatRoom> { on { isGroup } doReturn true }))
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_VIDEO_CALL_ACTION)
             .assertDoesNotExist()
     }
@@ -231,7 +233,7 @@ class ChatAppBarTest {
     fun `test that video call is shown and enabled when my permission is standard`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Standard,
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Standard },
                 isConnected = true,
             )
         )
@@ -243,7 +245,7 @@ class ChatAppBarTest {
     fun `test that video call is shown and enabled when my permission is moderator`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Moderator,
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Moderator },
                 isConnected = true,
             )
         )
@@ -255,7 +257,7 @@ class ChatAppBarTest {
     fun `test that video call is shown but disabled when my permission is moderator and this chat has a call`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Moderator,
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Moderator },
                 callInThisChat = mock(),
                 isConnected = true,
             )
@@ -272,8 +274,10 @@ class ChatAppBarTest {
     fun `test that add participants is available when the chat is a group my permission is moderator`() {
         initComposeRuleContent(
             ChatUiState(
-                isGroup = true,
-                myPermission = ChatRoomPermission.Moderator,
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                    on { isGroup } doReturn true
+                },
                 isConnected = true,
             )
         )
@@ -289,8 +293,11 @@ class ChatAppBarTest {
     fun `test that add participants is available when the chat is a group and is open invite`() {
         initComposeRuleContent(
             ChatUiState(
-                isGroup = true,
-                isOpenInvite = true,
+                chat = mock<ChatRoom> {
+                    on { isActive } doReturn true
+                    on { isGroup } doReturn true
+                    on { isOpenInvite } doReturn true
+                },
                 isConnected = true,
             )
         )
@@ -304,7 +311,7 @@ class ChatAppBarTest {
 
     @Test
     fun `test that add participants is not available when the chat is not a group`() {
-        initComposeRuleContent(ChatUiState(isGroup = false))
+        initComposeRuleContent(ChatUiState(chat = mock<ChatRoom> { on { isGroup } doReturn false }))
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION)
             .assertDoesNotExist()
@@ -320,7 +327,14 @@ class ChatAppBarTest {
 
     @Test
     fun `test that add participants is not available when the group is not active`() {
-        initComposeRuleContent(ChatUiState(isGroup = true, isActive = false))
+        initComposeRuleContent(
+            ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { isGroup } doReturn true
+                    on { isActive } doReturn false
+                },
+            )
+        )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_ADD_PARTICIPANTS_ACTION)
             .assertDoesNotExist()
@@ -328,7 +342,14 @@ class ChatAppBarTest {
 
     @Test
     fun `test that add participants is not available when the group does not open invite`() {
-        initComposeRuleContent(ChatUiState(isGroup = true, isOpenInvite = false))
+        initComposeRuleContent(
+            ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { isGroup } doReturn true
+                    on { isOpenInvite } doReturn false
+                },
+            )
+        )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
     }
 
@@ -336,8 +357,10 @@ class ChatAppBarTest {
     fun `test that add participants is not available when my permission is not moderator`() {
         initComposeRuleContent(
             ChatUiState(
-                isGroup = true,
-                myPermission = ChatRoomPermission.Standard
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Standard
+                    on { isGroup } doReturn true
+                }
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
@@ -350,8 +373,8 @@ class ChatAppBarTest {
     fun `test that archive label shown when chat is archived`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isArchived } doReturn true },
                 isConnected = true,
-                isArchived = true
             )
         )
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.archived_chat))
@@ -362,8 +385,8 @@ class ChatAppBarTest {
     fun `test that archive label doesn't show when chat is not archived`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isArchived } doReturn false },
                 isConnected = true,
-                isArchived = false
             )
         )
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.archived_chat))
@@ -374,8 +397,8 @@ class ChatAppBarTest {
     fun `test that read only label shown when in a chat I have read only permission`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.ReadOnly },
                 isConnected = true,
-                myPermission = ChatRoomPermission.ReadOnly
             )
         )
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.observer_permission_label_participants_panel))
@@ -397,8 +420,8 @@ class ChatAppBarTest {
     fun `test that inactive label shown when in a chat I have read only permission`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Removed },
                 isConnected = true,
-                myPermission = ChatRoomPermission.Removed
             )
         )
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.inactive_chat))
@@ -419,13 +442,20 @@ class ChatAppBarTest {
 
     @Test
     fun `test that Info menu action is not available when chat is joining or leaving`() {
-        initComposeRuleContent(ChatUiState(isGroup = true, isOpenInvite = false))
+        initComposeRuleContent(
+            ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { isGroup } doReturn true
+                    on { isOpenInvite } doReturn false
+                },
+            )
+        )
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_INFO_ACTION).assertDoesNotExist()
     }
 
     @Test
     fun `test that Info menu action is not available when chat is in preview mode`() {
-        initComposeRuleContent(ChatUiState(isPreviewMode = true))
+        initComposeRuleContent(ChatUiState(chat = mock<ChatRoom> { on { isPreview } doReturn true }))
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_INFO_ACTION).assertDoesNotExist()
     }
 
@@ -438,9 +468,10 @@ class ChatAppBarTest {
     @Test
     fun `test that Info menu action is not available when 1on1 chat is read only`() {
         initComposeRuleContent(
-            ChatUiState(
-                isGroup = false,
-                myPermission = ChatRoomPermission.ReadOnly
+            ChatUiState(chat = mock<ChatRoom> {
+                on { ownPrivilege } doReturn ChatRoomPermission.ReadOnly
+                on { isGroup } doReturn false
+            }
             )
         )
 
@@ -451,11 +482,13 @@ class ChatAppBarTest {
     fun `test that Info menu action is available in 1on1 chat and my permission is Moderator`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                    on { isGroup } doReturn false
+                    on { isPreview } doReturn false
+                },
                 isJoining = false,
-                isPreviewMode = false,
                 isConnected = true,
-                isGroup = false,
-                myPermission = ChatRoomPermission.Moderator
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
@@ -467,10 +500,12 @@ class ChatAppBarTest {
     fun `test that Info menu action is available in group chat`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { isGroup } doReturn true
+                    on { isPreview } doReturn false
+                },
                 isJoining = false,
-                isPreviewMode = false,
                 isConnected = true,
-                isGroup = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
@@ -479,7 +514,12 @@ class ChatAppBarTest {
 
 
     fun `test that online label shows if the chat is 1to1 and the contacts status is online`() {
-        initComposeRuleContent(ChatUiState(isGroup = false, userChatStatus = UserChatStatus.Online))
+        initComposeRuleContent(
+            ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn false },
+                userChatStatus = UserChatStatus.Online
+            )
+        )
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.online_status))
             .assertIsDisplayed()
     }
@@ -488,8 +528,8 @@ class ChatAppBarTest {
     fun `test that away label shows if the chat is 1to1 and the contacts status is away`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn false },
                 isConnected = true,
-                isGroup = false,
                 userChatStatus = UserChatStatus.Away
             )
         )
@@ -501,8 +541,8 @@ class ChatAppBarTest {
     fun `test that busy label shows if the chat is 1to1 and the contacts status is busy`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn false },
                 isConnected = true,
-                isGroup = false,
                 userChatStatus = UserChatStatus.Busy
             )
         )
@@ -514,8 +554,8 @@ class ChatAppBarTest {
     fun `test that offline label shows if the chat is 1to1 and the contacts status is offline`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn false },
                 isConnected = true,
-                isGroup = false,
                 userChatStatus = UserChatStatus.Offline
             )
         )
@@ -527,8 +567,8 @@ class ChatAppBarTest {
     fun `test that last green label shows if the chat is 1to1 and the contacts last green is not null`() {
         val lastGreen = initComposeRuleContentWithLastGreen(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn false },
                 isConnected = true,
-                isGroup = false,
                 userLastGreen = 123456
             )
         )
@@ -540,8 +580,8 @@ class ChatAppBarTest {
         val count = 5
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn true },
                 isConnected = true,
-                isGroup = true,
                 customSubtitleList = null,
                 participantsCount = count.toLong()
             )
@@ -555,8 +595,8 @@ class ChatAppBarTest {
         val count = 5
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isPreview } doReturn true },
                 isConnected = true,
-                isPreviewMode = true,
                 participantsCount = count.toLong()
             )
         )
@@ -569,8 +609,8 @@ class ChatAppBarTest {
     fun `test that custom subtitle shows if the chat is a group, has custom subtitle and has only me as participant`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn true },
                 isConnected = true,
-                isGroup = true,
                 customSubtitleList = emptyList(),
             )
         )
@@ -581,9 +621,11 @@ class ChatAppBarTest {
     fun `test that custom subtitle shows if the chat is a group, has custom subtitle, is preview and does not have participants`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { isGroup } doReturn false
+                    on { isPreview } doReturn true
+                },
                 isConnected = true,
-                isGroup = true,
-                isPreviewMode = true,
                 customSubtitleList = emptyList(),
             )
         )
@@ -596,8 +638,8 @@ class ChatAppBarTest {
         val userA = "A"
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn true },
                 isConnected = true,
-                isGroup = true,
                 customSubtitleList = listOf(userA),
             )
         )
@@ -610,9 +652,11 @@ class ChatAppBarTest {
         val userA = "A"
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { isGroup } doReturn true
+                    on { isPreview } doReturn true
+                },
                 isConnected = true,
-                isGroup = true,
-                isPreviewMode = true,
                 customSubtitleList = listOf(userA),
             )
         )
@@ -625,8 +669,8 @@ class ChatAppBarTest {
         val userB = "B"
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn true },
                 isConnected = true,
-                isGroup = true,
                 customSubtitleList = listOf(userA, userB),
             )
         )
@@ -640,9 +684,11 @@ class ChatAppBarTest {
         val userB = "B"
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { isGroup } doReturn true
+                    on { isPreview } doReturn true
+                },
                 isConnected = true,
-                isGroup = true,
-                isPreviewMode = true,
                 customSubtitleList = listOf(userA, userB),
             )
         )
@@ -656,8 +702,8 @@ class ChatAppBarTest {
         val userC = "C"
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn true },
                 isConnected = true,
-                isGroup = true,
                 customSubtitleList = listOf(userA, userB, userC),
             )
         )
@@ -672,9 +718,11 @@ class ChatAppBarTest {
         val userC = "C"
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { isGroup } doReturn true
+                    on { isPreview } doReturn true
+                },
                 isConnected = true,
-                isGroup = true,
-                isPreviewMode = true,
                 customSubtitleList = listOf(userA, userB, userC),
             )
         )
@@ -689,8 +737,8 @@ class ChatAppBarTest {
         val more = "3"
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn true },
                 isConnected = true,
-                isGroup = true,
                 customSubtitleList = listOf(userA, userB, userC, more),
             )
         )
@@ -710,9 +758,11 @@ class ChatAppBarTest {
         val more = "2"
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { isGroup } doReturn true
+                    on { isPreview } doReturn true
+                },
                 isConnected = true,
-                isGroup = true,
-                isPreviewMode = true,
                 customSubtitleList = listOf(userA, userB, userC, more),
             )
         )
@@ -750,8 +800,10 @@ class ChatAppBarTest {
     fun `test that audio call is shown but disabled when chat is a waiting room and I am not a morerator`() {
         initComposeRuleContent(
             ChatUiState(
-                myPermission = ChatRoomPermission.Standard,
-                isWaitingRoom = true,
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Standard
+                    on { isWaitingRoom } doReturn true
+                },
                 isConnected = true,
             )
         )
@@ -776,7 +828,7 @@ class ChatAppBarTest {
     fun `test that toolbar tap is disabled if is preview mode`() {
         initComposeRuleContent(
             ChatUiState(
-                isPreviewMode = true
+                chat = mock<ChatRoom> { on { isPreview } doReturn true },
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_APP_BAR).apply {
@@ -804,9 +856,11 @@ class ChatAppBarTest {
     fun `test that toolbar tap is disabled if not a group and my permission is read only`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.ReadOnly
+                    on { isGroup } doReturn false
+                },
                 isConnected = true,
-                isGroup = false,
-                myPermission = ChatRoomPermission.ReadOnly,
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_APP_BAR).apply {
@@ -820,8 +874,8 @@ class ChatAppBarTest {
     fun `test that toolbar tap is enabled if is a group`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn true },
                 isConnected = true,
-                isGroup = true
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_APP_BAR).apply {
@@ -835,9 +889,11 @@ class ChatAppBarTest {
     fun `test that toolbar tap is enabled if is not a group and I have moderator permission`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                    on { isGroup } doReturn false
+                },
                 isConnected = true,
-                isGroup = false,
-                myPermission = ChatRoomPermission.Moderator,
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_APP_BAR).apply {
@@ -876,22 +932,26 @@ class ChatAppBarTest {
 
     private fun uiStateToShowUnmuteIn1on1Chat() =
         ChatUiState(
-            isGroup = false,
-            isPreviewMode = false,
+            chat = mock<ChatRoom> {
+                on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                on { isGroup } doReturn false
+                on { isPreview } doReturn false
+            },
             isJoining = false,
             isChatNotificationMute = true,
             isConnected = true,
-            myPermission = ChatRoomPermission.Moderator,
         )
 
     private fun uiStateToShowUnmuteInGroupChat(): ChatUiState =
         ChatUiState(
-            isGroup = true,
-            isPreviewMode = false,
+            chat = mock<ChatRoom> {
+                on { isGroup } doReturn true
+                on { isPreview } doReturn false
+                on { isActive } doReturn true
+            },
             isJoining = false,
             isChatNotificationMute = true,
             isConnected = true,
-            isActive = true,
         )
 
     @Test
@@ -917,7 +977,7 @@ class ChatAppBarTest {
     @Test
     fun `test that unmute menu action is not shown when chat is in preview mode`() {
         initComposeRuleContent(
-            uiStateToShowUnmuteIn1on1Chat().copy(isPreviewMode = true)
+            uiStateToShowUnmuteIn1on1Chat().copy(chat = mock<ChatRoom> { on { isPreview } doReturn true })
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
@@ -937,7 +997,7 @@ class ChatAppBarTest {
     @Test
     fun `test that unmute menu action is not shown when it is a group chat but not active`() {
         initComposeRuleContent(
-            uiStateToShowUnmuteInGroupChat().copy(isActive = false)
+            uiStateToShowUnmuteInGroupChat().copy(chat = mock<ChatRoom> { on { isActive } doReturn false })
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
@@ -947,7 +1007,7 @@ class ChatAppBarTest {
     @Test
     fun `test that unmute menu action is not shown when it is a 1on1 chat but I am not a moderator`() {
         initComposeRuleContent(
-            uiStateToShowUnmuteIn1on1Chat().copy(myPermission = ChatRoomPermission.ReadOnly)
+            uiStateToShowUnmuteIn1on1Chat().copy(chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.ReadOnly })
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
@@ -983,22 +1043,26 @@ class ChatAppBarTest {
 
     private fun uiStateToShowMuteIn1on1Chat() =
         ChatUiState(
-            isGroup = false,
-            isPreviewMode = false,
+            chat = mock<ChatRoom> {
+                on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                on { isGroup } doReturn false
+                on { isPreview } doReturn false
+            },
             isJoining = false,
             isChatNotificationMute = false,
             isConnected = true,
-            myPermission = ChatRoomPermission.Moderator,
         )
 
     private fun uiStateToShowMuteInGroupChat(): ChatUiState =
         ChatUiState(
-            isGroup = true,
-            isPreviewMode = false,
+            chat = mock<ChatRoom> {
+                on { isGroup } doReturn true
+                on { isPreview } doReturn false
+                on { isActive } doReturn true
+            },
             isJoining = false,
             isChatNotificationMute = true,
             isConnected = true,
-            isActive = true,
         )
 
     @Test
@@ -1024,7 +1088,7 @@ class ChatAppBarTest {
     @Test
     fun `test that mute menu action is not shown when chat is in preview mode`() {
         initComposeRuleContent(
-            uiStateToShowMuteIn1on1Chat().copy(isPreviewMode = true)
+            uiStateToShowMuteIn1on1Chat().copy(chat = mock<ChatRoom> { on { isPreview } doReturn true })
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
@@ -1044,7 +1108,7 @@ class ChatAppBarTest {
     @Test
     fun `test that mute menu action is not shown when it is a group chat but not active`() {
         initComposeRuleContent(
-            uiStateToShowMuteInGroupChat().copy(isActive = false)
+            uiStateToShowMuteInGroupChat().copy(chat = mock<ChatRoom> { on { isActive } doReturn false })
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
@@ -1054,7 +1118,7 @@ class ChatAppBarTest {
     @Test
     fun `test that mute menu action is not shown when it is a 1on1 chat but I am not a moderator`() {
         initComposeRuleContent(
-            uiStateToShowMuteIn1on1Chat().copy(myPermission = ChatRoomPermission.ReadOnly)
+            uiStateToShowMuteIn1on1Chat().copy(chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.ReadOnly })
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_UNMUTE_ACTION)
@@ -1075,7 +1139,7 @@ class ChatAppBarTest {
     @Test
     fun `test that Clear menu action is not available when is preview mode`() {
         initComposeRuleContent(
-            ChatUiState(isPreviewMode = true)
+            ChatUiState(chat = mock<ChatRoom> { on { isPreview } doReturn true })
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION)
@@ -1096,9 +1160,11 @@ class ChatAppBarTest {
     fun `test that Clear menu action is not available in group chat with standard permissions`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Standard
+                    on { isGroup } doReturn true
+                },
                 isConnected = true,
-                isGroup = true,
-                myPermission = ChatRoomPermission.Standard,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
@@ -1110,9 +1176,11 @@ class ChatAppBarTest {
     fun `test that Clear menu action is not available in 1on1 chat with read only permissions`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.ReadOnly
+                    on { isGroup } doReturn false
+                },
                 isConnected = true,
-                isGroup = false,
-                myPermission = ChatRoomPermission.ReadOnly,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
@@ -1122,9 +1190,11 @@ class ChatAppBarTest {
     fun `test that Clear menu action is available in group chat with moderator permissions`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                    on { isGroup } doReturn true
+                },
                 isConnected = true,
-                isGroup = true,
-                myPermission = ChatRoomPermission.Moderator,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
@@ -1135,9 +1205,11 @@ class ChatAppBarTest {
     fun `test that Clear menu action is available in 1on1 chat with standard permissions`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Standard
+                    on { isGroup } doReturn false
+                },
                 isConnected = true,
-                isGroup = false,
-                myPermission = ChatRoomPermission.Standard,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
@@ -1148,8 +1220,10 @@ class ChatAppBarTest {
     fun `test that end call for all is available when the chat is a group my permission is moderator and has a call in this chat`() {
         initComposeRuleContent(
             ChatUiState(
-                isGroup = true,
-                myPermission = ChatRoomPermission.Moderator,
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                    on { isGroup } doReturn true
+                },
                 callInThisChat = mock(),
                 isConnected = true,
             )
@@ -1166,8 +1240,10 @@ class ChatAppBarTest {
     fun `test that end call for all is not available when the chat is a group my permission is moderator and hasn't a call in this chat`() {
         initComposeRuleContent(
             ChatUiState(
-                isGroup = true,
-                myPermission = ChatRoomPermission.Moderator,
+                chat = mock<ChatRoom> {
+                    on { ownPrivilege } doReturn ChatRoomPermission.Moderator
+                    on { isGroup } doReturn true
+                },
                 callInThisChat = null,
                 isConnected = true,
             )
@@ -1191,9 +1267,7 @@ class ChatAppBarTest {
 
     @Test
     fun `test that Archive menu action is not available if is preview mode`() {
-        initComposeRuleContent(
-            ChatUiState(isPreviewMode = true)
-        )
+        initComposeRuleContent(ChatUiState(chat = mock<ChatRoom> { on { isPreview } doReturn true }))
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertDoesNotExist()
     }
@@ -1209,9 +1283,7 @@ class ChatAppBarTest {
 
     @Test
     fun `test that Archive menu action is not available if already archived`() {
-        initComposeRuleContent(
-            ChatUiState(isArchived = true)
-        )
+        initComposeRuleContent(ChatUiState(chat = mock<ChatRoom> { on { isArchived } doReturn true }))
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).assertDoesNotExist()
         composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_CLEAR_ACTION).assertDoesNotExist()
     }
@@ -1220,8 +1292,8 @@ class ChatAppBarTest {
     fun `test that Archive menu action is available if is not archived`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isArchived } doReturn false },
                 isConnected = true,
-                isArchived = false,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
@@ -1237,7 +1309,7 @@ class ChatAppBarTest {
         }
         initComposeRuleContent(
             ChatUiState(
-                isPreviewMode = false,
+                chat = mock<ChatRoom> { on { isPreview } doReturn false },
                 messages = listOf(textMessage),
                 isConnected = true,
             )
@@ -1252,9 +1324,11 @@ class ChatAppBarTest {
         val invalidMessage = mock<InvalidUiMessage.UnrecognizableInvalidUiMessage>()
         initComposeRuleContent(
             ChatUiState(
-                isPreviewMode = false,
+                chat = mock<ChatRoom> {
+                    on { isPreview } doReturn false
+                    on { isArchived } doReturn false
+                },
                 isConnected = true,
-                isArchived = false,
                 messages = listOf(invalidMessage),
             )
         )
@@ -1267,8 +1341,8 @@ class ChatAppBarTest {
     fun `test that Unarchive menu action is available if it is archived`() {
         initComposeRuleContent(
             ChatUiState(
+                chat = mock<ChatRoom> { on { isArchived } doReturn true },
                 isConnected = true,
-                isArchived = true,
             )
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()

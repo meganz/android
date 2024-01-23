@@ -37,6 +37,7 @@ import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.shared.theme.MegaAppTheme
 
@@ -319,11 +320,34 @@ private fun ChatAppBarPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatAppBar(
             uiState = ChatUiState(
-                title = "My Name",
+                chat = ChatRoom(
+                    chatId = 1L,
+                    ownPrivilege = ChatRoomPermission.Standard,
+                    numPreviewers = 0L,
+                    peerPrivilegesByHandles = mapOf(),
+                    peerCount = 0,
+                    peerHandlesList = emptyList(),
+                    peerPrivilegesList = emptyList(),
+                    isGroup = false,
+                    isPublic = false,
+                    isPreview = false,
+                    authorizationToken = "authorizationToken",
+                    title = "My name",
+                    hasCustomTitle = false,
+                    unreadCount = 0,
+                    userTyping = 0,
+                    userHandle = 0,
+                    isActive = true,
+                    isArchived = false,
+                    retentionTime = 0,
+                    creationTime = 0,
+                    isMeeting = false,
+                    isWaitingRoom = false,
+                    isOpenInvite = false,
+                    isSpeakRequest = false,
+                ),
                 userChatStatus = UserChatStatus.Away,
                 isChatNotificationMute = true,
-                isPrivateChat = true,
-                myPermission = ChatRoomPermission.Standard,
             )
         )
     }
