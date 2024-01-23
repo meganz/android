@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.CoroutineScope
@@ -12,18 +13,24 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.model.mapper.NodeBottomSheetActionMapper
+import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -32,6 +39,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -49,8 +57,13 @@ class NodeOptionsBottomSheetViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
     private val moveNodesUseCase = mock<MoveNodesUseCase>()
+    private val copyNodesUseCase = mock<CopyNodesUseCase>()
+    private val setCopyLatestTargetPathUseCase = mock<SetCopyLatestTargetPathUseCase>()
     private val setMoveLatestTargetPathUseCase = mock<SetMoveLatestTargetPathUseCase>()
     private val deleteNodeVersionsUseCase = mock<DeleteNodeVersionsUseCase>()
+    private val moveRequestMessageMapper = mock<MoveRequestMessageMapper>()
+    private val versionHistoryRemoveMessageMapper = mock<VersionHistoryRemoveMessageMapper>()
+    private val snackBarHandler = mock<SnackBarHandler>()
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
     }
@@ -73,8 +86,13 @@ class NodeOptionsBottomSheetViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             moveNodesUseCase = moveNodesUseCase,
+            copyNodesUseCase = copyNodesUseCase,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
+            setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
+            snackBarHandler = snackBarHandler,
+            moveRequestMessageMapper = moveRequestMessageMapper,
+            versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper,
             applicationScope = applicationScope,
         )
     }
@@ -95,42 +113,37 @@ class NodeOptionsBottomSheetViewModelTest {
     }
 
     @Test
-    fun `test that moveRequestResults are updated properly in state`() =
+    fun `test that moveNodesUseCase is called when move node method is invoked`() =
         runTest {
-            whenever(moveNodesUseCase(emptyMap())).thenThrow(RuntimeException())
+            whenever(moveNodesUseCase(emptyMap())).thenThrow(ForeignNodeException())
             initViewModel()
             viewModel.moveNodes(emptyMap())
+            verify(moveNodesUseCase).invoke(emptyMap())
             viewModel.state.test {
-                val stateOne = awaitItem()
-                assertThat(stateOne.moveRequestResult).isInstanceOf(
-                    StateEventWithContentTriggered::class.java
-                )
-            }
-            viewModel.markHandleMoveRequestResult()
-            viewModel.state.test {
-                val stateTwo = awaitItem()
-                assertThat(stateTwo.moveRequestResult).isInstanceOf(
-                    StateEventWithContentConsumed::class.java
-                )
+                val state = awaitItem()
+                assertThat(state.showForeignNodeDialog).isInstanceOf(StateEvent.Triggered::class.java)
             }
         }
 
     @Test
     fun `test that node name collision results are updated properly in state`() = runTest {
-        whenever(checkNodesNameCollisionUseCase(listOf(1).associate {
-            Pair(1, sampleNode.id.longValue)
-        }, NodeNameCollisionType.MOVE)).thenReturn(
+        whenever(
+            checkNodesNameCollisionUseCase(
+                nodes = listOf(element = 1).associate { Pair(1, sampleNode.id.longValue) },
+                type = NodeNameCollisionType.MOVE,
+            ),
+        ).thenReturn(
             NodeNameCollisionResult(
-                emptyMap(),
-                emptyMap(),
-                NodeNameCollisionType.MOVE
+                noConflictNodes = emptyMap(),
+                conflictNodes = emptyMap(),
+                type = NodeNameCollisionType.MOVE
             )
         )
         initViewModel()
         viewModel.checkNodesNameCollision(
-            listOf(1),
-            sampleNode.id.longValue,
-            NodeNameCollisionType.MOVE
+            nodes = listOf(element = 1),
+            targetNode = sampleNode.id.longValue,
+            type = NodeNameCollisionType.MOVE
         )
         viewModel.state.test {
             val stateOne = awaitItem()
@@ -160,22 +173,34 @@ class NodeOptionsBottomSheetViewModelTest {
     fun `test that deleteNodeVersionsUseCase is triggered when delete node history is called`() =
         runTest {
             whenever(deleteNodeVersionsUseCase(sampleNode.id)).thenReturn(Unit)
+            whenever(versionHistoryRemoveMessageMapper(anyOrNull())).thenReturn("")
             initViewModel()
             viewModel.deleteVersionHistory(sampleNode.id.longValue)
-            viewModel.state.test {
-                val stateOne = awaitItem()
-                assertThat(stateOne.deleteVersionsResult).isInstanceOf(
-                    StateEventWithContentTriggered::class.java
-                )
-            }
             verify(deleteNodeVersionsUseCase).invoke(sampleNode.id)
-            viewModel.markHandleDeleteVersionsResult()
+            verify(versionHistoryRemoveMessageMapper).invoke(anyOrNull())
+            verify(snackBarHandler).postSnackbarMessage("")
+        }
+
+    @Test
+    fun `test that copyNodesUseCase is called when copy node method is invoked`() =
+        runTest {
+            whenever(copyNodesUseCase(emptyMap())).thenThrow(ForeignNodeException())
+            initViewModel()
+            viewModel.copyNodes(emptyMap())
+            verify(copyNodesUseCase).invoke(emptyMap())
             viewModel.state.test {
-                val stateTwo = awaitItem()
-                assertThat(stateTwo.deleteVersionsResult).isInstanceOf(
-                    StateEventWithContentConsumed::class.java
-                )
+                val state = awaitItem()
+                assertThat(state.showForeignNodeDialog).isInstanceOf(StateEvent.Triggered::class.java)
             }
         }
+
+    @Test
+    fun `test that setCopyTargetPath is called when copy node is success`() = runTest {
+        whenever(copyNodesUseCase(mapOf(sampleNode.id.longValue to sampleNode.id.longValue)))
+            .thenReturn(MoveRequestResult.GeneralMovement(0, 0))
+        initViewModel()
+        viewModel.copyNodes(mapOf(sampleNode.id.longValue to sampleNode.id.longValue))
+        verify(setCopyLatestTargetPathUseCase).invoke(sampleNode.id.longValue)
+    }
 
 }

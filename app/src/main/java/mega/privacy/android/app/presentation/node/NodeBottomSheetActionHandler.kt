@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
+import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.MoveMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.core.ui.model.MenuAction
@@ -41,6 +42,19 @@ class NodeBottomSheetActionHandler(
             }
         }
 
+    private val selectCopyNodeActivityLauncher =
+        (activity as? AppCompatActivity)?.registerForActivityResult(
+            SelectFolderToMoveActivityContract()
+        ) { result ->
+            result?.let {
+                nodeOptionsBottomSheetViewModel.checkNodesNameCollision(
+                    it.first.toList(),
+                    it.second,
+                    NodeNameCollisionType.COPY
+                )
+            }
+        }
+
     private val versionsActivityLauncher =
         (activity as? AppCompatActivity)?.registerForActivityResult(
             VersionsFileActivityContract()
@@ -60,6 +74,7 @@ class NodeBottomSheetActionHandler(
         when (action) {
             is VersionsMenuAction -> versionsActivityLauncher?.launch(node.id.longValue)
             is MoveMenuAction -> selectMoveNodeActivityLauncher?.launch(longArrayOf(node.id.longValue))
+            is CopyMenuAction -> selectCopyNodeActivityLauncher?.launch(longArrayOf(node.id.longValue))
 
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }

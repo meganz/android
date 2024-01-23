@@ -21,6 +21,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
@@ -47,6 +50,10 @@ import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeD
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
+import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
+import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
+import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
+import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.domain.entity.ThemeMode
@@ -57,7 +64,6 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchType
-import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
@@ -65,8 +71,6 @@ import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchResetFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchVideosFilterPressedEvent
-import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
-import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -144,6 +148,7 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
     /**
      * onCreate
      */
+    @OptIn(ExperimentalMaterialNavigationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -170,6 +175,8 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
             )
 
             val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
+            val bottomSheetNavigator = rememberBottomSheetNavigator()
+            val navHostController = rememberNavController(bottomSheetNavigator)
 
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 Scaffold(
@@ -194,6 +201,8 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
                         showSortOrderBottomSheet = ::showSortOrderBottomSheet,
                         trackAnalytics = ::trackAnalytics,
                         nodeBottomSheetActionHandler = bottomSheetActionHandler,
+                        navHostController = navHostController,
+                        bottomSheetNavigator = bottomSheetNavigator,
                         onBackPressed = {
                             if (viewModel.state.value.selectedNodes.isNotEmpty()) {
                                 viewModel.clearSelection()
@@ -254,20 +263,6 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
                     }
                 )
                 EventEffect(
-                    event = nodeOptionsBottomSheetState.moveRequestResult,
-                    onConsumed = nodeOptionsBottomSheetViewModel::markHandleMoveRequestResult,
-                    action = {
-                        if (it.isSuccess) {
-                            val data = it.getOrThrow()
-                            scaffoldState.snackbarHostState.showSnackbar(
-                                moveRequestMessageMapper(data)
-                            )
-                        } else {
-                            manageCopyMoveException(it.exceptionOrNull())
-                        }
-                    }
-                )
-                EventEffect(
                     event = nodeOptionsBottomSheetState.nodeNameCollisionResult,
                     onConsumed = nodeOptionsBottomSheetViewModel::markHandleNodeNameCollisionResult,
                     action = {
@@ -275,11 +270,15 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
                     }
                 )
                 EventEffect(
-                    event = nodeOptionsBottomSheetState.deleteVersionsResult,
-                    onConsumed = nodeOptionsBottomSheetViewModel::markHandleDeleteVersionsResult,
+                    event = nodeOptionsBottomSheetState.showForeignNodeDialog,
+                    onConsumed = nodeOptionsBottomSheetViewModel::markForeignNodeDialogShown,
+                    action = { navHostController.navigate(searchForeignNodeDialog) }
+                )
+                EventEffect(
+                    event = nodeOptionsBottomSheetState.showQuotaDialog,
+                    onConsumed = nodeOptionsBottomSheetViewModel::markQuotaDialogShown,
                     action = {
-                        val snackBarMessage = handleVersionHistoryRemoveEvent(it)
-                        scaffoldState.snackbarHostState.showSnackbar(snackBarMessage)
+                        navHostController.navigate(searchOverQuotaDialog.plus("/${it}"))
                     }
                 )
             }
@@ -290,36 +289,6 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
         }
     }
 
-    private fun handleVersionHistoryRemoveEvent(
-        it: Throwable?,
-    ): String {
-        return if (it == null) {
-            getString(R.string.version_history_deleted)
-        } else {
-            when (it) {
-                is VersionsNotDeletedException -> {
-                    val versionsDeleted =
-                        it.totalRequestedToDelete - it.totalNotDeleted
-                    val firstLine = getString(
-                        R.string.version_history_deleted_erroneously
-                    )
-                    val secondLine = resources.getQuantityString(
-                        R.plurals.versions_deleted_succesfully,
-                        versionsDeleted,
-                        versionsDeleted
-                    )
-                    val thirdLine = resources.getQuantityString(
-                        R.plurals.versions_not_deleted,
-                        it.totalNotDeleted,
-                        it.totalNotDeleted
-                    )
-                    "$firstLine\n$secondLine\n$thirdLine"
-                }
-
-                else -> getString(R.string.general_text_error)
-            }
-        }
-    }
 
     private fun handleClick(node: TypedNode?) = node?.let {
         when (it) {
@@ -444,6 +413,7 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
         if (result.noConflictNodes.isNotEmpty()) {
             when (result.type) {
                 NodeNameCollisionType.MOVE -> nodeOptionsBottomSheetViewModel.moveNodes(result.noConflictNodes)
+                NodeNameCollisionType.COPY -> nodeOptionsBottomSheetViewModel.copyNodes(result.noConflictNodes)
                 else -> Timber.d("Not implemented")
             }
         }

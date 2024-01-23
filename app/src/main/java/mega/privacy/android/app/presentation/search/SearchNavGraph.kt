@@ -16,11 +16,13 @@ import mega.privacy.android.app.presentation.search.model.navigation.removeNodeL
 import mega.privacy.android.app.presentation.search.navigation.cannotVerifyUserNavigation
 import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetNavigation
 import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.foreignNodeDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.leaveFolderShareDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDeleteNavigation
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetNavigation
-import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
-import mega.privacy.android.app.presentation.search.navigation.leaveFolderShareDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.overQuotaDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.removeShareFolderDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.shareFolderDialogNavigation
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -102,6 +104,8 @@ internal fun NavGraphBuilder.searchNavGraph(
         navHostController = navHostController,
         searchActivityViewModel = searchActivityViewModel
     )
+    overQuotaDialogNavigation(navHostController = navHostController)
+    foreignNodeDialogNavigation(navHostController = navHostController)
 }
 
 /**
