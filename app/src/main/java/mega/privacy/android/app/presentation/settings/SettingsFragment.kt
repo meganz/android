@@ -113,6 +113,8 @@ class SettingsFragment :
             }
         }
 
+    private var cookiePolicyLink: String? = null
+
     private var playerServiceViewModelGateway: AudioPlayerServiceViewModelGateway? = null
     private val mediaServiceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -208,6 +210,7 @@ class SettingsFragment :
                     findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
                     updatePasscodeLockSummary(state.passcodeLock)
                     updateSubFolderMediaDiscovery(state.subFolderMediaDiscoveryChecked)
+                    cookiePolicyLink = state.cookiePolicyLink
                 }
             }
         }
@@ -415,9 +418,19 @@ class SettingsFragment :
 
             KEY_CANCEL_ACCOUNT -> deleteAccountClicked()
             KEY_ABOUT_COOKIE_POLICY -> {
-                val intent = Intent(context, WebViewActivity::class.java)
-                intent.data = Uri.parse(COOKIES_URI)
-                startActivity(intent)
+                if (cookiePolicyLink == null) {
+                    view?.let {
+                        Snackbar.make(
+                            it,
+                            R.string.general_something_went_wrong_error,
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    val intent = Intent(context, WebViewActivity::class.java)
+                    intent.data = Uri.parse(cookiePolicyLink)
+                    startActivity(intent)
+                }
             }
 
             KEY_COOKIE_SETTINGS -> startActivity(

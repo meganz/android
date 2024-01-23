@@ -18,6 +18,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
 import mega.privacy.android.app.presentation.settings.SettingsViewModel
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.MegaException
@@ -37,6 +38,7 @@ import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
@@ -48,13 +50,18 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.TEST_USER_ACCOUNT
 import test.mega.privacy.android.app.extensions.asHotFlow
+import java.util.stream.Stream
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -84,6 +91,7 @@ class SettingsViewModelTest {
         mock<SetSubFolderMediaDiscoveryEnabledUseCase>()
     private val monitorSubFolderMediaDiscoverySettingsUseCase =
         mock<MonitorSubFolderMediaDiscoverySettingsUseCase>()
+    private val getSessionTransferURLUseCase = mock<GetSessionTransferURLUseCase>()
 
     @BeforeAll
     fun initialise() {
@@ -143,6 +151,8 @@ class SettingsViewModelTest {
 
         isCameraUploadsEnabledUseCase.stub { onBlocking { invoke() }.thenReturn(false) }
 
+        getSessionTransferURLUseCase.stub { onBlocking { invoke(any()) }.thenReturn(null) }
+
         initViewModel()
     }
 
@@ -174,6 +184,7 @@ class SettingsViewModelTest {
             monitorPasscodeLockPreferenceUseCase = monitorPasscodeLockPreferenceUseCase,
             setSubFolderMediaDiscoveryEnabledUseCase = setSubFolderMediaDiscoveryEnabledUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase = monitorSubFolderMediaDiscoverySettingsUseCase,
+            getSessionTransferURLUseCase = getSessionTransferURLUseCase,
         )
     }
 
@@ -184,7 +195,8 @@ class SettingsViewModelTest {
             getFeatureFlagValueUseCase,
             monitorHideRecentActivityUseCase,
             getAccountDetailsUseCase,
-            monitorSubFolderMediaDiscoverySettingsUseCase
+            monitorSubFolderMediaDiscoverySettingsUseCase,
+            getSessionTransferURLUseCase,
         )
     }
 
@@ -488,4 +500,31 @@ class SettingsViewModelTest {
                 }
         }
 
+    @ParameterizedTest(name = "when all Feature Flags are {0} and sessionTransferURL is {1} then cookiePolicyLink is: {2}")
+    @MethodSource("provideCookiePolicyLinkParameters")
+    fun `test that cookiePolicyLink is updated`(
+        isEnabled: Boolean,
+        link: String?,
+        expected: String?,
+    ) = runTest {
+        initViewModel()
+        whenever(getSessionTransferURLUseCase(any())).thenReturn(link)
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(any()) }.thenReturn(isEnabled)
+        }
+        advanceUntilIdle()
+        underTest.uiState.map { it.cookiePolicyLink }
+            .distinctUntilChanged()
+            .test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+    }
+
+    private fun provideCookiePolicyLinkParameters(): Stream<Arguments> {
+        return Stream.of(
+            Arguments.of(true, "https://mega.nz/testcookie", "https://mega.nz/testcookie"),
+            Arguments.of(true, null, null),
+            Arguments.of(false, null, COOKIES_URI)
+        )
+    }
 }

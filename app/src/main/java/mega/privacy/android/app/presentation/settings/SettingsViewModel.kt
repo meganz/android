@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.SettingsState
 import mega.privacy.android.domain.entity.UserAccount
@@ -39,6 +41,7 @@ import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
@@ -74,6 +77,7 @@ class SettingsViewModel @Inject constructor(
     private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase,
     private val setSubFolderMediaDiscoveryEnabledUseCase: SetSubFolderMediaDiscoveryEnabledUseCase,
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
+    private val getSessionTransferURLUseCase: GetSessionTransferURLUseCase,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -104,6 +108,7 @@ class SettingsViewModel @Inject constructor(
             accountType = "",
             passcodeLock = false,
             subFolderMediaDiscoveryChecked = true,
+            cookiePolicyLink = null,
         )
     }
 
@@ -184,7 +189,23 @@ class SettingsViewModel @Inject constructor(
                 state.update(it)
             }
         }
+        getCookiePolicyLink()
+    }
 
+    /**
+     * Get link for Cookie policy page
+     */
+    private fun getCookiePolicyLink() = viewModelScope.launch {
+        runCatching {
+            val isAdsFeatureEnabled = getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement) &&
+                    getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
+                    getFeatureFlagValueUseCase(ABTestFeatures.adse)
+            val url =
+                if (isAdsFeatureEnabled) getSessionTransferURLUseCase("cookie") else COOKIES_URI
+            state.update { it.copy(cookiePolicyLink = url) }
+        }.onFailure {
+            Timber.e("Failed to fetch session transfer URL for Cookie Policy page: ${it.message}")
+        }
     }
 
     private suspend fun monitorPasscodePreference() =
