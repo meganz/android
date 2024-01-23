@@ -13,6 +13,7 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import mega.privacy.android.data.facade.debugWorkInfo
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import timber.log.Timber
@@ -23,6 +24,7 @@ internal class NewMediaWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
+    private val crashReporter: CrashReporter,
 ) : CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         runCatching {
@@ -30,7 +32,7 @@ internal class NewMediaWorker @AssistedInject constructor(
                 Timber.d("Capture new media")
                 startCameraUploadUseCase()
                 // it's one time job, we need to re-listen again
-                scheduleWork(context, true)
+                scheduleWork(context, true, crashReporter)
             }
         }.onFailure {
             Timber.e(it)
@@ -41,13 +43,17 @@ internal class NewMediaWorker @AssistedInject constructor(
 
     companion object {
         private const val NEW_MEDIA_WORKER_TAG = "NEW_MEDIA_WORKER_TAG"
-        suspend fun scheduleWork(context: Context, isForce: Boolean = false) {
+        suspend fun scheduleWork(
+            context: Context,
+            isForce: Boolean = false,
+            crashReporter: CrashReporter,
+        ) {
             val workManager =
                 WorkManager.getInstance(context.applicationContext)
             if (isForce
                 || isQueuedOrRunning(workManager)
             ) {
-                workManager.debugWorkInfo()
+                workManager.debugWorkInfo(crashReporter)
 
                 val photoCheckBuilder =
                     OneTimeWorkRequest.Builder(NewMediaWorker::class.java)

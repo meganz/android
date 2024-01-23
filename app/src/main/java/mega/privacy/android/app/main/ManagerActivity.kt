@@ -302,6 +302,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -457,6 +458,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var workManager: WorkManager
+
+    @Inject
+    lateinit var crashReporter: CrashReporter
 
     @Inject
     @ApplicationScope
@@ -1396,7 +1400,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             dbH.setInvalidateSdkCache(false)
             applicationScope.launch {
-                MegaMessageService.getToken(workManager)
+                MegaMessageService.getToken(workManager, crashReporter)
             }
             userInfoViewModel.getUserInfo()
             preloadPayment()

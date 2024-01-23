@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAct
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import nz.mega.sdk.MegaApiJava
@@ -81,6 +82,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper,
+    private val crashReporter: CrashReporter,
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
@@ -396,7 +398,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun listenToNewMedia() {
         withContext(ioDispatcher) {
             if (isCameraUploadsEnabled() == true) {
-                NewMediaWorker.scheduleWork(context, false)
+                NewMediaWorker.scheduleWork(context, false, crashReporter)
             }
         }
     }

@@ -117,6 +117,7 @@ class DefaultCameraUploadRepositoryTest {
             context = mock(),
             cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
             cameraUploadsStatusInfoMapper = cameraUploadsStatusInfoMapper,
+            crashReporter = mock(),
         )
     }
 
