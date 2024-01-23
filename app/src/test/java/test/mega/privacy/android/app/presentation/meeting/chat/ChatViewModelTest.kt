@@ -28,6 +28,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuActi
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
+import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRequest
@@ -1429,8 +1430,8 @@ internal class ChatViewModelTest {
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {
-            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
-                .content?.inviteContactToChatResult
+            val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content as InfoToShow.InviteContactResult).result
             assertThat(result).isInstanceOf(InviteContactToChatResult.MultipleContactsAdded::class.java)
         }
     }
@@ -1449,8 +1450,8 @@ internal class ChatViewModelTest {
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {
-            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
-                .content?.inviteContactToChatResult
+            val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content as InfoToShow.InviteContactResult).result
             assertThat(result).isInstanceOf(InviteContactToChatResult.OnlyOneContactAdded::class.java)
         }
     }
@@ -1474,8 +1475,8 @@ internal class ChatViewModelTest {
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {
-            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
-                .content?.inviteContactToChatResult
+            val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content as InfoToShow.InviteContactResult).result
             assertThat(result).isInstanceOf(InviteContactToChatResult.AlreadyExistsError::class.java)
         }
     }
@@ -1501,8 +1502,8 @@ internal class ChatViewModelTest {
             initTestClass()
             underTest.inviteContactsToChat(chatId, contactList)
             underTest.state.test {
-                val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
-                    .content?.inviteContactToChatResult
+                val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                    .content as InfoToShow.InviteContactResult).result
                 assertThat(result).isInstanceOf(InviteContactToChatResult.GeneralError::class.java)
             }
         }
@@ -1533,8 +1534,8 @@ internal class ChatViewModelTest {
         initTestClass()
         underTest.inviteContactsToChat(chatId, contactList)
         underTest.state.test {
-            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
-                .content?.inviteContactToChatResult
+            val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content as InfoToShow.InviteContactResult).result
             assertThat(result).isInstanceOf(InviteContactToChatResult.SomeAddedSomeNot::class.java)
             (result as InviteContactToChatResult.SomeAddedSomeNot).let {
                 assertThat(it.success).isEqualTo(2)
@@ -1594,8 +1595,8 @@ internal class ChatViewModelTest {
             initTestClass()
             underTest.handleActionPress(ChatRoomMenuAction.Unmute)
             underTest.state.test {
-                val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
-                    .content?.chatPushNotificationMuteOption
+                val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                    .content as InfoToShow.MuteOptionResult).result
                 assertThat(result).isInstanceOf(ChatPushNotificationMuteOption.Unmute::class.java)
             }
         }
@@ -1627,8 +1628,8 @@ internal class ChatViewModelTest {
 
         underTest.clearChatHistory()
         underTest.state.test {
-            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
-                .content?.stringId
+            val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content as InfoToShow.SimpleString).stringId
             assertThat(result).isEqualTo(
                 if (success) R.string.clear_history_success
                 else R.string.clear_history_error
@@ -1643,23 +1644,24 @@ internal class ChatViewModelTest {
         verify(sendStatisticsMeetingsUseCase).invoke(any())
     }
 
-    @ParameterizedTest(name = " with success {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that archive finish`(
-        success: Boolean,
-    ) = runTest {
-        if (success) {
-            whenever(archiveChatUseCase(chatId = chatId, true)).thenReturn(Unit)
-        } else {
-            whenever(archiveChatUseCase(chatId = chatId, true)).thenThrow(RuntimeException())
-        }
-
+    @Test
+    fun `test that archive finish with error and shows it`() = runTest {
+        whenever(archiveChatUseCase(chatId = chatId, true)).thenThrow(RuntimeException())
         underTest.archiveChat()
         underTest.state.test {
-            val actual = awaitItem()
-            val result = (actual.infoToShowEvent as StateEventWithContentTriggered)
-                .content?.stringId
-            assertThat(result).isEqualTo(if (success) null else R.string.error_archive_chat)
+            val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered).content
+                    as InfoToShow.StringWithParams).stringId
+            assertThat(result).isEqualTo(R.string.error_archive_chat)
+        }
+    }
+
+    @Test
+    fun `test that archive finish with success`() = runTest {
+        whenever(archiveChatUseCase(chatId = chatId, true)).thenReturn(Unit)
+        underTest.archiveChat()
+        underTest.state.test {
+            assertThat(awaitItem().infoToShowEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
         }
     }
 
@@ -1992,9 +1994,9 @@ internal class ChatViewModelTest {
         underTest.mutePushNotification(muteOption)
 
         underTest.state.test {
-            val item =
-                (awaitItem().infoToShowEvent as StateEventWithContentTriggered).content?.chatPushNotificationMuteOption
-            assertThat(item).isEqualTo(muteOption)
+            val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content as InfoToShow.MuteOptionResult).result
+            assertThat(result).isEqualTo(muteOption)
         }
     }
 
@@ -2085,8 +2087,8 @@ internal class ChatViewModelTest {
         whenever(openChatLinkUseCase(chatLink, null, false)).thenThrow(RuntimeException())
         initTestClass()
         underTest.state.test {
-            val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
-                .content?.stringId
+            val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content as InfoToShow.SimpleString).stringId
             assertThat(result).isEqualTo(R.string.error_general_nodes)
         }
     }
@@ -2103,8 +2105,8 @@ internal class ChatViewModelTest {
             )
             initTestClass()
             underTest.state.test {
-                val result = (awaitItem().infoToShowEvent as StateEventWithContentTriggered)
-                    .content?.stringId
+                val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                    .content as InfoToShow.SimpleString).stringId
                 assertThat(result).isEqualTo(R.string.invalid_chat_link)
             }
         }

@@ -241,9 +241,9 @@ class ChatViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e(it)
                     val infoToShow = if (it is ResourceDoesNotExistChatException) {
-                        InfoToShow(stringId = R.string.invalid_chat_link)
+                        InfoToShow.SimpleString(stringId = R.string.invalid_chat_link)
                     } else {
-                        InfoToShow(stringId = R.string.error_general_nodes)
+                        InfoToShow.SimpleString(stringId = R.string.error_general_nodes)
                     }
                     _state.update { state -> state.copy(infoToShowEvent = triggered(infoToShow)) }
                 }
@@ -661,9 +661,7 @@ class ChatViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         infoToShowEvent = triggered(
-                            InfoToShow(
-                                chatPushNotificationMuteOption = ChatPushNotificationMuteOption.Unmute
-                            )
+                            InfoToShow.MuteOptionResult(result = ChatPushNotificationMuteOption.Unmute)
                         )
                     )
                 }
@@ -703,9 +701,7 @@ class ChatViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         infoToShowEvent = triggered(
-                            InfoToShow(
-                                chatPushNotificationMuteOption = option
-                            )
+                            InfoToShow.MuteOptionResult(result = option)
                         )
                     )
                 }
@@ -724,8 +720,8 @@ class ChatViewModel @Inject constructor(
                 _state.update { state ->
                     state.copy(
                         infoToShowEvent = triggered(
-                            InfoToShow(
-                                inviteContactToChatResult = inviteParticipantResultMapper(result)
+                            InfoToShow.InviteContactResult(
+                                result = inviteParticipantResultMapper(result)
                             )
                         )
                     )
@@ -744,7 +740,7 @@ class ChatViewModel @Inject constructor(
                 .onSuccess {
                     _state.update { state ->
                         state.copy(
-                            infoToShowEvent = triggered(InfoToShow(stringId = R.string.clear_history_success))
+                            infoToShowEvent = triggered(InfoToShow.SimpleString(stringId = R.string.clear_history_success))
                         )
                     }
                 }
@@ -752,7 +748,7 @@ class ChatViewModel @Inject constructor(
                     Timber.e("Error clearing chat history $it")
                     _state.update { state ->
                         state.copy(
-                            infoToShowEvent = triggered(InfoToShow(stringId = R.string.clear_history_error))
+                            infoToShowEvent = triggered(InfoToShow.SimpleString(stringId = R.string.clear_history_error))
                         )
                     }
                 }
@@ -791,7 +787,7 @@ class ChatViewModel @Inject constructor(
                     _state.update { state ->
                         state.copy(
                             infoToShowEvent = triggered(
-                                InfoToShow(
+                                InfoToShow.StringWithParams(
                                     stringId = R.string.error_archive_chat,
                                     args = state.title?.let { title -> listOf(title) }.orEmpty()
                                 )
@@ -813,7 +809,7 @@ class ChatViewModel @Inject constructor(
                     _state.update { state ->
                         state.copy(
                             infoToShowEvent = triggered(
-                                InfoToShow(
+                                InfoToShow.StringWithParams(
                                     stringId = R.string.error_unarchive_chat,
                                     args = state.title?.let { title -> listOf(title) }.orEmpty()
                                 )

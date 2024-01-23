@@ -730,14 +730,13 @@ internal fun ChatView(
     }
 }
 
-private fun getInfoToShow(infoToShow: InfoToShow, context: Context): String? = with(infoToShow) {
-    inviteContactToChatResult?.toInfoText(context)
-        ?: chatPushNotificationMuteOption?.toInfoText(context)
-        ?: if (args.isNotEmpty()) {
-            stringId?.let { context.getString(it, *args.toTypedArray()) }
-        } else {
-            stringId?.let { context.getString(it) }
-        }
+private fun getInfoToShow(infoToShow: InfoToShow, context: Context) = with(infoToShow) {
+    when (this) {
+        is InfoToShow.InviteContactResult -> result.toInfoText(context)
+        is InfoToShow.MuteOptionResult -> result.toInfoText(context)
+        is InfoToShow.StringWithParams -> context.getString(stringId, *args.toTypedArray())
+        is InfoToShow.SimpleString -> context.getString(stringId)
+    }
 }
 
 /**
