@@ -35,6 +35,7 @@ class CookieSettingsFragment : SettingsBaseFragment(),
     private var adsCookiesPreference: SwitchPreferenceCompat? = null
     private var policiesPreference: TwoButtonsPreference? = null
     private var showAdsCookiePreference = false
+    private var cookiePolicyLink: String? = null
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_cookie)
@@ -56,6 +57,8 @@ class CookieSettingsFragment : SettingsBaseFragment(),
             showAdsCookiePreference = uiState.showAdsCookiePreference
             adsCookiesPreference?.isVisible = showAdsCookiePreference
             updateAcceptCookiesPreference(showAdsCookiePreference)
+            cookiePolicyLink =
+                if (showAdsCookiePreference) uiState.cookiePolicyWithAdsLink else COOKIE_URL
         }
         viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showCookies)
         viewModel.onUpdateResult().observe(viewLifecycleOwner) { success ->
@@ -73,10 +76,16 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         adsCookiesPreference?.onPreferenceChangeListener = this
         policiesPreference?.apply {
             setButton1(getString(R.string.settings_about_cookie_policy)) {
-                openBrowser("https://mega.nz/cookie".toUri())
+                cookiePolicyLink?.let { openBrowser(it.toUri()) } ?: run {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.general_something_went_wrong_error,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
             setButton2(getString(R.string.settings_about_privacy_policy)) {
-                openBrowser("https://mega.nz/privacy".toUri())
+                openBrowser(PRIVACY_URL.toUri())
             }
         }
     }
@@ -138,5 +147,10 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         startActivity(Intent(requireContext(), WebViewActivity::class.java).apply {
             data = uri
         })
+    }
+
+    companion object {
+        private const val COOKIE_URL = "https://mega.nz/cookie"
+        private const val PRIVACY_URL = "https://mega.nz/privacy"
     }
 }

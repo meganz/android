@@ -2,18 +2,21 @@ package mega.privacy.android.domain.usecase.setting
 
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.featureflag.ABTestFeature
+import mega.privacy.android.domain.entity.settings.cookie.CookieDialog
 import mega.privacy.android.domain.entity.settings.cookie.CookieDialogType
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import javax.inject.Inject
 
 /**
  * Use Case to get the type of cookie dialog to be shown.
  */
-class GetCookieDialogTypeUseCase @Inject constructor(
+class GetCookieDialogUseCase @Inject constructor(
     private val shouldShowCookieDialogWithAdsUseCase: ShouldShowCookieDialogWithAdsUseCase,
     private val shouldShowGenericCookieDialogUseCase: ShouldShowGenericCookieDialogUseCase,
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
+    private val getSessionTransferURLUseCase: GetSessionTransferURLUseCase,
 ) {
     /**
      *  Get the type of cookie dialog to be shown.
@@ -27,7 +30,7 @@ class GetCookieDialogTypeUseCase @Inject constructor(
         inAppAdvertisementFeature: Feature,
         isAdsEnabledFeature: ABTestFeature,
         isExternalAdsEnabledFeature: ABTestFeature,
-    ): CookieDialogType {
+    ): CookieDialog {
         val cookieSettings = getCookieSettingsUseCase()
 
         val shouldShowCookieDialogWithAds = shouldShowCookieDialogWithAdsUseCase(
@@ -44,13 +47,14 @@ class GetCookieDialogTypeUseCase @Inject constructor(
             ) {
                 updateCookieSettingsUseCase(cookieSettings - CookieType.ADVERTISEMENT)
             }
-            CookieDialogType.CookieDialogWithAds
+            val cookiePolicyLink = getSessionTransferURLUseCase("cookie")
+            CookieDialog(CookieDialogType.CookieDialogWithAds, cookiePolicyLink)
         } else {
             val shouldShowGenericCookieDialog = shouldShowGenericCookieDialogUseCase(cookieSettings)
             if (shouldShowGenericCookieDialog) {
-                CookieDialogType.GenericCookieDialog
+                CookieDialog(CookieDialogType.GenericCookieDialog, "https://mega.nz/cookie")
             } else {
-                CookieDialogType.None
+                CookieDialog(CookieDialogType.None)
             }
         }
     }

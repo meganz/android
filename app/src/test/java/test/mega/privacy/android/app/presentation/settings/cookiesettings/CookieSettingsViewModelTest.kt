@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.presentation.settings.cookiesettings
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -11,12 +11,12 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieSettingsViewModel
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -45,6 +45,7 @@ class CookieSettingsViewModelTest {
     private val updateCrashAndPerformanceReportersUseCase =
         mock<UpdateCrashAndPerformanceReportersUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getSessionTransferURLUseCase = mock<GetSessionTransferURLUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -62,7 +63,8 @@ class CookieSettingsViewModelTest {
             updateCookieSettingsUseCase = updateCookieSettingsUseCase,
             broadcastCookieSettingsSavedUseCase = broadcastCookieSettingsSavedUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase
+            updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase,
+            getSessionTransferURLUseCase = getSessionTransferURLUseCase,
         )
     }
 
@@ -73,7 +75,8 @@ class CookieSettingsViewModelTest {
             updateCookieSettingsUseCase,
             broadcastCookieSettingsSavedUseCase,
             getFeatureFlagValueUseCase,
-            updateCrashAndPerformanceReportersUseCase
+            updateCrashAndPerformanceReportersUseCase,
+            getSessionTransferURLUseCase,
         )
     }
 
@@ -84,9 +87,16 @@ class CookieSettingsViewModelTest {
         )
     }
 
+    private fun provideCookiePolicyWithAdsLinkParameters(): Stream<Arguments> {
+        return Stream.of(
+            Arguments.of("https://mega.nz/testcookie", "https://mega.nz/testcookie"),
+            Arguments.of(null, null)
+        )
+    }
+
     @ParameterizedTest(name = "when all Feature flags are: {0}, then showAdsCookiePreference is: {1}")
     @MethodSource("provideShowAdsCookiePreferenceParameters")
-    fun `Test that showAdsCookiePreference is updated when checkForInAppAdvertisementUseCase is successful`(
+    fun `test that showAdsCookiePreference is updated when checkForInAppAdvertisementUseCase is successful`(
         input: Boolean,
         expected: Boolean,
     ) = runTest {
@@ -94,12 +104,26 @@ class CookieSettingsViewModelTest {
         initTestClass()
         underTest.uiState.test {
             val state = awaitItem()
-            Truth.assertThat(state.showAdsCookiePreference).isEqualTo(expected)
+            assertThat(state.showAdsCookiePreference).isEqualTo(expected)
+        }
+    }
+
+    @ParameterizedTest(name = "when sessionTransferURL is {0} then cookiePolicyWithAdsLink is: {1}")
+    @MethodSource("provideCookiePolicyWithAdsLinkParameters")
+    fun `test that cookiePolicyWithAdsLink is updated when getSessionTransferURLUseCase is successful`(
+        link: String?,
+        expected: String?,
+    ) = runTest {
+        whenever(getSessionTransferURLUseCase(any())).thenReturn(link)
+        initTestClass()
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.cookiePolicyWithAdsLink).isEqualTo(expected)
         }
     }
 
     @Test
-    fun `Test that showAdsCookiePreference is false when checkForInAppAdvertisementUseCase is not successful`() =
+    fun `test that showAdsCookiePreference is false when checkForInAppAdvertisementUseCase is not successful`() =
         runTest {
             whenever(getFeatureFlagValueUseCase(any())).thenAnswer {
                 throw Exception()
@@ -107,7 +131,7 @@ class CookieSettingsViewModelTest {
             initTestClass()
             underTest.uiState.test {
                 val state = awaitItem()
-                Truth.assertThat(state.showAdsCookiePreference).isEqualTo(false)
+                assertThat(state.showAdsCookiePreference).isEqualTo(false)
             }
         }
 

@@ -16,6 +16,7 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.model.CookieS
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
@@ -30,6 +31,7 @@ class CookieSettingsViewModel @Inject constructor(
     private val broadcastCookieSettingsSavedUseCase: BroadcastCookieSettingsSavedUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
+    private val getSessionTransferURLUseCase: GetSessionTransferURLUseCase,
 ) : BaseRxViewModel() {
 
     private val _uiState = MutableStateFlow(CookieSettingsUIState())
@@ -55,6 +57,7 @@ class CookieSettingsViewModel @Inject constructor(
     init {
         loadCookieSettings()
         checkForInAppAdvertisement()
+        getCookiePolicyWithAdsLink()
     }
 
     fun onEnabledCookies(): LiveData<MutableSet<CookieType>> = enabledCookies
@@ -96,6 +99,23 @@ class CookieSettingsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Get link for Cookie policy with Ads
+     */
+    private fun getCookiePolicyWithAdsLink() {
+        viewModelScope.launch {
+            var url: String? = null
+            runCatching {
+                url = getSessionTransferURLUseCase("cookie")
+            }.onFailure {
+                Timber.e("Failed to fetch session transfer URL: ${it.message}")
+            }.onSuccess {
+                _uiState.update { state ->
+                    state.copy(cookiePolicyWithAdsLink = url)
+                }
+            }
+        }
+    }
 
     /**
      * Check if showAdsCookiePreference is enabled
