@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -15,7 +14,6 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.RectF
-import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -41,6 +39,10 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.icon.pack.R as iconPackR
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import mega.privacy.android.domain.usecase.meeting.HangChatCallByChatIdUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -53,14 +55,15 @@ import javax.inject.Inject
 /**
  * Service to handle mega calls
  *
- * @property callChangesObserver [CallChangesObserver]
- * @property megaApi            [MegaApiAndroid]
- * @property megaChatApi        [MegaChatApiAndroid]
- * @property app                [MegaApplication]
+ * @property callChangesObserver            [CallChangesObserver]
+ * @property hangChatCallByChatIdUseCase    [HangChatCallByChatIdUseCase]
+ * @property megaApi                        [MegaApiAndroid]
+ * @property megaChatApi                    [MegaChatApiAndroid]
+ * @property app                            [MegaApplication]
 
  */
 @AndroidEntryPoint
-class CallService : Service() {
+class CallService : LifecycleService() {
 
     @Inject
     lateinit var callChangesObserver: CallChangesObserver
@@ -71,6 +74,9 @@ class CallService : Service() {
 
     @Inject
     lateinit var megaChatApi: MegaChatApiAndroid
+
+    @Inject
+    lateinit var hangChatCallByChatIdUseCase: HangChatCallByChatIdUseCase
 
     var app: MegaApplication? = null
 
@@ -126,6 +132,7 @@ class CallService : Service() {
      */
     override fun onCreate() {
         super.onCreate()
+
         app = application as MegaApplication
 
         mBuilderCompat = NotificationCompat.Builder(this, notificationChannelId)
@@ -148,12 +155,16 @@ class CallService : Service() {
     /**
      * Bind service
      */
-    override fun onBind(intent: Intent?): IBinder? = null
+    override fun onBind(intent: Intent): IBinder? {
+        super.onBind(intent)
+        return null
+    }
 
     /**
      * Start service work
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         if (intent == null) {
             stopSelf()
             return START_NOT_STICKY
@@ -177,6 +188,14 @@ class CallService : Service() {
 
         showCallInProgressNotification()
         return START_NOT_STICKY
+    }
+
+    /**
+     * Task removed
+     */
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        lifecycleScope.launch { hangChatCallByChatIdUseCase(currentChatId) }
     }
 
     /**
