@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -31,6 +32,8 @@ import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUse
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import org.junit.jupiter.api.AfterAll
@@ -71,6 +74,8 @@ class StartDownloadTransfersViewModelTest {
         mock<SetAskBeforeLargeDownloadsSettingUseCase>()
     private val getOrCreateStorageDownloadLocationUseCase =
         mock<GetOrCreateStorageDownloadLocationUseCase>()
+    private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
+    private val getCurrentDownloadSpeedUseCase = mock<GetCurrentDownloadSpeedUseCase>()
 
 
     private val node: TypedFileNode = mock()
@@ -80,6 +85,7 @@ class StartDownloadTransfersViewModelTest {
     @BeforeAll
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        initialStub()
         underTest = StartDownloadTransfersViewModel(
             getOfflinePathForNodeUseCase,
             getOrCreateStorageDownloadLocationUseCase,
@@ -92,6 +98,8 @@ class StartDownloadTransfersViewModelTest {
             fileSizeStringMapper,
             isAskBeforeLargeDownloadsSettingUseCase,
             setAskBeforeLargeDownloadsSettingUseCase,
+            monitorOngoingActiveTransfersUseCase,
+            getCurrentDownloadSpeedUseCase,
         )
 
     }
@@ -111,7 +119,14 @@ class StartDownloadTransfersViewModelTest {
             fileSizeStringMapper,
             isAskBeforeLargeDownloadsSettingUseCase,
             setAskBeforeLargeDownloadsSettingUseCase,
+            monitorOngoingActiveTransfersUseCase,
+            getCurrentDownloadSpeedUseCase,
         )
+        initialStub()
+    }
+
+    private fun initialStub() {
+        whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
     }
 
     @AfterAll

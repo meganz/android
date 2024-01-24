@@ -41,9 +41,13 @@ abstract class RatingHandler(val context: Context) {
     fun showRatingBaseOnSpeedAndSize(
         size: Long,
         speed: Long,
-        listener: OnCompleteListener
+        listener: OnCompleteListener,
     ) {
-        if (!meetBaseCondition() || size <= 0 || speed <= 0) return
+        if (!meetBaseCondition()) {
+            listener.onConditionsUnmet()
+            return
+        }
+        if (size <= 0 || speed <= 0) return
 
         val condition = byteToMb(size) >= SIZE_LIMIT && byteToMb(speed) >= SPEED_LIMIT
 
@@ -215,5 +219,13 @@ abstract class RatingHandler(val context: Context) {
  *
  */
 fun interface OnCompleteListener {
+    /**
+     * Event launched when the rating dialog has been shown to the user
+     */
     fun onComplete()
+
+    /**
+     * Event launched when conditions to show the rating dialog are unmet, so it has no sense to keep checking
+     */
+    fun onConditionsUnmet() {}
 }

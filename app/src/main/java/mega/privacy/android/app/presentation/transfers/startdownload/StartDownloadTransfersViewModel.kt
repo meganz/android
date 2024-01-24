@@ -10,16 +10,20 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferEvent
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
@@ -32,6 +36,8 @@ import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUse
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import timber.log.Timber
@@ -54,6 +60,8 @@ class StartDownloadTransfersViewModel @Inject constructor(
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val isAskBeforeLargeDownloadsSettingUseCase: IsAskBeforeLargeDownloadsSettingUseCase,
     private val setAskBeforeLargeDownloadsSettingUseCase: SetAskBeforeLargeDownloadsSettingUseCase,
+    private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
+    private val getCurrentDownloadSpeedUseCase: GetCurrentDownloadSpeedUseCase,
 ) : ViewModel() {
 
     private var currentInProgressJob: Job? = null
@@ -64,6 +72,10 @@ class StartDownloadTransfersViewModel @Inject constructor(
      * the state of the view
      */
     internal val uiState = _uiState.asStateFlow()
+
+    init {
+        checkRating()
+    }
 
     /**
      * It starts downloading the related nodes, asking for confirmation in case of large transfers if corresponds
@@ -192,6 +204,7 @@ class StartDownloadTransfersViewModel @Inject constructor(
                     }
                 }.last()
             }
+        checkRating()
         if (terminalEvent == MultiTransferEvent.ScanningFoldersFinished) toDoAfterProcessing?.invoke()
         _uiState.updateEventAndClearProgress(
             when (terminalEvent) {
@@ -248,6 +261,36 @@ class StartDownloadTransfersViewModel @Inject constructor(
         return false
     }
 
+    private var checkShowRating = true
+    private fun checkRating() {
+        //check download speed and size to show rating
+        if (checkShowRating) {
+            viewModelScope.launch {
+                monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD).conflate().takeWhile {
+                    checkShowRating
+                }.collect { (transferTotals, paused) ->
+                    if (checkShowRating && !paused && transferTotals.totalFileTransfers > 0) {
+                        val currentDownloadSpeed = getCurrentDownloadSpeedUseCase()
+                        RatingHandlerImpl().showRatingBaseOnSpeedAndSize(
+                            size = transferTotals.totalFileTransfers.toLong(),
+                            speed = currentDownloadSpeed.toLong(),
+                            listener = object : OnCompleteListener {
+                                override fun onComplete() {
+                                    checkShowRating = false
+                                }
+
+
+                                override fun onConditionsUnmet() {
+                                    checkShowRating = false
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     private fun MutableStateFlow<StartDownloadTransferViewState>.updateEventAndClearProgress(
         event: StartDownloadTransferEvent?,
     ) =
@@ -258,5 +301,6 @@ class StartDownloadTransfersViewModel @Inject constructor(
             )
         }
 
-    private fun String.ensureSuffix(suffix: String) = this.removeSuffix(suffix).plus(suffix)
+    private fun String.ensureSuffix(suffix: String) =
+        if (this.endsWith(suffix)) this else this.plus(suffix)
 }

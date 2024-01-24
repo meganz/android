@@ -15,7 +15,7 @@ import timber.log.Timber
  *
  * @param context Context for getting rating dialog
  */
-class RatingHandlerImpl(context: Context) : RatingHandler(context) {
+class RatingHandlerImpl(context: Context = MegaApplication.getInstance()) : RatingHandler(context) {
 
     override fun showReviewDialog(context: Context, listener: OnCompleteListener) {
         val manager: ReviewManager = ReviewManagerFactory.create(context)
