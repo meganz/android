@@ -43,10 +43,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -68,6 +66,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
+import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBar
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContactsAddedDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EnableGeolocationDialog
@@ -90,7 +89,6 @@ import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
-import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.ChatObserverIndicator
 import mega.privacy.android.core.ui.controls.chat.ScrollToBottomFab
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
@@ -182,6 +180,23 @@ internal fun ChatView(
             bottomPadding = bottomPadding,
             onUserUpdateHandled = onUserUpdateHandled,
             onMessageLongClick = onMessageLongClick,
+        )
+    },
+    bottomBar: @Composable (
+        uiState: ChatUiState,
+        showEmojiPicker: Boolean,
+        onSendClick: (String) -> Unit,
+        onAttachmentClick: () -> Unit,
+        onEmojiClick: () -> Unit,
+        interactionSourceTextInput: MutableInteractionSource,
+    ) -> Unit = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, interactionSourceTextInput ->
+        ChatBottomBar(
+            uiState = state,
+            showEmojiPicker = showEmojiPicker,
+            onSendClick = onSendClicked,
+            onAttachmentClick = onAttachmentClick,
+            onEmojiClick = onEmojiClick,
+            interactionSourceTextInput = interactionSourceTextInput,
         )
     },
     onSendClick: (String) -> Unit = {},
@@ -502,36 +517,26 @@ internal fun ChatView(
                 },
                 bottomBar = {
                     if (haveWritePermission) {
-                        Column {
-                            UserTypingView(
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                                usersTyping = uiState.usersTyping,
-                            )
-                            ChatInputTextToolbar(
-                                onAttachmentClick = {
-                                    coroutineScope.launch {
-                                        toolbarModalSheetState.show()
-                                    }
-                                },
-                                text = uiState.sendingText,
-                                placeholder = stringResource(
-                                    R.string.type_message_hint_with_customized_title,
-                                    uiState.title.orEmpty()
-                                ),
-                                showEmojiPicker = showEmojiPicker,
-                                onSendClick = onSendClick,
-                                onEmojiClick = {
-                                    showEmojiPicker = !showEmojiPicker
+                        bottomBar(
+                            uiState,
+                            showEmojiPicker,
+                            onSendClick,
+                            {
+                                coroutineScope.launch {
+                                    toolbarModalSheetState.show()
+                                }
+                            },
+                            {
+                                showEmojiPicker = !showEmojiPicker
 
-                                    if (showEmojiPicker) {
-                                        keyboardController?.hide()
-                                    } else {
-                                        keyboardController?.show()
-                                    }
-                                },
-                                interactionSource = interactionSourceTextInput
-                            )
-                        }
+                                if (showEmojiPicker) {
+                                    keyboardController?.hide()
+                                } else {
+                                    keyboardController?.show()
+                                }
+                            },
+                            interactionSourceTextInput,
+                        )
                     }
                     JoinChatButton(isPreviewMode = isPreviewMode, isJoining = isJoining) {
                         if (isAnonymousMode) {

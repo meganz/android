@@ -12,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -40,6 +41,7 @@ import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.chat.ChatRoomPreference
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
@@ -67,6 +69,7 @@ import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomPreferenceUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeavingChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
@@ -230,6 +233,9 @@ internal class ChatViewModelTest {
     private val sendLocationMessageUseCase = mock<SendLocationMessageUseCase>()
     private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
     private val testDispatcher = UnconfinedTestDispatcher()
+    private val monitorChatRoomPreferenceUseCase = mock<MonitorChatRoomPreferenceUseCase> {
+        on { invoke(any()) } doReturn emptyFlow()
+    }
 
     @BeforeAll
     fun setup() {
@@ -309,6 +315,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorContactCacheUpdates() } doReturn emptyFlow()
         wheneverBlocking { monitorJoiningChatUseCase(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorLeavingChatUseCase(any()) } doReturn emptyFlow()
+        whenever(monitorChatRoomPreferenceUseCase(any())) doReturn emptyFlow()
     }
 
     private fun initTestClass() {
@@ -365,7 +372,8 @@ internal class ChatViewModelTest {
             monitorLeavingChatUseCase = monitorLeavingChatUseCase,
             applicationScope = CoroutineScope(testDispatcher),
             sendLocationMessageUseCase = sendLocationMessageUseCase,
-            sendChatAttachmentsUseCase = sendChatAttachmentsUseCase
+            sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
+            monitorChatRoomPreferenceUseCase = monitorChatRoomPreferenceUseCase
         )
     }
 
@@ -2336,6 +2344,16 @@ internal class ChatViewModelTest {
             underTest.onAttachFiles(files)
             verify(sendChatAttachmentsUseCase).invoke(chatId, expected)
         }
+
+    @Test
+    fun `test that sending text updates state correctly`() = runTest {
+        whenever(monitorChatRoomPreferenceUseCase(chatId))
+            .thenReturn(flowOf(ChatRoomPreference(1L, "draft message")))
+        initTestClass()
+        underTest.state.test {
+            assertThat(awaitItem().sendingText).isEqualTo("draft message")
+        }
+    }
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

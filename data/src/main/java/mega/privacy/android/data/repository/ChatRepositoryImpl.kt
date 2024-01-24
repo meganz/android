@@ -1317,7 +1317,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun getChatRoomPreference(chatId: Long): Flow<ChatRoomPreference> {
+    override fun monitorChatRoomPreference(chatId: Long): Flow<ChatRoomPreference> {
         return megaLocalRoomGateway.getChatRoomPreference(chatId)
             .filterNotNull()
     }

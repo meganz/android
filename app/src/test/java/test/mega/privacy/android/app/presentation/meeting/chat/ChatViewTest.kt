@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
@@ -15,6 +16,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuActi
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_VIDEO_CALL_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
+import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBarContent
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_ENABLE_GEOLOCATION_DIALOG
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_LOCATION
@@ -135,6 +137,22 @@ class ChatViewTest {
     }
 
     @Test
+    fun `test that enable geolocation dialog shows when geolocation is not enabled and user clicks on location`() {
+        initComposeRuleContent(
+            ChatUiState(
+                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Standard },
+                isGeolocationEnabled = false,
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_ATTACHMENT_ICON, true).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_LOCATION).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_ENABLE_GEOLOCATION_DIALOG).assertIsDisplayed()
+    }
+
+    @Test
     fun `test that end call for all dialog show when click to end call for all menu option`() {
         initComposeRuleContent(
             ChatUiState(
@@ -157,29 +175,25 @@ class ChatViewTest {
             .assertIsDisplayed()
     }
 
-    @Test
-    fun `test that enable geolocation dialog shows when geolocation is not enabled and user clicks on location`() {
-        initComposeRuleContent(
-            ChatUiState(
-                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Standard },
-                isGeolocationEnabled = false,
-            )
-        )
-        composeTestRule.onNodeWithTag(TEST_TAG_ATTACHMENT_ICON, true).apply {
-            assertIsDisplayed()
-            performClick()
-        }
-        composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_LOCATION).performClick()
-        composeTestRule.onNodeWithTag(TEST_TAG_ENABLE_GEOLOCATION_DIALOG).assertIsDisplayed()
-    }
-
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             ChatView(
                 uiState = state,
                 onBackPressed = {},
                 onMenuActionPressed = actionPressed,
-                messageListView = { _, _, _, _ -> }
+                messageListView = { _, _, _, _ -> },
+                bottomBar = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, interactionSourceTextInput ->
+                    ChatBottomBarContent(
+                        uiState = state,
+                        textFieldValue = TextFieldValue(state.sendingText),
+                        showEmojiPicker = showEmojiPicker,
+                        onSendClick = onSendClicked,
+                        onAttachmentClick = onAttachmentClick,
+                        onEmojiClick = onEmojiClick,
+                        onTextChange = {},
+                        interactionSourceTextInput = interactionSourceTextInput,
+                    )
+                }
             )
         }
     }

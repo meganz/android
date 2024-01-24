@@ -67,13 +67,14 @@ fun ChatInputTextToolbar(
     onAttachmentClick: () -> Unit,
     onSendClick: (String) -> Unit,
     onEmojiClick: () -> Unit,
+    onTextChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    textFieldValue: TextFieldValue = TextFieldValue(text),
 ) {
     var isInputExpanded by rememberSaveable { mutableStateOf(false) }
     var showExpandButton by remember { mutableStateOf(false) }
     var isRoundedShape by remember { mutableStateOf(false) }
-    var textFieldValue by remember { mutableStateOf(TextFieldValue(text)) }
     LaunchedEffect(textFieldValue.text) {
         if (textFieldValue.text.isEmpty()) {
             isInputExpanded = false
@@ -118,7 +119,7 @@ fun ChatInputTextToolbar(
                 ChatTextField(
                     textFieldValue = textFieldValue,
                     placeholder = placeholder,
-                    onTextChange = { textFieldValue = it },
+                    onTextChange = onTextChange,
                     onEmojiClick = onEmojiClick,
                     isEmojiPickerShown = showEmojiPicker,
                     modifier = Modifier
@@ -149,7 +150,6 @@ fun ChatInputTextToolbar(
                             .clickable(onClick = {
                                 onSendClick(textFieldValue.text)
                                 isInputExpanded = false
-                                textFieldValue = TextFieldValue("")
                             }),
                         painter = painterResource(id = R.drawable.ic_send),
                         contentDescription = "Send icon",
@@ -160,7 +160,7 @@ fun ChatInputTextToolbar(
             AnimatedVisibility(visible = showEmojiPicker) {
                 MegaEmojiPickerView(
                     onEmojiPicked = {
-                        textFieldValue = addPickedEmojiToInput(it.emoji, textFieldValue)
+                        onTextChange(addPickedEmojiToInput(it.emoji, textFieldValue))
                     },
                     showEmojiPicker = showEmojiPicker,
                 )
@@ -199,6 +199,7 @@ private fun ChatInputTextToolbarPlaceholderPreview(
             onAttachmentClick = {},
             onSendClick = {},
             onEmojiClick = {},
+            onTextChange = {},
         )
     }
 }
@@ -216,6 +217,7 @@ private fun ChatInputTextToolbarLongTextPreview(
             onAttachmentClick = {},
             onSendClick = {},
             onEmojiClick = {},
+            onTextChange = {},
         )
     }
 }

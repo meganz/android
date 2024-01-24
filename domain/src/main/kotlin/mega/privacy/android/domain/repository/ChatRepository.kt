@@ -964,10 +964,10 @@ interface ChatRepository {
     suspend fun setChatDraftMessage(chatId: Long, draftMessage: String)
 
     /**
-     * Get chat room preference
+     * Monitor chat room preference
      *
      * @param chatId   Chat id
      * @return         Chat room preference
      */
-    fun getChatRoomPreference(chatId: Long): Flow<ChatRoomPreference>
+    fun monitorChatRoomPreference(chatId: Long): Flow<ChatRoomPreference>
 }

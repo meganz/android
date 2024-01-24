@@ -44,9 +44,11 @@ class ChatInputTextToolbarTest {
                 text = text,
                 placeholder = placeHolder,
                 showEmojiPicker = false,
-                {},
-                {},
-                {})
+                onAttachmentClick = {},
+                onSendClick = {},
+                onEmojiClick = {},
+                onTextChange = {},
+            )
         }
     }
 }

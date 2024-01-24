@@ -14,7 +14,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.database.dao.ChatRoomPreferenceDao
-import mega.privacy.android.data.database.entity.ChatRoomPreferenceEntity
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -1000,7 +999,7 @@ class ChatRepositoryImplTest {
         val message = "message"
         val model = ChatRoomPreference(chatId, message)
         whenever(megaLocalRoomGateway.getChatRoomPreference(chatId)).thenReturn(flowOf(model))
-        underTest.getChatRoomPreference(chatId).test {
+        underTest.monitorChatRoomPreference(chatId).test {
             assertThat(awaitItem()).isEqualTo(model)
             awaitComplete()
         }
