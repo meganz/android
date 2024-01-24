@@ -10,33 +10,36 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialog
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
+import mega.privacy.android.app.presentation.search.isFromToolbar
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
 
 internal fun NavGraphBuilder.shareFolderDialogNavigation(
     navHostController: NavHostController,
     searchActivityViewModel: SearchActivityViewModel,
+    nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
 ) {
     dialog(
-        route = "$searchFolderShareDialog/{$searchFolderShareDialogArgumentNodeId}/{$isFolderShareFromToolbar}",
+        route = "$searchFolderShareDialog/{$isFromToolbar}",
         arguments = listOf(
-            navArgument(searchFolderShareDialogArgumentNodeId) { type = NavType.LongType },
-            navArgument(isFolderShareFromToolbar) { type = NavType.BoolType }
+            navArgument(isFromToolbar) { type = NavType.BoolType }
         )
     ) {
         if (it.arguments?.getBoolean(isFromToolbar) == false) {
-            it.arguments?.getLong(searchFolderShareDialogArgumentNodeId)?.let { handle ->
+            val nodeOptionsState by nodeOptionsBottomSheetViewModel.state.collectAsStateWithLifecycle()
+            nodeOptionsState.node?.let { node ->
                 ShareFolderDialog(
-                    nodeIds = listOf(NodeId(handle)),
+                    nodeIds = listOf(NodeId(node.id.longValue)),
                     onDismiss = {
                         navHostController.navigateUp()
                     },
                     onOkClicked = {
                         launchFileContactListActivity(
                             navHostController.context,
-                            NodeId(handle)
+                            node.id
                         )
                     }
                 )
@@ -87,5 +90,3 @@ private fun launchMultipleShareFolder(context: Context, nodeId: List<NodeId>) {
 }
 
 internal const val searchFolderShareDialog = "search/folder_share"
-internal const val searchFolderShareDialogArgumentNodeId = "nodeId"
-internal const val isFolderShareFromToolbar = "isFromToolbar"

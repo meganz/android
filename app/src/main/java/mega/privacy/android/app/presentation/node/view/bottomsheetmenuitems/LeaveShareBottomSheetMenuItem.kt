@@ -35,7 +35,7 @@ class LeaveShareBottomSheetMenuItem @Inject constructor(
     ): () -> Unit = {
         onDismiss()
         navController.navigate(
-            searchLeaveShareFolderDialog.plus("/${node.id.longValue}").plus("/${false}")
+            searchLeaveShareFolderDialog.plus("/${false}")
         )
     }
 

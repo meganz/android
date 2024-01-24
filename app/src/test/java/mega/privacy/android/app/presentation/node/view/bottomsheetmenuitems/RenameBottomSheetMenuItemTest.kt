@@ -57,7 +57,7 @@ class RenameBottomSheetMenuItemTest {
         )
         onClickFunction()
         verify(onDismiss).invoke()
-        verify(navController).navigate("$searchRenameDialog/${node.id.longValue}")
+        verify(navController).navigate(searchRenameDialog)
     }
 
     private fun provideTestParameters() = Stream.of(

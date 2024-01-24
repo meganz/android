@@ -7,24 +7,27 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
+import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
+import mega.privacy.android.app.presentation.search.isFromToolbar
 
 internal fun NavGraphBuilder.leaveFolderShareDialogNavigation(
     navHostController: NavHostController,
     searchActivityViewModel: SearchActivityViewModel,
+    nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel
 ) {
     dialog(
-        route = "$searchLeaveShareFolderDialog/{$searchLeaveShareDialogArgumentNodeId}/{$isLeaveShareFromToolbar}",
+        route = "$searchLeaveShareFolderDialog/{$isFromToolbar}",
         arguments = listOf(
-            navArgument(searchRemoveFolderShareDialogArgumentNodeId) { type = NavType.LongType },
-            navArgument(isRemoveFolderShareFromToolbar) { type = NavType.BoolType }
+            navArgument(isFromToolbar) { type = NavType.BoolType }
         )
     ) {
         if (it.arguments?.getBoolean(isFromToolbar) == false) {
-            it.arguments?.getLong(searchRemoveFolderShareDialogArgumentNodeId)?.let { handle ->
+            val nodeOptionsState by nodeOptionsBottomSheetViewModel.state.collectAsStateWithLifecycle()
+            nodeOptionsState.node?.let { node ->
                 LeaveShareDialog(
-                    handles = listOf(handle),
+                    handles = listOf(node.id.longValue),
                     onDismiss = {
                         navHostController.navigateUp()
                     }
@@ -46,5 +49,3 @@ internal fun NavGraphBuilder.leaveFolderShareDialogNavigation(
 }
 
 internal const val searchLeaveShareFolderDialog = "search/leave_share_folder"
-internal const val searchLeaveShareDialogArgumentNodeId = "nodeId"
-internal const val isLeaveShareFromToolbar = "isFromToolbar"

@@ -32,7 +32,7 @@ class DeletePermanentlyBottomSheetMenuItem @Inject constructor(
         navController: NavHostController,
     ): () -> Unit = {
         onDismiss()
-        navController.navigate(route = "$moveToRubbishOrDelete/${node.id.longValue}/${true}/${false}")
+        navController.navigate(route = "$moveToRubbishOrDelete/${true}/${false}")
     }
 
     override val isDestructiveAction = true

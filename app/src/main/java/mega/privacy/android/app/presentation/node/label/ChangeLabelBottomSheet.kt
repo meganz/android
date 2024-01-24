@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,15 +29,20 @@ import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.NodeLabel
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 
 @Composable
 internal fun ChangeLabelBottomSheetContent(
+    node: Node,
     viewModel: ChangeLabelBottomSheetViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        viewModel.loadLabelInfo(node)
+    }
     ChangeLabelBottomSheetContent(
         state = state,
         onLabelSelected = { label ->

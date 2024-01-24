@@ -57,19 +57,20 @@ internal fun NavGraphBuilder.searchNavGraph(
     }
     moveToRubbishOrDeleteNavigation(
         navHostController = navHostController,
-        searchActivityViewModel = searchActivityViewModel
+        searchActivityViewModel = searchActivityViewModel,
+        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
     )
-    renameDialogNavigation(navHostController)
+    renameDialogNavigation(navHostController, nodeOptionsBottomSheetViewModel)
     nodeBottomSheetNavigation(
         nodeBottomSheetActionHandler,
         navHostController,
         nodeOptionsBottomSheetViewModel
     )
-    changeLabelBottomSheetNavigation(navHostController)
+    changeLabelBottomSheetNavigation(navHostController, nodeOptionsBottomSheetViewModel)
     changeNodeExtensionDialogNavigation(
         navHostController = navHostController,
+        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
     )
-    renameDialogNavigation(navHostController)
     cannotVerifyUserNavigation(navHostController)
     removeNodeLinkDialogNavigation(
         navHostController = navHostController,
@@ -77,15 +78,18 @@ internal fun NavGraphBuilder.searchNavGraph(
     )
     shareFolderDialogNavigation(
         navHostController = navHostController,
-        searchActivityViewModel = searchActivityViewModel
+        searchActivityViewModel = searchActivityViewModel,
+        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
     )
     removeShareFolderDialogNavigation(
         navHostController = navHostController,
-        searchActivityViewModel = searchActivityViewModel
+        searchActivityViewModel = searchActivityViewModel,
+        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
     )
     leaveFolderShareDialogNavigation(
         navHostController = navHostController,
-        searchActivityViewModel = searchActivityViewModel
+        searchActivityViewModel = searchActivityViewModel,
+        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
     )
     overQuotaDialogNavigation(navHostController = navHostController)
     foreignNodeDialogNavigation(navHostController = navHostController)
@@ -95,3 +99,4 @@ internal fun NavGraphBuilder.searchNavGraph(
  * Route for Search
  */
 internal const val searchRoute = "search/main"
+internal const val isFromToolbar = "isFromToolbar"

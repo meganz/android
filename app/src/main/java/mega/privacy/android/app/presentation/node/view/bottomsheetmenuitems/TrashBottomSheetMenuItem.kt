@@ -37,7 +37,7 @@ class TrashBottomSheetMenuItem @Inject constructor(
         navController: NavHostController,
     ): () -> Unit = {
         onDismiss()
-        navController.navigate(route = "$moveToRubbishOrDelete/${node.id.longValue}/${false}/${false}")
+        navController.navigate(route = "$moveToRubbishOrDelete/${false}/${false}")
     }
 
     override val isDestructiveAction: Boolean

@@ -77,9 +77,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
         navController: NavHostController,
     ): () -> Unit = {
         onDismiss()
-        navController.navigate(
-            route = changeLabelBottomSheetRoute.plus("/${node.id.longValue}")
-        )
+        navController.navigate(route = changeLabelBottomSheetRoute)
     }
 
     override val groupId: Int

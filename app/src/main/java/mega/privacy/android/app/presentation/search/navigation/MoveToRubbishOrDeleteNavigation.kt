@@ -9,28 +9,31 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
+import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialog
 import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
+import mega.privacy.android.app.presentation.search.isFromToolbar
 
 
 internal fun NavGraphBuilder.moveToRubbishOrDeleteNavigation(
     navHostController: NavHostController,
     searchActivityViewModel: SearchActivityViewModel,
+    nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel
 ) {
     dialog(
-        route = "$moveToRubbishOrDelete/{$argumentNodeId}/{$argumentIsInRubbish}/{$isFromToolbar}",
+        route = "$moveToRubbishOrDelete/{$argumentIsInRubbish}/{$isFromToolbar}",
         arguments = listOf(
-            navArgument(argumentNodeId) { type = NavType.LongType },
             navArgument(argumentIsInRubbish) { type = NavType.BoolType },
             navArgument(isFromToolbar) { type = NavType.BoolType },
         )
     ) {
         if (it.arguments?.getBoolean(isFromToolbar) == false) {
-            it.arguments?.getLong(argumentNodeId)?.let { nodeId ->
+            val nodeBottomSheetState by nodeOptionsBottomSheetViewModel.state.collectAsStateWithLifecycle()
+            nodeBottomSheetState.node?.let { node ->
                 MoveToRubbishOrDeleteNodeDialog(
                     onDismiss = { navHostController.navigateUp() },
-                    nodesList = listOf(nodeId),
+                    nodesList = listOf(node.id.longValue),
                     isNodeInRubbish = it.arguments?.getBoolean(argumentIsInRubbish) ?: false,
                 )
             }
@@ -53,6 +56,4 @@ internal fun NavGraphBuilder.moveToRubbishOrDeleteNavigation(
 }
 
 internal const val moveToRubbishOrDelete = "search/moveToRubbishOrDelete/isInRubbish"
-internal const val argumentNodeId = "nodeId"
 internal const val argumentIsInRubbish = "isInRubbish"
-internal const val isFromToolbar = "isFromToolbar"

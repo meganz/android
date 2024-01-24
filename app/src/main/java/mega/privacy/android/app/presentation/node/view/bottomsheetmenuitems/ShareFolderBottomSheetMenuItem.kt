@@ -65,7 +65,7 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
                 val backupType = checkBackupNodeTypeByHandleUseCase(node)
                 if (backupType != BackupNodeType.NonBackupNode) {
                     navController.navigate(
-                        searchFolderShareDialog.plus("/${node.id.longValue}").plus("/${false}")
+                        searchFolderShareDialog.plus("/${false}")
                     )
                 } else {
                     val intent = Intent().apply {

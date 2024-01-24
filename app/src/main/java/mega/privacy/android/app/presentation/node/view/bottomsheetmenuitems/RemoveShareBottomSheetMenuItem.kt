@@ -33,7 +33,7 @@ class RemoveShareBottomSheetMenuItem @Inject constructor() :
     ): () -> Unit = {
         onDismiss()
         navController.navigate(
-            searchRemoveFolderShareDialog.plus("/${node.id.longValue}").plus("/${false}")
+            searchRemoveFolderShareDialog.plus("/${false}")
         )
     }
 

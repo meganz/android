@@ -7,25 +7,28 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
+import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removesharefolder.RemoveShareFolderDialog
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
+import mega.privacy.android.app.presentation.search.isFromToolbar
 import mega.privacy.android.domain.entity.node.NodeId
 
 internal fun NavGraphBuilder.removeShareFolderDialogNavigation(
     navHostController: NavHostController,
     searchActivityViewModel: SearchActivityViewModel,
+    nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel
 ) {
     dialog(
-        route = "$searchRemoveFolderShareDialog/{$searchRemoveFolderShareDialogArgumentNodeId}/{$isRemoveFolderShareFromToolbar}",
+        route = "$searchRemoveFolderShareDialog/{$isFromToolbar}",
         arguments = listOf(
-            navArgument(searchRemoveFolderShareDialogArgumentNodeId) { type = NavType.LongType },
-            navArgument(isRemoveFolderShareFromToolbar) { type = NavType.BoolType }
+            navArgument(isFromToolbar) { type = NavType.BoolType }
         )
     ) {
         if (it.arguments?.getBoolean(isFromToolbar) == false) {
-            it.arguments?.getLong(searchRemoveFolderShareDialogArgumentNodeId)?.let { handle ->
+            val nodeOptionsState by nodeOptionsBottomSheetViewModel.state.collectAsStateWithLifecycle()
+            nodeOptionsState.node?.let { node ->
                 RemoveShareFolderDialog(
-                    nodeList = listOf(NodeId(handle)),
+                    nodeList = listOf(NodeId(node.id.longValue)),
                     onDismiss = {
                         navHostController.navigateUp()
                     }
@@ -47,5 +50,3 @@ internal fun NavGraphBuilder.removeShareFolderDialogNavigation(
 }
 
 internal const val searchRemoveFolderShareDialog = "search/folder_share_remove"
-internal const val searchRemoveFolderShareDialogArgumentNodeId = "nodeId"
-internal const val isRemoveFolderShareFromToolbar = "isFromToolbar"

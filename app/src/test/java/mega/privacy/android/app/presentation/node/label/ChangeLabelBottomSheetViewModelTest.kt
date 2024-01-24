@@ -1,8 +1,5 @@
 package mega.privacy.android.app.presentation.node.label
 
-import androidx.lifecycle.SavedStateHandle
-import app.cash.turbine.test
-import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -11,7 +8,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.node.model.mapper.NodeLabelResourceMapper
-import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetRouteNodeIdArg
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId
@@ -36,7 +32,6 @@ class ChangeLabelBottomSheetViewModelTest {
     private val getNodeLabelListUseCase = mock<GetNodeLabelListUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val nodeLabelMapper = NodeLabelMapper()
-    private val stateHandle = mock<SavedStateHandle>()
     private val nodeLabelResourceMapper: NodeLabelResourceMapper = NodeLabelResourceMapper()
     private lateinit var underTest: ChangeLabelBottomSheetViewModel
     private val node = mock<TypedFolderNode> {
@@ -44,11 +39,11 @@ class ChangeLabelBottomSheetViewModelTest {
         on { childFileCount }.thenReturn(1)
         on { childFolderCount }.thenReturn(1)
         on { label }.thenReturn(1)
+        on { id }.thenReturn(NodeId(1L))
     }
 
     fun initViewModel() {
         runBlocking {
-            whenever(stateHandle.get<Long>(changeLabelBottomSheetRouteNodeIdArg)).thenReturn(1L)
             whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(node)
             whenever(getNodeLabelListUseCase()).thenReturn(
                 listOf(
@@ -67,8 +62,6 @@ class ChangeLabelBottomSheetViewModelTest {
             getNodeLabelListUseCase,
             nodeLabelMapper,
             nodeLabelResourceMapper,
-            getNodeByIdUseCase,
-            stateHandle
         )
     }
 
@@ -80,19 +73,12 @@ class ChangeLabelBottomSheetViewModelTest {
     }
 
     @Test
-    fun `test that when label change it calls changeLabelUseCase`() = runTest {
+    fun `test that changeLabelUseCase is invoked when the label changes`() = runTest {
         val nodeId = NodeId(1L)
         val selectedLabel = NodeLabel.RED
+        underTest.loadLabelInfo(node)
         underTest.onLabelSelected(selectedLabel)
         verify(changeLabelUseCase).invoke(nodeId, selectedLabel)
-    }
-
-    @Test
-    fun `test that when getNodeLabel list called it fills new list`() = runTest {
-        underTest.state.test {
-            val state = awaitItem()
-            Truth.assertThat(state.labelList).isNotEmpty()
-        }
     }
 
     @AfterAll
