@@ -1390,7 +1390,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                         totalToUpload,
                         totalUploadedBytes,
                         totalUploadBytes,
-                        progressPercent,
+                        progressPercent.floatValue,
                         areTransfersPaused()
                     )
                 }
@@ -1406,7 +1406,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         totalToUpload: Int,
         totalUploadedBytes: Long,
         totalUploadBytes: Long,
-        progress: Int,
+        progress: Float,
         areUploadsPaused: Boolean,
     ) {
         runCatching {
@@ -1430,7 +1430,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      *  Display a notification for video compression progress
      */
     private suspend fun showVideoCompressionProgress(
-        progress: Int,
+        progress: Float,
         currentFileIndex: Int,
         totalCount: Int,
     ) {

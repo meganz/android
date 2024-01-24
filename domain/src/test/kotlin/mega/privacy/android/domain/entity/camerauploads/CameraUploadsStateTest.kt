@@ -1,10 +1,10 @@
 package mega.privacy.android.domain.entity.camerauploads
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.Progress
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.util.Hashtable
-import kotlin.math.roundToInt
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class CameraUploadsStateTest {
@@ -129,7 +129,7 @@ internal class CameraUploadsStateTest {
     fun `test that when totalBytesToUpload is equal to 0 then totalProgress returns 0`() {
         val primaryBytesToUpload = 0L
         val secondaryBytesToUpload = 0L
-        val expected = 0
+        val expected = Progress(0f)
 
         underTest = CameraUploadsState(
             primaryCameraUploadsState = CameraUploadsFolderState(
@@ -157,10 +157,9 @@ internal class CameraUploadsStateTest {
         val secondaryBytesFinishedUploadedCount = 2000L
         val secondaryBytesUploaded =
             secondaryBytesFinishedUploadedCount + fileC.second + fileD.second
-        val expected =
-            (((primaryBytesUploaded + secondaryBytesUploaded).toDouble() / (primaryBytesToUpload + secondaryBytesToUpload)) * 100)
-                .roundToInt()
-
+        val expected = Progress(
+            (((primaryBytesUploaded + secondaryBytesUploaded).toFloat() / (primaryBytesToUpload + secondaryBytesToUpload)))
+        )
         val primaryBytesInProgressUploadedTable = Hashtable<Long, Long>().apply {
             this[fileA.first] = fileA.second
             this[fileB.first] = fileB.second

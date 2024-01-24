@@ -21,9 +21,11 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -47,38 +49,34 @@ class CameraUploadsStatusInfoMapper @Inject constructor() {
                 }
 
                 PROGRESS -> {
-                    with(progress) {
-                        CameraUploadsStatusInfo.Progress(
-                            totalUploaded = getInt(TOTAL_UPLOADED, 0),
-                            totalToUpload = getInt(TOTAL_TO_UPLOAD, 0),
-                            totalUploadedBytes = getLong(
-                                TOTAL_UPLOADED_BYTES,
-                                0L
-                            ),
-                            totalUploadBytes = getLong(
-                                TOTAL_UPLOAD_BYTES,
-                                0L
-                            ),
-                            progress = getInt(CURRENT_PROGRESS, 0),
-                            areUploadsPaused = getBoolean(
-                                ARE_UPLOADS_PAUSED,
-                                false
+                    runCatching {
+                        with(progress) {
+                            CameraUploadsStatusInfo.UploadProgress(
+                                totalUploaded = getInt(TOTAL_UPLOADED, 0),
+                                totalToUpload = getInt(TOTAL_TO_UPLOAD, 0),
+                                totalUploadedBytes = getLong(TOTAL_UPLOADED_BYTES, 0L),
+                                totalUploadBytes = getLong(TOTAL_UPLOAD_BYTES, 0L),
+                                progress = Progress(getFloat(CURRENT_PROGRESS, 0f)),
+                                areUploadsPaused = getBoolean(ARE_UPLOADS_PAUSED, false)
                             )
-                        )
-                    }
+                        }
+                    }.onFailure {
+                        Timber.e(it)
+                    }.getOrNull()
                 }
 
                 COMPRESSION_PROGRESS -> {
-                    with(progress) {
-                        CameraUploadsStatusInfo.VideoCompressionProgress(
-                            currentFileIndex = getInt(
-                                CURRENT_FILE_INDEX,
-                                0
-                            ),
-                            totalCount = getInt(TOTAL_COUNT, 0),
-                            progress = getInt(CURRENT_PROGRESS, 0),
-                        )
-                    }
+                    runCatching {
+                        with(progress) {
+                            CameraUploadsStatusInfo.VideoCompressionProgress(
+                                currentFileIndex = getInt(CURRENT_FILE_INDEX, 0),
+                                totalCount = getInt(TOTAL_COUNT, 0),
+                                progress = Progress(getFloat(CURRENT_PROGRESS, 0f)),
+                            )
+                        }
+                    }.onFailure {
+                        Timber.e(it)
+                    }.getOrNull()
                 }
 
                 COMPRESSION_ERROR -> {

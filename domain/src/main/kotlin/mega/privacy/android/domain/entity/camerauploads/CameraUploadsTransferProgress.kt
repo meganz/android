@@ -102,11 +102,11 @@ sealed interface CameraUploadsTransferProgress {
         /**
          * Represents a record that is under compression
          *
-         * @property progress the current progress of the compression
+         * @property progress the current progress of the compression represented by a [Float] between 0 and 1
          */
         data class Progress(
             override val record: CameraUploadsRecord,
-            val progress: Int,
+            val progress: Float,
         ) : Compressing
 
         /**

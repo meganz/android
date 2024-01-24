@@ -580,7 +580,7 @@ class CameraUploadsWorkerTest {
                 TOTAL_TO_UPLOAD to 1,
                 TOTAL_UPLOADED_BYTES to 0L,
                 TOTAL_UPLOAD_BYTES to size * 1024 * 1024,
-                CURRENT_PROGRESS to 0,
+                CURRENT_PROGRESS to 0f,
                 ARE_UPLOADS_PAUSED to false,
             )
             val afterTransferUpdateEventData = workDataOf(
@@ -589,7 +589,7 @@ class CameraUploadsWorkerTest {
                 TOTAL_TO_UPLOAD to 1,
                 TOTAL_UPLOADED_BYTES to size / 2 * 1024 * 1024,
                 TOTAL_UPLOAD_BYTES to size * 1024 * 1024,
-                CURRENT_PROGRESS to 50,
+                CURRENT_PROGRESS to 0.5f,
                 ARE_UPLOADS_PAUSED to false,
             )
             val afterUploadedEventData = workDataOf(
@@ -598,7 +598,7 @@ class CameraUploadsWorkerTest {
                 TOTAL_TO_UPLOAD to 1,
                 TOTAL_UPLOADED_BYTES to size * 1024 * 1024,
                 TOTAL_UPLOAD_BYTES to size * 1024 * 1024,
-                CURRENT_PROGRESS to 100,
+                CURRENT_PROGRESS to 1f,
                 ARE_UPLOADS_PAUSED to false,
             )
             underTest.doWork()
@@ -737,7 +737,7 @@ class CameraUploadsWorkerTest {
                 TOTAL_TO_UPLOAD to 1,
                 TOTAL_UPLOADED_BYTES to 0L,
                 TOTAL_UPLOAD_BYTES to size * 1024 * 1024,
-                CURRENT_PROGRESS to 0,
+                CURRENT_PROGRESS to 0f,
                 ARE_UPLOADS_PAUSED to false,
             )
             val afterCopiedEventData = workDataOf(
@@ -746,7 +746,7 @@ class CameraUploadsWorkerTest {
                 TOTAL_TO_UPLOAD to 1,
                 TOTAL_UPLOADED_BYTES to size * 1024 * 1024,
                 TOTAL_UPLOAD_BYTES to size * 1024 * 1024,
-                CURRENT_PROGRESS to 100,
+                CURRENT_PROGRESS to 1f,
                 ARE_UPLOADS_PAUSED to false,
             )
             underTest.doWork()
@@ -770,8 +770,8 @@ class CameraUploadsWorkerTest {
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
 
-            val progress = 50
-            val progress2 = progress + 20
+            val progress = 0.5f
+            val progress2 = progress + 0.2f
             val compressionProgressEvent = CameraUploadsTransferProgress.Compressing.Progress(
                 record = record,
                 progress = progress,

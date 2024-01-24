@@ -31,6 +31,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMe
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
@@ -180,7 +181,7 @@ class TimelineViewModelTest {
             assertWithMessage("daysCardPhotos value is incorrect").that(initialState.daysCardPhotos)
                 .isEmpty()
             assertWithMessage("timeBarTabs value is incorrect").that(initialState.timeBarTabs)
-                .containsExactlyElementsIn(TimeBarTab.values())
+                .containsExactlyElementsIn(TimeBarTab.entries.toTypedArray())
             assertWithMessage("selectedTimeBarTab value is incorrect").that(initialState.selectedTimeBarTab)
                 .isEqualTo(TimeBarTab.All)
             assertWithMessage("currentZoomLevel value is incorrect").that(initialState.currentZoomLevel)
@@ -325,12 +326,12 @@ class TimelineViewModelTest {
         runTest {
             val totalUploaded = 100
             val totalToUpload = 200
-            val expectedProgress = 50
+            val expectedProgress = 0.5f
             val expectedPending = totalToUpload - totalUploaded
-            val cameraUploadsStatusInfo = mock<CameraUploadsStatusInfo.Progress> {
+            val cameraUploadsStatusInfo = mock<CameraUploadsStatusInfo.UploadProgress> {
                 on { this.totalUploaded }.thenReturn(totalUploaded)
                 on { this.totalToUpload }.thenReturn(totalToUpload)
-                on { this.progress }.thenReturn(expectedProgress)
+                on { this.progress }.thenReturn(Progress(expectedProgress))
             }
             cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
 
@@ -340,7 +341,7 @@ class TimelineViewModelTest {
                 val state = awaitItem()
                 assertThat(state.pending).isEqualTo(expectedPending)
                 assertThat(state.progressBarShowing).isEqualTo(true)
-                assertThat(state.progress).isEqualTo(expectedProgress.toFloat() / 100)
+                assertThat(state.progress).isEqualTo(expectedProgress)
             }
         }
 
@@ -362,12 +363,12 @@ class TimelineViewModelTest {
     fun `test that when camera upload progress is received with pending 0, then progressBarShowing state is set to false`() =
         runTest {
             val totalUploaded = 200
-            val cameraUploadsStatusInfo = CameraUploadsStatusInfo.Progress(
+            val cameraUploadsStatusInfo = CameraUploadsStatusInfo.UploadProgress(
                 totalUploaded = totalUploaded,
                 totalToUpload = totalUploaded,
                 totalUploadedBytes = 2000,
                 totalUploadBytes = 2000,
-                progress = 100,
+                progress = Progress(1f),
                 areUploadsPaused = false,
             )
             cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
@@ -383,7 +384,7 @@ class TimelineViewModelTest {
     @Test
     fun `test that when camera upload progress is received and some items are currently selected, the progressBarShowing state is set to false`() =
         runTest {
-            val progress = mock<CameraUploadsStatusInfo.Progress>()
+            val progress = mock<CameraUploadsStatusInfo.UploadProgress>()
 
             val selectedPhoto = mock<Photo.Image> { on { id }.thenReturn(1L) }
             underTest.setSelectedPhotos(listOf(mock<PhotoListItem.PhotoGridItem> {
@@ -404,7 +405,7 @@ class TimelineViewModelTest {
     @Test
     fun `test that when camera upload progress is received and current view is not TimeBar ALL, the progressBarShowing state is set to false`() =
         runTest {
-            val progress = mock<CameraUploadsStatusInfo.Progress>()
+            val progress = mock<CameraUploadsStatusInfo.UploadProgress>()
 
             underTest.onTimeBarTabSelected(TimeBarTab.Years)
             cameraUploadsStatusInfoFlow.emit(progress)

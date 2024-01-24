@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.camerauploads
 
+import mega.privacy.android.domain.entity.Progress
+
 /**
  * Camera Uploads Status Info
  */
@@ -24,12 +26,12 @@ sealed interface CameraUploadsStatusInfo {
      *  @property progress
      *  @property areUploadsPaused
      */
-    data class Progress(
+    data class UploadProgress(
         val totalUploaded: Int,
         val totalToUpload: Int,
         val totalUploadedBytes: Long,
         val totalUploadBytes: Long,
-        val progress: Int,
+        val progress: Progress,
         val areUploadsPaused: Boolean,
     ) : CameraUploadsStatusInfo
 
@@ -40,7 +42,7 @@ sealed interface CameraUploadsStatusInfo {
      *  @property totalCount
      */
     data class VideoCompressionProgress(
-        val progress: Int,
+        val progress: Progress,
         val currentFileIndex: Int,
         val totalCount: Int,
     ) : CameraUploadsStatusInfo

@@ -44,7 +44,7 @@ class VideoRepositoryImplTest {
     @Test
     fun `test that starting video compression emits events in order`() {
         runTest {
-            val list = listOf(25, 50, 57, 100)
+            val list = listOf(0.25f, 0.5f, 0.57f, 1f)
             val flow = flow {
                 list.forEach {
                     emit(

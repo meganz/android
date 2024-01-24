@@ -23,6 +23,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import org.junit.jupiter.api.BeforeAll
@@ -40,7 +41,7 @@ class CameraUploadsStatusInfoMapperTest {
     private val totalToUpload = 100
     private val totalUploadedBytes = 1024L
     private val totalUploadBytes = 2048L
-    private val progress = 50
+    private val progress = 0.5f
     private val areUploadsPaused = false
     private val currentFileIndex = 11
     private val totalCount = 20
@@ -56,12 +57,12 @@ class CameraUploadsStatusInfoMapperTest {
         ARE_UPLOADS_PAUSED to areUploadsPaused
     )
 
-    private val cameraUploadProgressInfo = CameraUploadsStatusInfo.Progress(
+    private val cameraUploadProgressInfo = CameraUploadsStatusInfo.UploadProgress(
         totalUploaded = totalUploaded,
         totalToUpload = totalToUpload,
         totalUploadedBytes = totalUploadedBytes,
         totalUploadBytes = totalUploadBytes,
-        progress = progress,
+        progress = Progress(progress),
         areUploadsPaused = areUploadsPaused
     )
 
@@ -75,7 +76,7 @@ class CameraUploadsStatusInfoMapperTest {
     private val videoProgressInfo = CameraUploadsStatusInfo.VideoCompressionProgress(
         currentFileIndex = currentFileIndex,
         totalCount = totalCount,
-        progress = progress,
+        progress = Progress(progress),
     )
 
     @BeforeAll

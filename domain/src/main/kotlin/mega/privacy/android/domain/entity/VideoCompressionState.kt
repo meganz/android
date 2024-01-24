@@ -21,9 +21,9 @@ sealed interface VideoCompressionState {
      */
     data class Progress(
         /**
-         * progress
+         * progress represented by a [Float] between 0 and 1
          */
-        val progress: Int,
+        val progress: Float,
         /**
          * current Index
          */

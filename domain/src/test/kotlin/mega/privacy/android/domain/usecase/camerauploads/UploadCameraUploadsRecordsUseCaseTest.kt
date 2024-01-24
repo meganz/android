@@ -1073,9 +1073,10 @@ class UploadCameraUploadsRecordsUseCaseTest {
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             val compressionEvents: List<VideoCompressionState> =
-                (0..2).map {
-                    VideoCompressionState.Progress(it, 0, 1, "path")
-                }
+                generateSequence(0f) { it + 0.5f }
+                    .takeWhile { it <= 1f }.map {
+                        VideoCompressionState.Progress(it, 0, 1, "path")
+                    }.toList()
             setInput(cameraUploadFolderType, type = CameraUploadsRecordType.TYPE_VIDEO)
             val quality = VideoQuality.HIGH
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
@@ -1251,14 +1252,14 @@ class UploadCameraUploadsRecordsUseCaseTest {
             Arguments.of(
                 CameraUploadFolderType.Primary,
                 listOf(
-                    VideoCompressionState.Progress(50, 0, 1, "path"),
+                    VideoCompressionState.Progress(0.5f, 0, 1, "path"),
                     VideoCompressionState.Finished,
                 ),
             ),
             Arguments.of(
                 CameraUploadFolderType.Secondary,
                 listOf(
-                    VideoCompressionState.Progress(50, 0, 1, "path"),
+                    VideoCompressionState.Progress(0.5f, 0, 1, "path"),
                     VideoCompressionState.Finished,
                 ),
             ),

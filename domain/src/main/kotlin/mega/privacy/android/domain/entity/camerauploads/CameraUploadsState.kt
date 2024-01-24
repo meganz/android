@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.camerauploads
 
-import kotlin.math.roundToInt
+import mega.privacy.android.domain.entity.Progress
 
 /**
  * Camera Uploads State
@@ -11,7 +11,7 @@ import kotlin.math.roundToInt
  * @property totalPendingCount total number of files remaining to be uploaded
  * @property totalBytesToUploadCount Total number of bytes to upload
  * @property totalBytesUploadedCount Total number of bytes uploaded
- * @property totalProgress current progress of the camera uploads process. A [Int] between 0 and 100
+ * @property totalProgress current progress of the camera uploads process. A [Float] between 0 and 1
  */
 data class CameraUploadsState(
     val primaryCameraUploadsState: CameraUploadsFolderState = CameraUploadsFolderState(),
@@ -32,10 +32,10 @@ data class CameraUploadsState(
     val totalBytesUploadedCount: Long
         get() = primaryCameraUploadsState.bytesUploadedCount + secondaryCameraUploadsState.bytesUploadedCount
 
-    val totalProgress: Int
+    val totalProgress: Progress
         get() =
             when (totalBytesToUploadCount) {
-                0L -> 0
-                else -> ((totalBytesUploadedCount.toDouble() / totalBytesToUploadCount) * 100).roundToInt()
+                0L -> Progress(0f)
+                else -> Progress(totalBytesUploadedCount, totalBytesToUploadCount)
             }
 }

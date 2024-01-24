@@ -153,7 +153,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
      */
     private suspend fun prepareAndChangeResolution(
         videoAttachment: VideoAttachment,
-        block: (Int) -> Unit,
+        block: (Float) -> Unit,
     ) = suspendCancellableCoroutine {
         Timber.d("prepareAndChangeResolution")
         var exception: Exception? = null
@@ -270,7 +270,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                 outputSurface = outputSurface,
                 video = videoAttachment,
             ) { progress ->
-                Timber.d("Current Video Compression Progress $it")
+                Timber.d("Current Video Compression Progress $progress")
                 block(progress)
             }
         } catch (e: Exception) {
@@ -312,7 +312,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
         inputSurface: InputSurface,
         outputSurface: OutputSurface,
         video: VideoAttachment,
-        block: (Int) -> Unit,
+        block: (Float) -> Unit,
     ) {
         Timber.d("change Resolution")
         val videoDecoderOutputBufferInfo = MediaCodec.BufferInfo()
@@ -418,7 +418,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                     inputSurface.setPresentationTime(videoDecoderOutputBufferInfo.presentationTimeUs * 1000)
                     inputSurface.swapBuffers()
                     val progress =
-                        ((videoDecoderOutputBufferInfo.presentationTimeUs.toFloat() / video.totalDuration.toFloat()) / 10).toInt()
+                        (videoDecoderOutputBufferInfo.presentationTimeUs.toFloat() / video.totalDuration.toFloat()) / 1000
                     video.currentDuration = videoDecoderOutputBufferInfo.presentationTimeUs
                     block(progress)
                 }
@@ -544,7 +544,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
             }
         }
         // send video progress 100% event
-        block(100)
+        block(1f)
     }
 
 

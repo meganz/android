@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,6 +33,7 @@ import mega.privacy.android.app.presentation.photos.util.createDaysCardList
 import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
@@ -82,7 +82,7 @@ import javax.inject.Inject
  * @property checkEnableCameraUploadsStatus
  * @property stopCameraUploadsUseCase
  * @property broadcastBusinessAccountExpiredUseCase
- * @param monitorCameraUploadProgress
+ * @param monitorCameraUploadsStatusInfoUseCase
  */
 @HiltViewModel
 class TimelineViewModel @Inject constructor(
@@ -124,10 +124,10 @@ class TimelineViewModel @Inject constructor(
         }
         viewModelScope.launch {
             monitorCameraUploadsStatusInfoUseCase()
-                .filter { it is CameraUploadsStatusInfo.Progress || it is CameraUploadsStatusInfo.Finished }
+                .filter { it is CameraUploadsStatusInfo.UploadProgress || it is CameraUploadsStatusInfo.Finished }
                 .collect {
                     when (it) {
-                        is CameraUploadsStatusInfo.Progress -> {
+                        is CameraUploadsStatusInfo.UploadProgress -> {
                             updateCameraUploadProgressIfNeeded(
                                 progress = it.progress,
                                 pending = it.totalToUpload - it.totalUploaded,
@@ -135,7 +135,7 @@ class TimelineViewModel @Inject constructor(
                         }
 
                         is CameraUploadsStatusInfo.Finished -> {
-                            updateCameraUploadProgressIfNeeded(progress = 100, pending = 0)
+                            updateCameraUploadProgressIfNeeded(progress = Progress(1f), pending = 0)
                         }
 
                         else -> Unit
@@ -185,7 +185,7 @@ class TimelineViewModel @Inject constructor(
      * @param progress value between 0 and 100
      * @param pending count of pending items to be uploaded
      */
-    private fun updateCameraUploadProgressIfNeeded(progress: Int, pending: Int) {
+    private fun updateCameraUploadProgressIfNeeded(progress: Progress, pending: Int) {
         if (state.value.selectedPhotoCount > 0 || !isInAllView()) {
             setShowProgressBar(show = false)
         } else {
@@ -193,10 +193,10 @@ class TimelineViewModel @Inject constructor(
             updateProgress(
                 pending = pending,
                 showProgress = pending > 0,
-                progress = progress.toFloat() / 100
+                progress = progress.floatValue,
             )
 
-            Timber.d("CU Upload Progress: Pending: {$pending}, Progress: {$progress}")
+            Timber.d("CU Upload Progress: Pending: {$pending}, Progress: {${progress.floatValue}}")
         }
     }
 

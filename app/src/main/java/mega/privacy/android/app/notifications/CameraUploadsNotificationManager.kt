@@ -96,12 +96,12 @@ class CameraUploadsNotificationManager @Inject constructor(
             )
 
             CameraUploadsStatusInfo.NotEnoughStorage -> showNotEnoughStorageNotification()
-            is CameraUploadsStatusInfo.Progress -> showUploadProgressNotification(
+            is CameraUploadsStatusInfo.UploadProgress -> showUploadProgressNotification(
                 totalUploaded = cameraUploadsStatusInfo.totalUploaded,
                 totalToUpload = cameraUploadsStatusInfo.totalToUpload,
                 totalUploadedBytes = cameraUploadsStatusInfo.totalUploadedBytes,
                 totalUploadBytes = cameraUploadsStatusInfo.totalUploadBytes,
-                progress = cameraUploadsStatusInfo.progress,
+                progress = cameraUploadsStatusInfo.progress.intValue,
                 areUploadsPaused = cameraUploadsStatusInfo.areUploadsPaused,
             )
 
@@ -118,7 +118,7 @@ class CameraUploadsNotificationManager @Inject constructor(
 
             CameraUploadsStatusInfo.VideoCompressionOutOfSpace -> showVideoCompressionOutOfSpaceNotification()
             is CameraUploadsStatusInfo.VideoCompressionProgress -> showVideoCompressionProgressNotification(
-                progress = cameraUploadsStatusInfo.progress,
+                progress = cameraUploadsStatusInfo.progress.intValue,
                 currentFileIndex = cameraUploadsStatusInfo.currentFileIndex,
                 totalCount = cameraUploadsStatusInfo.totalCount,
             )
@@ -162,6 +162,11 @@ class CameraUploadsNotificationManager @Inject constructor(
         return builder.build()
     }
 
+    /**
+     * Display a notification for upload progress
+     *
+     * @progress an Int between 0 and 100
+     */
     private fun showUploadProgressNotification(
         totalUploaded: Int,
         totalToUpload: Int,
@@ -192,6 +197,8 @@ class CameraUploadsNotificationManager @Inject constructor(
 
     /**
      *  Display a notification for video compression progress
+     *
+     *  @progress an Int between 0 and 100
      */
     private fun showVideoCompressionProgressNotification(
         progress: Int,
@@ -382,7 +389,7 @@ class CameraUploadsNotificationManager @Inject constructor(
     /**
      * Dismiss error notifications
      */
-    fun cancelAllNotifications() {
+    private fun cancelAllNotifications() {
         with(notificationManager) {
             cancel(PRIMARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID)
             cancel(SECONDARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID)
@@ -396,14 +403,14 @@ class CameraUploadsNotificationManager @Inject constructor(
     /**
      * Dismiss progress notification
      */
-    fun cancelNotification() {
+    private fun cancelNotification() {
         notificationManager.cancel(NOTIFICATION_ID)
     }
 
     /**
      * Dismiss compression progress notification
      */
-    fun cancelCompressionNotification() {
+    private fun cancelCompressionNotification() {
         notificationManager.cancel(COMPRESSION_NOTIFICATION_ID)
     }
 
