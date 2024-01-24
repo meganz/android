@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import mega.privacy.android.data.database.MegaDatabaseConstant
 
 @Entity(tableName = MegaDatabaseConstant.TABLE_CHAT_ROOM_PREFERENCE)
-internal data class ChatRoomPreferenceEntity(
+internal data class ChatPendingChangesEntity(
     @PrimaryKey
     val chatId: Long = 0L,
     @ColumnInfo(name = "draft_message")

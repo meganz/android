@@ -1,12 +1,12 @@
 package mega.privacy.android.domain.entity.chat
 
 /**
- * Chat room preference
+ * Chat pending changes
  *
  * @property chatId Chat identifier
  * @property draftMessage Draft message
  */
-data class ChatRoomPreference(
+data class ChatPendingChanges(
     val chatId: Long,
     val draftMessage: String = "",
 )

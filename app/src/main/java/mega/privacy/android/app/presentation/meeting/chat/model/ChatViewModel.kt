@@ -60,7 +60,7 @@ import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorChatRoomPreferenceUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatPendingChangesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeavingChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
@@ -178,7 +178,7 @@ class ChatViewModel @Inject constructor(
     private val monitorLeavingChatUseCase: MonitorLeavingChatUseCase,
     private val sendLocationMessageUseCase: SendLocationMessageUseCase,
     private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
-    private val monitorChatRoomPreferenceUseCase: MonitorChatRoomPreferenceUseCase,
+    private val monitorChatPendingChangesUseCase: MonitorChatPendingChangesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -217,7 +217,7 @@ class ChatViewModel @Inject constructor(
 
     private fun monitorChatRoomPreference() {
         viewModelScope.launch {
-            monitorChatRoomPreferenceUseCase(chatId)
+            monitorChatPendingChangesUseCase(chatId)
                 .catch { Timber.e(it) }
                 .collect { preference ->
                     _state.update { state -> state.copy(sendingText = preference.draftMessage) }

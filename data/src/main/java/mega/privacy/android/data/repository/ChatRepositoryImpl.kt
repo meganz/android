@@ -68,8 +68,8 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatInitState
 import mega.privacy.android.domain.entity.chat.ChatListItem
+import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.entity.chat.ChatRoomPreference
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
 import mega.privacy.android.domain.entity.chat.messages.paging.MessagePagingInfo
@@ -1308,17 +1308,17 @@ internal class ChatRepositoryImpl @Inject constructor(
     }
 
     override suspend fun setChatDraftMessage(chatId: Long, draftMessage: String) {
-        val preference = megaLocalRoomGateway.getChatRoomPreference(chatId).firstOrNull()
-            ?: ChatRoomPreference(chatId = chatId,)
-        megaLocalRoomGateway.setChatRoomPreference(
+        val preference = megaLocalRoomGateway.monitorChatPendingChanges(chatId).firstOrNull()
+            ?: ChatPendingChanges(chatId = chatId,)
+        megaLocalRoomGateway.setChatPendingChanges(
             preference.copy(
                 draftMessage = draftMessage
             )
         )
     }
 
-    override fun monitorChatRoomPreference(chatId: Long): Flow<ChatRoomPreference> {
-        return megaLocalRoomGateway.getChatRoomPreference(chatId)
+    override fun monitorChatPendingChanges(chatId: Long): Flow<ChatPendingChanges> {
+        return megaLocalRoomGateway.monitorChatPendingChanges(chatId)
             .filterNotNull()
     }
 }

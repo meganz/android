@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.database.dao.ChatRoomPreferenceDao
+import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -31,7 +31,7 @@ import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
 import mega.privacy.android.data.mapper.chat.ChatPreviewMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
-import mega.privacy.android.data.mapper.chat.ChatRoomPreferenceModelMapper
+import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesModelMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.ContainsMetaMapper
@@ -46,7 +46,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatPreview
-import mega.privacy.android.domain.entity.chat.ChatRoomPreference
+import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.exception.MegaException
@@ -115,8 +115,8 @@ class ChatRepositoryImplTest {
     private val chatPreviewMapper = mock<ChatPreviewMapper>()
     private val databaseHandler = mock<DatabaseHandler>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
-    private val chatRoomPreferenceModelMapper: ChatRoomPreferenceModelMapper = mock()
-    private val chatRoomPreferenceDao: ChatRoomPreferenceDao = mock()
+    private val chatRoomPendingChangesModelMapper: ChatRoomPendingChangesModelMapper = mock()
+    private val chatPendingChangesDao: ChatPendingChangesDao = mock()
 
     @Before
     fun setUp() {
@@ -987,19 +987,19 @@ class ChatRepositoryImplTest {
         val chatId = 123L
         val message = "message"
         val draftMessage = "draftMessage"
-        val model = ChatRoomPreference(chatId, message)
-        whenever(megaLocalRoomGateway.getChatRoomPreference(chatId)).thenReturn(flowOf(model))
+        val model = ChatPendingChanges(chatId, message)
+        whenever(megaLocalRoomGateway.monitorChatPendingChanges(chatId)).thenReturn(flowOf(model))
         underTest.setChatDraftMessage(chatId, draftMessage)
-        verify(megaLocalRoomGateway).setChatRoomPreference(model.copy(draftMessage = draftMessage))
+        verify(megaLocalRoomGateway).setChatPendingChanges(model.copy(draftMessage = draftMessage))
     }
 
     @Test
     fun `test that get chat room preferences returns correctly`() = runTest {
         val chatId = 123L
         val message = "message"
-        val model = ChatRoomPreference(chatId, message)
-        whenever(megaLocalRoomGateway.getChatRoomPreference(chatId)).thenReturn(flowOf(model))
-        underTest.monitorChatRoomPreference(chatId).test {
+        val model = ChatPendingChanges(chatId, message)
+        whenever(megaLocalRoomGateway.monitorChatPendingChanges(chatId)).thenReturn(flowOf(model))
+        underTest.monitorChatPendingChanges(chatId).test {
             assertThat(awaitItem()).isEqualTo(model)
             awaitComplete()
         }

@@ -4,7 +4,7 @@ import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
 /**
- * Set Chat Room Preference Use Case
+ * Set chat draft message use case
  *
  */
 class SetChatDraftMessageUseCase @Inject constructor(

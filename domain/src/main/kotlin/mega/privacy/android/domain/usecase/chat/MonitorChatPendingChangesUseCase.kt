@@ -4,10 +4,10 @@ import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
 /**
- * Get Chat Room Preference Use Case
+ * Monitor chat pending changes use case
  *
  */
-class MonitorChatRoomPreferenceUseCase @Inject constructor(
+class MonitorChatPendingChangesUseCase @Inject constructor(
     private val repository: ChatRepository,
 ) {
     /**
@@ -15,5 +15,5 @@ class MonitorChatRoomPreferenceUseCase @Inject constructor(
      *
      */
     operator fun invoke(chatId: Long) =
-        repository.monitorChatRoomPreference(chatId)
+        repository.monitorChatPendingChanges(chatId)
 }

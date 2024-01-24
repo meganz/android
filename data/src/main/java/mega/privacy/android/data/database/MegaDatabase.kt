@@ -11,7 +11,7 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
-import mega.privacy.android.data.database.dao.ChatRoomPreferenceDao
+import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
@@ -21,7 +21,7 @@ import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
-import mega.privacy.android.data.database.entity.ChatRoomPreferenceEntity
+import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.data.database.entity.OfflineEntity
@@ -43,7 +43,7 @@ import timber.log.Timber
         SyncSolvedIssueEntity::class,
         UserPausedSyncEntity::class,
         CameraUploadsRecordEntity::class,
-        ChatRoomPreferenceEntity::class,
+        ChatPendingChangesEntity::class,
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
@@ -78,7 +78,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
 
     abstract fun cameraUploadsRecordDao(): CameraUploadsRecordDao
 
-    abstract fun chatRoomPreferenceDao(): ChatRoomPreferenceDao
+    abstract fun chatPendingChangesDao(): ChatPendingChangesDao
 
     companion object {
 

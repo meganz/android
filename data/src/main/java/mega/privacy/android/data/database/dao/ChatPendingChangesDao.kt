@@ -5,13 +5,13 @@ import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.MegaDatabaseConstant
-import mega.privacy.android.data.database.entity.ChatRoomPreferenceEntity
+import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 
 @Dao
-internal interface ChatRoomPreferenceDao {
+internal interface ChatPendingChangesDao {
     @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_CHAT_ROOM_PREFERENCE} WHERE chatId = :chatId")
-    fun getChatRoomPreference(chatId: Long): Flow<ChatRoomPreferenceEntity?>
+    fun getChatPendingChanges(chatId: Long): Flow<ChatPendingChangesEntity?>
 
     @Upsert
-    suspend fun upsertChatRoomPreference(entity: ChatRoomPreferenceEntity)
+    suspend fun upsertChatPendingChanges(entity: ChatPendingChangesEntity)
 }

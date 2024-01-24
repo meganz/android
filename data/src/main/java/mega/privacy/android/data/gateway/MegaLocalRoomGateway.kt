@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
-import mega.privacy.android.domain.entity.chat.ChatRoomPreference
+import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -407,17 +407,17 @@ interface MegaLocalRoomGateway {
     suspend fun removeOfflineInformationById(id: Int)
 
     /**
-     * Get chat room preference
+     * monitor chat pending changes
      *
      * @param chatId
      * @return
      */
-    fun getChatRoomPreference(chatId: Long): Flow<ChatRoomPreference?>
+    fun monitorChatPendingChanges(chatId: Long): Flow<ChatPendingChanges?>
 
     /**
-     * Set chat room preference
+     * Set chat pending changes
      *
-     * @param chatRoomPreference
+     * @param chatPendingChanges [ChatPendingChanges]
      */
-    suspend fun setChatRoomPreference(chatRoomPreference: ChatRoomPreference)
+    suspend fun setChatPendingChanges(chatPendingChanges: ChatPendingChanges)
 }

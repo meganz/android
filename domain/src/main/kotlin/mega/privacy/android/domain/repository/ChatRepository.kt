@@ -10,9 +10,9 @@ import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatInitState
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.entity.chat.ChatRoomPreference
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.chat.PendingMessage
@@ -956,7 +956,7 @@ interface ChatRepository {
     ): ChatMessage
 
     /**
-     * Set chat room preference
+     * Set chat draft message
      *
      * @param chatId   Chat id
      * @param draftMessage Draft message
@@ -964,10 +964,10 @@ interface ChatRepository {
     suspend fun setChatDraftMessage(chatId: Long, draftMessage: String)
 
     /**
-     * Monitor chat room preference
+     * Monitor chat pending changes
      *
      * @param chatId   Chat id
-     * @return         Chat room preference
+     * @return         [ChatPendingChanges]
      */
-    fun monitorChatRoomPreference(chatId: Long): Flow<ChatRoomPreference>
+    fun monitorChatPendingChanges(chatId: Long): Flow<ChatPendingChanges>
 }
