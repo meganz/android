@@ -1461,8 +1461,6 @@
     <string name="dialog_title_new_text_file">Nieuw tekst bestand</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Bestand Naam</string>
-    <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">Link naam</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">Link URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
@@ -2332,7 +2330,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA Instellen</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
+    <string name="setup_mega_explanation">MEGA heeft uw toestemming nodig om toegang te krijgen tot uw media en bestanden om te delen. Er zijn mogelijk andere toegangsmachtigingen nodig om de functies en diensten van deze applicatie te gebruiken.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Toegang tot foto’s, media en bestanden toestaan</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -3400,22 +3398,10 @@
     <string name="backup_remove_folder_title">Verplaats “%1s” naar Prullenbak</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Back-up uitschakelen</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">Typ a.u.b. “%1s” om deze actie te bevestigen</string>
-    <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">Ingevoerde tekst komt niet overeen</string>
-    <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">Item toevoegen naar “%1s”</string>
-    <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">Back-up Instellen</string>
-    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Om ervoor te zorgen dat deze items die aan uw back-up map worden toegevoegd, automatisch worden gesynchroniseerd met de MEGA Cloud. Gelieve deze in te stellen in de MEGA Desktop Applicatie.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Alleen-lezen</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Deze map kan alleen als alleen-lezen worden gedeeld, aangezien dit een back-upmap is, kunnen wijzigingen in de inhoud de back-up uitschakelen.</string>
-    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Items in deze map maken deel uit van een geconfigureerde back-up en worden gesynchroniseerd met een lokale map. Als u deze actie uitvoert, wordt de synchronisatie verbroken en wordt de back-up uitgeschakeld. De back-up kan opnieuw worden ingeschakeld in de MEGA Desktop-applicatie. Weet u zeker dat u verder wilt gaan?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Deze mappen kunnen alleen als alleen-lezen worden gedeeld, aangezien het back-up mappen zijn, kunnen wijzigingen in de inhoud de back-ups uitschakelen.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -5141,20 +5127,6 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Alles weergeven</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Niet weigeren</string>
-    <!--  -->
-    <string name="camera_uploads_up_to_date">Camerauploads zijn bijgewerkt</string>
-    <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">Het uploaden is onderbroken vanwege geen internetverbinding</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="one">Camera uploads zijn in behandeling,%1$d bestand in wachtrij</item>
-        <item quantity="other">Camera uploads zijn in behandeling, %1$d bestanden in wachtrij</item>
-    </plurals>
-    <!--  -->
-    <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="one">Camera uploads voltooid, %1$d bestand geüpload</item>
-        <item quantity="other">Camera uploads voltooid, %1$d bestanden geüpload</item>
-    </plurals>
     <!-- camera uploads limited access -->
     <string name="camera_uploads_limited_access">MEGA heeft beperkte toegang tot uw fotobibliotheek en kan geen back-up maken van al uw foto\’s.</string>
     <!-- camera uploads change permissions -->
@@ -5253,4 +5225,16 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Geen antwoord</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Iedereen bellen</string>
+    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA heeft toegang tot uw camera nodig om foto\’s en video\’s vast te leggen</string>
+    <!-- Warning shown if user denies the location permission when trying to pick a location -->
+    <string name="chat_attach_location_deny_permission">U heeft MEGA toegang tot uw locatie geweigerd. Als u uw locatie wilt delen, geef MEGA toestemming om dat te doen.</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">Grote download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">Download starten</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">Altijd downloaden en niet nogmaals vragen</string>
 </resources>

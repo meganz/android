@@ -1494,8 +1494,6 @@
     <string name="dialog_title_new_text_file">Nuovo file di testo</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Nome del file</string>
-    <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">Nome del link</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">URL del link</string>
     <!-- Title of the field subject when a new file is created to upload -->
@@ -3493,22 +3491,10 @@
     <string name="backup_remove_folder_title">Sposta “%1s” nel Cestino</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Disattiva backup</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">Per favore, inserisci “%1s” per confermare questa azione</string>
-    <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">il testo inserito non combacia</string>
-    <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">Aggiungi oggetto a “%1s”</string>
-    <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">Imposta un backup</string>
-    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Per assicurarti che questi oggetti aggiunti alla tua cartella di backup vengano sincronizzati automaticamente con il tuo Cloud MEGA, per favore impostalo nell\’app per desktop di MEGA.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Sola lettura</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Questa cartella può essere condivisa solamente come di sola lettura; visto che si tratta di una cartella di backup, qualsiasi modifica ai suoi contenuti potrebbe disabilitare il backup.</string>
-    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Gli oggetti in questa cartella sono parte di un backup configurato e sono sincronizzati ad una cartella locale. Portare a termine questa azione romperà la sincronizzazione e disabiliterà il backup. Il backup può essere riattivato tramite l\’app per desktop di MEGA. Vuoi procedere?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Queste cartelle possono essere condivise solo come di sola lettura; essendo cartelle di backup, qualsiasi modifica al loro contenuto potrebbe disabilitare i backup.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -5371,22 +5357,6 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Vedi tutti</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Non negare</string>
-    <!--  -->
-    <string name="camera_uploads_up_to_date">Caricamenti da fotocamera aggiornati</string>
-    <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">Il caricamento è stato messo in pausa a causa dell\’assenza di connessione ad internet</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="one">Caricamenti da fotocamera in corso, %1$d file in attesa</item>
-        <item quantity="many">Caricamenti da fotocamera in corso, %1$d di file in attesa</item>
-        <item quantity="other">Caricamenti da fotocamera in corso, %1$d file in attesa</item>
-    </plurals>
-    <!--  -->
-    <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="one">Caricamenti da fotocamera completati, %1$d file caricato</item>
-        <item quantity="many">Caricamenti da fotocamera completati, %1$d di file caricati</item>
-        <item quantity="other">Caricamenti da fotocamera completati, %1$d file caricati</item>
-    </plurals>
     <!-- camera uploads limited access -->
     <string name="camera_uploads_limited_access">MEGA ha accesso limitato alla tua Galleria e non può effettuare il backup di tutte le tue foto.</string>
     <!-- camera uploads change permissions -->
@@ -5487,4 +5457,16 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Nessuna risposta</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Chiama tutti</string>
+    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA needs access to your camera to capture photos and videos.</string>
+    <!-- Warning shown if user denies the location permission when trying to pick a location -->
+    <string name="chat_attach_location_deny_permission">You denied MEGA access to your location. If you’d like to share your location, allow MEGA permission to do so.</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">Large download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
 </resources>

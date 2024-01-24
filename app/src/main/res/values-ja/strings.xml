@@ -1428,8 +1428,6 @@
     <string name="dialog_title_new_text_file">新規テキストファイル</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">ファイル名</string>
-    <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">リンク名</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">リンクURL</string>
     <!-- Title of the field subject when a new file is created to upload -->
@@ -3307,22 +3305,10 @@
     <string name="backup_remove_folder_title">「%1s」をごみ箱に移動</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">バックアップを無効にする</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">このアクションを確認するために「%1s」を入力してください</string>
-    <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">入力されたテキストが一致しません</string>
-    <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">項目を「%1s」に追加</string>
-    <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">バックアップを設定してください</string>
-    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">バックアップフォルダに追加された項目が自動的にMEGAクラウドに同期されるようにするには、MEGAデスクトップアプリで設定してください。</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">読み取り専用</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">このフォルダは読み取り専用としてのみ共有することができます。なぜなら、これはバックアップ用のフォルダであり、コンテンツを変更するとバックアップが無効になる可能性があるからです。</string>
-    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">このフォルダ内の項目は、構成されたバックアップの一部であり、ローカルフォルダに同期されます。この操作を行うと同期が解除され、バックアップが無効になります。 バックアップはMEGAデスクトップアプリで再度有効にすることができます。続行してもよろしいですか？</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">これらのフォルダは読み取り専用としてのみ共有することができます。なぜなら、これらはバックアップ用のフォルダであり、コンテンツを変更するとバックアップが無効になる可能性があるからです。</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4911,18 +4897,6 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">すべて表示</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">拒否しない</string>
-    <!--  -->
-    <string name="camera_uploads_up_to_date">カメラアップロードが更新されました</string>
-    <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">インターネット接続がないためアップロードが一時停止されました</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="other">カメラアップロードが進行中です。%1$d個のファイルが保留中です。</item>
-    </plurals>
-    <!--  -->
-    <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="other">カメラアップロードが完了しました。%1$d個のファイルがアップロードされました。</item>
-    </plurals>
     <!-- camera uploads limited access -->
     <string name="camera_uploads_limited_access">MEGAはフォトライブラリへのアクセスが制限されているため、すべての写真をバックアップすることはできません。</string>
     <!-- camera uploads change permissions -->
@@ -5019,4 +4993,16 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">応答なし</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">全員と通話</string>
+    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGAは写真や動画を取得するためにカメラにアクセスする必要があります。</string>
+    <!-- Warning shown if user denies the location permission when trying to pick a location -->
+    <string name="chat_attach_location_deny_permission">MEGAによる現在地へのアクセスを拒否しました。現在地を共有されたい場合は、MEGAに共有の許可を与えてください。</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">大量のダウンロード</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">ダウンロード開始</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">常にダウンロードし、再度質問しない</string>
 </resources>

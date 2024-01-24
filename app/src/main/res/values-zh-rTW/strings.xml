@@ -1217,7 +1217,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">正在連線⋯</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s was already invited. Check your pending requests.</string>
+    <string name="context_contact_already_invited">%s已被邀請。請檢查您的待處理請求。</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">如果您拼錯您的電子郵件地址，請更正它並點擊[A]重新發送[A]。</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1359,7 +1359,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">邀請朋友以獲得獎勵</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each invitation. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">每個邀請可獲得%1$s儲存空間。有效期為365天。</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s儲存空間。有效期限365天。</string>
     <!-- title of the section for unlocked rewards -->
@@ -1428,8 +1428,6 @@
     <string name="dialog_title_new_text_file">新的文字檔案</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">檔案名稱</string>
-    <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">連結名稱</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">連結網址</string>
     <!-- Title of the field subject when a new file is created to upload -->
@@ -1519,7 +1517,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">二維條碼已下載到%s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">Invitation not sent</string>
+    <string name="invite_not_sent">邀請未發送</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">二維條碼或聯絡人連結無效。請嘗試掃描有效二維條碼或開啟有效連結。</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -1539,7 +1537,7 @@
     <!-- positive button on dialog to view a contact -->
     <string name="contact_view">檢視</string>
     <!-- Item menu option to reproduce audio or video in external reproductors -->
-    <string name="external_play">打開檔案的應用程式</string>
+    <string name="external_play">開啟於</string>
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">用&#8230;共享</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
@@ -2260,7 +2258,7 @@
     <!--  -->
     <string name="custom_subtitle_of_group_chat">還有%1$s和%2$d</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
-    <string name="message_error_set_title_get_link">在您生成對話連結之前，您需要先設定說明：</string>
+    <string name="message_error_set_title_get_link">在您生成對話連結之前，您需要先設定描述：</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">已複製連結到剪貼簿</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
@@ -2278,7 +2276,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">設定MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
+    <string name="setup_mega_explanation">MEGA需要您的授權才能存取您的媒體和檔案以進行共享。使用此應用程式時可能還需要授予其它存取權限才能使用其提供的功能和服務。</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">允許存取相片、媒體與檔案</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -3270,13 +3268,13 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">您已邀請過%1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invitation sent. See Sent requests.</string>
+    <string name="contact_invited">邀請已發送。查看已發送的請求。</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">檔案可離線使用</string>
     <!-- Message when file removed from offline. -->
     <string name="file_removed_offline">檔案已從可離線使用中移除</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">打開連結</string>
+    <string name="action_open_link">開啟連結</string>
     <!-- error message shown when a chat link is not well formed. -->
     <string name="invalid_chat_link_args">無效的對話連結</string>
     <!-- Menu option to open a chat link. -->
@@ -3296,7 +3294,7 @@
     <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
     <string name="valid_contact_link">您已貼上一個聯絡人連結。</string>
     <!-- Action button to open a contact link.-->
-    <string name="action_open_contact_link">打開聯絡人連結</string>
+    <string name="action_open_contact_link">開啟聯絡人連結</string>
     <!-- title for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_title">使用行動數據預覽高解析度圖片</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
@@ -3307,22 +3305,10 @@
     <string name="backup_remove_folder_title">移動「%1s」到垃圾筒</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">停用備份</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">請輸入“%1s”確認此操作</string>
-    <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">輸入的文字不相符</string>
-    <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">新增項目到“%1s”</string>
-    <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">設定備份</string>
-    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">為確保加到您備份資料夾的這些項目有自動同步到MEGA雲端，請在MEGA桌面應用程式上進行設定。</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">僅能讀取</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">因為這是一個備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
-    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">此資料夾中的項目是備份設定中的一部份而且已同步至本地資料夾。執行此操作將中斷同步並停用備份。您可以在MEGA桌面應用程式重新啟用備份。您確定要繼續嗎？</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">因為這些是備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -3862,7 +3848,7 @@
     <!-- User Alert notification for scheduled meeting time change -->
     <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s更新[/A][B]會議時間[/B]</string>
     <!-- User Alert notification for scheduled meeting description change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s更新[/A][B]會議說明[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s更新[/A][B]會議描述[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
     <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s更新[/A][B]以下排定時間的會議說明：[/B]</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
@@ -3890,7 +3876,7 @@
     <!-- User Alert notification for new scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s[/A][B]邀請您參加週期性會議，排定時間：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s更新[/A][B]定期性會議說明[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s更新[/A][B]定期性會議描述[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s更新[/A][B]以下排定時間的週期性會議細節：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
@@ -4285,8 +4271,7 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">加入會議</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">%1$d invitation sent.&#160;</item>
-        <item quantity="other">%1$d invitations sent.&#160;</item>
+        <item quantity="other">已發送%1$d個請求。&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4555,7 +4540,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;自動備份</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;Pro&#160;Lite最多可回溯90天，Pro&#160;I、II、和III最多可回溯180天</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;垃圾筒清理排程7天至10年</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4912,20 +4897,8 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">查看全部</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">不要拒絕</string>
-    <!--  -->
-    <string name="camera_uploads_up_to_date">相機上傳已更新</string>
-    <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">由於沒有網路連線，上傳已暫停</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="other">相機上傳正在進行中，%1$d個檔案待處理</item>
-    </plurals>
-    <!--  -->
-    <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="other">相機上傳已完成，%1$d個檔案已上傳</item>
-    </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA對您相簿的存取權限有限，無法備份您的所有照片。</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">點選以更改權限。</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -4997,7 +4970,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226; 無&#160;廣告&#160;</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA meeting invitation</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA會議邀請</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
     <string name="meetings_sharing_meeting_link_title">%1$s正在邀請你參加MEGA會議</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
@@ -5020,4 +4993,16 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">沒有回應</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">與所有人通話</string>
+    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA需要存取您的相機來拍攝照片和影片。</string>
+    <!-- Warning shown if user denies the location permission when trying to pick a location -->
+    <string name="chat_attach_location_deny_permission">您拒絕MEGA存取您的位置。如果您想共享您的位置，請授予MEGA權限。</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">大量下載</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">開始下載</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">總是下載並且不再詢問</string>
 </resources>

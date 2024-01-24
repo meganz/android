@@ -1428,8 +1428,6 @@
     <string name="dialog_title_new_text_file">Tệp văn bản mới</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Tên Tệp Tin</string>
-    <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">Tên đường liên kết</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">Liên kết URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
@@ -3307,22 +3305,10 @@
     <string name="backup_remove_folder_title">Di chuyển “%1s” vào Thùng Rác</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Tat luu du phong</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">Xin điền “%1s” để xác nhận hành động này</string>
-    <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">chữ đã nhập không trùng khớp</string>
-    <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">Thêm mục vào “%1s”</string>
-    <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">Cài đặt lưu dự phòng</string>
-    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Để đảm bảo các mục này được thêm vào thư mục sao lưu và tự động đồng bộ hóa với Ổ Mây MEGA, vui lòng thiết lập trong App MEGA cho Máy Tính.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Chỉ-được-xem</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Thư mục này được chia sẻ dưới dạng chỉ-được-xem bởi vì là thư mục lưu dự phòng, bất kỳ thay đổi trong nội dung sẽ vô hiệu hóa việc sao lưu dự phòng.</string>
-    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Các mục trong thư mục này là một phần của việc sao lưu đã được cấu định và được đồng bộ hóa với một thư mục cục bộ. Thực hiện hành động này sẽ phá vỡ quá trình đồng bộ hóa và vô hiệu hóa việc sao lưu. Việc sao lưu có thể được kích hoạt lại bằng cách sử dụng App MEGA cho Máy Tính. Bạn có chắc muốn tiếp tục không?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Các thư mục này được chia sẻ dưới dạng chỉ-được-xem bởi vì đây là các thư mục lưu dự phòng, bất kỳ thay đổi trong nội dung sẽ vô hiệu hóa việc sao lưu dự phòng.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4912,18 +4898,6 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Xem tất&#160;cả</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Không từ&#160;chối</string>
-    <!--  -->
-    <string name="camera_uploads_up_to_date">Đăng tải camêra đã được cập&#160;nhật</string>
-    <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">Tải lên bị tạm dừng do không có kết&#160;nối internet</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="other">Việc đăng&#160;tải camêra đang được thực hiện, %1$d tệp đang chờ</item>
-    </plurals>
-    <!--  -->
-    <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="other">Đăng tải camêra hoàn tất, %1$d tệp tin đã được tải lên</item>
-    </plurals>
     <!-- camera uploads limited access -->
     <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
@@ -5020,4 +4994,16 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Không có phản&#160;hồi</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Gọi tất cả</string>
+    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA needs access to your camera to capture photos and videos.</string>
+    <!-- Warning shown if user denies the location permission when trying to pick a location -->
+    <string name="chat_attach_location_deny_permission">You denied MEGA access to your location. If you’d like to share your location, allow MEGA permission to do so.</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">Large download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
 </resources>

@@ -1273,7 +1273,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Conectando&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s was already invited. Check your pending requests.</string>
+    <string name="context_contact_already_invited">%s ya ha sido invitado. Consulta tus invitaciones pendientes.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">Si has escrito mal tu dirección de correo electrónico, corrígela y pulsa en [A]Reenviar[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1421,7 +1421,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invita a tus amigos y gana bonos</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each invitation. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">%1$s de almacenamiento por cada invitación. Válido durante 365 días.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s de almacenamiento. Válido durante 365 días.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1451,7 +1451,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bono de almacenamiento gratuito aplicable solo a usuarios nuevos que instalen la aplicación móvil o de escritorio de MEGA.</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Invitation sent</string>
+    <string name="subtitle_confirmation_invite_friends">Invitación enviada</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Correo electrónico no válido</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1494,8 +1494,6 @@
     <string name="dialog_title_new_text_file">Nuevo archivo de texto</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Nombre del archivo</string>
-    <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">Nombre del enlace</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">URL del enlace</string>
     <!-- Title of the field subject when a new file is created to upload -->
@@ -1573,7 +1571,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">No se ha podido eliminar el código QR. Inténtalo de nuevo.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">Invitation sent</string>
+    <string name="invite_sent">Invitación enviada</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">El usuario ha sido invitado y aparecerá en tu lista de contactos en cuanto acepte la invitación.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1587,7 +1585,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">El código QR se ha descargado en %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">Invitation not sent</string>
+    <string name="invite_not_sent">Invitación no enviada</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">El código QR o el enlace de contacto no son válidos. Intenta escanear un código válido o abrir un enlace válido.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -2386,7 +2384,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurar MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
+    <string name="setup_mega_explanation">MEGA necesita permisos de acceso a tus archivos para que los puedas compartir. Es posible que se necesiten otros permisos de acceso para usar las características y los servicios que ofrece esta aplicación.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Permitir acceso a fotos, archivos multimedia y archivos</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -3456,7 +3454,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Ya has invitado a %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invitation sent. See Sent requests.</string>
+    <string name="contact_invited">Invitación enviada. Ver en Solicitudes enviadas.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Archivo disponible sin conexión</string>
     <!-- Message when file removed from offline. -->
@@ -3493,22 +3491,10 @@
     <string name="backup_remove_folder_title">Mover “%1s” a la Papelera</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Desactivar backup</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">Escribe “%1s” para confirmar esta acción</string>
-    <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">El texto no coincide</string>
-    <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">Añadir elemento a “%1s”</string>
-    <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">Configurar backup</string>
-    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Para asegurarte de que estos elementos añadidos a tu carpeta de backup se sincronicen automáticamente con la Nube, configúralos en la aplicación de escritorio de MEGA.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Solo lectura</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Esta carpeta se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de una carpeta de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
-    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">El contenido de esta carpeta forma parte de un backup sincronizado con una carpeta local. Realizar esta acción parará la sincronización y desactivará el backup. Podrás volver a reactivar el backup a través de la aplicación de escritorio de MEGA. ¿Confirmas que quieres continuar?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Estas carpetas se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de carpetas de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4653,8 +4639,9 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Unirse a la reunión</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">%1$d invitation sent.&#160;</item>
-        <item quantity="other">%1$d invitations sent.&#160;</item>
+        <item quantity="one">Se ha enviado %1$d invitación.&#160;</item>
+        <item quantity="many">Se han enviado %1$d de invitaciones.&#160;</item>
+        <item quantity="other">Se han enviado %1$d invitaciones.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4775,7 +4762,7 @@
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">Repetir</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_send_calendar_invite_label">Send calendar invitation</string>
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">Enviar invitación al evento</string>
     <!-- Title of option to add description in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_add_description_label">Añadir descripción</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
@@ -4979,7 +4966,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backups automáticos</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rebobinado hasta 90 días en Pro&#160;Lite y hasta 180 días en Pro&#160;I, II y III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Limpieza automática de la papelera entre 7 días y 10 años</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5235,7 +5222,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">Puedes ver, cancelar o editar cualquier evento de una reunión periódica tocando los tres puntos a la derecha y seleccionando [A]Eventos[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invitation to participants so they can add the meeting to their calendars.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Envía por correo electrónico una invitación a los participantes para que puedan añadir la reunión a sus calendarios.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Reunión actualizada</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -5370,24 +5357,8 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Ver todo</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">No denegar</string>
-    <!--  -->
-    <string name="camera_uploads_up_to_date">Subidas de la cámara actualizadas</string>
-    <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">La subida se ha detenido debido a la falta de conexión a Internet</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="one">Subidas de la cámara en curso, %1$d archivo pendiente</item>
-        <item quantity="many">Subidas de la cámara en curso, %1$d de archivos pendientes</item>
-        <item quantity="other">Subidas de la cámara en curso, %1$d archivos pendientes</item>
-    </plurals>
-    <!--  -->
-    <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="one">Subidas de la cámara completadas, %1$d archivo subido</item>
-        <item quantity="many">Subidas de la cámara completadas, %1$d de archivos subidos</item>
-        <item quantity="other">Subidas de la cámara completadas, %1$d archivos subidos</item>
-    </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA tiene acceso limitado a la biblioteca de fotos y no puede hacer un backup de todas tus fotos.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Pulsa para cambiar los permisos.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5461,17 +5432,17 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sincronizar</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad&#160;free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Sin&#160;anuncios</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA meeting invitation</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Invitación a una reunión de MEGA</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s te ha invitado a una reunión de MEGA</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">Nombre de la reunión: %1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">Enlace de la reunión: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Fecha y hora: %1$s</string>
     <!-- Text to show when the list of participants who are not in the call is empty -->
     <string name="meetings_bottom_panel_participants_not_in_call_empty">Todos los participantes invitados se han unido a la llamada</string>
     <!-- Text to show when the list of participants who are in waiting room is empty -->
@@ -5486,4 +5457,16 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Sin respuesta</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Llamar a todos</string>
+    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA necesita acceso a tu cámara para hacer fotos y vídeos.</string>
+    <!-- Warning shown if user denies the location permission when trying to pick a location -->
+    <string name="chat_attach_location_deny_permission">Has denegado el acceso a tu ubicación para MEGA. Si quieres compartir tu ubicación, concede a MEGA el permiso para hacerlo.</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">Large download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
 </resources>

@@ -625,7 +625,7 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">كيفية الترفيع</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">تمكين ترفيعات الوسائط المتعددة</string>
+    <string name="settings_secondary_upload_on">تمكين ترفيعات وسائط ثانوية</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
     <string name="settings_secondary_upload_off">تعطيل ترفيعات الوسائط المتعددة</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
@@ -1593,8 +1593,6 @@
     <string name="dialog_title_new_text_file">ملف نصي جديد</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">اسم الملف</string>
-    <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">اسم الرابط</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">الرابط الالكتروني URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
@@ -3772,22 +3770,10 @@
     <string name="backup_remove_folder_title">نقل “%1s” إلى سلة المحذوفات</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">تعطيل النسخ الاحتياطي</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">الرجاء كتابة “%1s” لتأكيد هذا الإجراء</string>
-    <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">النص المدخل غير متطابق</string>
-    <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">إضافة عنصر إلى “%1s”</string>
-    <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">شغل النسخ الاحتياطي</string>
-    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">للتأكد من أن هذه العناصر المضافة إلى مجلد النسخ الاحتياطي تتم مزامنتها تلقائيًا مع سحابة ميغا MEGA، يرجى إعدادها في تطبيق الحاسوب المكتبي MEGA Desktop App.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">للقراءة فقط</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">لا يمكن مشاركة هذا المجلد إلا للقراءة فقط ؛ نظرًا لأن هذا مجلد نسخ احتياطي ، فإن أي تغييرات تطرأ على محتواه قد تؤدي إلى تعطيل النسخ الاحتياطي.</string>
-    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">العناصر الموجودة في هذا المجلد هي جزء من نسخة احتياطية تم تكوينها و مزامنتها مع مجلد محلي. سيؤدي اتخاذ هذا الإجراء إلى تعطيل المزامنة وتعطيل النسخ الاحتياطي. يمكن إعادة تمكين النسخ الاحتياطي باستخدام تطبيق ميغا للحاسوب المكتبي MEGA Desktop App. هل انت متأكد انك تريد المتابعة؟</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">يمكن مشاركة هذه المجلدات للقراءة فقط لأنها مجلدات نسخ احتياطي، قد تؤدي أي تغييرات في محتواها إلى تعطيل النسخ الاحتياطية.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -6057,28 +6043,6 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">اظهار الكل</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">لا ترفض</string>
-    <!--  -->
-    <string name="camera_uploads_up_to_date">تم تحديث ترفيعات الكاميرا</string>
-    <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">توقف الترفيع مؤقتًا بسبب عدم وجود اتصال بالإنترنت</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="zero">ترفيعات الكاميرا قيد الإنجاز، %1$d ملف معلق</item>
-        <item quantity="one">ترفيعات الكاميرا قيد الإنجاز، %1$d ملف معلق</item>
-        <item quantity="two">ترفيعات الكاميرا قيد الإنجاز، %1$d ملفان معلقان</item>
-        <item quantity="few">ترفيعات الكاميرا قيد الإنجاز %1$d ملفات معلقة</item>
-        <item quantity="many">ترفيعات الكاميرا قيد الإنجاز، %1$d ملفاً معلقاً</item>
-        <item quantity="other">ترفيعات الكاميرا قيد الإنجاز، %1$d ملف معلق</item>
-    </plurals>
-    <!--  -->
-    <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="zero">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
-        <item quantity="one">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
-        <item quantity="two">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفين</item>
-        <item quantity="few">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفات</item>
-        <item quantity="many">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفاً</item>
-        <item quantity="other">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
-    </plurals>
     <!-- camera uploads limited access -->
     <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
     <!-- camera uploads change permissions -->
@@ -6185,4 +6149,16 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">لا يوجد رد</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">اتصل بالجميع</string>
+    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA needs access to your camera to capture photos and videos.</string>
+    <!-- Warning shown if user denies the location permission when trying to pick a location -->
+    <string name="chat_attach_location_deny_permission">You denied MEGA access to your location. If you’d like to share your location, allow MEGA permission to do so.</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">Large download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
 </resources>

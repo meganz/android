@@ -1428,8 +1428,6 @@
     <string name="dialog_title_new_text_file">새 텍스트 파일</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">파일 이름</string>
-    <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">링크 이름</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">링크 URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
@@ -3307,22 +3305,10 @@
     <string name="backup_remove_folder_title">“%1s”을/를 휴지통으로 이동</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">백업 비활성화</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">이 행동을 승인하려면 “%1s”을/를 입력하세요</string>
-    <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">입력한 문자가 일치하지 않습니다</string>
-    <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">“%1s”에 항목 추가</string>
-    <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">백업 설정</string>
-    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">이 항목들이 백업 폴더에 추가되어 MEGA 클라우드와 자동으로 동기화 되었는지 확실히 하려면, MEGA 데스크톱 앱에서 설정하세요.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">읽기 전용</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">이 폴더는 읽기 전용으로만 공유할 수 있습니다; 이 폴더는 백업 폴더이므로, 이 항목에 대한 어떠한 변경은 백업을 비활성화 할 수 있습니다.</string>
-    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">이 폴더 안의 항목은 구성된 백업의 일부이며 로컬 폴더로 동기화 됩니다. 이 행동을 하면 동기화가 깨지고 백업이 비활성화 됩니다. 백업은 MEGA 데스크톱 앱에서 다시 활성화할 수 있습니다. 계속 하시겠습니까?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">이 폴더들은 읽기 전용으로만 공유할 수 있습니다; 이 폴더들은 백업 폴더이므로, 이 항목에 대한 어떠한 변경은 백업을 비활성화 할 수 있습니다.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4911,18 +4897,6 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">모두 보기</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">거부하지 않기</string>
-    <!--  -->
-    <string name="camera_uploads_up_to_date">카메라 업로드 업데이트됨</string>
-    <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">인터넷 연결이 없어서 업로드가 일시정지 되었습니다</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
-    </plurals>
-    <!--  -->
-    <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
-    </plurals>
     <!-- camera uploads limited access -->
     <string name="camera_uploads_limited_access">MEGA가 사진 라이브러리에 제한된 접근 권한을 가지고 있어서 모든 사진을 백업할 수 없습니다.</string>
     <!-- camera uploads change permissions -->
@@ -4992,7 +4966,7 @@
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">우리는 우리의 서비스를 향상시키고 광고를 하기 위한 목적으로 쿠키 그리고 이와 유사한 기술을 이용합니다. MEGA를 계속 이용함으로써 당신은 우리의 개정된 [A]쿠키 정책[/A]에 동의함을 뜻합니다.</string>
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
-    <string name="home_side_menu_sync_title">Sync</string>
+    <string name="home_side_menu_sync_title">동기화</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;광고&#160;없음</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
@@ -5019,4 +4993,16 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">응답 없음</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">모두 통화</string>
+    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA는 사진과 동영상을 촬영하기 위해 당신의 카메라에 접근해야 합니다</string>
+    <!-- Warning shown if user denies the location permission when trying to pick a location -->
+    <string name="chat_attach_location_deny_permission">You denied MEGA access to your location. If you’d like to share your location, allow MEGA permission to do so.</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">Large download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
 </resources>

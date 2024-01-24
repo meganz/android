@@ -1217,7 +1217,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">กำลังเชื่อมต่อ&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s was already invited. Check your pending requests.</string>
+    <string name="context_contact_already_invited">%s ได้รับเชิญไปแล้ว ตรวจสอบคำขอที่รอดำเนินการของคุณ</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">หากคุณสะกดอีเมลผิด ให้แก้ไขแล้วแตะ[A]ส่งใหม่[A]</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1359,7 +1359,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">เชิญเพื่อนและรับรางวัล</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each invitation. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">รับพื้นที่เก็บข้อมูล %1$s ทุกครั้งเมื่อชวนเพื่อนสร้างรายได้ มีอายุใช้งาน 365 วัน</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">พื้นที่เก็บข้อมูล %1$s มีอายุใช้งาน 365 วัน</string>
     <!-- title of the section for unlocked rewards -->
@@ -1389,7 +1389,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">โบนัสพื้นที่เก็บข้อมูลฟรี เฉพาะคำเชิญใหม่และติดตั้งแอป MEGA บนมือถือหรือแอป MEGA เดสก์ทอปเท่านั้น</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Invitation sent</string>
+    <string name="subtitle_confirmation_invite_friends">ส่งคำเชิญแล้ว</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">ที่อยู่อีเมลมีรูปแบบไม่ถูกต้อง</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1428,8 +1428,6 @@
     <string name="dialog_title_new_text_file">ไฟล์ข้อความใหม่</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">ชื่อไฟล์</string>
-    <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">ชื่อลิงก์</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">ลิงก์ URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
@@ -1505,7 +1503,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">คิวอาร์โค้ดไม่ถูกลบเนื่องจากข้อผิดพลาด กรุณาลองอีกครั้ง</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">Invitation sent</string>
+    <string name="invite_sent">ส่งคำเชิญแล้ว</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">ได้เชิญผู้ใช้แล้ว และจะปรากฏในรายชื่อผู้ติดต่อของคุณเมื่ออีกฝ่ายกดยอมรับ</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1519,7 +1517,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">ดาวน์โหลดคิวอาร์โค้ดไปที่ %s แล้ว</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">Invitation not sent</string>
+    <string name="invite_not_sent">ยังไม่ได้ส่งคำเชิญ</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">คิวอาร์โค้ดหรือรายชื่อผู้ติดต่อไม่ถูกต้อง ลองสแกนโค้ดที่ถูกต้องหรือเปิดลิงก์ที่ถูกต้องอีกครั้ง</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -3270,7 +3268,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">คุณเคยเชิญ %1$s แล้ว</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invitation sent. See Sent requests.</string>
+    <string name="contact_invited">ส่งคำเชิญแล้ว ดูได้ที่คำขอที่ส่งแล้ว</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">ไฟล์พร้อมใช้งานออฟไลน์แล้ว</string>
     <!-- Message when file removed from offline. -->
@@ -3307,22 +3305,10 @@
     <string name="backup_remove_folder_title">ย้าย “%1s” ไปที่ถังขยะ</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">ปิดสำรองข้อมูล</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">กรุณาพิมพ์ “%1s” เพื่อยืนยันการดำเนินการนี้</string>
-    <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">ข้อความที่คุณกรอกไม่ตรงกัน</string>
-    <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">เพิ่มรายการไปที่ “%1s”</string>
-    <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">ตั้งค่าการสำรองข้อมูล</string>
-    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">เพื่อให้แน่ใจว่ารายการนี้ที่เพิ่มในโฟลเดอร์สำรองของคุณจะซิงโครไนซ์กับ MEGA คลาวด์โดยอัตโนมัติ กรุณาตั้งค่าได้ที่แอปเดสก์ท็อป</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">อ่านอย่างเดียว</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">โฟลเดอร์นี้สามารถแชร์เป็นแบบอ่านอย่างเดียวเท่านั้น เนื่องจากเป็นโฟลเดอร์ที่ใช้สำรองข้อมูล การเปลี่ยนแปลงใด ๆ ในเนื้อหาอาจเป็นการปิดใช้งานสำรองข้อมูลได้</string>
-    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">รายการในโฟลเดอร์นี้เป็นส่วนหนึ่งของการสำรองข้อมูลที่ได้กำหนดค่าและซิงโครไนซ์กับโฟลเดอร์ในเครื่องไว้ การดำเนินการนี้จะหยุดการซิงโครไนซ์และปิดใช้งานการสำรองข้อมูล การสำรองข้อมูลสามารถเปิดใช้งานได้อีกครั้งในแอป MEGA บนเดสก์ทอป คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">โฟลเดอร์เหล่านี้สามารถแชร์เป็นแบบอ่านอย่างเดียวเท่านั้น เนื่องจากเป็นโฟลเดอร์ที่ใช้สำรองข้อมูล การเปลี่ยนแปลงใด ๆ ในเนื้อหาอาจเป็นการปิดใช้งานสำรองข้อมูลได้</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4285,8 +4271,7 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">เข้าร่วมการประชุม</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">%1$d invitation sent.&#160;</item>
-        <item quantity="other">%1$d invitations sent.&#160;</item>
+        <item quantity="other">ส่งคำเชิญ %1$d รายการแล้ว&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4379,7 +4364,7 @@
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">กิจวัตร</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_send_calendar_invite_label">Send calendar invitation</string>
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">ส่งคำเชิญปฏิทินทางอีเมล</string>
     <!-- Title of option to add description in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_add_description_label">เพิ่มคำอธิบาย</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
@@ -4555,7 +4540,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;ตั้งค่าการสำรองข้อมูลอัตโนมัติได้</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;ใช้ฟีเจอร์ย้อนกลับไฟล์ได้ โดย Pro&#160;Lite ย้อนกลับได้ถึง 90 วัน ส่วน Pro&#160;I, II และ III ย้อนกลับได้ถึง 180 วัน</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;สร้างกำหนดการล้างถังขยะได้ตั้งแต่ 7 วันถึง 10 ปี</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4783,7 +4768,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">คุณสามารถดู ยกเลิก หรือแก้ไขการประชุมแบบเป็นประจำได้โดยแตะที่จุดสามจุดทางด้านขวาและเลือก [A]เหตุการณ์[/A]</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invitation to participants so they can add the meeting to their calendars.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">ส่งอีเมลคำเชิญในปฏิทินไปที่ผู้เข้าร่วมเพื่อให้สามารถเพิ่มการประชุมลงในปฏิทินได้</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">อัปเดตการประชุมแล้ว</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -4912,20 +4897,8 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">ดูทั้งหมด</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">ไม่ต้องปฏิเสธ</string>
-    <!--  -->
-    <string name="camera_uploads_up_to_date">การอัปโหลดจากกล้องได้อัปเดตล่าสุดแล้ว</string>
-    <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">การอัปโหลดถูกหยุดชั่วคราวเนื่องจากการเชื่อมต่ออินเทอร์เน็ตขาดหายไป</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="other">การอัปโหลดจากกล้องกำลังอยู่ในระหว่างดำเนินการ มี %1$d ไฟล์รอดำเนินการ</item>
-    </plurals>
-    <!--  -->
-    <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="other">การอัปโหลดจากกล้องเสร็จสมบูรณ์ มี %1$d ไฟล์ที่อัปโหลดแล้ว</item>
-    </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA ถูกจำกัดการเข้าถึงไลบรารีรูปภาพของคุณและไม่สามารถสำรองรูปภาพทั้งหมดของคุณได้</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">แตะเพื่อเปลี่ยนการอนุญาต</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -4995,17 +4968,17 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">ซิงค์</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad&#160;free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;ไม่มีโฆษณา</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA meeting invitation</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">เชิญเข้าร่วมการประชุม MEGA</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s เชิญคุณเข้าร่วมการประชุม MEGA</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">ชื่อเรื่องการประชุม: %1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">ลิงก์ประชุม: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">วันที่และเวลา: %1$s</string>
     <!-- Text to show when the list of participants who are not in the call is empty -->
     <string name="meetings_bottom_panel_participants_not_in_call_empty">ทุกคนที่ถูกเชิญมา ได้เข้าร่วมสายครบแล้ว</string>
     <!-- Text to show when the list of participants who are in waiting room is empty -->
@@ -5020,4 +4993,16 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">ไม่รับสาย</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">โทรหาทั้งหมด</string>
+    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA ต้องการเข้าถึงกล้องของคุณเพื่อถ่ายภาพและวิดีโอ</string>
+    <!-- Warning shown if user denies the location permission when trying to pick a location -->
+    <string name="chat_attach_location_deny_permission">MEGA ไม่สามารถเข้าถึงตำแหน่งที่ตั้งของคุณได้ หากคุณต้องการแชร์ตำแหน่งที่ตั้ง ต้องอนุญาต MEGA ให้สามารถเข้าถึงตำแหน่งที่ตั้งของคุณ</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">ดาวน์โหลดไฟล์ขนาดใหญ่</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">เริ่มดาวน์โหลด</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">ดาวน์โหลดทันทีและไม่ต้องถามอีก</string>
 </resources>

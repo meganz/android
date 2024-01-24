@@ -1217,7 +1217,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Menghubungkan&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s was already invited. Check your pending requests.</string>
+    <string name="context_contact_already_invited">%s sudah diundang. Periksa permintaan anda yang tertunda.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">Jika anda salah mengeja alamat e-mail, perbaiki dan ketuk [A]Kirim Ulang[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1345,9 +1345,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Pindahkan ke Sampah?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Camera uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Apakah anda ingin memindahkan folder ini ke Tempat Sampah? Folder baru akan dibuat secara otomatis untuk unggahan Kamera.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Do you want to move this folder to the Rubbish bin? A new folder will be automatically created for Media uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Apakah anda ingin memindahkan folder ini ke Tempat sampah? Folder baru akan dibuat secara otomatis untuk unggahan Media.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Pindahkan ke Sampah?</string>
     <!-- confirmation message before removing a file -->
@@ -1359,7 +1359,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Undang teman dan dapatkan hadiah</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each invitation. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">%1$s penyimpanan untuk setiap undangan. Berlaku selama 365 hari.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$spenyimpanan. Berlaku selama 365 hari.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1389,7 +1389,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bonus penyimpanan gratis hanya berlaku untuk undangan baru dan di mana Aplikasi Seluler MEGA atau Aplikasi Desktop MEGA diinstal.</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Invitation sent</string>
+    <string name="subtitle_confirmation_invite_friends">Undangan dikirim</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Alamat email salah format</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1428,8 +1428,6 @@
     <string name="dialog_title_new_text_file">File teks baru</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Nama File</string>
-    <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">Nama link</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">URL link</string>
     <!-- Title of the field subject when a new file is created to upload -->
@@ -1505,7 +1503,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">Kode QR tidak dihapus karena kesalahan. Tolong, coba lagi.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">Invitation sent</string>
+    <string name="invite_sent">Undangan dikirim</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">Pengguna telah diundang dan akan muncul di daftar kontak anda setelah diterima.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1519,7 +1517,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">Kode QR telah diunduh ke %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">Invitation not sent</string>
+    <string name="invite_not_sent">Undangan tidak terkirim</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">Kode QR atau tautan kontak tidak valid. Coba pindai kode yang valid atau untuk membuka tautan yang valid.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -2278,7 +2276,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Siapkan MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
+    <string name="setup_mega_explanation">MEGA membutuhkan izin anda untuk mengakses media dan file anda untuk berbagi. Izin akses lain mungkin diperlukan untuk menggunakan fitur dan layanan yang disediakan aplikasi ini.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Izinkan akses ke foto, media, dan file</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -3270,7 +3268,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Anda sudah mengundang %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invitation sent. See Sent requests.</string>
+    <string name="contact_invited">Undangan dikirim. Lihat Permintaan Terkirim.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File tersedia Offline</string>
     <!-- Message when file removed from offline. -->
@@ -3307,22 +3305,10 @@
     <string name="backup_remove_folder_title">Pindahkan “%1s” ke Tempat Sampah</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Nonaktifkan cadangan</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">Tolong ketik “%1s” untuk mengkonfirmasi tindakan ini</string>
-    <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">teks yang dimasukkan tidak cocok</string>
-    <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">Tambahkan item ke “%1s”</string>
-    <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">Siapkan cadangan</string>
-    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Untuk memastikan item yang ditambahkan ke folder cadangan anda secara otomatis disinkronkan ke MEGA Cloud, silakan atur di Aplikasi Desktop MEGA.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Hanya-baca</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Folder ini hanya dapat dibagikan sebagai hanya-baca; karena ini adalah folder cadangan, perubahan apa pun pada kontennya dapat menonaktifkan cadangan.</string>
-    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Item dalam folder ini adalah bagian dari cadangan yang dikonfigurasi dan disinkronkan ke folder lokal. Mengambil tindakan ini akan merusak sinkronisasi dan menonaktifkan pencadangan. Pencadangan dapat diaktifkan kembali di Aplikasi Desktop MEGA. Anda yakin ingin melanjutkan?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Folder ini hanya dapat dibagikan sebagai hanya-baca; karena merupakan folder cadangan, perubahan apa pun pada kontennya dapat menonaktifkan pencadangan.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4285,8 +4271,7 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Gabung rapat</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">%1$d invitation sent.&#160;</item>
-        <item quantity="other">%1$d invitations sent.&#160;</item>
+        <item quantity="other">%1$d undangan dikirim.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -4379,7 +4364,7 @@
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">Berulang</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_send_calendar_invite_label">Send calendar invitation</string>
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">Kirim undangan kalender</string>
     <!-- Title of option to add description in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_add_description_label">Tambah deskripsi</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
@@ -4783,7 +4768,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">Anda dapat melihat, membatalkan, atau mengedit kejadian rapat berulang dengan mengetuk tiga titik di sebelah kanan dan memilih [A]Kejadian[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invitation to participants so they can add the meeting to their calendars.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email undangan kalender kepada peserta sehingga mereka dapat menambahkan rapat ke kalender mereka.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Rapat diperbarui</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -4912,20 +4897,8 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Lihat semua</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Jangan tolak</string>
-    <!--  -->
-    <string name="camera_uploads_up_to_date">Unggahan kamera diperbarui</string>
-    <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">Pengunggahan dijeda karena tidak ada koneksi internet</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="other">Pengunggahan kamera sedang berlangsung, %1$d file tertunda</item>
-    </plurals>
-    <!--  -->
-    <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="other">Unggahan kamera selesai, %1$d file diunggah</item>
-    </plurals>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">MEGA memiliki akses terbatas ke perpustakaan foto anda dan tidak dapat membuat cadangan semua foto anda.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Ketuk untuk mengubah izin.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -4987,7 +4960,7 @@
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galeri</string>
     <!-- Preference screen item title for Ads Cookie -->
-    <string name="settings_cookies_settings_ads_title">Cookie iklan</string>
+    <string name="settings_cookies_settings_ads_title">Cookie Iklan</string>
     <!-- Preference screen item summary for Ads Cookie-->
     <string name="settings_cookies_settings_ads_summary">Digunakan oleh mitra periklanan kami yang disetujui untuk mengumpulkan data tentang aktivitas penjelajahan anda dan menyesuaikan iklan yang anda lihat di layanan kami dan di situs web lain. Tidak menerima cookie ini berarti anda masih akan melihat iklan tetapi iklan tersebut tidak akan dipersonalisasi.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
@@ -4995,21 +4968,21 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">Sinkronkan</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad&#160;free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Iklan&#160;gratis</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA meeting invitation</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Undangan pertemuan MEGA</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s mengundang anda ke pertemuan MEGA</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">Nama rapat: %1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">Tautan pertemuan: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Tanggal dan waktu: %1$s</string>
     <!-- Text to show when the list of participants who are not in the call is empty -->
     <string name="meetings_bottom_panel_participants_not_in_call_empty">Semua peserta yang diundang telah bergabung dalam panggilan tersebut</string>
     <!-- Text to show when the list of participants who are in waiting room is empty -->
-    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">There is no one in the waiting room</string>
+    <string name="meetings_bottom_panel_participants_in_waiting_room_empty">Tidak ada seorang pun di ruang tunggu</string>
     <!-- Label of the button to call an absent participant from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_button">Panggilan</string>
     <!-- Default status label for an absent participant at the not in call participants list -->
@@ -5019,5 +4992,17 @@
     <!-- Status label after call an absent participant from the not in call participants list and get no response -->
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Tidak ada respon</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
-    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Hubungi semua</string>
+    <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Panggil semua</string>
+    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA membutuhkan akses ke kamera anda untuk menangkap foto dan video.</string>
+    <!-- Warning shown if user denies the location permission when trying to pick a location -->
+    <string name="chat_attach_location_deny_permission">Anda menolak akses MEGA ke lokasi anda. Jika anda ingin membagikan lokasi anda, perbolehkan izin MEGA untuk melakukannya.</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">Large download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
 </resources>

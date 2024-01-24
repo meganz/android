@@ -1527,8 +1527,6 @@
     <string name="dialog_title_new_text_file">Новый текстовый файл</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Название файла</string>
-    <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">Название ссылки</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">Адрес ссылки</string>
     <!-- Title of the field subject when a new file is created to upload -->
@@ -1573,7 +1571,7 @@
     <!-- Label to show send feedback -->
     <string name="send_feedback_panel">Нет, написать отзыв</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA нужны разрешения на чтение и запись в вашем внешнем хранилище для скачивания файлов.</string>
+    <string name="download_requires_permission">Для скачивания файлов MEGA требуются разрешения на чтение и запись в вашем внешнем хранилище.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">Старая SD-карта недоступна, пожалуйста, укажите новое место для скачивания.</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
@@ -2440,7 +2438,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Настроить MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
+    <string name="setup_mega_explanation">Для хранения и обмена файлами приложению MEGA требуется ваше разрешение на доступ к файлам. Для корректной работы приложения могут потребоваться и другие разрешения.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Разрешите доступ к фотографиям, медиа и файлам</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -3116,7 +3114,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Ссылка: %1$s\n\nПароль: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA требуется ваше разрешение, чтобы делиться файлами.</string>
+    <string name="files_required_permissions_warning">Чтобы делиться файлами, MEGA требуется ваше разрешение на доступ к файлам.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Избранное</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3341,7 +3339,7 @@
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Добавить номер телефона</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
-    <string name="denied_write_permissions">MEGA нужно разрешение на запись в память устройства, чтобы продолжить.</string>
+    <string name="denied_write_permissions">Чтобы продолжить, MEGA требуется разрешение на запись в память устройства.</string>
     <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
     <string name="tomorrow_date">Завтра, %1$s</string>
     <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
@@ -3459,7 +3457,7 @@
     <!-- Warning show to the user when the app needs permissions to start a meeting.-->
     <string name="meeting_permission_info">Разрешения доступа, необходимые MEGA</string>
     <!-- Message of a dialog to show user the permissions that needed-->
-    <string name="meeting_permission_info_message">Для встреч MEGA нужен доступ к вашему микрофону и камере.</string>
+    <string name="meeting_permission_info_message">Для встреч MEGA требуется доступ к микрофону и камере.</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">Понятно</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
@@ -3586,22 +3584,10 @@
     <string name="backup_remove_folder_title">Перемещение папки «%1s» в Корзину</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Отключить</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">Пожалуйста, введите «%1s», чтобы продолжить</string>
-    <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">Введённый текст не подходит</string>
-    <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">Добавление элемента в папку «%1s»</string>
-    <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">Настройка резервного копирования</string>
-    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Чтобы элементы в папке резервного копирования автоматически синхронизировались с облаком MEGA, настройте его в настольном приложении.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Только чтение</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Эта папка доступна только для чтения. Поскольку это папка резервных копий, любые изменения её содержимого могут отключить резервное копирование.</string>
-    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Элементы в этой папке являются частью настроенной резервной копии и синхронизируются с локальной папкой. Выполнение этого действия нарушит синхронизацию и отключит резервное копирование. Резервное копирование можно повторно включить в настольном приложении MEGA. Вы действительно хотите продолжить?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Эти папки могут быть доступны только для чтения; это папки резервных копий, поэтому любые изменения их содержимого могут отключить резервное копирование.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -5601,24 +5587,6 @@
     <string name="meetings_waiting_room_call_ui_see_all_button">Посмотреть всех</string>
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Пустить</string>
-    <!--  -->
-    <string name="camera_uploads_up_to_date">Загрузки из камеры обновлены</string>
-    <!--  -->
-    <string name="camera_uploads_paused_due_to_no_internet">Загрузка приостановлена из-за отсутствия подключения к Интернету</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <plurals name="camera_uploads_in_progress_pending_files">
-        <item quantity="one">Выполняется загрузка из камеры, %1$d файл ожидает обработки</item>
-        <item quantity="few">Выполняется загрузка из камеры, %1$d файла ожидает обработки</item>
-        <item quantity="many">Выполняется загрузка из камеры, %1$d файлов ожидает обработки</item>
-        <item quantity="other">Выполняется загрузка из камеры, %1$d файла ожидает обработки</item>
-    </plurals>
-    <!--  -->
-    <plurals name="camera_uploads_complete_uploaded_files">
-        <item quantity="one">Загрузка из камеры завершена, загружен %1$d файл</item>
-        <item quantity="few">Загрузка из камеры завершена, загружено %1$d файла</item>
-        <item quantity="many">Загрузка из камеры завершена, загружено %1$d файлов</item>
-        <item quantity="other">Загрузка из камеры завершена, загружено %1$d файла</item>
-    </plurals>
     <!-- camera uploads limited access -->
     <string name="camera_uploads_limited_access">MEGA имеет ограниченный доступ к вашей библиотеке фотографий и не может создавать резервные копии всех ваших фотографий.</string>
     <!-- camera uploads change permissions -->
@@ -5721,4 +5689,16 @@
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Не отвечает</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Позвонить всем</string>
+    <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="chat_attach_pick_from_camera_deny_permission">Для фото- и видеосъёмки MEGA требуется доступ к камере.</string>
+    <!-- Warning shown if user denies the location permission when trying to pick a location -->
+    <string name="chat_attach_location_deny_permission">You denied MEGA access to your location. If you’d like to share your location, allow MEGA permission to do so.</string>
+    <!-- Title for the confirmation dialog shown when the user is starting a large download -->
+    <string name="transfers_confirm_large_download_title">Large download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
+    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
+    <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
 </resources>
