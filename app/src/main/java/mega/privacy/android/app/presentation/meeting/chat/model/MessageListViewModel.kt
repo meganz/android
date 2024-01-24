@@ -9,7 +9,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.insertHeaderItem
+import androidx.paging.insertFooterItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -87,7 +87,7 @@ class MessageListViewModel @Inject constructor(
      */
     val pagedMessages: Flow<PagingData<UiChatMessage>> = pagedFlow
         .map { pagingData ->
-            pagingData.insertHeaderItem(
+            pagingData.insertFooterItem(
                 item = ChatHeaderMessage()
             )
         }

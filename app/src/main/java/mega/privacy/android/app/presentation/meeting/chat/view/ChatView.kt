@@ -281,8 +281,7 @@ internal fun ChatView(
     val scrollState = rememberLazyListState()
     val showScrollToBottomFab by remember {
         derivedStateOf {
-            scrollState.layoutInfo.totalItemsCount > 0
-                    && scrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index != scrollState.layoutInfo.totalItemsCount - 1
+            scrollState.layoutInfo.totalItemsCount > 0 && scrollState.firstVisibleItemIndex != 0
         }
     }
     val interactionSourceTextInput = remember { MutableInteractionSource() }
@@ -555,7 +554,7 @@ internal fun ChatView(
                     ) {
                         ScrollToBottomFab {
                             coroutineScope.launch {
-                                scrollState.animateScrollToItem(scrollState.layoutInfo.totalItemsCount - 1)
+                                scrollState.animateScrollToItem(0)
                             }
                         }
                     }

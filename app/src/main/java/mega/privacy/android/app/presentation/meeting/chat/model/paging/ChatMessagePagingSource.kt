@@ -21,7 +21,6 @@ import timber.log.Timber
  * @property fetchMessages
  * @property messageFlow
  * @property scope
- * @property pagedTypedMessageResultUiMapper
  */
 class ChatMessagePagingSource(
     private val chatId: Long,
@@ -70,17 +69,17 @@ class ChatMessagePagingSource(
         val messages = typedMessages.await()
         val historyLoadStatus = status.await()
 
-        val prevKey =
+        val nextKey =
             PagingLoadResult(
                 loadStatus = historyLoadStatus,
-                nextMessageUserHandle = messages.firstOrNull()?.userHandle,
-                nexMessageIsMine = messages.firstOrNull()?.isMine,
+                nextMessageUserHandle = messages.lastOrNull()?.userHandle,
+                nexMessageIsMine = messages.lastOrNull()?.isMine,
             )
 
         return LoadResult.Page(
             data = messages.map { uiChatMessageMapper(it) },
-            prevKey = prevKey,
-            nextKey = null,
+            prevKey = null,
+            nextKey = nextKey,
         )
     }
 

@@ -30,7 +30,7 @@ class MapChatMessageListUseCase @Inject constructor(
         nextMessageUserHandle: Long?,
     ): List<TypedMessage> {
         return chatMessages
-            .sortedBy { it.timestamp }
+            .sortedByDescending { it.timestamp }
             .mapIndexed { index, chatMessage ->
                 val isMine = chatMessage.userHandle == currentUserHandle
                 val shouldShowAvatar = shouldShowAvatar(

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,14 +44,6 @@ internal fun MessageListView(
     var lastCacheUpdateTime by remember {
         mutableStateOf(emptyMap<Long, Long>())
     }
-    var scrollToBottom by remember { mutableStateOf(true) }
-    val derivedScrollToBottom by remember {
-        derivedStateOf {
-            scrollToBottom &&
-                    pagingItems.loadState.refresh is LoadState.NotLoading &&
-                    pagingItems.itemCount > 0
-        }
-    }
 
     LaunchedEffect(pagingItems.itemSnapshotList) {
         viewModel.updateLatestMessageId(pagingItems.itemSnapshotList.lastOrNull()?.id ?: -1L)
@@ -70,29 +60,15 @@ internal fun MessageListView(
         }
     }
 
-    LaunchedEffect(key1 = derivedScrollToBottom) {
-        Timber.d("Paging derivedScrollToBottom is $derivedScrollToBottom")
-        if (derivedScrollToBottom) {
-            scrollState.scrollToItem(
-                index = pagingItems.itemCount - 1
-            )
-            scrollToBottom = false
-        }
-    }
     val context = LocalContext.current
-
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = scrollState,
-        contentPadding = PaddingValues(bottom = bottomPadding.coerceAtLeast(12.dp))
+        contentPadding = PaddingValues(bottom = bottomPadding.coerceAtLeast(12.dp)),
+        reverseLayout = true,
     ) {
-        item("header") {
-            AnimatedVisibility(visible = pagingItems.loadState.refresh is LoadState.Loading) {
-                LoadingMessagesHeader()
-            }
-        }
         when {
             pagingItems.loadState.refresh is LoadState.Error -> {
 //                Error view
@@ -136,6 +112,12 @@ internal fun MessageListView(
                     if (uiState.haveWritePermission) onMessageLongClick(it)
                 },
             )
+        }
+
+        if (pagingItems.loadState.append is LoadState.Loading || pagingItems.loadState.refresh is LoadState.Loading) {
+            item {
+                LoadingMessagesHeader()
+            }
         }
     }
 }
