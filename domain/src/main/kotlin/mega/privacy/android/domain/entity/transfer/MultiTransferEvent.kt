@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.transfer
 
-import kotlin.math.roundToInt
+import mega.privacy.android.domain.entity.Progress
 
 /**
  * Events for transfers (Upload or Download) that may involve more than one file or folder
@@ -47,16 +47,9 @@ sealed interface MultiTransferEvent {
         }
 
         /**
-         * Current overall progress of all the initiated transfers in [0,100] range. May be inaccurate since some nodes may not have been processed yet, and therefore, totalBytesToTransfer could be inaccurate.
+         * Current overall progress of all the initiated transfers. May be inaccurate since some nodes may not have been processed yet, and therefore, totalBytesToTransfer could be inaccurate.
          */
-        val overallProgress =
-            if (totalBytesToTransfer == 0L) {
-                0
-            } else {
-                (totalBytesTransferred.toFloat() / totalBytesToTransfer.toFloat())
-                    .times(100).roundToInt()
-                    .coerceIn(0, 100)
-            }
+        val overallProgress = Progress(totalBytesTransferred, totalBytesToTransfer)
     }
 
     /**

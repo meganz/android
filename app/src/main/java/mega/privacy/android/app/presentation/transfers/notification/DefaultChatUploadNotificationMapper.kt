@@ -80,7 +80,7 @@ class DefaultChatUploadNotificationMapper @Inject constructor(
             setOnlyAlertOnce(true)
             setAutoCancel(false)
             setContentIntent(pendingIntent)
-            activeTransferTotals?.progressPercent?.let { setProgress(100, it, false) }
+            activeTransferTotals?.transferProgress?.let { setProgress(100, it.intValue, false) }
         }
         return builder.build()
     }

@@ -77,7 +77,7 @@ class DefaultDownloadNotificationMapper @Inject constructor(
             setOnlyAlertOnce(true)
             setAutoCancel(false)
             setContentIntent(pendingIntent)
-            activeTransferTotals?.progressPercent?.let { setProgress(100, it, false) }
+            activeTransferTotals?.transferProgress?.let { setProgress(100, it.intValue, false) }
             subText?.let { setSubText(subText) }
         }
         return builder.build()

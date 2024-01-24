@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.voiceclip
 
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 
 /**
@@ -14,8 +15,8 @@ import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
  */
 data class VoiceClipMessageUiState(
     val isPlaying: Boolean = false,
-    val playProgress: Int? = null,
-    val loadProgress: Int? = 0,
+    val playProgress: Progress? = null,
+    val loadProgress: Progress? = Progress(0f),
     val timestamp: String = "--:--",
     val voiceClipMessage: VoiceClipMessage? = null,
     val isError: Boolean = false,

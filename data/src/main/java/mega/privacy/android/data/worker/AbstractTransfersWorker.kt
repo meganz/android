@@ -96,10 +96,10 @@ abstract class AbstractTransfersWorker(
                 .catch { Timber.e("${this::class.java.simpleName}error: $it") }
                 .onEach { (transferTotals, paused, _) ->
                     //set progress percent as worker progress
-                    setProgress(workDataOf(PROGRESS to transferTotals.progressPercent))
+                    setProgress(workDataOf(PROGRESS to transferTotals.transferProgress.floatValue))
                     //update the notification
                     notify(createUpdateNotification(transferTotals, paused))
-                    Timber.d("${this::class.java.simpleName}${if (paused) "(paused) " else ""} Notification update (${transferTotals.progressPercent}):${transferTotals.hasOngoingTransfers()}")
+                    Timber.d("${this::class.java.simpleName}${if (paused) "(paused) " else ""} Notification update (${transferTotals.transferProgress.intValue}):${transferTotals.hasOngoingTransfers()}")
                 }
                 .last().let { (lastActiveTransferTotals, _, overQuota) ->
                     stopService(monitorJob)
@@ -204,7 +204,7 @@ abstract class AbstractTransfersWorker(
 
     companion object {
         /**
-         * Tag to get the progress percent of this worker
+         * Tag to get the progress as float in [0,1] range of this worker
          */
         const val PROGRESS = "Progress"
         private const val NOTIFICATION_STORAGE_OVERQUOTA = 14

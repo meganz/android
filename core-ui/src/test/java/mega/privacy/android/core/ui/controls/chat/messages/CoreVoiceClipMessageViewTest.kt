@@ -32,7 +32,7 @@ class VoiceClipMessageViewTest {
     @Test
     fun `test that progress indicator is visible when it is loading`() {
         initComposeRuleContent(
-            progress = 50,
+            progress = .5f,
             isPlaying = false,
             onPlayClicked = {},
         )
@@ -65,7 +65,7 @@ class VoiceClipMessageViewTest {
 
 
     private fun initComposeRuleContent(
-        progress: Int?,
+        progress: Float?,
         isPlaying: Boolean,
         onPlayClicked: () -> Unit,
     ) {

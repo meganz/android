@@ -50,8 +50,8 @@ internal const val VOICE_CLIP_MESSAGE_VIEW_LOAD_PROGRESS_INDICATOR_TEST_TAG =
  *                  show elapsed time when playing.
  * @param modifier modifier
  * @param isError whether message is in error status
- * @param loadProgress loading progress of the message. null if already loaded. The value can be 0-100.
- * @param playProgress playing progress of the audio. null if not playing. The value can be 0-100.
+ * @param loadProgress loading progress of the message. null if already loaded. The value can be 0-1.
+ * @param playProgress playing progress of the audio. null if not playing. The value can be 0-1.
  * @param isPlaying Whether voice clip is playing. Default is false.
  * @param onPlayClicked Callback when play button is clicked.
  */
@@ -61,8 +61,8 @@ fun CoreVoiceClipMessageView(
     timestamp: String,
     modifier: Modifier = Modifier,
     isError: Boolean = false,
-    loadProgress: Int? = null,
-    playProgress: Int? = null,
+    loadProgress: Float? = null,
+    playProgress: Float? = null,
     isPlaying: Boolean = false,
     onPlayClicked: () -> Unit = {},
 ) {
@@ -98,7 +98,7 @@ fun CoreVoiceClipMessageView(
 }
 
 @Composable
-private fun LoadProgress(loadProgress: Int?, isError: Boolean) {
+private fun LoadProgress(loadProgress: Float?, isError: Boolean) {
     loadProgress?.let {
         if (!isError) {
             MegaLinearProgressIndicator(
@@ -117,12 +117,12 @@ private fun LoadProgress(loadProgress: Int?, isError: Boolean) {
  * Show the play progress
  *
  * @param isMe whether message is sent from me
- * @param progress loading progress of the audio. null if already loaded. The value can be 0-100.
+ * @param progress loading progress of the audio. null if already loaded. The value can be 0-1.
  */
 @Composable
 private fun PlayProgress(
     isMe: Boolean,
-    progress: Int?,
+    progress: Float?,
     modifier: Modifier = Modifier,
 ) {
     // @formatter:off
@@ -135,7 +135,7 @@ private fun PlayProgress(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        val dividerPos = progress?.let { (it.toFloat() / 100f * heightList.size).toInt() } ?: 0
+        val dividerPos = progress?.let { (it * heightList.size).toInt() } ?: 0
         val color =
             if (isMe) MegaTheme.colors.icon.inverse else MegaTheme.colors.text.onColorDisabled
 
@@ -195,10 +195,10 @@ private fun PlayButton(
 /**
  * Show an overlay when voice clip is loading.
  *
- * @param loadProgress loading progress of the message. null if already loaded. The value can be 0-100.
+ * @param loadProgress loading progress of the message. null if already loaded. The value can be 0-1.
  */
 @Composable
-private fun LoadOverlay(loadProgress: Int?, isError: Boolean) {
+private fun LoadOverlay(loadProgress: Float?, isError: Boolean) {
     if (loadProgress != null || isError) {
         Box(
             modifier = Modifier
@@ -234,7 +234,7 @@ private fun LoadingVoiceClipMessageViewPreview(
         CoreVoiceClipMessageView(
             isMe = isMe,
             timestamp = "00:49",
-            loadProgress = 50,
+            loadProgress = .5f,
         )
     }
 }
@@ -250,7 +250,7 @@ private fun Playing20VoiceClipMessageViewPreview(
             timestamp = "00:49",
             loadProgress = null,
             isPlaying = true,
-            playProgress = 20,
+            playProgress = .2f,
         )
     }
 }
@@ -266,7 +266,7 @@ private fun Playing50VoiceClipMessageViewPreview(
             timestamp = "00:49",
             loadProgress = null,
             isPlaying = true,
-            playProgress = 50,
+            playProgress = .5f,
         )
     }
 }
@@ -282,7 +282,7 @@ private fun Playing80VoiceClipMessageViewPreview(
             timestamp = "00:49",
             loadProgress = null,
             isPlaying = true,
-            playProgress = 80,
+            playProgress = .8f,
         )
     }
 }

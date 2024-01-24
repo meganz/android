@@ -31,8 +31,8 @@ fun VoiceClipMessageView(
         timestamp = uiState.timestamp,
         modifier = modifier,
         isError = uiState.isError,
-        loadProgress = uiState.loadProgress,
-        playProgress = uiState.playProgress,
+        loadProgress = uiState.loadProgress?.floatValue,
+        playProgress = uiState.playProgress?.floatValue,
         isPlaying = uiState.isPlaying,
         onPlayClicked = { viewModel.onPlayOrPauseClicked(message.msgId) },
     )

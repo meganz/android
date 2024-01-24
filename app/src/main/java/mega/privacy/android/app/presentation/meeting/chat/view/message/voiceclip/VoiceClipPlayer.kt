@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.voicecli
 
 import android.media.MediaPlayer
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
@@ -41,7 +40,7 @@ class VoiceClipPlayer @Inject constructor(
     }
 
     /**
-     * Get the play progress of current voice clip
+     * Get the play position of current voice clip
      *
      * @param key
      * @return position in milliseconds

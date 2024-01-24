@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.transfer
 
+import mega.privacy.android.domain.entity.Progress
+
 /**
  * Class to expose the totals for active transfers grouped by [TransferType]
  *
@@ -44,10 +46,9 @@ data class ActiveTransferTotals(
     fun allPaused() = pendingFileTransfers > 0 && pausedFileTransfers == pendingFileTransfers
 
     /**
-     * Represents the percentage (with base 100) of the already transferred bytes
+     * Represents the progress of the already transferred bytes
      */
-    val progressPercent =
-        if (totalBytes == 0L) 0 else ((transferredBytes * 100L) / totalBytes).toInt()
+    val transferProgress = Progress(transferredBytes, totalBytes)
 
     /**
      * The total number of active file transfers of this specific type that are pending for download (not finished), whether paused or in progress.

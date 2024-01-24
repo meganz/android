@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.meeting.chat.mapper.DurationTextMapper
 import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -224,7 +225,7 @@ class VoiceClipMessageViewModel @Inject constructor(
         val timestamp = durationTextMapper(state.pos)
         val playProgress =
             getUiStateFlow(msgId).value.voiceClipMessage?.duration?.let { dur ->
-                (state.pos * 100L / dur).toInt()
+                Progress(state.pos, dur)
             }
         getMutableStateFlow(msgId)?.update {
             it.copy(

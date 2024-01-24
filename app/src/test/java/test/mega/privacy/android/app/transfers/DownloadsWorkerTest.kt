@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMa
 import mega.privacy.android.data.worker.AbstractTransfersWorker
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.data.worker.DownloadsWorker
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -267,11 +268,12 @@ class DownloadsWorkerTest {
     @Test
     fun `test that progress is set as work progress`() = runTest {
         val transferTotal = mockActiveTransferTotals(true)
-        val expectedProgress = 100
-        whenever(transferTotal.progressPercent).thenReturn(expectedProgress)
+        val expectedProgress = Progress(1f)
+        whenever(transferTotal.transferProgress).thenReturn(expectedProgress)
         commonStub(transferTotals = listOf(transferTotal))
         underTest.doWork()
-        val expectedData = workDataOf(AbstractTransfersWorker.PROGRESS to expectedProgress)
+        val expectedData =
+            workDataOf(AbstractTransfersWorker.PROGRESS to expectedProgress.floatValue)
         verify(workProgressUpdater).updateProgress(eq(context), any(), eq(expectedData))
     }
 
