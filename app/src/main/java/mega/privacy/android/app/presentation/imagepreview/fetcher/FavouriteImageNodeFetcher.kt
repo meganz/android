@@ -22,7 +22,7 @@ internal class FavouriteImageNodeFetcher @Inject constructor(
             nodeId = NodeId(bundle.getLong(NODE_ID)),
             count = 1,
         ).mapLatest { imageNodes ->
-            imageNodes.sortedByDescending { imageNode -> imageNode.modificationTime }
+            imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
         }.flowOn(defaultDispatcher)
     }
 

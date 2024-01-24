@@ -21,7 +21,7 @@ internal class DefaultImageNodeFetcher @Inject constructor(
         return monitorImageNodesUseCase(
             nodeIds = bundle.getLongArray(NODE_IDS)?.map { NodeId(it) }.orEmpty(),
         ).mapLatest { imageNodes ->
-            imageNodes.sortedByDescending { imageNode -> imageNode.modificationTime }
+            imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
         }.flowOn(defaultDispatcher)
     }
 

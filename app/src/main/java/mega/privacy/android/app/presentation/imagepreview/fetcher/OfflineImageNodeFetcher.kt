@@ -18,8 +18,8 @@ internal class OfflineImageNodeFetcher @Inject constructor(
 ) : ImageNodeFetcher {
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
         return monitorOfflineNodesUseCase(path = bundle.getString(PATH, ""))
-            .mapLatest {
-                it.sortedByDescending { imageNode -> imageNode.modificationTime }
+            .mapLatest { imageNodes ->
+                imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
             }.flowOn(defaultDispatcher)
     }
 

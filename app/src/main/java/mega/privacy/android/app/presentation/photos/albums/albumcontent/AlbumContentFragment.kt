@@ -43,7 +43,6 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumType
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -55,6 +54,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.AlbumContentScreenEvent
 import mega.privacy.mobile.analytics.event.AlbumContentShareLinkMenuToolbarEvent
@@ -198,6 +198,9 @@ class AlbumContentFragment : Fragment() {
                         if (currentAlbum is UserAlbum) {
                             this[AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID] = currentAlbum.id.id
                         }
+
+                        this[AlbumContentImageNodeFetcher.ALBUM_SORT_TYPE] =
+                            albumContentViewModel.state.value.currentSort
                     }
                     val intent = ImagePreviewActivity.createIntent(
                         context = requireContext(),

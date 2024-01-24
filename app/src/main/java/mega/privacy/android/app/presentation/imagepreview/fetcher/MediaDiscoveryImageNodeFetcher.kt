@@ -19,8 +19,8 @@ class MediaDiscoveryImageNodeFetcher @Inject constructor(
         return monitorMediaDiscoveryNodesUseCase(
             parentId = NodeId(bundle.getLong(PARENT_ID)),
             recursive = bundle.getBoolean(IS_RECURSIVE),
-        ).mapLatest {
-            it.sortedByDescending { imageNode -> imageNode.modificationTime }
+        ).mapLatest { imageNodes ->
+            imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
         }.flowOn(defaultDispatcher)
     }
 

@@ -18,8 +18,8 @@ internal class AlbumSharingImageNodeFetcher @Inject constructor(
 ) : ImageNodeFetcher {
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
         return monitorPublicAlbumNodesUseCase()
-            .mapLatest {
-                it.sortedByDescending { imageNode -> imageNode.modificationTime }
+            .mapLatest { imageNodes ->
+                imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
             }.flowOn(defaultDispatcher)
     }
 }

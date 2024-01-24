@@ -4,7 +4,6 @@ import android.os.Bundle
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -18,7 +17,7 @@ class TimelineImageNodeFetcher @Inject constructor(
 
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
         return monitorTimelineNodesUseCase().mapLatest { imageNodes ->
-            imageNodes.sortedByDescending { imageNode -> imageNode.modificationTime }
+            imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
         }.flowOn(defaultDispatcher)
     }
 }

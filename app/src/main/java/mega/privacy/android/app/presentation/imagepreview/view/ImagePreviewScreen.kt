@@ -311,12 +311,15 @@ internal fun ImagePreviewScreen(
                     getImageThumbnailPath = viewModel::getLowestResolutionImagePath,
                     onClickInfo = {
                         onClickInfo(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickFavourite = {
                         onClickFavourite(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickLabel = {
                         onClickLabel(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickDispute = {},
                     onClickOpenWith = {
@@ -330,6 +333,7 @@ internal fun ImagePreviewScreen(
                     },
                     onClickImport = {
                         onClickImport(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onSwitchAvailableOffline = { checked ->
                         onSwitchAvailableOffline?.invoke(checked, currentImageNode)
@@ -337,11 +341,13 @@ internal fun ImagePreviewScreen(
                     },
                     onClickGetLink = {
                         onClickGetLink(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickRemoveLink = {
                         if (!currentImageNode.isTakenDown) {
                             showRemoveLinkDialog = true
                         }
+                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickSendToChat = {
                         onClickSendTo(currentImageNode)
@@ -349,20 +355,29 @@ internal fun ImagePreviewScreen(
                     },
                     onClickShare = {
                         onClickShare(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickRename = {
                         onClickRename(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickMove = {
                         onClickMove(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickCopy = {
                         onClickCopy(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
-                    onClickRestore = {},
-                    onClickRemove = {},
+                    onClickRestore = {
+                        hideBottomSheet(coroutineScope, modalSheetState)
+                    },
+                    onClickRemove = {
+                        hideBottomSheet(coroutineScope, modalSheetState)
+                    },
                     onClickMoveToRubbishBin = {
                         showMoveToRubbishBinDialog = true
+                        hideBottomSheet(coroutineScope, modalSheetState)
                     },
                 )
             },

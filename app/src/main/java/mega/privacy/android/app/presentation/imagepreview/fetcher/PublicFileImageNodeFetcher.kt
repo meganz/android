@@ -20,7 +20,7 @@ internal class PublicFileImageNodeFetcher @Inject constructor(
         return monitorPublicImageNodesUseCase(
             url = bundle.getString(URL).orEmpty(),
         ).mapLatest { imageNodes ->
-            imageNodes.sortedByDescending { imageNode -> imageNode.modificationTime }
+            imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
         }.flowOn(defaultDispatcher)
     }
 
