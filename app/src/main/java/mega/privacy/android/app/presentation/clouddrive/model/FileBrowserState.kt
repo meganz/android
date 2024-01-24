@@ -17,8 +17,11 @@ import mega.privacy.android.domain.entity.preference.ViewType
  *
  * @property currentViewType serves as the original view type
  * @property fileBrowserHandle current file browser handle
+ * @property accessedFolderHandle The Folder Handle set when Cloud Drive is opened and
+ * there's a Node that immediately needs to be opened
+ * @property isAccessedFolderExited true if the User has left the Folder specified by
+ * [accessedFolderHandle]
  * @property mediaDiscoveryViewSettings current settings for displaying discovery view
- * @property parentHandle Parent Handle of current Node
  * @property isPendingRefresh
  * @property nodesList list of [NodeUIItem]
  * @property isInSelection if list is in selection mode or not
@@ -44,8 +47,9 @@ import mega.privacy.android.domain.entity.preference.ViewType
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
     val fileBrowserHandle: Long = -1L,
+    val accessedFolderHandle: Long? = null,
+    val isAccessedFolderExited: Boolean = false,
     val mediaDiscoveryViewSettings: Int = MediaDiscoveryViewSettings.INITIAL.ordinal,
-    val parentHandle: Long? = null,
     val isPendingRefresh: Boolean = false,
     val nodesList: List<NodeUIItem<TypedNode>> = emptyList(),
     val isInSelection: Boolean = false,

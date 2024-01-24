@@ -224,8 +224,34 @@ class FileBrowserViewModel @Inject constructor(
         viewModelScope.launch {
             handleStack.push(handle)
             _state.update { it.copy(fileBrowserHandle = handle) }
-            refreshNodes()
+            refreshNodesState()
         }
+
+    /**
+     * Immediately opens a Node in order to display its contents
+     *
+     * @param folderHandle The Folder Handle
+     */
+    suspend fun openFileBrowserWithSpecificNode(folderHandle: Long) {
+        handleStack.push(folderHandle)
+        _state.update {
+            it.copy(
+                fileBrowserHandle = folderHandle,
+                accessedFolderHandle = folderHandle,
+            )
+        }
+        refreshNodesState()
+        if (shouldEnterMediaDiscoveryMode(
+                folderHandle = folderHandle,
+                mediaDiscoveryViewSettings = state.value.mediaDiscoveryViewSettings,
+            )
+        ) {
+            setMediaDiscoveryVisibility(
+                isMediaDiscoveryOpen = true,
+                isMediaDiscoveryOpenedByIconClick = false,
+            )
+        }
+    }
 
     /**
      * Get the browser parent handle
@@ -245,15 +271,15 @@ class FileBrowserViewModel @Inject constructor(
     /**
      * If a folder only contains images or videos, then go to MD mode directly
      *
-     * @param parentHandle the folder handle
+     * @param folderHandle the folder handle
      * @param mediaDiscoveryViewSettings [mediaDiscoveryViewSettings]
      * @return true is should enter MD mode, otherwise is false
      */
     suspend fun shouldEnterMediaDiscoveryMode(
-        parentHandle: Long,
+        folderHandle: Long,
         mediaDiscoveryViewSettings: Int,
     ): Boolean =
-        getFileBrowserNodeChildrenUseCase(parentHandle).let { nodes ->
+        getFileBrowserNodeChildrenUseCase(folderHandle).let { nodes ->
             if (nodes.isEmpty() || mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.DISABLED.ordinal) {
                 false
             } else {
@@ -279,7 +305,6 @@ class FileBrowserViewModel @Inject constructor(
 
     private suspend fun refreshNodesState() {
         val fileBrowserHandle = _state.value.fileBrowserHandle
-        val parentHandle = getParentNodeUseCase(NodeId(fileBrowserHandle))?.id?.longValue
         val rootNode = getRootNodeUseCase()?.id?.longValue
         val isRootNode = fileBrowserHandle == rootNode
 
@@ -292,7 +317,6 @@ class FileBrowserViewModel @Inject constructor(
         _state.update {
             it.copy(
                 showMediaDiscoveryIcon = showMediaDiscoveryIcon,
-                parentHandle = parentHandle,
                 nodesList = nodeUIItems,
                 sortOrder = sortOrder,
                 isFileBrowserEmpty = isFileBrowserEmpty,
@@ -353,9 +377,12 @@ class FileBrowserViewModel @Inject constructor(
     suspend fun exitMediaDiscovery(performBackNavigation: Boolean) {
         if (performBackNavigation) {
             handleStack.pop()
-            val currentParent = _state.value.parentHandle ?: getRootNodeUseCase()?.id?.longValue
-            ?: MegaApiJava.INVALID_HANDLE
-            _state.update { it.copy(fileBrowserHandle = currentParent) }
+            handleAccessedFolderOnBackPress()
+
+            val parentHandle =
+                getParentNodeUseCase(NodeId(_state.value.fileBrowserHandle))?.id?.longValue
+                    ?: getRootNodeUseCase()?.id?.longValue ?: MegaApiJava.INVALID_HANDLE
+            _state.update { it.copy(fileBrowserHandle = parentHandle) }
             setMediaDiscoveryVisibility(
                 isMediaDiscoveryOpen = false,
                 isMediaDiscoveryOpenedByIconClick = false,
@@ -372,8 +399,9 @@ class FileBrowserViewModel @Inject constructor(
     /**
      * Goes back one level from the Cloud Drive hierarchy
      */
-    fun performBackNavigation() {
-        _state.value.parentHandle?.let { parentHandle ->
+    suspend fun performBackNavigation() {
+        handleAccessedFolderOnBackPress()
+        getParentNodeUseCase(NodeId(_state.value.fileBrowserHandle))?.id?.longValue?.let { parentHandle ->
             setFileBrowserHandle(parentHandle)
             handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
             // Update the Toolbar Title
@@ -385,14 +413,30 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
-     * Performs action when folder is clicked from adapter
-     * @param handle node handle
+     * Checks and updates State Parameters if the User performs a Back Navigation event, and is in
+     * the Folder Level that he/she immediately accessed
      */
-    private fun onFolderItemClicked(handle: Long) {
+    private fun handleAccessedFolderOnBackPress() {
+        if (_state.value.fileBrowserHandle == _state.value.accessedFolderHandle) {
+            _state.update {
+                it.copy(
+                    isAccessedFolderExited = true,
+                    accessedFolderHandle = null,
+                )
+            }
+        }
+    }
+
+    /**
+     * Performs specific actions upon clicking a Folder Node
+     *
+     * @param folderHandle The Folder Handle
+     */
+    private fun onFolderItemClicked(folderHandle: Long) {
         viewModelScope.launch {
-            setFileBrowserHandle(handle)
+            setFileBrowserHandle(folderHandle)
             if (shouldEnterMediaDiscoveryMode(
-                    parentHandle = handle,
+                    folderHandle = folderHandle,
                     mediaDiscoveryViewSettings = state.value.mediaDiscoveryViewSettings,
                 )
             ) {
@@ -666,4 +710,17 @@ class FileBrowserViewModel @Inject constructor(
     fun consumeUpdateToolbarTitleEvent() {
         _state.update { it.copy(updateToolbarTitleEvent = consumed) }
     }
+
+    /**
+     * Checks if the User has left the Folder that was immediately accessed
+     *
+     * @return true if the User left the accessed Folder
+     */
+    fun isAccessedFolderExited() = _state.value.isAccessedFolderExited
+
+    /**
+     * Resets the value of [FileBrowserState.isAccessedFolderExited]
+     */
+    fun resetIsAccessedFolderExited() =
+        _state.update { it.copy(isAccessedFolderExited = false) }
 }

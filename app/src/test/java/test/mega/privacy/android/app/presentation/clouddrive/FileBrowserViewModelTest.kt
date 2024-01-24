@@ -2,7 +2,7 @@ package test.mega.privacy.android.app.presentation.clouddrive
 
 import android.view.MenuItem
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.Dispatchers
@@ -126,12 +126,11 @@ class FileBrowserViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.state.test {
             val initial = awaitItem()
-            Truth.assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
-            Truth.assertThat(initial.fileBrowserHandle).isEqualTo(-1L)
-            Truth.assertThat(initial.mediaDiscoveryViewSettings)
+            assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
+            assertThat(initial.fileBrowserHandle).isEqualTo(-1L)
+            assertThat(initial.mediaDiscoveryViewSettings)
                 .isEqualTo(MediaDiscoveryViewSettings.INITIAL.ordinal)
-            Truth.assertThat(initial.parentHandle).isNull()
-            Truth.assertThat(initial.nodesList).isEmpty()
+            assertThat(initial.nodesList).isEmpty()
         }
     }
 
@@ -141,9 +140,9 @@ class FileBrowserViewModelTest {
         underTest.state.map { it.fileBrowserHandle }.distinctUntilChanged()
             .test {
                 val newValue = 123456789L
-                Truth.assertThat(awaitItem()).isEqualTo(-1L)
+                assertThat(awaitItem()).isEqualTo(-1L)
                 underTest.setFileBrowserHandle(newValue)
-                Truth.assertThat(awaitItem()).isEqualTo(newValue)
+                assertThat(awaitItem()).isEqualTo(newValue)
             }
     }
 
@@ -151,7 +150,7 @@ class FileBrowserViewModelTest {
     fun `test that get safe browser parent handle returns INVALID_HANDLE if not set and root folder fails`() =
         runTest {
             whenever(getRootNodeUseCase()).thenReturn(null)
-            Truth.assertThat(underTest.getSafeBrowserParentHandle())
+            assertThat(underTest.getSafeBrowserParentHandle())
                 .isEqualTo(MegaApiJava.INVALID_HANDLE)
         }
 
@@ -160,7 +159,7 @@ class FileBrowserViewModelTest {
         runTest {
             val expectedHandle = 123456789L
             underTest.setFileBrowserHandle(expectedHandle)
-            Truth.assertThat(underTest.getSafeBrowserParentHandle()).isEqualTo(expectedHandle)
+            assertThat(underTest.getSafeBrowserParentHandle()).isEqualTo(expectedHandle)
         }
 
     @Test
@@ -177,7 +176,7 @@ class FileBrowserViewModelTest {
             )
             monitorNodeUpdatesFakeFlow.emit(NodeUpdate(update))
             underTest.setFileBrowserHandle(newValue)
-            Truth.assertThat(underTest.state.value.nodesList.size).isEqualTo(2)
+            assertThat(underTest.state.value.nodesList.size).isEqualTo(2)
         }
 
     @Test
@@ -186,7 +185,7 @@ class FileBrowserViewModelTest {
             val newValue = 123456789L
             whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(emptyList())
             underTest.setFileBrowserHandle(newValue)
-            Truth.assertThat(underTest.state.value.nodesList.size).isEqualTo(0)
+            assertThat(underTest.state.value.nodesList.size).isEqualTo(0)
             verify(getFileBrowserNodeChildrenUseCase).invoke(newValue)
         }
 
@@ -201,7 +200,7 @@ class FileBrowserViewModelTest {
                 newValue,
                 MediaDiscoveryViewSettings.INITIAL.ordinal
             )
-        Truth.assertThat(shouldEnter).isFalse()
+        assertThat(shouldEnter).isFalse()
     }
 
     @Test
@@ -217,7 +216,7 @@ class FileBrowserViewModelTest {
                     newValue,
                     MediaDiscoveryViewSettings.DISABLED.ordinal
                 )
-            Truth.assertThat(shouldEnter).isFalse()
+            assertThat(shouldEnter).isFalse()
         }
 
     @Test
@@ -238,7 +237,7 @@ class FileBrowserViewModelTest {
                     newValue,
                     MediaDiscoveryViewSettings.ENABLED.ordinal
                 )
-            Truth.assertThat(shouldEnter).isFalse()
+            assertThat(shouldEnter).isFalse()
         }
 
     @Test
@@ -283,9 +282,9 @@ class FileBrowserViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedFolderNodes).isEqualTo(1)
-                Truth.assertThat(state.selectedFileNodes).isEqualTo(0)
-                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(1)
+                assertThat(state.selectedFolderNodes).isEqualTo(1)
+                assertThat(state.selectedFileNodes).isEqualTo(0)
+                assertThat(state.selectedNodeHandles.size).isEqualTo(1)
             }
         }
 
@@ -318,9 +317,9 @@ class FileBrowserViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedFolderNodes).isEqualTo(0)
-                Truth.assertThat(state.selectedFileNodes).isEqualTo(0)
-                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(0)
+                assertThat(state.selectedFolderNodes).isEqualTo(0)
+                assertThat(state.selectedFileNodes).isEqualTo(0)
+                assertThat(state.selectedNodeHandles.size).isEqualTo(0)
             }
         }
 
@@ -353,9 +352,9 @@ class FileBrowserViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedFolderNodes).isEqualTo(1)
-                Truth.assertThat(state.selectedFileNodes).isEqualTo(1)
-                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(2)
+                assertThat(state.selectedFolderNodes).isEqualTo(1)
+                assertThat(state.selectedFileNodes).isEqualTo(1)
+                assertThat(state.selectedNodeHandles.size).isEqualTo(2)
             }
         }
 
@@ -375,7 +374,7 @@ class FileBrowserViewModelTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             underTest.refreshNodes()
             underTest.selectAllNodes()
-            Truth.assertThat(underTest.state.value.nodesList.size)
+            assertThat(underTest.state.value.nodesList.size)
                 .isEqualTo(underTest.state.value.selectedNodeHandles.size)
         }
 
@@ -384,7 +383,7 @@ class FileBrowserViewModelTest {
         underTest.clearAllNodes()
         underTest.state.test {
             val state = awaitItem()
-            Truth.assertThat(state.selectedNodeHandles).isEmpty()
+            assertThat(state.selectedNodeHandles).isEmpty()
         }
     }
 
@@ -410,9 +409,9 @@ class FileBrowserViewModelTest {
         initViewModel()
         advanceUntilIdle()
         underTest.state.test {
-            Truth.assertThat(awaitItem().isPendingRefresh).isFalse()
+            assertThat(awaitItem().isPendingRefresh).isFalse()
             flow.emit(Unit)
-            Truth.assertThat(awaitItem().isPendingRefresh).isTrue()
+            assertThat(awaitItem().isPendingRefresh).isTrue()
         }
     }
 
@@ -423,7 +422,7 @@ class FileBrowserViewModelTest {
             whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(10000)
             underTest.changeTransferOverQuotaBannerVisibility()
             underTest.state.test {
-                Truth.assertThat(awaitItem().shouldShowBannerVisibility).isFalse()
+                assertThat(awaitItem().shouldShowBannerVisibility).isFalse()
             }
         }
 
@@ -433,9 +432,8 @@ class FileBrowserViewModelTest {
             onDownloadOptionClick()
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.downloadEvent)
-                    .isInstanceOf(StateEventWithContentTriggered::class.java)
-                Truth.assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
+                assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
                     .isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
             }
         }
@@ -449,8 +447,7 @@ class FileBrowserViewModelTest {
             underTest.consumeDownloadEvent()
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.downloadEvent)
-                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+                assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
             }
         }
 
