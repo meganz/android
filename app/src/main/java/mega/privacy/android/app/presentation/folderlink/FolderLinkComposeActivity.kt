@@ -182,8 +182,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                val isInAppAdvertisementEnabled =
-                    getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement)
+                val isInAppAdvertisementEnabled = true
                 val isAdsEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads)
 
                 if (isInAppAdvertisementEnabled && isAdsEnabled) {
