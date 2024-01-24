@@ -1,11 +1,16 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.os.Environment.getExternalStoragePublicDirectory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,11 +56,14 @@ import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.getScreenHeight
 import mega.privacy.android.app.utils.getScreenWidth
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
@@ -68,6 +76,7 @@ import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
 import org.jetbrains.anko.configuration
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -396,10 +405,28 @@ class VideoPlayerFragment : Fragment() {
         }
     }
 
-    @OptIn(UnstableApi::class)
     private fun screenshotButtonClicked() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && !hasPermissions(
+                requireContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        ) {
+            requestPermission(
+                requireActivity(),
+                REQUEST_WRITE_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        } else {
+            captureScreenShot()
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun captureScreenShot() {
+        val rootPath =
+            getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
         binding.playerView.videoSurfaceView?.let { view ->
-            viewModel.screenshotWhenVideoPlaying(captureView = view) { bitmap ->
+            viewModel.screenshotWhenVideoPlaying(rootPath, captureView = view) { bitmap ->
                 viewModel.sendSnapshotButtonClickedEvent()
                 Analytics.tracker.trackEvent(SnapshotButtonPressedEvent)
                 viewLifecycleOwner.lifecycleScope.launch {
@@ -411,8 +438,21 @@ class VideoPlayerFragment : Fragment() {
                     videoPlayerActivity?.showSnackBarForVideoPlayer(
                         getString(R.string.media_player_video_snackbar_screenshot_saved)
                     )
+                    refreshGalleryWhenDeviceOSisLowerQ(rootPath)
                 }
             }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun refreshGalleryWhenDeviceOSisLowerQ(refreshPath: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            activity?.sendBroadcast(
+                Intent(
+                    Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                    Uri.fromFile(File(refreshPath))
+                )
+            )
         }
     }
 
