@@ -23,7 +23,6 @@ class MoveBottomSheetMenuItem @Inject constructor(
     ) = isInBackups.not()
             && isNodeInRubbish.not()
             && node.isIncomingShare.not()
-            && node.isTakenDown.not()
             && accessPermission in listOf(
         AccessPermission.OWNER,
         AccessPermission.FULL,

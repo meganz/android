@@ -46,7 +46,7 @@ class MoveBottomSheetMenuItemTest {
             AccessPermission.OWNER,
             false,
             mock<TypedFileNode> { on { isTakenDown } doReturn true },
-            false
+            true
         ),
         Arguments.of(
             false,

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
@@ -40,7 +41,6 @@ import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
-import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
@@ -48,6 +48,7 @@ import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -163,12 +164,19 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
                 Scaffold(
                     modifier = Modifier,
                     scaffoldState = scaffoldState,
+                    snackbarHost = {
+                        SnackbarHost(
+                            modifier = Modifier.navigationBarsPadding(),
+                            hostState = snackbarHostState
+                        ) { data ->
+                            MegaSnackbar(snackbarData = data)
+                        }
+                    }
                 ) { padding ->
                     SearchNavHostController(
                         modifier = Modifier
                             .padding(padding)
-                            .statusBarsPadding()
-                            .navigationBarsPadding(),
+                            .statusBarsPadding(),
                         viewModel = viewModel,
                         nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
                         handleClick = ::handleClick,
