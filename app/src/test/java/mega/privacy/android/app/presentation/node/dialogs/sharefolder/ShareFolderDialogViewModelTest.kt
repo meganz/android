@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.dialogs.sharefolder
 
 import com.google.common.truth.Truth
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -27,8 +28,10 @@ import org.mockito.kotlin.whenever
 class ShareFolderDialogViewModelTest {
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase = mock()
+    private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val underTest = ShareFolderDialogViewModel(
+        applicationScope = applicationScope,
         getNodeByHandleUseCase = getNodeByHandleUseCase,
         checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase
     )
@@ -70,7 +73,7 @@ class ShareFolderDialogViewModelTest {
     fun resetMocks() {
         reset(
             getNodeByHandleUseCase,
-            checkBackupNodeTypeByHandleUseCase
+            checkBackupNodeTypeByHandleUseCase,
         )
     }
 

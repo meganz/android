@@ -8,13 +8,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.presentation.node.dialogs.removesharefolder.RemoveShareFolderDialog
-import mega.privacy.android.app.presentation.node.dialogs.removesharefolder.RemoveShareFolderViewModel
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 import mega.privacy.android.domain.entity.node.NodeId
 
 internal fun NavGraphBuilder.removeShareFolderDialogNavigation(
     navHostController: NavHostController,
-    removeShareFolderViewModel: RemoveShareFolderViewModel,
     searchActivityViewModel: SearchActivityViewModel,
 ) {
     dialog(
@@ -28,7 +26,6 @@ internal fun NavGraphBuilder.removeShareFolderDialogNavigation(
             it.arguments?.getLong(searchRemoveFolderShareDialogArgumentNodeId)?.let { handle ->
                 RemoveShareFolderDialog(
                     nodeList = listOf(NodeId(handle)),
-                    viewModel = removeShareFolderViewModel,
                     onDismiss = {
                         navHostController.navigateUp()
                     }
@@ -41,9 +38,8 @@ internal fun NavGraphBuilder.removeShareFolderDialogNavigation(
             }
             RemoveShareFolderDialog(
                 nodeList = nodeIds,
-                viewModel = removeShareFolderViewModel,
                 onDismiss = {
-                    navHostController.popBackStack()
+                    navHostController.navigateUp()
                 }
             )
         }

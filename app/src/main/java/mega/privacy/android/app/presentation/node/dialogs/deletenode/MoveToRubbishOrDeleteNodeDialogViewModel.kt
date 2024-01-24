@@ -1,19 +1,13 @@
 package mega.privacy.android.app.presentation.node.dialogs.deletenode
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.palm.composestateevents.StateEventWithContent
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import timber.log.Timber
@@ -21,31 +15,28 @@ import javax.inject.Inject
 
 /**
  * View Model for Move to rubbish or delete view Model
+ * @property applicationScope [CoroutineScope]
  * @property deleteNodesUseCase [DeleteNodesUseCase]
  * @property moveNodesToRubbishUseCase [MoveNodesToRubbishUseCase]
  * @property moveRequestMessageMapper [MoveRequestMessageMapper]
+ * @property snackBarHandler [SnackBarHandler]
  */
 @HiltViewModel
 class MoveToRubbishOrDeleteNodeDialogViewModel @Inject constructor(
+    @ApplicationScope private val applicationScope: CoroutineScope,
     private val deleteNodesUseCase: DeleteNodesUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
     private val moveRequestMessageMapper: MoveRequestMessageMapper,
+    private val snackBarHandler: SnackBarHandler
 ) : ViewModel() {
-
-    private val _state = MutableStateFlow(MoveToRubbishOrDeleteNodesState())
-
-    /**
-     * state for MoveToRubbishOrDeleteNodeDialog
-     */
-    val state: StateFlow<MoveToRubbishOrDeleteNodesState> = _state.asStateFlow()
 
     /**
      * Delete nodes
      *
-     * @param nodeHandles
+     * @param handles
      */
     fun deleteNodes(handles: List<Long>) {
-        viewModelScope.launch {
+        applicationScope.launch {
             val nodeHandles = handles.map {
                 NodeId(it)
             }
@@ -56,11 +47,7 @@ class MoveToRubbishOrDeleteNodeDialogViewModel @Inject constructor(
             }
             result.getOrNull()?.let { res ->
                 val message = moveRequestMessageMapper(res)
-                _state.update {
-                    it.copy(
-                        deleteEvent = triggered(message)
-                    )
-                }
+                snackBarHandler.postSnackbarMessage(message)
             }
         }
     }
@@ -68,10 +55,10 @@ class MoveToRubbishOrDeleteNodeDialogViewModel @Inject constructor(
     /**
      * Move nodes to rubbish
      *
-     * @param nodeHandles
+     * @param handles
      */
     fun moveNodesToRubbishBin(handles: List<Long>) {
-        viewModelScope.launch {
+        applicationScope.launch {
             val handlesList = handles.map {
                 it
             }
@@ -82,21 +69,8 @@ class MoveToRubbishOrDeleteNodeDialogViewModel @Inject constructor(
             }
             result.getOrNull()?.let { res ->
                 val message = moveRequestMessageMapper(res)
-                _state.update {
-                    it.copy(
-                        deleteEvent = triggered(message)
-                    )
-                }
+                snackBarHandler.postSnackbarMessage(message)
             }
-        }
-    }
-
-    /**
-     * Consumed Delete event
-     */
-    fun consumeDeleteEvent() {
-        _state.update {
-            it.copy(deleteEvent = consumed())
         }
     }
 }

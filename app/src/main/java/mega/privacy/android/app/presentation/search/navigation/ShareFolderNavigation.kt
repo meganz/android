@@ -10,16 +10,13 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialog
-import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
 
 internal fun NavGraphBuilder.shareFolderDialogNavigation(
     navHostController: NavHostController,
-    shareFolderDialogViewModel: ShareFolderDialogViewModel,
     searchActivityViewModel: SearchActivityViewModel,
 ) {
     dialog(
@@ -33,7 +30,6 @@ internal fun NavGraphBuilder.shareFolderDialogNavigation(
             it.arguments?.getLong(searchFolderShareDialogArgumentNodeId)?.let { handle ->
                 ShareFolderDialog(
                     nodeIds = listOf(NodeId(handle)),
-                    shareFolderDialogViewModel = shareFolderDialogViewModel,
                     onDismiss = {
                         navHostController.navigateUp()
                     },
@@ -52,7 +48,6 @@ internal fun NavGraphBuilder.shareFolderDialogNavigation(
             }
             ShareFolderDialog(
                 nodeIds = nodeIds,
-                shareFolderDialogViewModel = shareFolderDialogViewModel,
                 onDismiss = {
                     navHostController.navigateUp()
                 },

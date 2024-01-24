@@ -10,5 +10,4 @@ internal data class RenameNodeDialogState(
     @StringRes val errorMessage: Int? = null,
     val showChangeNodeExtensionDialogEvent: StateEventWithContent<String> = consumed(),
     val renameValidationPassedEvent: StateEvent = consumed,
-    val renameSuccessfulEvent: StateEvent = consumed,
 )

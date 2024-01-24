@@ -6,6 +6,4 @@ internal sealed interface ChangeNodeExtensionAction {
         val nodeId: Long,
         val newNodeName: String,
     ) : ChangeNodeExtensionAction
-
-    data object OnChangeExtensionConsumed : ChangeNodeExtensionAction
 }

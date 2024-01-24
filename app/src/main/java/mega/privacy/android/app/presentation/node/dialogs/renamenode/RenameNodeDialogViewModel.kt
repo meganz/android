@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,14 +21,18 @@ import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeD
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnLoadNodeName
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameValidationPassed
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
+import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 internal class RenameNodeDialogViewModel @Inject constructor(
+    @ApplicationScope private val applicationScope: CoroutineScope,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val checkForValidNameUseCase: CheckForValidNameUseCase,
     private val renameNodeUseCase: RenameNodeUseCase,
+    private val snackBarHandler: SnackBarHandler,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RenameNodeDialogState())
@@ -51,15 +56,20 @@ internal class RenameNodeDialogViewModel @Inject constructor(
             }
 
             is OnRenameConfirmed -> {
-                viewModelScope.launch {
-                    getNodeByHandleUseCase(action.nodeId)?.let { currentNode ->
-                        handleValidationResult(action, currentNode)
-                    }
+                applicationScope.launch {
+                    runCatching { getNodeByHandleUseCase(action.nodeId) }
+                        .onSuccess {
+                            it?.let { currentNode ->
+                                handleValidationResult(action, currentNode)
+                            }
+                        }.onFailure {
+                            Timber.e(it)
+                        }
                 }
             }
 
             is OnRenameSucceeded -> {
-                _state.update { it.copy(renameSuccessfulEvent = consumed) }
+                snackBarHandler.postSnackbarMessage(R.string.context_correctly_renamed)
             }
 
             is OnRenameValidationPassed -> {
@@ -109,11 +119,11 @@ internal class RenameNodeDialogViewModel @Inject constructor(
     }
 
     private fun renameNode(nodeId: Long, newNodeName: String) {
-        viewModelScope.launch {
+        applicationScope.launch {
             runCatching {
                 renameNodeUseCase(nodeId, newNodeName)
             }.onSuccess {
-                _state.update { it.copy(renameSuccessfulEvent = triggered) }
+                snackBarHandler.postSnackbarMessage(R.string.context_correctly_renamed)
             }.onFailure {
                 Timber.e(it)
             }

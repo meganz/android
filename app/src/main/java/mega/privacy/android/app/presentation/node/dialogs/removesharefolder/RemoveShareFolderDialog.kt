@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
@@ -23,7 +24,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 fun RemoveShareFolderDialog(
     nodeList: List<NodeId>,
     onDismiss: () -> Unit,
-    viewModel: RemoveShareFolderViewModel,
+    viewModel: RemoveShareFolderViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

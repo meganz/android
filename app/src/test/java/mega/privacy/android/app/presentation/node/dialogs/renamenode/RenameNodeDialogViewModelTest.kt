@@ -1,11 +1,11 @@
 package mega.privacy.android.app.presentation.node.dialogs.renamenode
 
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -20,6 +20,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
@@ -40,13 +41,17 @@ class RenameNodeDialogViewModelTest {
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
     private val checkForValidNameUseCase: CheckForValidNameUseCase = mock()
     private val renameNodeUseCase: RenameNodeUseCase = mock()
+    private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
+    private val snackBarHandler: SnackBarHandler = mock()
 
     @BeforeEach
     fun setup() {
         underTest = RenameNodeDialogViewModel(
+            applicationScope,
             getNodeByHandleUseCase,
             checkForValidNameUseCase,
-            renameNodeUseCase
+            renameNodeUseCase,
+            snackBarHandler
         )
     }
 
@@ -57,7 +62,7 @@ class RenameNodeDialogViewModelTest {
 
     @AfterEach
     fun tearDown() {
-        reset(getNodeByHandleUseCase, checkForValidNameUseCase, renameNodeUseCase)
+        reset(getNodeByHandleUseCase, checkForValidNameUseCase, renameNodeUseCase, snackBarHandler)
     }
 
     @AfterAll
@@ -72,7 +77,6 @@ class RenameNodeDialogViewModelTest {
         val node: FileNode = mock()
         whenever(node.name).thenReturn(nodeName)
         whenever(getNodeByHandleUseCase(nodeId)).thenReturn(node)
-
         underTest.handleAction(RenameNodeDialogAction.OnLoadNodeName(nodeId))
 
         assertThat(nodeName).isEqualTo(underTest.state.value.nodeName)
@@ -99,6 +103,7 @@ class RenameNodeDialogViewModelTest {
             )
 
             verify(renameNodeUseCase).invoke(nodeId.longValue, newNodeName)
+            verify(snackBarHandler).postSnackbarMessage(R.string.context_correctly_renamed)
             assertThat(underTest.state.value.renameValidationPassedEvent).isEqualTo(triggered)
         }
 
@@ -129,9 +134,7 @@ class RenameNodeDialogViewModelTest {
     fun `test that OnRenameSucceeded updates state with success event`() = runTest {
         underTest.handleAction(RenameNodeDialogAction.OnRenameSucceeded)
 
-        val currentState = underTest.state.value
-        Truth.assertThat(currentState.renameSuccessfulEvent).isEqualTo(consumed)
-
+        verify(snackBarHandler).postSnackbarMessage(R.string.context_correctly_renamed)
     }
 
     @Test

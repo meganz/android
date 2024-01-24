@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
@@ -39,7 +40,7 @@ internal fun RenameNodeDialog(
     nodeId: Long,
     onDismiss: () -> Unit,
     onOpenChangeExtensionDialog: (newName: String) -> Unit,
-    viewModel: RenameNodeDialogViewModel,
+    viewModel: RenameNodeDialogViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 

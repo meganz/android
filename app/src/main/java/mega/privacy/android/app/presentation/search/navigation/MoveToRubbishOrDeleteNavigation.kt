@@ -16,7 +16,6 @@ import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 
 internal fun NavGraphBuilder.moveToRubbishOrDeleteNavigation(
     navHostController: NavHostController,
-    moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel,
     searchActivityViewModel: SearchActivityViewModel,
 ) {
     dialog(
@@ -33,7 +32,6 @@ internal fun NavGraphBuilder.moveToRubbishOrDeleteNavigation(
                     onDismiss = { navHostController.navigateUp() },
                     nodesList = listOf(nodeId),
                     isNodeInRubbish = it.arguments?.getBoolean(argumentIsInRubbish) ?: false,
-                    viewModel = moveToRubbishOrDeleteNodeDialogViewModel
                 )
             }
         } else {
@@ -49,7 +47,6 @@ internal fun NavGraphBuilder.moveToRubbishOrDeleteNavigation(
                 onDismiss = { navHostController.navigateUp() },
                 nodesList = list.value,
                 isNodeInRubbish = it.arguments?.getBoolean(argumentIsInRubbish) ?: false,
-                viewModel = moveToRubbishOrDeleteNodeDialogViewModel
             )
         }
     }

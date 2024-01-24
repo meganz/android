@@ -6,11 +6,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialog
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 
 internal fun NavGraphBuilder.renameDialogNavigation(
     navHostController: NavHostController,
-    renameNodeDialogViewModel: RenameNodeDialogViewModel,
 ) {
     dialog(
         "$searchRenameDialog/{${searchRenameDialogArgumentNodeId}}",
@@ -27,7 +25,6 @@ internal fun NavGraphBuilder.renameDialogNavigation(
                 onOpenChangeExtensionDialog = { newNodeName ->
                     navHostController.navigate("$searchChangeExtensionNodeDialog/$nodeId/$newNodeName")
                 },
-                viewModel = renameNodeDialogViewModel
             )
         }
     }

@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.snackbar
 
+import android.content.Context
+import androidx.annotation.StringRes
 import androidx.compose.material.SnackbarDuration
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -18,12 +21,14 @@ import javax.inject.Singleton
  * @property activityLifecycleHandler [ActivityLifecycleHandler]
  * @property applicationScope [CoroutineScope]
  * @property mainDispatcher [CoroutineDispatcher]
+ * @property context [Context]
  */
 @Singleton
 class SnackBarHandler @Inject constructor(
     private val activityLifecycleHandler: ActivityLifecycleHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+    @ApplicationContext private val context: Context
 ) {
     private val snackBarDecoration = MutableSharedFlow<SnackBarDecoration>()
 
@@ -54,7 +59,7 @@ class SnackBarHandler @Inject constructor(
      *
      * @param message text to be shown in the Snackbar
      * @param actionLabel optional action label to show as button in the Snackbar
-     * @param duration duration to control how long snackbar will be shown in [SnackbarHost], either
+     * @param snackbarDuration duration to control how long snackbar will be shown in [SnackbarHost], either
      * [SnackbarDuration.Short], [SnackbarDuration.Long] or [SnackbarDuration.Indefinite]
      */
     fun postSnackbarMessage(
@@ -65,6 +70,29 @@ class SnackBarHandler @Inject constructor(
         applicationScope.launch {
             val snackBarDecorationValue = SnackBarDecoration(
                 message = message,
+                actionLabel = actionLabel,
+                snackbarDuration = snackbarDuration
+            )
+            snackBarDecoration.emit(snackBarDecorationValue)
+        }
+    }
+
+    /**
+     * Post message to show snackbar
+     *
+     * @param resId ResourceId from strings
+     * @param actionLabel optional action label to show as button in the Snackbar
+     * @param snackbarDuration duration to control how long snackbar will be shown in [SnackbarHost], either
+     * [SnackbarDuration.Short], [SnackbarDuration.Long] or [SnackbarDuration.Indefinite]
+     */
+    fun postSnackbarMessage(
+        @StringRes resId: Int,
+        actionLabel: String? = null,
+        snackbarDuration: MegaSnackbarDuration = MegaSnackbarDuration.Short,
+    ) {
+        applicationScope.launch {
+            val snackBarDecorationValue = SnackBarDecoration(
+                message = context.getString(resId),
                 actionLabel = actionLabel,
                 snackbarDuration = snackbarDuration
             )

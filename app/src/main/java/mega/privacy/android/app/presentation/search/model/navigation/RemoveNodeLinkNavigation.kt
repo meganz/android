@@ -10,12 +10,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkDialog
-import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 
 internal fun NavGraphBuilder.removeNodeLinkDialogNavigation(
     navHostController: NavHostController,
-    removeNodeLinkViewModel: RemoveNodeLinkViewModel,
     searchActivityViewModel: SearchActivityViewModel,
 ) {
     dialog(
@@ -30,7 +28,6 @@ internal fun NavGraphBuilder.removeNodeLinkDialogNavigation(
                 RemoveNodeLinkDialog(
                     onDismiss = { navHostController.navigateUp() },
                     nodesList = listOf(nodeId),
-                    viewModel = removeNodeLinkViewModel
                 )
             }
         } else {
@@ -45,7 +42,6 @@ internal fun NavGraphBuilder.removeNodeLinkDialogNavigation(
             RemoveNodeLinkDialog(
                 onDismiss = { navHostController.navigateUp() },
                 nodesList = list.value,
-                viewModel = removeNodeLinkViewModel
             )
         }
     }

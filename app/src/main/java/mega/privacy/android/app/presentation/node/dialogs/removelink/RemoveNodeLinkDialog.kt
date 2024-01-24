@@ -20,13 +20,11 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  */
 @Composable
 fun RemoveNodeLinkDialog(
-    modifier: Modifier = Modifier,
     nodesList: List<Long>,
+    viewModel: RemoveNodeLinkViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
-    viewModel: RemoveNodeLinkViewModel,
 ) {
     RemoveNodeLinkDialogBody(
-        modifier = modifier,
         count = nodesList.size,
         onConfirmClicked = {
             viewModel.disableExport(nodesList)
@@ -40,14 +38,12 @@ fun RemoveNodeLinkDialog(
 
 @Composable
 private fun RemoveNodeLinkDialogBody(
-    modifier: Modifier = Modifier,
     count: Int,
     onConfirmClicked: () -> Unit,
     onCancelClicked: () -> Unit,
 ) {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MegaAlertDialog(
-            modifier = modifier,
             text = pluralStringResource(
                 id = R.plurals.remove_links_warning_text,
                 count = count

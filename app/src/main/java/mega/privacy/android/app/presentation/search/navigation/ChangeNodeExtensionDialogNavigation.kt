@@ -6,11 +6,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialog
-import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
 
 internal fun NavGraphBuilder.changeNodeExtensionDialogNavigation(
     navHostController: NavHostController,
-    changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel,
 ) {
     dialog(
         "$searchChangeExtensionNodeDialog/{${searchChangeNodeExtensionDialogArgumentNodeId}}/{${searchChangeNodeExtensionDialogArgumentNodeNewName}}",
@@ -37,7 +35,6 @@ internal fun NavGraphBuilder.changeNodeExtensionDialogNavigation(
             onDismiss = {
                 navHostController.navigateUp()
             },
-            viewModel = changeNodeExtensionDialogViewModel
         )
     }
 }

@@ -1,9 +1,6 @@
 package mega.privacy.android.app.presentation.node.dialogs.removelink
 
-import com.google.common.truth.Truth
-import de.palm.composestateevents.StateEventWithContent
-import de.palm.composestateevents.StateEventWithContentConsumed
-import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -11,6 +8,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
+import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ResultCount
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
@@ -30,9 +28,14 @@ class RemoveNodeLinkViewModelTest {
 
     private val disableExportNodesUseCase: DisableExportNodesUseCase = mock()
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper = mock()
+    private val snackBarHandler: SnackBarHandler = mock()
+    private val applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
+
     private val underTest = RemoveNodeLinkViewModel(
+        applicationScope = applicationScope,
         disableExportNodesUseCase = disableExportNodesUseCase,
-        removePublicLinkResultMapper = removePublicLinkResultMapper
+        removePublicLinkResultMapper = removePublicLinkResultMapper,
+        snackBarHandler = snackBarHandler
     )
 
     private val handles = listOf(
@@ -59,22 +62,14 @@ class RemoveNodeLinkViewModelTest {
 
         underTest.disableExport(handles)
         verify(disableExportNodesUseCase).invoke(nodeIds)
-        Truth.assertThat(underTest.state.value.removeLinkEvent)
-            .isInstanceOf(StateEventWithContentTriggered::class.java)
-    }
-
-    @Test
-    fun `test that RemoveLinkEvent updates consumeDeleteEvent to consumed`() {
-        underTest.consumeDeleteEvent()
-        Truth.assertThat(underTest.state.value.removeLinkEvent)
-            .isInstanceOf(StateEventWithContentConsumed::class.java)
     }
 
     @AfterEach
     fun resetMock() {
         reset(
             disableExportNodesUseCase,
-            removePublicLinkResultMapper
+            removePublicLinkResultMapper,
+            snackBarHandler
         )
     }
 

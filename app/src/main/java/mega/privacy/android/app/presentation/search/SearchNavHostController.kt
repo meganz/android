@@ -11,12 +11,6 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
-import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
-import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
-import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
-import mega.privacy.android.app.presentation.node.dialogs.removesharefolder.RemoveShareFolderViewModel
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
-import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -35,13 +29,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 @Composable
 internal fun SearchNavHostController(
     viewModel: SearchActivityViewModel,
-    moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel,
-    renameNodeDialogViewModel: RenameNodeDialogViewModel,
-    removeNodeLinkViewModel: RemoveNodeLinkViewModel,
-    changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel,
     nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
-    shareFolderDialogViewModel: ShareFolderDialogViewModel,
-    removeShareFolderViewModel: RemoveShareFolderViewModel,
     handleClick: (TypedNode?) -> Unit,
     navigateToLink: (String) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
@@ -71,12 +59,6 @@ internal fun SearchNavHostController(
                 searchActivityViewModel = viewModel,
                 nodeBottomSheetActionHandler = nodeBottomSheetActionHandler,
                 onBackPressed = onBackPressed,
-                moveToRubbishOrDeleteNodeDialogViewModel = moveToRubbishOrDeleteNodeDialogViewModel,
-                renameNodeDialogViewModel = renameNodeDialogViewModel,
-                removeNodeLinkViewModel = removeNodeLinkViewModel,
-                shareFolderDialogViewModel = shareFolderDialogViewModel,
-                changeNodeExtensionDialogViewModel = changeNodeExtensionDialogViewModel,
-                removeShareFolderViewModel = removeShareFolderViewModel,
                 nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
             )
         }

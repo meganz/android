@@ -1,8 +1,7 @@
 package mega.privacy.android.app.presentation.node.dialogs.removesharefolder
 
 import com.google.common.truth.Truth
-import de.palm.composestateevents.StateEventWithContentConsumed
-import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -10,6 +9,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
+import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ResultCount
@@ -28,14 +28,19 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RemoveShareFolderViewModelTest {
+
+    private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val getOutShareByNodeIdUseCase: GetOutShareByNodeIdUseCase = mock()
     private val removeShareUseCase: RemoveShareUseCase = mock()
     private val removeShareResultMapper: RemoveShareResultMapper = mock()
+    private val snackBarHandler: SnackBarHandler = mock()
 
     private val underTest = RemoveShareFolderViewModel(
+        applicationScope = applicationScope,
         getOutShareByNodeIdUseCase = getOutShareByNodeIdUseCase,
         removeShareUseCase = removeShareUseCase,
-        removeShareResultMapper = removeShareResultMapper
+        removeShareResultMapper = removeShareResultMapper,
+        snackBarHandler = snackBarHandler
     )
 
     @BeforeAll
@@ -68,15 +73,6 @@ class RemoveShareFolderViewModelTest {
         )
         underTest.removeShare(nodeIds)
         verify(removeShareUseCase).invoke(nodeIds)
-        Truth.assertThat(underTest.state.value.removeFolderShareEvent)
-            .isInstanceOf(StateEventWithContentTriggered::class.java)
-    }
-
-    @Test
-    fun `test that RemoveFolderShareEvent updates consumeDeleteEvent to consumed`() {
-        underTest.consumeRemoveShareEvent()
-        Truth.assertThat(underTest.state.value.removeFolderShareEvent)
-            .isInstanceOf(StateEventWithContentConsumed::class.java)
     }
 
     @AfterEach

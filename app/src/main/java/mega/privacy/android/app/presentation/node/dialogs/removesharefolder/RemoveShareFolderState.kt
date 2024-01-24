@@ -13,5 +13,4 @@ import de.palm.composestateevents.consumed
 data class RemoveShareFolderState(
     val numberOfShareContact: Int = 0,
     val numberOfShareFolder: Int = 0,
-    val removeFolderShareEvent: StateEventWithContent<String> = consumed()
 )

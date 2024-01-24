@@ -5,12 +5,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
-import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
-import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
-import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
-import mega.privacy.android.app.presentation.node.dialogs.removesharefolder.RemoveShareFolderViewModel
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
-import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.cannotVerifyUserNavigation
@@ -47,12 +41,6 @@ internal fun NavGraphBuilder.searchNavGraph(
     navHostController: NavHostController,
     nodeBottomSheetActionHandler: NodeBottomSheetActionHandler,
     searchActivityViewModel: SearchActivityViewModel,
-    moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel,
-    renameNodeDialogViewModel: RenameNodeDialogViewModel,
-    removeNodeLinkViewModel: RemoveNodeLinkViewModel,
-    shareFolderDialogViewModel: ShareFolderDialogViewModel,
-    changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel,
-    removeShareFolderViewModel: RemoveShareFolderViewModel,
     nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
     onBackPressed: () -> Unit,
 ) {
@@ -69,10 +57,9 @@ internal fun NavGraphBuilder.searchNavGraph(
     }
     moveToRubbishOrDeleteNavigation(
         navHostController = navHostController,
-        moveToRubbishOrDeleteNodeDialogViewModel = moveToRubbishOrDeleteNodeDialogViewModel,
         searchActivityViewModel = searchActivityViewModel
     )
-    renameDialogNavigation(navHostController, renameNodeDialogViewModel)
+    renameDialogNavigation(navHostController)
     nodeBottomSheetNavigation(
         nodeBottomSheetActionHandler,
         navHostController,
@@ -81,23 +68,19 @@ internal fun NavGraphBuilder.searchNavGraph(
     changeLabelBottomSheetNavigation(navHostController)
     changeNodeExtensionDialogNavigation(
         navHostController = navHostController,
-        changeNodeExtensionDialogViewModel = changeNodeExtensionDialogViewModel,
     )
-    renameDialogNavigation(navHostController, renameNodeDialogViewModel)
+    renameDialogNavigation(navHostController)
     cannotVerifyUserNavigation(navHostController)
     removeNodeLinkDialogNavigation(
         navHostController = navHostController,
-        removeNodeLinkViewModel = removeNodeLinkViewModel,
         searchActivityViewModel = searchActivityViewModel
     )
     shareFolderDialogNavigation(
         navHostController = navHostController,
-        shareFolderDialogViewModel = shareFolderDialogViewModel,
         searchActivityViewModel = searchActivityViewModel
     )
     removeShareFolderDialogNavigation(
         navHostController = navHostController,
-        removeShareFolderViewModel = removeShareFolderViewModel,
         searchActivityViewModel = searchActivityViewModel
     )
     leaveFolderShareDialogNavigation(

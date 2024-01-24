@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.preview.BooleanProvider
@@ -22,11 +23,10 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  */
 @Composable
 fun MoveToRubbishOrDeleteNodeDialog(
-    modifier: Modifier = Modifier,
     nodesList: List<Long>,
     isNodeInRubbish: Boolean = false,
+    viewModel: MoveToRubbishOrDeleteNodeDialogViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
-    viewModel: MoveToRubbishOrDeleteNodeDialogViewModel,
 ) {
     val message = when {
         isNodeInRubbish -> stringResource(id = R.string.confirmation_delete_from_mega)
@@ -39,7 +39,6 @@ fun MoveToRubbishOrDeleteNodeDialog(
     }
 
     MoveToRubbishOrDeleteNodeDialogBody(
-        modifier = modifier,
         message = message,
         positiveText = positiveText,
         onPositiveButtonClicked = {
@@ -58,7 +57,6 @@ fun MoveToRubbishOrDeleteNodeDialog(
 
 @Composable
 private fun MoveToRubbishOrDeleteNodeDialogBody(
-    modifier: Modifier = Modifier,
     message: String,
     positiveText: String,
     onPositiveButtonClicked: () -> Unit,
@@ -66,7 +64,6 @@ private fun MoveToRubbishOrDeleteNodeDialogBody(
 ) {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MegaAlertDialog(
-            modifier = modifier,
             text = message,
             confirmButtonText = positiveText,
             cancelButtonText = stringResource(id = R.string.general_cancel),

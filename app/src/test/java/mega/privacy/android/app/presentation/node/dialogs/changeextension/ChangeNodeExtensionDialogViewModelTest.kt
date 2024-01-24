@@ -1,14 +1,14 @@
 package mega.privacy.android.app.presentation.node.dialogs.changeextension
 
-import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -27,10 +27,16 @@ internal class ChangeNodeExtensionDialogViewModelTest {
 
     private lateinit var underTest: ChangeNodeExtensionDialogViewModel
     private val renameNodeUseCase = mock<RenameNodeUseCase>()
+    private val snackBarHandler: SnackBarHandler = mock()
+    private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
     @BeforeEach
     fun setup() {
-        underTest = ChangeNodeExtensionDialogViewModel(renameNodeUseCase)
+        underTest = ChangeNodeExtensionDialogViewModel(
+            applicationScope = applicationScope,
+            renameNodeUseCase = renameNodeUseCase,
+            snackBarHandler = snackBarHandler
+        )
     }
 
     @BeforeAll
@@ -54,7 +60,6 @@ internal class ChangeNodeExtensionDialogViewModelTest {
             val nodeId = 123L
             val newNodeName = "New Node Name"
             whenever(renameNodeUseCase(nodeId, newNodeName)).thenReturn(Unit)
-
             underTest.handleAction(
                 ChangeNodeExtensionAction.OnChangeExtensionConfirmed(
                     nodeId, newNodeName
@@ -62,13 +67,6 @@ internal class ChangeNodeExtensionDialogViewModelTest {
             )
 
             verify(renameNodeUseCase).invoke(nodeId, newNodeName)
-            assertThat(underTest.state.value.renameSuccessfulEvent).isEqualTo(triggered)
+            verify(snackBarHandler).postSnackbarMessage(R.string.context_correctly_renamed)
         }
-
-    @Test
-    fun `test that OnChangeExtensionConsumed updates state`() = runTest {
-        underTest.handleAction(ChangeNodeExtensionAction.OnChangeExtensionConsumed)
-
-        assertThat(underTest.state.value.renameSuccessfulEvent).isEqualTo(consumed)
-    }
 }

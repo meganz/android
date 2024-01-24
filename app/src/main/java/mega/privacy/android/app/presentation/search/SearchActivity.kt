@@ -17,7 +17,6 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -41,13 +40,6 @@ import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
-import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionAction
-import mega.privacy.android.app.presentation.node.dialogs.changeextension.ChangeNodeExtensionDialogViewModel
-import mega.privacy.android.app.presentation.node.dialogs.deletenode.MoveToRubbishOrDeleteNodeDialogViewModel
-import mega.privacy.android.app.presentation.node.dialogs.removelink.RemoveNodeLinkViewModel
-import mega.privacy.android.app.presentation.node.dialogs.removesharefolder.RemoveShareFolderViewModel
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameSucceeded
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogViewModel
 import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialogViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
@@ -81,12 +73,6 @@ import javax.inject.Inject
 class SearchActivity : BaseActivity(), MegaSnackbarShower {
     private val viewModel: SearchActivityViewModel by viewModels()
     private val nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel by viewModels()
-    private val moveToRubbishOrDeleteNodeDialogViewModel: MoveToRubbishOrDeleteNodeDialogViewModel by viewModels()
-    private val renameNodeDialogViewModel: RenameNodeDialogViewModel by viewModels()
-    private val removeNodeLinkViewModel: RemoveNodeLinkViewModel by viewModels()
-    private val changeNodeExtensionDialogViewModel: ChangeNodeExtensionDialogViewModel by viewModels()
-    private val removeShareFolderViewModel: RemoveShareFolderViewModel by viewModels()
-    private val shareFolderDialogViewModel: ShareFolderDialogViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
     /**
@@ -159,11 +145,6 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-            val moveToRubbishState by moveToRubbishOrDeleteNodeDialogViewModel.state.collectAsStateWithLifecycle()
-            val renameFolderState by renameNodeDialogViewModel.state.collectAsStateWithLifecycle()
-            val removeLinkState by removeNodeLinkViewModel.state.collectAsStateWithLifecycle()
-            val changeNodeExtensionDialogViewModelState by changeNodeExtensionDialogViewModel.state.collectAsStateWithLifecycle()
-            val removeFolderShareState by removeShareFolderViewModel.state.collectAsStateWithLifecycle()
             val nodeOptionsBottomSheetState by nodeOptionsBottomSheetViewModel.state.collectAsStateWithLifecycle()
 
             // Remember a SystemUiController
@@ -189,13 +170,7 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
                             .statusBarsPadding()
                             .navigationBarsPadding(),
                         viewModel = viewModel,
-                        moveToRubbishOrDeleteNodeDialogViewModel = moveToRubbishOrDeleteNodeDialogViewModel,
-                        renameNodeDialogViewModel = renameNodeDialogViewModel,
-                        removeNodeLinkViewModel = removeNodeLinkViewModel,
-                        changeNodeExtensionDialogViewModel = changeNodeExtensionDialogViewModel,
                         nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
-                        shareFolderDialogViewModel = shareFolderDialogViewModel,
-                        removeShareFolderViewModel = removeShareFolderViewModel,
                         handleClick = ::handleClick,
                         navigateToLink = ::navigateToLink,
                         showSortOrderBottomSheet = ::showSortOrderBottomSheet,
@@ -213,55 +188,6 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
                     )
                 }
 
-                EventEffect(
-                    moveToRubbishState.deleteEvent,
-                    onConsumed = {
-                        moveToRubbishOrDeleteNodeDialogViewModel.consumeDeleteEvent()
-                    }
-                ) {
-                    scaffoldState.snackbarHostState.showSnackbar(it)
-                }
-
-                val renameSuccessMessage = stringResource(R.string.context_correctly_renamed)
-                EventEffect(
-                    event = renameFolderState.renameSuccessfulEvent,
-                    onConsumed = {
-                        renameNodeDialogViewModel.handleAction(OnRenameSucceeded)
-                    }
-                ) {
-                    scaffoldState.snackbarHostState.showSnackbar(renameSuccessMessage)
-                }
-
-                EventEffect(
-                    event = removeLinkState.removeLinkEvent,
-                    onConsumed = {
-                        removeNodeLinkViewModel.consumeDeleteEvent()
-                    }
-                ) {
-                    scaffoldState.snackbarHostState.showSnackbar(it)
-                }
-
-                EventEffect(
-                    event = changeNodeExtensionDialogViewModelState.renameSuccessfulEvent,
-                    onConsumed = {
-                        changeNodeExtensionDialogViewModel.handleAction(
-                            ChangeNodeExtensionAction.OnChangeExtensionConsumed
-                        )
-                    },
-                    action = {
-                        scaffoldState.snackbarHostState.showSnackbar(
-                            renameSuccessMessage
-                        )
-                    }
-                )
-
-                EventEffect(
-                    event = removeFolderShareState.removeFolderShareEvent,
-                    onConsumed = { removeShareFolderViewModel.consumeRemoveShareEvent() },
-                    action = {
-                        scaffoldState.snackbarHostState.showSnackbar(it)
-                    }
-                )
                 EventEffect(
                     event = nodeOptionsBottomSheetState.nodeNameCollisionResult,
                     onConsumed = nodeOptionsBottomSheetViewModel::markHandleNodeNameCollisionResult,
