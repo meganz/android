@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2b33d137ac4ff634a6aa0e7039afce4e",
+    "identityHash": "c64705542f301dca5a82da19576f9bc4",
     "entities": [
       {
         "tableName": "typed_messages",
@@ -244,14 +244,8 @@
       },
       {
         "tableName": "rich_preview",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `messageId` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `image` TEXT, `imageFormat` TEXT, `icon` TEXT, `iconFormat` TEXT, `url` TEXT NOT NULL, `domainName` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`messageId` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `image` TEXT, `imageFormat` TEXT, `icon` TEXT, `iconFormat` TEXT, `url` TEXT NOT NULL, `domainName` TEXT NOT NULL, PRIMARY KEY(`messageId`))",
         "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "messageId",
             "columnName": "messageId",
@@ -308,9 +302,9 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": true,
+          "autoGenerate": false,
           "columnNames": [
-            "id"
+            "messageId"
           ]
         },
         "indices": [],
@@ -318,14 +312,8 @@
       },
       {
         "tableName": "giphy",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `messageId` INTEGER NOT NULL, `mp4Src` TEXT, `webpSrc` TEXT, `title` TEXT, `mp4Size` INTEGER NOT NULL, `webpSize` INTEGER NOT NULL, `width` INTEGER NOT NULL, `height` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`messageId` INTEGER NOT NULL, `mp4Src` TEXT, `webpSrc` TEXT, `title` TEXT, `mp4Size` INTEGER NOT NULL, `webpSize` INTEGER NOT NULL, `width` INTEGER NOT NULL, `height` INTEGER NOT NULL, PRIMARY KEY(`messageId`))",
         "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "messageId",
             "columnName": "messageId",
@@ -376,9 +364,9 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": true,
+          "autoGenerate": false,
           "columnNames": [
-            "id"
+            "messageId"
           ]
         },
         "indices": [],
@@ -386,14 +374,8 @@
       },
       {
         "tableName": "chat_geolocation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `messageId` INTEGER NOT NULL, `longitude` REAL NOT NULL, `latitude` REAL NOT NULL, `image` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`messageId` INTEGER NOT NULL, `longitude` REAL NOT NULL, `latitude` REAL NOT NULL, `image` TEXT, PRIMARY KEY(`messageId`))",
         "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "messageId",
             "columnName": "messageId",
@@ -420,9 +402,9 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": true,
+          "autoGenerate": false,
           "columnNames": [
-            "id"
+            "messageId"
           ]
         },
         "indices": [],
@@ -542,7 +524,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b33d137ac4ff634a6aa0e7039afce4e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c64705542f301dca5a82da19576f9bc4')"
     ]
   }
 }

@@ -20,7 +20,6 @@ class GiphyEntityMapper @Inject constructor() {
         messageId: Long,
         info: ChatGifInfo,
     ) = GiphyEntity(
-        id = 0,
         messageId = messageId,
         mp4Src = info.mp4Src,
         webpSrc = info.webpSrc,

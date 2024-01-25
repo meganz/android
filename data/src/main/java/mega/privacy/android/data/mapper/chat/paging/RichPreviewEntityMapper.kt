@@ -16,7 +16,6 @@ class RichPreviewEntityMapper @Inject constructor() {
      */
     operator fun invoke(messageId: Long, info: ChatRichPreviewInfo) =
         RichPreviewEntity(
-            id = 0,
             messageId = messageId,
             title = info.title,
             description = info.description,

@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.chat.messages.ChatGifInfo
 /**
  * Entity to store a giphy.
  *
- * @property id ID.
  * @property messageId Message ID.
  * @property mp4Src Source of the mp4.
  * @property webpSrc Source of the webp.
@@ -19,8 +18,7 @@ import mega.privacy.android.domain.entity.chat.messages.ChatGifInfo
  */
 @Entity(tableName = "giphy")
 data class GiphyEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int,
-    val messageId: Long,
+    @PrimaryKey val messageId: Long,
     override val mp4Src: String?,
     override val webpSrc: String?,
     override val title: String?,

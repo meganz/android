@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.chat.messages.ChatRichPreviewInfo
 /**
  * Entity to store a rich preview.
  *
- * @property id ID.
  * @property messageId Message ID.
  * @property title Title.
  * @property description Description.
@@ -20,8 +19,7 @@ import mega.privacy.android.domain.entity.chat.messages.ChatRichPreviewInfo
  */
 @Entity(tableName = "rich_preview")
 data class RichPreviewEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int,
-    val messageId: Long,
+    @PrimaryKey val messageId: Long,
     override val title: String,
     override val description: String,
     override val image: String?,

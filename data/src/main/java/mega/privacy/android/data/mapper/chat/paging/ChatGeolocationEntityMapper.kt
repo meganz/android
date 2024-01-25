@@ -20,7 +20,6 @@ class ChatGeolocationEntityMapper @Inject constructor() {
         messageId: Long,
         info: ChatGeolocationInfo,
     ) = ChatGeolocationEntity(
-        id = 0,
         messageId = messageId,
         latitude = info.latitude,
         longitude = info.longitude,
