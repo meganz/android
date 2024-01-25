@@ -3,6 +3,7 @@ package mega.privacy.android.data.mapper.audios
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 internal class TypedAudioNodeMapper @Inject constructor() {
     operator fun invoke(
@@ -10,6 +11,6 @@ internal class TypedAudioNodeMapper @Inject constructor() {
         duration: Int,
     ) = TypedAudioNode(
         fileNode = fileNode,
-        duration = duration,
+        duration = duration.seconds,
     )
 }

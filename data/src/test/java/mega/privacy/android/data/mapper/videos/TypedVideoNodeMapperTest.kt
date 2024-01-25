@@ -27,7 +27,7 @@ class TypedVideoNodeMapperTest @Inject constructor() {
             fileNode = expectedFileNode,
             duration = expectedDuration,
         ).let {
-            assertThat(it.duration).isEqualTo(expectedDuration)
+            assertThat(it.duration.inWholeSeconds).isEqualTo(expectedDuration)
         }
     }
 }

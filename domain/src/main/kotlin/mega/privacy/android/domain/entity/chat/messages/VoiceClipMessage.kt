@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages
 
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
+import kotlin.time.Duration
 
 /**
  * Voice clip message
@@ -18,7 +19,7 @@ data class VoiceClipMessage(
     val status: ChatMessageStatus,
     val name: String,
     val size: Long,
-    val duration: Int,
+    val duration: Duration,
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val shouldShowDate: Boolean,

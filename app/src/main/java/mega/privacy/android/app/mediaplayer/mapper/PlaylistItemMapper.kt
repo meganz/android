@@ -2,6 +2,7 @@ package mega.privacy.android.app.mediaplayer.mapper
 
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import java.io.File
+import kotlin.time.Duration
 
 /**
  * Mapper to convert [PlaylistItem]
@@ -13,7 +14,7 @@ typealias PlaylistItemMapper = (
     @JvmSuppressWildcards Int,
     @JvmSuppressWildcards Int,
     @JvmSuppressWildcards Long,
-    @JvmSuppressWildcards Int,
+    @JvmSuppressWildcards Duration,
 ) -> @JvmSuppressWildcards PlaylistItem
 
 internal fun toPlaylistItemMapper(
@@ -23,7 +24,7 @@ internal fun toPlaylistItemMapper(
     index: Int,
     type: Int,
     size: Long,
-    duration: Int,
+    duration: Duration,
 ): PlaylistItem =
     PlaylistItem(
         nodeHandle = nodeHandle,

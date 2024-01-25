@@ -1,14 +1,13 @@
 package test.mega.privacy.android.app.presentation.mediaplayer
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.mediaplayer.mapper.toPlaylistItemMapper
 import org.junit.Test
 import org.mockito.kotlin.mock
 import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class PlaylistItemMapperTest {
 
     @Test
@@ -19,7 +18,7 @@ internal class PlaylistItemMapperTest {
         val expectedIndex = 0
         val expectedType = 1
         val expectedSize: Long = 999
-        val expectedDuration = 1000
+        val expectedDuration = 1000.seconds
 
         val actual = toPlaylistItemMapper(
             expectedNodeHandle,
@@ -48,7 +47,7 @@ internal class PlaylistItemMapperTest {
         val expectedIndex = 0
         val expectedType = 1
         val expectedSize: Long = 999
-        val expectedDuration = 1000
+        val expectedDuration = 1000.seconds
 
         val actual = toPlaylistItemMapper(
             expectedNodeHandle,

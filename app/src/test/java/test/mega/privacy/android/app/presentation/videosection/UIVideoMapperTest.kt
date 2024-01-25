@@ -1,8 +1,8 @@
 package test.mega.privacy.android.app.presentation.videosection
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.meeting.chat.mapper.DurationTextMapper
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
@@ -10,17 +10,19 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import kotlin.time.Duration.Companion.seconds
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UIVideoMapperTest {
     private lateinit var underTest: UIVideoMapper
 
+    private val durationTextMapper = DurationTextMapper()
+
     @BeforeAll
     fun setUp() {
-        underTest = UIVideoMapper()
+        underTest = UIVideoMapper(durationTextMapper)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test that UIVideo can be mapped correctly`() = runTest {
         val expectedId = NodeId(123456L)
@@ -36,7 +38,7 @@ class UIVideoMapperTest {
             on { size }.thenReturn(expectedSize)
             on { isFavourite }.thenReturn(false)
             on { isAvailableOffline }.thenReturn(expectedAvailableOffline)
-            on { duration }.thenReturn(100)
+            on { duration }.thenReturn(100.seconds)
             on { thumbnailPath }.thenReturn(expectedThumbnail)
         }
 

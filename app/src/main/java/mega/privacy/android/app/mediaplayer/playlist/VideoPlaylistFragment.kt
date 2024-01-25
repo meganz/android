@@ -27,6 +27,7 @@ import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
+import mega.privacy.android.app.presentation.meeting.chat.mapper.DurationTextMapper
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.autoCleared
@@ -43,6 +44,12 @@ class VideoPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListen
     @VideoPlayer
     @Inject
     lateinit var mediaPlayerGateway: MediaPlayerGateway
+
+    /**
+     * [DurationTextMapper]
+     */
+    @Inject
+    lateinit var durationTextMapper: DurationTextMapper
 
     private val videoViewModel: VideoPlayerViewModel by activityViewModels()
 
@@ -118,7 +125,8 @@ class VideoPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListen
                 it,
                 this,
                 dragStartListener = this,
-                isAudio = false
+                isAudio = false,
+                durationTextMapper = durationTextMapper,
             )
         }
         listLayoutManager =

@@ -1,9 +1,9 @@
 package test.mega.privacy.android.app.presentation.audiosection
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.audiosection.mapper.UIAudioMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.DurationTextMapper
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
@@ -12,15 +12,17 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UIAudioMapperTest {
     private lateinit var underTest: UIAudioMapper
 
+    private val durationTextMapper = DurationTextMapper()
+
     @BeforeAll
     fun setUp() {
-        underTest = UIAudioMapper()
+        underTest = UIAudioMapper(durationTextMapper)
     }
 
     @Test
@@ -43,7 +45,7 @@ class UIAudioMapperTest {
             on { name }.thenReturn(expectedName)
             on { size }.thenReturn(expectedSize)
             on { isFavourite }.thenReturn(false)
-            on { duration }.thenReturn(100)
+            on { duration }.thenReturn(100.seconds)
             on { thumbnailPath }.thenReturn(expectedThumbnail)
             on { isFavourite }.thenReturn(expectedIsFavourite)
             on { exportedData }.thenReturn(expectedIsExported)

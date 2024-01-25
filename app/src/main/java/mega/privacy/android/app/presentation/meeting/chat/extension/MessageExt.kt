@@ -41,9 +41,8 @@ val TypedMessage.canForward: Boolean
  */
 val TypedMessage.canLongClick: Boolean
     get() = when (this) {
-        is RichPreviewMessage, is GiphyMessage, is LocationMessage, is ChatLinkMessage,
-        is TextLinkMessage, is FolderLinkMessage, is FileLinkMessage, is ContactAttachmentMessage,
-        is NodeAttachmentMessage, is VoiceClipMessage, is NormalMessage,
+        is RichPreviewMessage, is GiphyMessage, is LocationMessage, is NormalMessage,
+        is ContactAttachmentMessage, is NodeAttachmentMessage, is VoiceClipMessage,
         -> true
 
         else -> false

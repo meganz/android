@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.node
 
+import kotlin.time.Duration
+
 /**
  * The typed video node entity
  *
@@ -8,5 +10,5 @@ package mega.privacy.android.domain.entity.node
  */
 data class TypedVideoNode(
     private val fileNode: FileNode,
-    val duration: Int,
+    val duration: Duration,
 ) : TypedFileNode, FileNode by fileNode

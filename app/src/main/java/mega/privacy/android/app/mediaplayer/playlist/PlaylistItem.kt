@@ -1,6 +1,8 @@
 package mega.privacy.android.app.mediaplayer.playlist
 
 import java.io.File
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * UI data class for playlist screen.
@@ -24,5 +26,5 @@ data class PlaylistItem(
     val size: Long,
     val isSelected: Boolean = false,
     val headerIsVisible: Boolean = false,
-    val duration: Int = 0,
+    val duration: Duration = 0.seconds,
 )

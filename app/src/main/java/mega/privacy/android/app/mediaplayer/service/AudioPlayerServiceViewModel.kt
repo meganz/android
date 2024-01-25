@@ -132,6 +132,7 @@ import timber.log.Timber
 import java.io.File
 import java.util.Collections
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * A class containing audio player service logic, because using ViewModel in Service
@@ -557,7 +558,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 }
             }
 
-            val duration = node?.duration ?: 0
+            val duration = node?.duration ?: 0.seconds
 
             playlistItemMapper(
                 firstPlayHandle,
@@ -639,7 +640,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                         currentIndex,
                         TYPE_NEXT,
                         megaOffline.getSize(context),
-                        0
+                        0.seconds
                     )
                         .let { playlistItem ->
                             playlistItems.add(playlistItem)
@@ -805,7 +806,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 currentIndex,
                 TYPE_NEXT,
                 file.length(),
-                0
+                0.seconds
             )
                 .let { playlistItem ->
                     playlistItems.add(playlistItem)

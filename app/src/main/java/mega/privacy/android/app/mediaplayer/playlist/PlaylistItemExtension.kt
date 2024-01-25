@@ -3,8 +3,10 @@ package mega.privacy.android.app.mediaplayer.playlist
 import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PREVIOUS
-import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
+import mega.privacy.android.app.presentation.meeting.chat.mapper.DurationTextMapper
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 /**
  * Create a new instance with the specified index and item type,
@@ -21,7 +23,7 @@ fun PlaylistItem.finalizeItem(
     index: Int = this.index,
     type: Int,
     isSelected: Boolean = false,
-    duration: Int = 0,
+    duration: Duration = 0.seconds,
     headerIsVisible: Boolean = false,
 ): PlaylistItem = copy(
     index = index,
@@ -45,16 +47,17 @@ fun PlaylistItem.updateNodeName(newName: String) = copy(nodeName = newName)
  * @param currentPosition the current position of playing item
  * @return strings of time
  */
-fun PlaylistItem.formatCurrentPositionAndDuration(currentPosition: Long) =
-    "${formatMillisecondsToString(milliseconds = currentPosition)} / ${
-        formatSecondsToString(seconds = duration)
-    }"
-
-/**
- * Format duration
- * @return time strings
- */
-fun PlaylistItem.formatDuration() = formatSecondsToString(seconds = duration)
+fun PlaylistItem.formatCurrentPositionAndDuration(
+    currentPosition: Long,
+    durationTextMapper: DurationTextMapper,
+) = "${
+    durationTextMapper(
+        currentPosition.seconds,
+        DurationUnit.SECONDS
+    )
+} / ${
+    durationTextMapper(duration, DurationUnit.SECONDS)
+}"
 
 /**
  * Get name of item header
@@ -84,38 +87,3 @@ fun PlaylistItem.getHeaderName(
             }
         }
     )
-
-
-/**
- * Format milliseconds to time string
- * @param milliseconds time value that unit is milliseconds
- * @return strings of time
- */
-private fun formatMillisecondsToString(milliseconds: Long): String {
-    // Make the time displayed is same as Exoplayer
-    val totalSeconds = (milliseconds.toFloat() / 1000).roundToInt()
-    return formatSecondsToString(seconds = totalSeconds)
-}
-
-/**
- * Format seconds to time string
- * @param seconds time value that unit is seconds
- * @return strings of time
- */
-private fun formatSecondsToString(seconds: Int): String {
-    val hour = TimeUnit.SECONDS.toHours(seconds.toLong())
-    val minutes =
-        TimeUnit.SECONDS.toMinutes(seconds.toLong()) - TimeUnit.HOURS.toMinutes(hour)
-    val resultSeconds =
-        seconds.toLong() - TimeUnit.MINUTES.toSeconds(
-            TimeUnit.SECONDS.toMinutes(
-                seconds.toLong()
-            )
-        )
-
-    return if (hour >= 1) {
-        String.format("%2d:%02d:%02d", hour, minutes, resultSeconds)
-    } else {
-        String.format("%02d:%02d", minutes, resultSeconds)
-    }
-}

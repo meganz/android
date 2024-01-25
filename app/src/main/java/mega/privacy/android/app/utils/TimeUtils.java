@@ -401,6 +401,14 @@ public class TimeUtils implements Comparator<Calendar> {
                 .format(new Date(milliseconds));
     }
 
+    /**
+     * Gets video duration time from a duration received.
+     *
+     * @param duration Duration in seconds.
+     * @return The time string.
+     * @deprecated Use DurationTextMapper instead.
+     */
+    @Deprecated
     public static String getVideoDuration(int duration) {
         if (duration > 0) {
             int hours = duration / 3600;

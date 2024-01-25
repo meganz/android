@@ -40,6 +40,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.stream.Stream
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -54,7 +55,7 @@ class VoiceClipMessageViewModelTest {
         time = 1,
         status = ChatMessageStatus.SERVER_RECEIVED,
         size = 1,
-        duration = 3000,
+        duration = 3000.milliseconds,
         userHandle = 1L,
         shouldShowAvatar = true,
         shouldShowTime = true,
@@ -115,7 +116,7 @@ class VoiceClipMessageViewModelTest {
             on { exists() }.thenReturn(true)
             on { length() }.thenReturn(voiceClipMessage.size)
         }
-        whenever(durationTextMapper(any())).thenReturn(mockTimestamp)
+        whenever(durationTextMapper(any(), any())).thenReturn(mockTimestamp)
     }
 
     @BeforeEach

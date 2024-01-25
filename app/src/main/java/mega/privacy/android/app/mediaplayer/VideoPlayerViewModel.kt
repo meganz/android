@@ -164,6 +164,7 @@ import java.util.Collections
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * ViewModel for video player.
@@ -961,7 +962,7 @@ class VideoPlayerViewModel @Inject constructor(
                 }
             }
 
-            val duration = node?.duration ?: 0
+            val duration = node?.duration ?: 0.seconds
 
             playlistItemMapper(
                 firstPlayHandle,
@@ -1020,7 +1021,7 @@ class VideoPlayerViewModel @Inject constructor(
                         currentIndex,
                         TYPE_NEXT,
                         megaOffline.getSize(context),
-                        0
+                        0.seconds
                     )
                         .let { playlistItem ->
                             playlistItems.add(playlistItem)
@@ -1150,7 +1151,7 @@ class VideoPlayerViewModel @Inject constructor(
                 currentIndex,
                 TYPE_NEXT,
                 file.length(),
-                0
+                0.seconds
             )
                 .let { playlistItem ->
                     playlistItems.add(playlistItem)

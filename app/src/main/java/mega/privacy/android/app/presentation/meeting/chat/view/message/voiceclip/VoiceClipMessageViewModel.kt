@@ -23,6 +23,8 @@ import timber.log.Timber
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
 
 /**
  * View model for voice clip message. This view model manages all visible voice clip messages
@@ -73,7 +75,7 @@ class VoiceClipMessageViewModel @Inject constructor(
             message.status == ChatMessageStatus.SERVER_REJECTED ||
                     message.status == ChatMessageStatus.SENDING_MANUAL ||
                     message.status == ChatMessageStatus.SENDING ||
-                    message.duration == 0
+                    message.duration.inWholeMilliseconds == 0L
         if (hasError) {
             updateUiToErrorState(message.msgId)
             return@launch
@@ -90,7 +92,7 @@ class VoiceClipMessageViewModel @Inject constructor(
                 getMutableStateFlow(message.msgId)?.update {
                     it.copy(
                         loadProgress = null,
-                        timestamp = durationTextMapper(message.duration)
+                        timestamp = durationTextMapper(message.duration, DurationUnit.MILLISECONDS)
                     )
                 }
                 return@launch
@@ -125,7 +127,10 @@ class VoiceClipMessageViewModel @Inject constructor(
                 getMutableStateFlow(msgId)?.update {
                     it.copy(
                         loadProgress = null,
-                        timestamp = durationTextMapper(it.voiceClipMessage?.duration ?: 0),
+                        timestamp = durationTextMapper(
+                            it.voiceClipMessage?.duration,
+                            DurationUnit.MILLISECONDS
+                        ),
                     )
                 }
             }
@@ -222,10 +227,13 @@ class VoiceClipMessageViewModel @Inject constructor(
         state: VoiceClipPlayState.Playing,
         msgId: Long,
     ) {
-        val timestamp = durationTextMapper(state.pos)
+        val timestamp = durationTextMapper(
+            state.pos.milliseconds,
+            DurationUnit.MILLISECONDS
+        )
         val playProgress =
             getUiStateFlow(msgId).value.voiceClipMessage?.duration?.let { dur ->
-                Progress(state.pos, dur)
+                Progress(state.pos, dur.inWholeMilliseconds)
             }
         getMutableStateFlow(msgId)?.update {
             it.copy(
