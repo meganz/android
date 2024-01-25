@@ -17,4 +17,5 @@ enum class ImagePreviewFetcherSource {
     FOLDER_LINK_MEDIA_DISCOVERY,
     SHARED_ITEMS,
     BACKUPS,
+    RUBBISH_BIN,
 }

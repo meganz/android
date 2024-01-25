@@ -19,4 +19,5 @@ data class ImagePreviewState(
     val copyMoveException: Throwable? = null,
     val nameCollision: NameCollision? = null,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    val showDeletedMessage: Boolean = false,
 )

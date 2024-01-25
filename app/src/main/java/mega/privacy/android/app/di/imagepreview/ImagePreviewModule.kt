@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetch
 import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -88,4 +89,9 @@ internal interface ImagePreviewModule {
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.BACKUPS)
     fun BackupsImageNodeFetcher.bindBackupsFetcher(): ImageNodeFetcher
+
+    @Binds
+    @IntoMap
+    @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.RUBBISH_BIN)
+    fun RubbishBinImageNodeFetcher.bindRubbishBinFetcher(): ImageNodeFetcher
 }

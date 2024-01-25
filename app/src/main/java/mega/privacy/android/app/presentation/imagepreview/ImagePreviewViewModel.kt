@@ -46,6 +46,7 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
@@ -84,6 +85,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
     private val resetTotalDownloadsUseCase: ResetTotalDownloadsUseCase,
+    private val deleteNodesUseCase: DeleteNodesUseCase,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
@@ -629,6 +631,26 @@ class ImagePreviewViewModel @Inject constructor(
                 fromMediaViewer = false,
                 needSerialize = true,
             )
+        }
+    }
+
+    fun deleteNode(nodeId: NodeId) {
+        viewModelScope.launch {
+            runCatching {
+                deleteNodesUseCase(nodes = listOf(nodeId))
+            }.onSuccess {
+                _state.update {
+                    it.copy(showDeletedMessage = true)
+                }
+            }.onFailure {
+                Timber.d(it)
+            }
+        }
+    }
+
+    fun hideDeletedMessage() {
+        _state.update {
+            it.copy(showDeletedMessage = false)
         }
     }
 

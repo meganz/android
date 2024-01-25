@@ -15,6 +15,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
@@ -32,6 +33,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
+import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.FileNode
@@ -237,15 +239,21 @@ class GetIntentToOpenFileMapper @Inject constructor(
             intentInternalIntentPair.first
 
         } else if (MimeTypeList.typeForName(fileNode.name).isImage) {
-            if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)
-                && viewType == FILE_BROWSER_ADAPTER
-            ) {
+            if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview) && viewType == FILE_BROWSER_ADAPTER) {
                 ImagePreviewActivity.createIntent(
                     context = activity,
                     imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
                     menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
                     anchorImageNodeId = fileNode.id,
                     params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to fileNode.parentId.longValue),
+                )
+            } else if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview) && viewType == RUBBISH_BIN_ADAPTER) {
+                ImagePreviewActivity.createIntent(
+                    context = activity,
+                    imageSource = ImagePreviewFetcherSource.RUBBISH_BIN,
+                    menuOptionsSource = ImagePreviewMenuSource.RUBBISH_BIN,
+                    anchorImageNodeId = fileNode.id,
+                    params = mapOf(RubbishBinImageNodeFetcher.PARENT_ID to fileNode.parentId.longValue),
                 )
             } else {
                 ImageViewerActivity.getIntentForParentNode(

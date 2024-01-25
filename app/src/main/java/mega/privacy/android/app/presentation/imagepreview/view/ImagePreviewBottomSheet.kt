@@ -399,6 +399,7 @@ internal fun ImagePreviewBottomSheet(
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_remove),
                         text = stringResource(id = R.string.context_remove),
+                        isDestructive = true,
                         onActionClicked = onClickRemove,
                         addSeparator = false,
                     )

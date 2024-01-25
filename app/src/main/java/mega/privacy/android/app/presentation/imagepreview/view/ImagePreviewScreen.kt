@@ -101,6 +101,8 @@ internal fun ImagePreviewScreen(
     onClickRename: (ImageNode) -> Unit = {},
     onClickMove: (ImageNode) -> Unit = {},
     onClickCopy: (ImageNode) -> Unit = {},
+    onClickRestore: (ImageNode) -> Unit = {},
+    onClickRemove: (ImageNode) -> Unit = {},
     onClickMoveToRubbishBin: (ImageNode) -> Unit = {},
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
@@ -117,6 +119,7 @@ internal fun ImagePreviewScreen(
         val isCurrentImageNodeAvailableOffline = viewState.isCurrentImageNodeAvailableOffline
         var showRemoveLinkDialog by rememberSaveable { mutableStateOf(false) }
         var showMoveToRubbishBinDialog by rememberSaveable { mutableStateOf(false) }
+        var showRemoveDialog by rememberSaveable { mutableStateOf(false) }
 
         val inFullScreenMode = viewState.inFullScreenMode
         val systemUiController = rememberSystemUiController()
@@ -129,6 +132,7 @@ internal fun ImagePreviewScreen(
 
         val scaffoldState = rememberScaffoldState()
         val isLight = MaterialTheme.colors.isLight
+        val context = LocalContext.current
         val photoState = rememberPhotoState()
         val pagerState = rememberPagerState(
             initialPage = currentImageNodeIndex,
@@ -171,6 +175,15 @@ internal fun ImagePreviewScreen(
             }
         }
 
+        if (viewState.showDeletedMessage) {
+            LaunchedEffect(Unit) {
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = context.getString(R.string.context_correctly_removed),
+                )
+                viewModel.hideDeletedMessage()
+            }
+        }
+
         if (showRemoveLinkDialog) {
             MegaAlertDialog(
                 text = pluralStringResource(
@@ -202,6 +215,21 @@ internal fun ImagePreviewScreen(
                 },
                 onDismiss = {
                     showMoveToRubbishBinDialog = false
+                }
+            )
+        }
+
+        if (showRemoveDialog) {
+            MegaAlertDialog(
+                text = stringResource(id = R.string.confirmation_delete_from_mega),
+                confirmButtonText = stringResource(id = R.string.general_remove),
+                cancelButtonText = stringResource(id = R.string.general_cancel),
+                onConfirm = {
+                    onClickRemove(currentImageNode)
+                    showRemoveDialog = false
+                },
+                onDismiss = {
+                    showRemoveDialog = false
                 }
             )
         }
@@ -371,9 +399,11 @@ internal fun ImagePreviewScreen(
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickRestore = {
+                        onClickRestore(currentImageNode)
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickRemove = {
+                        showRemoveDialog = true
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickMoveToRubbishBin = {

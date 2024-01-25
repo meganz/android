@@ -129,6 +129,8 @@ class ImagePreviewActivity : BaseActivity() {
                     onClickRename = ::renameNode,
                     onClickMove = ::moveNode,
                     onClickCopy = ::copyNode,
+                    onClickRestore = ::restoreNode,
+                    onClickRemove = ::removeNode,
                     onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
                 )
             }
@@ -259,6 +261,21 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun copyNode(imageNode: ImageNode) {
         selectCopyFolderLauncher.launch(longArrayOf(imageNode.id.longValue))
+    }
+
+    private fun restoreNode(imageNode: ImageNode) {
+        val nodeId = imageNode.id
+        val restoreId = imageNode.restoreId ?: return
+
+        viewModel.moveNode(
+            context = this,
+            moveHandle = nodeId.longValue,
+            toHandle = restoreId.longValue,
+        )
+    }
+
+    private fun removeNode(imageNode: ImageNode) {
+        viewModel.deleteNode(nodeId = imageNode.id)
     }
 
     private fun moveNodeToRubbishBin(imageNode: ImageNode) {
