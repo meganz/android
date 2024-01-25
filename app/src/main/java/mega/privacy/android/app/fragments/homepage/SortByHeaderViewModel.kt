@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
 import mega.privacy.android.app.fragments.homepage.model.SortByHeaderState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
