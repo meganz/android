@@ -22,7 +22,7 @@ interface TypedMessageDao {
      * @return paging source
      */
     @Transaction
-    @Query("SELECT * FROM typed_messages WHERE chatId = :chatId")
+    @Query("SELECT * FROM typed_messages WHERE chatId = :chatId ORDER BY timestamp DESC")
     fun getAllAsPagingSource(chatId: Long): PagingSource<Int, MetaTypedMessageEntity>
 
     /**

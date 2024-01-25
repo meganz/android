@@ -31,7 +31,7 @@ import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
     ],
     version = 1,
 )
-internal abstract class InMemoryChatDatabase : RoomDatabase() {
+abstract class InMemoryChatDatabase : RoomDatabase() {
 
     abstract fun typedMessageDao(): TypedMessageDao
 

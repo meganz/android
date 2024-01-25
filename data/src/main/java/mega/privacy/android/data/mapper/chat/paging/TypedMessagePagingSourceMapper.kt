@@ -2,6 +2,8 @@ package mega.privacy.android.data.mapper.chat.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import androidx.room.InvalidationTracker
+import mega.privacy.android.data.database.chat.InMemoryChatDatabase
 import mega.privacy.android.data.database.entity.chat.MetaTypedMessageEntity
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import timber.log.Timber
@@ -14,6 +16,7 @@ import javax.inject.Inject
  */
 class TypedMessagePagingSourceMapper @Inject constructor(
     private val metaTypedEntityTypedMessageMapper: MetaTypedEntityTypedMessageMapper,
+    private val database: InMemoryChatDatabase,
 ) {
 
     /**
@@ -26,13 +29,28 @@ class TypedMessagePagingSourceMapper @Inject constructor(
         return MappingPagingSource(
             entityPagingSource,
             metaTypedEntityTypedMessageMapper,
+            database,
         )
     }
 
     internal class MappingPagingSource(
         private val originalSource: PagingSource<Int, MetaTypedMessageEntity>,
         private val metaTypedMessageEntityMapper: MetaTypedEntityTypedMessageMapper,
+        database: InMemoryChatDatabase,
     ) : PagingSource<Int, TypedMessage>() {
+
+        private val invalidationObserver: InvalidationTracker.Observer =
+            object : InvalidationTracker.Observer("typed_messages") {
+                override fun onInvalidated(tables: Set<String>) {
+                    Timber.d("Paging mediator mapper invalidation observer: invalidated")
+                    invalidate()
+                }
+            }
+
+        init {
+            database.invalidationTracker.addObserver(invalidationObserver)
+        }
+
         override fun getRefreshKey(state: PagingState<Int, TypedMessage>): Int? {
             return originalSource.getRefreshKey(
                 PagingState(

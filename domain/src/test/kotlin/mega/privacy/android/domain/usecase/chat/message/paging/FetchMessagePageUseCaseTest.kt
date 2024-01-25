@@ -62,7 +62,7 @@ class FetchMessagePageUseCaseTest {
             onBlocking { invoke(any()) } doReturn expectedMessages
         }
 
-        assertThat(underTest.invoke(0)).isEqualTo(
+        assertThat(underTest.invoke(0, this)).isEqualTo(
             FetchMessagePageResponse(
                 chatId = 0,
                 messages = expectedMessages,

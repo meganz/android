@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.chat.message.paging
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.domain.entity.chat.messages.paging.FetchMessagePageResponse
@@ -26,18 +26,20 @@ class FetchMessagePageUseCase @Inject constructor(
      * Invoke
      *
      * @param chatId
+     * @param coroutineScope
      * @return FetchMessagePageResponse
      */
     suspend operator fun invoke(
         chatId: Long,
-    ): FetchMessagePageResponse = coroutineScope {
+        coroutineScope: CoroutineScope,
+    ): FetchMessagePageResponse {
         val messageFlow = monitorChatRoomMessagesUseCase(chatId).shareIn(
-            scope = this@coroutineScope, started = SharingStarted.Eagerly
+            scope = coroutineScope, started = SharingStarted.Eagerly
         )
 
-        val messageResponse = async { getMessageListUseCase(messageFlow) }
-        val loadResponse = async { loadMessagesUseCase(chatId) }
-        return@coroutineScope FetchMessagePageResponse(
+        val messageResponse = coroutineScope.async { getMessageListUseCase(messageFlow) }
+        val loadResponse = coroutineScope.async { loadMessagesUseCase(chatId) }
+        return FetchMessagePageResponse(
             chatId = chatId,
             messages = messageResponse.await(),
             loadResponse = loadResponse.await(),
