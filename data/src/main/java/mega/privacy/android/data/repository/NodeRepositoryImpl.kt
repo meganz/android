@@ -916,4 +916,24 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun shareFolder(
+        nodeId: NodeId,
+        email: String,
+        accessPermission: AccessPermission,
+    ) {
+        withContext(ioDispatcher) {
+            val node = getMegaNodeByHandle(nodeId, true)
+                ?: throw IllegalArgumentException("Node to share with handle $nodeId not found")
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("shareFolder") {}
+                megaApiGateway.setShareAccess(
+                    megaNode = node,
+                    accessLevel = accessPermissionIntMapper(accessPermission),
+                    email = email,
+                    listener = listener
+                )
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
+    }
 }

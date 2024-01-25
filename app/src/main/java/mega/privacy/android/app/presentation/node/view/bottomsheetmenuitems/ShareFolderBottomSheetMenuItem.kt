@@ -59,7 +59,6 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
     ): () -> Unit = {
         scope.launch(mainDispatcher) {
             onDismiss()
-            val context = navController.context
             if (node is TypedFolderNode) {
                 createShareKeyUseCase(node)
                 val backupType = checkBackupNodeTypeByHandleUseCase(node)
@@ -68,13 +67,7 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
                         searchFolderShareDialog.plus("/${false}")
                     )
                 } else {
-                    val intent = Intent().apply {
-                        setClass(context, AddContactActivity::class.java)
-                        putExtra("contactType", Constants.CONTACT_TYPE_BOTH)
-                        putExtra("MULTISELECT", 0)
-                        putExtra(AddContactActivity.EXTRA_NODE_HANDLE, node.id.longValue)
-                    }
-                    context.startActivity(intent)
+                    actionHandler(menuAction, node)
                 }
             }
         }

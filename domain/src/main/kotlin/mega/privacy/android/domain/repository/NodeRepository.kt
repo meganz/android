@@ -634,4 +634,12 @@ interface NodeRepository {
      * @param nodeToLeaveShare [NodeId]
      */
     suspend fun leaveShareByHandle(nodeToLeaveShare: NodeId)
+
+    /**
+     * Share Node with Email with permission
+     * @param nodeId [NodeId]
+     * @param email Users' email
+     * @param accessPermission [AccessPermission]
+     */
+    suspend fun shareFolder(nodeId: NodeId, email: String, accessPermission: AccessPermission)
 }

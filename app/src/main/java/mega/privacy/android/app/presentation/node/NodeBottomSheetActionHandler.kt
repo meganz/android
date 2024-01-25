@@ -3,9 +3,11 @@ package mega.privacy.android.app.presentation.node
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
+import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.MoveMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -64,6 +66,12 @@ class NodeBottomSheetActionHandler(
             }
         }
 
+    private val shareFolderActivityLauncher =
+        (activity as? AppCompatActivity)?.registerForActivityResult(
+            ShareFolderActivityContract()
+        ) { result ->
+        }
+
     /**
      * handles actions
      *
@@ -75,7 +83,7 @@ class NodeBottomSheetActionHandler(
             is VersionsMenuAction -> versionsActivityLauncher?.launch(node.id.longValue)
             is MoveMenuAction -> selectMoveNodeActivityLauncher?.launch(longArrayOf(node.id.longValue))
             is CopyMenuAction -> selectCopyNodeActivityLauncher?.launch(longArrayOf(node.id.longValue))
-
+            is ShareFolderMenuAction -> shareFolderActivityLauncher?.launch(longArrayOf(node.id.longValue))
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }
     }

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.dialogs.sharefolder
+package mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.CoroutineScope

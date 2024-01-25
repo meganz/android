@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.dialogs.sharefolder
+package mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable

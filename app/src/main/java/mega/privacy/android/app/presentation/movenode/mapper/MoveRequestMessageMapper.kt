@@ -182,5 +182,41 @@ class MoveRequestMessageMapper @Inject constructor(
                     }
                 }
             }
+
+            is MoveRequestResult.ShareMovement -> {
+                when {
+                    request.isAllRequestError -> {
+                        context.resources.getQuantityString(
+                            R.plurals.shared_items_cloud_drive_snackbar_sharing_folder_failed,
+                            request.count,
+                            request.count
+                        )
+                    }
+
+                    request.isSuccess -> {
+                        context.resources.getQuantityString(
+                            R.plurals.shared_items_cloud_drive_snackbar_sharing_folder_success,
+                            request.count,
+                            request.count
+                        )
+                    }
+
+                    else -> {
+                        "${
+                            context.resources.getQuantityString(
+                                R.plurals.shared_items_cloud_drive_snackbar_sharing_folder_success,
+                                request.count - request.errorCount,
+                                request.count - request.errorCount
+                            )
+                        }${
+                            context.resources.getQuantityString(
+                                R.plurals.shared_items_cloud_drive_snackbar_sharing_folder_failed_concat,
+                                request.errorCount,
+                                request.errorCount
+                            )
+                        }"
+                    }
+                }
+            }
         }
 }

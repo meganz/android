@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.dialogs.sharefolder
+package mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -88,4 +88,17 @@ sealed class MoveRequestResult(
         count = count,
         errorCount = errorCount,
     )
+
+    /**
+     * Result of a Share
+     */
+    class ShareMovement(
+        count: Int,
+        errorCount: Int,
+        nodes: List<Long>,
+    ) : MoveRequestResult(
+        count = count,
+        errorCount = errorCount,
+        nodes = nodes,
+    )
 }

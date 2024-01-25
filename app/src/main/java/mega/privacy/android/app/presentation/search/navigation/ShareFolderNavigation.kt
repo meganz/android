@@ -11,7 +11,7 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
-import mega.privacy.android.app.presentation.node.dialogs.sharefolder.ShareFolderDialog
+import mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning.ShareFolderDialog
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 import mega.privacy.android.app.presentation.search.isFromToolbar
 import mega.privacy.android.app.utils.Constants

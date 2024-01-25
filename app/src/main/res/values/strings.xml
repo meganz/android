@@ -5243,4 +5243,19 @@
     <string name="transfers_confirm_large_download_button_start">Start download</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
     <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
+    <!-- Success message when folder is shared when  share clicked -->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
+        <item quantity="one">Folder shared</item>
+        <item quantity="other">%1$d folders shared</item>
+    </plurals>
+    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
+        <item quantity="one">Folder shared,&#160;</item>
+        <item quantity="other">%1$d folders shared,&#160;</item>
+    </plurals>
+    <!-- error message when sharing a folder(s) fails to be completed concat-->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
+        <item quantity="one">couldn’t share %1$d folder</item>
+        <item quantity="other">couldn’t share %1$d folders</item>
+    </plurals>
 </resources>
