@@ -25,6 +25,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import timber.log.Timber
 import java.io.File
@@ -37,17 +38,27 @@ class AlbumGetLinkViewModel @Inject constructor(
     private val getAlbumPhotosUseCase: GetAlbumPhotos,
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
     private val exportAlbumsUseCase: ExportAlbumsUseCase,
+    private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumGetLinkState())
     val stateFlow = state.asStateFlow()
 
-    fun initialize() {
+    fun initialize() = viewModelScope.launch {
         fetchAlbum()
 
         state.update {
-            it.copy(isInitialized = true)
+            it.copy(
+                isInitialized = true,
+                showCopyright = shouldShowCopyrightUseCase(),
+            )
+        }
+    }
+
+    fun hideCopyright() {
+        state.update {
+            it.copy(showCopyright = false)
         }
     }
 

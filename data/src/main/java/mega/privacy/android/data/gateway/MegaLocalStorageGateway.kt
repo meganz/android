@@ -335,4 +335,9 @@ interface MegaLocalStorageGateway {
      * @param chatId Chat id.
      */
     fun removePendingMessageByChatId(chatId: Long)
+
+    /**
+     * Should show copyright
+     */
+    fun shouldShowCopyright(): Boolean
 }

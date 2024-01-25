@@ -567,4 +567,9 @@ interface AccountRepository {
      * @param enabledCookieSettings Set of CookieType
      */
     suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>)
+
+    /**
+     * Should show copyright
+     */
+    suspend fun shouldShowCopyright(): Boolean
 }

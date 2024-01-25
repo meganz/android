@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.photos.albums.getmultiplelinks
 
 import android.text.TextUtils.TruncateAt.MIDDLE
+import android.view.View
 import android.widget.TextView
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -52,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -62,6 +65,7 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.getLink.CopyrightFragment
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumSummary
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054
@@ -80,6 +84,7 @@ private typealias ImageDownloader = (photo: Photo, callback: (Boolean) -> Unit) 
 @Composable
 fun AlbumGetMultipleLinksScreen(
     viewModel: AlbumGetMultipleLinksViewModel = viewModel(),
+    createView: (Fragment) -> View,
     onBack: () -> Unit,
     onShareLinks: (List<AlbumLink>) -> Unit,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
@@ -105,6 +110,14 @@ fun AlbumGetMultipleLinksScreen(
 
     LaunchedEffect(state.exitScreen) {
         if (state.exitScreen) {
+            onBack()
+        }
+    }
+
+    BackHandler {
+        if (state.showCopyright) {
+            viewModel.hideCopyright()
+        } else {
             onBack()
         }
     }
@@ -144,6 +157,18 @@ fun AlbumGetMultipleLinksScreen(
             )
         },
     )
+
+    if (state.showCopyright) {
+        Surface {
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = {
+                    val fragment = CopyrightFragment()
+                    createView(fragment)
+                },
+            )
+        }
+    }
 }
 
 @Composable

@@ -8,6 +8,7 @@ data class AlbumGetLinkState(
     val isSeparateKeyEnabled: Boolean = false,
     val link: String = "",
     val exitScreen: Boolean = false,
+    val showCopyright: Boolean = false,
 )
 
 data class AlbumSummary(

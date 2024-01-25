@@ -1066,6 +1066,9 @@ internal class DefaultAccountRepository @Inject constructor(
     override fun monitorCookieSettingsSaved(): Flow<Set<CookieType>> =
         appEventGateway.monitorCookieSettings
 
+    override suspend fun shouldShowCopyright(): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.shouldShowCopyright()
+    }
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

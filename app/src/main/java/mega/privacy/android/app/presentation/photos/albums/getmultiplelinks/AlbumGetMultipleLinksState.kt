@@ -21,4 +21,5 @@ data class AlbumGetMultipleLinksState(
     val albumLinks: Map<AlbumId, AlbumLink> = mapOf(),
     val albumLinksList: List<String> = listOf(),
     val exitScreen: Boolean = false,
+    val showCopyright: Boolean = false,
 )

@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import org.junit.After
 import org.junit.Before
@@ -40,6 +41,8 @@ class AlbumGetMultipleLegacyLinksViewModelTest {
 
     private val exportAlbumsUseCase: ExportAlbumsUseCase = mock()
 
+    private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase = mock()
+
     @Before
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
@@ -52,12 +55,16 @@ class AlbumGetMultipleLegacyLinksViewModelTest {
 
     @Test
     fun `test that fetch link works correctly`() = runTest {
+        whenever(shouldShowCopyrightUseCase())
+            .thenReturn(false)
+
         underTest = AlbumGetMultipleLinksViewModel(
             savedStateHandle = SavedStateHandle(mapOf(ALBUM_ID to longArrayOf(1L, 2L))),
             getUserAlbumUseCase = getUserAlbumUseCase,
             getAlbumPhotosUseCase = getAlbumPhotosUseCase,
             downloadThumbnailUseCase = downloadThumbnailUseCase,
             exportAlbumsUseCase = exportAlbumsUseCase,
+            shouldShowCopyrightUseCase = shouldShowCopyrightUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
         )
@@ -110,6 +117,7 @@ class AlbumGetMultipleLegacyLinksViewModelTest {
         underTest.stateFlow.drop(2).test {
             val state = awaitItem()
             assertThat(state.albumLinks).isEqualTo(expectedLinks)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }

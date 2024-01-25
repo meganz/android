@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import org.junit.After
 import org.junit.Before
@@ -37,6 +38,8 @@ class AlbumGetLinkViewModelTest {
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase = mock()
 
     private val exportAlbumsUseCase: ExportAlbumsUseCase = mock()
+
+    private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase = mock()
 
     @Before
     fun setup() {
@@ -67,6 +70,7 @@ class AlbumGetLinkViewModelTest {
             getAlbumPhotosUseCase = getAlbumPhotosUseCase,
             downloadThumbnailUseCase = downloadThumbnailUseCase,
             exportAlbumsUseCase = exportAlbumsUseCase,
+            shouldShowCopyrightUseCase = shouldShowCopyrightUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
         )
@@ -80,11 +84,14 @@ class AlbumGetLinkViewModelTest {
         whenever(exportAlbumsUseCase(listOf(userAlbum.id)))
             .thenReturn(listOf(AlbumIdLink(userAlbum.id, expectedLink)))
 
+        whenever(shouldShowCopyrightUseCase())
+            .thenReturn(false)
+
         // when
         underTest.initialize()
 
         // then
-        underTest.stateFlow.drop(1).test {
+        underTest.stateFlow.drop(2).test {
             val state = awaitItem()
             assertThat(state.link).contains(expectedLink.link)
         }
@@ -108,6 +115,7 @@ class AlbumGetLinkViewModelTest {
             getAlbumPhotosUseCase = getAlbumPhotosUseCase,
             downloadThumbnailUseCase = downloadThumbnailUseCase,
             exportAlbumsUseCase = exportAlbumsUseCase,
+            shouldShowCopyrightUseCase = shouldShowCopyrightUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
         )
@@ -121,11 +129,14 @@ class AlbumGetLinkViewModelTest {
         whenever(exportAlbumsUseCase(listOf()))
             .thenReturn(listOf())
 
+        whenever(shouldShowCopyrightUseCase())
+            .thenReturn(false)
+
         // when
         underTest.initialize()
 
         // then
-        underTest.stateFlow.drop(1).test {
+        underTest.stateFlow.drop(2).test {
             val state = awaitItem()
             assertThat(state.exitScreen).isTrue()
         }
