@@ -75,6 +75,7 @@ internal fun NodeOptionsBottomSheetContent(
             is FolderNode -> node.folderInfo()
             else -> ""
         },
+        showVersion = node?.hasVersion == true,
         icon = (node as? TypedFolderNode)?.getIcon()
             ?: MimeTypeList.typeForName(node?.name).iconResourceId,
         thumbnailData = node?.id?.let { ThumbnailRequest(it) },
