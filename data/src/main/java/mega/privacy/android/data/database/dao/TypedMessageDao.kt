@@ -42,6 +42,14 @@ interface TypedMessageDao {
     suspend fun deleteMessagesByChatId(chatId: Long)
 
     /**
+     * Delete messages by msg id
+     *
+     * @param msgIds
+     */
+    @Query("SELECT msgId FROM typed_messages WHERE chatId = :chatId")
+    suspend fun getMsgIdsByChatId(chatId: Long): List<Long>
+
+    /**
      * Get message with next greatest timestamp
      *
      * @param chatId

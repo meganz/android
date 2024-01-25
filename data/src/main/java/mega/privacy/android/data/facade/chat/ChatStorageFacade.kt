@@ -46,11 +46,12 @@ internal class ChatStorageFacade @Inject constructor(
         with(database) {
             withTransaction {
                 typedMessageDao().insertAll(messages)
+                val metaDao = chatMessageMetaDao()
                 richPreviews.takeUnless { it.isEmpty() }
-                    ?.let { chatMessageMetaDao().insertRichPreviews(it) }
-                giphys.takeUnless { it.isEmpty() }?.let { chatMessageMetaDao().insertGiphys(it) }
+                    ?.let { metaDao.insertRichPreviews(it) }
+                giphys.takeUnless { it.isEmpty() }?.let { metaDao.insertGiphys(it) }
                 geolocations.takeUnless { it.isEmpty() }
-                    ?.let { chatMessageMetaDao().insertGeolocations(it) }
+                    ?.let { metaDao.insertGeolocations(it) }
                 chatNodes.takeUnless { it.isEmpty() }?.let { chatNodeDao().insertChatNodes(it) }
             }
         }
@@ -62,7 +63,20 @@ internal class ChatStorageFacade @Inject constructor(
      * @param chatId Chat ID
      */
     override suspend fun clearChatMessages(chatId: Long) {
-        database.typedMessageDao().deleteMessagesByChatId(chatId)
+        with(database) {
+            withTransaction {
+                val messagesToDelete = typedMessageDao().getMsgIdsByChatId(chatId)
+                typedMessageDao().deleteMessagesByChatId(chatId)
+
+                val metaDao = chatMessageMetaDao()
+                metaDao.deleteRichPreviewsByMessageId(messagesToDelete)
+                metaDao.deleteGiphysByMessageId(messagesToDelete)
+                metaDao.deleteGeolocationsByMessageId(messagesToDelete)
+                chatNodeDao().deleteChatNodesByMessageId(messagesToDelete)
+
+                chatHistoryStateDao().deleteState(chatId)
+            }
+        }
     }
 
     /**
