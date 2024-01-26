@@ -49,6 +49,7 @@ dependencies {
     implementation(lib.javax.inject)
 
     implementation(google.hilt.core)
+    implementation(androidx.paging.core)
 
     val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
     if (shouldApplyDefaultConfiguration()) {

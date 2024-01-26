@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import androidx.paging.PagingSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
@@ -57,6 +58,7 @@ import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
+import mega.privacy.android.domain.entity.chat.messages.paging.PagedChatMessage
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.ChatSettings
@@ -1144,6 +1146,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
+
     override fun monitorRichLinkPreviewConfig(): Flow<RichLinkConfig> = richLinkConfig.asStateFlow()
 
     override fun hasUrl(url: String): Boolean = megaChatApiGateway.hasUrl(url)
@@ -1158,5 +1161,17 @@ internal class ChatRepositoryImpl @Inject constructor(
             megaApiGateway.enableRichPreviews(enable, listener)
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
+    }
+
+    override fun getPagedMessages(chatId: Long): Flow<PagingSource<Int, PagedChatMessage>> {
+        return flow { throw NotImplementedError("Not implemented yet") }
+    }
+
+    override suspend fun getLastLoadResponse(chatId: Long): ChatHistoryLoadStatus {
+        throw NotImplementedError("Not implemented yet")
+    }
+
+    override suspend fun setLastLoadResponse(chatId: Long, status: ChatHistoryLoadStatus) {
+        throw NotImplementedError("Not implemented yet")
     }
 }

@@ -87,6 +87,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 sqlite-ktx = { module = "androidx.sqlite:sqlite-ktx", version.ref = "sqlite" }
 security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
 paging = { module = "androidx.paging:paging-runtime" , version.ref = "paging" }
+paging-core = { module = "androidx.paging:paging-common" , version.ref = "paging" }
 paging-compose = { module = "androidx.paging:paging-compose" , version.ref = "paging-compose" }
 
 [bundles]
