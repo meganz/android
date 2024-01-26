@@ -1163,7 +1163,11 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getPagedMessages(chatId: Long): PagingSource<Int, PagedChatMessage> {
+    override suspend fun getPagedMessages(chatId: Long): PagingSource<Int, PagedChatMessage> {
+        throw NotImplementedError("Not implemented yet")
+    }
+
+    override suspend fun storeMessages(chatId: Long, messages: List<PagedChatMessage>) {
         throw NotImplementedError("Not implemented yet")
     }
 
