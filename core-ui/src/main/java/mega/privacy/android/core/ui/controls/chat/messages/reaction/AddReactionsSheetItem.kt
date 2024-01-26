@@ -105,7 +105,7 @@ internal fun ReactionItem(
         )
     } ?: Icon(
         modifier = Modifier.size(24.dp),
-        imageVector = ImageVector.vectorResource(R.drawable.ic_emoji_add2),
+        imageVector = ImageVector.vectorResource(R.drawable.ic_icon_add_small_regular_outline),
         contentDescription = "Add more reactions",
         tint = MegaTheme.colors.icon.secondary,
     )

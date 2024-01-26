@@ -51,7 +51,7 @@ internal fun AddReactionChip(
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_emoji_add2),
+            imageVector = ImageVector.vectorResource(R.drawable.ic_icon_add_small_regular_outline),
             contentDescription = null,
             tint = MegaTheme.colors.icon.secondary,
         )
