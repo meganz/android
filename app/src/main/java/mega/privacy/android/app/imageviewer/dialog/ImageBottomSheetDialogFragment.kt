@@ -13,7 +13,9 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.common.ResizeOptions
@@ -21,6 +23,7 @@ import com.facebook.imagepipeline.common.RotationOptions
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.WebViewActivity
@@ -54,6 +57,7 @@ import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
 import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -65,6 +69,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelText
 import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -96,6 +101,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private val viewModel by viewModels<ImageViewerViewModel>({ requireActivity() })
+    private val startDownloadViewModel by activityViewModels<StartDownloadViewModel>()
     private val itemId by lazy {
         arguments?.getLong(INTENT_EXTRA_KEY_HANDLE) ?: error("Null Item Id")
     }
@@ -294,8 +300,18 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionOfflineRemove.isVisible = imageItem is ImageItem.OfflineNode
             switchOffline.isChecked = nodeItem?.isAvailableOffline == true
             val offlineAction = {
-                viewModel.switchNodeOfflineAvailability(nodeItem!!, requireActivity())
-                dismissAllowingStateLoss()
+                lifecycleScope.launch {
+                    if (node != null && nodeItem?.isAvailableOffline == false && startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                        if (node.isForeign) {
+                            startDownloadViewModel.onSaveOfflineClicked(node.serialize())
+                        } else {
+                            startDownloadViewModel.onSaveOfflineClicked(NodeId(node.handle))
+                        }
+                    } else if (nodeItem != null) {
+                        viewModel.switchNodeOfflineAvailability(nodeItem, requireActivity())
+                    }
+                    dismissAllowingStateLoss()
+                }
             }
             optionOfflineRemove.setOnClickListener {
                 viewModel.removeOfflineNode(

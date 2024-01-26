@@ -191,6 +191,16 @@ class StartDownloadViewModelTest {
         assertStartDownloadForOffline(chatFile)
     }
 
+    @Test
+    fun `test that onSaveOfflineClicked with serialized data launches the correct event`() =
+        runTest {
+            val node = mock<PublicLinkFile>()
+            val serializedData = "serialized data"
+            whenever(getPublicNodeFromSerializedDataUseCase(serializedData)).thenReturn(node)
+            underTest.onSaveOfflineClicked(serializedData)
+            assertStartDownloadForOffline(node)
+        }
+
     private suspend fun assertStartDownloadNode(vararg node: TypedNode) {
         underTest.state.test {
             val event = awaitItem()

@@ -45,6 +45,8 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showTransfersSnackBar
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_LINK
@@ -78,6 +80,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.PhotoPreviewSaveToDeviceMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
@@ -392,6 +395,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     private val viewModel by viewModels<ImageViewerViewModel>()
+    private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
     private val appBarConfiguration by lazy {
         AppBarConfiguration(
             topLevelDestinationIds = setOf(),
@@ -433,6 +437,17 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 }
             }
         }
+        addStartDownloadTransferView()
+    }
+
+    private fun addStartDownloadTransferView() {
+        binding.root.addView(
+            createStartDownloadView(
+                this,
+                startDownloadViewModel.state,
+                startDownloadViewModel::consumeDownloadEvent
+            )
+        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -724,7 +739,22 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             else -> super.onOptionsItemSelected(item)
         }
 
+
     fun saveNode(node: MegaNode) {
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                if (node.isForeign) {
+                    startDownloadViewModel.onDownloadClicked(node.serialize())
+                } else {
+                    startDownloadViewModel.onDownloadClicked(NodeId(node.handle))
+                }
+            } else {
+                legacyDownload(node)
+            }
+        }
+    }
+
+    private fun legacyDownload(node: MegaNode) {
         PermissionUtils.checkNotificationsPermission(this)
         nodeSaver?.saveNode(
             node,

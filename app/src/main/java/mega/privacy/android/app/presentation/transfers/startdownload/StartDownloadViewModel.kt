@@ -157,6 +157,19 @@ class StartDownloadViewModel @Inject constructor(
     }
 
     /**
+     * Triggers the event to save offline a node with its serialized data for link nodes
+     * @param serializedData of the link node
+     */
+    fun onSaveOfflineClicked(serializedData: String) {
+        viewModelScope.launch {
+            val node = getPublicNodeFromSerializedDataUseCase(serializedData)
+            _state.update {
+                triggered(TransferTriggerEvent.StartDownloadForOffline(node))
+            }
+        }
+    }
+
+    /**
      * Triggers the event related to save offline a node
      * @param node
      */
