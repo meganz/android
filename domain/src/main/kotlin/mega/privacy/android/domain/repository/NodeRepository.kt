@@ -96,6 +96,14 @@ interface NodeRepository {
     suspend fun getNodeById(nodeId: NodeId): Node?
 
     /**
+     * Get node by its serialized data
+     *
+     * @param serializedData
+     * @return The node if can be un-serialized else null
+     */
+    suspend fun getNodeFromSerializedData(serializedData: String): UnTypedNode?
+
+    /**
      * Retrieves the Node Path with the provided Node ID
      *
      * @param nodeId [NodeId]

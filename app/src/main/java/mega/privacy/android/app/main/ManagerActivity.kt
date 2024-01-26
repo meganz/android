@@ -163,7 +163,7 @@ import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB
 import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
@@ -236,7 +236,7 @@ import mega.privacy.android.app.presentation.startconversation.StartConversation
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
-import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadTransferView
+import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
@@ -382,7 +382,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val userInfoViewModel: UserInfoViewModel by viewModels()
     private val transferPageViewModel: TransferPageViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
-    private val nodeOptionsDownloadViewModel: NodeOptionsDownloadViewModel by viewModels()
+    private val startDownloadViewModel: StartDownloadViewModel by viewModels()
     private val searchResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -1076,10 +1076,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun addStartDownloadTransferView() {
         findViewById<ViewGroup>(R.id.root_content_layout).addView(
-            createStartDownloadTransferView(
+            createStartDownloadView(
                 this,
-                nodeOptionsDownloadViewModel.state,
-                nodeOptionsDownloadViewModel::consumeDownloadEvent
+                startDownloadViewModel.state,
+                startDownloadViewModel::consumeDownloadEvent
             )
         )
     }

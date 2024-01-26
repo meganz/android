@@ -85,7 +85,7 @@ abstract class AbstractTransfersWorker(
     open suspend fun onTransferEventReceived(event: TransferEvent) {}
 
     override suspend fun doWork() = coroutineScope {
-        Timber.d("${this::class.java.simpleName} Started")
+        Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Started")
         // Signal to not kill the worker if the app is killed
         setForegroundAsync(getForegroundInfo())
 
@@ -93,19 +93,19 @@ abstract class AbstractTransfersWorker(
             val monitorJob = monitorTransferEvents(this)
             correctActiveTransfersUseCase(type) //to be sure we haven't missed any event before monitoring them
             monitorOngoingActiveTransfersUseCase(type)
-                .catch { Timber.e("${this::class.java.simpleName}error: $it") }
+                .catch { Timber.e("${this@AbstractTransfersWorker::class.java.simpleName}error: $it") }
                 .onEach { (transferTotals, paused, _) ->
                     //set progress percent as worker progress
                     setProgress(workDataOf(PROGRESS to transferTotals.transferProgress.floatValue))
                     //update the notification
                     notify(createUpdateNotification(transferTotals, paused))
-                    Timber.d("${this::class.java.simpleName}${if (paused) "(paused) " else ""} Notification update (${transferTotals.transferProgress.intValue}):${transferTotals.hasOngoingTransfers()}")
+                    Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}${if (paused) "(paused) " else ""} Notification update (${transferTotals.transferProgress.intValue}):${transferTotals.hasOngoingTransfers()}")
                 }
                 .last().let { (lastActiveTransferTotals, _, overQuota) ->
                     stopService(monitorJob)
                     clearActiveTransfersIfFinishedUseCase(type)
                     if (lastActiveTransferTotals.hasCompleted()) {
-                        Timber.d("${this::class.java.simpleName}Finished Successful: $lastActiveTransferTotals")
+                        Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished Successful: $lastActiveTransferTotals")
                         if (lastActiveTransferTotals.totalTransfers > 0) {
                             showFinishNotification(lastActiveTransferTotals)
                         }
@@ -124,7 +124,7 @@ abstract class AbstractTransfersWorker(
                         } else {
                             showFinishNotification(lastActiveTransferTotals)
                         }
-                        Timber.d("${this::class.java.simpleName}finished Failure: $lastActiveTransferTotals")
+                        Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}finished Failure: $lastActiveTransferTotals")
                         Result.failure()//to retry in the future
                     }
                 }

@@ -898,6 +898,18 @@ class NodeRepositoryImplTest {
         assertThat(actual).isEqualTo(expected)
     }
 
+    @Test
+    fun `test that getNodeFromSerializedData returns mapped node from gateway with correct serialized data`() =
+        runTest {
+            val serializedData = "serialized Data"
+            val megaNode = mockMegaNodeForConversion()
+            whenever(megaNode.serialize()).thenReturn(serializedData)
+            whenever(megaApiGateway.unSerializeNode(serializedData)).thenReturn(megaNode)
+            whenever(megaApiGateway.getNumVersions(megaNode)).thenReturn(1)
+            val actual = underTest.getNodeFromSerializedData(serializedData)
+            assertThat(actual?.serializedData).isEqualTo(serializedData)
+        }
+
     companion object {
         private const val nodeHandle = 1L
         private val nodeId = NodeId(nodeHandle)

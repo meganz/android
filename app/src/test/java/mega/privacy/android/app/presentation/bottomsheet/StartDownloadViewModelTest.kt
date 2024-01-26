@@ -10,13 +10,17 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -33,13 +37,16 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class NodeOptionsDownloadViewModelTest {
+class StartDownloadViewModelTest {
 
-    private lateinit var underTest: NodeOptionsDownloadViewModel
+    private lateinit var underTest: StartDownloadViewModel
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getChatFileUseCase = mock<GetChatFileUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val getPublicNodeFromSerializedDataUseCase =
+        mock<GetPublicNodeFromSerializedDataUseCase>()
+    val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -54,14 +61,22 @@ class NodeOptionsDownloadViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(getFeatureFlagValueUseCase, getChatFileUseCase, getNodeByIdUseCase)
-    }
-
-    private fun initViewModel() {
-        underTest = NodeOptionsDownloadViewModel(
+        reset(
             getFeatureFlagValueUseCase,
             getChatFileUseCase,
             getNodeByIdUseCase,
+            getPublicNodeFromSerializedDataUseCase,
+            getPublicChildNodeFromIdUseCase,
+        )
+    }
+
+    private fun initViewModel() {
+        underTest = StartDownloadViewModel(
+            getFeatureFlagValueUseCase,
+            getChatFileUseCase,
+            getNodeByIdUseCase,
+            getPublicNodeFromSerializedDataUseCase,
+            getPublicChildNodeFromIdUseCase,
         )
     }
 
@@ -94,6 +109,24 @@ class NodeOptionsDownloadViewModelTest {
         val node = mock<TypedFileNode>()
         whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
         underTest.onDownloadClicked(nodeId)
+        assertStartDownloadNode(node)
+    }
+
+    @Test
+    fun `test that onDownloadClicked with serialized data launches the correct event`() = runTest {
+        val node = mock<PublicLinkFile>()
+        val serializedData = "serialized data"
+        whenever(getPublicNodeFromSerializedDataUseCase(serializedData)).thenReturn(node)
+        underTest.onDownloadClicked(serializedData)
+        assertStartDownloadNode(node)
+    }
+
+    @Test
+    fun `test that onFolderLinkChildNodeDownloadClicked  launches the correct event`() = runTest {
+        val node = mock<PublicLinkFile>()
+        val id = NodeId(1L)
+        whenever(getPublicChildNodeFromIdUseCase(id)).thenReturn(node)
+        underTest.onFolderLinkChildNodeDownloadClicked(id)
         assertStartDownloadNode(node)
     }
 

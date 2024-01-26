@@ -36,7 +36,7 @@ import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
-import static mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadTransferComponentKt.createStartDownloadTransferView;
+import static mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponentKt.createStartDownloadView;
 import static mega.privacy.android.app.providers.FileProviderActivity.FROM_MEGA_APP;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -368,7 +368,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.objects.PasscodeManagement;
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsDownloadViewModel;
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
 import mega.privacy.android.app.presentation.chat.ContactInvitation;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
@@ -575,7 +575,7 @@ public class ChatActivity extends PasscodeActivity
     HasMediaPermissionUseCase hasMediaPermissionUseCase;
 
     private ChatViewModel viewModel;
-    private NodeOptionsDownloadViewModel nodeOptionsDownloadViewModel;
+    private StartDownloadViewModel startDownloadViewModel;
 
     private WaitingRoomManagementViewModel waitingRoomManagementViewModel;
 
@@ -1459,7 +1459,7 @@ public class ChatActivity extends PasscodeActivity
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
-        nodeOptionsDownloadViewModel = new ViewModelProvider(this).get(NodeOptionsDownloadViewModel.class);
+        startDownloadViewModel = new ViewModelProvider(this).get(StartDownloadViewModel.class);
         waitingRoomManagementViewModel = new ViewModelProvider(this).get(WaitingRoomManagementViewModel.class);
 
         if (shouldRefreshSessionDueToKarere()) {
@@ -2006,11 +2006,11 @@ public class ChatActivity extends PasscodeActivity
     private void addStartDownloadTransferView() {
         ViewGroup root = findViewById(R.id.fragment_container_chat);
         root.addView(
-                createStartDownloadTransferView(
+                createStartDownloadView(
                         this,
-                        nodeOptionsDownloadViewModel.getState(),
+                        startDownloadViewModel.getState(),
                         () -> {
-                            nodeOptionsDownloadViewModel.consumeDownloadEvent();
+                            startDownloadViewModel.consumeDownloadEvent();
                             return Unit.INSTANCE;
                         }
                 )
@@ -5050,7 +5050,7 @@ public class ChatActivity extends PasscodeActivity
                     Long megaNodeHandle = messagesSelected.get(i).getMessage().getMsgId();
                     messageIds.add(megaNodeHandle);
                 }
-                nodeOptionsDownloadViewModel.downloadChatNodesOnlyIfFeatureFlagIsTrue(
+                startDownloadViewModel.downloadChatNodesOnlyIfFeatureFlagIsTrue(
                         idChat,
                         messageIds,
                         () -> {
@@ -5767,7 +5767,7 @@ public class ChatActivity extends PasscodeActivity
             manageTextFileIntent(this, msgId, idChat);
         } else {
             onNodeTapped(this, node, (megaNode) -> {
-                nodeOptionsDownloadViewModel.downloadChatNodesOnlyIfFeatureFlagIsTrue(
+                startDownloadViewModel.downloadChatNodesOnlyIfFeatureFlagIsTrue(
                         idChat,
                         List.of(msgId),
                         () -> {

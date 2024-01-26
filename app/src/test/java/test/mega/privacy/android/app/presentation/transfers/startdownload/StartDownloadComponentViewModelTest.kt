@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadTransfersViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadComponentViewModel
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferEvent
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
@@ -54,9 +54,9 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class StartDownloadTransfersViewModelTest {
+class StartDownloadComponentViewModelTest {
 
-    lateinit var underTest: StartDownloadTransfersViewModel
+    private lateinit var underTest: StartDownloadComponentViewModel
 
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase = mock()
     private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase = mock()
@@ -86,7 +86,7 @@ class StartDownloadTransfersViewModelTest {
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         initialStub()
-        underTest = StartDownloadTransfersViewModel(
+        underTest = StartDownloadComponentViewModel(
             getOfflinePathForNodeUseCase,
             getOrCreateStorageDownloadLocationUseCase,
             startDownloadsWithWorkerUseCase,

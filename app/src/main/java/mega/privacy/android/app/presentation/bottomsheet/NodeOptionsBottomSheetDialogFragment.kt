@@ -56,6 +56,7 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.Aut
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.search.SearchViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants
@@ -104,7 +105,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private val nodeOptionsViewModel: NodeOptionsViewModel by viewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
-    private val nodeOptionsDownloadViewModel: NodeOptionsDownloadViewModel by activityViewModels()
+    private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
 
     /**
      * onCreateView
@@ -1170,8 +1171,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             Analytics.tracker.trackEvent(SearchResultSaveToDeviceMenuItemEvent)
         }
         lifecycleScope.launch {
-            if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                nodeOptionsDownloadViewModel.onDownloadClicked(NodeId(node.handle))
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                startDownloadViewModel.onDownloadClicked(NodeId(node.handle))
             } else {
                 (activity as? ManagerActivity)?.saveNodesToDevice(
                     nodes = listOf(node),
@@ -1211,8 +1212,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             Util.showSnackbar(activity, resources.getString(R.string.file_removed_offline))
         } else {
             lifecycleScope.launch {
-                if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                    nodeOptionsDownloadViewModel.onSaveOfflineClicked(NodeId(node.handle))
+                if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                    startDownloadViewModel.onSaveOfflineClicked(NodeId(node.handle))
                 } else {
                     saveForOffline(
                         node = node,

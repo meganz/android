@@ -11,7 +11,6 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Rect
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -28,6 +27,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener
@@ -54,6 +54,8 @@ import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -70,6 +72,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
@@ -174,6 +177,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     }
 
     private val viewModel by viewModels<PdfViewerViewModel>()
+    private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
 
     override fun shouldSetStatusBarTextColor() = false
 
@@ -432,6 +436,17 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         if (!isToolbarVisible) {
             setToolbarVisibilityHide(0L)
         }
+        addStartDownloadTransferView()
+    }
+
+    private fun addStartDownloadTransferView() {
+        binding.root.addView(
+            createStartDownloadView(
+                this,
+                startDownloadViewModel.state,
+                startDownloadViewModel::consumeDownloadEvent
+            )
+        )
     }
 
     private fun setupBottomClick() = binding.uploadContainerLayoutBottom.setOnClickListener {
@@ -683,6 +698,30 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     }
 
     private fun download() {
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                if (fromChat) {
+                    startDownloadViewModel.onDownloadClicked(chatId, msgId)
+                } else if (type == Constants.FILE_LINK_ADAPTER) {
+                    node?.serialize()?.let {
+                        startDownloadViewModel.onDownloadClicked(it)
+                    }
+                } else if (isFolderLink) {
+                    node?.handle?.let {
+                        startDownloadViewModel.onFolderLinkChildNodeDownloadClicked(NodeId(it))
+                    }
+                } else {
+                    node?.handle?.let {
+                        startDownloadViewModel.onDownloadClicked(NodeId(it))
+                    }
+                }
+            } else {
+                legacyDownload()
+            }
+        }
+    }
+
+    private fun legacyDownload() {
         checkNotificationsPermission(this)
         if (type == Constants.OFFLINE_ADAPTER) {
             val node = dbH.findByHandle(handle)
@@ -916,7 +955,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     saveForOfflineMenuItem.isVisible = false
                     chatRemoveMenuItem.isVisible = false
                 }
-            } else if (type == Constants.FILE_LINK_ADAPTER) {
+            } else if (type == Constants.FILE_LINK_ADAPTER || isFolderLink) {
                 Timber.d("FILE_LINK_ADAPTER")
                 getLinkMenuItem.isVisible = false
                 removeLinkMenuItem.isVisible = false
@@ -928,7 +967,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 moveToTrashMenuItem.isVisible = false
                 removeMenuItem.isVisible = false
                 chatMenuItem.isVisible = false
-                importMenuItem.isVisible = false
+                importMenuItem.isVisible = true
                 saveForOfflineMenuItem.isVisible = false
                 chatRemoveMenuItem.isVisible = false
             } else if (type == Constants.ZIP_ADAPTER) {

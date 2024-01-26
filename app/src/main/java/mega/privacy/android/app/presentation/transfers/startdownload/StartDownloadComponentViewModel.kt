@@ -48,7 +48,7 @@ import javax.inject.Inject
  * View model to handle start downloading
  */
 @HiltViewModel
-class StartDownloadTransfersViewModel @Inject constructor(
+internal class StartDownloadComponentViewModel @Inject constructor(
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase,
     private val getOrCreateStorageDownloadLocationUseCase: GetOrCreateStorageDownloadLocationUseCase,
     private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase,

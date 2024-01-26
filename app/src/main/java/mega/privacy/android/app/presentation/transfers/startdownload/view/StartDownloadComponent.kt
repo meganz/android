@@ -39,7 +39,7 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadTransfersViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadComponentViewModel
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferEvent
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
@@ -63,11 +63,11 @@ import timber.log.Timber
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-internal fun StartDownloadTransferComponent(
+internal fun StartDownloadComponent(
     event: StateEventWithContent<TransferTriggerEvent>,
     onConsumeEvent: () -> Unit,
     snackBarHostState: SnackbarHostState,
-    viewModel: StartDownloadTransfersViewModel = viewModel(),
+    viewModel: StartDownloadComponentViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -91,7 +91,7 @@ internal fun StartDownloadTransferComponent(
             }
             viewModel.startDownload(it)
         })
-    StartDownloadTransferComponent(
+    StartDownloadComponent(
         uiState = uiState,
         onOneOffEventConsumed = viewModel::consumeOneOffEvent,
         onCancelledConfirmed = viewModel::cancelCurrentJob,
@@ -106,12 +106,12 @@ internal fun StartDownloadTransferComponent(
 }
 
 /**
- * Helper function to wrap [StartDownloadTransferComponent] into a [ComposeView] so it can be used in screens using View system
+ * Helper function to wrap [StartDownloadComponent] into a [ComposeView] so it can be used in screens using View system
  * @param activity the parent activity where this view will be added, it should implement [SnackbarShower] to show the generated Snackbars
  * @param downloadEventState flow that usually comes from the view model and triggers the download Transfer events
  * @param onConsumeEvent lambda to consume the download event, typically it will launch the corresponding consume event in the view model
  */
-fun createStartDownloadTransferView(
+fun createStartDownloadView(
     activity: Activity,
     downloadEventState: Flow<StateEventWithContent<TransferTriggerEvent>>,
     onConsumeEvent: () -> Unit,
@@ -129,7 +129,7 @@ fun createStartDownloadTransferView(
                     Util.showSnackbar(activity, it)
                 }
             }
-            StartDownloadTransferComponent(
+            StartDownloadComponent(
                 downloadEvent,
                 onConsumeEvent,
                 snackBarHostState = snackbarHostState,
@@ -140,7 +140,7 @@ fun createStartDownloadTransferView(
 
 
 @Composable
-private fun StartDownloadTransferComponent(
+private fun StartDownloadComponent(
     uiState: StartDownloadTransferViewState,
     onOneOffEventConsumed: () -> Unit,
     onCancelledConfirmed: () -> Unit,

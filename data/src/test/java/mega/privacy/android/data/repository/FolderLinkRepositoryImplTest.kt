@@ -36,6 +36,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 
@@ -215,4 +216,43 @@ class FolderLinkRepositoryImplTest {
             underTest.getPublicLinkInformation(folderLink)
         }
     }
+
+    @Test
+    fun `test that correct node from gateway is returned when getChildNode is invoked`() = runTest {
+        val megaNode = mock<MegaNode>()
+        val id = 1L
+        whenever(megaApiFolderGateway.getMegaNodeByHandle(id)).thenReturn(megaNode)
+        whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
+        whenever(nodeMapper(any(), any(), any(), anyOrNull())).thenReturn(untypedNode)
+        val actual = underTest.getChildNode(NodeId(id))
+        assertThat(actual).isEqualTo(untypedNode)
+    }
+
+    @Test
+    fun `test that node is authorized when getChildNode is invoked`() = runTest {
+        val megaNode = mock<MegaNode>()
+        val id = 1L
+        whenever(megaApiFolderGateway.getMegaNodeByHandle(id)).thenReturn(megaNode)
+        whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
+        whenever(nodeMapper(any(), any(), any(), anyOrNull())).thenReturn(untypedNode)
+        underTest.getChildNode(NodeId(id))
+        verify(megaApiFolderGateway).authorizeNode(megaNode)
+    }
+
+    @Test
+    fun `test that node is mapped with correct parameters when getChildNode is invoked`() =
+        runTest {
+            val megaNode = mock<MegaNode>()
+            val id = 1L
+            whenever(megaApiFolderGateway.getMegaNodeByHandle(id)).thenReturn(megaNode)
+            whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
+            whenever(nodeMapper(any(), any(), any(), anyOrNull())).thenReturn(untypedNode)
+            underTest.getChildNode(NodeId(id))
+            verify(nodeMapper).invoke(
+                megaNode,
+                fromFolderLink = true,
+                requireSerializedData = false,
+                offline = null
+            )
+        }
 }

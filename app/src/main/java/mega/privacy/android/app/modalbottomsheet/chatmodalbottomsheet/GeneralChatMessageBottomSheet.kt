@@ -25,7 +25,7 @@ import mega.privacy.android.app.main.megachat.ChatReactionsView
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -91,7 +91,7 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
     private var cannotOpenFileDialog: AlertDialog? = null
     private val rxSubscriptions = CompositeDisposable()
 
-    private val nodeOptionsDownloadViewModel: NodeOptionsDownloadViewModel by activityViewModels()
+    private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
 
     @Inject
     lateinit var getNodeUseCase: GetNodeUseCase
@@ -295,8 +295,8 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                         node
                     ) { megaNode: MegaNode? ->
                         lifecycleScope.launch {
-                            if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                                nodeOptionsDownloadViewModel.onDownloadClicked(chatId, messageId)
+                            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                                startDownloadViewModel.onDownloadClicked(chatId, messageId)
                             } else {
                                 (requireActivity() as ChatActivity).saveNodeByTap(megaNode)
                             }
@@ -370,8 +370,8 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 node
             ) { node: MegaNode? ->
                 lifecycleScope.launch {
-                    if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                        nodeOptionsDownloadViewModel.onDownloadClicked(chatId, messageId)
+                    if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                        startDownloadViewModel.onDownloadClicked(chatId, messageId)
                     } else {
                         (requireActivity() as ChatActivity).saveNodeByTap(node)
                     }
@@ -462,8 +462,8 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 return
             }
             lifecycleScope.launch {
-                if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                    nodeOptionsDownloadViewModel.onDownloadClicked(chatId, messageId)
+                if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                    startDownloadViewModel.onDownloadClicked(chatId, messageId)
                 } else {
                     val nodeList = message.message?.megaNodeList
                     if (nodeList != null && nodeList.size() > 0) {
@@ -489,8 +489,8 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 )
             } else {
                 lifecycleScope.launch {
-                    if (nodeOptionsDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                        nodeOptionsDownloadViewModel
+                    if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                        startDownloadViewModel
                             .onSaveOfflineClicked(chatId, messageId)
                     } else {
                         checkNotificationsPermission(requireActivity())

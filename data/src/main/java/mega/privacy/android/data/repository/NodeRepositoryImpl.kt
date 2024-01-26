@@ -198,6 +198,13 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getNodeFromSerializedData(serializedData: String) =
+        withContext(ioDispatcher) {
+            megaApiGateway.unSerializeNode(serializedData)?.let {
+                nodeMapper.invoke(megaNode = it, requireSerializedData = true)
+            }
+        }
+
     override suspend fun getNodePathById(nodeId: NodeId) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
             megaApiGateway.getNodePath(it) ?: ""

@@ -43,7 +43,7 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadTransferComponent
+import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
@@ -179,7 +179,7 @@ class FileInfoActivity : BaseActivity() {
                         onDismiss = viewModel::extraActionFinished,
                     )
                 }
-                StartDownloadTransferComponent(
+                StartDownloadComponent(
                     uiState.downloadEvent,
                     { viewModel.consumeDownloadEvent() },
                     snackBarHostState = snackBarHostState,

@@ -44,7 +44,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadTransferComponent
+import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
@@ -150,7 +150,7 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                     },
                     onAdDismissed = adsViewModel::onAdConsumed
                 )
-                StartDownloadTransferComponent(
+                StartDownloadComponent(
                     event = uiState.downloadEvent,
                     onConsumeEvent = viewModel::resetDownloadFile,
                     snackBarHostState = snackBarHostState

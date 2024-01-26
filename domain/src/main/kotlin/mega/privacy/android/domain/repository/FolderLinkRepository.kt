@@ -48,6 +48,13 @@ interface FolderLinkRepository {
     suspend fun getParentNode(nodeId: NodeId): UnTypedNode?
 
     /**
+     * Get a child node
+     *
+     * @param nodeId of the node, it should be a folder link child node
+     */
+    suspend fun getChildNode(nodeId: NodeId): UnTypedNode?
+
+    /**
      * Get children nodes by handle
      */
     suspend fun getNodeChildren(handle: Long, order: Int? = null): List<UnTypedNode>

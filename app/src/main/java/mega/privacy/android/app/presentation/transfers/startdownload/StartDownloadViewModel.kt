@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.bottomsheet
+package mega.privacy.android.app.presentation.transfers.startdownload
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,19 +16,23 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import javax.inject.Inject
 
 /**
  * View model to be shared by legacy screens where there isn't a view model to handle download state following our architecture (like [NodeOptionsBottomSheetDialogFragment] and its callers)
  * It can receive download events through a state flow instead of of directly calling legacy download methods
- * Once these screens are migrated to compose this view model should be removed and the state added to the corresponding view model (the same state that will trigger the event to show the bottom sheet).
+ * Once these screens are migrated to compose this view model should be removed and the state added to the corresponding view model.
  */
 @HiltViewModel
-class NodeOptionsDownloadViewModel @Inject constructor(
+class StartDownloadViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
+    private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<StateEventWithContent<TransferTriggerEvent>>(consumed())
@@ -51,7 +55,33 @@ class NodeOptionsDownloadViewModel @Inject constructor(
      */
     fun onDownloadClicked(nodeId: NodeId) {
         viewModelScope.launch {
-            val nodes = listOf(getNodeByIdUseCase(nodeId)).filterNotNull()
+            val nodes = listOfNotNull(getNodeByIdUseCase(nodeId))
+            _state.update {
+                triggered(TransferTriggerEvent.StartDownloadNode(nodes))
+            }
+        }
+    }
+
+    /**
+     * Triggers the event to download a folder link's child node with its [nodeId]
+     * @param nodeId
+     */
+    fun onFolderLinkChildNodeDownloadClicked(nodeId: NodeId) {
+        viewModelScope.launch {
+            val nodes = listOfNotNull(getPublicChildNodeFromIdUseCase(nodeId))
+            _state.update {
+                triggered(TransferTriggerEvent.StartDownloadNode(nodes))
+            }
+        }
+    }
+
+    /**
+     * Triggers the event related to download a node with its serialized data for link nodes
+     * @param serializedData of the link node
+     */
+    fun onDownloadClicked(serializedData: String) {
+        viewModelScope.launch {
+            val nodes = listOfNotNull(getPublicNodeFromSerializedDataUseCase(serializedData))
             _state.update {
                 triggered(TransferTriggerEvent.StartDownloadNode(nodes))
             }
