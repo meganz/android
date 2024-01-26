@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -76,7 +75,6 @@ import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
 import org.jetbrains.anko.configuration
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -438,21 +436,8 @@ class VideoPlayerFragment : Fragment() {
                     videoPlayerActivity?.showSnackBarForVideoPlayer(
                         getString(R.string.media_player_video_snackbar_screenshot_saved)
                     )
-                    refreshGalleryWhenDeviceOSisLowerQ(rootPath)
                 }
             }
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun refreshGalleryWhenDeviceOSisLowerQ(refreshPath: String) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            activity?.sendBroadcast(
-                Intent(
-                    Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-                    Uri.fromFile(File(refreshPath))
-                )
-            )
         }
     }
 

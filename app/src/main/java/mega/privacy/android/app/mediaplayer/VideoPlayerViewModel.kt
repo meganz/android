@@ -158,7 +158,6 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import timber.log.Timber
 import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.Date
@@ -588,9 +587,6 @@ class VideoPlayerViewModel @Inject constructor(
         captureView: View,
         successCallback: (bitmap: Bitmap) -> Unit,
     ) {
-        val screenshotFileName =
-            SimpleDateFormat(DATE_FORMAT_PATTERN).format(Date(System.currentTimeMillis()))
-        val fileName = "${SCREENSHOT_NAME_PREFIX}$screenshotFileName${SCREENSHOT_NAME_SUFFIX}"
         // Using video size for the capture size to ensure the screenshot is complete.
         val (captureWidth, captureHeight) = currentPlayingVideoSize?.let { (width, height) ->
             width to height
@@ -608,11 +604,11 @@ class VideoPlayerViewModel @Inject constructor(
                 { copyResult ->
                     if (copyResult == PixelCopy.SUCCESS) {
                         viewModelScope.launch {
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                                saveBitmap(rootPath, screenshotBitmap, successCallback)
-                            } else {
-                                saveBitmapByMediaStore(fileName, screenshotBitmap, successCallback)
-                            }
+                            saveBitmapByMediaStore(
+                                rootPath = rootPath,
+                                bitmap = screenshotBitmap,
+                                successCallback = successCallback
+                            )
                         }
                     }
                 },
@@ -1835,48 +1831,45 @@ class VideoPlayerViewModel @Inject constructor(
         }
 
     @SuppressLint("SimpleDateFormat")
-    private suspend fun saveBitmap(
+    private suspend fun saveBitmapByMediaStore(
         rootPath: String,
         bitmap: Bitmap,
         successCallback: (bitmap: Bitmap) -> Unit,
     ) = withContext(ioDispatcher) {
-        val screenshotsFolderPath =
-            "${rootPath}${File.separator}${MEGA_SCREENSHOTS_FOLDER_NAME}${File.separator}"
-        File(screenshotsFolderPath).apply {
-            if (exists().not()) {
-                mkdirs()
-            }
-        }
+        val contentValues = organiseContentValues(rootPath)
+        insertAndCompressBitmap(contentValues, bitmap, successCallback)
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun organiseContentValues(rootPath: String): ContentValues {
         val screenshotFileName =
             SimpleDateFormat(DATE_FORMAT_PATTERN).format(Date(System.currentTimeMillis()))
-        val filePath =
-            "$screenshotsFolderPath${SCREENSHOT_NAME_PREFIX}$screenshotFileName${SCREENSHOT_NAME_SUFFIX}"
-        val screenshotFile = File(filePath)
-        try {
-            val outputStream = FileOutputStream(screenshotFile)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY_SCREENSHOT, outputStream)
-            outputStream.flush()
-            outputStream.close()
-            successCallback(bitmap)
-        } catch (e: Exception) {
-            Timber.e("Bitmap is saved error: ${e.message}")
+        val screenshotFileFullName =
+            "${SCREENSHOT_NAME_PREFIX}$screenshotFileName${SCREENSHOT_NAME_SUFFIX}"
+
+        return ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, screenshotFileFullName)
+            put(MediaStore.Images.Media.MIME_TYPE, MIME_TYPE_JPEG)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                val screenshotsFolderPath =
+                    "${rootPath}${File.separator}${MEGA_SCREENSHOTS_FOLDER_NAME}${File.separator}"
+                val fileAbsolutePath = "$screenshotsFolderPath$screenshotFileFullName"
+
+                put(MediaStore.Images.Media.DATA, fileAbsolutePath)
+            } else {
+                put(
+                    MediaStore.Images.Media.RELATIVE_PATH,
+                    "${DCIM_FOLDER_NAME}$MEGA_SCREENSHOTS_FOLDER_NAME"
+                )
+            }
         }
     }
 
-    private suspend fun saveBitmapByMediaStore(
-        fileName: String,
+    private fun insertAndCompressBitmap(
+        contentValues: ContentValues,
         bitmap: Bitmap,
         successCallback: (bitmap: Bitmap) -> Unit,
-    ) = withContext(ioDispatcher) {
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
-            put(MediaStore.Images.Media.MIME_TYPE, MIME_TYPE_JPEG)
-            put(
-                MediaStore.Images.Media.RELATIVE_PATH,
-                "${DCIM_FOLDER_NAME}$MEGA_SCREENSHOTS_FOLDER_NAME"
-            )
-        }
-
+    ) {
         val contentResolver = context.contentResolver
         contentResolver?.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
             ?.let { uri ->
