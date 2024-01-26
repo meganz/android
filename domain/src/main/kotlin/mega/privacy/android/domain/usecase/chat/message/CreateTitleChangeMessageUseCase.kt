@@ -13,7 +13,10 @@ internal class CreateTitleChangeMessageUseCase @Inject constructor() : CreateTyp
             time = message.timestamp,
             isMine = isMine,
             userHandle = message.userHandle,
-            content = message.content.orEmpty()
+            content = message.content.orEmpty(),
+            shouldShowAvatar = shouldShowAvatar,
+            shouldShowTime = shouldShowTime,
+            shouldShowDate = shouldShowDate,
         )
     }
 }

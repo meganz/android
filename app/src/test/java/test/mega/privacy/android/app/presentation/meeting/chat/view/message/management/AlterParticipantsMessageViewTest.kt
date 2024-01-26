@@ -119,7 +119,10 @@ class AlterParticipantsMessageViewTest {
                     isMine = true,
                     userHandle = userHandle,
                     privilege = privilege,
-                    handleOfAction = handleOfAction
+                    handleOfAction = handleOfAction,
+                    shouldShowAvatar = false,
+                    shouldShowTime = false,
+                    shouldShowDate = false,
                 ),
                 ownerActionFullName = ownerActionFullName,
                 targetActionFullName = targetActionFullName,

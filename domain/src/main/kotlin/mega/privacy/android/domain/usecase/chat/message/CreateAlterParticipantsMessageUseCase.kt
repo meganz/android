@@ -14,7 +14,10 @@ internal class CreateAlterParticipantsMessageUseCase @Inject constructor() :
             isMine = isMine,
             userHandle = message.userHandle,
             privilege = message.privilege,
-            handleOfAction = message.handleOfAction
+            handleOfAction = message.handleOfAction,
+            shouldShowAvatar = shouldShowAvatar,
+            shouldShowTime = shouldShowTime,
+            shouldShowDate = shouldShowDate,
         )
     }
 }

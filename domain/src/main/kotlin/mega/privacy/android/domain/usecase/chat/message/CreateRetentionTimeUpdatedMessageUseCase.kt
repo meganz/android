@@ -14,7 +14,10 @@ internal class CreateRetentionTimeUpdatedMessageUseCase @Inject constructor() :
             time = message.timestamp,
             isMine = isMine,
             userHandle = message.userHandle,
-            retentionTime = message.retentionTime
+            retentionTime = message.retentionTime,
+            shouldShowAvatar = shouldShowAvatar,
+            shouldShowTime = shouldShowTime,
+            shouldShowDate = shouldShowDate,
         )
     }
 }

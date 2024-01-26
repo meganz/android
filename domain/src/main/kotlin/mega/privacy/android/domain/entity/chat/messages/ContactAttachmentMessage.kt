@@ -11,7 +11,10 @@ data class ContactAttachmentMessage(
     override val time: Long,
     override val isMine: Boolean,
     override val userHandle: Long,
+    override val shouldShowAvatar: Boolean,
+    override val shouldShowTime: Boolean,
+    override val shouldShowDate: Boolean,
     val contactEmail: String,
     val contactUserName: String,
-    val contactHandle: Long
+    val contactHandle: Long,
 ) : TypedMessage

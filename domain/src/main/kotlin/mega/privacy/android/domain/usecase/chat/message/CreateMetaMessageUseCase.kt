@@ -17,7 +17,10 @@ internal class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessa
                 time = message.timestamp,
                 isMine = isMine,
                 userHandle = message.userHandle,
-                preview = message.containsMeta.richPreview
+                preview = message.containsMeta.richPreview,
+                shouldShowAvatar = shouldShowAvatar,
+                shouldShowTime = shouldShowTime,
+                shouldShowDate = shouldShowDate,
             )
 
             ContainsMetaType.GEOLOCATION -> LocationMessage(
@@ -26,6 +29,9 @@ internal class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessa
                 isMine = isMine,
                 userHandle = message.userHandle,
                 geolocation = message.containsMeta.geolocation,
+                shouldShowAvatar = shouldShowAvatar,
+                shouldShowTime = shouldShowTime,
+                shouldShowDate = shouldShowDate,
             )
 
             ContainsMetaType.GIPHY -> GiphyMessage(
@@ -33,7 +39,10 @@ internal class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessa
                 time = message.timestamp,
                 isMine = isMine,
                 userHandle = message.userHandle,
-                giphy = message.containsMeta.giphy
+                giphy = message.containsMeta.giphy,
+                shouldShowAvatar = shouldShowAvatar,
+                shouldShowTime = shouldShowTime,
+                shouldShowDate = shouldShowDate,
             )
 
             else -> InvalidMetaMessage(
@@ -41,6 +50,9 @@ internal class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessa
                 time = message.timestamp,
                 isMine = isMine,
                 userHandle = message.userHandle,
+                shouldShowAvatar = shouldShowAvatar,
+                shouldShowTime = shouldShowTime,
+                shouldShowDate = shouldShowDate,
             )
         }
     }

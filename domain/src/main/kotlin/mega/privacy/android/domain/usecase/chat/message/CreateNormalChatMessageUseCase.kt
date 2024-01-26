@@ -28,7 +28,10 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                         userHandle = message.userHandle,
                         links = allLinks,
                         content = message.content.orEmpty(),
-                        tempId = message.tempId
+                        tempId = message.tempId,
+                        shouldShowAvatar = shouldShowAvatar,
+                        shouldShowTime = shouldShowTime,
+                        shouldShowDate = shouldShowDate,
                     )
 
                 else -> TextMessage(
@@ -38,7 +41,10 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                     userHandle = message.userHandle,
                     tempId = message.tempId,
                     content = message.content,
-                    hasOtherLink = allLinks.any { it.type !in supportedTypes }
+                    hasOtherLink = allLinks.any { it.type !in supportedTypes },
+                    shouldShowAvatar = shouldShowAvatar,
+                    shouldShowTime = shouldShowTime,
+                    shouldShowDate = shouldShowDate,
                 )
             }
         }

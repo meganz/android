@@ -12,6 +12,9 @@ data class TextMessage(
     override val isMine: Boolean,
     override val userHandle: Long,
     override val tempId: Long,
+    override val shouldShowAvatar: Boolean,
+    override val shouldShowTime: Boolean,
+    override val shouldShowDate: Boolean,
     val content: String?,
     val hasOtherLink: Boolean,
 ) : NormalMessage

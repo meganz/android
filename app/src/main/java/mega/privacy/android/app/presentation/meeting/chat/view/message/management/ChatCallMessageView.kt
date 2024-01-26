@@ -167,7 +167,10 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isMine = true,
-                    userHandle = 123L
+                    userHandle = 123L,
+                    shouldShowAvatar = false,
+                    shouldShowTime = false,
+                    shouldShowDate = false,
                 ),
                 isOneToOneChat = true
             ),
@@ -178,7 +181,10 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 0,
-                    userHandle = 123L
+                    userHandle = 123L,
+                    shouldShowAvatar = false,
+                    shouldShowTime = false,
+                    shouldShowDate = false,
                 ),
                 isOneToOneChat = true
             ),
@@ -189,7 +195,10 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 0,
-                    userHandle = 123L
+                    userHandle = 123L,
+                    shouldShowAvatar = false,
+                    shouldShowTime = false,
+                    shouldShowDate = false,
                 ),
                 isOneToOneChat = false
             ),
@@ -200,7 +209,10 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 100,
-                    userHandle = 123L
+                    userHandle = 123L,
+                    shouldShowAvatar = false,
+                    shouldShowTime = false,
+                    shouldShowDate = false,
                 ),
                 isOneToOneChat = true
             ),
@@ -211,7 +223,10 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 100,
-                    userHandle = 123L
+                    userHandle = 123L,
+                    shouldShowAvatar = false,
+                    shouldShowTime = false,
+                    shouldShowDate = false,
                 ),
                 isOneToOneChat = false
             ),
@@ -222,7 +237,10 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     isMine = true,
                     termCode = ChatMessageTermCode.FAILED,
                     duration = 0,
-                    userHandle = 123L
+                    userHandle = 123L,
+                    shouldShowAvatar = false,
+                    shouldShowTime = false,
+                    shouldShowDate = false,
                 ),
                 isOneToOneChat = true
             ),
@@ -233,7 +251,10 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     isMine = true,
                     termCode = ChatMessageTermCode.CANCELLED,
                     duration = 0,
-                    userHandle = 123L
+                    userHandle = 123L,
+                    shouldShowAvatar = false,
+                    shouldShowTime = false,
+                    shouldShowDate = false,
                 ),
                 isOneToOneChat = false
             ),
@@ -244,7 +265,10 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     isMine = true,
                     termCode = ChatMessageTermCode.REJECTED,
                     duration = 0,
-                    userHandle = 123L
+                    userHandle = 123L,
+                    shouldShowAvatar = false,
+                    shouldShowTime = false,
+                    shouldShowDate = false,
                 ),
                 isOneToOneChat = true
             ),
@@ -255,7 +279,10 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     isMine = true,
                     termCode = ChatMessageTermCode.NO_ANSWER,
                     duration = 0,
-                    userHandle = 123L
+                    userHandle = 123L,
+                    shouldShowAvatar = false,
+                    shouldShowTime = false,
+                    shouldShowDate = false,
                 ),
                 isOneToOneChat = false
             ),

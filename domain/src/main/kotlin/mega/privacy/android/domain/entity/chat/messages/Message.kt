@@ -24,4 +24,19 @@ interface Message {
      * User handle
      */
     val userHandle: Long
+
+    /**
+     * Should show avatar
+     */
+    val shouldShowAvatar: Boolean
+
+    /**
+     * Should show time
+     */
+    val shouldShowTime: Boolean
+
+    /**
+     * Should show date
+     */
+    val shouldShowDate: Boolean
 }

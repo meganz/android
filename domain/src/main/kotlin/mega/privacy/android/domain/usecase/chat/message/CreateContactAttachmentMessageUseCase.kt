@@ -16,6 +16,9 @@ internal class CreateContactAttachmentMessageUseCase @Inject constructor() :
             contactEmail = message.userEmails.firstOrNull().orEmpty(),
             contactUserName = message.userNames.firstOrNull().orEmpty(),
             contactHandle = message.userHandles.firstOrNull() ?: -1,
+            shouldShowAvatar = shouldShowAvatar,
+            shouldShowTime = shouldShowTime,
+            shouldShowDate = shouldShowDate,
         )
     }
 }

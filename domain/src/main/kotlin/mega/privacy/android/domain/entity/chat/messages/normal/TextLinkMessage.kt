@@ -14,5 +14,8 @@ data class TextLinkMessage(
     override val userHandle: Long,
     override val tempId: Long,
     val links: List<LinkDetail>,
+    override val shouldShowAvatar: Boolean,
+    override val shouldShowTime: Boolean,
+    override val shouldShowDate: Boolean,
     val content: String,
 ) : NormalMessage

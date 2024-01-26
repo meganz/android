@@ -32,6 +32,9 @@ class ChatCallMessageViewTest {
                 time = System.currentTimeMillis(),
                 isMine = true,
                 userHandle = 1234567890L,
+                shouldShowAvatar = false,
+                shouldShowTime = false,
+                shouldShowDate = false,
             ),
             isOneToOneChat = true
         )
@@ -50,6 +53,9 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.ENDED,
                 duration = 0,
                 userHandle = 1234567890L,
+                shouldShowAvatar = false,
+                shouldShowTime = false,
+                shouldShowDate = false,
             ),
             isOneToOneChat = true
         )
@@ -68,6 +74,9 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.ENDED,
                 duration = 0,
                 userHandle = 1234567890L,
+                shouldShowAvatar = false,
+                shouldShowTime = false,
+                shouldShowDate = false,
             ),
             isOneToOneChat = false
         )
@@ -90,6 +99,9 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.REJECTED,
                 duration = 0,
                 userHandle = 1234567890L,
+                shouldShowAvatar = false,
+                shouldShowTime = false,
+                shouldShowDate = false,
             ),
             isOneToOneChat = true
         )
@@ -112,6 +124,9 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.NO_ANSWER,
                 duration = 0,
                 userHandle = 1234567890L,
+                shouldShowAvatar = false,
+                shouldShowTime = false,
+                shouldShowDate = false,
             ),
             isOneToOneChat = true
         )
@@ -134,6 +149,9 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.NO_ANSWER,
                 duration = 0,
                 userHandle = 1234567890L,
+                shouldShowAvatar = false,
+                shouldShowTime = false,
+                shouldShowDate = false,
             ),
             isOneToOneChat = true
         )
@@ -156,6 +174,9 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.CANCELLED,
                 duration = 0,
                 userHandle = 1234567890L,
+                shouldShowAvatar = false,
+                shouldShowTime = false,
+                shouldShowDate = false,
             ),
             isOneToOneChat = true
         )
@@ -178,6 +199,9 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.CANCELLED,
                 duration = 0,
                 userHandle = 1234567890L,
+                shouldShowAvatar = false,
+                shouldShowTime = false,
+                shouldShowDate = false,
             ),
             isOneToOneChat = true
         )
@@ -200,6 +224,9 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.FAILED,
                 duration = 0,
                 userHandle = 1234567890L,
+                shouldShowAvatar = false,
+                shouldShowTime = false,
+                shouldShowDate = false,
             ),
             isOneToOneChat = true
         )
