@@ -46,12 +46,15 @@ class AlbumGetLinkViewModel @Inject constructor(
     val stateFlow = state.asStateFlow()
 
     fun initialize() = viewModelScope.launch {
-        fetchAlbum()
+        val showCopyright = shouldShowCopyrightUseCase()
+        if (!showCopyright) {
+            fetchAlbum()
+        }
 
         state.update {
             it.copy(
                 isInitialized = true,
-                showCopyright = shouldShowCopyrightUseCase(),
+                showCopyright = showCopyright,
             )
         }
     }
@@ -62,7 +65,7 @@ class AlbumGetLinkViewModel @Inject constructor(
         }
     }
 
-    private fun fetchAlbum() =
+    fun fetchAlbum() =
         savedStateHandle.getStateFlow<Long?>(ALBUM_ID, null)
             .filterNotNull()
             .map(::getAlbumSummary)

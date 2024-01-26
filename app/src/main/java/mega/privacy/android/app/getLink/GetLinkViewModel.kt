@@ -53,7 +53,9 @@ class GetLinkViewModel @Inject constructor(
     private val expiryDate: MutableLiveData<String> = MutableLiveData()
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
     private val _linkCopied: MutableStateFlow<Pair<String, String>?> = MutableStateFlow(null)
+    private val _copyrightAgreed: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val linkCopied = _linkCopied.asStateFlow()
+    val copyrightAgreed = _copyrightAgreed.asStateFlow()
 
     private val _state = MutableStateFlow(GetLinkUiState())
 
@@ -416,5 +418,9 @@ class GetLinkViewModel @Inject constructor(
      */
     fun resetLink() {
         _linkCopied.value = null
+    }
+
+    fun agreeCopyrightTerms() {
+        _copyrightAgreed.value = true
     }
 }

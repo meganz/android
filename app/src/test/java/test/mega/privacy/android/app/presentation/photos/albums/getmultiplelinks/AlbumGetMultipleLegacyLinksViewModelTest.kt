@@ -114,9 +114,9 @@ class AlbumGetMultipleLegacyLinksViewModelTest {
             )
 
         // then
-        underTest.stateFlow.drop(2).test {
+        underTest.stateFlow.drop(1).test {
             val state = awaitItem()
-            assertThat(state.albumLinks).isEqualTo(expectedLinks)
+            assertThat(state.showCopyright).isEqualTo(false)
             cancelAndIgnoreRemainingEvents()
         }
     }

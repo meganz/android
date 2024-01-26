@@ -19,6 +19,10 @@ class CopyrightFragment : Fragment(), Scrollable {
 
     private lateinit var binding: FragmentCopyrightBinding
 
+    private val customBackPressed: Boolean by lazy {
+        arguments?.getBoolean("back_press") ?: false
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,7 +46,11 @@ class CopyrightFragment : Fragment(), Scrollable {
 
         binding.agreeButton.setOnClickListener {
             viewModel.updateShowCopyRight(false)
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            viewModel.agreeCopyrightTerms()
+
+            if (!customBackPressed) {
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
         }
 
         binding.disagreeButton.setOnClickListener {

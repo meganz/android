@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -55,6 +56,8 @@ class AlbumScreenWrapperActivity : BaseActivity() {
     private val albumScreen: AlbumScreen? by lazy(LazyThreadSafetyMode.NONE) {
         AlbumScreen.valueOf(intent.getStringExtra(ALBUM_SCREEN) ?: "")
     }
+
+    private val getLinkViewModel: GetLinkViewModel by viewModels()
 
     @Inject
     lateinit var albumImportPreviewProvider: AlbumImportPreviewProvider
@@ -98,6 +101,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
                     AlbumScreen.AlbumGetLinkScreen -> {
                         AlbumGetLinkScreen(
+                            getLinkViewModel = getLinkViewModel,
                             createView = ::showFragment,
                             onBack = ::finish,
                             onLearnMore = {

@@ -50,20 +50,23 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
     val stateFlow = state.asStateFlow()
 
     init {
-        fetchAlbums()
-        fetchLinks()
-
         viewModelScope.launch {
+            val showCopyright = shouldShowCopyrightUseCase()
+            if (!showCopyright) {
+                fetchAlbums()
+                fetchLinks()
+            }
+
             state.update {
                 it.copy(
                     isInitialized = true,
-                    showCopyright = shouldShowCopyrightUseCase(),
+                    showCopyright = showCopyright,
                 )
             }
         }
     }
 
-    private fun fetchAlbums() =
+    fun fetchAlbums() =
         savedStateHandle.getStateFlow<LongArray?>(ALBUM_ID, null)
             .filterNotNull()
             .map(::getAlbumsSummaries)
@@ -98,7 +101,7 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
         }
     }
 
-    private fun fetchLinks() =
+    fun fetchLinks() =
         savedStateHandle.getStateFlow<LongArray?>(ALBUM_ID, null)
             .filterNotNull()
             .map(::getAlbumLinks)

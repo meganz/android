@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.photos.albums.getlink
 import android.text.TextUtils.TruncateAt.MIDDLE
 import android.view.View
 import android.widget.TextView
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -57,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -69,6 +69,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.CopyrightFragment
+import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.theme.grey_alpha_012
@@ -89,6 +90,7 @@ private typealias ImageDownloader = (photo: Photo, callback: (Boolean) -> Unit) 
 @Composable
 internal fun AlbumGetLinkScreen(
     albumGetLinkViewModel: AlbumGetLinkViewModel = viewModel(),
+    getLinkViewModel: GetLinkViewModel = viewModel(),
     createView: (Fragment) -> View,
     onBack: () -> Unit,
     onLearnMore: () -> Unit,
@@ -97,6 +99,7 @@ internal fun AlbumGetLinkScreen(
 ) {
     val isLight = MaterialTheme.colors.isLight
     val state by albumGetLinkViewModel.stateFlow.collectAsStateWithLifecycle()
+    val isCopyrightAgreed by getLinkViewModel.copyrightAgreed.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
@@ -131,11 +134,10 @@ internal fun AlbumGetLinkScreen(
         }
     }
 
-    BackHandler {
-        if (state.showCopyright) {
+    LaunchedEffect(isCopyrightAgreed) {
+        if (isCopyrightAgreed) {
             albumGetLinkViewModel.hideCopyright()
-        } else {
-            onBack()
+            albumGetLinkViewModel.fetchAlbum()
         }
     }
 
@@ -225,7 +227,9 @@ internal fun AlbumGetLinkScreen(
             AndroidView(
                 modifier = Modifier.fillMaxSize(),
                 factory = {
-                    val fragment = CopyrightFragment()
+                    val fragment = CopyrightFragment().apply {
+                        arguments = bundleOf("back_press" to true)
+                    }
                     createView(fragment)
                 },
             )
