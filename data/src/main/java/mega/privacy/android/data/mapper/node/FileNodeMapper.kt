@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import java.io.File
 import javax.inject.Inject
@@ -49,6 +50,9 @@ internal class FileNodeMapper @Inject constructor(
         label = megaNode.label,
         parentId = NodeId(megaNode.parentHandle),
         base64Id = megaNode.base64Handle,
+        restoreId = NodeId(megaNode.restoreHandle).takeIf {
+            it.longValue != MegaApiJava.INVALID_HANDLE
+        },
         creationTime = megaNode.creationTime,
         modificationTime = megaNode.modificationTime,
         thumbnailPath = getThumbnailCacheFilePath(

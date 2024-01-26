@@ -33,6 +33,7 @@ data class ChatNodeEntity(
     override val name: String,
     override val parentId: NodeId,
     override val base64Id: String,
+    override val restoreId: NodeId?,
     override val label: Int,
     override val isFavourite: Boolean,
     @Embedded override val exportedData: ExportedData?,

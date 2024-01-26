@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -35,6 +36,9 @@ internal class ImageNodeMapper @Inject constructor(
             override val label = megaNode.label
             override val parentId = NodeId(megaNode.parentHandle)
             override val base64Id = megaNode.base64Handle
+            override val restoreId = NodeId(megaNode.restoreHandle).takeIf {
+                it.longValue != MegaApiJava.INVALID_HANDLE
+            }
             override val creationTime = megaNode.creationTime
             override val modificationTime = megaNode.modificationTime
             override val thumbnailPath = null

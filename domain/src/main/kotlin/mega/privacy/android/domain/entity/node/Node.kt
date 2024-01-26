@@ -27,6 +27,11 @@ interface Node {
     val base64Id: String
 
     /**
+     * Restore id
+     */
+    val restoreId: NodeId?
+
+    /**
      * Label
      */
     val label: Int

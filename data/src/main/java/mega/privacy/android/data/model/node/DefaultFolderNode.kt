@@ -11,6 +11,7 @@ internal data class DefaultFolderNode(
     override val name: String,
     override val parentId: NodeId,
     override val base64Id: String,
+    override val restoreId: NodeId?,
     override val label: Int,
     override val childFolderCount: Int,
     override val childFileCount: Int,

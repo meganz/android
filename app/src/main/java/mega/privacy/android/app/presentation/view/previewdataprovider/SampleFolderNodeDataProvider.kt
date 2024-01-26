@@ -27,6 +27,7 @@ internal class SampleFolderNodeDataProvider :
             override val name = "My important files"
             override val parentId = NodeId(2L)
             override val base64Id = "1L"
+            override val restoreId: NodeId? = null
             override val label = 1
             override val isFavourite = false
             override val exportedData = null
@@ -55,6 +56,7 @@ internal class SampleFolderNodeDataProvider :
             override val name = "Less important files"
             override val parentId = NodeId(2L)
             override val base64Id = "1L"
+            override val restoreId: NodeId? = null
             override val label = 1
             override val isFavourite = true
             override val exportedData = null
@@ -83,6 +85,7 @@ internal class SampleFolderNodeDataProvider :
             override val name = "stuff"
             override val parentId = NodeId(2L)
             override val base64Id = "1L"
+            override val restoreId: NodeId? = null
             override val label = 1
             override val isFavourite = false
             override val exportedData = null

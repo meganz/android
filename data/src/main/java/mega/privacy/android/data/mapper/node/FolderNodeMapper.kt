@@ -6,6 +6,7 @@ import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -38,6 +39,9 @@ internal class FolderNodeMapper @Inject constructor(
         label = megaNode.label,
         parentId = NodeId(megaNode.parentHandle),
         base64Id = megaNode.base64Handle,
+        restoreId = NodeId(megaNode.restoreHandle).takeIf {
+            it.longValue != MegaApiJava.INVALID_HANDLE
+        },
         childFolderCount = if (fromFolderLink)
             megaApiFolderGateway.getNumChildFolders(megaNode)
         else
