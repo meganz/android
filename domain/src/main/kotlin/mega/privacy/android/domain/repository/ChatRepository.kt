@@ -868,7 +868,7 @@ interface ChatRepository {
      * @param chatId
      * @return flow of paged messages
      */
-    suspend fun getPagedMessages(chatId: Long): PagingSource<Int, PagedChatMessage>
+    fun getPagedMessages(chatId: Long): PagingSource<Int, PagedChatMessage>
 
     /**
      * Store messages
