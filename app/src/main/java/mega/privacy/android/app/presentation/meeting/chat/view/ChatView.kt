@@ -20,8 +20,13 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
@@ -94,11 +99,9 @@ import mega.privacy.android.core.ui.controls.chat.ScrollToBottomFab
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
-import mega.privacy.android.core.ui.model.KeyboardState
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
@@ -149,7 +152,8 @@ internal fun ChatView(
 @OptIn(
     ExperimentalMaterialApi::class,
     ExperimentalPermissionsApi::class,
-    ExperimentalComposeUiApi::class
+    ExperimentalComposeUiApi::class,
+    ExperimentalLayoutApi::class
 )
 @Composable
 internal fun ChatView(
@@ -222,8 +226,6 @@ internal fun ChatView(
     var showJoinAnswerCallDialog by rememberSaveable { mutableStateOf(false) }
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
     var showReactionPicker by rememberSaveable { mutableStateOf(false) }
-    val keyboardState by keyboardAsState()
-    val isKeyboardShown = keyboardState == KeyboardState.Opened
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val keyboardController = LocalSoftwareKeyboardController.current
     val toolbarModalSheetState =
@@ -296,7 +298,7 @@ internal fun ChatView(
             fileModalSheetState.hide()
         }
     }
-    BackHandler(enabled = isKeyboardShown) {
+    BackHandler(enabled = WindowInsets.isImeVisible) {
         keyboardController?.hide()
     }
     BackHandler(enabled = showEmojiPicker) {
@@ -451,6 +453,10 @@ internal fun ChatView(
             sheetGesturesEnabled = !showReactionPicker,
         ) {
             MegaScaffold(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .systemBarsPadding()
+                    .imePadding(),
                 topBar = {
                     if (isSelectMode) {
                         SelectModeAppBar(
