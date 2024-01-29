@@ -163,7 +163,6 @@ import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB
 import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
@@ -236,6 +235,7 @@ import mega.privacy.android.app.presentation.startconversation.StartConversation
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
@@ -2960,7 +2960,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     if (megaApi.rootNode != null) {
                         if ((parentNode.handle == megaApi.rootNode?.handle
                                     || fileBrowserViewModel.state().fileBrowserHandle == -1L)
-                            && mediaDiscoveryFragment == null
+                            && !fileBrowserViewModel.isMediaDiscoveryOpen()
                         ) {
                             supportActionBar?.title = getString(R.string.section_cloud_drive)
                             viewModel.setIsFirstNavigationLevel(true)
@@ -4529,7 +4529,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 DrawerItem.CLOUD_DRIVE -> {
                     openLinkMenuItem?.isVisible = isFirstNavigationLevel
                     moreMenuItem.isVisible = !isFirstNavigationLevel
-                    if (mediaDiscoveryFragment == null && isCloudAdded && fileBrowserViewModel.state().nodesList.isNotEmpty()
+                    if (!fileBrowserViewModel.isMediaDiscoveryOpen() && isCloudAdded && fileBrowserViewModel.state().nodesList.isNotEmpty()
                     ) {
                         searchMenuItem?.isVisible = true
                     }
@@ -5244,16 +5244,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val oldDrawerItem = drawerItem
         when (menuItem.itemId) {
             R.id.bottom_navigation_item_cloud_drive -> {
-                if (drawerItem === DrawerItem.CLOUD_DRIVE) {
-                    val rootNode = megaApi.rootNode
-                    if (rootNode == null) {
-                        Timber.e("Root node is null")
-                    }
-                    if (rootNode != null && fileBrowserViewModel.state().fileBrowserHandle != INVALID_HANDLE && fileBrowserViewModel.state().fileBrowserHandle != rootNode.handle) {
-                        fileBrowserViewModel.setFileBrowserHandle(rootNode.handle)
-                        refreshFragment(FragmentTag.CLOUD_DRIVE.tag)
+                // User is in Cloud Drive. Go back to the Root Node level
+                if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+                    lifecycleScope.launch {
+                        if (fileBrowserViewModel.isMediaDiscoveryOpen()) {
+                            removeFragment(mediaDiscoveryFragment)
+                        }
+                        fileBrowserViewModel.goBackToRootLevel()
                     }
                 } else {
+                    // User is not in Cloud Drive. Navigate to the feature
                     drawerItem = DrawerItem.CLOUD_DRIVE
                     setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
                 }
@@ -5274,7 +5274,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             R.id.bottom_navigation_item_camera_uploads -> {
 
                 // if pre fragment is the same one, do nothing.
-                if (oldDrawerItem !== DrawerItem.PHOTOS) {
+                if (oldDrawerItem != DrawerItem.PHOTOS) {
                     drawerItem = DrawerItem.PHOTOS
                     setBottomNavigationMenuItemChecked(PHOTOS_BNV)
                 }
@@ -5283,14 +5283,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             R.id.bottom_navigation_item_shared_items -> {
                 Analytics.tracker.trackEvent(SharedItemsScreenEvent)
-                if (drawerItem === DrawerItem.SHARED_ITEMS) {
-                    if (tabItemShares === SharesTab.INCOMING_TAB && incomingSharesViewModel.state().incomingHandle != INVALID_HANDLE) {
+                if (drawerItem == DrawerItem.SHARED_ITEMS) {
+                    if (tabItemShares == SharesTab.INCOMING_TAB && incomingSharesViewModel.state().incomingHandle != INVALID_HANDLE) {
                         incomingSharesViewModel.resetIncomingTreeDepth()
                         refreshIncomingShares()
-                    } else if (tabItemShares === SharesTab.OUTGOING_TAB && outgoingSharesViewModel.state().outgoingHandle != INVALID_HANDLE) {
+                    } else if (tabItemShares == SharesTab.OUTGOING_TAB && outgoingSharesViewModel.state().outgoingHandle != INVALID_HANDLE) {
                         outgoingSharesViewModel.resetOutgoingTreeDepth()
                         refreshOutgoingShares()
-                    } else if (tabItemShares === SharesTab.LINKS_TAB && legacyLinksViewModel.state().linksHandle != INVALID_HANDLE) {
+                    } else if (tabItemShares == SharesTab.LINKS_TAB && legacyLinksViewModel.state().linksHandle != INVALID_HANDLE) {
                         legacyLinksViewModel.resetLinksTreeDepth()
                         refreshLinks()
                     }
@@ -7536,7 +7536,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return@launch
         }
         when (drawerItem) {
-            DrawerItem.CLOUD_DRIVE -> if (mediaDiscoveryFragment == null) {
+            DrawerItem.CLOUD_DRIVE -> if (!fileBrowserViewModel.isMediaDiscoveryOpen()) {
                 updateFabAndShow()
             }
 
@@ -8222,7 +8222,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @return True if the current screen is MD, false otherwise.
      */
     fun isInMediaDiscovery() =
-        drawerItem == DrawerItem.CLOUD_DRIVE && mediaDiscoveryFragment != null
+        drawerItem == DrawerItem.CLOUD_DRIVE && fileBrowserViewModel.isMediaDiscoveryOpen()
 
     /**
      * Create the instance of FileBackupManager
