@@ -17,11 +17,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.Lifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationState
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
 /**
@@ -35,10 +37,12 @@ fun NotificationView(
     onNotificationsLoaded: () -> Unit = {},
 ) {
     if (state.notifications.isNotEmpty()) {
-        NotificationListView(modifier,
+        NotificationListView(
+            modifier,
             state,
             onClick = { notification: Notification -> onClick(notification) },
-            onNotificationsLoaded = onNotificationsLoaded)
+            onNotificationsLoaded = onNotificationsLoaded
+        )
     } else {
         NotificationEmptyView(modifier)
     }
@@ -63,8 +67,12 @@ private fun NotificationListView(
         derivedStateOf { listState.layoutInfo.totalItemsCount == state.notifications.size }
     }
 
-    if (allItemsLoaded) {
-        onNotificationsLoaded()
+    ComposableLifecycle { event ->
+        if (event == Lifecycle.Event.ON_PAUSE) {
+            if (allItemsLoaded) {
+                onNotificationsLoaded()
+            }
+        }
     }
 
     LazyColumn(state = listState, modifier = modifier.testTag("NotificationListView")) {
@@ -80,8 +88,7 @@ private fun NotificationListView(
 @Composable
 private fun NotificationEmptyView(modifier: Modifier) {
     val context = LocalContext.current
-    val isPortrait =
-        LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+    val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
 
     val emptyImgResId =
         if (isPortrait) R.drawable.empty_notification_portrait else R.drawable.empty_notification_landscape
@@ -92,8 +99,7 @@ private fun NotificationEmptyView(modifier: Modifier) {
             imageBitmap = ImageBitmap.imageResource(id = emptyImgResId),
             text = context.getString(R.string.context_empty_notifications)
                 .formatColorTag(context, 'A', R.color.grey_900_grey_100)
-                .formatColorTag(context, 'B', R.color.grey_300_grey_600)
-                .toSpannedHtmlText()
+                .formatColorTag(context, 'B', R.color.grey_300_grey_600).toSpannedHtmlText()
         )
     }
 
