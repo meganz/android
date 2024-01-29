@@ -3405,15 +3405,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         appBarLayout.visibility = View.VISIBLE
         drawerItem = DrawerItem.NOTIFICATIONS
         setBottomNavigationMenuItemChecked(NO_BNV)
-        var notificationsFragment =
-            supportFragmentManager.findFragmentByTag(FragmentTag.NOTIFICATIONS.tag) as? NotificationsFragment
-        if (notificationsFragment == null) {
-            Timber.w("New NotificationsFragment")
-            notificationsFragment = NotificationsFragment.newInstance()
-        } else {
-            refreshFragment(FragmentTag.NOTIFICATIONS.tag)
-        }
-        replaceFragment(notificationsFragment, FragmentTag.NOTIFICATIONS.tag)
+        replaceFragmentWithBackStack(
+            fragmentToReplace = notificationsFragment,
+            newFragmentInstance = NotificationsFragment.newInstance(),
+            fragmentTag = FragmentTag.NOTIFICATIONS.tag,
+        )
         setToolbarTitle()
         showFabButton()
     }
@@ -4181,6 +4177,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val deviceCenterFragment: DeviceCenterFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.DEVICE_CENTER.tag) as? DeviceCenterFragment
 
+    private val notificationsFragment: NotificationsFragment?
+        get() = supportFragmentManager.findFragmentByTag(FragmentTag.NOTIFICATIONS.tag) as? NotificationsFragment
+
     private val backupsFragment: BackupsFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.BACKUPS.tag) as? BackupsFragment
 
@@ -4684,12 +4683,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         return when (item.itemId) {
             android.R.id.home -> {
                 if (isFirstNavigationLevel && drawerItem != DrawerItem.SEARCH) {
-                    if (drawerItem == DrawerItem.SYNC || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.TRANSFERS) {
+                    if (drawerItem == DrawerItem.SYNC || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.TRANSFERS) {
                         goBackToBottomNavigationItem(bottomNavigationCurrentItem)
                         if (transfersToImageViewer) {
                             switchImageViewerToFront()
                         }
-                    } else if (drawerItem == DrawerItem.DEVICE_CENTER) {
+                    } else if (drawerItem == DrawerItem.DEVICE_CENTER || drawerItem == DrawerItem.NOTIFICATIONS) {
                         handleSuperBackPressed()
                         goBackToBottomNavigationItem(bottomNavigationCurrentItem)
                         if (transfersToImageViewer) {
@@ -4995,6 +4994,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 bottomNavigationCurrentItem
             )
         } else if (drawerItem == DrawerItem.NOTIFICATIONS) {
+            handleSuperBackPressed()
             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
         } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
             onBackPressedInSharedItemsDrawerItem()
