@@ -32,12 +32,12 @@ import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity.Companion.IS_CROSS_ACCOUNT_MATCH
 import mega.privacy.android.app.usecase.QuerySignupLinkUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
 import mega.privacy.android.app.utils.CallUtil.showConfirmationInACall
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACCOUNT_INVITATION_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.ACTION_CANCEL_ACCOUNT
 import mega.privacy.android.app.utils.Constants.ACTION_CHANGE_MAIL
@@ -146,6 +146,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private val binding: ActivityOpenLinkBinding by lazy(LazyThreadSafetyMode.NONE) {
         ActivityOpenLinkBinding.inflate(layoutInflater)
     }
+    private var isCrossAccountMatch: Boolean = false
 
     /**
      * onCreate
@@ -498,20 +499,11 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     // Check if the email passed in the intent matches the one currently logged in
                     // and make sure that the VPN app is updated to the latest version. If it's not
                     // updated, then it will be considered as cross account match.
-                    val isCrossAccountMatch =
+                    isCrossAccountMatch =
                         !isVpnAppUpdated || email == getCurrentUserEmail(forceRefresh = false)
 
-                    startActivity(
-                        Intent(
-                            this@OpenLinkActivity,
-                            UpgradeAccountActivity::class.java
-                        ).apply {
-                            putExtra(
-                                IS_CROSS_ACCOUNT_MATCH,
-                                isCrossAccountMatch
-                            )
-                        }
-                    )
+                    navigateToUpgradeAccount()
+
                     finish()
                 }
             }
@@ -524,6 +516,14 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
             }
         }
+    }
+
+    override fun navigateToUpgradeAccount() {
+        val intent = Intent(this, ManagerActivity::class.java)
+        intent.action = Constants.ACTION_SHOW_UPGRADE_ACCOUNT
+        intent.putExtra(IS_CROSS_ACCOUNT_MATCH, isCrossAccountMatch)
+        intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
     }
 
     private fun collectFlows() {

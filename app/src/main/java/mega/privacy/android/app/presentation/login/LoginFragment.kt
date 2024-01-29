@@ -50,6 +50,7 @@ import mega.privacy.android.app.presentation.login.view.LoginView
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp
 import mega.privacy.android.app.providers.FileProviderActivity
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
@@ -555,6 +556,18 @@ class LoginFragment : Fragment() {
                                     intent.action = Constants.ACTION_JOIN_OPEN_CHAT_LINK
                                     intent.data = Uri.parse(intentDataString)
                                 }
+                            }
+
+                            Constants.ACTION_SHOW_UPGRADE_ACCOUNT -> {
+                                intent.action = Constants.ACTION_SHOW_UPGRADE_ACCOUNT
+                                val isCrossAccountMatch = requireActivity().intent.getBooleanExtra(
+                                    UpgradeAccountActivity.IS_CROSS_ACCOUNT_MATCH,
+                                    false
+                                )
+                                intent.putExtra(
+                                    UpgradeAccountActivity.IS_CROSS_ACCOUNT_MATCH,
+                                    isCrossAccountMatch
+                                )
                             }
 
                             else -> intent =
