@@ -6025,6 +6025,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             return
         } else if (Constants.ACTION_SHOW_UPGRADE_ACCOUNT == intent.action) {
+            setIntent(intent)
             navigateToUpgradeAccount()
             return
         } else if (Constants.ACTION_SHOW_TRANSFERS == intent.action) {
@@ -6055,7 +6056,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         ) {
             drawerLayout.closeDrawer(GravityCompat.START)
         }
-        startActivity(Intent(this, UpgradeAccountActivity::class.java))
+        val isCrossAccountMatch =
+            intent?.getBooleanExtra(UpgradeAccountActivity.IS_CROSS_ACCOUNT_MATCH, false) ?: false
+        startActivity(Intent(this, UpgradeAccountActivity::class.java).apply {
+            putExtra(UpgradeAccountActivity.IS_CROSS_ACCOUNT_MATCH, isCrossAccountMatch)
+        })
         myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.MANAGER
     }
 
