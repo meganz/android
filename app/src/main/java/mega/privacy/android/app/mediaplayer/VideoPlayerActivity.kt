@@ -115,6 +115,7 @@ import mega.privacy.android.app.utils.getFragmentFromNavHost
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
@@ -234,6 +235,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         binding = ActivityVideoPlayerBinding.inflate(layoutInflater)
 
         setContentView(dragToExit.wrapContentView(binding.root))
+        addStartDownloadTransferView(binding.root)
         dragToExit.observeThumbnailLocation(this, intent)
 
         binding.toolbar.apply {
@@ -474,46 +476,25 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         }
 
                         FROM_CHAT -> {
-                            getChatMessageNode()?.let { node ->
-                                nodeSaver.saveNode(
-                                    node = node,
-                                    highPriority = true,
-                                    fromMediaViewer = true,
-                                    needSerialize = true
-                                )
-                            }
+                            saveChatNode()
                         }
 
                         FILE_LINK_ADAPTER -> {
                             launchIntent.getStringExtra(EXTRA_SERIALIZE_STRING)?.let { serialize ->
-                                MegaNode.unserialize(serialize)?.let { currentDocument ->
-                                    Timber.d("currentDocument NOT NULL")
-                                    nodeSaver.saveNode(
-                                        currentDocument,
-                                        isFolderLink = false,
-                                        fromMediaViewer = true,
-                                        needSerialize = true
-                                    )
-                                } ?: Timber.w("currentDocument is NULL")
+                                saveFileLinkNode(serialize)
                             }
+                        }
+
+                        FOLDER_LINK_ADAPTER -> {
+                            saveNodeFromFolderLink(NodeId(playingHandle))
                         }
 
                         FROM_ALBUM_SHARING -> {
-                            viewModel.getNodeForAlbumSharing(playingHandle)?.let { node ->
-                                nodeSaver.saveNode(
-                                    node = node,
-                                    fromMediaViewer = true,
-                                    needSerialize = true
-                                )
-                            }
+                            saveFromAlbumSharing(NodeId(playingHandle))
                         }
 
                         else -> {
-                            nodeSaver.saveHandle(
-                                handle = playingHandle,
-                                isFolderLink = adapterType == FOLDER_LINK_ADAPTER,
-                                fromMediaViewer = true
-                            )
+                            saveNode(NodeId(playingHandle))
                         }
                     }
                 }

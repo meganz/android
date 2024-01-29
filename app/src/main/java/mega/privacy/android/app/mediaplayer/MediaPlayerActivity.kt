@@ -3,14 +3,19 @@ package mega.privacy.android.app.mediaplayer
 import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.main.controllers.ChatController
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
@@ -20,9 +25,11 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_HANDLES
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 
 /**
  * Media player Activity
@@ -30,6 +37,7 @@ import nz.mega.sdk.MegaNode
 @AndroidEntryPoint
 abstract class MediaPlayerActivity : PasscodeActivity() {
     internal val viewModel: MediaPlayerViewModel by viewModels()
+    internal val startDownloadViewModel: StartDownloadViewModel by viewModels()
 
     internal var searchMenuItem: MenuItem? = null
     internal var optionsMenu: Menu? = null
@@ -45,6 +53,16 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
             permissionRequester = this,
             snackbarShower = this,
             confirmDialogShower = AlertsAndWarnings.showSaveToDeviceConfirmDialog(this)
+        )
+    }
+
+    protected fun addStartDownloadTransferView(root: ViewGroup) {
+        root.addView(
+            createStartDownloadView(
+                this,
+                startDownloadViewModel.state,
+                startDownloadViewModel::consumeDownloadEvent
+            )
         )
     }
 
@@ -147,6 +165,87 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
             message.megaNodeList.get(0),
             megaChatApi.getChatRoom(pair.first)
         )
+    }
+
+    internal fun saveChatNode() {
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                val (chatId, message) = getChatMessage()
+                startDownloadViewModel.onDownloadClicked(chatId, message?.msgId ?: INVALID_HANDLE)
+            } else {
+                getChatMessageNode()?.let { node ->
+                    nodeSaver.saveNode(
+                        node = node,
+                        highPriority = true,
+                        fromMediaViewer = true,
+                        needSerialize = true
+                    )
+                }
+            }
+        }
+    }
+
+    internal fun saveFileLinkNode(serializedNode: String) {
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                startDownloadViewModel.onDownloadClicked(serializedNode)
+            } else {
+                MegaNode.unserialize(serializedNode)
+                    ?.let { currentDocument ->
+                        Timber.d("currentDocument NOT NULL")
+                        nodeSaver.saveNode(
+                            currentDocument,
+                            isFolderLink = false,
+                            fromMediaViewer = true,
+                            needSerialize = true
+                        )
+                    } ?: Timber.w("currentDocument is NULL")
+            }
+        }
+    }
+
+    internal fun saveNodeFromFolderLink(nodeId: NodeId) {
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                startDownloadViewModel.onFolderLinkChildNodeDownloadClicked(nodeId)
+            } else {
+                nodeSaver.saveHandle(
+                    handle = nodeId.longValue,
+                    isFolderLink = true,
+                    fromMediaViewer = true
+                )
+            }
+        }
+    }
+
+    internal fun saveFromAlbumSharing(nodeId: NodeId) {
+        viewModel.getNodeForAlbumSharing(nodeId.longValue)?.let { node ->
+            lifecycleScope.launch {
+                if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                    startDownloadViewModel.onDownloadClicked(node.serialize())
+                } else {
+                    nodeSaver.saveNode(
+                        node = node,
+                        fromMediaViewer = true,
+                        needSerialize = true
+                    )
+                }
+            }
+        }
+    }
+
+    internal fun saveNode(nodeId: NodeId) {
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                startDownloadViewModel.onDownloadClicked(nodeId)
+            } else {
+                nodeSaver.saveHandle(
+                    handle = nodeId.longValue,
+                    isFolderLink = false,
+                    fromMediaViewer = true
+                )
+            }
+        }
     }
 
     /**

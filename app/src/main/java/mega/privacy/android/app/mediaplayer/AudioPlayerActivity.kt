@@ -74,6 +74,7 @@ import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.getFragmentFromNavHost
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import nz.mega.sdk.MegaError
@@ -190,6 +191,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
+        addStartDownloadTransferView(binding.root)
         binding.toolbar.setBackgroundColor(Color.TRANSPARENT)
 
         val navHostFragment =
@@ -285,37 +287,22 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                         }
 
                         FROM_CHAT -> {
-                            getChatMessageNode()?.let { node ->
-                                nodeSaver.saveNode(
-                                    node = node,
-                                    highPriority = true,
-                                    fromMediaViewer = true,
-                                    needSerialize = true
-                                )
-                            }
+                            saveChatNode()
                         }
 
                         FILE_LINK_ADAPTER -> {
                             launchIntent.getStringExtra(EXTRA_SERIALIZE_STRING)
                                 ?.let { serialize ->
-                                    MegaNode.unserialize(serialize)?.let { currentDocument ->
-                                        Timber.d("currentDocument NOT NULL")
-                                        nodeSaver.saveNode(
-                                            currentDocument,
-                                            isFolderLink = false,
-                                            fromMediaViewer = true,
-                                            needSerialize = true
-                                        )
-                                    } ?: Timber.w("currentDocument is NULL")
+                                    saveFileLinkNode(serialize)
                                 }
                         }
 
+                        FOLDER_LINK_ADAPTER -> {
+                            saveNodeFromFolderLink(NodeId(playingHandle))
+                        }
+
                         else -> {
-                            nodeSaver.saveHandle(
-                                handle = playingHandle,
-                                isFolderLink = adapterType == FOLDER_LINK_ADAPTER,
-                                fromMediaViewer = true
-                            )
+                            saveNode(NodeId(playingHandle))
                         }
                     }
                 }
