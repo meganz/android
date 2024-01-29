@@ -1,5 +1,6 @@
 package mega.privacy.android.app.notifications
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -26,7 +27,6 @@ import mega.privacy.android.domain.entity.pushes.PushMessage.ScheduledMeetingPus
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationJoinButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationMessageButtonEvent
-import mega.privacy.android.icon.pack.R as iconPackR
 import javax.inject.Inject
 
 /**
@@ -108,7 +108,7 @@ class ScheduledMeetingPushMessageNotification @Inject constructor(
      * @param chatId    Chat Id
      * @return          PendingIntent
      */
-    private suspend fun getShowChatIntent(context: Context, chatId: Long): PendingIntent {
+    private suspend fun getShowChatIntent(context: Context, chatId: Long): PendingIntent? {
         Analytics.initialise(context)
         Analytics.tracker.trackEvent(ScheduledMeetingReminderNotificationMessageButtonEvent)
         val isNewChatEnable = getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)
@@ -136,7 +136,11 @@ class ScheduledMeetingPushMessageNotification @Inject constructor(
      * @param chatId    Meeting's Chat Id
      * @return          PendingIntent
      */
-    private fun getJoinMeetingIntent(context: Context, chatId: Long, schedId: Long): PendingIntent {
+    private fun getJoinMeetingIntent(
+        context: Context,
+        chatId: Long,
+        schedId: Long,
+    ): PendingIntent? {
         Analytics.initialise(context)
         Analytics.tracker.trackEvent(ScheduledMeetingReminderNotificationJoinButtonEvent)
         val intent = Intent(context, MeetingActivity::class.java).apply {

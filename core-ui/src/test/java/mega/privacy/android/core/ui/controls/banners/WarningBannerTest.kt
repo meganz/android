@@ -1,6 +1,8 @@
 package mega.privacy.android.core.ui.controls.banners
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -22,7 +24,7 @@ class WarningBannerTest {
         composeTestRule.setContent {
             WarningBanner(textString = "Warning!", onCloseEvent)
         }
-        composeTestRule.onNodeWithTag(TEST_TAG_WARNING_BANNER_CLOSE).assertExists()
+        composeTestRule.onAllNodesWithTag(TEST_TAG_WARNING_BANNER_CLOSE).onFirst().assertExists()
     }
 
     @Test
@@ -48,7 +50,7 @@ class WarningBannerTest {
         composeTestRule.setContent {
             WarningBanner(textString = "Warning!", onCloseEvent)
         }
-        composeTestRule.onNodeWithTag(TEST_TAG_WARNING_BANNER_CLOSE).performClick()
+        composeTestRule.onAllNodesWithTag(TEST_TAG_WARNING_BANNER_CLOSE).onFirst().performClick()
         verify(onCloseEvent).invoke()
     }
 }

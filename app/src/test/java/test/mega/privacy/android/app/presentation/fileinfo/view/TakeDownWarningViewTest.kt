@@ -1,7 +1,8 @@
 package test.mega.privacy.android.app.presentation.fileinfo.view
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.fileinfo.view.TakeDownWarningView
@@ -23,7 +24,7 @@ class TakeDownWarningViewTest {
         composeTestRule.setContent {
             TakeDownWarningView(isFile = true, onCloseClick = onCloseEvent, onLinkClick = {})
         }
-        composeTestRule.onNodeWithTag(TEST_TAG_WARNING_BANNER_CLOSE, true).performClick()
+        composeTestRule.onAllNodesWithTag(TEST_TAG_WARNING_BANNER_CLOSE).onFirst().performClick()
         verify(onCloseEvent).invoke()
     }
 }

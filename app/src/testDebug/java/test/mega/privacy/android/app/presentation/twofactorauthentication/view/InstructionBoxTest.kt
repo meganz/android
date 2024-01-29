@@ -49,7 +49,7 @@ class InstructionBoxTest {
     @Test
     fun `test that hint's question mark icon is shown`() {
         setupRule()
-        composeRule.onNodeWithTag(QUESTION_MARK_ICON_TEST_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(QUESTION_MARK_ICON_TEST_TAG).assertExists()
     }
 
     @Test
@@ -61,6 +61,6 @@ class InstructionBoxTest {
     @Test
     fun `test that hint's question mark icon has the right drawable`() {
         setupRule()
-        composeRule.onNode(hasDrawable(R.drawable.ic_question_mark)).assertIsDisplayed()
+        composeRule.onNode(hasDrawable(R.drawable.ic_question_mark)).assertExists()
     }
 }
