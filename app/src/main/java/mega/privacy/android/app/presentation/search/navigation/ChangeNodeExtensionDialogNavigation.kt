@@ -15,7 +15,7 @@ internal fun NavGraphBuilder.changeNodeExtensionDialogNavigation(
     nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel
 ) {
     dialog(
-        "$searchChangeExtensionNodeDialog/{${searchChangeNodeExtensionDialogArgumentNodeNewName}}",
+        "$searchChangeExtensionNodeDialog/{$searchChangeNodeExtensionDialogArgumentNodeNewName}",
         arguments = listOf(
             navArgument(searchChangeNodeExtensionDialogArgumentNodeNewName) {
                 type = NavType.StringType

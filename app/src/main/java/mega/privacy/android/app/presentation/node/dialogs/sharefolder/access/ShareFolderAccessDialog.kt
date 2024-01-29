@@ -21,9 +21,19 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 fun ShareFolderAccessDialog(
     handles: List<Long>,
     contactData: List<String>,
+    isFromBackups: Boolean,
     viewModel: ShareFolderAccessDialogViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
 ) {
+
+    if (isFromBackups) {
+        viewModel.shareFolder(
+            handles = handles,
+            contactData = contactData,
+            accessPermission = AccessPermission.READ
+        )
+        onDismiss()
+    }
     ShareFolderAccessDialogBody(
         radioButtonOptions = listOf(
             AccessPermission.READ,

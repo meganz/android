@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetNa
 import mega.privacy.android.app.presentation.search.navigation.overQuotaDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.removeShareFolderDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.shareFolderDialogNavigation
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -79,7 +80,8 @@ internal fun NavGraphBuilder.searchNavGraph(
     shareFolderDialogNavigation(
         navHostController = navHostController,
         searchActivityViewModel = searchActivityViewModel,
-        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
+        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
+        nodeBottomSheetActionHandler = nodeBottomSheetActionHandler
     )
     removeShareFolderDialogNavigation(
         navHostController = navHostController,
@@ -93,6 +95,11 @@ internal fun NavGraphBuilder.searchNavGraph(
     )
     overQuotaDialogNavigation(navHostController = navHostController)
     foreignNodeDialogNavigation(navHostController = navHostController)
+    shareFolderAccessDialogNavigation(
+        navHostController = navHostController,
+        searchActivityViewModel = searchActivityViewModel,
+        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
+    )
 }
 
 /**

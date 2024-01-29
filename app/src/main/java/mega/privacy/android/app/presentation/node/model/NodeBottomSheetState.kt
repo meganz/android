@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @property nodeNameCollisionResult
  * @property showForeignNodeDialog
  * @property showQuotaDialog
+ * @property contactsData
  */
 data class NodeBottomSheetState(
     val name: String = "",
@@ -28,4 +29,5 @@ data class NodeBottomSheetState(
     val nodeNameCollisionResult: StateEventWithContent<NodeNameCollisionResult> = consumed(),
     val showForeignNodeDialog: StateEvent = consumed,
     val showQuotaDialog: StateEventWithContent<Boolean> = consumed(),
+    val contactsData: StateEventWithContent<Pair<List<String>, Boolean>> = consumed(),
 )

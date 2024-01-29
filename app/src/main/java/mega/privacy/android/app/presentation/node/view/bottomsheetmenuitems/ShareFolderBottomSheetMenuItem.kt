@@ -1,19 +1,12 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
-import android.content.Intent
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import mega.privacy.android.app.di.CoroutineScopesModule
-import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchFolderShareDialog
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -22,7 +15,6 @@ import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import javax.inject.Inject

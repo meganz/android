@@ -12,7 +12,7 @@ import mega.privacy.android.app.utils.Constants
  * Versions file activity contract
  */
 class ShareFolderActivityContract :
-    ActivityResultContract<LongArray, Pair<List<Long>, List<String>>?>() {
+    ActivityResultContract<LongArray, List<String>?>() {
     override fun createIntent(context: Context, input: LongArray): Intent {
         return Intent().apply {
             setClass(context, AddContactActivity::class.java)
@@ -22,25 +22,18 @@ class ShareFolderActivityContract :
         }
     }
 
-    override fun parseResult(resultCode: Int, intent: Intent?): Pair<List<Long>, List<String>>? {
+    override fun parseResult(resultCode: Int, intent: Intent?): List<String>? {
         return when {
             resultCode == Activity.RESULT_OK &&
                     intent?.extras != null -> {
                 val contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
                 when (intent.getIntExtra("MULTISELECT", -1)) {
                     0 -> {
-                        val nodeHandle =
-                            intent.getLongExtra(AddContactActivity.EXTRA_NODE_HANDLE, -1)
-                        Pair(listOf(nodeHandle), contactsData ?: listOf())
+                        contactsData ?: emptyList()
                     }
 
                     1 -> {
-                        val nodeHandles =
-                            intent.getLongArrayExtra(AddContactActivity.EXTRA_NODE_HANDLE)
-                        val handles = nodeHandles?.map {
-                            it
-                        }
-                        Pair(handles ?: emptyList(), contactsData ?: emptyList())
+                        contactsData ?: emptyList()
                     }
 
                     else -> null

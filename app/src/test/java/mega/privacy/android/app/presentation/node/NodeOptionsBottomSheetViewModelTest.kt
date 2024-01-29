@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
+import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -64,6 +66,8 @@ class NodeOptionsBottomSheetViewModelTest {
     private val moveRequestMessageMapper = mock<MoveRequestMessageMapper>()
     private val versionHistoryRemoveMessageMapper = mock<VersionHistoryRemoveMessageMapper>()
     private val snackBarHandler = mock<SnackBarHandler>()
+    private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase = mock()
+
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
     }
@@ -94,6 +98,7 @@ class NodeOptionsBottomSheetViewModelTest {
             moveRequestMessageMapper = moveRequestMessageMapper,
             versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper,
             applicationScope = applicationScope,
+            checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase
         )
     }
 
@@ -203,4 +208,14 @@ class NodeOptionsBottomSheetViewModelTest {
         verify(setCopyLatestTargetPathUseCase).invoke(sampleNode.id.longValue)
     }
 
+    @Test
+    fun `test that contactSelectedForShareFolder is called when contact list is selected`() =
+        runTest {
+            initViewModel()
+            viewModel.contactSelectedForShareFolder(listOf("sample@mega.co.nz", "test@mega.co.nz"))
+            viewModel.state.test {
+                val state = awaitItem()
+                assertThat(state.contactsData).isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
 }

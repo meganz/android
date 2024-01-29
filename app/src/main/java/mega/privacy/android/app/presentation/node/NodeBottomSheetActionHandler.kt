@@ -70,6 +70,9 @@ class NodeBottomSheetActionHandler(
         (activity as? AppCompatActivity)?.registerForActivityResult(
             ShareFolderActivityContract()
         ) { result ->
+            result?.let {
+                nodeOptionsBottomSheetViewModel.contactSelectedForShareFolder(it)
+            }
         }
 
     /**

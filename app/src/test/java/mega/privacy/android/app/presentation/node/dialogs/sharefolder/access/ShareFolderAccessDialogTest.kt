@@ -24,6 +24,7 @@ class ShareFolderAccessDialogTest {
                 handles = listOf(1234L, 2345L),
                 contactData = listOf("sample.mega.co.nz", "test@mega.co.na"),
                 onDismiss = {},
+                isFromBackups = false,
                 viewModel = shareAccessDialogViewModel
             )
         }

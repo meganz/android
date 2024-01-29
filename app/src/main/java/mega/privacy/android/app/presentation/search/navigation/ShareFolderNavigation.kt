@@ -10,8 +10,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning.ShareFolderDialog
+import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 import mega.privacy.android.app.presentation.search.isFromToolbar
 import mega.privacy.android.app.utils.Constants
@@ -21,6 +23,7 @@ internal fun NavGraphBuilder.shareFolderDialogNavigation(
     navHostController: NavHostController,
     searchActivityViewModel: SearchActivityViewModel,
     nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
+    nodeBottomSheetActionHandler: NodeBottomSheetActionHandler
 ) {
     dialog(
         route = "$searchFolderShareDialog/{$isFromToolbar}",
@@ -37,10 +40,7 @@ internal fun NavGraphBuilder.shareFolderDialogNavigation(
                         navHostController.navigateUp()
                     },
                     onOkClicked = {
-                        launchFileContactListActivity(
-                            navHostController.context,
-                            node.id
-                        )
+                        nodeBottomSheetActionHandler.handleAction(ShareFolderMenuAction(), node)
                     }
                 )
             }
@@ -63,17 +63,6 @@ internal fun NavGraphBuilder.shareFolderDialogNavigation(
             )
         }
     }
-}
-
-private fun launchFileContactListActivity(context: Context, nodeId: NodeId) {
-    val intent = Intent()
-        .apply {
-            setClass(context, AddContactActivity::class.java)
-            putExtra("contactType", Constants.CONTACT_TYPE_BOTH)
-            putExtra("MULTISELECT", 0)
-            putExtra(AddContactActivity.EXTRA_NODE_HANDLE, nodeId.longValue)
-        }
-    context.startActivity(intent)
 }
 
 private fun launchMultipleShareFolder(context: Context, nodeId: List<NodeId>) {

@@ -21,6 +21,7 @@ import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
+import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import timber.log.Timber
 import javax.inject.Inject
@@ -75,6 +77,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val snackBarHandler: SnackBarHandler,
     private val moveRequestMessageMapper: MoveRequestMessageMapper,
     private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper,
+    private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -102,6 +105,12 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
      * @return state
      */
     fun getBottomSheetOptions(nodeId: Long) = viewModelScope.launch {
+        _state.update {
+            it.copy(
+                actions = emptyList(),
+                node = null
+            )
+        }
         val node = async { runCatching { getNodeByIdUseCase(NodeId(nodeId)) }.getOrNull() }
         val isNodeInRubbish =
             async { runCatching { isNodeInRubbish(nodeId) }.getOrDefault(false) }
@@ -271,4 +280,33 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
         _state.update { it.copy(showQuotaDialog = consumed()) }
     }
 
+    /**
+     * Contact selected for folder share
+     */
+    fun contactSelectedForShareFolder(contactsData: List<String>) {
+        state.value.node?.let {
+            viewModelScope.launch {
+                val isFromBackUps = checkBackupNodeTypeByHandleUseCase(it)
+                _state.update {
+                    it.copy(
+                        contactsData = triggered(
+                            Pair(
+                                contactsData,
+                                isFromBackUps != BackupNodeType.NonBackupNode
+                            )
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Contact selected for folder share
+     */
+    fun markShareFolderAccessDialogShown() {
+        _state.update {
+            it.copy(contactsData = consumed())
+        }
+    }
 }

@@ -42,8 +42,10 @@ import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageM
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
+import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
+import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialog
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.utils.Constants
@@ -215,6 +217,15 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
                         navHostController.navigate(searchOverQuotaDialog.plus("/${it}"))
                     }
                 )
+                EventEffect(
+                    event = nodeOptionsBottomSheetState.contactsData,
+                    onConsumed = nodeOptionsBottomSheetViewModel::markShareFolderAccessDialogShown,
+                    action = {
+                        val contactList = it.first.joinToString(separator = contactArraySeparator)
+                        navHostController.navigate(
+                            shareFolderAccessDialog.plus("/${contactList}").plus("/${it.second}")
+                        )
+                    })
             }
         }
 
