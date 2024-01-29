@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import nz.mega.sdk.MegaChatMessage
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 internal class ChatMessageMapper @Inject constructor(
     private val chatPermissionsMapper: ChatPermissionsMapper,
@@ -42,7 +43,7 @@ internal class ChatMessageMapper @Inject constructor(
         userEmails = msg.toUserEmails(),
         nodeList = msg.megaNodeList?.let { nodeListMapper(it) }.orEmpty(),
         handleList = msg.megaHandleList?.let { handleListMapper(it) }.orEmpty(),
-        duration = msg.duration,
+        duration = msg.duration.seconds,
         retentionTime = msg.retentionTime,
         termCode = msg.termCode.toChatMessageTermCode(),
         rowId = msg.rowId,

@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.meeting
 
 import java.time.Instant
+import kotlin.time.Duration
 
 /**
  * Scheduled meeting status.
@@ -17,10 +18,10 @@ sealed class ScheduledMeetingStatus {
      *
      * @property callStartTimestamp     Call start timestamp
      */
-    class NotJoined(callDuration: Long?) : ScheduledMeetingStatus() {
+    class NotJoined(callDuration: Duration?) : ScheduledMeetingStatus() {
         val callStartTimestamp = callDuration
-            ?.takeIf { it > 0 }
-            ?.let { Instant.now().minusSeconds(it).epochSecond }
+            ?.takeIf { it.inWholeSeconds > 0 }
+            ?.let { Instant.now().minusSeconds(it.inWholeSeconds).epochSecond }
     }
 
     /**
@@ -28,9 +29,9 @@ sealed class ScheduledMeetingStatus {
      *
      * @property callStartTimestamp     Call start timestamp
      */
-    class Joined(callDuration: Long?) : ScheduledMeetingStatus() {
+    class Joined(callDuration: Duration?) : ScheduledMeetingStatus() {
         val callStartTimestamp = callDuration
-            ?.takeIf { it > 0 }
-            ?.let { Instant.now().minusSeconds(it).epochSecond }
+            ?.takeIf { it.inWholeSeconds > 0 }
+            ?.let { Instant.now().minusSeconds(it.inWholeSeconds).epochSecond }
     }
 }

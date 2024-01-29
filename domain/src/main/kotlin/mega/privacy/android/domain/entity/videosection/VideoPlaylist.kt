@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.videosection
 
 import mega.privacy.android.domain.entity.node.NodeId
+import kotlin.time.Duration
 
 /**
  * Entity video playlist
@@ -22,5 +23,5 @@ data class VideoPlaylist(
     val modificationTime: Long,
     val thumbnailList: List<String>?,
     val numberOfVideos: Int,
-    val totalDuration: Int,
+    val totalDuration: Duration,
 )

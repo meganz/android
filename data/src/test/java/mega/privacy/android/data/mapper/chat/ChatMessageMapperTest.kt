@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import kotlin.time.Duration.Companion.seconds
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChatMessageMapperTest {
@@ -125,7 +126,7 @@ class ChatMessageMapperTest {
             userEmails = listOf(userEmail1, userEmail2, userEmail3),
             nodeList = nodeListMapper(nodeList),
             handleList = handleListMapper(handleList),
-            duration = megaChatMessage.duration,
+            duration = megaChatMessage.duration.seconds,
             retentionTime = megaChatMessage.retentionTime,
             termCode = ChatMessageTermCode.ENDED,
             rowId = megaChatMessage.rowId,

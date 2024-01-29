@@ -17,8 +17,8 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -65,6 +65,7 @@ class RubbishBinViewModel @Inject constructor(
     private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     private val fileDurationMapper: FileDurationMapper,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : ViewModel() {
 
     /**
@@ -154,7 +155,7 @@ class RubbishBinViewModel @Inject constructor(
             val isSelected =
                 state.value.selectedNodeHandles.contains(it.id.longValue)
             val fileDuration = if (it is FileNode) {
-                fileDurationMapper(it.type)?.let { TimeUtils.getVideoDuration(it) } ?: run { null }
+                fileDurationMapper(it.type)?.let { durationInSecondsTextMapper(it) }
             } else null
             NodeUIItem(
                 node = it,

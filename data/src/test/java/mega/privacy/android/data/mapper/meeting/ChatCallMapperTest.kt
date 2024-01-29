@@ -6,11 +6,9 @@ import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSession
-import mega.privacy.android.domain.entity.meeting.ChatWaitingRoom
 import mega.privacy.android.domain.entity.meeting.EndCallReason
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
 import mega.privacy.android.domain.entity.meeting.TermCodeType
-import mega.privacy.android.domain.entity.meeting.WaitingRoomStatus
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaHandleList
@@ -18,6 +16,8 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class ChatRequestMapperTest {
     private lateinit var underTest: ChatCallMapper
@@ -269,7 +269,7 @@ class ChatRequestMapperTest {
         changes: Int = -1,
         hasSpeakerPermission: Boolean = false,
         isAudioDetected: Boolean = false,
-        duration: Long = 100L,
+        duration: Duration = 100.seconds,
         initialTimeStamp: Long = 1L,
         finalTimeStamp: Long = 1L,
         termCode: Int = -1,
@@ -302,7 +302,7 @@ class ChatRequestMapperTest {
             on { this.caller }.thenReturn(caller)
             on { this.isSpeakRequestEnabled }.thenReturn(isSpeakRequestEnabled)
             on { this.hasSpeakPermission() }.thenReturn(hasSpeakerPermission)
-            on { this.duration }.thenReturn(duration)
+            on { this.duration }.thenReturn(duration.inWholeSeconds)
             on { this.numParticipants }.thenReturn(numParticipants)
             on { this.changes }.thenReturn(changes)
             on { this.endCallReason }.thenReturn(endCallReason)

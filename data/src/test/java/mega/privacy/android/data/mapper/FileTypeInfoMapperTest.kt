@@ -17,6 +17,7 @@ import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.seconds
 
 class FileTypeInfoMapperTest {
     private val underTest = ::getFileTypeInfo
@@ -117,7 +118,7 @@ class FileTypeInfoMapperTest {
             AudioFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension,
-                duration = expectedDuration
+                duration = expectedDuration.seconds
             )
         )
     }
@@ -136,7 +137,7 @@ class FileTypeInfoMapperTest {
             AudioFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension,
-                duration = expectedDuration,
+                duration = expectedDuration.seconds,
             )
         )
     }
@@ -155,7 +156,7 @@ class FileTypeInfoMapperTest {
             AudioFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension,
-                duration = expectedDuration,
+                duration = expectedDuration.seconds,
             )
         )
     }
@@ -354,7 +355,7 @@ class FileTypeInfoMapperTest {
             VideoFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension,
-                duration = expectedDuration
+                duration = expectedDuration.seconds
             )
         )
     }
@@ -373,7 +374,7 @@ class FileTypeInfoMapperTest {
             VideoFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension,
-                duration = expectedDuration
+                duration = expectedDuration.seconds
             )
         )
     }

@@ -19,6 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 class ReturnToCallBannerTest {
@@ -30,7 +31,7 @@ class ReturnToCallBannerTest {
     fun `test that banner is shown with correct ui when there is only a call in this 1on1 chat answered`() {
         val callInThisChat = mock<ChatCall> {
             on { status } doReturn ChatCallStatus.InProgress
-            on { duration } doReturn 10L
+            on { duration } doReturn 10.seconds
         }
         initComposeRuleContent(
             ChatUiState(
@@ -133,7 +134,7 @@ class ReturnToCallBannerTest {
     fun `test that banner is shown with correct ui when there is only other chat call and is answered`() {
         val callInOtherChat = mock<ChatCall> {
             on { status } doReturn ChatCallStatus.InProgress
-            on { duration } doReturn 10L
+            on { duration } doReturn 10.seconds
         }
         initComposeRuleContent(
             ChatUiState(
@@ -213,6 +214,7 @@ class ReturnToCallBannerTest {
     fun `test that banner is shown with correct ui if there is only one call already answered in other chat`() {
         val callInOtherChat = mock<ChatCall> {
             on { status } doReturn ChatCallStatus.InProgress
+            on { duration } doReturn 10.seconds
         }
         initComposeRuleContent(
             ChatUiState(
@@ -233,6 +235,7 @@ class ReturnToCallBannerTest {
     fun `test that banner is shown with correct ui if there are two calls and one is answered`() {
         val callInOtherChat = mock<ChatCall> {
             on { status } doReturn ChatCallStatus.InProgress
+            on { duration } doReturn 10.seconds
         }
         val callInThisChat = mock<ChatCall> {
             on { status } doReturn ChatCallStatus.UserNoPresent

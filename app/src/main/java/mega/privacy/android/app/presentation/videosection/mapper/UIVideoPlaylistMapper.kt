@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.videosection.mapper
 
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
-import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import java.io.File
 import javax.inject.Inject
@@ -9,7 +9,9 @@ import javax.inject.Inject
 /**
  * The mapper class to convert the VideoPlaylist to UIVideoPlaylist
  */
-class UIVideoPlaylistMapper @Inject constructor() {
+class UIVideoPlaylistMapper @Inject constructor(
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+) {
 
     /**
      * Convert to VideoPlaylist to UIVideoPlaylist
@@ -25,6 +27,6 @@ class UIVideoPlaylistMapper @Inject constructor() {
                 File(path)
             },
             numberOfVideos = videoPlaylist.numberOfVideos,
-            totalDuration = TimeUtils.getVideoDuration(videoPlaylist.totalDuration),
+            totalDuration = durationInSecondsTextMapper(videoPlaylist.totalDuration),
         )
 }

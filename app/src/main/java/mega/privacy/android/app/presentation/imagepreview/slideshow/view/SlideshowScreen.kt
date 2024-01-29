@@ -128,7 +128,7 @@ fun SlideshowScreen(
             if (isPlaying) {
                 while (true) {
                     yield()
-                    delay(speed.duration * 1000L)
+                    delay(speed.duration.inWholeMilliseconds)
                     tween<Float>(600)
                     try {
                         pagerState.animateScrollToPage(

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.notifications.chat
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -25,10 +26,10 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
-import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Object for showing chat message notifications.
@@ -126,13 +127,13 @@ internal object ChatMessageNotification {
         ChatMessageType.NODE_ATTACHMENT, ChatMessageType.VOICE_CLIP -> {
             with(msg.nodeList) {
                 val node = if (isEmpty()) null else this[0]
-                val duration = ((node as? FileNode)?.type?.let { fileDurationMapper(it) } ?: 0)
-                    .toLong()
+                val duration = (node as? FileNode)?.type?.let { fileDurationMapper(it) }
+                    ?: 0.seconds
 
                 if (node == null) msg.content
                 else if (!typeForName(node.name).isAudioVoiceClip) node.name
                 else "\uD83C\uDF99 " + CallUtil.milliSecondsToTimer(
-                    if (duration == 0L) 0 else duration * 1000
+                    if (duration.inWholeSeconds == 0L) 0 else duration.inWholeMilliseconds
                 )
             }
         }

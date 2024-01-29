@@ -13,6 +13,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ContainsMediaItemUseCaseTest {
@@ -46,7 +47,7 @@ class ContainsMediaItemUseCaseTest {
         val node1 = mock<TypedFileNode>()
         val nodeList: List<TypedNode> = listOf(node1)
 
-        whenever(node1.type).thenReturn(VideoFileTypeInfo("image", "mp4", 10))
+        whenever(node1.type).thenReturn(VideoFileTypeInfo("image", "mp4", 10.seconds))
         assertThat(underTest(nodeList)).isEqualTo(true)
     }
 
@@ -67,7 +68,7 @@ class ContainsMediaItemUseCaseTest {
         val node4 = mock<TypedFolderNode>()
         val nodeList: List<TypedNode> = listOf(node1, node2, node3, node4)
 
-        whenever(node1.type).thenReturn(VideoFileTypeInfo("video", "mp4", 10))
+        whenever(node1.type).thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
         whenever(node2.type).thenReturn(StaticImageFileTypeInfo("image", "jpg"))
         whenever(node3.type).thenReturn(SvgFileTypeInfo("image", "svg"))
         assertThat(underTest(nodeList)).isEqualTo(true)

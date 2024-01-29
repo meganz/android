@@ -36,7 +36,7 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
-import mega.privacy.android.app.presentation.meeting.chat.mapper.DurationTextMapper
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.autoCleared
@@ -49,10 +49,10 @@ import javax.inject.Inject
 class AudioPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
 
     /**
-     * [DurationTextMapper]
+     * [DurationInSecondsTextMapper]
      */
     @Inject
-    lateinit var durationTextMapper: DurationTextMapper
+    lateinit var durationInSecondsTextMapper: DurationInSecondsTextMapper
 
     private var binding by autoCleared<FragmentMediaPlaylistBinding>()
 
@@ -170,7 +170,7 @@ class AudioPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListen
                 this,
                 dragStartListener = this,
                 isAudio = true,
-                durationTextMapper = durationTextMapper,
+                durationInSecondsTextMapper = durationInSecondsTextMapper,
             )
         }
         listLayoutManager =

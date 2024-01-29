@@ -3,6 +3,7 @@ package mega.privacy.android.domain.entity.chat
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
 import mega.privacy.android.domain.entity.node.Node
+import kotlin.time.Duration
 
 /**
  * Data class as entity for chat messages.
@@ -91,7 +92,7 @@ data class ChatMessage(
     override val userEmails: List<String>,
     val nodeList: List<Node>,
     override val handleList: List<Long>,
-    override val duration: Int,
+    override val duration: Duration,
     override val retentionTime: Long,
     override val termCode: ChatMessageTermCode,
     override val rowId: Long,

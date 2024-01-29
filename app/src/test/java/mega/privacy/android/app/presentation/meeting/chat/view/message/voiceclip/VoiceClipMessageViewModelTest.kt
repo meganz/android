@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.meeting.chat.mapper.DurationTextMapper
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.node.NodeId
@@ -70,7 +70,7 @@ class VoiceClipMessageViewModelTest {
     private val downloadNodeResultFlow: MutableSharedFlow<MultiTransferEvent> = MutableSharedFlow()
     private val downloadNodesUseCase: DownloadNodesUseCase = mock()
     private val voiceClipPlayResultFlow: MutableSharedFlow<VoiceClipPlayState> = MutableSharedFlow()
-    private val durationTextMapper: DurationTextMapper = mock()
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
 
     private val cacheFileParentPath = "parent path"
     private val mockTimestamp = "00:03"
@@ -97,7 +97,7 @@ class VoiceClipMessageViewModelTest {
             getChatFileUseCase,
             getCacheFileUseCase,
             voiceClipPlayer,
-            durationTextMapper
+            durationInSecondsTextMapper
         )
 
         whenever(getCacheFileUseCase(any(), any())).thenReturn(cacheFile)
@@ -116,7 +116,7 @@ class VoiceClipMessageViewModelTest {
             on { exists() }.thenReturn(true)
             on { length() }.thenReturn(voiceClipMessage.size)
         }
-        whenever(durationTextMapper(any(), any())).thenReturn(mockTimestamp)
+        whenever(durationInSecondsTextMapper(any())).thenReturn(mockTimestamp)
     }
 
     @BeforeEach
@@ -126,7 +126,7 @@ class VoiceClipMessageViewModelTest {
             getChatFileUseCase = getChatFileUseCase,
             getCacheFileUseCase = getCacheFileUseCase,
             voiceClipPlayer = voiceClipPlayer,
-            durationTextMapper = durationTextMapper,
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
         )
     }
 

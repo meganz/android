@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageCode
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
+import kotlin.time.Duration
 
 /**
  * @property status
@@ -59,7 +60,7 @@ interface ChatMessageInfo {
     val userNames: List<String>
     val userEmails: List<String>
     val handleList: List<Long>
-    val duration: Int
+    val duration: Duration
     val retentionTime: Long
     val termCode: ChatMessageTermCode
     val rowId: Long

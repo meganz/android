@@ -210,7 +210,7 @@ internal fun PhotoViewContainer(
             )
 
             Text(
-                text = TimeUtils.getVideoDuration(photo.fileTypeInfo.duration),
+                text = TimeUtils.getVideoDuration(photo.fileTypeInfo.duration.inWholeSeconds.toInt()),
                 color = white,
                 modifier = Modifier
                     .wrapContentSize()

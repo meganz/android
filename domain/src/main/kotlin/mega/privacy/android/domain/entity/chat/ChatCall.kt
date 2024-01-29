@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.meeting.NetworkQualityType
 import mega.privacy.android.domain.entity.meeting.TermCodeType
 import mega.privacy.android.domain.entity.meeting.WaitingRoomStatus
 import java.time.Instant
+import kotlin.time.Duration
 
 /**
  * Chat call
@@ -58,7 +59,7 @@ data class ChatCall(
     val changes: List<ChatCallChanges>? = null,
     val hasSpeakPermission: Boolean = false,
     val isAudioDetected: Boolean = false,
-    val duration: Long? = null,
+    val duration: Duration? = null,
     val initialTimestamp: Long? = null,
     val finalTimestamp: Long? = null,
     val termCode: TermCodeType? = null,
@@ -92,5 +93,6 @@ data class ChatCall(
      * @return  Timestamp in Epoch seconds
      */
     fun getStartTimestamp(): Long? =
-        duration?.takeIf { it > 0 }?.let { Instant.now().minusSeconds(it).epochSecond }
+        duration?.takeIf { it.inWholeSeconds > 0 }
+            ?.let { Instant.now().minusSeconds(it.inWholeSeconds).epochSecond }
 }

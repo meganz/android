@@ -2,6 +2,8 @@ package mega.privacy.android.data.database.converter
 
 import androidx.room.TypeConverter
 import mega.privacy.android.domain.entity.chat.ChatMessageChange
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Converters for the typed message entity.
@@ -66,4 +68,22 @@ class TypedMessageEntityConverters {
     @TypeConverter
     fun convertToChatMessageChangeList(string: String): List<ChatMessageChange> =
         string.split(",").mapNotNull { runCatching { ChatMessageChange.valueOf(it) }.getOrNull() }
+
+    /**
+     * Convert a [Duration] to Long.
+     *
+     * @param duration [Duration].
+     * @return [Long].
+     */
+    @TypeConverter
+    fun convertFromDuration(duration: Duration): Long = duration.inWholeSeconds
+
+    /**
+     * Convert to Duration.
+     *
+     * @param long [Long].
+     * @return [Duration].
+     */
+    @TypeConverter
+    fun convertToDuration(long: Long): Duration = long.seconds
 }

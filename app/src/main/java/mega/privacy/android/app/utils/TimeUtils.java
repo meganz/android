@@ -406,7 +406,7 @@ public class TimeUtils implements Comparator<Calendar> {
      *
      * @param duration Duration in seconds.
      * @return The time string.
-     * @deprecated Use DurationTextMapper instead.
+     * @deprecated Use DurationInSecondsTextMapper instead.
      */
     @Deprecated
     public static String getVideoDuration(int duration) {

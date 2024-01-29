@@ -70,7 +70,7 @@ internal fun ReturnToCallBanner(
                         else -> startMeetingActivity(context, chatId)
                     }
                 },
-                duration = callInThisChat.duration?.takeIf { answered && it > 0 }
+                duration = callInThisChat.duration?.takeIf { answered && it.inWholeSeconds > 0 }
             )
         }
 

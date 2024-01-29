@@ -1,5 +1,11 @@
 package mega.privacy.android.domain.entity
 
+import mega.privacy.android.domain.entity.PdfFileTypeInfo.extension
+import mega.privacy.android.domain.entity.PdfFileTypeInfo.mimeType
+import mega.privacy.android.domain.entity.UrlFileTypeInfo.extension
+import mega.privacy.android.domain.entity.UrlFileTypeInfo.mimeType
+import kotlin.time.Duration
+
 /**
  * File type info
  */
@@ -92,7 +98,7 @@ data class AudioFileTypeInfo(
     /**
      * Duration
      */
-    val duration: Int,
+    val duration: Duration,
 ) : FileTypeInfo
 
 /**
@@ -164,5 +170,5 @@ data class VideoFileTypeInfo(
     /**
      * Duration
      */
-    val duration: Int,
+    val duration: Duration,
 ) : FileTypeInfo

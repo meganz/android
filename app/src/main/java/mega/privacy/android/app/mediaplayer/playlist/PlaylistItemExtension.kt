@@ -3,10 +3,9 @@ package mega.privacy.android.app.mediaplayer.playlist
 import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PREVIOUS
-import mega.privacy.android.app.presentation.meeting.chat.mapper.DurationTextMapper
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
 
 /**
  * Create a new instance with the specified index and item type,
@@ -49,15 +48,8 @@ fun PlaylistItem.updateNodeName(newName: String) = copy(nodeName = newName)
  */
 fun PlaylistItem.formatCurrentPositionAndDuration(
     currentPosition: Long,
-    durationTextMapper: DurationTextMapper,
-) = "${
-    durationTextMapper(
-        currentPosition.seconds,
-        DurationUnit.SECONDS
-    )
-} / ${
-    durationTextMapper(duration, DurationUnit.SECONDS)
-}"
+    durationInSecondsTextMapper: DurationInSecondsTextMapper,
+) = "${durationInSecondsTextMapper(currentPosition.seconds)} / ${durationInSecondsTextMapper(duration)}"
 
 /**
  * Get name of item header

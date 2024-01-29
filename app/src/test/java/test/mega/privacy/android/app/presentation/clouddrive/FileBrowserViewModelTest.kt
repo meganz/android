@@ -25,6 +25,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -62,6 +63,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.seconds
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -89,6 +91,7 @@ class FileBrowserViewModelTest {
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
 
     @BeforeEach
     fun setUp() {
@@ -118,7 +121,8 @@ class FileBrowserViewModelTest {
             fileDurationMapper = fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            monitorConnectivityUseCase = monitorConnectivityUseCase
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
         )
     }
 
@@ -468,7 +472,7 @@ class FileBrowserViewModelTest {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
         whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(1L)
-        whenever(fileDurationMapper(any())).thenReturn(1)
+        whenever(fileDurationMapper(any())).thenReturn(1.seconds)
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)

@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.presentation.videosection
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoPlaylistMapper
 import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
 import mega.privacy.android.domain.entity.node.NodeId
@@ -11,10 +12,13 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import kotlin.time.Duration.Companion.seconds
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UIVideoPlaylistMapperTest {
     private lateinit var underTest: UIVideoPlaylistMapper
+
+    private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
 
     private val id = NodeId(123456L)
     private val title = "title name"
@@ -32,7 +36,7 @@ class UIVideoPlaylistMapperTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = UIVideoPlaylistMapper()
+        underTest = UIVideoPlaylistMapper(durationInSecondsTextMapper)
     }
 
     @Test
@@ -48,7 +52,7 @@ class UIVideoPlaylistMapperTest {
         on { modificationTime }.thenReturn(modificationTime)
         on { thumbnailList }.thenReturn(thumbnailList)
         on { numberOfVideos }.thenReturn(numberOfVideos)
-        on { totalDuration }.thenReturn(100)
+        on { totalDuration }.thenReturn(100.seconds)
     }
 
     private fun assertMappedVideoPlaylistObject(uiVideoPlaylist: UIVideoPlaylist) {

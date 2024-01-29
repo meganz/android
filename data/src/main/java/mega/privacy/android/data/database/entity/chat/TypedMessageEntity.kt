@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
+import kotlin.time.Duration
 
 /**
  * Entity to store a typed message request.
@@ -75,7 +76,7 @@ data class TypedMessageEntity(
     override val userNames: List<String>,
     override val userEmails: List<String>,
     override val handleList: List<Long>,
-    override val duration: Int,
+    override val duration: Duration,
     override val retentionTime: Long,
     override val termCode: ChatMessageTermCode,
     override val rowId: Long,

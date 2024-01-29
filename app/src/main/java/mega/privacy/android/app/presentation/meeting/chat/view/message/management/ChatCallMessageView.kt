@@ -18,6 +18,8 @@ import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 import mega.privacy.android.domain.entity.chat.messages.management.CallStartedMessage
 import mega.privacy.android.shared.theme.MegaAppTheme
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Chat call message view
@@ -89,9 +91,9 @@ private fun CallMessage.getText(isOneToOneChat: Boolean): String {
 @Composable
 private fun getAppropriateStringForCallEnded(
     isOneToOne: Boolean,
-    duration: Long,
-): String {
-    val hasDuration = duration > 0
+    duration: Duration,
+): String = with(duration.inWholeSeconds) {
+    val hasDuration = this > 0
     if (!isOneToOne && !hasDuration) {
         return TextUtil.removeFormatPlaceholder(
             stringResource(R.string.group_call_ended_no_duration_message)
@@ -102,10 +104,10 @@ private fun getAppropriateStringForCallEnded(
             if (isOneToOne) stringResource(R.string.call_ended_message)
             else stringResource(R.string.group_call_ended_message)
         )
-        val hours = TimeUnit.SECONDS.toHours(duration)
-        val minutes = (TimeUnit.SECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(hours))
+        val hours = TimeUnit.SECONDS.toHours(this)
+        val minutes = (TimeUnit.SECONDS.toMinutes(this) - TimeUnit.HOURS.toMinutes(hours))
         val seconds =
-            TimeUnit.SECONDS.toSeconds(duration) - (TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(
+            TimeUnit.SECONDS.toSeconds(this) - (TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(
                 minutes
             ))
 
@@ -180,7 +182,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
-                    duration = 0,
+                    duration = 0.seconds,
                     userHandle = 123L,
                     shouldShowAvatar = false,
                     shouldShowTime = false,
@@ -194,7 +196,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
-                    duration = 0,
+                    duration = 0.seconds,
                     userHandle = 123L,
                     shouldShowAvatar = false,
                     shouldShowTime = false,
@@ -208,7 +210,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
-                    duration = 100,
+                    duration = 100.seconds,
                     userHandle = 123L,
                     shouldShowAvatar = false,
                     shouldShowTime = false,
@@ -222,7 +224,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.ENDED,
-                    duration = 100,
+                    duration = 100.seconds,
                     userHandle = 123L,
                     shouldShowAvatar = false,
                     shouldShowTime = false,
@@ -236,7 +238,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.FAILED,
-                    duration = 0,
+                    duration = 0.seconds,
                     userHandle = 123L,
                     shouldShowAvatar = false,
                     shouldShowTime = false,
@@ -250,7 +252,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.CANCELLED,
-                    duration = 0,
+                    duration = 0.seconds,
                     userHandle = 123L,
                     shouldShowAvatar = false,
                     shouldShowTime = false,
@@ -264,7 +266,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.REJECTED,
-                    duration = 0,
+                    duration = 0.seconds,
                     userHandle = 123L,
                     shouldShowAvatar = false,
                     shouldShowTime = false,
@@ -278,7 +280,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     time = System.currentTimeMillis(),
                     isMine = true,
                     termCode = ChatMessageTermCode.NO_ANSWER,
-                    duration = 0,
+                    duration = 0.seconds,
                     userHandle = 123L,
                     shouldShowAvatar = false,
                     shouldShowTime = false,

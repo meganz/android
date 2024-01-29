@@ -41,6 +41,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultPhotosRepositoryTest {
@@ -361,7 +362,7 @@ class DefaultPhotosRepositoryTest {
         } else if (name.contains("raw")) {
             return RawFileTypeInfo(mimeType = "", extension = "raw")
         } else if (name.contains("video")) {
-            return VideoFileTypeInfo(mimeType = "", extension = "video", duration = 120)
+            return VideoFileTypeInfo(mimeType = "", extension = "video", duration = 120.seconds)
         } else {
             return UnknownFileTypeInfo(mimeType = "", extension = "")
         }

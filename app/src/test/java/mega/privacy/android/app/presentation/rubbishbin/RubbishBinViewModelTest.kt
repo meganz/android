@@ -14,11 +14,10 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
-import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
@@ -30,6 +29,8 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
@@ -43,6 +44,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.seconds
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -62,6 +64,7 @@ class RubbishBinViewModelTest {
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getRubbishBinNodeChildrenUseCase = mock<GetRubbishBinNodeChildrenUseCase>()
     private val fileDurationMapper: FileDurationMapper = mock()
+    private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
 
     @BeforeEach
     fun setUp() {
@@ -84,7 +87,8 @@ class RubbishBinViewModelTest {
             getIntentToOpenFileMapper = getIntentToOpenFileMapper,
             getRubbishBinFolderUseCase = getRubbishBinFolderUseCase,
             getNodeByHandle = getNodeByHandle,
-            fileDurationMapper = fileDurationMapper
+            fileDurationMapper = fileDurationMapper,
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
         )
     }
 
@@ -438,7 +442,7 @@ class RubbishBinViewModelTest {
         whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(null)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(getRubbishBinFolderUseCase()).thenReturn(null)
-        whenever(fileDurationMapper(any())).thenReturn(1)
+        whenever(fileDurationMapper(any())).thenReturn(1.seconds)
     }
 
     @AfterEach

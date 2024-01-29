@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessa
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import kotlin.time.Duration.Companion.seconds
 
 class TypedMessageEntityMapperTest {
     private val underTest = TypedMessageEntityMapper()
@@ -43,7 +44,7 @@ class TypedMessageEntityMapperTest {
         val expectedUserNames = listOf("userNames")
         val expectedUserEmails = listOf("userEmails")
         val expectedHandleList = listOf(1234L)
-        val expectedDuration = 1
+        val expectedDuration = 1.seconds
         val expectedRetentionTime = 165432L
         val expectedTermCode = ChatMessageTermCode.ENDED
         val expectedRowId = 123435424L

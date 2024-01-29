@@ -20,8 +20,8 @@ import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
-import mega.privacy.android.app.utils.TimeUtils.getVideoDuration
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -90,6 +90,7 @@ class FileBrowserViewModel @Inject constructor(
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -332,7 +333,7 @@ class FileBrowserViewModel @Inject constructor(
         return nodeList.mapIndexed { index, node ->
             val isSelected = state.value.selectedNodeHandles.contains(node.id.longValue)
             val fileDuration = if (node is FileNode) {
-                fileDurationMapper(node.type)?.let { getVideoDuration(it) } ?: run { null }
+                fileDurationMapper(node.type)?.let { durationInSecondsTextMapper(it) }
             } else null
             NodeUIItem(
                 node = node,

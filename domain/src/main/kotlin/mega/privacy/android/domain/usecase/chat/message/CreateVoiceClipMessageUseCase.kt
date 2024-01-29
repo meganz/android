@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 internal class CreateVoiceClipMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
 
@@ -21,8 +21,7 @@ internal class CreateVoiceClipMessageUseCase @Inject constructor() : CreateTyped
             status = status,
             name = fileNode?.name.orEmpty(),
             size = fileNode?.size ?: 0L,
-            duration = ((fileNode?.type as? AudioFileTypeInfo)?.duration?.let { it * 1000 } ?: 0)
-                .milliseconds,
+            duration = (fileNode?.type as? AudioFileTypeInfo)?.duration ?: 0.seconds,
             shouldShowAvatar = shouldShowAvatar,
             shouldShowTime = shouldShowTime,
             shouldShowDate = shouldShowDate,

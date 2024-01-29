@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.ChatSession
 import nz.mega.sdk.MegaChatCall
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Chat call mapper
@@ -26,7 +27,7 @@ internal class ChatCallMapper @Inject constructor(
         chatId = megaChatCall.chatid,
         status = chatCallStatusMapper(megaChatCall.status),
         caller = megaChatCall.caller,
-        duration = megaChatCall.duration,
+        duration = megaChatCall.duration.seconds,
         numParticipants = megaChatCall.numParticipants,
         changes = chatCallChangesMapper(megaChatCall.changes),
         endCallReason = endCallReasonMapper(megaChatCall.endCallReason),

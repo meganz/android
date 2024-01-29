@@ -67,7 +67,6 @@ import mega.privacy.android.app.presentation.slideshow.model.SlideshowItem
 import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
 import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_070
 import mega.privacy.android.core.ui.theme.white
@@ -76,6 +75,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.SlideShowScreenEvent
 import timber.log.Timber
 import javax.inject.Inject
@@ -222,7 +222,7 @@ class SlideshowFragment : Fragment() {
                 imageViewerViewModel.showToolbar(false)
                 while (true) {
                     yield()
-                    delay(speed.duration * 1000L)
+                    delay(speed.duration.inWholeMilliseconds)
                     tween<Float>(600)
                     try {
                         pagerState.animateScrollToPage(

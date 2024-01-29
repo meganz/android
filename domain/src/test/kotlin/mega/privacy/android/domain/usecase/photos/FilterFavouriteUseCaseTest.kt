@@ -12,6 +12,7 @@ import org.mockito.kotlin.mock
 import java.time.LocalDateTime
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -102,7 +103,7 @@ class FilterFavouriteUseCaseTest {
             modificationTime = modificationTime,
             thumbnailFilePath = "thumbnailFilePath",
             previewFilePath = "previewFilePath",
-            fileTypeInfo = VideoFileTypeInfo("", "", duration = 123)
+            fileTypeInfo = VideoFileTypeInfo("", "", duration = 123.seconds)
         )
     }
 

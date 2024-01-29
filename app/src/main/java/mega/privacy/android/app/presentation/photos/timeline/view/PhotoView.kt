@@ -174,7 +174,7 @@ fun PhotoCoverView(
                 )
 
                 Text(
-                    text = TimeUtils.getVideoDuration(photo.fileTypeInfo.duration),
+                    text = TimeUtils.getVideoDuration(photo.fileTypeInfo.duration.inWholeSeconds.toInt()),
                     color = colorResource(id = R.color.white),
                     modifier = Modifier
                         .wrapContentSize()

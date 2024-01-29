@@ -11,6 +11,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 class ReturnToCallBannerTest {
@@ -45,7 +46,7 @@ class ReturnToCallBannerTest {
 
     @Test
     fun `test Chronometer is displayed if duration is received`() {
-        val duration = 100L
+        val duration = 100.seconds
         composeRule.setContent {
             ReturnToCallBanner(text = text, onBannerClicked = {}, duration = duration)
         }

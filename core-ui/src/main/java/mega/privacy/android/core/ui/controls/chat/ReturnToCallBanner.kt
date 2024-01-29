@@ -29,6 +29,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import kotlin.time.Duration
 
 /**
  * Return to call banner
@@ -41,7 +42,7 @@ fun ReturnToCallBanner(
     text: String,
     onBannerClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    duration: Long? = null,
+    duration: Duration? = null,
 ) = Row(
     modifier = modifier
         .fillMaxWidth()
@@ -62,7 +63,7 @@ fun ReturnToCallBanner(
 }
 
 @Composable
-private fun CallChronometer(duration: Long, textStyle: TextStyle) {
+private fun CallChronometer(duration: Duration, textStyle: TextStyle) {
     val resolver: FontFamily.Resolver = LocalFontFamilyResolver.current
     val typeface: Typeface = remember(resolver, textStyle) {
         resolver.resolve(
@@ -76,7 +77,7 @@ private fun CallChronometer(duration: Long, textStyle: TextStyle) {
     AndroidView(
         factory = { context ->
             Chronometer(context).apply {
-                base = SystemClock.elapsedRealtime() - duration * 1000
+                base = SystemClock.elapsedRealtime() - duration.inWholeMilliseconds
                 start()
                 format = " %s"
                 this.typeface = typeface

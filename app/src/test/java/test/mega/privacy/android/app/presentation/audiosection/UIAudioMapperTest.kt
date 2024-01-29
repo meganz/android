@@ -3,7 +3,7 @@ package test.mega.privacy.android.app.presentation.audiosection
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.audiosection.mapper.UIAudioMapper
-import mega.privacy.android.app.presentation.meeting.chat.mapper.DurationTextMapper
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
@@ -18,11 +18,11 @@ import kotlin.time.Duration.Companion.seconds
 class UIAudioMapperTest {
     private lateinit var underTest: UIAudioMapper
 
-    private val durationTextMapper = DurationTextMapper()
+    private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
 
     @BeforeAll
     fun setUp() {
-        underTest = UIAudioMapper(durationTextMapper)
+        underTest = UIAudioMapper(durationInSecondsTextMapper)
     }
 
     @Test

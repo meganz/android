@@ -20,6 +20,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetAlbumPhotosTest {
@@ -104,7 +105,7 @@ class DefaultGetAlbumPhotosTest {
         duration: Int = 0,
         fileTypeInfo: VideoFileTypeInfo = VideoFileTypeInfo(mimeType = "",
             extension = "",
-            duration = duration),
+            duration = duration.seconds),
     ): Photo = Photo.Video(
         id,
         albumPhotoId,

@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import nz.mega.sdk.MegaNode
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Map node to file type info
@@ -80,7 +81,7 @@ private fun getFileTypeInfoForExtension(
         AudioFileTypeInfo(
             mimeType = mimeType,
             extension = extension,
-            duration = duration
+            duration = duration.seconds
         )
     }
     mimeType.isTextMimeType(extension) -> {
@@ -93,7 +94,7 @@ private fun getFileTypeInfoForExtension(
         VideoFileTypeInfo(
             mimeType = mimeType,
             extension = extension,
-            duration = duration
+            duration = duration.seconds
         )
     }
     mimeType.isUnMappedMimeType(extension) -> {
