@@ -162,8 +162,7 @@ class UpgradeAccountViewModel @Inject constructor(
             runCatching {
                 val showNoAds =
                     getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement) &&
-                            getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
-                            getFeatureFlagValueUseCase(ABTestFeatures.adse)
+                            getFeatureFlagValueUseCase(ABTestFeatures.ads)
                 _state.update { state ->
                     state.copy(
                         showNoAdsFeature = showNoAds
