@@ -3,6 +3,7 @@ package mega.privacy.android.app.main.megachat;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
 import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponentKt.createStartDownloadView;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.manageTextFileIntent;
@@ -45,6 +46,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -76,6 +78,7 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
@@ -95,6 +98,7 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel;
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -129,6 +133,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     CopyRequestMessageMapper copyRequestMessageMapper;
 
     private NodeAttachmentHistoryViewModel viewModel;
+    private StartDownloadViewModel startDownloadViewModel;
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -203,6 +208,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         super.onCreate(savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(NodeAttachmentHistoryViewModel.class);
+        startDownloadViewModel = new ViewModelProvider(this).get(StartDownloadViewModel.class);
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
@@ -222,6 +228,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 new IntentFilter(BROADCAST_ACTION_ERROR_COPYING_NODES));
 
         setContentView(R.layout.activity_node_history);
+        addStartDownloadTransferView();
 
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong("chatId", -1);
@@ -364,6 +371,20 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 Timber.e("ERROR: node is NULL");
             }
         }
+    }
+
+    private void addStartDownloadTransferView() {
+        ViewGroup root = findViewById(R.id.node_history_main_layout);
+        root.addView(
+                createStartDownloadView(
+                        this,
+                        startDownloadViewModel.getState(),
+                        () -> {
+                            startDownloadViewModel.consumeDownloadEvent();
+                            return Unit.INSTANCE;
+                        }
+                )
+        );
     }
 
     @Override
@@ -793,15 +814,24 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             } else if (itemId == R.id.chat_cab_menu_download) {
                 clearSelections();
                 hideMultipleSelect();
-
-                ArrayList<MegaNodeList> list = new ArrayList<>();
-                for (int i = 0; i < messagesSelected.size(); i++) {
-
-                    MegaNodeList megaNodeList = messagesSelected.get(i).getMegaNodeList();
-                    list.add(megaNodeList);
+                ArrayList<Long> messageIds = new ArrayList<>();
+                for(MegaChatMessage message : messagesSelected) {
+                    Long megaNodeHandle = message.getMsgId();
+                    messageIds.add(megaNodeHandle);
                 }
-                PermissionUtils.checkNotificationsPermission(nodeAttachmentHistoryActivity);
-                nodeSaver.saveNodeLists(list, false, false, false, true);
+                startDownloadViewModel.downloadChatNodesOnlyIfFeatureFlagIsTrue(
+                        chatId,
+                        messageIds,
+                        () -> {
+                            ArrayList<MegaNodeList> list = new ArrayList<>();
+                            for(MegaChatMessage message : messagesSelected) {
+                                MegaNodeList megaNodeList = message.getMegaNodeList();
+                                list.add(megaNodeList);
+                            }
+                            PermissionUtils.checkNotificationsPermission(nodeAttachmentHistoryActivity);
+                            nodeSaver.saveNodeLists(list, false, false, false, true);
+                            return Unit.INSTANCE;
+                        });
             } else if (itemId == R.id.chat_cab_menu_import) {
                 clearSelections();
                 hideMultipleSelect();
@@ -1371,9 +1401,17 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         this.myChatFilesFolder = myChatFilesFolder;
     }
 
-    public void downloadNodeList(MegaNodeList nodeList) {
-        PermissionUtils.checkNotificationsPermission(this);
-        nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true);
+    public void downloadMessageNode(MegaNodeList nodeList, Long msgId) {
+        ArrayList<Long> msgIds = new ArrayList<>();
+        msgIds.add(msgId);
+        startDownloadViewModel.downloadChatNodesOnlyIfFeatureFlagIsTrue(
+                chatId,
+                msgIds,
+                () -> {
+                    PermissionUtils.checkNotificationsPermission(this);
+                    nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true);
+                    return Unit.INSTANCE;
+                });
     }
 }
 
