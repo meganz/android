@@ -370,6 +370,22 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
+     * Navigate back to the Cloud Drive Root Level hierarchy
+     */
+    suspend fun goBackToRootLevel() {
+        _state.update {
+            it.copy(
+                accessedFolderHandle = null,
+                isMediaDiscoveryOpen = false,
+                isMediaDiscoveryOpenedByIconClick = false,
+            )
+        }
+        getRootNodeUseCase()?.id?.longValue?.let { rootHandle ->
+            setFileBrowserHandle(rootHandle)
+        }
+    }
+
+    /**
      * Exits the Media Discovery
      *
      * @param performBackNavigation If true, goes back one level from the Cloud Drive hierarchy
