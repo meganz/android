@@ -118,9 +118,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                 ) ?: throw NullFileException()
                 suspendCancellableCoroutine { continuation ->
                     val listener = OptionalMegaTransferListenerInterface(
-                        onTransferTemporaryError = { _, error ->
-                            continuation.failWithError(error, "downloadBackgroundFile")
-                        },
                         onTransferFinish = { _, error ->
                             if (error.errorCode == MegaError.API_OK) {
                                 continuation.resumeWith(Result.success(file.absolutePath))
