@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.imagepreview.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.ImageNode
 
 data class ImagePreviewState(
@@ -15,4 +18,5 @@ data class ImagePreviewState(
     val resultMessage: String = "",
     val copyMoveException: Throwable? = null,
     val nameCollision: NameCollision? = null,
+    val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
 )

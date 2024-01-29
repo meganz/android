@@ -7,6 +7,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +20,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
@@ -26,14 +29,19 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -69,6 +77,9 @@ class ImagePreviewViewModel @Inject constructor(
     private val checkUri: CheckFileUriUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
     private val moveRequestMessageMapper: MoveRequestMessageMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
+    private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
@@ -81,6 +92,8 @@ class ImagePreviewViewModel @Inject constructor(
 
     private val imagePreviewMenuSource: ImagePreviewMenuSource
         get() = savedStateHandle[IMAGE_PREVIEW_MENU_OPTIONS] ?: ImagePreviewMenuSource.TIMELINE
+
+    private val isFromFolderLink = savedStateHandle[IMAGE_PREVIEW_IS_FOREIGN] ?: false
 
     private val imageNodesOffline: MutableMap<NodeId, Boolean> = mutableMapOf()
 
@@ -299,12 +312,20 @@ class ImagePreviewViewModel @Inject constructor(
     /**
      * Check if transfers are paused.
      */
-    fun executeTransfer(transferMessage: String, transferAction: () -> Unit) {
+    fun executeTransfer(transferMessage: String, legacyTransferAction: () -> Unit) {
         viewModelScope.launch {
             if (areTransfersPausedUseCase()) {
                 setTransferMessage(transferMessage)
             } else {
-                transferAction()
+                if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                    triggerDownloadEvent(
+                        imageNode = _state.value.currentImageNode,
+                    ) {
+                        TransferTriggerEvent.StartDownloadNode(listOf(it))
+                    }
+                } else {
+                    legacyTransferAction()
+                }
             }
         }
     }
@@ -326,14 +347,60 @@ class ImagePreviewViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             if (setOffline) {
-                setNodeAvailableOffline(
-                    nodeId = imageNode.id,
-                    availableOffline = true,
-                    activity = activity
-                )
+                if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                    triggerDownloadEvent(
+                        imageNode,
+                    ) {
+                        TransferTriggerEvent.StartDownloadForOffline(it)
+                    }
+                } else {
+                    setNodeAvailableOffline(
+                        nodeId = imageNode.id,
+                        availableOffline = true,
+                        activity = activity
+                    )
+                }
             } else {
                 removeOfflineNodeUseCase(imageNode.id)
             }
+        }
+    }
+
+    private suspend fun triggerDownloadEvent(
+        imageNode: ImageNode?,
+        eventBuilder: (TypedNode) -> TransferTriggerEvent,
+    ) {
+        imageNode?.let { node ->
+            //addImageTypeUseCase is not adding chat or link types, so we need to do it here for now
+            // chat nodes are not using this screen for now
+            when {
+                isFromFolderLink -> getPublicChildNodeFromIdUseCase(node.id)
+                imagePreviewMenuSource == ImagePreviewMenuSource.PUBLIC_FILE -> {
+                    node.serializedData?.let {
+                        getPublicNodeFromSerializedDataUseCase(it)
+                    }
+                }
+
+                else -> addImageTypeUseCase(node)
+            }
+        }?.let { typedNode ->
+            val event = eventBuilder(typedNode)
+            _state.update {
+                it.copy(
+                    downloadEvent = triggered(event)
+                )
+            }
+        } ?: run {
+            Timber.e("Current Image node not found")
+        }
+    }
+
+    /**
+     * Consume download event
+     */
+    fun consumeDownloadEvent() {
+        _state.update {
+            it.copy(downloadEvent = consumed())
         }
     }
 
