@@ -11,6 +11,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -20,6 +22,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
@@ -28,10 +33,12 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
@@ -70,8 +77,13 @@ import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadBackgroundFile
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -103,6 +115,11 @@ import javax.inject.Inject
  * @property copyNodeUseCase            UseCase required to copy nodes.
  * @property downloadBackgroundFile     Use case for downloading the file in background if required.
  * @property ioDispatcher
+ * @property getFeatureFlagValueUseCase
+ * @property getNodeByIdUseCase
+ * @property getChatFileUseCase
+ * @property getPublicChildNodeFromIdUseCase
+ * @property getPublicNodeFromSerializedDataUseCase
  */
 @HiltViewModel
 class TextEditorViewModel @Inject constructor(
@@ -117,6 +134,11 @@ class TextEditorViewModel @Inject constructor(
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val downloadBackgroundFile: DownloadBackgroundFile,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getChatFileUseCase: GetChatFileUseCase,
+    private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
+    private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -146,6 +168,10 @@ class TextEditorViewModel @Inject constructor(
     private lateinit var preferences: SharedPreferences
 
     private var downloadBackgroundFileJob: Job? = null
+
+    private val _uiState = MutableStateFlow(TextEditorViewState())
+
+    val uiState = _uiState.asStateFlow()
 
     fun onTextFileEditorDataUpdate(): LiveData<TextEditorData> = textEditorData
 
@@ -841,18 +867,71 @@ class TextEditorViewModel @Inject constructor(
                 true
             )
 
-            FROM_CHAT -> nodeSaver.saveNode(
-                getNode()!!,
-                highPriority = true,
-                isFolderLink = true,
-                fromMediaViewer = true
-            )
+            else -> {
+                viewModelScope.launch {
+                    if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                        when (getAdapterType()) {
+                            FROM_CHAT -> {
+                                val chatId =
+                                    textEditorData.value?.chatRoom?.chatId ?: INVALID_HANDLE
+                                val msgId = textEditorData.value?.msgChat?.msgId ?: INVALID_HANDLE
+                                val nodes = listOfNotNull(getChatFileUseCase(chatId, msgId))
+                                updateDownloadEvent(
+                                    TransferTriggerEvent.StartDownloadNode(nodes)
+                                )
+                            }
 
-            else -> nodeSaver.saveHandle(
-                getNode()!!.handle,
-                isFolderLink = getAdapterType() == FOLDER_LINK_ADAPTER,
-                fromMediaViewer = true
-            )
+                            FOLDER_LINK_ADAPTER -> {
+                                val nodeId = NodeId(getNode()?.handle ?: INVALID_HANDLE)
+                                val nodes = listOfNotNull(getPublicChildNodeFromIdUseCase(nodeId))
+                                updateDownloadEvent(
+                                    TransferTriggerEvent.StartDownloadNode(nodes)
+                                )
+                            }
+
+                            FILE_LINK_ADAPTER -> {
+                                val node = getNode()?.serialize()?.let {
+                                    getPublicNodeFromSerializedDataUseCase(it)
+                                }
+                                val nodes = listOfNotNull(node)
+                                updateDownloadEvent(
+                                    TransferTriggerEvent.StartDownloadNode(nodes)
+                                )
+                            }
+                        }
+                    } else {
+                        when (getAdapterType()) {
+                            FROM_CHAT -> nodeSaver.saveNode(
+                                getNode()!!,
+                                highPriority = true,
+                                isFolderLink = true,
+                                fromMediaViewer = true
+                            )
+
+                            else -> nodeSaver.saveHandle(
+                                getNode()!!.handle,
+                                isFolderLink = getAdapterType() == FOLDER_LINK_ADAPTER,
+                                fromMediaViewer = true
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateDownloadEvent(event: TransferTriggerEvent) {
+        _uiState.update {
+            it.copy(downloadEvent = triggered(event))
+        }
+    }
+
+    /**
+     * Consume download event
+     */
+    fun consumeDownloadEvent() {
+        _uiState.update {
+            it.copy(downloadEvent = consumed())
         }
     }
 

@@ -3,7 +3,6 @@ package mega.privacy.android.app.textEditor
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
-import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
@@ -28,6 +27,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
@@ -39,6 +39,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
+import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -171,6 +172,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
         setUpObservers()
         setUpView(savedInstanceState)
+        addStartDownloadTransferView()
 
         if (savedInstanceState != null) {
             nodeAttacher.restoreState(savedInstanceState)
@@ -572,6 +574,16 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             hideUI()
             animatePaginationUI()
         }
+    }
+
+    private fun addStartDownloadTransferView() {
+        binding.root.addView(
+            createStartDownloadView(
+                this,
+                viewModel.uiState.map { it.downloadEvent },
+                viewModel::consumeDownloadEvent
+            )
+        )
     }
 
     private fun setUpObservers() {
