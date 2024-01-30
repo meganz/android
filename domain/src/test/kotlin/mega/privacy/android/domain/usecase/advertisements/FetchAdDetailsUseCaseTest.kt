@@ -27,7 +27,7 @@ class FetchAdDetailUseCaseTest {
 
     private val slotId = "ANDFB"
     private val adBaseUrl = "https://megaad.nz/#z_xyz"
-    private val adsCookieEnabledPostfix = "&ads=1"
+    private val adsCookieEnabledPostfix = "&ac=1"
     private val fetchDetailsRequest = FetchAdDetailRequest(slotId, null)
     private fun initTestClass() {
         underTest = FetchAdDetailUseCase(

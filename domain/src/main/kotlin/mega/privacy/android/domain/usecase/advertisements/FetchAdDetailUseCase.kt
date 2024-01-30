@@ -42,7 +42,7 @@ class FetchAdDetailUseCase @Inject constructor(
                     )
                 )
             return if (isAdsCookieEnabled) {
-                adDetails.copy(slotId = adDetails.slotId, url = "${adDetails.url}&ads=1")
+                adDetails.copy(slotId = adDetails.slotId, url = "${adDetails.url}&ac=1")
             } else {
                 adDetails
             }
