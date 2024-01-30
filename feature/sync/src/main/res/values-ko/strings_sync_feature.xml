@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Syncs [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">당신의 로컬 폴더를 동기화하기 위해 장치 저장소에 접근이 필요합니다. 접근을 승인하려면 탭하세요</string>
+    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to grant access.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">파일과 폴더를 계속 동기화하려면, MEGA가 백그라운드에서 작동하도록 허용하세요.</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -131,7 +131,7 @@
     <!-- Sync stalled issue reason is can not support tree depth-->
     <string name="sync_stalled_issue_cannot_support_tree_depth">동기화 항목이 최대 폴더 깊이를 초과함</string>
     <!-- Sync stalled issue reason is Folder Matched Against File-->
-    <string name="sync_stalled_issue_folder_matched_against_file">파일이 폴더와 연결됨</string>
+    <string name="sync_stalled_issue_folder_matched_against_file">동기화하려는 파일에 확장자가 없고 존재하는 폴더와 이름이 같습니다</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
     <string name="sync_stalled_issue_local_and_remote_change_last_sync">로컬과 원격이 지난 동기화 이후로 변경됨</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->

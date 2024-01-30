@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Sincronizações [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">Nós precisamos acessar o armazenamento do seu dispositivo para sincronizar a sua pasta local. Toque para permitir o acesso</string>
+    <string name="sync_storage_permission_banner">Nós precisamos acessar o armazenamento do seu dispositivo para sincronizar a sua pasta local. Toque aqui para permitir o acesso</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Para a sincronização contínua dos seus arquivos e das suas pastas, permita que o MEGA seja executado em segundo plano.</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -77,7 +77,7 @@
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">Não há problemas solucionados</string>
     <!-- Sync state message for No Stalled Issues -->
-    <string name="sync_stalled_issues_empty_message">No issues</string>
+    <string name="sync_stalled_issues_empty_message">Não há problemas</string>
     <!-- Sync option to choose folder pair -->
     <string name="sync_folders_choose_folder_pair">Nomeie a sincronização</string>
     <!-- Sync option to choose device folder -->
@@ -139,7 +139,7 @@
     <!-- Sync stalled issue reason is can not support tree depth-->
     <string name="sync_stalled_issue_cannot_support_tree_depth">A sincronização do item excede a profundidade máxima da pasta</string>
     <!-- Sync stalled issue reason is Folder Matched Against File-->
-    <string name="sync_stalled_issue_folder_matched_against_file">Pasta pareada com arquivo</string>
+    <string name="sync_stalled_issue_folder_matched_against_file">O arquivo que você está tentando sincronizar não tem extensão e tem o mesmo nome de uma pasta existente</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
     <string name="sync_stalled_issue_local_and_remote_change_last_sync">Itens locais e remotos alterados desde a última sincronização</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
