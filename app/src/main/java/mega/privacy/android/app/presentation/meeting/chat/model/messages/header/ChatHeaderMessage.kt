@@ -29,5 +29,4 @@ class ChatHeaderMessage : UiChatMessage {
     override val userHandle = -1L
     override val showTime = false
     override val showDate = false
-    override val canLongClick = false
 }

@@ -91,18 +91,6 @@ interface UiChatMessage {
     val showDate: Boolean
 
     /**
-     * Can long click
-     */
-    val canLongClick: Boolean
-
-    /**
-     * Get long click or null
-     */
-    fun getLongClickOrNull(
-        onLongClick: (TypedMessage) -> Unit,
-    ) = if (canLongClick) onLongClick else null
-
-    /**
      * Key
      */
     fun key(): String = "${id}_${showTime}_${showDate}"

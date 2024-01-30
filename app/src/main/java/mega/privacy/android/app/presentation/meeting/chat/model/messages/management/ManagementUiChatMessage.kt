@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
-import mega.privacy.android.app.presentation.meeting.chat.extension.canLongClick
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
@@ -56,9 +55,6 @@ abstract class ManagementUiChatMessage : UiChatMessage {
 
     override val userHandle: Long
         get() = message.userHandle
-
-    override val canLongClick: Boolean
-        get() = message.canLongClick
 
     override val id: Long
         get() = message.msgId

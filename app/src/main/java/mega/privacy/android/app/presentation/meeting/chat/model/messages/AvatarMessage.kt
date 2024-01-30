@@ -20,12 +20,8 @@ abstract class AvatarMessage : UiChatMessage {
     /**
      * Content composable
      */
-    abstract val contentComposable: @Composable() (RowScope.() -> Unit)
-
-    /**
-     * Long click
-     */
-    var longClick: ((TypedMessage) -> Unit)? = null
+    @Composable
+    abstract fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit)
 
     /**
      * Avatar composable
@@ -56,7 +52,6 @@ abstract class AvatarMessage : UiChatMessage {
         dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,
     ) {
-        longClick = this.getLongClickOrNull(onLongClick)
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),
             isMine = displayAsMine,
@@ -68,7 +63,9 @@ abstract class AvatarMessage : UiChatMessage {
                     lastUpdatedCache = lastUpdatedCache
                 )
             },
-            content = contentComposable,
+            content = {
+                ContentComposable(onLongClick)
+            },
         )
     }
 

@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
-import mega.privacy.android.app.presentation.meeting.chat.extension.canLongClick
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.voiceclip.VoiceClipMessageView
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 
 /**
@@ -24,12 +24,13 @@ class VoiceClipUiMessage(
 ) : AvatarMessage() {
 
     @OptIn(ExperimentalFoundationApi::class)
-    override val contentComposable: @Composable (RowScope.() -> Unit) = {
+    @Composable
+    override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
         VoiceClipMessageView(
             message = message,
             modifier = Modifier.combinedClickable(
                 onClick = {},
-                onLongClick = { longClick?.let { it(message) } }
+                onLongClick = { onLongClick(message) }
             )
         )
     }
@@ -41,6 +42,5 @@ class VoiceClipUiMessage(
     override val canForward = message.canForward
     override val timeSent = message.time
     override val userHandle = message.userHandle
-    override val canLongClick = message.canLongClick
     override val id = message.msgId
 }

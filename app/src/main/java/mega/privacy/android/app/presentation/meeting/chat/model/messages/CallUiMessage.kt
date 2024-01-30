@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
-import mega.privacy.android.app.presentation.meeting.chat.extension.canLongClick
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatCallMessageView
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
@@ -52,6 +51,5 @@ data class CallUiMessage(
     override val canForward = message.canForward
     override val timeSent = message.time
     override val userHandle = message.userHandle
-    override val canLongClick = message.canLongClick
     override val id = message.msgId
 }

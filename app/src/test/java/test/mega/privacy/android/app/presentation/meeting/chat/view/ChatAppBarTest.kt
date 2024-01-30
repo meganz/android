@@ -1304,9 +1304,7 @@ class ChatAppBarTest {
     @Ignore("Need to implement a new solution that works with paged loading")
     @Test
     fun `test that select menu action is available if messages contains text message`() {
-        val textMessage = mock<TextUiMessage> {
-            on { message }.thenReturn(mock())
-        }
+        val textMessage = TextUiMessage(mock())
         initComposeRuleContent(
             ChatUiState(
                 chat = mock<ChatRoom> { on { isPreview } doReturn false },

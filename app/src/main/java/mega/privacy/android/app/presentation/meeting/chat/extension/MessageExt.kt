@@ -35,15 +35,3 @@ val TypedMessage.canForward: Boolean
 
         else -> false
     }
-
-/**
- * Can long click
- */
-val TypedMessage.canLongClick: Boolean
-    get() = when (this) {
-        is RichPreviewMessage, is GiphyMessage, is LocationMessage, is NormalMessage,
-        is ContactAttachmentMessage, is NodeAttachmentMessage, is VoiceClipMessage,
-        -> true
-
-        else -> false
-    }
