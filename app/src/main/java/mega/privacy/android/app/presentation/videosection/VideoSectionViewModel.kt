@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
@@ -100,15 +99,12 @@ class VideoSectionViewModel @Inject constructor(
 
     private fun loadVideoPlaylists() {
         viewModelScope.launch {
-            getVideoPlaylistsUseCase()
-                .catch { exception -> Timber.e(exception) }
-                .collectLatest { videoPlaylists ->
-                    _state.update {
-                        it.copy(videoPlaylists = videoPlaylists.map { videoPlaylist ->
-                            uiVideoPlaylistMapper(videoPlaylist)
-                        })
-                    }
-                }
+            val videoPlaylists = getVideoPlaylistsUseCase()
+            _state.update {
+                it.copy(videoPlaylists = videoPlaylists.map { videoPlaylist ->
+                    uiVideoPlaylistMapper(videoPlaylist)
+                })
+            }
         }
     }
 

@@ -21,7 +21,7 @@ data class VideoPlaylist(
     val cover: Long?,
     val creationTime: Long,
     val modificationTime: Long,
-    val thumbnailList: List<String>?,
+    val thumbnailList: List<String?>?,
     val numberOfVideos: Int,
     val totalDuration: Duration,
 )

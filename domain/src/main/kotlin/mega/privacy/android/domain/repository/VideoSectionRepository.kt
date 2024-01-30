@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 
 /**
  * Repository related to video section
@@ -14,4 +15,11 @@ interface VideoSectionRepository {
      * @return typed video node list
      */
     suspend fun getAllVideos(order: SortOrder): List<TypedVideoNode>
+
+    /**
+     * Get video playlists
+     *
+     * @return video playlist lists
+     */
+    suspend fun getVideoPlaylists(): List<VideoPlaylist>
 }

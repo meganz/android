@@ -40,8 +40,8 @@ class UIVideoPlaylistMapperTest {
     }
 
     @Test
-    fun `test that UIVideo can be mapped correctly`() = runTest {
-        assertMappedVideoPlaylistObject(underTest(initVideoPlaylist()))
+    fun `test that UIVideoPlaylist can be mapped correctly`() = runTest {
+        assertMappedUIVideoPlaylistObject(underTest(initVideoPlaylist()))
     }
 
     private fun initVideoPlaylist() = mock<VideoPlaylist> {
@@ -55,10 +55,10 @@ class UIVideoPlaylistMapperTest {
         on { totalDuration }.thenReturn(100.seconds)
     }
 
-    private fun assertMappedVideoPlaylistObject(uiVideoPlaylist: UIVideoPlaylist) {
+    private fun assertMappedUIVideoPlaylistObject(uiVideoPlaylist: UIVideoPlaylist) {
         uiVideoPlaylist.let {
             assertAll(
-                "Grouped Assertions of ${VideoPlaylist::class.simpleName}",
+                "Grouped Assertions of ${UIVideoPlaylist::class.simpleName}",
                 { assertThat(it.id).isEqualTo(id) },
                 { assertThat(it.title).isEqualTo(title) },
                 { assertThat(it.cover).isEqualTo(cover) },

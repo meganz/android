@@ -22,7 +22,7 @@ data class UIVideoPlaylist(
     val cover: Long?,
     val creationTime: Long,
     val modificationTime: Long,
-    val thumbnailList: List<File>?,
+    val thumbnailList: List<File?>?,
     val numberOfVideos: Int,
     val totalDuration: String,
     val isSelected: Boolean = false,

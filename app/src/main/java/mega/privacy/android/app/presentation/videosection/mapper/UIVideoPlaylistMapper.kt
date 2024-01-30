@@ -24,7 +24,7 @@ class UIVideoPlaylistMapper @Inject constructor(
             creationTime = videoPlaylist.creationTime,
             modificationTime = videoPlaylist.modificationTime,
             thumbnailList = videoPlaylist.thumbnailList?.map { path ->
-                File(path)
+                path?.let { File(it) }
             },
             numberOfVideos = videoPlaylist.numberOfVideos,
             totalDuration = durationInSecondsTextMapper(videoPlaylist.totalDuration),

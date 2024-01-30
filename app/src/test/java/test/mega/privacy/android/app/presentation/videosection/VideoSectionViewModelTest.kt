@@ -6,8 +6,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -78,7 +76,7 @@ class VideoSectionViewModelTest {
         wheneverBlocking { monitorOfflineNodeUpdatesUseCase() }.thenReturn(
             fakeMonitorOfflineNodeUpdatesFlow
         )
-        wheneverBlocking { getVideoPlaylistsUseCase() }.thenReturn(flowOf(listOf()))
+        wheneverBlocking { getVideoPlaylistsUseCase() }.thenReturn(listOf())
         initUnderTest()
     }
 
@@ -306,15 +304,6 @@ class VideoSectionViewModelTest {
         }
 
     @Test
-    fun `test that an error would return an empty list`() = runTest {
-        whenever(getVideoPlaylistsUseCase()).thenReturn(flow { throw Exception("Error") })
-
-        underTest.state.test {
-            assertThat(awaitItem().videoPlaylists).isEmpty()
-        }
-    }
-
-    @Test
     fun `test that the playlists are returned correctly`() = runTest {
         initVideoPlaylistsReturned()
         initUnderTest()
@@ -324,8 +313,8 @@ class VideoSectionViewModelTest {
         }
     }
 
-    private fun initVideoPlaylistsReturned() {
-        whenever(getVideoPlaylistsUseCase()).thenReturn(flowOf(listOf(mock(), mock())))
+    private suspend fun initVideoPlaylistsReturned() {
+        whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(mock(), mock()))
         whenever(uiVideoPlaylistMapper(any())).thenReturn(mock())
     }
 }
