@@ -5232,7 +5232,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Call all</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA needs access to your camera to capture photos and videos.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->

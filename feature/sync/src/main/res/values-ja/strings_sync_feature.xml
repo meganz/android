@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">同期 [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">ローカルフォルダを同期するには、お使いのデバイスのストレージにアクセスする必要があります。タップしてアクセスを許可してください</string>
+    <string name="sync_storage_permission_banner">ローカルフォルダを同期するには、お使いのデバイスのストレージにアクセスする必要があります。こちらをタップしてアクセスを許可してください。</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">ファイルとフォルダを継続的に同期するには、MEGAをバックグラウンドで実行できるようにします。</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -69,7 +69,7 @@
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">解決済みの問題はありません</string>
     <!-- Sync state message for No Stalled Issues -->
-    <string name="sync_stalled_issues_empty_message">No issues</string>
+    <string name="sync_stalled_issues_empty_message">問題はありません</string>
     <!-- Sync option to choose folder pair -->
     <string name="sync_folders_choose_folder_pair">同期に名前を付ける</string>
     <!-- Sync option to choose device folder -->
@@ -131,7 +131,7 @@
     <!-- Sync stalled issue reason is can not support tree depth-->
     <string name="sync_stalled_issue_cannot_support_tree_depth">同期項目がフォルダの最大深さを超えています</string>
     <!-- Sync stalled issue reason is Folder Matched Against File-->
-    <string name="sync_stalled_issue_folder_matched_against_file">ファイルと一致するフォルダ</string>
+    <string name="sync_stalled_issue_folder_matched_against_file">同期しようとしているファイルには拡張子がなく、既存のフォルダと同じ名前が付いています</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
     <string name="sync_stalled_issue_local_and_remote_change_last_sync">前回の同期以降にローカルとリモートが変更されました</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->

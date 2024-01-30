@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Syncs [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap to grant access.</string>
+    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to grant access.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background.</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -103,7 +103,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Chỉ lúc dùng Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">You’ll need to set up a local folder on your\ndevice that will sync with a chosen folder on\nyour Cloud drive.</string>
+    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">Monitoring syncs</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
@@ -131,7 +131,7 @@
     <!-- Sync stalled issue reason is can not support tree depth-->
     <string name="sync_stalled_issue_cannot_support_tree_depth">Sync item exceeds maximum folder depth</string>
     <!-- Sync stalled issue reason is Folder Matched Against File-->
-    <string name="sync_stalled_issue_folder_matched_against_file">Folder matched against file</string>
+    <string name="sync_stalled_issue_folder_matched_against_file">The file you’re attempting to sync has no extension and has the same name as an existing folder</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
     <string name="sync_stalled_issue_local_and_remote_change_last_sync">Local and remote changed since last sync</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->

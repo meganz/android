@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Sincronizări [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">Trebuie să accesăm memoria dispozitivului dvs. pentru a vă sincroniza folderul local. Atingeți ușor pentru a acorda acces</string>
+    <string name="sync_storage_permission_banner">Trebuie să accesăm spațiul de stocare al dispozitivului pentru a vă sincroniza folderul local. Atingeți aici pentru a acorda acces.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Pentru a sincroniza continuu fișierele și folderele, permiteți MEGA să ruleze în fundal.</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -77,7 +77,7 @@
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">Nicio problemă rezolvată</string>
     <!-- Sync state message for No Stalled Issues -->
-    <string name="sync_stalled_issues_empty_message">No issues</string>
+    <string name="sync_stalled_issues_empty_message">Nicio problemă</string>
     <!-- Sync option to choose folder pair -->
     <string name="sync_folders_choose_folder_pair">Denumiți sincronizarea</string>
     <!-- Sync option to choose device folder -->
@@ -139,7 +139,7 @@
     <!-- Sync stalled issue reason is can not support tree depth-->
     <string name="sync_stalled_issue_cannot_support_tree_depth">Element de sincronizare prea jos în arborele de foldere</string>
     <!-- Sync stalled issue reason is Folder Matched Against File-->
-    <string name="sync_stalled_issue_folder_matched_against_file">Un folder este comparat cu un fișier</string>
+    <string name="sync_stalled_issue_folder_matched_against_file">Fișierul pe care încercați să îl sincronizați nu are extensie și are același nume ca un folder existent</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
     <string name="sync_stalled_issue_local_and_remote_change_last_sync">Elemente locale și distante modificate de la ultima sincronizare</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->

@@ -5226,7 +5226,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Alle anrufen</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA needs access to your camera to capture photos and videos.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -5237,4 +5237,19 @@
     <string name="transfers_confirm_large_download_button_start">Start download</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
     <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
+    <!-- Success message when folder is shared when  share clicked -->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- error message when sharing a folder(s) fails to be completed concat-->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
 </resources>

@@ -7,9 +7,9 @@
     <!-- Sync text of sync-->
     <string name="sync">Sync</string>
     <!-- Sync spannable section to show sync count with notification count-->
-    <string name="section_sync_with_notification">Syncs [A](%1$d)[/A]</string>
+    <string name="section_sync_with_notification">Synchronizacja [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">Aby zsynchronizować katalog lokalny, musimy uzyskać dostęp do pamięci urządzenia. Wybierz, aby przyznać dostęp</string>
+    <string name="sync_storage_permission_banner">Aby zsynchronizować katalog lokalny, musimy uzyskać dostęp do pamięci urządzenia. Wybierz tutaj, aby przyznać dostęp.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Aby stale synchronizować pliki i katalogi, pozwól MEGA działać w tle.</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -53,13 +53,13 @@
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Zmień nazwę wszystkich elementów</string>
     <!-- Sync to resolve conflict Merge folders -->
-    <string name="sync_stalled_issue_merge_folders">Merge folders</string>
+    <string name="sync_stalled_issue_merge_folders">Scalanie katalogów</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Choose local file</string>
+    <string name="sync_stalled_issue_choose_local_file">Wybierz plik lokalny</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Choose remote file</string>
+    <string name="sync_stalled_issue_choose_remote_file">Wybierz plik zdalny</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
-    <string name="sync_stalled_issue_choose_latest_modified_time">Choose the last modified file</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time">Wybierz ostatnio zmodyfikowany plik</string>
     <!-- Sync message when conflict resolved -->
     <string name="sync_stalled_issue_conflict_resolved">Konflikt rozwiązany</string>
     <!-- Sync message to access storage permission on device -->
@@ -71,9 +71,9 @@
     <!-- Sync dialog title for storage access -->
     <string name="sync_dialog_storage_access_title">Dostęp do wszystkich plików</string>
     <!-- Sync dialog title for battery optimization -->
-    <string name="sync_dialog_battery_optimization_title">Battery optimisation</string>
+    <string name="sync_dialog_battery_optimization_title">Optymalizacja baterii</string>
     <!-- Sync dialog cancel button text -->
-    <string name="sync_dialog_battery_optimization_negative_button">Don’t allow</string>
+    <string name="sync_dialog_battery_optimization_negative_button">Nie zezwalaj</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">Zezwól</string>
     <!-- Sync dialog battery optimization message -->
@@ -81,7 +81,7 @@
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">Brak rozwiązanych problemów</string>
     <!-- Sync state message for No Stalled Issues -->
-    <string name="sync_stalled_issues_empty_message">No issues</string>
+    <string name="sync_stalled_issues_empty_message">Brak problemów</string>
     <!-- Sync option to choose folder pair -->
     <string name="sync_folders_choose_folder_pair">Nazwa synchronizacji</string>
     <!-- Sync option to choose device folder -->
@@ -107,7 +107,7 @@
     <!-- Sync Pause -->
     <string name="sync_card_pause_sync">Wstrzymaj</string>
     <!-- Sync Run -->
-    <string name="sync_card_run_sync">Resume</string>
+    <string name="sync_card_run_sync">Wznów</string>
     <!-- Sync Remove -->
     <string name="sync_card_remove_sync">Usuń</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
@@ -117,7 +117,7 @@
     <!-- Sync empty state message -->
     <string name="sync_empty_state_message">Konieczne będzie skonfigurowanie lokalnego\n katalogu na urządzeniu, który będzie synchronizowany z wybranym katalogiem \nna dysku w chmurze.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_notification_monitoring_description">Monitoring syncs</string>
+    <string name="sync_notification_monitoring_description">Monitorowanie synchronizacji</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
     <string name="sync_options_changed_to_wifi_only">Opcje synchronizacji zmieniono na: Tylko Wi-Fi</string>
     <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
@@ -125,7 +125,7 @@
     <!-- Sync stalled issue reason is no reason-->
     <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
-    <string name="sync_stalled_issue_file_issue">File or folder issue</string>
+    <string name="sync_stalled_issue_file_issue">Problem z plikiem lub katalogiem</string>
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Nie można przenieść ani zmienić nazwy</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
@@ -143,11 +143,11 @@
     <!-- Sync stalled issue reason is can not support tree depth-->
     <string name="sync_stalled_issue_cannot_support_tree_depth">Synchronizowany element przekracza maksymalną głębokość katalogu</string>
     <!-- Sync stalled issue reason is Folder Matched Against File-->
-    <string name="sync_stalled_issue_folder_matched_against_file">Katalog dopasowany do pliku</string>
+    <string name="sync_stalled_issue_folder_matched_against_file">Plik, który próbujesz zsynchronizować, nie ma rozszerzenia i ma taką samą nazwę jak istniejący katalog</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
     <string name="sync_stalled_issue_local_and_remote_change_last_sync">Zmiany lokalne i zdalne od ostatniej synchronizacji</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
-    <string name="sync_stalled_issue_local_and_remote_not_synced">File or folder conflict</string>
+    <string name="sync_stalled_issue_local_and_remote_not_synced">Konflikt plików lub katalogów</string>
     <!-- Sync stalled issue reason is Name clash-->
     <string name="sync_stalled_issue_name_clash">Konflikt nazw plików lub katalogów</string>
     <!-- Sync stalled issue reason is Last PlusOne-->
