@@ -267,7 +267,7 @@ class PhotosFragment : Fragment() {
         // CU default menu
         val showCameraUploadsButton = state.enableCameraUploadButtonShowing
         this.menu?.findItem(R.id.action_cu_status_default)?.isVisible =
-            showCameraUploadsButton && isMenuVisible
+            showCameraUploadsButton
 
         // CU complete menu
         val showCameraUploadsComplete = state.showCameraUploadsComplete
@@ -536,6 +536,7 @@ class PhotosFragment : Fragment() {
 
             R.id.action_cu_status_default -> {
                 openCameraUploadsSettings()
+                timelineViewModel.setCameraUploadsSyncFab(isVisible = true)
                 true
             }
 

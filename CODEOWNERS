@@ -1,9 +1,9 @@
 
 [Photos Owners]
 /app/src/main/java/mega/privacy/android/app/presentation/photos/ @es @jj @jta @ks @lh @kh @do @yenel @rsh
-/app/src/main/java/mega/privacy/android/app/presentation/imagepreview/ @es @jj @rsh
-/domain/src/main/kotlin/mega/privacy/android/domain/usecase/photos/ @es @jj @rsh
-/data/src/main/java/mega/privacy/android/data/repository/photos/ @es @jj @rsh
+/app/src/main/java/mega/privacy/android/app/presentation/imagepreview/ @es @jj @rsh @kh @do @yenel
+/domain/src/main/kotlin/mega/privacy/android/domain/usecase/photos/ @es @jj @rsh @kh @do @yenel
+/data/src/main/java/mega/privacy/android/data/repository/photos/ @es @jj @rsh @kh @do @yenel
 
 [Chat Owners] @jg @raquelgc @yenel @rsh @kh @do @lh @pau @atr
 app/src/main/java/mega/privacy/android/app/di/chat/
