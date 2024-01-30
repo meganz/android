@@ -21,14 +21,17 @@ import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
  * @property secondaryFolderName Name of the Camera Uploads Folder
  * @property secondaryFolderPath The Secondary Folder path
  * @property shouldShowBusinessAccountPrompt Checks whether the Dialog indicating that the account is a Business Account should be shown or not
- * @property shouldTriggerCameraUploads Checks whether the Camera Uploads functionality in Settings should be triggered or not
  * @property shouldShowMediaPermissionsRationale Checks whether the Media Permissions Rationale should be shown or not
  * @property uploadConnectionType Determines the connection type for uploading content in Camera Uploads
  * @property uploadOption Determines what content should be uploaded
  * @property videoCompressionSizeLimit The maximum video file size that can be compressed
+ * @property showNewVideoCompressionSizePrompt Checks whether the new Video Compression Size prompt
+ * should be shown or not
+ * @property clearNewVideoCompressionSizeInput If true, this signals to reset the inputted New Video
+ * Compression Size in the prompt from [showNewVideoCompressionSizePrompt]
  * @property videoQuality Determines the Video Quality of videos to be uploaded
  * @property shouldShowError Should display an error
- * @property shouldTriggerPermissionDialog
+ * @property shouldTriggerPermissionDialog Checks whether the Permissions Dialog should be shown or not
  */
 data class SettingsCameraUploadsState(
     @StringRes val accessMediaLocationRationaleText: Int? = null,
@@ -49,6 +52,8 @@ data class SettingsCameraUploadsState(
     val uploadConnectionType: UploadConnectionType? = null,
     val uploadOption: UploadOption? = null,
     val videoCompressionSizeLimit: Int = 0,
+    val showNewVideoCompressionSizePrompt: Boolean = false,
+    val clearNewVideoCompressionSizeInput: Boolean = false,
     val videoQuality: VideoQuality? = null,
     val shouldShowError: Boolean = false,
     val shouldTriggerPermissionDialog: Boolean = false,

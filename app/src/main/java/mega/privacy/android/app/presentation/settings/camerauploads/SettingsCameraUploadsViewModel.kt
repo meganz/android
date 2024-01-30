@@ -430,7 +430,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun changeUploadVideoQuality(value: Int) {
         viewModelScope.launch {
             runCatching {
-                VideoQuality.values().find { it.value == value }?.let { videoQuality ->
+                VideoQuality.entries.find { it.value == value }?.let { videoQuality ->
                     setUploadVideoQualityUseCase(videoQuality)
                     refreshUploadVideoQuality()
                     stopCameraUploads()
@@ -452,23 +452,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setChargingRequiredForVideoCompressionUseCase(chargingRequired)
                 refreshChargingRequiredForVideoCompression()
-                stopCameraUploads()
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
-    }
-
-    /**
-     * Sets the new video compression size limit
-     *
-     * @param size The new video compression size limit
-     */
-    fun changeVideoCompressionSizeLimit(size: Int) {
-        viewModelScope.launch {
-            runCatching {
-                setVideoCompressionSizeLimitUseCase(size)
-                refreshVideoCompressionSizeLimit()
                 stopCameraUploads()
             }.onFailure {
                 Timber.e(it)
@@ -817,19 +800,15 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     ): Boolean {
         with(_state.value) {
             // if primary uploads is enabled, local path of primary upload can't be empty
-            if ((isCameraUploadsEnabled && primaryPath.isNullOrBlank())
-                // if secondary uploads is enabled, local path of secondary upload can't be empty
-                || (isSecondaryEnabled && secondaryPath.isNullOrBlank())
-                // if secondary upload is enabled primary upload and secondary upload cloud folder can't be the same
-                || (primaryHandle != null && primaryHandle == secondaryHandle && isSecondaryEnabled)
-                // if secondary media is enabled  secondary upload local folder can't be the sub folder of primary local folder
-                || (primaryPath?.contains(secondaryPath ?: "-1") == true && isSecondaryEnabled)
-                // if secondary media is enabled  primary upload local folder can't be the sub folder of secondary local folder
-                || (secondaryPath?.contains(primaryPath ?: "-1") == true && isSecondaryEnabled)
-            ) {
-                return false
-            }
-            return true
+            return !((isCameraUploadsEnabled && primaryPath.isNullOrBlank())
+                    // if secondary uploads is enabled, local path of secondary upload can't be empty
+                    || (isSecondaryEnabled && secondaryPath.isNullOrBlank())
+                    // if secondary upload is enabled primary upload and secondary upload cloud folder can't be the same
+                    || (primaryHandle != null && primaryHandle == secondaryHandle && isSecondaryEnabled)
+                    // if secondary media is enabled  secondary upload local folder can't be the sub folder of primary local folder
+                    || (primaryPath?.contains(secondaryPath ?: "-1") == true && isSecondaryEnabled)
+                    // if secondary media is enabled  primary upload local folder can't be the sub folder of secondary local folder
+                    || (secondaryPath?.contains(primaryPath ?: "-1") == true && isSecondaryEnabled))
         }
     }
 
@@ -865,5 +844,78 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                 it.copy(shouldTriggerPermissionDialog = false)
             }
         }
+    }
+
+    /**
+     * Updates [SettingsCameraUploadsState.showNewVideoCompressionSizePrompt] to determine whether
+     * to show the New Video Compression Size Dialog or not
+     *
+     * @param showDialog true if the New Video Compression Size Dialog should be shown
+     */
+    fun showNewVideoCompressionSizeDialog(showDialog: Boolean) {
+        _state.update { it.copy(showNewVideoCompressionSizePrompt = showDialog) }
+    }
+
+    /**
+     * Updates the established Video Compression Size
+     */
+    fun setNewVideoCompressionSize(newVideoCompressionSizeString: String) {
+        viewModelScope.launch {
+            if (newVideoCompressionSizeString.trim().isBlank()) {
+                // Dismiss the Prompt if an empty input is provided
+                showNewVideoCompressionSizeDialog(false)
+            } else {
+                val convertedVideoCompressionSize = try {
+                    newVideoCompressionSizeString.toInt()
+                } catch (e: NumberFormatException) {
+                    Timber.e("The new Video Compression Size is invalid")
+                    0
+                }
+                if (convertedVideoCompressionSize in MINIMUM_NEW_VIDEO_COMPRESSION_SIZE
+                    ..MAXIMUM_NEW_VIDEO_COMPRESSION_SIZE
+                ) {
+                    // Dismiss the Prompt and set the New Video Compression Size
+                    showNewVideoCompressionSizeDialog(false)
+                    runCatching {
+                        setVideoCompressionSizeLimitUseCase(convertedVideoCompressionSize)
+                        refreshVideoCompressionSizeLimit()
+                        stopCameraUploads()
+                    }.onFailure {
+                        Timber.e(it)
+                    }
+                } else {
+                    // Clear the Prompt input if the new Video Compression Size does not fall
+                    // within the range
+                    clearNewVideoCompressionSizeInput()
+                }
+            }
+        }
+    }
+
+    /**
+     * Notifies the View that the inputted New Video Compression Size should be cleared
+     */
+    private fun clearNewVideoCompressionSizeInput() {
+        _state.update { it.copy(clearNewVideoCompressionSizeInput = true) }
+    }
+
+    /**
+     * Notifies [SettingsCameraUploadsState.clearNewVideoCompressionSizeInput] that the Event has
+     * been performed
+     */
+    fun onClearNewVideoCompressionSizeInputConsumed() {
+        _state.update { it.copy(clearNewVideoCompressionSizeInput = false) }
+    }
+
+    companion object {
+        /**
+         * The minimum Video Compression Size that can be set by the User, represented as MB
+         */
+        private const val MINIMUM_NEW_VIDEO_COMPRESSION_SIZE = 100
+
+        /**
+         * The maximum Video Compression Size that can be set by the User, represented as MB
+         */
+        private const val MAXIMUM_NEW_VIDEO_COMPRESSION_SIZE = 1000
     }
 }

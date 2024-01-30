@@ -15,10 +15,12 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
         super.onCreate(savedInstanceState)
 
         if (shouldRefreshSessionDueToSDK(true)) return
-
         setTitle(R.string.section_photo_sync)
-        SettingsCameraUploadsFragment().also {
-            replaceFragment(it)
+
+        if (savedInstanceState == null) {
+            SettingsCameraUploadsFragment().also {
+                replaceFragment(it)
+            }
         }
     }
 }

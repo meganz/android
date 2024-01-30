@@ -15,9 +15,15 @@ import mega.privacy.android.app.interfaces.SimpleSnackbarCallBack
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
 
+/**
+ * The Base Activity used by Settings Activities
+ */
 @AndroidEntryPoint
 open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack {
 
+    /**
+     * The Base Activity's layout
+     */
     protected lateinit var binding: ActivitySettingsBinding
 
     private val isDark by lazy { Util.isDarkMode(this) }
@@ -30,6 +36,9 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private var withElevation = false
 
+    /**
+     * onCreate
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
@@ -43,6 +52,9 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
         }
     }
 
+    /**
+     * onOptionsItemSelected
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> finish()
@@ -50,10 +62,18 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
         return true
     }
 
+    /**
+     * setTitle
+     */
     override fun setTitle(@StringRes titleId: Int) {
         supportActionBar?.title = getString(titleId)
     }
 
+    /**
+     * Displays the specified [fragment] by calling FragmentTransaction.replace()
+     *
+     * @param fragment The [Fragment] to be displayed
+     */
     protected fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
@@ -61,6 +81,9 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
         }
     }
 
+    /**
+     * showSaveButton
+     */
     protected fun showSaveButton(callback: () -> Unit) {
         binding.viewSave.isVisible = true
         binding.btnSave.setOnClickListener { callback.invoke() }

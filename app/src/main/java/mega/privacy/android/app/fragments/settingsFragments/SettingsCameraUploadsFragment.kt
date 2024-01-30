@@ -54,8 +54,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_KEEP_FILE_NAMES
 import mega.privacy.android.app.constants.SettingsConstants.KEY_LOCAL_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.KEY_MEGA_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.KEY_SECONDARY_MEDIA_FOLDER_ON
-import mega.privacy.android.app.constants.SettingsConstants.KEY_SET_QUEUE_DIALOG
-import mega.privacy.android.app.constants.SettingsConstants.KEY_SET_QUEUE_SIZE
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_CAMERA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_CAMERA_FOLDER
@@ -105,8 +103,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private var localSecondaryFolder: Preference? = null
     private var megaSecondaryFolder: Preference? = null
     private var businessCameraUploadsAlertDialog: AlertDialog? = null
-    private var compressionQueueSizeDialog: AlertDialog? = null
-    private var queueSizeInput: EditText? = null
+    private var newVideoCompressionSizeDialog: AlertDialog? = null
+    private var newVideoCompressionSizeInput: EditText? = null
     private var mediaPermissionsDialog: AlertDialog? = null
 
     private val permissionsList by lazy {
@@ -146,7 +144,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
      * Register the permissions callback when the user attempts to enable Camera Uploads
      */
     private val enableCameraUploadsPermissionLauncher =
-        registerForActivityResult(RequestMultiplePermissions()) { permissions ->
+        registerForActivityResult(RequestMultiplePermissions()) {
             viewModel.handlePermissionsResult()
         }
 
@@ -176,20 +174,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
         lv?.setPadding(0, 0, 0, 0)
         setOnlineOptions(viewModel.isConnected && megaApi != null && megaApi.rootNode != null)
         return v
-    }
-
-
-    /**
-     * onSaveInstanceState Behavior
-     */
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        if (compressionQueueSizeDialog != null && (compressionQueueSizeDialog
-                ?: return).isShowing
-        ) {
-            outState.putBoolean(KEY_SET_QUEUE_DIALOG, true)
-            outState.putString(KEY_SET_QUEUE_SIZE, queueSizeInput?.text.toString())
-        }
     }
 
     /**
@@ -276,18 +260,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
 
         megaSecondaryFolder = findPreference(KEY_MEGA_SECONDARY_MEDIA_FOLDER)
         megaSecondaryFolder?.onPreferenceClickListener = this
-
-        if (savedInstanceState != null) {
-            val isShowingQueueDialog = savedInstanceState.getBoolean(KEY_SET_QUEUE_DIALOG, false)
-            if (isShowingQueueDialog) {
-                showResetCompressionQueueSizeDialog()
-                val input = savedInstanceState.getString(KEY_SET_QUEUE_SIZE, "")
-                queueSizeInput?.let {
-                    it.setText(input)
-                    it.setSelection(input.length)
-                }
-            }
-        }
     }
 
     /**
@@ -320,7 +292,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 viewModel.changeChargingRequiredForVideoCompression(chargingRequired)
             }
 
-            KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE -> showResetCompressionQueueSizeDialog()
+            KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE -> viewModel.showNewVideoCompressionSizeDialog(true)
             KEY_KEEP_FILE_NAMES -> {
                 val keepFileNames = optionKeepUploadFileNames?.isChecked ?: false
                 viewModel.keepUploadFileNames(keepFileNames)
@@ -538,13 +510,15 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     videoCompressionSizeLimit = it.videoCompressionSizeLimit,
                     videoQuality = it.videoQuality,
                 )
-                handleVideoCompressionSizeChange(
+                handleVideosToCompressSize(
                     isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     isChargingRequiredForVideoCompression = it.isChargingRequiredForVideoCompression,
                     uploadOption = it.uploadOption,
                     videoCompressionSizeLimit = it.videoCompressionSizeLimit,
                     videoQuality = it.videoQuality,
                 )
+                handleNewVideoCompressionSizeChange(it.showNewVideoCompressionSizePrompt)
+                handleClearNewVideoCompressionSizeInputEvent(it.clearNewVideoCompressionSizeInput)
                 handleKeepUploadFileNames(
                     isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     areUploadFileNamesKept = it.areUploadFileNamesKept,
@@ -572,7 +546,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             collectFlow(viewModel.monitorBackupInfoType) {
                 reEnableCameraUploadsPreference(it)
             }
-
             collectFlow(viewModel.monitorCameraUploadsFolderDestination) {
                 setCameraUploadsDestinationFolder(it)
             }
@@ -785,7 +758,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
      * @param videoCompressionSizeLimit The maximum video file size that can be compressed
      * @param videoQuality The specific [VideoQuality] which can be nullable
      */
-    private fun handleVideoCompressionSizeChange(
+    private fun handleVideosToCompressSize(
         isCameraUploadsEnabled: Boolean,
         isChargingRequiredForVideoCompression: Boolean,
         uploadOption: UploadOption?,
@@ -809,6 +782,136 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     ""
                 }
         }
+    }
+
+    /**
+     * Handles the "Notify me when size is larger than" Dialog visibility and content when a UI State
+     * change happens
+     *
+     * @param showNewVideoCompressionSizePrompt If true, the Dialog is shown
+     */
+    private fun handleNewVideoCompressionSizeChange(showNewVideoCompressionSizePrompt: Boolean) {
+        if (showNewVideoCompressionSizePrompt) {
+            if (newVideoCompressionSizeDialog?.isShowing == true) {
+                return
+            }
+            // Create and show the New Video Compression Size Input
+            newVideoCompressionSizeDialog = buildNewVideoCompressionSizeDialog().show()
+        } else {
+            newVideoCompressionSizeDialog?.dismiss()
+        }
+    }
+
+    /**
+     * Clears the inputted New Video Compression Size upon receiving a prompt
+     */
+    private fun handleClearNewVideoCompressionSizeInputEvent(clearNewVideoCompressionSizeInput: Boolean) {
+        if (clearNewVideoCompressionSizeInput) {
+            newVideoCompressionSizeInput?.let { editText ->
+                with(editText) {
+                    setText("")
+                    requestFocus()
+                }
+            }
+            viewModel.onClearNewVideoCompressionSizeInputConsumed()
+        }
+    }
+
+    /**
+     * Builds the new Video Compression Size Dialog
+     *
+     * @return a [MaterialAlertDialogBuilder] used to create the Dialog
+     */
+    @Suppress("DEPRECATION")
+    private fun buildNewVideoCompressionSizeDialog(): MaterialAlertDialogBuilder {
+        val display = requireActivity().windowManager.defaultDisplay
+        val outMetrics = DisplayMetrics()
+        display?.getMetrics(outMetrics)
+        val margin = 20
+        val layout = LinearLayout(context)
+        layout.orientation = LinearLayout.VERTICAL
+        var params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.setMargins(
+            Util.dp2px(margin.toFloat(), outMetrics),
+            Util.dp2px(margin.toFloat(), outMetrics),
+            Util.dp2px(margin.toFloat(), outMetrics),
+            0
+        )
+
+        newVideoCompressionSizeInput = EditText(context)
+        newVideoCompressionSizeInput?.let { editText ->
+            editText.inputType = InputType.TYPE_CLASS_NUMBER
+            layout.addView(editText, params)
+            editText.setSingleLine()
+            editText.setTextColor(
+                getThemeColor(
+                    requireContext(),
+                    android.R.attr.textColorSecondary
+                )
+            )
+            editText.hint = getString(R.string.label_mega_byte)
+            editText.imeOptions = EditorInfo.IME_ACTION_DONE
+            editText.setOnEditorActionListener { textView, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    viewModel.setNewVideoCompressionSize(textView.text.toString())
+                    return@setOnEditorActionListener true
+                }
+                false
+            }
+            editText.setImeActionLabel(
+                getString(R.string.general_create),
+                EditorInfo.IME_ACTION_DONE
+            )
+            editText.setOnFocusChangeListener { view, hasFocus ->
+                if (hasFocus) Util.showKeyboardDelayed(view)
+            }
+        }
+
+        params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.setMargins(
+            Util.dp2px((margin + 5).toFloat(), outMetrics),
+            Util.dp2px(0f, outMetrics),
+            Util.dp2px(margin.toFloat(), outMetrics),
+            0
+        )
+        val textView = TextView(context)
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+        textView.text = getString(
+            R.string.settings_compression_queue_subtitle,
+            getString(
+                R.string.label_file_size_mega_byte,
+                COMPRESSION_QUEUE_SIZE_MIN.toString()
+            ),
+            getString(
+                R.string.label_file_size_mega_byte,
+                COMPRESSION_QUEUE_SIZE_MAX.toString()
+            )
+        )
+        layout.addView(textView, params)
+
+        return MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog,
+        )
+            .setView(layout)
+            .setTitle(getString(R.string.settings_video_compression_queue_size_popup_title))
+            .setPositiveButton(R.string.general_ok) { _, _ ->
+                newVideoCompressionSizeInput?.let { editText ->
+                    viewModel.setNewVideoCompressionSize(editText.text.toString())
+                }
+            }
+            .setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setOnDismissListener {
+                viewModel.showNewVideoCompressionSizeDialog(false)
+            }
     }
 
     /**
@@ -1033,146 +1136,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     }
 
     /**
-     * Set Compression Queue Size
-     *
-     * @param value the Compression Value
-     * @param input the [EditText]
-     */
-    private fun setCompressionQueueSize(value: String, input: EditText) {
-        if (value.isEmpty()) {
-            compressionQueueSizeDialog?.dismiss()
-            return
-        }
-        try {
-            val newSize = value.toInt()
-            if (isQueueSizeValid(newSize)) {
-                viewModel.changeVideoCompressionSizeLimit(newSize)
-                compressionQueueSizeDialog?.dismiss()
-            } else {
-                resetSizeInput(input)
-            }
-        } catch (e: Exception) {
-            Timber.e(e)
-            resetSizeInput(input)
-        }
-    }
-
-    /**
-     * Is Queue Size Valid
-     *
-     * @param size The Queue size
-     */
-    private fun isQueueSizeValid(size: Int): Boolean =
-        size in COMPRESSION_QUEUE_SIZE_MIN..COMPRESSION_QUEUE_SIZE_MAX
-
-    /**
-     * Reset Size Input
-     *
-     * @param input the [EditText`]
-     */
-    private fun resetSizeInput(input: EditText) = with(input) {
-        setText("")
-        requestFocus()
-    }
-
-    /**
-     * Show Reset Compression Queue Size Dialog
-     */
-    @Suppress("DEPRECATION")
-    private fun showResetCompressionQueueSizeDialog() {
-        val display = requireActivity().windowManager.defaultDisplay
-        val outMetrics = DisplayMetrics()
-        display?.getMetrics(outMetrics)
-        val margin = 20
-        val layout = LinearLayout(context)
-        layout.orientation = LinearLayout.VERTICAL
-        var params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        params.setMargins(
-            Util.dp2px(margin.toFloat(), outMetrics),
-            Util.dp2px(margin.toFloat(), outMetrics),
-            Util.dp2px(margin.toFloat(), outMetrics),
-            0
-        )
-
-        queueSizeInput = EditText(context)
-        queueSizeInput?.let { editText ->
-            editText.inputType = InputType.TYPE_CLASS_NUMBER
-            layout.addView(editText, params)
-            editText.setSingleLine()
-            editText.setTextColor(
-                getThemeColor(
-                    requireContext(),
-                    android.R.attr.textColorSecondary
-                )
-            )
-            editText.hint = getString(R.string.label_mega_byte)
-            editText.imeOptions = EditorInfo.IME_ACTION_DONE
-            editText.setOnEditorActionListener { textView, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    val value = textView.text.toString().trim { it <= ' ' }
-                    setCompressionQueueSize(value, editText)
-                    return@setOnEditorActionListener true
-                }
-                false
-            }
-            editText.setImeActionLabel(
-                getString(R.string.general_create),
-                EditorInfo.IME_ACTION_DONE
-            )
-            editText.setOnFocusChangeListener { view, hasFocus ->
-                if (hasFocus) Util.showKeyboardDelayed(view)
-            }
-        }
-
-        params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        params.setMargins(
-            Util.dp2px((margin + 5).toFloat(), outMetrics),
-            Util.dp2px(0f, outMetrics),
-            Util.dp2px(margin.toFloat(), outMetrics),
-            0
-        )
-        val textView = TextView(context)
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
-        textView.text = getString(
-            R.string.settings_compression_queue_subtitle,
-            getString(
-                R.string.label_file_size_mega_byte,
-                COMPRESSION_QUEUE_SIZE_MIN.toString()
-            ),
-            getString(
-                R.string.label_file_size_mega_byte,
-                COMPRESSION_QUEUE_SIZE_MAX.toString()
-            )
-        )
-        layout.addView(textView, params)
-
-        val builder = AlertDialog.Builder(requireContext())
-        with(builder) {
-            setTitle(getString(R.string.settings_video_compression_queue_size_popup_title))
-            setPositiveButton(getString(R.string.general_ok), null)
-            setNegativeButton(getString(android.R.string.cancel), null)
-            setView(layout)
-        }
-
-        compressionQueueSizeDialog = builder.create()
-        compressionQueueSizeDialog?.let { alertDialog ->
-            alertDialog.show()
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                queueSizeInput?.let { editText ->
-                    val value = editText.text.toString().trim { it <= ' ' }
-                    setCompressionQueueSize(value, editText)
-                }
-            }
-        }
-    }
-
-    /**
      * Enables or disables the Camera Uploads switch
      *
      * @param isOnline Set "true" to enable the Camera Uploads switch and "false" to disable it
@@ -1224,7 +1187,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 megaSecondaryFolder?.isEnabled = true
             }
 
-            else -> {}
+            else -> Unit
         }
     }
 }

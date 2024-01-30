@@ -306,6 +306,8 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(state.uploadConnectionType).isEqualTo(UploadConnectionType.WIFI)
             assertThat(state.uploadOption).isEqualTo(UploadOption.PHOTOS_AND_VIDEOS)
             assertThat(state.videoCompressionSizeLimit).isEqualTo(200)
+            assertThat(state.showNewVideoCompressionSizePrompt).isFalse()
+            assertThat(state.clearNewVideoCompressionSizeInput).isFalse()
             assertThat(state.videoQuality).isEqualTo(VideoQuality.ORIGINAL)
             assertThat(state.shouldShowError).isFalse()
             assertThat(state.primaryUploadSyncHandle).isEqualTo(1L)
@@ -502,20 +504,6 @@ class SettingsCameraUploadsViewModelTest {
                 )
             }
         }
-
-    @Test
-    fun `test that a new maximum video compression size limit is set`() = runTest {
-        val newSize = 300
-        setupUnderTest()
-        whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(newSize)
-        underTest.changeVideoCompressionSizeLimit(newSize)
-
-        verify(setVideoCompressionSizeLimitUseCase).invoke(newSize)
-        verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
-        underTest.state.test {
-            assertThat(awaitItem().videoCompressionSizeLimit).isEqualTo(newSize)
-        }
-    }
 
     @ParameterizedTest(name = "with {0}, file names should be kept {0}")
     @ValueSource(booleans = [true, false])
@@ -834,4 +822,69 @@ class SettingsCameraUploadsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @ParameterizedTest(name = "is new video compression size dialog shown: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that the new video compression size dialog input has correct visibility`(showDialog: Boolean) =
+        runTest {
+            setupUnderTest()
+            underTest.showNewVideoCompressionSizeDialog(showDialog)
+            underTest.state.test {
+                assertThat(awaitItem().showNewVideoCompressionSizePrompt).isEqualTo(showDialog)
+            }
+        }
+
+    @Test
+    fun `test that the prompt to clear the new video compression size dialog input has been acknowledged`() =
+        runTest {
+            setupUnderTest()
+            underTest.onClearNewVideoCompressionSizeInputConsumed()
+            underTest.state.test {
+                assertThat(awaitItem().clearNewVideoCompressionSizeInput).isFalse()
+            }
+        }
+
+    @ParameterizedTest(name = "inputted new video compression size in MB: \"{0}\"")
+    @ValueSource(strings = ["", " "])
+    fun `test that the new video compression size prompt is dismissed when the input is empty`(
+        newVideoCompressionSize: String,
+    ) = runTest {
+        setupUnderTest()
+        underTest.setNewVideoCompressionSize(newVideoCompressionSize)
+        underTest.state.test {
+            assertThat(awaitItem().showNewVideoCompressionSizePrompt).isFalse()
+        }
+    }
+
+    @ParameterizedTest(name = "inputted new video compression size in MB: {0}")
+    @ValueSource(strings = ["99", "1001", "0", "00"])
+    fun `test that the new video compression size prompt is cleared when the input is invalid`(
+        newVideoCompressionSize: String,
+    ) = runTest {
+        setupUnderTest()
+        underTest.setNewVideoCompressionSize(newVideoCompressionSize)
+        underTest.state.test {
+            assertThat(awaitItem().clearNewVideoCompressionSizeInput).isTrue()
+        }
+    }
+
+    @ParameterizedTest(name = "inputted new video compression size in MB: {0}")
+    @ValueSource(strings = ["100", "500", "1000"])
+    fun `test that the new video compression size is set and the prompt dismissed when the input is valid`(
+        newVideoCompressionSizeString: String,
+    ) = runTest {
+        val newVideoCompressionSizeInt = newVideoCompressionSizeString.toInt()
+        setupUnderTest()
+        whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(newVideoCompressionSizeInt)
+        underTest.setNewVideoCompressionSize(newVideoCompressionSizeString)
+
+        verify(setVideoCompressionSizeLimitUseCase).invoke(newVideoCompressionSizeInt)
+        verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.showNewVideoCompressionSizePrompt).isFalse()
+            assertThat(state.videoCompressionSizeLimit).isEqualTo(newVideoCompressionSizeInt)
+        }
+    }
 }

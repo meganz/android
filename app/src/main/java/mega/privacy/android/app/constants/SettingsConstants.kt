@@ -6,22 +6,17 @@ package mega.privacy.android.app.constants
 object SettingsConstants {
     /* General settings */
 
-    const val KEY_FEATURES = "settings_features"
     const val KEY_FEATURES_CAMERA_UPLOAD = "settings_features_camera_upload"
     const val KEY_FEATURES_CHAT = "settings_features_chat"
-    const val CATEGORY_STORAGE = "settings_storage"
     const val KEY_STORAGE_DOWNLOAD = "settings_nested_download_location"
     const val KEY_STORAGE_FILE_MANAGEMENT = "settings_storage_file_management"
-    const val CATEGORY_SECURITY = "settings_security"
     const val KEY_RECOVERY_KEY = "settings_recovery_key"
     const val KEY_PASSCODE_LOCK = "settings_passcode_lock"
     const val KEY_CHANGE_PASSWORD = "settings_change_password"
     const val KEY_2FA = "settings_2fa_activated"
     const val KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept"
-    const val KEY_SECURITY_ADVANCED = "settings_security_advanced"
     const val KEY_HELP_CENTRE = "settings_help_centre"
     const val KEY_HELP_SEND_FEEDBACK = "settings_help_send_feedback"
-    const val CATEGORY_ABOUT = "settings_about"
     const val KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy"
     const val KEY_ABOUT_COOKIE_POLICY = "settings_about_cookie_policy"
     const val KEY_COOKIE_SETTINGS = "settings_cookie"
@@ -32,9 +27,6 @@ object SettingsConstants {
     const val KEY_ABOUT_APP_VERSION = "settings_about_app_version"
     const val KEY_CANCEL_ACCOUNT = "settings_about_cancel_account"
     const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED = "settings_audio_background_play_enabled"
-    const val KEY_AUDIO_SHUFFLE_ENABLED = "settings_audio_shuffle_enabled"
-    const val KEY_AUDIO_REPEAT_MODE = "settings_audio_repeat_mode"
-    const val KEY_VIDEO_REPEAT_MODE = "settings_video_repeat_mode"
     const val KEY_FEATURES_CALLS = "settings_features_calls"
 
     /* CU settings */
@@ -58,15 +50,12 @@ object SettingsConstants {
     const val REQUEST_MEGA_CAMERA_FOLDER = 3000
     const val REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER = 4000
     const val REQUEST_MEGA_SECONDARY_MEDIA_FOLDER = 5000
-    const val KEY_SET_QUEUE_DIALOG = "KEY_SET_QUEUE_DIALOG"
-    const val KEY_SET_QUEUE_SIZE = "KEY_SET_QUEUE_SIZE"
     const val SELECTED_MEGA_FOLDER = "SELECT_MEGA_FOLDER"
     const val CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001
     const val CAMERA_UPLOAD_WIFI = 1002
     const val CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS = 1001
     const val CAMERA_UPLOAD_FILE_UPLOAD_VIDEOS = 1002
     const val CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS = 1003
-    const val INVALID_PATH = ""
 
     /* Chat settings */
     const val KEY_CHAT_NOTIFICATIONS_CHAT = "settings_chat_notification_chat"
@@ -114,7 +103,6 @@ object SettingsConstants {
 
     /* Cookie settings  */
     const val KEY_COOKIE_ACCEPT = "settings_cookie_accept"
-    const val KEY_COOKIE_ESSENTIAL = "settings_cookie_essential"
     const val KEY_COOKIE_ANALYTICS = "settings_cookie_performance_analytics"
     const val KEY_COOKIE_POLICIES = "setting_cookie_policies"
     const val KEY_COOKIE_ADS = "settings_cookie_advertisement"
