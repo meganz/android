@@ -16,8 +16,10 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
@@ -25,6 +27,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.databinding.FragmentFileBrowserBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -36,6 +39,10 @@ import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFra
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
 import mega.privacy.android.app.main.managerSections.RotatableFragment
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
@@ -52,6 +59,8 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -72,6 +81,8 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * Number of items in the adapter
@@ -382,18 +393,34 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     fun openFile(node: MegaNode, fragmentAdapter: Int, position: Int) {
         val mimeType = MimeTypeList.typeForName(node.name)
         val mimeTypeType = mimeType.type
-        val intent: Intent
+        var intent: Intent
         var internalIntent = false
 
         when {
             mimeType.isImage -> {
-                intent = getIntentForParentNode(
-                    requireContext(),
-                    parentHandle,
-                    sortOrder,
-                    node.handle
-                )
-                launchIntent(intent, true, position)
+                lifecycleScope.launch {
+                    if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                        ImagePreviewActivity.createIntent(
+                            context = requireContext(),
+                            imageSource = ImagePreviewFetcherSource.SHARED_ITEMS,
+                            menuOptionsSource = ImagePreviewMenuSource.SHARED_ITEMS,
+                            anchorImageNodeId = NodeId(node.handle),
+                            params = mapOf(
+                                SharedItemsImageNodeFetcher.PARENT_ID to parentHandle,
+                            ),
+                        ).run {
+                            requireContext().startActivity(this)
+                        }
+                    } else {
+                        intent = getIntentForParentNode(
+                            requireContext(),
+                            parentHandle,
+                            sortOrder,
+                            node.handle
+                        )
+                        launchIntent(intent, true, position)
+                    }
+                }
             }
 
             (mimeType.isVideoMimeType || mimeType.isAudio) -> {
@@ -648,30 +675,37 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                     )
                     hideActionMode()
                 }
+
                 R.id.cab_menu_rename -> {
                     managerActivity?.showRenameDialog(selected[0])
                     hideActionMode()
                 }
+
                 R.id.cab_menu_copy -> {
                     nC.chooseLocationToCopyNodes(handleList)
                     hideActionMode()
                 }
+
                 R.id.cab_menu_move -> {
                     nC.chooseLocationToMoveNodes(handleList)
                     hideActionMode()
                 }
+
                 R.id.cab_menu_share_folder -> {
                     nC.selectContactToShareFolders(handleList)
                     hideActionMode()
                 }
+
                 R.id.cab_menu_share_out -> {
                     shareNodes(requireActivity(), selected)
                     hideActionMode()
                 }
+
                 R.id.cab_menu_share_link, R.id.cab_menu_edit_link -> {
                     managerActivity?.showGetLinkActivity(selected[0].handle)
                     hideActionMode()
                 }
+
                 R.id.cab_menu_remove_link -> {
                     RemovePublicLinkDialogFragment.newInstance(selected.map { it.handle })
                         .show(
@@ -680,16 +714,19 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                         )
                     hideActionMode()
                 }
+
                 R.id.cab_menu_leave_share -> showConfirmationLeaveIncomingShares(
                     requireActivity(),
                     (requireActivity() as SnackbarShower), handleList
                 )
+
                 R.id.cab_menu_send_to_chat -> {
                     megaNodeAdapter?.arrayListSelectedNodes?.let {
                         managerActivity?.attachNodesToChats(it)
                     }
                     hideActionMode()
                 }
+
                 R.id.cab_menu_trash -> {
                     if (handleList.isNotEmpty()) {
                         ConfirmMoveToRubbishBinDialogFragment.newInstance(handleList)
@@ -699,6 +736,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                             )
                     }
                 }
+
                 R.id.cab_menu_select_all -> selectAll()
                 R.id.cab_menu_clear_selection -> hideActionMode()
                 R.id.cab_menu_remove_share ->

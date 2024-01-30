@@ -17,7 +17,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import javax.inject.Inject
 
 /**
- * Use case to monitor timeline nodes
+ * Use case to monitor cloud drive nodes
  */
 class MonitorCloudDriveNodesUseCase @Inject constructor(
     private val photosRepository: PhotosRepository,
