@@ -747,4 +747,12 @@ internal class MegaChatApiFacade @Inject constructor(
         latitude: Float,
         image: String,
     ): MegaChatMessage = chatApi.sendGeolocation(chatId, longitude, latitude, image)
+
+    override fun mutePeers(
+        chatId: Long,
+        clientId: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) {
+        chatApi.mutePeers(chatId, clientId, listener)
+    }
 }

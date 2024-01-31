@@ -462,4 +462,16 @@ interface CallRepository {
      * @param chatId    ID of the chat to which the call corresponded.
      */
     suspend fun broadcastCallEnded(chatId: Long)
+
+    /**
+     * Mute peers
+     *
+     * @param chatId            The chat id.
+     * @param clientId          The client id.
+     * @return                  [ChatRequest]
+     */
+    suspend fun mutePeers(
+        chatId: Long,
+        clientId: Long,
+    ): ChatRequest
 }

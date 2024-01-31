@@ -1427,4 +1427,17 @@ interface MegaChatApiGateway {
         latitude: Float,
         image: String,
     ): MegaChatMessage
+
+    /**
+     * Mute a specific client or all of them in a call
+     * This method can be called only by users with moderator role
+     * @param chatId Id that identifies the chat room
+     * @param clientId Id that identifies the client we want to mute, or MEGACHAT_INVALID_HANDLE to mute all participants
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun mutePeers(
+        chatId: Long,
+        clientId: Long,
+        listener: MegaChatRequestListenerInterface,
+    )
 }
