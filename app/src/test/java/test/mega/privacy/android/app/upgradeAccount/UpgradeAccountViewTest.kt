@@ -24,8 +24,11 @@ import mega.privacy.android.app.upgradeAccount.view.BILLING_WARNING_TAG
 import mega.privacy.android.app.upgradeAccount.view.BUY_BUTTON_TAG
 import mega.privacy.android.app.upgradeAccount.view.BuyNewSubscriptionDialog
 import mega.privacy.android.app.upgradeAccount.view.EMPTY_CARD_TAG
+import mega.privacy.android.app.upgradeAccount.view.GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG
 import mega.privacy.android.app.upgradeAccount.view.PRICING_PAGE_LINK_TAG
 import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_CARD_TAG
+import mega.privacy.android.app.upgradeAccount.view.SUBSCRIPTION_DETAILS_DESCRIPTION_TAG
+import mega.privacy.android.app.upgradeAccount.view.SUBSCRIPTION_DETAILS_TITLE_TAG
 import mega.privacy.android.app.upgradeAccount.view.UPGRADE_ACCOUNT_SCREEN_TAG
 import mega.privacy.android.app.upgradeAccount.view.UPGRADE_WARNING_BANNER_TAG
 import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
@@ -135,6 +138,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -171,6 +175,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -206,6 +211,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -235,6 +241,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -264,6 +271,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -290,6 +298,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -320,6 +329,7 @@ class UpgradeAccountViewTest {
                 onBuyClicked = onBuyClicked,
                 onBackPressed = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -351,6 +361,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -379,6 +390,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -403,6 +415,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -428,6 +441,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -454,6 +468,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -480,6 +495,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -513,6 +529,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
                 onChoosingPlanType = {},
@@ -586,6 +603,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingPlanType = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -613,6 +631,7 @@ class UpgradeAccountViewTest {
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingPlanType = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -625,6 +644,36 @@ class UpgradeAccountViewTest {
         }
 
         composeRule.onNodeWithTag(BUY_BUTTON_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that subscription details is shown correctly`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                state = getUpgradeAccountState(
+                    accountType = AccountType.PRO_I,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                onPlayStoreLinkClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                showBillingWarning = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
+                showUpgradeWarningBanner = false
+            )
+        }
+        composeRule.onNodeWithTag(GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG)
+            .assertExists()
+        composeRule.onNodeWithTag(SUBSCRIPTION_DETAILS_TITLE_TAG).assertExists()
+        composeRule.onNodeWithTag(SUBSCRIPTION_DETAILS_DESCRIPTION_TAG).assertExists()
+
     }
 
     private fun getUpgradeAccountState(
