@@ -1,15 +1,11 @@
 package mega.privacy.android.core.ui.controls.chat
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -43,7 +39,6 @@ import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
-import mega.privacy.android.core.ui.theme.extensions.conditional
 
 internal const val CHAT_TEXT_FIELD_TEXT_TAG = "chat_text_field"
 internal const val CHAT_TEXT_FIELD_EMOJI_ICON = "chat_text_field:emoji_icon"
@@ -59,7 +54,7 @@ internal const val CHAT_TEXT_FIELD_EMOJI_ICON = "chat_text_field:emoji_icon"
  * @param imeAction ime action
  * @param keyboardActions keyboard actions
  */
-@OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatTextField(
     textFieldValue: TextFieldValue,
@@ -74,7 +69,6 @@ fun ChatTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     maxLines: Int = if (isExpanded) Int.MAX_VALUE else 5,
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    shape: RoundedCornerShape = CircleShape,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) = Box(modifier = modifier) {
     val colors = TextFieldDefaults.textFieldColors(
@@ -97,12 +91,6 @@ fun ChatTextField(
             onValueChange = onTextChange,
             modifier = Modifier
                 .testTag(CHAT_TEXT_FIELD_TEXT_TAG)
-                .conditional(!isExpanded) {
-                    background(
-                        color = MegaTheme.colors.background.surface2,
-                        shape = shape,
-                    )
-                }
                 .indicatorLine(
                     enabled = true,
                     isError = false,

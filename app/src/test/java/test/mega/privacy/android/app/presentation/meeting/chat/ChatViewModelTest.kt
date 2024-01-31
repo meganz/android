@@ -39,10 +39,10 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
-import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
@@ -2354,6 +2354,14 @@ internal class ChatViewModelTest {
         initTestClass()
         underTest.state.test {
             assertThat(awaitItem().sendingText).isEqualTo("draft message")
+        }
+    }
+
+    @Test
+    fun `test that close editing message updates state correctly`() = runTest {
+        underTest.onCloseEditing()
+        underTest.state.test {
+            assertThat(awaitItem().editingMessageId).isNull()
         }
     }
 

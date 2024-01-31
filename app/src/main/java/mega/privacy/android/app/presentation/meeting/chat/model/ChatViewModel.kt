@@ -1088,6 +1088,14 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * On close editing
+     *
+     */
+    fun onCloseEditing() {
+        _state.update { state -> state.copy(editingMessageId = null) }
+    }
+
     override fun onCleared() {
         if (state.value.isPreviewMode) {
             applicationScope.launch {

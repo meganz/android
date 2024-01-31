@@ -182,7 +182,7 @@ class ChatViewTest {
                 onBackPressed = {},
                 onMenuActionPressed = actionPressed,
                 messageListView = { _, _, _, _ -> },
-                bottomBar = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, interactionSourceTextInput ->
+                bottomBar = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, onCloseEditing, interactionSourceTextInput ->
                     ChatBottomBarContent(
                         uiState = state,
                         textFieldValue = TextFieldValue(state.sendingText),
@@ -192,6 +192,7 @@ class ChatViewTest {
                         onEmojiClick = onEmojiClick,
                         onTextChange = {},
                         interactionSourceTextInput = interactionSourceTextInput,
+                        onCloseEditing = onCloseEditing
                     )
                 }
             )

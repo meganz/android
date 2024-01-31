@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property userUpdate [UserUpdate] with the changes in the user.
  * @property isAnonymousMode True if the chat is in anonymous mode, false otherwise.
  * @property chatLink String with the chat link.
+ * @property editingMessageId Id of the message being edited.
  */
 data class ChatUiState(
     val chat: ChatRoom? = null,
@@ -80,6 +81,7 @@ data class ChatUiState(
     val userUpdate: UserUpdate? = null,
     val isAnonymousMode: Boolean = false,
     val chatLink: String? = null,
+    val editingMessageId: Long? = null,
 ) {
 
     /**

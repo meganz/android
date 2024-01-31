@@ -140,6 +140,7 @@ internal fun ChatView(
         createNewImage = viewModel::createNewImageUri,
         onSendLocationMessage = viewModel::sendLocationMessage,
         onAttachFiles = viewModel::onAttachFiles,
+        onCloseEditing = viewModel::onCloseEditing,
     )
 }
 
@@ -152,7 +153,6 @@ internal fun ChatView(
 @OptIn(
     ExperimentalMaterialApi::class,
     ExperimentalPermissionsApi::class,
-    ExperimentalComposeUiApi::class,
     ExperimentalLayoutApi::class
 )
 @Composable
@@ -192,8 +192,9 @@ internal fun ChatView(
         onSendClick: (String) -> Unit,
         onAttachmentClick: () -> Unit,
         onEmojiClick: () -> Unit,
+        onCloseEditing: () -> Unit,
         interactionSourceTextInput: MutableInteractionSource,
-    ) -> Unit = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, interactionSourceTextInput ->
+    ) -> Unit = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, onCloseEditing, interactionSourceTextInput ->
         ChatBottomBar(
             uiState = state,
             showEmojiPicker = showEmojiPicker,
@@ -201,6 +202,7 @@ internal fun ChatView(
             onAttachmentClick = onAttachmentClick,
             onEmojiClick = onEmojiClick,
             interactionSourceTextInput = interactionSourceTextInput,
+            onCloseEditing = onCloseEditing
         )
     },
     onSendClick: (String) -> Unit = {},
@@ -211,6 +213,7 @@ internal fun ChatView(
     createNewImage: suspend () -> Uri? = { null },
     onSendLocationMessage: (Intent?) -> Unit = { _ -> },
     onAttachFiles: (List<Uri>) -> Unit = {},
+    onCloseEditing: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -540,6 +543,7 @@ internal fun ChatView(
                                     keyboardController?.show()
                                 }
                             },
+                            onCloseEditing,
                             interactionSourceTextInput,
                         )
                     }

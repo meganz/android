@@ -71,10 +71,14 @@ fun ChatInputTextToolbar(
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textFieldValue: TextFieldValue = TextFieldValue(text),
+    editingMessageId: Long? = null,
+    editMessageContent: String? = null,
+    onCloseEditing: () -> Unit = {},
 ) {
     var isInputExpanded by rememberSaveable { mutableStateOf(false) }
     var showExpandButton by remember { mutableStateOf(false) }
     var isRoundedShape by remember { mutableStateOf(false) }
+    val isEditing = editingMessageId != null
     LaunchedEffect(textFieldValue.text) {
         if (textFieldValue.text.isEmpty()) {
             isInputExpanded = false
@@ -82,6 +86,11 @@ fun ChatInputTextToolbar(
     }
     BackHandler(enabled = isInputExpanded) {
         isInputExpanded = false
+    }
+    val shape = if (isRoundedShape && !isEditing) {
+        CircleShape
+    } else {
+        RoundedCornerShape(12.dp)
     }
     Box(
         modifier = modifier
@@ -93,7 +102,7 @@ fun ChatInputTextToolbar(
             Icon(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 6.dp)
+                    .padding(top = if (isEditing) 48.dp else 6.dp)
                     .testTag(TEST_TAG_EXPAND_ICON)
                     .clickable {
                         isInputExpanded = !isInputExpanded
@@ -116,25 +125,45 @@ fun ChatInputTextToolbar(
                     tint = MegaTheme.colors.icon.secondary,
                 )
 
-                ChatTextField(
-                    textFieldValue = textFieldValue,
-                    placeholder = placeholder,
-                    onTextChange = onTextChange,
-                    onEmojiClick = onEmojiClick,
-                    isEmojiPickerShown = showEmojiPicker,
+                Column(
                     modifier = Modifier
                         .weight(1f)
                         .conditional(isInputExpanded) {
                             fillMaxHeight()
+                        }
+                        .conditional(!isInputExpanded) {
+                            background(
+                                color = MegaTheme.colors.background.surface2,
+                                shape = shape,
+                            )
                         },
-                    isExpanded = isInputExpanded,
-                    onTextLayout = {
-                        showExpandButton = it.lineCount >= 4
-                        isRoundedShape = it.lineCount == 1
-                    },
-                    shape = if (isRoundedShape) CircleShape else RoundedCornerShape(12.dp),
-                    interactionSource = interactionSource
-                )
+                ) {
+                    if (editingMessageId != null) {
+                        ChatEditMessageView(
+                            modifier = Modifier.padding(
+                                start = 12.dp,
+                                end = 10.dp,
+                                top = 8.dp,
+                                bottom = 4.dp,
+                            ).fillMaxWidth(),
+                            content = editMessageContent.orEmpty(),
+                            onCloseEditing = onCloseEditing,
+                        )
+                    }
+                    ChatTextField(
+                        textFieldValue = textFieldValue,
+                        placeholder = placeholder,
+                        onTextChange = onTextChange,
+                        onEmojiClick = onEmojiClick,
+                        isEmojiPickerShown = showEmojiPicker,
+                        isExpanded = isInputExpanded,
+                        onTextLayout = {
+                            showExpandButton = it.lineCount >= 4
+                            isRoundedShape = it.lineCount == 1
+                        },
+                        interactionSource = interactionSource
+                    )
+                }
 
                 AnimatedVisibility(
                     modifier = Modifier
@@ -218,6 +247,26 @@ private fun ChatInputTextToolbarLongTextPreview(
             onSendClick = {},
             onEmojiClick = {},
             onTextChange = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ChatInputTextToolbarEditingMessageTextPreview(
+    @PreviewParameter(BooleanProvider::class) showEmojiPicker: Boolean,
+) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        ChatInputTextToolbar(
+            text = "Hello world",
+            placeholder = "",
+            showEmojiPicker = false,
+            onAttachmentClick = {},
+            onSendClick = {},
+            onEmojiClick = {},
+            onTextChange = {},
+            editingMessageId = 1L,
+            editMessageContent = "This is a message"
         )
     }
 }
