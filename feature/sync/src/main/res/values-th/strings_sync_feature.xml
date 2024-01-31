@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">ซิงค์ [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to grant access.</string>
+    <string name="sync_storage_permission_banner">เราจำเป็นต้องเข้าถึงไฟล์ในเครื่องของคุณ เพื่อซิงค์รายการเหล่านั้นกับอุปกรณ์อื่น ๆ แตะที่นี่เพื่ออนุญาตให้เราเข้าถึง</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">เพื่อให้การซิงค์ไฟล์และโฟลเดอร์ของคุณเป็นไปอย่างต่อเนื่อง คุณต้องอนุญาตให้ MEGA ทำงานในเบื้องหลัง</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -37,7 +37,7 @@
     <!-- Sync conflict message -->
     <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
     <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">ไฟล์เหล่านี้มีชื่อหลายชื่อ แต่จะมีการรวมชื่อที่ซ้ำกันให้เป็นชื่อเดียว</string>
+    <string name="sync_stalled_issue_detail_conflict_message">พบหลายรายการที่มีชื่อซ้ำกันหลายชื่อ แต่จะมีการรวมชื่อที่ซ้ำกันให้เป็นชื่อเดียว</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">เปลี่ยนชื่อรายการทั้งหมด</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -69,7 +69,7 @@
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">ปัญหาทั้งหมดได้รับการแก้ไขแล้ว</string>
     <!-- Sync state message for No Stalled Issues -->
-    <string name="sync_stalled_issues_empty_message">No issues</string>
+    <string name="sync_stalled_issues_empty_message">ยังไม่พบปัญหาใด ๆ</string>
     <!-- Sync option to choose folder pair -->
     <string name="sync_folders_choose_folder_pair">ชื่อการซิงค์</string>
     <!-- Sync option to choose device folder -->
@@ -157,7 +157,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">เลือก</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">ไฟล์หรือโฟลเดอร์บางไฟล์มีปัญหา คุณต้องตัดสินใจว่าจะแก้ไขอย่างไร</string>
+    <string name="sync_stalled_issue_file_issue_detail">ไฟล์หรือโฟลเดอร์มีปัญหาที่ต้องแก้ไข คุณต้องตัดสินใจว่าจะดำเนินการอย่างไร</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">รอให้กระบวนการอื่นเสร็จสิ้นก่อน</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -177,7 +177,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">ไฟล์นี้มีสำเนาที่ขัดแย้งกัน</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">ไฟล์เหล่านี้มีชื่อหลายชื่อ แต่จะมีการรวมชื่อที่ซ้ำกันให้เป็นชื่อเดียว</string>
+    <string name="sync_stalled_issue_name_clash_detail">พบหลายรายการที่มีชื่อซ้ำกันหลายชื่อ แต่จะมีการรวมชื่อที่ซ้ำกันให้เป็นชื่อเดียว</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">มีการย้ายหรือเปลี่ยนชื่อไฟล์ใน MEGA แต่ไม่สามารถซิงค์กับอุปกรณ์ของคุณได้</string>
     <!-- Sync notification title description sync monitoring-->

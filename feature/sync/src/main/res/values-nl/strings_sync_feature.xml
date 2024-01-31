@@ -35,13 +35,13 @@
     <!-- Sync options -->
     <string name="sync_menu_sync_options">Synchronisatie opties</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Opgeloste problemen wissen</string>
+    <string name="sync_menu_clear_issues">Clear resolved issues</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Tweezijdige synchronisatie</string>
     <!-- Sync conflict message -->
     <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
     <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">Er zijn meerdere bestandsnamen aan de ene kant die aan de andere kant allemaal dezelfde naam zouden worden.</string>
+    <string name="sync_stalled_issue_detail_conflict_message">Er zijn meerdere items met dezelfde naam aan één kant van uw synchronisatie die allemaal één dezelfde bestand worden aan de andere kant van uw synchronisatie</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Hernoem alle items</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -71,9 +71,9 @@
     <!-- Sync dialog battery optimization message -->
     <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">Geen opgeloste problemen</string>
+    <string name="sync_solved_issues_empty_message">No resolved issues</string>
     <!-- Sync state message for No Stalled Issues -->
-    <string name="sync_stalled_issues_empty_message">No issues</string>
+    <string name="sync_stalled_issues_empty_message">Geen problemen</string>
     <!-- Sync option to choose folder pair -->
     <string name="sync_folders_choose_folder_pair">Geef de synchronisatie een naam</string>
     <!-- Sync option to choose device folder -->
@@ -161,7 +161,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Selecteer</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">Er was een probleem met één bestand of map dat door u moet worden opgelost</string>
+    <string name="sync_stalled_issue_file_issue_detail">A file or folder has an issue that needs your decision to resolve it</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Wachten tot andere processen zijn voltooid</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -181,7 +181,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Dit bestand bevat conflicterende kopieën</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">Er zijn meerdere bestandsnamen aan de ene kant die aan de andere kant allemaal dezelfde naam zouden worden</string>
+    <string name="sync_stalled_issue_name_clash_detail">Er zijn meerdere items met dezelfde naam aan één kant van uw synchronisatie die allemaal één dezelfde bestand worden aan de andere kant van uw synchronisatie</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">Er is een verplaatsing of hernoeming gedetecteerd in MEGA, maar deze kon niet lokaal worden gerepliceerd.</string>
     <!-- Sync notification title description sync monitoring-->

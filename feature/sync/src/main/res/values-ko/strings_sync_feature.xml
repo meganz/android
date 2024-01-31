@@ -31,13 +31,13 @@
     <!-- Sync options -->
     <string name="sync_menu_sync_options">동기화 옵션</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">해결된 문제 지우기</string>
+    <string name="sync_menu_clear_issues">Clear resolved issues</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">양방향 동기화</string>
     <!-- Sync conflict message -->
     <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
     <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">한쪽에서 여러 이름을 가지고 있는 경우가 있지만, 다른 쪽에서는 모두 같은 이름이 될 것입니다.</string>
+    <string name="sync_stalled_issue_detail_conflict_message">There are multiple items with the same name on one side of your sync that would all become the same single item on the other side of your sync</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">모든 항목 이름 변경</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -67,7 +67,7 @@
     <!-- Sync dialog battery optimization message -->
     <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">해결된 문제 없음</string>
+    <string name="sync_solved_issues_empty_message">No resolved issues</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">No issues</string>
     <!-- Sync option to choose folder pair -->
@@ -157,7 +157,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">선택</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">한 개의 파일 또는 폴더에 문제가 있고 해결하기 위해 당신의 결정이 필요합니다</string>
+    <string name="sync_stalled_issue_file_issue_detail">A file or folder has an issue that needs your decision to resolve it</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">다른 프로세스가 완료되기를 기다리는 중입니다.</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -177,7 +177,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">이 파일은 충돌하는 사본이 있습니다</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">한쪽에서 여러 이름을 가지고 있는 경우가 있지만, 다른 쪽에서는 모두 같은 이름이 될 것입니다</string>
+    <string name="sync_stalled_issue_name_clash_detail">There are multiple items with the same name on one side of your sync that would all become the same single item on the other side of your sync</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">MEGA에서 이동 또는 이름 변경을 감지하였지만, 로컬에 반영할 수 없었습니다</string>
     <!-- Sync notification title description sync monitoring-->

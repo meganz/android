@@ -37,7 +37,7 @@
     <!-- Sync conflict message -->
     <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
     <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">一方では複数のファイル名がありますが、もう一方ではすべて同じ1つの名前になります。</string>
+    <string name="sync_stalled_issue_detail_conflict_message">同期の一方の側に同じ名前の複数の項目がありますが、同期のもう一方の側ではすべて同じ1つの項目になります。</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">すべての項目の名前を変更する</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -157,7 +157,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">選ぶ</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">単一のファイルまたはフォルダに解決する決定が必要な問題がありました</string>
+    <string name="sync_stalled_issue_file_issue_detail">あるファイルやフォルダに問題があり、それを解決するにはあなたの決定が必要です。</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">他のプロセスが完了するのを待っています</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -177,7 +177,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">このファイルには競合するコピーがあります</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">一方では複数のファイル名がありますが、もう一方ではすべて同じ1つの名前になります</string>
+    <string name="sync_stalled_issue_name_clash_detail">同期の一方の側に同じ名前の複数の項目がありますが、同期のもう一方の側ではすべて同じ1つの項目になります。</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">MEGAで移動または名前変更が検出されましたが、ローカルで複製できませんでした。</string>
     <!-- Sync notification title description sync monitoring-->
