@@ -968,7 +968,7 @@ class ChatViewModel @Inject constructor(
      */
     fun sendTextMessage(message: String) {
         viewModelScope.launch {
-            val tempMessage = sendTextMessageUseCase(chatId, message)
+            sendTextMessageUseCase(chatId, message)
         }
     }
 

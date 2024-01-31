@@ -45,6 +45,8 @@ internal class ChatStorageFacade @Inject constructor(
     ) {
         with(database) {
             withTransaction {
+                typedMessageDao().deleteStaleMessagesByTempIds(messages.map { it.tempId }
+                    .filterNot { it == -1L })
                 typedMessageDao().insertAll(messages)
                 val metaDao = chatMessageMetaDao()
                 richPreviews.takeUnless { it.isEmpty() }

@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
@@ -47,6 +48,15 @@ internal fun MessageListView(
 
     LaunchedEffect(pagingItems.itemSnapshotList) {
         viewModel.updateLatestMessageId(pagingItems.itemSnapshotList.lastOrNull()?.id ?: -1L)
+    }
+
+    LaunchedEffect(pagingItems) {
+        snapshotFlow { scrollState.firstVisibleItemIndex }
+            .collect {
+                if (it <= 1) {
+                    scrollState.scrollToItem(0)
+                }
+            }
     }
 
     LaunchedEffect(uiState.userUpdate) {

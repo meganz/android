@@ -34,6 +34,14 @@ interface TypedMessageDao {
     suspend fun insertAll(messages: List<TypedMessageEntity>)
 
     /**
+     * Delete messages by temp id
+     *
+     * @param tempIds
+     */
+    @Query("DELETE FROM typed_messages WHERE tempId IN (:tempIds) AND msgId = tempId")
+    suspend fun deleteStaleMessagesByTempIds(tempIds: List<Long>)
+
+    /**
      * Delete messages by chat id
      *
      * @param chatId
