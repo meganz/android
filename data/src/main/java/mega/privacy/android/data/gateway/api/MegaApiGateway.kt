@@ -1952,6 +1952,23 @@ interface MegaApiGateway {
     fun setMyChatFilesFolder(nodeHandle: Long, listener: MegaRequestListenerInterface)
 
     /**
+     * Gets My chat files target folder.
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_MY_CHAT_FILES_FOLDER
+     * <p>
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getNodehandle - Returns the handle of the node where My Chat Files are stored
+     * <p>
+     * If the folder is not set, the request will fail with the error code MegaError::API_ENOENT.
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getMyChatFilesFolder(listener: MegaRequestListenerInterface)
+
+    /**
      * Check if file versioning is enabled or disabled
      * <p>
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER

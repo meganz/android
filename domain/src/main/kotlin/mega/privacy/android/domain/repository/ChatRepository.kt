@@ -911,11 +911,6 @@ interface ChatRepository {
     suspend fun getNextMessagePagingInfo(chatId: Long, timestamp: Long): MessagePagingInfo?
 
     /**
-     * Returns the folder for saving chat files in user attributes, null if it's not configured yet
-     */
-    suspend fun getMyChatsFilesFolderId(): NodeId
-
-    /**
      * Monitor if chat is in joining state.
      */
     fun monitorJoiningChat(chatId: Long): Flow<Boolean>
@@ -970,4 +965,9 @@ interface ChatRepository {
      * @return         [ChatPendingChanges]
      */
     fun monitorChatPendingChanges(chatId: Long): Flow<ChatPendingChanges>
+
+    /**
+     * Get default folder name, localized to current device.
+     */
+    fun getDefaultChatFolderName(): String
 }

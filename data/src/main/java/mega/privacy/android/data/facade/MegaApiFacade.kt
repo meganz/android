@@ -1047,6 +1047,9 @@ internal class MegaApiFacade @Inject constructor(
             listener,
         )
 
+    override fun getMyChatFilesFolder(listener: MegaRequestListenerInterface) =
+        megaApi.getMyChatFilesFolder(listener)
+
     override fun getFileVersionsOption(listener: MegaRequestListenerInterface) {
         megaApi.getFileVersionsOption(listener)
     }

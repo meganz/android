@@ -4,9 +4,17 @@ import android.content.Context
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.yield
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
@@ -25,6 +33,7 @@ import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
@@ -33,6 +42,8 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaUser
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -43,8 +54,10 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -83,6 +96,17 @@ internal class FileSystemRepositoryImplTest {
 
     @BeforeAll
     fun setUp() {
+        Dispatchers.setMain(StandardTestDispatcher())
+        whenever(megaApiGateway.globalUpdates).thenReturn(emptyFlow())
+        initUnderTest()
+    }
+
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    private fun initUnderTest() {
         underTest = FileSystemRepositoryImpl(
             context = context,
             megaApiGateway = megaApiGateway,
@@ -104,6 +128,7 @@ internal class FileSystemRepositoryImplTest {
             deviceGateway = deviceGateway,
             sdCardGateway = sdCardGateway,
             fileAttributeGateway = fileAttributeGateway,
+            sharingScope = TestScope(),
         )
     }
 
@@ -128,6 +153,7 @@ internal class FileSystemRepositoryImplTest {
             streamingGateway,
             deviceGateway,
             sdCardGateway,
+            fileAttributeGateway,
         )
     }
 
@@ -405,6 +431,82 @@ internal class FileSystemRepositoryImplTest {
         fun `test that isSDCardCachePath returns gateway value`(expected: Boolean) = runTest {
             whenever(sdCardGateway.isSDCardCachePath(any())).thenReturn(expected)
             assertThat(underTest.isSDCardCachePath("something")).isEqualTo(expected)
+        }
+    }
+
+    @Nested
+    @DisplayName("My chats files folder")
+    inner class MyChatsFilesFolder {
+
+        private val globalUpdatesFlow = MutableSharedFlow<GlobalUpdate>()
+
+        @BeforeEach
+        fun resetCache() {
+            whenever(megaApiGateway.globalUpdates).thenReturn(globalUpdatesFlow)
+            initUnderTest()
+        }
+
+        @Test
+        fun `test that my chats files folder id is retrieved from the gateway if not set`() = runTest {
+            val handle = 11L
+            stubGetMyChatFilesFolder(handle)
+            val actual = underTest.getMyChatsFilesFolderId()
+            assertThat(actual?.longValue).isEqualTo(handle)
+        }
+
+        @Test
+        fun `test that my chats files folder id is cached`() = runTest {
+            stubGetMyChatFilesFolder()
+            underTest.getMyChatsFilesFolderId()
+            verify(megaApiGateway).getMyChatFilesFolder(any())
+            clearInvocations(megaApiGateway)
+            underTest.getMyChatsFilesFolderId()
+            verify(megaApiGateway, never()).getMyChatFilesFolder(any())
+        }
+
+        @Test
+        fun `test that updates are monitored after my chats files folder id is set`() = runTest {
+            val handle = 11L
+            stubGetMyChatFilesFolder(handle + 1)
+            val initial = underTest.getMyChatsFilesFolderId()
+            assertThat(initial?.longValue).isNotEqualTo(handle)
+
+            stubGetMyChatFilesFolder(handle)
+            globalUpdatesFlow.emit(stubGlobalMyChatsFilesFolderUpdate())
+
+            yield() // listening to global updates is in another scope, we need to yield to get the update
+            val expected = underTest.getMyChatsFilesFolderId()
+            assertThat(expected?.longValue).isEqualTo(handle)
+        }
+
+        private fun stubGetMyChatFilesFolder(folderHandle: Long = 1L) {
+            val megaError = mock<MegaError> {
+                on { errorCode } doReturn MegaError.API_OK
+                on { errorString } doReturn ""
+            }
+            val megaRequest = mock<MegaRequest> {
+                on { nodeHandle } doReturn folderHandle
+            }
+            whenever(megaApiGateway.getMyChatFilesFolder(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+        }
+
+        private fun stubGlobalMyChatsFilesFolderUpdate(): GlobalUpdate.OnUsersUpdate {
+            val userHandle = 77L
+            val megaUser = mock<MegaUser> {
+                on { this.handle } doReturn userHandle
+                on { isOwnChange } doReturn 0
+                on { this.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER.toLong()) } doReturn true
+            }
+            whenever(megaApiGateway.myUser).thenReturn(megaUser)
+            return mock<GlobalUpdate.OnUsersUpdate> {
+                on { users } doReturn arrayListOf(megaUser)
+            }
         }
     }
 }

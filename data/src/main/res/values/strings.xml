@@ -20,4 +20,5 @@
     <string name="settings_camera_notif_title" />
     <string name="download_show_info" />
     <string name="overquota_alert_title" />
+    <string name="my_chat_files_folder" />
 </resources>

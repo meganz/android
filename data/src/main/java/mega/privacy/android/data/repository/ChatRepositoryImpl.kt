@@ -1,5 +1,7 @@
 package mega.privacy.android.data.repository
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
@@ -27,6 +29,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.R
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.database.entity.chat.ChatHistoryLoadStatusEntity
 import mega.privacy.android.data.extensions.failWithError
@@ -163,6 +166,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val giphyEntityMapper: GiphyEntityMapper,
     private val chatGeolocationEntityMapper: ChatGeolocationEntityMapper,
     private val chatNodeEntityListMapper: ChatNodeEntityListMapper,
+    @ApplicationContext private val context: Context,
 ) : ChatRepository {
     private val richLinkConfig = MutableStateFlow(RichLinkConfig())
     private var chatRoomUpdates: HashMap<Long, Flow<ChatRoomUpdate>> = hashMapOf()
@@ -1284,10 +1288,6 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getMyChatsFilesFolderId(): NodeId {
-        throw NotImplementedError("Not implemented yet")
-    }
-
     override fun monitorJoiningChat(chatId: Long) = joiningIdsFlow
         .map { it.contains(chatId) }
         .distinctUntilChanged()
@@ -1321,4 +1321,6 @@ internal class ChatRepositoryImpl @Inject constructor(
         return megaLocalRoomGateway.monitorChatPendingChanges(chatId)
             .filterNotNull()
     }
+
+    override fun getDefaultChatFolderName() = context.getString(R.string.section_photo_sync)
 }

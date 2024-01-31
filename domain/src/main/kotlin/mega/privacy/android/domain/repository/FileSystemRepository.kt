@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ViewerNode
 import java.io.File
 import java.io.IOException
@@ -54,6 +55,11 @@ interface FileSystemRepository {
      * @return node handle [Long]
      */
     suspend fun setMyChatFilesFolder(nodeHandle: Long): Long?
+
+    /**
+     * @return the [NodeId] of the folder for saving chat files in user attributes, null if it's not configured yet
+     */
+    suspend fun getMyChatsFilesFolderId(): NodeId?
 
     /**
      * Get file versions option

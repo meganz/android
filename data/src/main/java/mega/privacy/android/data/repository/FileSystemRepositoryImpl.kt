@@ -7,7 +7,14 @@ import android.webkit.MimeTypeMap
 import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
@@ -37,18 +44,24 @@ import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ViewerNode
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.API_ENOENT
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
+import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -99,7 +112,15 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val sdCardGateway: SDCardGateway,
     private val fileAttributeGateway: FileAttributeGateway,
+    @ApplicationScope private val sharingScope: CoroutineScope,
 ) : FileSystemRepository {
+
+    init {
+        monitorChatsFilesFolderIdChanges()
+    }
+
+    private var myChatsFilesFolderIdFlow: MutableStateFlow<NodeId?> = MutableStateFlow(null)
+
 
     override val localDCIMFolderPath: String
         get() = fileGateway.localDCIMFolderPath
@@ -219,6 +240,56 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getMyChatsFilesFolderId(): NodeId? =
+        myChatsFilesFolderIdFlow.value ?: run {
+            getMyChatsFilesFolderIdFromGateway()
+        }
+
+    private suspend fun getMyChatsFilesFolderIdFromGateway(): NodeId? = withContext(ioDispatcher) {
+        runCatching {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("getMyChatFilesFolder") {
+                    NodeId(it.nodeHandle)
+                }
+                megaApiGateway.getMyChatFilesFolder(listener)
+
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }.getOrElse {
+            //if error is API_ENOENT it means folder is not set, not an actual error. Otherwise re-throw the error
+            if ((it as? MegaException)?.errorCode != API_ENOENT) {
+                throw (it)
+            } else {
+                null
+            }
+        }?.also {
+            myChatsFilesFolderIdFlow.value = it
+        }
+    }
+
+    private fun monitorChatsFilesFolderIdChanges() {
+        sharingScope.launch {
+            megaApiGateway.globalUpdates
+                .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
+                .filter {
+                    val currentUserHandle = megaApiGateway.myUser?.handle
+                    it.users?.any { user ->
+                        user.isOwnChange == 0
+                                && user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER.toLong())
+                                && user.handle == currentUserHandle
+                    } == true
+                }
+                .catch { Timber.e(it) }
+                .flowOn(ioDispatcher)
+                .collect {
+                    getMyChatsFilesFolderIdFromGateway()
+                }
+        }
+    }
+
 
     override suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean =
         fileVersionsOptionCache.get()?.takeUnless { forceRefresh }

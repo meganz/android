@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import android.content.Context
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
@@ -12,6 +13,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.R
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.gateway.AppEventGateway
@@ -45,8 +47,8 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
-import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.exception.MegaException
@@ -115,8 +117,9 @@ class ChatRepositoryImplTest {
     private val chatPreviewMapper = mock<ChatPreviewMapper>()
     private val databaseHandler = mock<DatabaseHandler>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
-    private val chatRoomPendingChangesModelMapper: ChatRoomPendingChangesModelMapper = mock()
-    private val chatPendingChangesDao: ChatPendingChangesDao = mock()
+    private val chatRoomPendingChangesModelMapper = mock<ChatRoomPendingChangesModelMapper>()
+    private val chatPendingChangesDao = mock<ChatPendingChangesDao>()
+    private val context = mock<Context>()
 
     @Before
     fun setUp() {
@@ -152,6 +155,7 @@ class ChatRepositoryImplTest {
             giphyEntityMapper = mock(),
             chatGeolocationEntityMapper = mock(),
             chatNodeEntityListMapper = mock(),
+            context = context,
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)
@@ -1003,5 +1007,13 @@ class ChatRepositoryImplTest {
             assertThat(awaitItem()).isEqualTo(model)
             awaitComplete()
         }
+    }
+
+    @Test
+    fun `test that the default chat folder name is retrieved`() = runTest {
+        val expected = "Default chat folder name"
+        whenever(context.getString(R.string.section_photo_sync)).thenReturn(expected)
+        val actual = underTest.getDefaultChatFolderName()
+        assertThat(actual).isEqualTo(expected)
     }
 }
