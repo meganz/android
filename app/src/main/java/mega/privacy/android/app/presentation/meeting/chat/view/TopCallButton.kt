@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.core.ui.controls.chat.ChatMeetingButton
+import mega.privacy.android.domain.entity.ChatRoomPermission
 
 @Composable
 fun TopCallButton(
@@ -20,13 +21,13 @@ fun TopCallButton(
         val modifier = Modifier
             .padding(top = 16.dp)
 
-        if (callInThisChat?.status?.isStarted != true) {
+        if (callInThisChat?.status?.isStarted != true && myPermission != ChatRoomPermission.ReadOnly) {
             ChatMeetingButton(
                 modifier = modifier,
                 text = stringResource(id = R.string.meetings_chat_room_start_scheduled_meeting_option),
                 onClick = onStartOrJoinMeeting,
             )
-        } else if (callInThisChat.status?.isJoined != true) {
+        } else if (callInThisChat != null && callInThisChat.status?.isJoined != true) {
             ChatMeetingButton(
                 modifier = modifier,
                 text = stringResource(id = R.string.meetings_chat_room_join_scheduled_meeting_option),
