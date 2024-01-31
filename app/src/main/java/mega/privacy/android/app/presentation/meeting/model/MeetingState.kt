@@ -54,6 +54,8 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property chatScheduledMeeting                       [ChatScheduledMeeting]
  * @property isRingingAll                               True if is ringing for all participants or False otherwise.
  * @property newInvitedParticipants                     List of emails of the new invited participants.
+ * @property allParticipantsAreMuted                    True, if all participants are muted. False, if not.
+ * @property isMuteFeatureFlagEnabled                   True, if Mute feature flag enabled. False, otherwise.
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -95,7 +97,9 @@ data class MeetingState(
     val myFullName: String = "",
     val chatScheduledMeeting: ChatScheduledMeeting? = null,
     val isRingingAll: Boolean = false,
-    val newInvitedParticipants: List<String> = emptyList()
+    val newInvitedParticipants: List<String> = emptyList(),
+    val allParticipantsAreMuted: Boolean = false,
+    val isMuteFeatureFlagEnabled: Boolean = false,
 ) {
     /**
      * Check if waiting room is opened
@@ -107,4 +111,23 @@ data class MeetingState(
      * Check if has host permission
      */
     fun hasHostPermission() = myPermission == ChatRoomPermission.Moderator
+
+    /**
+     * Check if Mute all item should be shown
+     */
+    fun shouldMuteAllItemBeShown() =
+        isMuteFeatureFlagEnabled && hasHostPermission() && participantsSection == ParticipantsSection.InCallSection
+
+    /**
+     * Check if Waiting room section should be shown
+     */
+    fun shouldWaitingRoomSectionBeShown() = hasWaitingRoom && hasHostPermission()
+
+    /**
+     * Check if Number of participants item should be shown
+     */
+    fun shouldNumberOfParticipantsItemBeShown() =
+        participantsSection == ParticipantsSection.InCallSection ||
+                (participantsSection == ParticipantsSection.NotInCallSection && chatParticipantsNotInCall.isNotEmpty()) ||
+                (participantsSection == ParticipantsSection.WaitingRoomSection && chatParticipantsInWaitingRoom.isNotEmpty())
 }

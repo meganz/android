@@ -218,6 +218,11 @@ enum class AppFeatures(override val description: String, private val defaultValu
     NewChatActivity("Enable new chat activity", false),
 
     /**
+     * Mute participant
+     */
+    MuteParticipant("Enable Mute participant", false),
+
+    /**
      * Enable new design Variant A for ChooseAccount screen
      */
     ChooseAccountScreenVariantA(

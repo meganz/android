@@ -39,6 +39,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
 import mega.privacy.android.app.extensions.updateItemAt
+import mega.privacy.android.app.featuretoggle.AppFeatures
 
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
@@ -205,6 +206,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val ringIndividualInACallUseCase: RingIndividualInACallUseCase,
     private val allowUsersJoinCallUseCase: AllowUsersJoinCallUseCase,
+    private var getFeatureFlagUseCase: GetFeatureFlagValueUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -323,6 +325,15 @@ class MeetingActivityViewModel @Inject constructor(
     ).post(isVisible)
 
     init {
+        viewModelScope.launch {
+            getFeatureFlagValue(AppFeatures.MuteParticipant).let { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isMuteFeatureFlagEnabled = flag,
+                    )
+                }
+            }
+        }
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .observeForever(audioOutputStateObserver)
 
