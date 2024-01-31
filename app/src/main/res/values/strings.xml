@@ -4473,18 +4473,12 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -5258,4 +5252,16 @@
         <item quantity="one">couldn’t share %1$d folder</item>
         <item quantity="other">couldn’t share %1$d folders</item>
     </plurals>
+    <!-- Button text to mute a participant in the info of participant in call screen-->
+    <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Mute</string>
+    <!-- Button text to mute all participant in the call screen-->
+    <string name="meetings_bottom_panel_in_call_participants_mute_all_participants_button">Mute all</string>
+    <!-- Label text indicating that all participants are muted -->
+    <string name="meetings_bottom_panel_in_call_participants_all_muted_label">All muted</string>
+    <!-- Message of the snackbar displayed when you have muted a participant. The placeholder is for the name of the participant you muted -->
+    <string name="meetings_muted_a_participant_snackbar_message">You’ve muted %s</string>
+    <!-- Message of the snackbar displayed when you have muted all participants -->
+    <string name="meetings_muted_all_participants_snackbar_message">You’ve muted all participants</string>
+    <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
+    <string name="meetings_muted_by_a_participant_snackbar_message">You’ve been muted by %s</string>
 </resources>
