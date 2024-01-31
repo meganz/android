@@ -382,6 +382,7 @@ class FileBrowserViewModel @Inject constructor(
             )
         }
         getRootNodeUseCase()?.id?.longValue?.let { rootHandle ->
+            Timber.d("Root Node Exists. Set data from the Root Node")
             setFileBrowserHandle(rootHandle)
         }
     }
