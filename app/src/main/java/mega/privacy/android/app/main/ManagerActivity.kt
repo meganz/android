@@ -3935,6 +3935,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     private fun handleCloudDriveNavigation() {
         if (fileBrowserViewModel.isMediaDiscoveryOpen()) {
+            Timber.d("Show Media Discovery Screen")
             Handler(Looper.getMainLooper()).post {
                 showMediaDiscovery(
                     mediaHandle = fileBrowserViewModel.getSafeBrowserParentHandle(),
@@ -3942,6 +3943,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 )
             }
         } else {
+            Timber.d("Show Cloud Drive Screen")
             selectDrawerItemCloudDrive()
         }
     }
@@ -5246,14 +5248,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             R.id.bottom_navigation_item_cloud_drive -> {
                 // User is in Cloud Drive. Go back to the Root Node level
                 if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+                    Timber.d("User is in Cloud Drive. Go back to the Root Level")
                     lifecycleScope.launch {
                         if (fileBrowserViewModel.isMediaDiscoveryOpen()) {
+                            Timber.d("Remove the Media Discovery Fragment")
                             removeFragment(mediaDiscoveryFragment)
                         }
                         fileBrowserViewModel.goBackToRootLevel()
                     }
                 } else {
                     // User is not in Cloud Drive. Navigate to the feature
+                    Timber.d("User is not in Cloud Drive. Navigate to Cloud Drive")
                     drawerItem = DrawerItem.CLOUD_DRIVE
                     setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
                 }
