@@ -138,7 +138,6 @@ class FileBrowserViewModelTest {
         }
     }
 
-
     @Test
     fun `test that the file browser handle is updated if new value provided`() = runTest {
         underTest.state.map { it.fileBrowserHandle }.distinctUntilChanged()

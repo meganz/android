@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  *
  * @property currentViewType serves as the original view type
  * @property fileBrowserHandle current file browser handle
+ * @property isLoading true if loading
  * @property accessedFolderHandle The Folder Handle set when Cloud Drive is opened and
  * there's a Node that immediately needs to be opened
  * @property isAccessedFolderExited true if the User has left the Folder specified by
@@ -43,9 +44,11 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property downloadEvent download event
  * @property updateToolbarTitleEvent State Event that refreshes the Toolbar Title
  * @property exitFileBrowserEvent State Event that exits the File Browser
+ * @property openedFolderNodeHandles Set of opened folder node handles
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
+    val isLoading: Boolean = true,
     val fileBrowserHandle: Long = -1L,
     val accessedFolderHandle: Long? = null,
     val isAccessedFolderExited: Boolean = false,
@@ -70,4 +73,5 @@ data class FileBrowserState(
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val updateToolbarTitleEvent: StateEvent = consumed,
     val exitFileBrowserEvent: StateEvent = consumed,
+    val openedFolderNodeHandles: Set<Long> = emptySet(),
 )

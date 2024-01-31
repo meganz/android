@@ -204,7 +204,8 @@ class FileBrowserComposeFragment : Fragment() {
                             )
                         },
                     )
-                    //snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet
+
+                    // Snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet
                     LaunchedEffect(snackbarHostState.currentSnackbarData) {
                         snackbarHostState.currentSnackbarData?.message?.let {
                             Util.showSnackbar(activity, it)

@@ -212,6 +212,7 @@ class FileBrowserViewModel @Inject constructor(
         setPendingRefreshNodes()
     }
 
+
     private fun setPendingRefreshNodes() {
         _state.update { it.copy(isPendingRefresh = true) }
     }
@@ -224,7 +225,11 @@ class FileBrowserViewModel @Inject constructor(
     fun setFileBrowserHandle(handle: Long) =
         viewModelScope.launch {
             handleStack.push(handle)
-            _state.update { it.copy(fileBrowserHandle = handle) }
+            _state.update {
+                it.copy(
+                    fileBrowserHandle = handle,
+                )
+            }
             refreshNodesState()
         }
 
@@ -239,6 +244,7 @@ class FileBrowserViewModel @Inject constructor(
             it.copy(
                 fileBrowserHandle = folderHandle,
                 accessedFolderHandle = folderHandle,
+                openedFolderNodeHandles = emptySet(),
             )
         }
         refreshNodesState()
@@ -319,6 +325,7 @@ class FileBrowserViewModel @Inject constructor(
             it.copy(
                 showMediaDiscoveryIcon = showMediaDiscoveryIcon,
                 nodesList = nodeUIItems,
+                isLoading = false,
                 sortOrder = sortOrder,
                 isFileBrowserEmpty = isFileBrowserEmpty,
             )
@@ -396,6 +403,7 @@ class FileBrowserViewModel @Inject constructor(
         if (performBackNavigation) {
             handleStack.pop()
             handleAccessedFolderOnBackPress()
+            removeCurrentNodeFromUiStateSet()
 
             val parentHandle =
                 getParentNodeUseCase(NodeId(_state.value.fileBrowserHandle))?.id?.longValue
@@ -415,18 +423,37 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
+     * Removes the current Node from the Set of opened Folder Nodes in UiState
+     */
+    private fun removeCurrentNodeFromUiStateSet() {
+        _state.update {
+            it.copy(
+                isLoading = true,
+                openedFolderNodeHandles = it.openedFolderNodeHandles.toMutableSet()
+                    .apply { remove(_state.value.fileBrowserHandle) },
+            )
+        }
+    }
+
+    /**
      * Goes back one level from the Cloud Drive hierarchy
      */
     suspend fun performBackNavigation() {
         handleAccessedFolderOnBackPress()
         getParentNodeUseCase(NodeId(_state.value.fileBrowserHandle))?.id?.longValue?.let { parentHandle ->
+            removeCurrentNodeFromUiStateSet()
             setFileBrowserHandle(parentHandle)
             handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
             // Update the Toolbar Title
             _state.update { it.copy(updateToolbarTitleEvent = triggered) }
         } ?: run {
             // Exit File Browser if there is nothing left in the Back Stack
-            _state.update { it.copy(exitFileBrowserEvent = triggered) }
+            _state.update {
+                it.copy(
+                    openedFolderNodeHandles = emptySet(),
+                    exitFileBrowserEvent = triggered
+                )
+            }
         }
     }
 
@@ -452,6 +479,13 @@ class FileBrowserViewModel @Inject constructor(
      */
     private fun onFolderItemClicked(folderHandle: Long) {
         viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isLoading = true,
+                    openedFolderNodeHandles = it.openedFolderNodeHandles.toMutableSet()
+                        .apply { add(_state.value.fileBrowserHandle) },
+                )
+            }
             setFileBrowserHandle(folderHandle)
             if (shouldEnterMediaDiscoveryMode(
                     folderHandle = folderHandle,

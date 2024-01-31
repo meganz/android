@@ -35,77 +35,78 @@ fun OverQuotaView(
     onUpgradeClicked: () -> Unit,
     onDismissClicked: () -> Unit,
 ) {
-    Column(
-        modifier = modifier
-            .padding(top = 22.dp, start = 16.dp, end = 16.dp)
-            .fillMaxWidth()
-    ) {
-
-        var time by remember {
-            mutableStateOf(TimeUtils.getHumanizedTimeMs(bannerTime))
-        }
-        var isTimerRunning by remember {
-            mutableStateOf(shouldShowBannerVisibility)
-        }
-
-        LaunchedEffect(bannerTime) {
-            if (isTimerRunning) {
-                for (timer in bannerTime downTo 0L step TimeUnit.SECONDS.toMillis(1)) {
-                    delay(TimeUnit.SECONDS.toMillis(1))
-                    time = TimeUtils.getHumanizedTimeMs(timer)
-                }
-                time = ""
-                isTimerRunning = false
-            }
-        }
-
-        OverQuotaBannerText(
-            time = time,
-            isTimerRunning = isTimerRunning,
-            onUpgradeClicked = onUpgradeClicked,
-            onDismissClicked = onDismissClicked
-        )
+    var time by remember {
+        mutableStateOf(TimeUtils.getHumanizedTimeMs(bannerTime))
     }
+    var isTimerRunning by remember {
+        mutableStateOf(shouldShowBannerVisibility)
+    }
+
+    LaunchedEffect(bannerTime) {
+        if (isTimerRunning) {
+            for (timer in bannerTime downTo 0L step TimeUnit.SECONDS.toMillis(1)) {
+                delay(TimeUnit.SECONDS.toMillis(1))
+                time = TimeUtils.getHumanizedTimeMs(timer)
+            }
+            time = ""
+            isTimerRunning = false
+        }
+    }
+
+    OverQuotaBannerText(
+        time = time,
+        isTimerRunning = isTimerRunning,
+        onUpgradeClicked = onUpgradeClicked,
+        onDismissClicked = onDismissClicked,
+        modifier = modifier
+    )
 }
 
 @Composable
 private fun OverQuotaBannerText(
+    modifier: Modifier = Modifier,
     time: String,
     isTimerRunning: Boolean,
     onUpgradeClicked: () -> Unit,
     onDismissClicked: () -> Unit,
 ) {
     if (isTimerRunning) {
-        Text(
-            text = stringResource(
-                id = R.string.current_text_depleted_transfer_overquota,
-                time,
-            ),
-            style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorPrimary),
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+        Column(
+            modifier = modifier
+                .padding(top = 22.dp, start = 16.dp, end = 16.dp)
+                .fillMaxWidth()
         ) {
-            TextMegaButton(
-                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                text = stringResource(id = R.string.my_account_upgrade_pro),
-                onClick = { onUpgradeClicked() }
+            Text(
+                text = stringResource(
+                    id = R.string.current_text_depleted_transfer_overquota,
+                    time,
+                ),
+                style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorPrimary),
             )
-            TextMegaButton(
-                modifier = Modifier
-                    .padding(end = 16.dp, top = 8.dp, bottom = 8.dp),
-                text = stringResource(id = R.string.general_dismiss),
-                onClick = { onDismissClicked() }
-            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextMegaButton(
+                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                    text = stringResource(id = R.string.my_account_upgrade_pro),
+                    onClick = { onUpgradeClicked() }
+                )
+                TextMegaButton(
+                    modifier = Modifier
+                        .padding(end = 16.dp, top = 8.dp, bottom = 8.dp),
+                    text = stringResource(id = R.string.general_dismiss),
+                    onClick = { onDismissClicked() }
+                )
+            }
         }
     }
 }
 
 @CombinedThemePreviews
 @Composable
-private fun OverQuotaView() {
+private fun OverQuotaViewPreview() {
     OverQuotaView(
         bannerTime = TimeUnit.MINUTES.toMillis(10),
         shouldShowBannerVisibility = true,
