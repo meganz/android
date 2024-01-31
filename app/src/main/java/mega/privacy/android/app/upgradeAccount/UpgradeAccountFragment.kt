@@ -1,6 +1,7 @@
 package mega.privacy.android.app.upgradeAccount
 
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -105,6 +106,7 @@ class UpgradeAccountFragment : Fragment() {
                     }
                 },
                 onTOSClicked = this::redirectToTOSPage,
+                onPlayStoreLinkClicked = this::redirectToPlayStoreSubscription,
                 onPricingPageClicked = this::redirectToPricingPage,
                 onChoosingMonthlyYearlyPlan = upgradeAccountViewModel::onSelectingMonthlyPlan,
                 onChoosingPlanType = {
@@ -212,6 +214,16 @@ class UpgradeAccountFragment : Fragment() {
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .setData(Uri.parse(Constants.TERMS_OF_SERVICE_URL))
         )
+    }
+
+    private fun redirectToPlayStoreSubscription(link: String) {
+        val uriUrl = Uri.parse(link)
+        val launchBrowser = Intent(ACTION_VIEW, uriUrl)
+        runCatching {
+            startActivity(launchBrowser)
+        }.onFailure {
+            Timber.e("Failed to open play store subscription page with error: ${it.message}")
+        }
     }
 
     private fun redirectToPricingPage(link: String) {

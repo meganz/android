@@ -8,13 +8,20 @@ const val PLAY_STORE_URL =
     "https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzmobileapps"
 
 /**
+ * Subscription page URL in Google Play Store for user to manage their subscriptions
+ */
+const val PLAY_STORE_SUBSCRIPTION_URL =
+    "https://play.google.com/store/account/subscriptions"
+
+/**
  * Landing Page / Download URL for MEGA app in Apple App Store
  */
 const val APP_STORE_URL = "https://apps.apple.com/app/mega/id706857885"
 
 private val whitelistedURL = listOf(
     PLAY_STORE_URL,
-    APP_STORE_URL
+    APP_STORE_URL,
+    PLAY_STORE_SUBSCRIPTION_URL,
 )
 
 /**

@@ -5264,4 +5264,8 @@
     <string name="meetings_muted_all_participants_snackbar_message">You’ve muted all participants</string>
     <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
     <string name="meetings_muted_by_a_participant_snackbar_message">You’ve been muted by %s</string>
+    <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
+    <string name="account_upgrade_account_description_subscription_title">Subscription details</string>
+    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
+    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
 </resources>
