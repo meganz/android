@@ -5,16 +5,20 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment
+import mega.privacy.android.app.presentation.shares.links.LinksComposeFragment
 import mega.privacy.android.app.presentation.shares.links.LinksFragment
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment
 
 /**
  * Pager adapter for shares pages
  *
- * @param fa FragmentActivity where the viewPager2 lives
+ * @param activity FragmentActivity where the viewPager2 lives
  */
-class SharesPageAdapter(private val fa: FragmentActivity) :
-    FragmentStateAdapter(fa) {
+class SharesPageAdapter(
+    private val enabledLinksCompose: Boolean,
+    private val activity: FragmentActivity,
+) :
+    FragmentStateAdapter(activity) {
 
     /**
      * The list of fragments hold by the adapter
@@ -22,7 +26,7 @@ class SharesPageAdapter(private val fa: FragmentActivity) :
     private val fragments = mutableMapOf(
         SharesTab.INCOMING_TAB to IncomingSharesFragment(),
         SharesTab.OUTGOING_TAB to OutgoingSharesFragment(),
-        SharesTab.LINKS_TAB to LinksFragment()
+        SharesTab.LINKS_TAB to if (enabledLinksCompose) LinksComposeFragment() else LinksFragment()
     )
 
     /**
@@ -52,7 +56,7 @@ class SharesPageAdapter(private val fa: FragmentActivity) :
         val fragment = when (SharesTab.fromPosition(position)) {
             SharesTab.INCOMING_TAB -> IncomingSharesFragment()
             SharesTab.OUTGOING_TAB -> OutgoingSharesFragment()
-            SharesTab.LINKS_TAB -> LinksFragment()
+            SharesTab.LINKS_TAB -> if (enabledLinksCompose) LinksComposeFragment() else LinksFragment()
             else -> throw Exception("Invalid position")
         }
         fragments[SharesTab.fromPosition(position)] = fragment
@@ -86,7 +90,7 @@ class SharesPageAdapter(private val fa: FragmentActivity) :
      * @return the fragment at the given position
      */
     fun getFragment(position: Int): Fragment? =
-        fa.supportFragmentManager.findFragmentByTag(getFragmentTag(position))
+        activity.supportFragmentManager.findFragmentByTag(getFragmentTag(position))
 
     /**
      * Return the tag of a fragment hold by the adapter

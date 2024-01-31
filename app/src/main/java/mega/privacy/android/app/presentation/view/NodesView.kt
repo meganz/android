@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.view
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
@@ -8,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -32,8 +34,11 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param gridState the state of the grid
  * @param spanCount the span count of the grid
  * @param showSortOrder whether to show change sort order button
+ * @param showLinkIcon whether to show public share link icon
+ * @param showChangeViewType whether to show change view type button
  * @param showMediaDiscoveryButton whether to show media discovery button
  * @param onEnterMediaDiscoveryClick callback for enter media discovery click
+ * @param listContentPadding the content padding of the list/lazyColumn
  */
 @Composable
 fun <T : TypedNode> NodesView(
@@ -51,10 +56,14 @@ fun <T : TypedNode> NodesView(
     listState: LazyListState = LazyListState(),
     gridState: LazyGridState = LazyGridState(),
     spanCount: Int = 2,
+    showLinkIcon: Boolean = true,
+    showChangeViewType: Boolean = true,
     showSortOrder: Boolean = true,
     showMediaDiscoveryButton: Boolean = false,
+    showPublicLinkCreationTime: Boolean = false,
     isPublicNode: Boolean = false,
     onEnterMediaDiscoveryClick: () -> Unit = {},
+    listContentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
     val orientation = LocalConfiguration.current.orientation
@@ -62,6 +71,7 @@ fun <T : TypedNode> NodesView(
     if (isListView) {
         NodeListView(
             modifier = modifier,
+            listContentPadding = listContentPadding,
             nodeUIItemList = nodeUIItems,
             onMenuClick = onMenuClick,
             onItemClicked = {
@@ -77,9 +87,12 @@ fun <T : TypedNode> NodesView(
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
             showSortOrder = showSortOrder,
+            showChangeViewType = showChangeViewType,
+            showLinkIcon = showLinkIcon,
             listState = listState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
-            isPublicNode = isPublicNode
+            isPublicNode = isPublicNode,
+            showPublicLinkCreationTime = showPublicLinkCreationTime,
         )
     } else {
         val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = span)
@@ -101,6 +114,7 @@ fun <T : TypedNode> NodesView(
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
             showSortOrder = showSortOrder,
+            showChangeViewType = showChangeViewType,
             gridState = gridState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             isPublicNode = isPublicNode

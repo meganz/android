@@ -31,8 +31,10 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.MonitorFolderNodeDeleteUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -63,6 +65,9 @@ internal class LinksViewModelTest {
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val handleOptionClickMapper: HandleOptionClickMapper = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val monitorFolderNodeDeleteUpdatesUseCase: MonitorFolderNodeDeleteUpdatesUseCase =
+        mock()
+    private val getIsNodeInRubbish: IsNodeInRubbish = mock()
 
     @BeforeAll
     internal fun initialise() {
@@ -76,11 +81,13 @@ internal class LinksViewModelTest {
     internal fun setUp() {
         underTest = LinksViewModel(
             monitorPublicLinksUseCase = monitorPublicLinksUseCase,
+            monitorFolderNodeDeleteUpdatesUseCase = monitorFolderNodeDeleteUpdatesUseCase,
             getCloudSortOrder = getCloudSortOrder,
             getLinksSortOrder = getLinksSortOrder,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             handleOptionClickMapper = handleOptionClickMapper,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getIsNodeInRubbish = getIsNodeInRubbish,
         )
     }
 
@@ -88,7 +95,9 @@ internal class LinksViewModelTest {
         whenever(getLinksSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
+        whenever(monitorFolderNodeDeleteUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+        whenever(getIsNodeInRubbish(any())).thenReturn(false)
     }
 
     @AfterAll
@@ -96,11 +105,13 @@ internal class LinksViewModelTest {
         Dispatchers.resetMain()
         reset(
             monitorPublicLinksUseCase,
+            monitorFolderNodeDeleteUpdatesUseCase,
             getCloudSortOrder,
             getLinksSortOrder,
             monitorConnectivityUseCase,
             handleOptionClickMapper,
             getFeatureFlagValueUseCase,
+            getIsNodeInRubbish,
         )
     }
 
@@ -141,6 +152,28 @@ internal class LinksViewModelTest {
                 assertThat(expected.nodesList).hasSize(1)
             }
         }
+
+    @Test
+    fun `test that calling openFolderByHandle opens the folder`() = runTest {
+        val childLinkNodes = listOf<PublicLinkFolder>(mock())
+        val flow = flow {
+            emit(childLinkNodes)
+            awaitCancellation()
+        }
+        val publicLinkNodes = listOf<PublicLinkFolder>(mock {
+            on { id }.thenReturn(NodeId(12))
+            on { children }.thenReturn(flow)
+        })
+
+        monitorLinksChannel.send(publicLinkNodes)
+        underTest.openFolderByHandle(12)
+
+        underTest.state.test {
+            val expected = awaitItem()
+            assertThat(expected.nodesList).hasSize(1)
+            assertThat(expected.parentNode?.id?.longValue).isEqualTo(12)
+        }
+    }
 
     @Test
     internal fun `test that updates from the root are ignored while children are displayed`() =
@@ -187,6 +220,7 @@ internal class LinksViewModelTest {
                 on { parent }.thenReturn(null)
                 on { children }.thenReturn(flow)
                 on { id }.thenReturn(NodeId(12))
+                on { node }.thenReturn(mock())
             }
 
             val currentFolder = mock<PublicLinkFolder> {
@@ -349,7 +383,7 @@ internal class LinksViewModelTest {
 
     @Test
     fun `test that the selected node handles is empty when clearing all nodes`() = runTest {
-        underTest.clearAllNodes()
+        underTest.clearAllNodesSelection()
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.selectedNodeHandles).isEmpty()

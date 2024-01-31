@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +23,6 @@ import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFold
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.node.FileNode
@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaNode
 
 /**
@@ -46,10 +47,12 @@ import nz.mega.sdk.MegaNode
  * @param onSortOrderClick callback to handle sort order click
  * @param onChangeViewTypeClick callback to handle change view type click
  * @param showSortOrder whether to show change sort order button
+ * @param showLinkIcon whether to show public share link icon
  * @param listState the state of the list
  * @param showMediaDiscoveryButton whether to show media discovery button
  * @param modifier
  * @param showChangeViewType whether to show change view type button
+ * @param listContentPadding the content padding of the list/lazyColumn
  */
 @Composable
 fun <T : TypedNode> NodeListView(
@@ -65,10 +68,13 @@ fun <T : TypedNode> NodeListView(
     listState: LazyListState,
     showMediaDiscoveryButton: Boolean,
     modifier: Modifier = Modifier,
+    showLinkIcon: Boolean = true,
     showChangeViewType: Boolean = true,
     isPublicNode: Boolean = false,
+    showPublicLinkCreationTime: Boolean = false,
+    listContentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
-    LazyColumn(state = listState, modifier = modifier) {
+    LazyColumn(state = listState, modifier = modifier, contentPadding = listContentPadding) {
         if (showSortOrder || showChangeViewType) {
             item(
                 key = "header"
@@ -110,11 +116,16 @@ fun <T : TypedNode> NodeListView(
                             java.util.Locale(
                                 Locale.current.language, Locale.current.region
                             ),
-                            fileNode.modificationTime
+                            if (showPublicLinkCreationTime)
+                                fileNode.exportedData?.publicLinkCreationTime
+                                    ?: fileNode.modificationTime
+                            else
+                                fileNode.modificationTime
                         )
                     },
                 name = nodeEntity.name,
                 showMenuButton = true,
+                showLinkIcon = showLinkIcon,
                 isTakenDown = nodeEntity.isTakenDown,
                 isFavourite = nodeEntity.isFavourite,
                 isSharedWithPublicLink = nodeEntity.exportedData != null,

@@ -42,7 +42,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import mega.privacy.android.core.R
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
@@ -50,6 +49,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.utils.isScreenOrientationLandscape
 import mega.privacy.android.legacy.core.ui.controls.text.MiddleEllipsisText
+import mega.privacy.android.shared.theme.MegaAppTheme
 import java.io.File
 
 /**
@@ -60,6 +60,7 @@ import java.io.File
  * @param isSelected true if the item is selected, and false if otherwise
  * @param folderInfo folder info, if null the item is a File
  * @param icon icon resource
+ * @param showLinkIcon whether to show public share link icon
  * @param applySecondaryColorIconTint if true, applies the textColorSecondary color from
  * [MaterialTheme.colors]. No tint is applied if false
  * @param fileSize file size
@@ -91,6 +92,7 @@ fun NodeListViewItem(
     onClick: () -> Unit,
     isSharedWithPublicLink: Boolean,
     modifier: Modifier = Modifier,
+    showLinkIcon: Boolean = true,
     applySecondaryColorIconTint: Boolean = false,
     infoColor: Color? = null,
     @DrawableRes infoIcon: Int? = null,
@@ -115,6 +117,7 @@ fun NodeListViewItem(
         infoIconTint = infoIconTint,
         labelColor = labelColor,
         showMenuButton = showMenuButton,
+        showLinkIcon = showLinkIcon,
         isTakenDown = isTakenDown,
         isFavourite = isFavourite,
         isSharedWithPublicLink = isSharedWithPublicLink,
@@ -166,6 +169,7 @@ fun NodeListViewItem(
     thumbnailData: Any?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    showLinkIcon: Boolean = true,
     applySecondaryColorIconTint: Boolean = false,
     infoColor: Color? = null,
     @DrawableRes infoIcon: Int? = null,
@@ -293,7 +297,7 @@ fun NodeListViewItem(
 
                             )
                     }
-                    if (isSharedWithPublicLink) {
+                    if (isSharedWithPublicLink && showLinkIcon) {
                         Image(
                             alignment = Alignment.Center,
                             modifier = iconModifier

@@ -8,9 +8,11 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
@@ -30,8 +32,10 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.MonitorFolderNodeDeleteUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
 import timber.log.Timber
 import java.util.Stack
@@ -44,11 +48,13 @@ import javax.inject.Inject
 @HiltViewModel
 class LinksViewModel @Inject constructor(
     private val monitorPublicLinksUseCase: MonitorPublicLinksUseCase,
+    private val monitorFolderNodeDeleteUpdatesUseCase: MonitorFolderNodeDeleteUpdatesUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getLinksSortOrder: GetLinksSortOrder,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getIsNodeInRubbish: IsNodeInRubbish,
 ) : ViewModel() {
 
     private val currentFlow = Channel<Flow<LinksUiState>>()
@@ -68,6 +74,22 @@ class LinksViewModel @Inject constructor(
         }
         monitorConnectivity()
         observeFlow(publicLinks())
+        monitorFolderNodeDeleteUpdates()
+    }
+
+    private fun monitorFolderNodeDeleteUpdates() {
+        viewModelScope.launch {
+            monitorFolderNodeDeleteUpdatesUseCase()
+                .catch {
+                    Timber.e(it)
+                }
+                .collect {
+                    val currentNodeHandle = getCurrentNodeHandle()
+                    if (it.contains(currentNodeHandle)) {
+                        performBackNavigation()
+                    }
+                }
+        }
     }
 
     private fun observeFlow(flow: Flow<LinksUiState>) {
@@ -80,21 +102,42 @@ class LinksViewModel @Inject constructor(
         _state.value.copy(
             nodesList = getNodeUiItems(list),
             sortOrder = getSortOrder(),
-            parentNode = null
+            parentNode = null,
+            isLoading = false
         )
     }
 
     private fun openFolder(parentNode: PublicLinkFolder) {
+        handleStack.push(parentNode.id.longValue)
         _state.update {
             it.copy(
-                parentNode = parentNode
+                parentNode = parentNode,
+                isLoading = true
             )
         }
         observeFlow(childLinks(parentNode))
     }
 
     private fun closeFolder(currentFolder: PublicLinkFolder) {
-        observeFlow(currentFolder.parent?.let { childLinks(it) } ?: publicLinks())
+        viewModelScope.launch {
+            // If the parent of the current folder is already in the rubbish bin, we need to navigate back again
+            currentFolder.parent?.takeIf {
+                it.id.longValue != -1L
+            }?.let { parent ->
+                val isNodeInRubbish = getIsNodeInRubbish(parent.node.id.longValue)
+                if (isNodeInRubbish) {
+                    _state.update {
+                        it.copy(
+                            parentNode = parent,
+                            isLoading = true
+                        )
+                    }
+                    performBackNavigation()
+                    return@launch
+                }
+            }
+            observeFlow(currentFolder.parent?.let { childLinks(it) } ?: publicLinks())
+        }
     }
 
     private fun childLinks(parentNode: PublicLinkFolder) =
@@ -102,9 +145,39 @@ class LinksViewModel @Inject constructor(
             _state.value.copy(
                 parentNode = parentNode,
                 nodesList = getNodeUiItems(list),
-                sortOrder = getSortOrder()
+                sortOrder = getSortOrder(),
+                isLoading = false
             )
         }
+
+    /**
+     * This will open the folder by node handle if it is a folder
+     */
+    fun openFolderByHandle(handle: Long): Boolean {
+        return state.value.nodesList
+            .firstOrNull { it.node.id.longValue == handle && it.node is PublicLinkFolder }
+            ?.node
+            ?.let {
+                openFolder(it as PublicLinkFolder)
+                true
+            } ?: false
+    }
+
+    /**
+     * Open the folder by node handle with retry after 200ms, max 3 times
+     * Note: retry was added as a failsafe in case the method is called from ManagerActivity before nodeList is updated
+     */
+    fun openFolderByHandleWithRetry(handle: Long) {
+        viewModelScope.launch {
+            var retryCount = 0
+            var success = openFolderByHandle(handle)
+            while (!success && retryCount < 3) {
+                delay(200L)
+                success = openFolderByHandle(handle)
+                retryCount++
+            }
+        }
+    }
 
     private suspend fun getSortOrder() =
         if (state.value.parentNode == null) getLinksSortOrder() else getCloudSortOrder()
@@ -115,6 +188,27 @@ class LinksViewModel @Inject constructor(
                 _state.update { state -> state.copy(isConnected = it) }
             }
         }
+    }
+
+    /**
+     * Returns the count of nodes in the current folder
+     */
+    fun getNodeCount() = _state.value.nodesList.size
+
+    /**
+     * This will reset the stack and will fetch the root links nodes
+     */
+    fun resetToRoot() {
+        handleStack.clear()
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    parentNode = null,
+                    isLoading = true
+                )
+            }
+        }
+        observeFlow(publicLinks())
     }
 
     /**
@@ -151,27 +245,12 @@ class LinksViewModel @Inject constructor(
                             currentFileNode = nodeUIItem.node
                         )
                     }
-
                 } else if (nodeUIItem.node is PublicLinkFolder) {
-                    onFolderItemClicked(nodeUIItem.node)
+                    openFolder(nodeUIItem.node)
                 }
             }
         }.onFailure {
             Timber.e(it)
-        }
-    }
-
-    /**
-     * Performs action when folder is clicked from adapter
-     * @param linkFolderNode node handle
-     */
-    private fun onFolderItemClicked(
-        linkFolderNode: PublicLinkFolder,
-    ) {
-        viewModelScope.launch {
-            val handle = linkFolderNode.id.longValue
-            handleStack.push(handle)
-            openFolder(linkFolderNode)
         }
     }
 
@@ -185,7 +264,6 @@ class LinksViewModel @Inject constructor(
             _state.value.nodesList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
         updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
     }
-
 
     /**
      * Handles Back Navigation events
@@ -216,6 +294,13 @@ class LinksViewModel @Inject constructor(
      * This will refresh link nodes and update [LinksUiState.nodesList]
      */
     fun refreshLinkNodes() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+        }
         observeFlow(publicLinks())
     }
 
@@ -316,11 +401,11 @@ class LinksViewModel @Inject constructor(
     /**
      * Clear All [NodeUIItem]
      */
-    fun clearAllNodes() {
+    fun clearAllNodesSelection() {
         viewModelScope.launch {
             _state.update {
                 it.copy(
-                    nodesList = clearNodeUiItemList(),
+                    nodesList = selectionClearedNodeUiItemList(),
                     selectedFileNodes = 0,
                     selectedFolderNodes = 0,
                     isInSelection = false,
@@ -332,9 +417,14 @@ class LinksViewModel @Inject constructor(
     }
 
     /**
+     * Returns current node handle from UI state
+     */
+    fun getCurrentNodeHandle(): Long = _state.value.parentNode?.id?.longValue ?: -1
+
+    /**
      * Clear the selections of items from NodesUiList
      */
-    private fun clearNodeUiItemList(): List<NodeUIItem<PublicLinkNode>> {
+    private fun selectionClearedNodeUiItemList(): List<NodeUIItem<PublicLinkNode>> {
         return _state.value.nodesList.map {
             it.copy(isSelected = false)
         }

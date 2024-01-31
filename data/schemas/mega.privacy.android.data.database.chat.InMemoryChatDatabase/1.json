@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9ca406d9a603164fb73c64d9e8dd696a",
+    "identityHash": "c64705542f301dca5a82da19576f9bc4",
     "entities": [
       {
         "tableName": "typed_messages",
@@ -412,7 +412,7 @@
       },
       {
         "tableName": "chat_node",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL, `base64Id` TEXT NOT NULL, `restoreId` INTEGER, `label` INTEGER NOT NULL, `isFavourite` INTEGER NOT NULL, `isTakenDown` INTEGER NOT NULL, `isIncomingShare` INTEGER NOT NULL, `isNodeKeyDecrypted` INTEGER NOT NULL, `creationTime` INTEGER NOT NULL, `serializedData` TEXT, `isAvailableOffline` INTEGER NOT NULL, `versionCount` INTEGER NOT NULL, `publicLink` TEXT, `publicLinkCreationTime` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL, `base64Id` TEXT NOT NULL, `label` INTEGER NOT NULL, `isFavourite` INTEGER NOT NULL, `isTakenDown` INTEGER NOT NULL, `isIncomingShare` INTEGER NOT NULL, `isNodeKeyDecrypted` INTEGER NOT NULL, `creationTime` INTEGER NOT NULL, `serializedData` TEXT, `isAvailableOffline` INTEGER NOT NULL, `versionCount` INTEGER NOT NULL, `publicLink` TEXT, `publicLinkCreationTime` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -443,12 +443,6 @@
             "columnName": "base64Id",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "restoreId",
-            "columnName": "restoreId",
-            "affinity": "INTEGER",
-            "notNull": false
           },
           {
             "fieldPath": "label",
@@ -530,7 +524,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9ca406d9a603164fb73c64d9e8dd696a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c64705542f301dca5a82da19576f9bc4')"
     ]
   }
 }
