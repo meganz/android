@@ -549,14 +549,6 @@
         </service>
 
         <receiver
-            android:name=".receivers.ChargeEventReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-            </intent-filter>
-        </receiver>
-        <receiver
             android:name=".receivers.BootEventReceiver"
             android:enabled="true"
             android:exported="false">

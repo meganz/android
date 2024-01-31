@@ -1774,7 +1774,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 closeDrawer()
             }
             checkCurrentStorageStatus()
-            viewModel.startCameraUpload()
 
             //INITIAL FRAGMENT
             if (selectDrawerItemPending) {
@@ -6658,8 +6657,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     /**
      * Check the current storage state.
-     *
-     * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
      */
     private fun checkCurrentStorageStatus() {
         // If the current storage state is not initialized is because the app received the
@@ -6688,7 +6685,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
                 storageState = newStorageState
-                viewModel.startCameraUpload()
             }
 
             StorageState.Orange -> {
@@ -6698,8 +6694,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     showStorageAlmostFullDialog()
                 }
                 storageState = newStorageState
-                Timber.d("Try to start CU, false.")
-                viewModel.startCameraUpload()
             }
 
             StorageState.Red -> {

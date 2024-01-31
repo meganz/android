@@ -5,8 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.InputType
 import android.util.Base64
 import android.util.TypedValue
@@ -309,7 +307,6 @@ class LoginFragment : Fragment() {
                                 intentDataString?.let { newIntent.data = Uri.parse(it) }
                                 newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
-                                startCameraUploadService(false, 5 * 60 * 1000)
                                 startActivity(newIntent)
                                 requireActivity().finish()
                             } else {
@@ -366,10 +363,6 @@ class LoginFragment : Fragment() {
                     }
 
                     newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-
-                    if (uiState.isCUSettingEnabled) {
-                        startCameraUploadService(false, 30 * 1000)
-                    }
 
                     startActivity(newIntent)
                     (requireActivity() as LoginActivity).finish()
@@ -580,12 +573,16 @@ class LoginFragment : Fragment() {
                     } else {
                         var initialCam = false
                         if (uiState.hasPreferences) {
-                            if (uiState.hasCUSetting) {
-                                if (uiState.isCUSettingEnabled) {
-                                    startCameraUploadService(false, 30 * 1000)
+                            if (!uiState.hasCUSetting) {
+                                with(requireActivity()) {
+                                    setStartScreenTimeStamp(this)
+
+                                    startActivity(Intent(this, ManagerActivity::class.java).apply {
+                                        putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                                    })
+
+                                    finish()
                                 }
-                            } else {
-                                startCameraUploadService(true, 30 * 1000)
                                 initialCam = true
                             }
                         } else {
@@ -811,34 +808,6 @@ class LoginFragment : Fragment() {
         setNegativeButton(R.string.general_cancel) { _, _ -> viewModel.resetOngoingTransfers() }
         setCancelable(false)
         show()
-    }
-
-    /**
-     * Starts CU service.
-     *
-     * @param firstTimeCam
-     * @param time
-     */
-    private fun startCameraUploadService(firstTimeCam: Boolean, time: Int) {
-        Timber.d("firstTimeCam: $firstTimeCam: $time")
-
-        with(requireActivity()) {
-            if (firstTimeCam) {
-                setStartScreenTimeStamp(this)
-
-                startActivity(Intent(this, ManagerActivity::class.java).apply {
-                    putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
-                })
-
-                finish()
-            } else {
-                Timber.d("Start the Camera Uploads service")
-                Handler(Looper.getMainLooper()).postDelayed({
-                    Timber.d("Now I start the service")
-                    viewModel.scheduleCameraUpload()
-                }, time.toLong())
-            }
-        }
     }
 
     /**

@@ -77,7 +77,6 @@ import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
-import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -110,7 +109,6 @@ class LoginViewModel @Inject constructor(
     private val fetchNodesUseCase: FetchNodesUseCase,
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
-    private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase,
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase,
@@ -771,11 +769,6 @@ class LoginViewModel @Inject constructor(
      */
     fun onSnackbarMessageConsumed() =
         _state.update { state -> state.copy(snackbarMessage = consumed()) }
-
-    /**
-     * Schedule camera upload
-     */
-    fun scheduleCameraUpload() = viewModelScope.launch { scheduleCameraUploadUseCase() }
 
     /**
      * Stop camera upload

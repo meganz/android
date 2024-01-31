@@ -9,7 +9,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import timber.log.Timber
@@ -24,7 +24,7 @@ class GlobalNetworkStateHandler @Inject constructor(
     private val application: Application,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
+    private val startCameraUploadUseCase: StartCameraUploadUseCase,
 ) {
     init {
         applicationScope.launch {
@@ -47,7 +47,9 @@ class GlobalNetworkStateHandler @Inject constructor(
                             megaChatApi.retryPendingConnections(false, null)
                         }
                     }
-                    scheduleCameraUploadUseCase()
+                    runCatching {
+                        startCameraUploadUseCase()
+                    }.onFailure { Timber.e(it) }
                 } else {
                     Timber.d("Network state: DISCONNECTED")
                     (application as MegaApplication).localIpAddress = null

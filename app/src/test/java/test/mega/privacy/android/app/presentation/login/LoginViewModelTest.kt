@@ -48,7 +48,6 @@ import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
-import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.Rule
 import org.junit.jupiter.api.AfterEach
@@ -94,7 +93,6 @@ internal class LoginViewModelTest {
     private val fetchNodesUseCase: FetchNodesUseCase = mock()
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase = mock()
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
-    private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase = mock()
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase = mock()
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase = mock()
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase = mock()
@@ -129,7 +127,6 @@ internal class LoginViewModelTest {
             fetchNodesUseCase = fetchNodesUseCase,
             ongoingTransfersExistUseCase = ongoingTransfersExistUseCase,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
-            scheduleCameraUploadUseCase = scheduleCameraUploadUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             monitorEphemeralCredentialsUseCase = monitorEphemeralCredentialsUseCase,
             saveEphemeralCredentialsUseCase = saveEphemeralCredentialsUseCase,

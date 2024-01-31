@@ -7,7 +7,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,12 +28,16 @@ class BootEventReceiver : BroadcastReceiver() {
      * Schedule camera upload
      */
     @Inject
-    lateinit var scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase
+    lateinit var startCameraUploadUseCase: StartCameraUploadUseCase
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action.equals(Intent.ACTION_BOOT_COMPLETED)) {
             Timber.d("BootEventReceiver")
-            applicationScope.launch { scheduleCameraUploadUseCase() }
+            applicationScope.launch {
+                runCatching {
+                    startCameraUploadUseCase
+                }.onFailure { Timber.e(it) }
+            }
         }
     }
 }

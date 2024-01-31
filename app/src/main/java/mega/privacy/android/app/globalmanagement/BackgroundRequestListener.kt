@@ -21,7 +21,6 @@ import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCas
 import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
-import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -45,7 +44,6 @@ import javax.inject.Inject
  * @property applicationScope [CoroutineScope]
  * @property getFullAccountInfoUseCase [GetFullAccountInfoUseCase]
  * @property broadcastFetchNodesFinishUseCase [BroadcastFetchNodesFinishUseCase]
- * @property scheduleCameraUploadUseCase [ScheduleCameraUploadUseCase]
  */
 class BackgroundRequestListener @Inject constructor(
     private val application: Application,
@@ -57,7 +55,6 @@ class BackgroundRequestListener @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
     private val broadcastFetchNodesFinishUseCase: BroadcastFetchNodesFinishUseCase,
-    private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
     private val setupDeviceNameUseCase: SetupDeviceNameUseCase,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
@@ -179,7 +176,6 @@ class BackgroundRequestListener @Inject constructor(
                 }.onFailure {
                     Timber.e(it)
                 }
-                scheduleCameraUploadUseCase()
 
                 runCatching {
                     updatePushNotificationSettingsUseCase()

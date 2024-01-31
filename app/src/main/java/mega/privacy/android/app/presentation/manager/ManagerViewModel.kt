@@ -443,6 +443,16 @@ class ManagerViewModel @Inject constructor(
                 }
             }
         }
+
+        viewModelScope.launch {
+            monitorMyAccountUpdateEvent
+                .filter {
+                    it.storageState == StorageState.Green || it.storageState == StorageState.Orange
+                }
+                .collect {
+                    startCameraUploads()
+                }
+        }
     }
 
     /**
@@ -656,9 +666,9 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Start camera upload
+     * Start camera uploads
      */
-    fun startCameraUpload() = viewModelScope.launch {
+    private fun startCameraUploads() = viewModelScope.launch {
         startCameraUploadUseCase()
     }
 

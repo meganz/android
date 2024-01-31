@@ -67,7 +67,6 @@ import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
-import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RenameRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
@@ -121,8 +120,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -246,14 +248,7 @@ class ManagerViewModelTest {
     private val monitorUserUpdates = mock<MonitorUserUpdates> {
         onBlocking { invoke() }.thenReturn(emptyFlow())
     }
-    private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase> {
-        onBlocking { invoke() }.thenReturn(
-            flowOf(
-                MyAccountUpdate(Action.STORAGE_STATE_CHANGED, StorageState.Green),
-                MyAccountUpdate(Action.UPDATE_ACCOUNT_DETAILS, null)
-            )
-        )
-    }
+    private var monitorMyAccountUpdateFakeFlow = MutableSharedFlow<MyAccountUpdate>()
     private val establishCameraUploadsSyncHandlesUseCase =
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
@@ -345,7 +340,9 @@ class ManagerViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             deleteOldestCompletedTransfersUseCase = deleteOldestCompletedTransfersUseCase,
             getIncomingContactRequestsUseCase = getIncomingContactRequestUseCase,
-            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
+            monitorMyAccountUpdateUseCase = mock {
+                on { invoke() }.thenReturn(monitorMyAccountUpdateFakeFlow)
+            },
             monitorUpdatePushNotificationSettingsUseCase = monitorPushNotificationSettingsUpdate,
             monitorOfflineNodeAvailabilityUseCase = monitorOfflineNodeAvailabilityUseCase,
             monitorChatArchivedUseCase = monitorChatArchivedUseCase,
@@ -431,7 +428,7 @@ class ManagerViewModelTest {
             passcodeManagement,
             hangChatCallUseCase,
             monitorChatArchivedUseCase,
-            monitorPushNotificationSettingsUpdate
+            monitorPushNotificationSettingsUpdate,
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(true)
@@ -447,6 +444,7 @@ class ManagerViewModelTest {
         monitorContactRequestUpdates = MutableStateFlow(emptyList())
         monitorNodeUpdatesFakeFlow = MutableSharedFlow()
         monitorSyncsUseCaseFakeFlow = MutableSharedFlow()
+        monitorMyAccountUpdateFakeFlow = MutableSharedFlow()
         initViewModel()
     }
 
@@ -575,9 +573,15 @@ class ManagerViewModelTest {
     @Test
     fun `test that monitor my account update events are returned`() =
         runTest {
-            underTest.monitorMyAccountUpdateEvent.distinctUntilChanged().test {
+            underTest.monitorMyAccountUpdateEvent.test {
+                monitorMyAccountUpdateFakeFlow.emit(
+                    MyAccountUpdate(Action.STORAGE_STATE_CHANGED, StorageState.Green),
+                )
                 assertThat(awaitItem().action).isEqualTo(Action.STORAGE_STATE_CHANGED)
-                monitorFinishActivity()
+
+                monitorMyAccountUpdateFakeFlow.emit(
+                    MyAccountUpdate(Action.UPDATE_ACCOUNT_DETAILS, null)
+                )
                 assertThat(awaitItem().action).isEqualTo(Action.UPDATE_ACCOUNT_DETAILS)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -641,20 +645,44 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that when startCameraUpload is called, startCameraUploadUseCase is called`() =
-        runTest {
-            underTest.startCameraUpload()
-            testScheduler.advanceUntilIdle()
-            verify(startCameraUploadUseCase).invoke()
-        }
-
-    @Test
     fun `test that when stopAndDisableCameraUploads is called, stopCameraUploadUseCase is called`() =
         runTest {
             underTest.stopAndDisableCameraUploads()
             testScheduler.advanceUntilIdle()
             verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
         }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = StorageState::class,
+        names = ["Green", "Orange"],
+        mode = EnumSource.Mode.INCLUDE,
+    )
+    fun `test that camera uploads is started when an account event indicating enough storage space is received`(
+        storageState: StorageState
+    ) = runTest {
+        monitorMyAccountUpdateFakeFlow.emit(
+            MyAccountUpdate(Action.STORAGE_STATE_CHANGED, storageState)
+        )
+        advanceUntilIdle()
+        verify(startCameraUploadUseCase).invoke()
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = StorageState::class,
+        names = ["Green", "Orange"],
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    fun `test that camera uploads is not started when an account event indicating not enough storage space is received`(
+        storageState: StorageState
+    ) = runTest {
+        monitorMyAccountUpdateFakeFlow.emit(
+            MyAccountUpdate(Action.STORAGE_STATE_CHANGED, storageState)
+        )
+        advanceUntilIdle()
+        verify(startCameraUploadUseCase, never()).invoke()
+    }
 
     @Test
     fun `test that monitor camera upload folder icon update events are returned`() =
