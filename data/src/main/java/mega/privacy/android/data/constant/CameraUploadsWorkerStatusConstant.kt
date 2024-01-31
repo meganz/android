@@ -16,6 +16,11 @@ object CameraUploadsWorkerStatusConstant {
     const val START = "start"
 
     /**
+     * FINISHED key
+     */
+    const val FINISHED = "finished"
+
+    /**
      * PROGRESS Key
      */
     const val PROGRESS = "progress"
@@ -105,4 +110,9 @@ object CameraUploadsWorkerStatusConstant {
      * TOTAL_COUNT key
      */
     const val FOLDER_TYPE = "folder_type"
+
+    /**
+     * FINISHED_REASON key
+     */
+    const val FINISHED_REASON = "finished_reason"
 }

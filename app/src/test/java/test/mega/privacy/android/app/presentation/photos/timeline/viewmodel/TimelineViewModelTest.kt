@@ -33,6 +33,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.photos.Photo
@@ -125,7 +126,7 @@ class TimelineViewModelTest {
             on { invoke() }.thenReturn(emptyFlow())
         }
         monitorCameraUploadsStatusInfoUseCase.stub {
-            on { invoke() }.thenReturn(cameraUploadsStatusInfoFlow)
+            onBlocking { invoke() }.thenReturn(cameraUploadsStatusInfoFlow)
         }
         reset(
             enableCameraUploadsInPhotosUseCase
@@ -348,7 +349,8 @@ class TimelineViewModelTest {
     @Test
     fun `test that when camera upload progress is received with status finished, then progressBarShowing state is set to false`() =
         runTest {
-            val cameraUploadsStatusInfo = CameraUploadsStatusInfo.Finished
+            val cameraUploadsStatusInfo =
+                CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.COMPLETED)
             cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
 
             advanceUntilIdle()

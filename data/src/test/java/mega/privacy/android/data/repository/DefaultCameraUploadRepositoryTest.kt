@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.net.Uri
+import android.os.Build
 import androidx.work.Data
 import androidx.work.WorkInfo
 import app.cash.turbine.test
@@ -631,15 +632,17 @@ class DefaultCameraUploadRepositoryTest {
                 val workInfo = mock<WorkInfo> {
                     on { this.progress }.thenReturn(progress)
                     on { this.state }.thenReturn(WorkInfo.State.RUNNING)
+                    on { this.stopReason }.thenReturn(WorkInfo.STOP_REASON_NOT_STOPPED)
                 }
                 val workInfoFlow = flowOf(listOf(workInfo, mock()))
 
                 val expected = mock<CameraUploadsStatusInfo.UploadProgress>()
-
+                whenever(deviceGateway.getSdkVersionInt()).thenReturn(Build.VERSION_CODES.S)
                 whenever(
                     cameraUploadsStatusInfoMapper(
                         workInfo.progress,
                         workInfo.state,
+                        workInfo.stopReason,
                     )
                 ).thenReturn(expected)
                 whenever(workManagerGateway.monitorCameraUploadsStatusInfo()).thenReturn(

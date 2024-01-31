@@ -34,6 +34,8 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMP
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_SUCCESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_FILE_INDEX
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_PROGRESS
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED_REASON
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.OUT_OF_SPACE
@@ -53,6 +55,7 @@ import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
@@ -850,6 +853,12 @@ class CameraUploadsWorkerTest {
             )
             val result = underTest.doWork()
             verify(underTest).setProgress(afterInsufficientStorageEventData)
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.INSUFFICIENT_LOCAL_STORAGE_SPACE.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         }
 
@@ -927,6 +936,12 @@ class CameraUploadsWorkerTest {
             )
             val result = underTest.doWork()
             verify(underTest).setProgress(afterErrorEventData)
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.INSUFFICIENT_LOCAL_STORAGE_SPACE.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         }
 
@@ -1033,6 +1048,12 @@ class CameraUploadsWorkerTest {
 
         val result = underTest.doWork()
 
+        verify(underTest).setProgress(
+            workDataOf(
+                STATUS_INFO to FINISHED,
+                FINISHED_REASON to CameraUploadsFinishedReason.DISABLED.name
+            )
+        )
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
     }
@@ -1044,6 +1065,12 @@ class CameraUploadsWorkerTest {
 
             val result = underTest.doWork()
 
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.MEDIA_PERMISSION_NOT_GRANTED.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
             verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
         }
@@ -1054,6 +1081,12 @@ class CameraUploadsWorkerTest {
 
         val result = underTest.doWork()
 
+        verify(underTest).setProgress(
+            workDataOf(
+                STATUS_INFO to FINISHED,
+                FINISHED_REASON to CameraUploadsFinishedReason.LOGIN_FAILED.name
+            )
+        )
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
     }
@@ -1065,6 +1098,12 @@ class CameraUploadsWorkerTest {
 
             val result = underTest.doWork()
 
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.LOCAL_PRIMARY_FOLDER_NOT_VALID.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
             verify(setPrimaryFolderLocalPathUseCase).invoke("")
             verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.RefreshSettings)
@@ -1102,6 +1141,12 @@ class CameraUploadsWorkerTest {
 
         val result = underTest.doWork()
 
+        verify(underTest).setProgress(
+            workDataOf(
+                STATUS_INFO to FINISHED,
+                FINISHED_REASON to CameraUploadsFinishedReason.ERROR_DURING_PROCESS.name
+            )
+        )
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
     }
@@ -1118,6 +1163,12 @@ class CameraUploadsWorkerTest {
 
             val result = underTest.doWork()
 
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.ERROR_DURING_PROCESS.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
             verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
         }
@@ -1136,6 +1187,12 @@ class CameraUploadsWorkerTest {
 
             val result = underTest.doWork()
 
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.ERROR_DURING_PROCESS.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
             verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
         }
@@ -1153,6 +1210,12 @@ class CameraUploadsWorkerTest {
 
             val result = underTest.doWork()
 
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.ERROR_DURING_PROCESS.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
             verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
         }
@@ -1172,6 +1235,12 @@ class CameraUploadsWorkerTest {
 
             val result = underTest.doWork()
 
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.ERROR_DURING_PROCESS.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
             verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
         }
@@ -1193,6 +1262,12 @@ class CameraUploadsWorkerTest {
 
             val result = underTest.doWork()
 
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.ERROR_DURING_PROCESS.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
             verify(underTest, never()).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
         }
@@ -1222,6 +1297,12 @@ class CameraUploadsWorkerTest {
 
             val result = underTest.doWork()
 
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         }
 
@@ -1242,6 +1323,12 @@ class CameraUploadsWorkerTest {
 
         val result = underTest.doWork()
 
+        verify(underTest).setProgress(
+            workDataOf(
+                STATUS_INFO to FINISHED,
+                FINISHED_REASON to CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET.name
+            )
+        )
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }
 
@@ -1261,6 +1348,12 @@ class CameraUploadsWorkerTest {
 
             val result = underTest.doWork()
 
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         }
 
@@ -1295,6 +1388,12 @@ class CameraUploadsWorkerTest {
 
             val result = underTest.doWork()
 
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.TARGET_NODES_DELETED.name
+                )
+            )
             assertThat(result).isEqualTo(ListenableWorker.Result.retry())
         }
 
@@ -1304,6 +1403,12 @@ class CameraUploadsWorkerTest {
 
         val result = underTest.doWork()
 
+        verify(underTest).setProgress(
+            workDataOf(
+                STATUS_INFO to FINISHED,
+                FINISHED_REASON to CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA.name
+            )
+        )
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }
 

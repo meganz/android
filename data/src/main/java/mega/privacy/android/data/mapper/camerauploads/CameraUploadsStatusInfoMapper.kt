@@ -8,6 +8,8 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMP
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_FILE_INDEX
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_PROGRESS
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED_REASON
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NOT_ENOUGH_STORAGE
@@ -23,6 +25,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import timber.log.Timber
@@ -37,11 +40,24 @@ class CameraUploadsStatusInfoMapper @Inject constructor() {
      * Invocation function
      *
      * @param progress [Data]
+     * @param state [WorkInfo.State]
+     * @param stopReason [Int] value coming from [WorkInfo.stopReason]
      * @return [CameraUploadsStatusInfo]
      */
-    operator fun invoke(progress: Data, state: WorkInfo.State): CameraUploadsStatusInfo? {
+    operator fun invoke(
+        progress: Data,
+        state: WorkInfo.State,
+        stopReason: Int,
+    ): CameraUploadsStatusInfo? {
         return when {
-            state.isFinished -> return CameraUploadsStatusInfo.Finished
+            state.isFinished ->
+                // In case the state is finished, only retain premature stop by the work manager system
+                // Those reason cannot be capture inside the CameraUploadsWorker itself
+                if (stopReason != WorkInfo.STOP_REASON_NOT_STOPPED) {
+                    CameraUploadsStatusInfo.Finished(
+                        reason = mapStopReasonToCameraUploadsFinishedReason(stopReason)
+                    )
+                } else null
 
             else -> when (progress.keyValueMap[STATUS_INFO]) {
                 START -> {
@@ -63,6 +79,15 @@ class CameraUploadsStatusInfoMapper @Inject constructor() {
                     }.onFailure {
                         Timber.e(it)
                     }.getOrNull()
+                }
+
+                FINISHED -> {
+                    CameraUploadsStatusInfo.Finished(
+                        reason = CameraUploadsFinishedReason.valueOf(
+                            progress.getString(FINISHED_REASON)
+                                ?: CameraUploadsFinishedReason.UNKNOWN.name
+                        )
+                    )
                 }
 
                 COMPRESSION_PROGRESS -> {
@@ -113,4 +138,29 @@ class CameraUploadsStatusInfoMapper @Inject constructor() {
             }
         }
     }
+
+    /**
+     * Maps the [WorkInfo.stopReason] to a [CameraUploadsFinishedReason]
+     *
+     * @param stopReason [Int] value coming from [WorkInfo.stopReason]
+     * @return [CameraUploadsFinishedReason]
+     */
+    private fun mapStopReasonToCameraUploadsFinishedReason(stopReason: Int) =
+        when (stopReason) {
+            WorkInfo.STOP_REASON_CANCELLED_BY_APP -> CameraUploadsFinishedReason.SYSTEM_REASON_CANCELLED_BY_APP
+            WorkInfo.STOP_REASON_PREEMPT -> CameraUploadsFinishedReason.SYSTEM_REASON_PREEMPT
+            WorkInfo.STOP_REASON_TIMEOUT -> CameraUploadsFinishedReason.SYSTEM_REASON_TIMEOUT
+            WorkInfo.STOP_REASON_DEVICE_STATE -> CameraUploadsFinishedReason.SYSTEM_REASON_DEVICE_STATE
+            WorkInfo.STOP_REASON_CONSTRAINT_BATTERY_NOT_LOW -> CameraUploadsFinishedReason.SYSTEM_REASON_CONSTRAINT_BATTERY_NOT_LOW
+            WorkInfo.STOP_REASON_CONSTRAINT_CHARGING -> CameraUploadsFinishedReason.SYSTEM_REASON_CONSTRAINT_CHARGING
+            WorkInfo.STOP_REASON_CONSTRAINT_CONNECTIVITY -> CameraUploadsFinishedReason.SYSTEM_REASON_CONSTRAINT_CONNECTIVITY
+            WorkInfo.STOP_REASON_CONSTRAINT_DEVICE_IDLE -> CameraUploadsFinishedReason.SYSTEM_REASON_CONSTRAINT_DEVICE_IDLE
+            WorkInfo.STOP_REASON_CONSTRAINT_STORAGE_NOT_LOW -> CameraUploadsFinishedReason.SYSTEM_REASON_CONSTRAINT_STORAGE_NOT_LOW
+            WorkInfo.STOP_REASON_QUOTA -> CameraUploadsFinishedReason.SYSTEM_REASON_QUOTA
+            WorkInfo.STOP_REASON_BACKGROUND_RESTRICTION -> CameraUploadsFinishedReason.SYSTEM_REASON_BACKGROUND_RESTRICTION
+            WorkInfo.STOP_REASON_APP_STANDBY -> CameraUploadsFinishedReason.SYSTEM_REASON_APP_STANDBY
+            WorkInfo.STOP_REASON_SYSTEM_PROCESSING -> CameraUploadsFinishedReason.SYSTEM_REASON_SYSTEM_PROCESSING
+            WorkInfo.STOP_REASON_ESTIMATED_APP_LAUNCH_TIME_CHANGED -> CameraUploadsFinishedReason.SYSTEM_REASON_ESTIMATED_APP_LAUNCH_TIME_CHANGED
+            else -> CameraUploadsFinishedReason.UNKNOWN
+        }
 }

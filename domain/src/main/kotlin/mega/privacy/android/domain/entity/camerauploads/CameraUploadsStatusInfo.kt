@@ -13,9 +13,13 @@ sealed interface CameraUploadsStatusInfo {
     data object Started : CameraUploadsStatusInfo
 
     /**
-     *  object used to notify that the Camera Uploads has finished
+     *  class used to notify that the Camera Uploads has finished
+     *
+     *  @property reason the reason why the Camera Uploads has finished
      */
-    data object Finished : CameraUploadsStatusInfo
+    data class Finished(
+        val reason: CameraUploadsFinishedReason,
+    ) : CameraUploadsStatusInfo
 
     /**
      *  class for displaying a notification for upload progress

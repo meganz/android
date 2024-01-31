@@ -1,6 +1,8 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import android.os.Build
+import androidx.work.WorkInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -551,7 +553,12 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override fun monitorCameraUploadsStatusInfo() =
         workManagerGateway.monitorCameraUploadsStatusInfo().mapNotNull { workInfoList ->
             with(workInfoList.first()) {
-                cameraUploadsStatusInfoMapper(progress, state)
+                cameraUploadsStatusInfoMapper(
+                    progress = progress,
+                    state = state,
+                    stopReason = if (deviceGateway.getSdkVersionInt() >= Build.VERSION_CODES.S) stopReason
+                    else WorkInfo.STOP_REASON_UNKNOWN
+                )
             }
         }.catch {
             Timber.e(it)

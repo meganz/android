@@ -11,6 +11,8 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMP
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_FILE_INDEX
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_PROGRESS
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED_REASON
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NOT_ENOUGH_STORAGE
@@ -25,6 +27,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
@@ -89,38 +92,54 @@ class CameraUploadsStatusInfoMapperTest {
     fun `test that mapper returns model correctly when invoke function`(
         progress: Data,
         state: WorkInfo.State,
-        cameraUploadsStatusInfo: CameraUploadsStatusInfo,
+        stopReason: Int,
+        cameraUploadsStatusInfo: CameraUploadsStatusInfo?,
     ) = runTest {
-        val actual = underTest(progress, state)
+        val actual = underTest(progress, state, stopReason)
         Truth.assertThat(actual).isEqualTo(cameraUploadsStatusInfo)
     }
 
     private fun provideParameters(): Stream<Arguments> = Stream.of(
-        Arguments.of(progressData, WorkInfo.State.RUNNING, cameraUploadProgressInfo),
-        Arguments.of(videoProgressData, WorkInfo.State.RUNNING, videoProgressInfo),
+        Arguments.of(
+            progressData,
+            WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
+            cameraUploadProgressInfo,
+        ),
+        Arguments.of(
+            videoProgressData,
+            WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
+            videoProgressInfo
+        ),
         Arguments.of(
             workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD),
             WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
             CameraUploadsStatusInfo.CheckFilesForUpload
         ),
         Arguments.of(
             workDataOf(STATUS_INFO to STORAGE_OVER_QUOTA),
             WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
             CameraUploadsStatusInfo.StorageOverQuota
         ),
         Arguments.of(
             workDataOf(STATUS_INFO to OUT_OF_SPACE),
             WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
             CameraUploadsStatusInfo.VideoCompressionOutOfSpace
         ),
         Arguments.of(
             workDataOf(STATUS_INFO to NOT_ENOUGH_STORAGE),
             WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
             CameraUploadsStatusInfo.NotEnoughStorage
         ),
         Arguments.of(
             workDataOf(STATUS_INFO to COMPRESSION_ERROR),
             WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
             CameraUploadsStatusInfo.VideoCompressionError
         ),
         Arguments.of(
@@ -129,6 +148,7 @@ class CameraUploadsStatusInfoMapperTest {
                 FOLDER_TYPE to CameraUploadFolderType.Primary.ordinal
             ),
             WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
             CameraUploadsStatusInfo.FolderUnavailable(CameraUploadFolderType.Primary)
         ),
         Arguments.of(
@@ -137,10 +157,50 @@ class CameraUploadsStatusInfoMapperTest {
                 FOLDER_TYPE to CameraUploadFolderType.Secondary.ordinal
             ),
             WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
             CameraUploadsStatusInfo.FolderUnavailable(CameraUploadFolderType.Secondary)
         ),
-        Arguments.of(progressData, WorkInfo.State.SUCCEEDED, CameraUploadsStatusInfo.Finished),
-        Arguments.of(progressData, WorkInfo.State.FAILED, CameraUploadsStatusInfo.Finished),
-        Arguments.of(progressData, WorkInfo.State.CANCELLED, CameraUploadsStatusInfo.Finished),
+        Arguments.of(
+            workDataOf(
+                STATUS_INFO to FINISHED,
+                FINISHED_REASON to CameraUploadsFinishedReason.COMPLETED.name,
+            ),
+            WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.COMPLETED)
+        ),
+        Arguments.of(
+            workDataOf(
+                STATUS_INFO to FINISHED,
+                FINISHED_REASON to CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA.name,
+            ),
+            WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.SUCCEEDED,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
+            null,
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
+            null,
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
+            null,
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_CANCELLED_BY_APP,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_CANCELLED_BY_APP)
+        ),
     )
 }
