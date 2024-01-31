@@ -5487,4 +5487,20 @@
         <item quantity="many"></item>
         <item quantity="other"></item>
     </plurals>
+    <!-- Button text to mute a participant in the info of participant in call screen-->
+    <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Silenciar</string>
+    <!-- Button text to mute all participant in the call screen-->
+    <string name="meetings_bottom_panel_in_call_participants_mute_all_participants_button">Silenciar a todos</string>
+    <!-- Label text indicating that all participants are muted -->
+    <string name="meetings_bottom_panel_in_call_participants_all_muted_label">Todos foram silenciados</string>
+    <!-- Message of the snackbar displayed when you have muted a participant. The placeholder is for the name of the participant you muted -->
+    <string name="meetings_muted_a_participant_snackbar_message">Você silenciou %s</string>
+    <!-- Message of the snackbar displayed when you have muted all participants -->
+    <string name="meetings_muted_all_participants_snackbar_message">Você silenciou todos os participantes</string>
+    <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
+    <string name="meetings_muted_by_a_participant_snackbar_message">Você foi silenciado por %s</string>
+    <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
+    <string name="account_upgrade_account_description_subscription_title">Informações da assinatura</string>
+    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
+    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
 </resources>

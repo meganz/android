@@ -4954,9 +4954,9 @@
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]瞭解更多[/A]</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
-    <string name="meetings_call_recording_started_snackbar_message">%1$s已開始錄影</string>
+    <string name="meetings_call_recording_started_snackbar_message">%1$s已開始錄製</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
-    <string name="meetings_call_recording_stopped_snackbar_message">%1$s已停止錄影</string>
+    <string name="meetings_call_recording_stopped_snackbar_message">%1$s已停止錄製</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">相簿</string>
     <!-- Preference screen item title for Ads Cookie -->
@@ -5017,4 +5017,20 @@
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
         <item quantity="other"></item>
     </plurals>
+    <!-- Button text to mute a participant in the info of participant in call screen-->
+    <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">靜音</string>
+    <!-- Button text to mute all participant in the call screen-->
+    <string name="meetings_bottom_panel_in_call_participants_mute_all_participants_button">全部靜音</string>
+    <!-- Label text indicating that all participants are muted -->
+    <string name="meetings_bottom_panel_in_call_participants_all_muted_label">已全部靜音</string>
+    <!-- Message of the snackbar displayed when you have muted a participant. The placeholder is for the name of the participant you muted -->
+    <string name="meetings_muted_a_participant_snackbar_message">您已將%s設為靜音</string>
+    <!-- Message of the snackbar displayed when you have muted all participants -->
+    <string name="meetings_muted_all_participants_snackbar_message">您已將所有與會者設為靜音</string>
+    <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
+    <string name="meetings_muted_by_a_participant_snackbar_message">%s已將您設為靜音</string>
+    <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
+    <string name="account_upgrade_account_description_subscription_title">訂閱詳情</string>
+    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
+    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
 </resources>

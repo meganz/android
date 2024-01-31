@@ -45,7 +45,7 @@
     <!-- Sync conflict message -->
     <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
     <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">Há vários nomes de arquivo em um lado que se tornariam todos o mesmo nome no outro lado.</string>
+    <string name="sync_stalled_issue_detail_conflict_message">Há vários itens com o mesmo nome em um lado da sincronização que se tornariam todos o mesmo item no outro lado da sincronização.</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Renomear todos os itens</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -165,7 +165,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Selecionar</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">Um arquivo ou uma pasta teve um problema que precisa ser solucionado por você</string>
+    <string name="sync_stalled_issue_file_issue_detail">Há um problema com um arquivo ou uma pasta que precisa de uma decisão sua para ser resolvido</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Esperando a conclusão de outros processos</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -185,7 +185,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Este arquivo tem cópias conflitantes</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">Há vários nomes de arquivo em um lado que se tornariam todos o mesmo nome no outro lado</string>
+    <string name="sync_stalled_issue_name_clash_detail">Há vários itens com o mesmo nome em um lado da sincronização que se tornariam todos o mesmo item no outro lado da sincronização.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">Uma movimentação ou renomeação foi detectada no MEGA, mas não foi possível replicá-la no dispositivo local.</string>
     <!-- Sync notification title description sync monitoring-->

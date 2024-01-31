@@ -5458,17 +5458,17 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Chiama tutti</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account.</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">Questa app ha un accesso effettuato su un diverso account MEGA.\nEffettua il logout da questo account, ed effettua il login sul tuo account MEGA VPN.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
-    <string name="chat_attach_pick_from_camera_deny_permission">MEGA needs access to your camera to capture photos and videos.</string>
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA ha bisogno di accedere alla tua fotocamera per scattare foto e registrare video.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
-    <string name="chat_attach_location_deny_permission">You denied MEGA access to your location. If you’d like to share your location, allow MEGA permission to do so.</string>
+    <string name="chat_attach_location_deny_permission">Hai negato a MEGA l\’accesso alla tua posizione. Se ti piacerebbe condividere la tua posizione, permetti a MEGA di fare ciò.</string>
     <!-- Title for the confirmation dialog shown when the user is starting a large download -->
-    <string name="transfers_confirm_large_download_title">Large download</string>
+    <string name="transfers_confirm_large_download_title">Grande download</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
-    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <string name="transfers_confirm_large_download_button_start">Avvia download</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
-    <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
+    <string name="transfers_confirm_large_download_button_start_always">Scarica sempre e non chiedere nuovamente</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
         <item quantity="one"></item>
@@ -5487,4 +5487,20 @@
         <item quantity="many"></item>
         <item quantity="other"></item>
     </plurals>
+    <!-- Button text to mute a participant in the info of participant in call screen-->
+    <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Muta</string>
+    <!-- Button text to mute all participant in the call screen-->
+    <string name="meetings_bottom_panel_in_call_participants_mute_all_participants_button">Muta tutti i partecipanti</string>
+    <!-- Label text indicating that all participants are muted -->
+    <string name="meetings_bottom_panel_in_call_participants_all_muted_label">Tutti mutati</string>
+    <!-- Message of the snackbar displayed when you have muted a participant. The placeholder is for the name of the participant you muted -->
+    <string name="meetings_muted_a_participant_snackbar_message">You’ve muted %s</string>
+    <!-- Message of the snackbar displayed when you have muted all participants -->
+    <string name="meetings_muted_all_participants_snackbar_message">Hai mutato tutti i partecipanti</string>
+    <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
+    <string name="meetings_muted_by_a_participant_snackbar_message">You’ve been muted by %s</string>
+    <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
+    <string name="account_upgrade_account_description_subscription_title">Dettagli dell\’abbonamento</string>
+    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
+    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
 </resources>

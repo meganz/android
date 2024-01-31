@@ -39,13 +39,13 @@
     <!-- Sync options -->
     <string name="sync_menu_sync_options">Opțiuni de sincronizare</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Ștergeți problemele rezolvate</string>
+    <string name="sync_menu_clear_issues">Clear resolved issues</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Sincronizarea bidirecțională</string>
     <!-- Sync conflict message -->
     <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
     <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">Există mai multe nume de fișiere pe o parte care ar deveni același nume unic pe cealaltă parte.</string>
+    <string name="sync_stalled_issue_detail_conflict_message">Există mai multe elemente cu același nume pe o parte a sincronizării dvs. care ar deveni toate același element unic pe cealaltă parte a sincronizării</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Redenumiți toate elementele</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -75,7 +75,7 @@
     <!-- Sync dialog battery optimization message -->
     <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">Nicio problemă rezolvată</string>
+    <string name="sync_solved_issues_empty_message">No resolved issues</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">Nicio problemă</string>
     <!-- Sync option to choose folder pair -->
@@ -165,7 +165,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Selectează</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">Un singur fișier sau folder a avut o problemă care necesită rezolvarea deciziei dvs.</string>
+    <string name="sync_stalled_issue_file_issue_detail">A file or folder has an issue that needs your decision to resolve it</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">În așteptarea finalizării altor procese</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -185,7 +185,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Acest fișier are copii conflictuale</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">Există mai multe nume de fișiere pe o parte care ar deveni același nume unic pe cealaltă parte</string>
+    <string name="sync_stalled_issue_name_clash_detail">Există mai multe elemente cu același nume pe o parte a sincronizării dvs. care ar deveni toate același element unic pe cealaltă parte a sincronizării</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">O mutare sau redenumire a fost detectată în MEGA, dar nu a putut fi replicată local.</string>
     <!-- Sync notification title description sync monitoring-->
