@@ -755,4 +755,11 @@ internal class MegaChatApiFacade @Inject constructor(
     ) {
         chatApi.mutePeers(chatId, clientId, listener)
     }
+
+    override fun addReaction(
+        chatId: Long,
+        msgId: Long,
+        reaction: String,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.addReaction(chatId, msgId, reaction, listener)
 }

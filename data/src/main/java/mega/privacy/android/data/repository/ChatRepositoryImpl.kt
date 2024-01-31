@@ -1309,7 +1309,7 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun setChatDraftMessage(chatId: Long, draftMessage: String) {
         val preference = megaLocalRoomGateway.monitorChatPendingChanges(chatId).firstOrNull()
-            ?: ChatPendingChanges(chatId = chatId,)
+            ?: ChatPendingChanges(chatId = chatId)
         megaLocalRoomGateway.setChatPendingChanges(
             preference.copy(
                 draftMessage = draftMessage
@@ -1323,4 +1323,15 @@ internal class ChatRepositoryImpl @Inject constructor(
     }
 
     override fun getDefaultChatFolderName() = context.getString(R.string.section_photo_sync)
+
+    override suspend fun addReaction(chatId: Long, msgId: Long, reaction: String) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getChatRequestListener("addReaction") {}
+                megaChatApiGateway.addReaction(chatId, msgId, reaction, listener)
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 }

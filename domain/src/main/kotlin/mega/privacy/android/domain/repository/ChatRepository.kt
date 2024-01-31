@@ -970,4 +970,36 @@ interface ChatRepository {
      * Get default folder name, localized to current device.
      */
     fun getDefaultChatFolderName(): String
+
+    /**
+     * Adds a reaction for a message in a chatroom
+     *
+     * The reactions updates will be notified one by one through the MegaChatRoomListener
+     * specified at MegaChatApi::openChatRoom (and through any other listener you may have
+     * registered by calling MegaChatApi::addChatRoomListener). The corresponding callback
+     * is MegaChatRoomListener::onReactionUpdate.
+     *
+     * Note that receiving an onRequestFinish with the error code MegaChatError::ERROR_OK, does not ensure
+     * that add reaction has been applied in chatd. As we've mentioned above, reactions updates will
+     * be notified through callback MegaChatRoomListener::onReactionUpdate.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_MANAGE_REACTION
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chatid that identifies the chatroom
+     * - MegaChatRequest::getUserHandle - Returns the msgid that identifies the message
+     * - MegaChatRequest::getText - Returns a UTF-8 NULL-terminated string that represents the reaction
+     * - MegaChatRequest::getFlag - Returns true indicating that requested action is add reaction
+     *
+     * On the onRequestFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ARGS - if reaction is NULL or the msgid references a management message.
+     * - MegaChatError::ERROR_NOENT - if the chatroom/message doesn't exists
+     * - MegaChatError::ERROR_ACCESS - if our own privilege is different than MegaChatPeerList::PRIV_STANDARD
+     * or MegaChatPeerList::PRIV_MODERATOR.
+     * - MegaChatError::ERROR_EXIST - if our own user has reacted previously with this reaction for this message
+     *
+     * @param chatId MegaChatHandle that identifies the chatroom
+     * @param msgId MegaChatHandle that identifies the message
+     * @param reaction UTF-8 NULL-terminated string that represents the reaction
+     */
+    suspend fun addReaction(chatId: Long, msgId: Long, reaction: String)
 }

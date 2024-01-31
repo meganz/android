@@ -141,6 +141,7 @@ internal fun ChatView(
         onSendLocationMessage = viewModel::sendLocationMessage,
         onAttachFiles = viewModel::onAttachFiles,
         onCloseEditing = viewModel::onCloseEditing,
+        onAddReaction = viewModel::onAddReaction,
     )
 }
 
@@ -214,6 +215,7 @@ internal fun ChatView(
     onSendLocationMessage: (Intent?) -> Unit = { _ -> },
     onAttachFiles: (List<Uri>) -> Unit = {},
     onCloseEditing: () -> Unit = {},
+    onAddReaction: (Long, String) -> Unit = { _, _ -> },
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -229,6 +231,7 @@ internal fun ChatView(
     var showJoinAnswerCallDialog by rememberSaveable { mutableStateOf(false) }
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
     var showReactionPicker by rememberSaveable { mutableStateOf(false) }
+    var messageClicked by rememberSaveable { mutableStateOf<TypedMessage?>(null) }
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val keyboardController = LocalSoftwareKeyboardController.current
     val toolbarModalSheetState =
@@ -254,6 +257,8 @@ internal fun ChatView(
         confirmValueChange = {
             if (it != ModalBottomSheetValue.Hidden) {
                 keyboardController?.hide()
+            } else {
+                messageClicked = null
             }
             true
         }
@@ -390,7 +395,8 @@ internal fun ChatView(
                         MessageOptionsBottomSheet(
                             showReactionPicker = showReactionPicker,
                             onReactionClicked = {
-                                // Add reaction
+                                messageClicked?.let { message -> onAddReaction(message.msgId, it) }
+                                coroutineScope.launch { messageOptionsModalSheetState.hide() }
                             },
                             onMoreReactionsClicked = { showReactionPicker = true },
                             sheetState = messageOptionsModalSheetState,
@@ -598,6 +604,7 @@ internal fun ChatView(
                                 scrollState,
                                 bottomPadding
                             ) { message ->
+                                messageClicked = message
                                 // Use message for showing correct available options
                                 coroutineScope.launch {
                                     messageOptionsModalSheetState.show()

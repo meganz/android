@@ -1016,4 +1016,21 @@ class ChatRepositoryImplTest {
         val actual = underTest.getDefaultChatFolderName()
         assertThat(actual).isEqualTo(expected)
     }
+
+    @Test
+    fun `test that add reaction invokes correctly`() = runTest {
+        val chatId = 123L
+        val msgId = 456L
+        val reaction = "reaction"
+        whenever(megaChatApiGateway.addReaction(any(), any(), any(), any())).thenAnswer {
+            ((it.arguments[3]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                megaChatErrorSuccess,
+            )
+        }
+        underTest.addReaction(chatId, msgId, reaction)
+        verify(megaChatApiGateway).addReaction(eq(chatId), eq(msgId), eq(reaction), any())
+        verifyNoMoreInteractions(megaChatApiGateway)
+    }
 }

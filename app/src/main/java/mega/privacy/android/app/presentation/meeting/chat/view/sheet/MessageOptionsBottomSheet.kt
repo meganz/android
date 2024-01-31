@@ -52,9 +52,6 @@ fun MessageOptionsBottomSheet(
             AddReactionsSheetItem(
                 onReactionClicked = {
                     onReactionClicked(it)
-                    coroutineScope.launch {
-                        sheetState.hide()
-                    }
                 },
                 onMoreReactionsClicked = onMoreReactionsClicked,
                 modifier = Modifier.padding(8.dp),
@@ -67,9 +64,6 @@ fun MessageOptionsBottomSheet(
             onEmojiPicked = {
                 //Add reaction
                 onReactionClicked(it.emoji)
-                coroutineScope.launch {
-                    sheetState.hide()
-                }
             },
             showEmojiPicker = showReactionPicker,
         )

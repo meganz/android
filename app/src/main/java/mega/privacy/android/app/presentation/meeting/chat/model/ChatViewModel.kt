@@ -69,6 +69,7 @@ import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
+import mega.privacy.android.domain.usecase.chat.message.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
@@ -179,6 +180,7 @@ class ChatViewModel @Inject constructor(
     private val sendLocationMessageUseCase: SendLocationMessageUseCase,
     private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
     private val monitorChatPendingChangesUseCase: MonitorChatPendingChangesUseCase,
+    private val addReactionUseCase: AddReactionUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1094,6 +1096,19 @@ class ChatViewModel @Inject constructor(
      */
     fun onCloseEditing() {
         _state.update { state -> state.copy(editingMessageId = null) }
+    }
+
+    /**
+     * Add reaction to a message.
+     *
+     * @param msgId The message id.
+     * @param reaction The reaction to add.
+     */
+    fun onAddReaction(msgId: Long, reaction: String) {
+        viewModelScope.launch {
+            runCatching { addReactionUseCase(chatId, msgId, reaction) }
+                .onFailure { Timber.e(it) }
+        }
     }
 
     override fun onCleared() {

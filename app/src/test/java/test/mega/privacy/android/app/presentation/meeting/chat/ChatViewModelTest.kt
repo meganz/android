@@ -79,6 +79,7 @@ import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
+import mega.privacy.android.domain.usecase.chat.message.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
@@ -237,6 +238,7 @@ internal class ChatViewModelTest {
     private val monitorChatPendingChangesUseCase = mock<MonitorChatPendingChangesUseCase> {
         on { invoke(any()) } doReturn emptyFlow()
     }
+    private val addReactionUseCase = mock<AddReactionUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -290,6 +292,7 @@ internal class ChatViewModelTest {
             createNewImageUriUseCase,
             sendLocationMessageUseCase,
             sendChatAttachmentsUseCase,
+            addReactionUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -374,7 +377,8 @@ internal class ChatViewModelTest {
             applicationScope = CoroutineScope(testDispatcher),
             sendLocationMessageUseCase = sendLocationMessageUseCase,
             sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
-            monitorChatPendingChangesUseCase = monitorChatPendingChangesUseCase
+            monitorChatPendingChangesUseCase = monitorChatPendingChangesUseCase,
+            addReactionUseCase = addReactionUseCase,
         )
     }
 
@@ -2363,6 +2367,15 @@ internal class ChatViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().editingMessageId).isNull()
         }
+    }
+
+    @Test
+    fun `test that add reaction invokes use case`() = runTest {
+        val msgId = 1234L
+        val reaction = "reaction"
+        whenever(addReactionUseCase(chatId, msgId, reaction)).thenReturn(Unit)
+        underTest.onAddReaction(msgId, reaction)
+        verify(addReactionUseCase).invoke(chatId, msgId, reaction)
     }
 
     private fun ChatRoom.getNumberParticipants() =
