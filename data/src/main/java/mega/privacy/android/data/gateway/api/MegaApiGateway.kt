@@ -3328,4 +3328,24 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun getSessionTransferURL(path: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get binary user handle
+     * @return user handle [Long]
+     */
+    fun getMyUserHandleBinary(): Long
+
+    /**
+     * Get nodes by fingerprint
+     * @param fingerprint fingerprint of node
+     * @return list of [MegaNode]
+     */
+    fun getNodesByFingerprint(fingerprint: String): List<MegaNode>
+
+    /**
+     * Get owner of node
+     * @param handle [Long]
+     * @return owner handle [Long]
+     */
+    fun getOwner(handle: Long): Long?
 }

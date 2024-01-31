@@ -1516,4 +1516,13 @@ internal class MegaApiFacade @Inject constructor(
     override fun getSessionTransferURL(path: String, listener: MegaRequestListenerInterface) {
         megaApi.getSessionTransferURL(path, listener)
     }
+
+    override fun getMyUserHandleBinary(): Long =
+        megaApi.myUserHandleBinary
+
+    override fun getNodesByFingerprint(fingerprint: String): List<MegaNode> =
+        megaApi.getNodesByFingerprint(fingerprint)
+
+    override fun getOwner(handle: Long): Long? =
+        megaApi.getNodeByHandle(handle)?.owner
 }

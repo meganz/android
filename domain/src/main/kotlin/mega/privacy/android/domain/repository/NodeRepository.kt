@@ -650,4 +650,24 @@ interface NodeRepository {
      * @param accessPermission [AccessPermission]
      */
     suspend fun shareFolder(nodeId: NodeId, email: String, accessPermission: AccessPermission)
+
+    /**
+     * Gets my binary user handle
+     * @return user handle [Long]
+     */
+    suspend fun getMyUserHandleBinary(): Long
+
+    /**
+     * Gets nodes from fingerprint
+     * @param fingerprint
+     * @return list of [Node]
+     */
+    suspend fun getNodesFromFingerPrint(fingerprint: String): List<Node>
+
+    /**
+     * Gets owner of node
+     * @param nodeId [NodeId]
+     * @return owner node [Long]
+     */
+    suspend fun getOwnerNode(nodeId: NodeId): Long?
 }

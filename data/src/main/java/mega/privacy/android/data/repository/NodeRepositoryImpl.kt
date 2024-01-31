@@ -943,4 +943,24 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getMyUserHandleBinary(): Long {
+        return withContext(ioDispatcher) {
+            megaApiGateway.getMyUserHandleBinary()
+        }
+    }
+
+    override suspend fun getNodesFromFingerPrint(fingerprint: String): List<Node> {
+        return withContext(ioDispatcher) {
+            megaApiGateway.getNodesByFingerprint(fingerprint).map {
+                convertToUnTypedNode(it)
+            }
+        }
+    }
+
+    override suspend fun getOwnerNode(nodeId: NodeId): Long? {
+        return withContext(ioDispatcher) {
+            megaApiGateway.getOwner(nodeId.longValue)
+        }
+    }
 }
