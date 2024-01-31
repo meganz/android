@@ -6,6 +6,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,6 +39,7 @@ import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.usecase.CopyNodeListUseCase
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.FileUtil
@@ -47,13 +50,15 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
-import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -94,6 +99,8 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
     private var getFeatureFlagUseCase: GetFeatureFlagValueUseCase,
     private val isNodeInRubbish: IsNodeInRubbish,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -607,5 +614,38 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     suspend fun setListViewTypeClicked() {
         setViewType(ViewType.LIST)
+    }
+
+    /**
+     * Consume download event once it's started
+     */
+    fun consumeDownloadEvent() {
+        _state.update {
+            it.copy(downloadEvent = consumed())
+        }
+    }
+
+    /**
+     * On save to device clicked, will start downloading selected nodes (or all if none selected)
+     * @param legacySaveToDevice: to launch legacy implementation if [AppFeatures.DownloadWorker] is false
+     */
+    fun onSaveToDeviceClicked(legacySaveToDevice: () -> Unit) {
+        viewModelScope.launch {
+            if (getFeatureFlagUseCase(AppFeatures.DownloadWorker)) {
+                val nodes = getNodes().mapNotNull {
+                    if (fromFolderLink == true) {
+                        getPublicChildNodeFromIdUseCase(NodeId(it.handle))
+                    } else {
+                        getNodeByIdUseCase(NodeId(it.handle))
+                    }
+                }
+                _state.update {
+                    it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(nodes)))
+                }
+                clearSelectedPhotos()
+            } else {
+                legacySaveToDevice()
+            }
+        }
     }
 }

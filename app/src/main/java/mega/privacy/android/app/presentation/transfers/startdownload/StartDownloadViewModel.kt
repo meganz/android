@@ -27,6 +27,7 @@ import javax.inject.Inject
  * Once these screens are migrated to compose this view model should be removed and the state added to the corresponding view model.
  */
 @HiltViewModel
+@Deprecated(message = "This view model should be used only as a temporal solution for existing legacy screens and view models, new view models should have the [TypedNode] and handle the [TransferTriggerEvent] event in its ui state")
 class StartDownloadViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,

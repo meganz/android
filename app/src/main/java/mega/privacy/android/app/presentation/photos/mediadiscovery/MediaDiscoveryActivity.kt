@@ -102,7 +102,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                     onPhotoClicked = this::onClick,
                     onPhotoLongPressed = this::onLongPress,
                     onImportClicked = this::importNode,
-                    onSaveToDeviceClicked = this::saveToDevice,
+                    legacyOnSaveToDeviceClicked = this::saveToDevice,
                 )
             }
         }
@@ -380,6 +380,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
     /**
      * Handle download option
      */
+    @Deprecated("This will be removed once [AppFeatures.DownloadWorker] is stable")
     private fun saveToDevice() {
         lifecycleScope.launch {
             val nodes = mediaDiscoveryViewModel.getNodes()

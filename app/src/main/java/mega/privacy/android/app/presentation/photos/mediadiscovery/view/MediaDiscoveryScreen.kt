@@ -15,6 +15,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,9 +47,10 @@ import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.EmptyView
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
-import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
+import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
+import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
@@ -66,10 +68,11 @@ fun MediaDiscoveryScreen(
     onPhotoClicked: (Photo) -> Unit,
     onPhotoLongPressed: (Photo) -> Unit,
     onImportClicked: () -> Unit,
-    onSaveToDeviceClicked: () -> Unit,
+    legacyOnSaveToDeviceClicked: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val lazyGridState = rememberLazyGridState()
+    val scaffoldState = rememberScaffoldState()
 
     var showSortByDialog by rememberSaveable { mutableStateOf(false) }
     var showFilterDialog by rememberSaveable { mutableStateOf(false) }
@@ -119,7 +122,9 @@ fun MediaDiscoveryScreen(
                     showMoreMenu = false
                 },
                 onSaveToDeviceClicked = {
-                    onSaveToDeviceClicked()
+                    viewModel.onSaveToDeviceClicked {
+                        legacyOnSaveToDeviceClicked()
+                    }
                     showMoreMenu = false
                 },
                 onSortByClicked = {
@@ -152,6 +157,7 @@ fun MediaDiscoveryScreen(
                 },
             )
         },
+        scaffoldState = scaffoldState,
         content = {
             if (uiState.loadPhotosDone) {
                 if (uiState.uiPhotoList.isNotEmpty()) {
@@ -182,6 +188,11 @@ fun MediaDiscoveryScreen(
             } else {
                 PhotosSkeletonView()
             }
+            StartDownloadComponent(
+                event = uiState.downloadEvent,
+                onConsumeEvent = viewModel::consumeDownloadEvent,
+                snackBarHostState = scaffoldState.snackbarHostState
+            )
         },
     )
 }
