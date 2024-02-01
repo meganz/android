@@ -55,6 +55,7 @@ class UiChatMessageMapper @Inject constructor() {
      */
     operator fun invoke(
         message: TypedMessage,
+        chatId: Long,
     ): UiChatMessage {
         return when (message) {
             is TextMessage -> TextUiMessage(
@@ -132,6 +133,7 @@ class UiChatMessageMapper @Inject constructor() {
 
             is VoiceClipMessage -> VoiceClipUiMessage(
                 message = message,
+                chatId = chatId,
             )
 
             is InvalidMessage, is InvalidMetaMessage -> mapInvalidMessage(

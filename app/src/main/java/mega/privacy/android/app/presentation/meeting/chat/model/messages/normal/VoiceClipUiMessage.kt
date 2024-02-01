@@ -15,12 +15,11 @@ import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
  * UI message for voice clip
  *
  * @property message [VoiceClipMessage]
- * @property showAvatar
- * @property showTime
- * @property showDate
+ * @property chatId
  */
 class VoiceClipUiMessage(
     val message: VoiceClipMessage,
+    val chatId: Long
 ) : AvatarMessage() {
 
     @OptIn(ExperimentalFoundationApi::class)
@@ -28,6 +27,7 @@ class VoiceClipUiMessage(
     override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
         VoiceClipMessageView(
             message = message,
+            chatId = chatId,
             modifier = Modifier.combinedClickable(
                 onClick = {},
                 onLongClick = { onLongClick(message) }

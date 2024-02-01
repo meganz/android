@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.core.ui.controls.chat.messages.CoreVoiceClipMessageView
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 
@@ -14,15 +13,15 @@ import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 @Composable
 fun VoiceClipMessageView(
     message: VoiceClipMessage,
+    chatId: Long,
     modifier: Modifier = Modifier,
     viewModel: VoiceClipMessageViewModel = hiltViewModel(),
-    chatViewModel: ChatViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.getUiStateFlow(message.msgId).collectAsStateWithLifecycle()
     LaunchedEffect(message.msgId) {
         viewModel.addVoiceClip(
             message = message,
-            chatId = chatViewModel.state.value.chatId
+            chatId = chatId
         )
     }
 

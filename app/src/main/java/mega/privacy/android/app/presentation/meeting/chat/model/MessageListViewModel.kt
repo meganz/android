@@ -69,11 +69,11 @@ class MessageListViewModel @Inject constructor(
         }.flow
             .map { pagingData ->
                 pagingData.map {
-                    uiChatMessageMapper(it)
+                    uiChatMessageMapper(it, chatId)
                 }
                     .insertFooterItem(
-                    item = ChatHeaderMessage()
-                )
+                        item = ChatHeaderMessage()
+                    )
             }
             .cachedIn(viewModelScope)
 
