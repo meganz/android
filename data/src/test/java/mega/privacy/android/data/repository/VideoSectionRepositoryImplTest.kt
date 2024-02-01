@@ -14,12 +14,18 @@ import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.data.mapper.videosection.VideoPlaylistMapper
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.set.UserSet
+import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.repository.VideoSectionRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
 import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
@@ -183,6 +189,51 @@ class VideoSectionRepositoryImplTest {
         whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
         whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(megaNode)
         whenever(typedVideoNodeMapper(any(), any())).thenReturn(typedVideoNode)
+    }
+
+    @Test
+    fun `test that the created video playlist has the correct title`() = runTest {
+        val api = mock<MegaApiJava>()
+
+        val testMegaSet = mock<MegaSet> {
+            on { id() }.thenReturn(1L)
+            on { name() }.thenReturn("video playlist title")
+        }
+
+        val userSet = createUserSet(
+            testMegaSet.id(),
+            testMegaSet.name(),
+            MegaSet.SET_TYPE_PLAYLIST,
+            null,
+            testMegaSet.cts(),
+            testMegaSet.ts(),
+            false,
+        )
+
+        val expectedVideoPlaylist = mock<VideoPlaylist> {
+            on { id }.thenReturn(NodeId(userSet.id))
+            on { title }.thenReturn(userSet.name)
+        }
+
+        val request = mock<MegaRequest> {
+            on { megaSet }.thenReturn(testMegaSet)
+        }
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        whenever(megaApiGateway.createSet(any(), any(), any())).thenAnswer {
+            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                error
+            )
+        }
+        whenever(videoPlaylistMapper(any(), any())).thenReturn(expectedVideoPlaylist)
+
+        val actual = underTest.createVideoPlaylist(userSet.name)
+        assertThat(actual.id.longValue).isEqualTo(userSet.id)
+        assertThat(actual.title).isEqualTo(userSet.name)
     }
 
     private fun createMegaSet(id: Long, type: Int = MegaSet.SET_TYPE_PLAYLIST) = mock<MegaSet> {

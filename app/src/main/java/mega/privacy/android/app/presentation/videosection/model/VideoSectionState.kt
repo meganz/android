@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.videosection.model
 
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 
 /**
  * The state is for the videos section
@@ -14,6 +15,8 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property selectedVideoHandles the selected video handles
  * @property isInSelection if list is in selection mode or not
  * @property videoPlaylists the video playlists
+ * @property currentVideoPlaylist the current video playlist
+ * @property isVideoPlaylistCreatedSuccessfully the video playlist created successfully state
  */
 data class VideoSectionState(
     val allVideos: List<UIVideo> = emptyList(),
@@ -24,5 +27,7 @@ data class VideoSectionState(
     val scrollToTop: Boolean = false,
     val selectedVideoHandles: List<Long> = emptyList(),
     val isInSelection: Boolean = false,
-    val videoPlaylists: List<UIVideoPlaylist> = emptyList()
+    val videoPlaylists: List<UIVideoPlaylist> = emptyList(),
+    val currentVideoPlaylist: VideoPlaylist? = null,
+    val isVideoPlaylistCreatedSuccessfully: Boolean = false
 )

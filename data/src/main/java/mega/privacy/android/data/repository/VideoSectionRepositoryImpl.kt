@@ -1,9 +1,12 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
@@ -18,8 +21,10 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
 import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSet
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -113,4 +118,34 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             videoNodeList = videoNodeList
         )
     }
+
+    override suspend fun createVideoPlaylist(title: String): VideoPlaylist =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { megaRequest, megaError ->
+                        if (megaError.errorCode == MegaError.API_OK) {
+                            val newSet = megaRequest.megaSet
+                            continuation.resumeWith(
+                                Result.success(
+                                    videoPlaylistMapper(
+                                        userSet = newSet.toUserSet(),
+                                        videoNodeList = emptyList()
+                                    )
+                                )
+                            )
+                        } else {
+                            Timber.e("Error creating new album: ${megaError.errorString}")
+                            continuation.failWithError(megaError, "createAlbum")
+                        }
+                    }
+                )
+                megaApiGateway.createSet(
+                    name = title,
+                    type = MegaSet.SET_TYPE_PLAYLIST,
+                    listener = listener
+                )
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
 }

@@ -22,4 +22,12 @@ interface VideoSectionRepository {
      * @return video playlist lists
      */
     suspend fun getVideoPlaylists(): List<VideoPlaylist>
+
+    /**
+     * Create a video playlist
+     *
+     * @param title video playlist title
+     * @return created video playlist
+     */
+    suspend fun createVideoPlaylist(title: String): VideoPlaylist
 }

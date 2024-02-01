@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import nz.mega.sdk.MegaNode
@@ -60,6 +62,7 @@ class VideoSectionViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getVideoPlaylistsUseCase: GetVideoPlaylistsUseCase,
     private val uiVideoPlaylistMapper: UIVideoPlaylistMapper,
+    private val createVideoPlaylistUseCase: CreateVideoPlaylistUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -77,6 +80,8 @@ class VideoSectionViewModel @Inject constructor(
 
     private var searchQuery = ""
     private val originalData = mutableListOf<UIVideo>()
+
+    private var createVideoPlaylistJob: Job? = null
 
     init {
         refreshNodesIfAnyUpdates()
@@ -321,4 +326,33 @@ class VideoSectionViewModel @Inject constructor(
                 getNodeByHandle(it)
             }.getOrNull()
         }
+
+    /**
+     * Create new video playlist
+     *
+     * @param title video playlist title
+     */
+    internal fun createNewPlaylist(title: String) {
+        if (createVideoPlaylistJob?.isActive == true) return
+        createVideoPlaylistJob = viewModelScope.launch {
+            runCatching {
+                title.trim().takeIf { it.isNotEmpty() }?.let { playlistTitle ->
+                    createVideoPlaylistUseCase(playlistTitle)
+                }
+            }.onSuccess { videoPlaylist ->
+                _state.update {
+                    it.copy(
+                        currentVideoPlaylist = videoPlaylist,
+                        isVideoPlaylistCreatedSuccessfully = true
+                    )
+                }
+                Timber.d("Current video playlist: ${videoPlaylist?.title}")
+            }.onFailure { exception ->
+                Timber.e(exception)
+                _state.update {
+                    it.copy(isVideoPlaylistCreatedSuccessfully = false)
+                }
+            }
+        }
+    }
 }

@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import org.junit.jupiter.api.AfterAll
@@ -62,6 +64,7 @@ class VideoSectionViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getVideoPlaylistsUseCase = mock<GetVideoPlaylistsUseCase>()
     private val uiVideoPlaylistMapper = mock<UIVideoPlaylistMapper>()
+    private val createVideoPlaylistUseCase = mock<CreateVideoPlaylistUseCase>()
 
     private val expectedVideo = mock<UIVideo> { on { name }.thenReturn("video name") }
 
@@ -94,7 +97,8 @@ class VideoSectionViewModelTest {
             getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getVideoPlaylistsUseCase = getVideoPlaylistsUseCase,
-            uiVideoPlaylistMapper = uiVideoPlaylistMapper
+            uiVideoPlaylistMapper = uiVideoPlaylistMapper,
+            createVideoPlaylistUseCase = createVideoPlaylistUseCase
         )
     }
 
@@ -111,7 +115,8 @@ class VideoSectionViewModelTest {
             getFileUrlByNodeHandleUseCase,
             getNodeByIdUseCase,
             getVideoPlaylistsUseCase,
-            uiVideoPlaylistMapper
+            uiVideoPlaylistMapper,
+            createVideoPlaylistUseCase
         )
     }
 
@@ -129,6 +134,8 @@ class VideoSectionViewModelTest {
             assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
             assertThat(initial.progressBarShowing).isEqualTo(true)
             assertThat(initial.videoPlaylists).isEmpty()
+            assertThat(initial.currentVideoPlaylist).isNull()
+            assertThat(initial.isVideoPlaylistCreatedSuccessfully).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -317,4 +324,38 @@ class VideoSectionViewModelTest {
         whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(mock(), mock()))
         whenever(uiVideoPlaylistMapper(any())).thenReturn(mock())
     }
+
+    @Test
+    fun `test that create video playlist returns a video playlist with the right title`() =
+        runTest {
+            val expectedTitle = "video playlist title"
+            val expectedVideoPlaylist = mock<VideoPlaylist> {
+                on { title }.thenReturn(expectedTitle)
+            }
+            whenever(createVideoPlaylistUseCase(expectedTitle)).thenReturn(expectedVideoPlaylist)
+
+            initUnderTest()
+
+            underTest.createNewPlaylist(expectedTitle)
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.currentVideoPlaylist?.title).isEqualTo(expectedTitle)
+                assertThat(actual.isVideoPlaylistCreatedSuccessfully).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that the correct state is returned when an error occurs in creating the video playlist`() =
+        runTest {
+            whenever(createVideoPlaylistUseCase(any())).thenAnswer { throw Exception() }
+
+            initUnderTest()
+
+            underTest.createNewPlaylist("video playlist title")
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual.currentVideoPlaylist).isNull()
+                assertThat(actual.isVideoPlaylistCreatedSuccessfully).isFalse()
+            }
+        }
 }
