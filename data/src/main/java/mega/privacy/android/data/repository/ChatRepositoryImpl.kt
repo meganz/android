@@ -1313,12 +1313,17 @@ internal class ChatRepositoryImpl @Inject constructor(
         chatMessageMapper(megaChatApiGateway.sendGeolocation(chatId, longitude, latitude, image))
     }
 
-    override suspend fun setChatDraftMessage(chatId: Long, draftMessage: String) {
+    override suspend fun setChatDraftMessage(
+        chatId: Long,
+        draftMessage: String,
+        editingMessageId: Long?,
+    ) {
         val preference = megaLocalRoomGateway.monitorChatPendingChanges(chatId).firstOrNull()
             ?: ChatPendingChanges(chatId = chatId)
         megaLocalRoomGateway.setChatPendingChanges(
             preference.copy(
-                draftMessage = draftMessage
+                draftMessage = draftMessage,
+                editingMessageId = editingMessageId
             )
         )
     }

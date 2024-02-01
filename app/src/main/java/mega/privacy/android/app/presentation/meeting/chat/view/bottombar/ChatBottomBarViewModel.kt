@@ -29,13 +29,14 @@ class ChatBottomBarViewModel @Inject constructor(
      *
      * @param draftMessage
      */
-    fun saveDraftMessage(draftMessage: String) {
+    fun saveDraftMessage(draftMessage: String, editingMessageId: Long?) {
         applicationScope.launch {
             Timber.d("Save draft message: $draftMessage")
             runCatching {
                 setChatDraftMessageUseCase(
                     chatId = chatId,
-                    draftMessage = draftMessage
+                    draftMessage = draftMessage,
+                    editingMessageId = editingMessageId,
                 )
             }.onFailure {
                 Timber.e(it, "Error saving draft message")

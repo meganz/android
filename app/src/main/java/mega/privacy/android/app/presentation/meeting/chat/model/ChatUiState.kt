@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property isAnonymousMode True if the chat is in anonymous mode, false otherwise.
  * @property chatLink String with the chat link.
  * @property editingMessageId Id of the message being edited.
+ * @property editingMessageContent Content of the message being edited.
  */
 data class ChatUiState(
     val chat: ChatRoom? = null,
@@ -82,6 +83,7 @@ data class ChatUiState(
     val isAnonymousMode: Boolean = false,
     val chatLink: String? = null,
     val editingMessageId: Long? = null,
+    val editingMessageContent: String? = null,
 ) {
 
     /**

@@ -8,5 +8,6 @@ internal class ChatRoomPendingChangesModelMapper @Inject constructor() {
     operator fun invoke(entity: ChatPendingChangesEntity) = ChatPendingChanges(
         chatId = entity.chatId,
         draftMessage = entity.draftMessage,
+        editingMessageId = entity.editingMessageId,
     )
 }

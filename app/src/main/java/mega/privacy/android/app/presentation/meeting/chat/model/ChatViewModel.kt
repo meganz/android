@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.CloseChatPreviewUseCase
 import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
@@ -181,6 +182,7 @@ class ChatViewModel @Inject constructor(
     private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
     private val monitorChatPendingChangesUseCase: MonitorChatPendingChangesUseCase,
     private val addReactionUseCase: AddReactionUseCase,
+    private val getChatMessageUseCase: GetChatMessageUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -222,7 +224,22 @@ class ChatViewModel @Inject constructor(
             monitorChatPendingChangesUseCase(chatId)
                 .catch { Timber.e(it) }
                 .collect { preference ->
-                    _state.update { state -> state.copy(sendingText = preference.draftMessage) }
+                    preference.editingMessageId?.let { editingMessageId ->
+                        runCatching {
+                            getChatMessageUseCase(chatId, editingMessageId)
+                        }.onFailure { Timber.e(it) }
+                            .getOrNull()?.takeIf { it.isEditable }
+                    }?.let { chatMessage ->
+                        _state.update { state ->
+                            state.copy(
+                                sendingText = preference.draftMessage,
+                                editingMessageId = chatMessage.msgId,
+                                editingMessageContent = chatMessage.content
+                            )
+                        }
+                    } ?: run {
+                        _state.update { state -> state.copy(sendingText = preference.draftMessage) }
+                    }
                 }
         }
     }

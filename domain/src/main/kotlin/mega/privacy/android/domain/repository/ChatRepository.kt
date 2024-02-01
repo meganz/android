@@ -956,8 +956,9 @@ interface ChatRepository {
      *
      * @param chatId   Chat id
      * @param draftMessage Draft message
+     * @param editingMessageId Editing message id
      */
-    suspend fun setChatDraftMessage(chatId: Long, draftMessage: String)
+    suspend fun setChatDraftMessage(chatId: Long, draftMessage: String, editingMessageId: Long?)
 
     /**
      * Monitor chat pending changes

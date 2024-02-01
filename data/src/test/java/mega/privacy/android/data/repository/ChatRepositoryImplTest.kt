@@ -1009,17 +1009,24 @@ class ChatRepositoryImplTest {
         val chatId = 123L
         val message = "message"
         val draftMessage = "draftMessage"
+        val editingMessageId = 456L
         val model = ChatPendingChanges(chatId, message)
         whenever(megaLocalRoomGateway.monitorChatPendingChanges(chatId)).thenReturn(flowOf(model))
-        underTest.setChatDraftMessage(chatId, draftMessage)
-        verify(megaLocalRoomGateway).setChatPendingChanges(model.copy(draftMessage = draftMessage))
+        underTest.setChatDraftMessage(chatId, draftMessage, editingMessageId)
+        verify(megaLocalRoomGateway).setChatPendingChanges(
+            model.copy(
+                draftMessage = draftMessage,
+                editingMessageId = editingMessageId
+            )
+        )
     }
 
     @Test
     fun `test that get chat room preferences returns correctly`() = runTest {
         val chatId = 123L
         val message = "message"
-        val model = ChatPendingChanges(chatId, message)
+        val editingMessageId = 456L
+        val model = ChatPendingChanges(chatId, message, editingMessageId)
         whenever(megaLocalRoomGateway.monitorChatPendingChanges(chatId)).thenReturn(flowOf(model))
         underTest.monitorChatPendingChanges(chatId).test {
             assertThat(awaitItem()).isEqualTo(model)

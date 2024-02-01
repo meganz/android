@@ -14,6 +14,6 @@ class SetChatDraftMessageUseCase @Inject constructor(
      * Invoke
      *
      */
-    suspend operator fun invoke(chatId: Long, draftMessage: String) =
-        repository.setChatDraftMessage(chatId, draftMessage)
+    suspend operator fun invoke(chatId: Long, draftMessage: String, editingMessageId: Long?) =
+        repository.setChatDraftMessage(chatId, draftMessage, editingMessageId)
 }

@@ -51,7 +51,7 @@ fun ChatBottomBar(
     }
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.saveDraftMessage(textFieldValue.text)
+            viewModel.saveDraftMessage(textFieldValue.text, uiState.editingMessageId)
         }
     }
 
@@ -116,6 +116,7 @@ fun ChatBottomBarContent(
             textFieldValue = textFieldValue,
             onTextChange = onTextChange,
             editingMessageId = uiState.editingMessageId,
+            editMessageContent = uiState.editingMessageContent,
             onCloseEditing = onCloseEditing
         )
     }

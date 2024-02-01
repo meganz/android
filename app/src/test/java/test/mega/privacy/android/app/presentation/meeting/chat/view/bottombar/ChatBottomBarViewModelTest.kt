@@ -55,10 +55,12 @@ internal class ChatBottomBarViewModelTest {
     @Test
     fun `test that save draft message invoke use case`() = runTest {
         val draftMessage = "draft message"
-        underTest.saveDraftMessage(draftMessage)
+        val editingMessageId = 456L
+        underTest.saveDraftMessage(draftMessage, editingMessageId)
         verify(setChatDraftMessageUseCase).invoke(
             chatId = chatId,
-            draftMessage = draftMessage
+            draftMessage = draftMessage,
+            editingMessageId = editingMessageId
         )
     }
 

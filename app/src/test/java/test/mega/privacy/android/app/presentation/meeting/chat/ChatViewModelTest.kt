@@ -39,6 +39,7 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -61,6 +62,7 @@ import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.CloseChatPreviewUseCase
 import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
@@ -239,6 +241,7 @@ internal class ChatViewModelTest {
         on { invoke(any()) } doReturn emptyFlow()
     }
     private val addReactionUseCase = mock<AddReactionUseCase>()
+    private val getChatMessageUseCase = mock<GetChatMessageUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -293,6 +296,7 @@ internal class ChatViewModelTest {
             sendLocationMessageUseCase,
             sendChatAttachmentsUseCase,
             addReactionUseCase,
+            getChatMessageUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -379,6 +383,7 @@ internal class ChatViewModelTest {
             sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
             monitorChatPendingChangesUseCase = monitorChatPendingChangesUseCase,
             addReactionUseCase = addReactionUseCase,
+            getChatMessageUseCase = getChatMessageUseCase
         )
     }
 
@@ -2377,6 +2382,56 @@ internal class ChatViewModelTest {
         underTest.onAddReaction(msgId, reaction)
         verify(addReactionUseCase).invoke(chatId, msgId, reaction)
     }
+
+    @Test
+    fun `test that editing message updates state correctly when a chat message exists`() = runTest {
+        whenever(monitorChatPendingChangesUseCase(chatId))
+            .thenReturn(
+                flowOf(
+                    ChatPendingChanges(
+                        chatId = chatId,
+                        draftMessage = "draft message",
+                        editingMessageId = 1234L
+                    )
+                )
+            )
+        val message = mock<ChatMessage> {
+            on { content } doReturn "editing message"
+            on { msgId } doReturn 1234L
+            on { isEditable } doReturn true
+        }
+        whenever(getChatMessageUseCase(chatId, 1234L)).thenReturn(message)
+        initTestClass()
+        underTest.state.test {
+            val item = awaitItem()
+            assertThat(item.sendingText).isEqualTo("draft message")
+            assertThat(item.editingMessageId).isEqualTo(1234L)
+            assertThat(item.editingMessageContent).isEqualTo("editing message")
+        }
+    }
+
+    @Test
+    fun `test that editing message updates state correctly when a chat message doesn't exist`() =
+        runTest {
+            whenever(monitorChatPendingChangesUseCase(chatId))
+                .thenReturn(
+                    flowOf(
+                        ChatPendingChanges(
+                            chatId = chatId,
+                            draftMessage = "draft message",
+                            editingMessageId = 1234L
+                        )
+                    )
+                )
+            whenever(getChatMessageUseCase(chatId, 1234L)).thenReturn(null)
+            initTestClass()
+            underTest.state.test {
+                val item = awaitItem()
+                assertThat(item.sendingText).isEqualTo("draft message")
+                assertThat(item.editingMessageId).isNull()
+                assertThat(item.editingMessageContent).isNull()
+            }
+        }
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

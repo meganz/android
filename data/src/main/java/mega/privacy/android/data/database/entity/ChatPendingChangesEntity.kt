@@ -11,4 +11,6 @@ internal data class ChatPendingChangesEntity(
     val chatId: Long = 0L,
     @ColumnInfo(name = "draft_message")
     val draftMessage: String = "",
+    @ColumnInfo(name = "editing_message_id")
+    val editingMessageId: Long? = null,
 )
