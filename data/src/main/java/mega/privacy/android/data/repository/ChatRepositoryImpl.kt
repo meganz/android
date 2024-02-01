@@ -77,6 +77,7 @@ import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
 import mega.privacy.android.domain.entity.chat.messages.paging.MessagePagingInfo
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.notification.ChatMessageNotification
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.ChatSettings
@@ -89,6 +90,7 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaChatNotificationListenerInterface
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
@@ -1334,4 +1336,19 @@ internal class ChatRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override fun monitorChatMessages() =
+        callbackFlow {
+            val listener =
+                MegaChatNotificationListenerInterface { _, chatId, message ->
+                    trySend(Pair(chatId, message))
+                }
+            megaChatApiGateway.registerChatNotificationListener(listener)
+            awaitClose {
+                megaChatApiGateway.deregisterChatNotificationListener(listener)
+            }
+        }.map { (chatId, message) ->
+            message?.let { ChatMessageNotification(chatId, chatMessageMapper(it)) }
+        }.flowOn(ioDispatcher)
+
 }

@@ -22,6 +22,7 @@ import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaChatNotificationListenerInterface
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatPresenceConfig
 import nz.mega.sdk.MegaChatRequestListenerInterface
@@ -762,4 +763,10 @@ internal class MegaChatApiFacade @Inject constructor(
         reaction: String,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.addReaction(chatId, msgId, reaction, listener)
+
+    override fun registerChatNotificationListener(listener: MegaChatNotificationListenerInterface) =
+        chatApi.addChatNotificationListener(listener)
+
+    override fun deregisterChatNotificationListener(listener: MegaChatNotificationListenerInterface) =
+        chatApi.removeChatNotificationListener(listener)
 }

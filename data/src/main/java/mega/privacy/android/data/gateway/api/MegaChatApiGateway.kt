@@ -10,6 +10,7 @@ import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaChatNotificationListenerInterface
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
@@ -1478,4 +1479,18 @@ interface MegaChatApiGateway {
         reaction: String,
         listener: MegaChatRequestListenerInterface,
     )
+
+    /**
+     * Register chat notification listener
+     *
+     * @param listener
+     */
+    fun registerChatNotificationListener(listener: MegaChatNotificationListenerInterface)
+
+    /**
+     * Deregister chat notification listener
+     *
+     * @param listener
+     */
+    fun deregisterChatNotificationListener(listener: MegaChatNotificationListenerInterface)
 }

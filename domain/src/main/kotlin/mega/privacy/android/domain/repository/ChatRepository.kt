@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.chat.RichLinkConfig
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.paging.MessagePagingInfo
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.entity.chat.notification.ChatMessageNotification
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 
@@ -1002,4 +1003,11 @@ interface ChatRepository {
      * @param reaction UTF-8 NULL-terminated string that represents the reaction
      */
     suspend fun addReaction(chatId: Long, msgId: Long, reaction: String)
+
+    /**
+     * Monitor chat messages
+     *
+     * @return flow of chat messages received
+     */
+    fun monitorChatMessages(): Flow<ChatMessageNotification?>
 }
