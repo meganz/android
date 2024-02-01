@@ -13,6 +13,7 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.notification.LauncherBadgeGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.EventMapper
@@ -53,6 +54,7 @@ internal class DefaultNotificationsRepository @Inject constructor(
     private val callsPreferencesGateway: CallsPreferencesGateway,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
+    private val launcherBadgeGateway: LauncherBadgeGateway,
 ) : NotificationsRepository, LegacyNotificationRepository {
 
     private val _pushNotificationSettings =
@@ -283,4 +285,10 @@ internal class DefaultNotificationsRepository @Inject constructor(
 
             appEventGateway.broadcastPushNotificationSettings()
         }
+
+    override suspend fun setLauncherBadgeCount(count: Int) {
+        withContext(dispatcher) {
+            launcherBadgeGateway.setLauncherBadgeCount(count)
+        }
+    }
 }
