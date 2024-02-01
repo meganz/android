@@ -1,12 +1,7 @@
 package mega.privacy.android.domain.usecase.node.chat
 
-import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
-import mega.privacy.android.domain.entity.node.ImageNode
-import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.chat.ChatFile
-import mega.privacy.android.domain.entity.node.chat.ChatImageFile
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import javax.inject.Inject
 
 /**
@@ -15,7 +10,7 @@ import javax.inject.Inject
  */
 class GetChatFileUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
-    private val addImageTypeUseCase: AddImageTypeUseCase,
+    private val addChatFileTypeUseCase: AddChatFileTypeUseCase,
 ) {
 
     /**
@@ -30,15 +25,6 @@ class GetChatFileUseCase @Inject constructor(
             val fileNode = nodeRepository.getNodeFromChatMessage(chatId, messageId, messageIndex)
         ) {
             null -> null
-            is ImageNode -> {
-                ChatImageFile(
-                    addImageTypeUseCase(fileNode),
-                    chatId,
-                    messageId,
-                    messageIndex
-                )
-            }
-
-            else -> ChatDefaultFile(DefaultTypedFileNode(fileNode), chatId, messageId, messageIndex)
+            else -> addChatFileTypeUseCase(fileNode, chatId, messageId, messageIndex)
         }
 }
