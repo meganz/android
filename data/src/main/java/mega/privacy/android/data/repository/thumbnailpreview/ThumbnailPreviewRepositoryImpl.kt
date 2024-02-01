@@ -12,7 +12,9 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.wrapper.StringWrapper
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import nz.mega.sdk.MegaError
@@ -26,6 +28,7 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheGateway: CacheGateway,
     private val stringWrapper: StringWrapper,
+    private val megaNodeMapper: MegaNodeMapper,
 ) : ThumbnailPreviewRepository {
 
     override suspend fun getThumbnailFromLocal(handle: Long): File? =
@@ -101,9 +104,9 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getPreviewFromServer(handle: Long): File? =
+    override suspend fun getPreviewFromServer(typedNode: TypedNode): File? =
         withContext(ioDispatcher) {
-            megaApi.getMegaNodeByHandle(handle)?.let { node ->
+            megaNodeMapper(typedNode)?.let { node ->
                 getPreviewFile(node)?.let { preview ->
                     suspendCancellableCoroutine { continuation ->
                         val listener = continuation.getRequestListener("getPreviewFromServer") {

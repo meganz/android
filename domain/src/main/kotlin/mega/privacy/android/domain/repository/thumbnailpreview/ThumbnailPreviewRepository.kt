@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository.thumbnailpreview
 
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.MegaException
 import java.io.File
 
@@ -47,10 +48,10 @@ interface ThumbnailPreviewRepository {
 
     /**
      * Check preview from server
-     * @param handle node handle
+     * @param typedNode
      * @return preview file
      */
-    suspend fun getPreviewFromServer(handle: Long): File?
+    suspend fun getPreviewFromServer(typedNode: TypedNode): File?
 
     /**
      * Download thumbnail
@@ -72,7 +73,6 @@ interface ThumbnailPreviewRepository {
      * Download public node thumbnail
      *
      * @param handle
-     * @param callback is download success
      */
     suspend fun downloadPublicNodeThumbnail(handle: Long): Boolean
 
@@ -80,7 +80,6 @@ interface ThumbnailPreviewRepository {
      * Download public node preview
      *
      * @param handle
-     * @param callback is download success
      */
     suspend fun downloadPublicNodePreview(handle: Long): Boolean
 

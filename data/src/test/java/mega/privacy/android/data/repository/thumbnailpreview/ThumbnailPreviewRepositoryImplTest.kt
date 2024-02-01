@@ -9,6 +9,7 @@ import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
@@ -41,6 +42,7 @@ class ThumbnailPreviewRepositoryImplTest {
     private val megaApiFolder = mock<MegaApiFolderGateway>()
     private val cacheGateway = mock<CacheGateway>()
     private val stringWrapper = mock<StringWrapper>()
+    private val megaNodeMapper = mock<MegaNodeMapper>()
 
     private val cacheDir = File("cache")
     private val thumbnailName = "thumbnailName"
@@ -58,12 +60,13 @@ class ThumbnailPreviewRepositoryImplTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             cacheGateway = cacheGateway,
             stringWrapper = stringWrapper,
+            megaNodeMapper = megaNodeMapper
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(megaApi, megaApiFolder, cacheGateway)
+        reset(megaApi, megaApiFolder, cacheGateway, stringWrapper, megaNodeMapper)
     }
 
     @Test

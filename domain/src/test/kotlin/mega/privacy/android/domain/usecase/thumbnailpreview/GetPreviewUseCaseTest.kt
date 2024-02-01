@@ -28,7 +28,7 @@ class GetPreviewUseCaseTest {
         thumbnailPreviewRepository.stub {
             onBlocking { getPreviewFromLocal(any()) }.thenReturn(localFile)
         }
-        assertThat(underTest(1L)).isSameInstanceAs(localFile)
+        assertThat(underTest(mock())).isSameInstanceAs(localFile)
     }
 
     @Test
@@ -38,6 +38,6 @@ class GetPreviewUseCaseTest {
             onBlocking { getPreviewFromLocal(any()) }.thenReturn(null)
             onBlocking { getPreviewFromServer(any()) }.thenReturn(remoteFile)
         }
-        assertThat(underTest(1L)).isSameInstanceAs(remoteFile)
+        assertThat(underTest(mock())).isSameInstanceAs(remoteFile)
     }
 }

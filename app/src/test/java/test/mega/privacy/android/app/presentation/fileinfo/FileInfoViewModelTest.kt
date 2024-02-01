@@ -90,7 +90,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -279,7 +278,7 @@ internal class FileInfoViewModelTest {
         whenever(typedFileNode.name).thenReturn("File name")
         whenever(typedFileNode.id).thenReturn(nodeId)
         whenever(getNodeAccessPermission.invoke(nodeId)).thenReturn(AccessPermission.READ)
-        whenever(getPreviewUseCase.invoke(anyLong())).thenReturn(null)
+        whenever(getPreviewUseCase.invoke(any())).thenReturn(null)
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
         whenever(typedFileNode.hasPreview).thenReturn(false)
         whenever(isAvailableOffline.invoke(any())).thenReturn(true)
@@ -645,7 +644,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test preview is assigned when node is updated`() = runTest {
         whenever(typedFileNode.hasPreview).thenReturn(true)
-        whenever(getPreviewUseCase.invoke(NODE_HANDLE)).thenReturn(previewFile)
+        whenever(getPreviewUseCase.invoke(typedFileNode)).thenReturn(previewFile)
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
         underTest.setNode(node.handle, true)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
@@ -658,7 +657,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test exception from getPreview is not propagated`() = runTest {
         whenever(typedFileNode.hasPreview).thenReturn(true)
-        whenever(getPreviewUseCase.invoke(NODE_HANDLE)).thenAnswer {
+        whenever(getPreviewUseCase.invoke(typedFileNode)).thenAnswer {
             throw MegaException(
                 -5,
                 "Failed Permanently"
@@ -685,7 +684,7 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test preview has priority over thumbnail`() = runTest {
-        whenever(getPreviewUseCase.invoke(NODE_HANDLE)).thenReturn(previewFile)
+        whenever(getPreviewUseCase.invoke(typedFileNode)).thenReturn(previewFile)
         whenever(typedFileNode.thumbnailPath).thenReturn(thumbUri)
         whenever(typedFileNode.hasPreview).thenReturn(true)
         underTest.setNode(node.handle, true)

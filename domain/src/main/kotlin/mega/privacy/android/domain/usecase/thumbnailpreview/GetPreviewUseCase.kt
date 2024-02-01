@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.thumbnailpreview
 
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import javax.inject.Inject
 
@@ -14,9 +15,9 @@ class GetPreviewUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param nodeId
+     * @param typedNode
      */
-    suspend operator fun invoke(nodeId: Long) =
-        thumbnailPreviewRepository.getPreviewFromLocal(nodeId)
-            ?: thumbnailPreviewRepository.getPreviewFromServer(nodeId)
+    suspend operator fun invoke(typedNode: TypedNode) =
+        thumbnailPreviewRepository.getPreviewFromLocal(typedNode.id.longValue)
+            ?: thumbnailPreviewRepository.getPreviewFromServer(typedNode)
 }
