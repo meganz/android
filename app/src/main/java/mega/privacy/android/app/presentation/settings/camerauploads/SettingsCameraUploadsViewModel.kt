@@ -12,6 +12,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
+import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
+import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -103,6 +105,7 @@ import javax.inject.Inject
  * @property startCameraUploadUseCase Start the camera upload
  * @property stopCameraUploadsUseCase Stop the camera upload
  * @property broadcastBusinessAccountExpiredUseCase broadcast business account expired
+ * @property snackBarHandler Handler used to display a Snackbar
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
@@ -154,6 +157,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
     private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase,
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
+    private val snackBarHandler: SnackBarHandler,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -259,7 +263,10 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             }
         }.onFailure {
             Timber.e(it)
-            setErrorState(shouldShow = true)
+            snackBarHandler.postSnackbarMessage(
+                resId = R.string.general_error,
+                snackbarDuration = MegaSnackbarDuration.Long,
+            )
         }
     }
 
@@ -272,41 +279,28 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             }
         }.onFailure {
             Timber.e(it)
-            setErrorState(shouldShow = true)
+            snackBarHandler.postSnackbarMessage(
+                resId = R.string.general_error,
+                snackbarDuration = MegaSnackbarDuration.Long,
+            )
         }
     }
 
     /**
-     * Sets up the Primary Folder with a given folder handle
+     * Sets the new Secondary Folder from Cloud Drive
+     *
+     * @param newHandle The handle of the new Secondary Folder from Cloud Drive
      */
-    fun setupPrimaryCameraUploadFolder(primaryHandle: Long) = viewModelScope.launch {
+    fun setSecondaryUploadNode(newHandle: Long) = viewModelScope.launch {
         runCatching {
-            setupPrimaryFolderUseCase(primaryHandle)
-            stopCameraUploads()
+            setupSecondaryFolderUseCase(newHandle)
         }.onFailure {
             Timber.w(it)
-            setErrorState(shouldShow = true)
+            snackBarHandler.postSnackbarMessage(
+                resId = R.string.general_error,
+                snackbarDuration = MegaSnackbarDuration.Long,
+            )
         }
-    }
-
-    /**
-     * Sets up the Secondary Folder with a given folder handle
-     */
-    fun setupSecondaryCameraUploadFolder(secondaryHandle: Long) = viewModelScope.launch {
-        runCatching {
-            setupSecondaryFolderUseCase(secondaryHandle)
-        }.onFailure {
-            Timber.w(it)
-            setErrorState(shouldShow = true)
-        }
-    }
-
-    /**
-     * Sets the value of [SettingsCameraUploadsState.shouldShowError]
-     * @param shouldShow The new state value
-     */
-    fun setErrorState(shouldShow: Boolean) {
-        _state.update { it.copy(shouldShowError = shouldShow) }
     }
 
     /**
@@ -318,15 +312,12 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Shows / hides the Access Media Location Permission rationale by updating the
-     * value of [SettingsCameraUploadsState.accessMediaLocationRationaleText]
-     *
-     * @param showRationale true if the rationale should be shown, and false if otherwise
+     * Shows the Access Media Location Permission rationale by displaying a Snackbar with a specific
+     * message
      */
-    fun setAccessMediaLocationRationaleShown(showRationale: Boolean) =
-        _state.update {
-            it.copy(accessMediaLocationRationaleText = if (showRationale) R.string.on_refuse_storage_permission else null)
-        }
+    fun showAccessMediaLocationRationale() {
+        snackBarHandler.postSnackbarMessage(R.string.on_refuse_storage_permission)
+    }
 
     /**
      * Resets all Timestamps and cleans the Cache Directory
@@ -349,7 +340,10 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                 setCameraUploadsEnabled(true)
             }.onFailure {
                 Timber.e(it)
-                setErrorState(shouldShow = true)
+                snackBarHandler.postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
             }
         }
     }
@@ -477,11 +471,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Sets the new Primary Folder path, once a Folder has been selected from the File Explorer
+     * Sets the new Primary Folder after selecting a Folder from File Explorer
      *
      * @param newPath The new Primary Folder path, which may be nullable
      */
-    fun changePrimaryFolderPath(newPath: String?) {
+    fun setPrimaryFolder(newPath: String?) {
         viewModelScope.launch {
             runCatching {
                 if (isPrimaryFolderPathValidUseCase(newPath)) {
@@ -493,7 +487,10 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     stopCameraUploads()
                     refreshPrimaryFolderPath()
                 } else {
-                    setInvalidFolderSelectedPromptShown(true)
+                    snackBarHandler.postSnackbarMessage(
+                        resId = R.string.error_invalid_folder_selected,
+                        snackbarDuration = MegaSnackbarDuration.Long,
+                    )
                 }
             }.onFailure {
                 Timber.e(it)
@@ -502,15 +499,32 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Shows / hides the Invalid Folder Selected prompt by updating the
-     * value of [SettingsCameraUploadsState.invalidFolderSelectedTextId]
+     * Sets the new Primary Folder from Cloud Drive
      *
-     * @param showPrompt true if the prompt should be shown, and false if otherwise
+     * @param newHandle The handle of the new Primary Folder from Cloud Drive
      */
-    fun setInvalidFolderSelectedPromptShown(showPrompt: Boolean) =
-        _state.update {
-            it.copy(invalidFolderSelectedTextId = if (showPrompt) R.string.error_invalid_folder_selected else null)
+    fun setPrimaryUploadNode(newHandle: Long) {
+        viewModelScope.launch {
+            if (isNewSettingValid(primaryHandle = newHandle)) {
+                runCatching {
+                    setupPrimaryFolderUseCase(newHandle)
+                    stopCameraUploads()
+                }.onFailure {
+                    Timber.w(it)
+                    snackBarHandler.postSnackbarMessage(
+                        resId = R.string.general_error,
+                        snackbarDuration = MegaSnackbarDuration.Long,
+                    )
+                }
+            } else {
+                Timber.e("Error choosing the MEGA Folder for Primary Uploads")
+                snackBarHandler.postSnackbarMessage(
+                    resId = R.string.error_invalid_folder_selected,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
         }
+    }
 
     /**
      * When [SettingsCameraUploadsViewModel] is instantiated, initialize the UI Elements
@@ -757,25 +771,28 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * updateMediaUploadsLocalFolder
-     * @param mediaUploadPath
+     * Sets the new Secondary Folder after selecting a Folder from File Explorer
+     *
+     * @param newPath The new Secondary Folder path, which may be nullable
      */
-    fun updateMediaUploadsLocalFolder(mediaUploadPath: String?) {
+    fun setSecondaryFolder(newPath: String?) {
         viewModelScope.launch {
             runCatching {
-                if (isSecondaryFolderPathValidUseCase(mediaUploadPath)) {
-                    mediaUploadPath?.let {
-                        setSecondaryFolderLocalPathUseCase(mediaUploadPath)
+                if (isSecondaryFolderPathValidUseCase(newPath)) {
+                    newPath?.let {
+                        setSecondaryFolderLocalPathUseCase(newPath)
                     }
                     clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Secondary))
                     stopCameraUploads()
                     _state.update {
-                        it.copy(secondaryFolderPath = mediaUploadPath.orEmpty())
+                        it.copy(secondaryFolderPath = newPath.orEmpty())
                     }
                 } else {
-                    setInvalidFolderSelectedPromptShown(showPrompt = true)
+                    snackBarHandler.postSnackbarMessage(
+                        resId = R.string.error_invalid_folder_selected,
+                        snackbarDuration = MegaSnackbarDuration.Long,
+                    )
                 }
-
             }.onFailure {
                 Timber.e(it)
             }
@@ -799,8 +816,9 @@ class SettingsCameraUploadsViewModel @Inject constructor(
         isSecondaryEnabled: Boolean = _state.value.isMediaUploadsEnabled,
     ): Boolean {
         with(_state.value) {
-            // if primary uploads is enabled, local path of primary upload can't be empty
-            return !((isCameraUploadsEnabled && primaryPath.isNullOrBlank())
+            // if primary uploads is enabled, then local path of primary upload can't be empty.
+            // The primary upload cloud folder must exist
+            return primaryHandle != -1L && !((isCameraUploadsEnabled && primaryPath.isNullOrBlank())
                     // if secondary uploads is enabled, local path of secondary upload can't be empty
                     || (isSecondaryEnabled && secondaryPath.isNullOrBlank())
                     // if secondary upload is enabled primary upload and secondary upload cloud folder can't be the same

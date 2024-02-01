@@ -22,14 +22,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -54,10 +52,10 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_KEEP_FILE_NAMES
 import mega.privacy.android.app.constants.SettingsConstants.KEY_LOCAL_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.KEY_MEGA_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.KEY_SECONDARY_MEDIA_FOLDER_ON
-import mega.privacy.android.app.constants.SettingsConstants.REQUEST_CAMERA_FOLDER
-import mega.privacy.android.app.constants.SettingsConstants.REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER
-import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_CAMERA_FOLDER
-import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_SECONDARY_MEDIA_FOLDER
+import mega.privacy.android.app.constants.SettingsConstants.REQUEST_PRIMARY_FOLDER
+import mega.privacy.android.app.constants.SettingsConstants.REQUEST_SECONDARY_FOLDER
+import mega.privacy.android.app.constants.SettingsConstants.REQUEST_PRIMARY_UPLOAD_NODE
+import mega.privacy.android.app.constants.SettingsConstants.REQUEST_SECONDARY_UPLOAD_NODE
 import mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -98,7 +96,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     private var optionVideoCompressionSize: Preference? = null
     private var optionKeepUploadFileNames: TwoLineCheckPreference? = null
     private var optionLocalCameraFolder: Preference? = null
-    private var megaCameraFolder: Preference? = null
+    private var optionMegaCameraFolder: Preference? = null
     private var secondaryMediaFolderOn: Preference? = null
     private var localSecondaryFolder: Preference? = null
     private var megaSecondaryFolder: Preference? = null
@@ -157,7 +155,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             if (hasAccessMediaLocationPermission(context)) {
                 includeLocationTags(true)
             } else {
-                viewModel.setAccessMediaLocationRationaleShown(true)
+                viewModel.showAccessMediaLocationRationale()
             }
         }
 
@@ -246,8 +244,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
         optionLocalCameraFolder = findPreference(KEY_CAMERA_UPLOAD_CAMERA_FOLDER)
         optionLocalCameraFolder?.onPreferenceClickListener = this
 
-        megaCameraFolder = findPreference(KEY_CAMERA_UPLOAD_MEGA_FOLDER)
-        megaCameraFolder?.onPreferenceClickListener = this
+        optionMegaCameraFolder = findPreference(KEY_CAMERA_UPLOAD_MEGA_FOLDER)
+        optionMegaCameraFolder?.onPreferenceClickListener = this
 
         secondaryMediaFolderOn = findPreference(KEY_SECONDARY_MEDIA_FOLDER_ON)
         secondaryMediaFolderOn?.let {
@@ -312,7 +310,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                         FileStorageActivity.PickFolderType.CU_FOLDER.folderType
                     )
                 }
-                startActivityForResult(intent, REQUEST_CAMERA_FOLDER)
+                startActivityForResult(intent, REQUEST_PRIMARY_FOLDER)
             }
 
             KEY_CAMERA_UPLOAD_MEGA_FOLDER -> {
@@ -321,7 +319,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 intent = Intent(context, FileExplorerActivity::class.java).apply {
                     action = FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC
                 }
-                startActivityForResult(intent, REQUEST_MEGA_CAMERA_FOLDER)
+                startActivityForResult(intent, REQUEST_PRIMARY_UPLOAD_NODE)
             }
 
             KEY_SECONDARY_MEDIA_FOLDER_ON -> {
@@ -337,7 +335,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                         FileStorageActivity.PickFolderType.MU_FOLDER.folderType
                     )
                 }
-                startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER)
+                startActivityForResult(intent, REQUEST_SECONDARY_FOLDER)
             }
 
             KEY_MEGA_SECONDARY_MEDIA_FOLDER -> {
@@ -346,7 +344,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 intent = Intent(context, FileExplorerActivity::class.java).apply {
                     action = FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC
                 }
-                startActivityForResult(intent, REQUEST_MEGA_SECONDARY_MEDIA_FOLDER)
+                startActivityForResult(intent, REQUEST_SECONDARY_UPLOAD_NODE)
             }
         }
         return true
@@ -404,35 +402,17 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
         if (resultCode != Activity.RESULT_OK || intent == null) return
         Timber.d("REQUEST CODE: %d___RESULT CODE: %d", requestCode, resultCode)
         when (requestCode) {
-            REQUEST_CAMERA_FOLDER -> {
+            REQUEST_PRIMARY_FOLDER -> {
                 val newPrimaryFolderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
-                viewModel.changePrimaryFolderPath(
-                    newPath = newPrimaryFolderPath
-                )
+                viewModel.setPrimaryFolder(newPrimaryFolderPath)
             }
 
-            REQUEST_MEGA_CAMERA_FOLDER -> {
-                // Primary Folder to Sync
-                val handle = intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
-                if (!viewModel.isNewSettingValid(primaryHandle = handle)) {
-                    Toast.makeText(
-                        context,
-                        getString(R.string.error_invalid_folder_selected),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    return
-                }
-                if (handle != MegaApiJava.INVALID_HANDLE) {
-                    // Set Primary Folder only
-                    Timber.d("Set Camera Uploads Primary Attribute: %s", handle)
-                    viewModel.setupPrimaryCameraUploadFolder(handle)
-                } else {
-                    Timber.e("Error choosing the Mega folder for Primary Uploads")
-                }
+            REQUEST_PRIMARY_UPLOAD_NODE -> {
+                val newMegaPrimaryFolderPath = intent.getLongExtra(SELECTED_MEGA_FOLDER, -1L)
+                viewModel.setPrimaryUploadNode(newMegaPrimaryFolderPath)
             }
 
-            REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER -> {
-                // Secondary Folder to Sync
+            REQUEST_SECONDARY_FOLDER -> {
                 val secondaryPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
                 if (!viewModel.isNewSettingValid(secondaryPath = secondaryPath)) {
                     Toast.makeText(
@@ -442,11 +422,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     ).show()
                     return
                 }
-                viewModel.updateMediaUploadsLocalFolder(secondaryPath)
+                viewModel.setSecondaryFolder(secondaryPath)
             }
 
-            REQUEST_MEGA_SECONDARY_MEDIA_FOLDER -> {
-                // Secondary Folder to Sync
+            REQUEST_SECONDARY_UPLOAD_NODE -> {
                 val secondaryHandle =
                     intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
                 if (!viewModel.isNewSettingValid(secondaryHandle = secondaryHandle)) {
@@ -459,7 +438,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 }
                 if (secondaryHandle != MegaApiJava.INVALID_HANDLE) {
                     Timber.d("Set Camera Uploads Secondary Attribute: %s", secondaryHandle)
-                    viewModel.setupSecondaryCameraUploadFolder(secondaryHandle)
+                    viewModel.setSecondaryUploadNode(secondaryHandle)
                 } else {
                     Timber.e("Error choosing the Mega folder for Secondary Uploads")
                 }
@@ -532,9 +511,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                     handlePrimaryFolderName(it.primaryFolderName)
                 }
                 handleMediaPermissionsRationale(it.shouldShowMediaPermissionsRationale)
-                handleAccessMediaLocationPermissionRationale(it.accessMediaLocationRationaleText)
-                handleInvalidFolderSelectedPrompt(it.invalidFolderSelectedTextId)
-                handleShouldDisplayError(it.shouldShowError)
                 handleShouldTriggerPermissionDialog(it.shouldTriggerPermissionDialog)
             }
             collectFlow(viewModel.monitorCameraUploadsSettingsActions) {
@@ -556,20 +532,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
      * Display primary upload folder's name
      */
     private fun handlePrimaryFolderName(primaryFolderName: String) {
-        megaCameraFolder?.let { preference ->
+        optionMegaCameraFolder?.let { preference ->
             preference.summary = primaryFolderName.takeIf { it.isNotEmpty() }
                 ?: getString(R.string.section_photo_sync)
             preferenceScreen.addPreference(preference)
-        }
-    }
-
-    /**
-     * Display a general error message in case an error occurred while processing one of option
-     */
-    private fun handleShouldDisplayError(shouldDisplayError: Boolean) {
-        if (shouldDisplayError) {
-            snackbarCallBack?.showSnackbar(getString(R.string.general_error))
-            viewModel.setErrorState(false)
         }
     }
 
@@ -589,7 +555,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             cameraUploadOnOff?.isChecked = false
             secondaryMediaFolderOn?.let { preferenceScreen.removePreference(it) }
 
-            megaCameraFolder?.let {
+            optionMegaCameraFolder?.let {
                 it.summary = ""
                 preferenceScreen.removePreference(it)
             }
@@ -1023,39 +989,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
         }
     }
 
-    /**
-     * Handle the display of the Access Media Location Permission rationale when a UI State change happens
-     *
-     * @param accessMediaLocationRationaleText A [StringRes] message to be displayed, which can be nullable
-     */
-    private fun handleAccessMediaLocationPermissionRationale(@StringRes accessMediaLocationRationaleText: Int?) {
-        if (accessMediaLocationRationaleText != null) {
-            view?.let {
-                Snackbar.make(
-                    it,
-                    getString(accessMediaLocationRationaleText),
-                    Snackbar.LENGTH_SHORT
-                ).show()
-            }
-
-            // Once the Rationale has been shown, notify the ViewModel
-            viewModel.setAccessMediaLocationRationaleShown(false)
-        }
-    }
-
-    /**
-     * Handle the display of the Invalid Folder Selected prompt when a UI State change happens
-     *
-     * @param invalidFolderSelectedTextId A [StringRes] message to be displayed, which can be nullable
-     */
-    private fun handleInvalidFolderSelectedPrompt(@StringRes invalidFolderSelectedTextId: Int?) {
-        invalidFolderSelectedTextId?.let {
-            Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
-        }
-        // Once the Prompt has been shown, notify the ViewModel
-        viewModel.setInvalidFolderSelectedPromptShown(false)
-    }
-
     private fun handleShouldTriggerPermissionDialog(shouldTriggerPermissionDialog: Boolean) {
         if (shouldTriggerPermissionDialog) {
             enableCameraUploadsPermissionLauncher.launch(permissionsList)
@@ -1168,8 +1101,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
                 cameraUploadOnOff?.isEnabled = true
                 Timber.d("${optionLocalCameraFolder?.isEnabled}")
                 optionLocalCameraFolder?.isEnabled = true
-                Timber.d("${megaCameraFolder?.isEnabled}")
-                megaCameraFolder?.isEnabled = true
+                Timber.d("${optionMegaCameraFolder?.isEnabled}")
+                optionMegaCameraFolder?.isEnabled = true
                 Timber.d("${secondaryMediaFolderOn?.isEnabled}")
                 secondaryMediaFolderOn?.isEnabled = true
                 Timber.d("${localSecondaryFolder?.isEnabled}")
