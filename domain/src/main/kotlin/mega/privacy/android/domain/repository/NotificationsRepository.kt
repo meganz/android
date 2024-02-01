@@ -120,11 +120,4 @@ interface NotificationsRepository {
      *  Retrieve the push notification settings from the server and update the data in memory
      */
     suspend fun updatePushNotificationSettings()
-
-    /**
-     * Set launcher badge count
-     *
-     * @param count
-     */
-    suspend fun setLauncherBadgeCount(count: Int)
 }

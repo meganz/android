@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.notification.LauncherBadgeGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.NodeProvider
@@ -77,7 +76,6 @@ class DefaultNotificationsRepositoryTest {
     private val getScheduledMeetingUseCase = mock<GetScheduledMeeting>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
     private val appEventGateway = mock<AppEventGateway>()
-    private val launcherBadgeGateway = mock<LauncherBadgeGateway>()
 
     @BeforeAll
     fun setUp() {
@@ -91,7 +89,6 @@ class DefaultNotificationsRepositoryTest {
             callsPreferencesGateway = callsPreferencesGateway,
             dispatcher = UnconfinedTestDispatcher(),
             appEventGateway = appEventGateway,
-            launcherBadgeGateway = launcherBadgeGateway,
         )
     }
 
@@ -105,7 +102,6 @@ class DefaultNotificationsRepositoryTest {
             getScheduledMeetingUseCase,
             callsPreferencesGateway,
             appEventGateway,
-            launcherBadgeGateway,
         )
 
         whenever(callsPreferencesGateway.getCallsMeetingInvitationsPreference())
@@ -289,14 +285,6 @@ class DefaultNotificationsRepositoryTest {
             assertThat(awaitItem()).isEqualTo(expectedEvent)
             awaitComplete()
         }
-    }
-
-    @Test
-    internal fun `test that correct count is passed to launcher badge gateway`() = runTest {
-        val expected = 42
-        underTest.setLauncherBadgeCount(expected)
-
-        verify(launcherBadgeGateway).setLauncherBadgeCount(expected)
     }
 
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)

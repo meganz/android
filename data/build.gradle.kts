@@ -128,12 +128,6 @@ dependencies {
     implementation(lib.sqlcipher)
     implementation(androidx.security.crypto)
 
-    implementation(lib.shortcutbadger) {
-        artifact {
-            type = "aar"
-        }
-    }
-
     // Testing dependencies
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.truth.ext)
