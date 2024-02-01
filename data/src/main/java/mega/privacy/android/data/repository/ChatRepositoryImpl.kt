@@ -31,7 +31,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.database.entity.chat.ChatHistoryLoadStatusEntity
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.extensions.getRequestListener
@@ -1264,17 +1263,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                     )
                 }.flatten(),
             )
-        }
-    }
-
-    override suspend fun getLastLoadResponse(chatId: Long): ChatHistoryLoadStatus? =
-        withContext(ioDispatcher) {
-            chatStorageGateway.getLastLoadResponse(chatId)?.status
-        }
-
-    override suspend fun setLastLoadResponse(chatId: Long, status: ChatHistoryLoadStatus) {
-        withContext(ioDispatcher) {
-            chatStorageGateway.setLastLoadResponse(ChatHistoryLoadStatusEntity(chatId, status))
         }
     }
 

@@ -880,22 +880,6 @@ interface ChatRepository {
     suspend fun storeMessages(chatId: Long, messages: List<CreateTypedMessageRequest>)
 
     /**
-     * Get last load response
-     *
-     * @param chatId
-     * @return last history load status for the chat
-     */
-    suspend fun getLastLoadResponse(chatId: Long): ChatHistoryLoadStatus?
-
-    /**
-     * Set last load response
-     *
-     * @param chatId
-     * @param status
-     */
-    suspend fun setLastLoadResponse(chatId: Long, status: ChatHistoryLoadStatus)
-
-    /**
      * Clear chat messages
      *
      * @param chatId

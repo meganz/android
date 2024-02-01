@@ -19,7 +19,6 @@ import mega.privacy.android.data.database.chat.InMemoryChatDatabase
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
-import mega.privacy.android.data.database.dao.ChatHistoryStateDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
@@ -165,8 +164,4 @@ internal object RoomDatabaseModule {
     internal fun provideTypedMessageRequestDao(chatDatabase: InMemoryChatDatabase): TypedMessageDao =
         chatDatabase.typedMessageDao()
 
-    @Provides
-    @Singleton
-    internal fun provideChatHistoryStateDao(chatDatabase: InMemoryChatDatabase): ChatHistoryStateDao =
-        chatDatabase.chatHistoryStateDao()
 }

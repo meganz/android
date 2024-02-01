@@ -4,12 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import mega.privacy.android.data.database.dao.ChatHistoryStateDao
 import mega.privacy.android.data.database.dao.ChatMessageMetaDao
 import mega.privacy.android.data.database.dao.ChatNodeDao
 import mega.privacy.android.data.database.dao.TypedMessageDao
 import mega.privacy.android.data.database.entity.chat.ChatGeolocationEntity
-import mega.privacy.android.data.database.entity.chat.ChatHistoryLoadStatusEntity
 import mega.privacy.android.data.database.entity.chat.ChatNodeEntity
 import mega.privacy.android.data.database.entity.chat.GiphyEntity
 import mega.privacy.android.data.database.entity.chat.RichPreviewEntity
@@ -23,7 +21,6 @@ import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
 @Database(
     entities = [
         TypedMessageEntity::class,
-        ChatHistoryLoadStatusEntity::class,
         RichPreviewEntity::class,
         GiphyEntity::class,
         ChatGeolocationEntity::class,
@@ -34,8 +31,6 @@ import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
 abstract class InMemoryChatDatabase : RoomDatabase() {
 
     abstract fun typedMessageDao(): TypedMessageDao
-
-    abstract fun chatHistoryStateDao(): ChatHistoryStateDao
 
     abstract fun chatMessageMetaDao(): ChatMessageMetaDao
 

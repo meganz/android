@@ -134,5 +134,30 @@ class PagedChatMessageRemoteMediatorTest {
         verify(clearChatMessagesUseCase).invoke(chatId)
     }
 
+    @Test
+    internal fun `test that end of pagination reached is only sent when load result is none`() =
+        runTest {
+            val response = mock<FetchMessagePageResponse> {
+                on { loadResponse }.thenReturn(
+                    ChatHistoryLoadStatus.REMOTE,
+                    ChatHistoryLoadStatus.NONE
+                )
+
+            }
+            fetchMessages.stub {
+                onBlocking {
+                    invoke(
+                        any(),
+                        any()
+                    )
+                }.thenReturn(response)
+            }
+
+            val firstResult = underTest.load(LoadType.REFRESH, state)
+            assertThat((firstResult as? RemoteMediator.MediatorResult.Success)?.endOfPaginationReached).isFalse()
+
+            val secondResult = underTest.load(LoadType.REFRESH, state)
+            assertThat((secondResult as? RemoteMediator.MediatorResult.Success)?.endOfPaginationReached).isTrue()
+        }
 
 }

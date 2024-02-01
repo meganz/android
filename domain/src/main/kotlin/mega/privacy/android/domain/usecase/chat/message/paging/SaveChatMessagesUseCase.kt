@@ -34,7 +34,6 @@ class SaveChatMessagesUseCase @Inject constructor(
             )
 
             chatRepository.storeMessages(chatId, requestList)
-            chatRepository.setLastLoadResponse(chatId, loadResponse)
         }
     }
 }

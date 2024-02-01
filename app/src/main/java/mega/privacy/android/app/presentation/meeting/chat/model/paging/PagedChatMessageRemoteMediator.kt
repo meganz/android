@@ -43,7 +43,7 @@ class PagedChatMessageRemoteMediator @AssistedInject constructor(
             val response = fetchMessages(chatId, coroutineScope)
             Timber.d("Paging mediator load: fetch messages response : $response")
             saveMessages(response)
-            MediatorResult.Success(endOfPaginationReached = loadType == LoadType.REFRESH || response.loadResponse == ChatHistoryLoadStatus.NONE)
+            MediatorResult.Success(endOfPaginationReached = response.loadResponse == ChatHistoryLoadStatus.NONE)
         } catch (e: Exception) {
             Timber.e(e, "Paging mediator load: error")
             MediatorResult.Error(e)

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9ca406d9a603164fb73c64d9e8dd696a",
+    "identityHash": "4f8c43a6323b4eb76ddd6bca0b014228",
     "entities": [
       {
         "tableName": "typed_messages",
@@ -217,32 +217,6 @@
         "foreignKeys": []
       },
       {
-        "tableName": "chat_history_load_status",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatId` INTEGER NOT NULL, `status` TEXT NOT NULL, PRIMARY KEY(`chatId`))",
-        "fields": [
-          {
-            "fieldPath": "chatId",
-            "columnName": "chatId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "status",
-            "columnName": "status",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "chatId"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
         "tableName": "rich_preview",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`messageId` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `image` TEXT, `imageFormat` TEXT, `icon` TEXT, `iconFormat` TEXT, `url` TEXT NOT NULL, `domainName` TEXT NOT NULL, PRIMARY KEY(`messageId`))",
         "fields": [
@@ -412,7 +386,7 @@
       },
       {
         "tableName": "chat_node",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL, `base64Id` TEXT NOT NULL, `restoreId` INTEGER, `label` INTEGER NOT NULL, `isFavourite` INTEGER NOT NULL, `isTakenDown` INTEGER NOT NULL, `isIncomingShare` INTEGER NOT NULL, `isNodeKeyDecrypted` INTEGER NOT NULL, `creationTime` INTEGER NOT NULL, `serializedData` TEXT, `isAvailableOffline` INTEGER NOT NULL, `versionCount` INTEGER NOT NULL, `publicLink` TEXT, `publicLinkCreationTime` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL, `base64Id` TEXT NOT NULL, `restoreId` INTEGER, `label` INTEGER NOT NULL, `isFavourite` INTEGER NOT NULL, `isTakenDown` INTEGER NOT NULL, `isIncomingShare` INTEGER NOT NULL, `isNodeKeyDecrypted` INTEGER NOT NULL, `creationTime` INTEGER NOT NULL, `serializedData` TEXT, `isAvailableOffline` INTEGER NOT NULL, `versionCount` INTEGER NOT NULL, `size` INTEGER NOT NULL, `modificationTime` INTEGER NOT NULL, `type` TEXT NOT NULL, `thumbnailPath` TEXT, `previewPath` TEXT, `fullSizePath` TEXT, `fingerprint` TEXT, `originalFingerprint` TEXT, `hasThumbnail` INTEGER NOT NULL, `hasPreview` INTEGER NOT NULL, `publicLink` TEXT, `publicLinkCreationTime` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -505,6 +479,66 @@
             "notNull": true
           },
           {
+            "fieldPath": "size",
+            "columnName": "size",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "modificationTime",
+            "columnName": "modificationTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thumbnailPath",
+            "columnName": "thumbnailPath",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "previewPath",
+            "columnName": "previewPath",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fullSizePath",
+            "columnName": "fullSizePath",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fingerprint",
+            "columnName": "fingerprint",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "originalFingerprint",
+            "columnName": "originalFingerprint",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hasThumbnail",
+            "columnName": "hasThumbnail",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasPreview",
+            "columnName": "hasPreview",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "exportedData.publicLink",
             "columnName": "publicLink",
             "affinity": "TEXT",
@@ -530,7 +564,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9ca406d9a603164fb73c64d9e8dd696a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4f8c43a6323b4eb76ddd6bca0b014228')"
     ]
   }
 }

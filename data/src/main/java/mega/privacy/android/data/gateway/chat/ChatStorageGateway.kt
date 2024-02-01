@@ -2,7 +2,6 @@ package mega.privacy.android.data.gateway.chat
 
 import androidx.paging.PagingSource
 import mega.privacy.android.data.database.entity.chat.ChatGeolocationEntity
-import mega.privacy.android.data.database.entity.chat.ChatHistoryLoadStatusEntity
 import mega.privacy.android.data.database.entity.chat.ChatNodeEntity
 import mega.privacy.android.data.database.entity.chat.GiphyEntity
 import mega.privacy.android.data.database.entity.chat.MetaTypedMessageEntity
@@ -37,21 +36,6 @@ interface ChatStorageGateway {
         geolocations: List<ChatGeolocationEntity>,
         chatNodes: List<ChatNodeEntity>,
     )
-
-    /**
-     * Get last load response
-     *
-     * @param chatId
-     * @return
-     */
-    suspend fun getLastLoadResponse(chatId: Long): ChatHistoryLoadStatusEntity?
-
-    /**
-     * Set last load response
-     *
-     * @param chatHistoryLoadStatusEntity
-     */
-    suspend fun setLastLoadResponse(chatHistoryLoadStatusEntity: ChatHistoryLoadStatusEntity)
 
     /**
      * Clear chat messages
