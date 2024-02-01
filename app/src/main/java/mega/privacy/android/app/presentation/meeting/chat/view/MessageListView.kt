@@ -21,6 +21,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import mega.privacy.android.app.presentation.extensions.paging.printLoadStates
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ParticipantUiMessage
@@ -39,7 +40,7 @@ internal fun MessageListView(
     onMessageLongClick: (TypedMessage) -> Unit = {},
 ) {
     val pagingItems = viewModel.pagedMessages.collectAsLazyPagingItems()
-    Timber.d("Paging pagingItems load state ${pagingItems.loadState}")
+    Timber.d("Paging pagingItems load state: \n ${pagingItems.printLoadStates()}")
     Timber.d("Paging pagingItems count ${pagingItems.itemCount}")
 
     var lastCacheUpdateTime by remember {
@@ -79,55 +80,45 @@ internal fun MessageListView(
         contentPadding = PaddingValues(bottom = bottomPadding.coerceAtLeast(12.dp)),
         reverseLayout = true,
     ) {
-        when {
-            pagingItems.loadState.refresh is LoadState.Error -> {
-//                Error view
-            }
 
-            pagingItems.loadState.prepend is LoadState.Error -> {
-                // Loading previous messages failed
-            }
-
-            pagingItems.loadState.prepend is LoadState.NotLoading
-                    && pagingItems.loadState.refresh is LoadState.NotLoading
-                    && pagingItems.loadState.prepend.endOfPaginationReached -> {
-
-            }
-        }
-
-        items(
-            count = pagingItems.itemCount,
-            key = pagingItems.itemKey {
-                if (it is ParticipantUiMessage) {
-                    // some messages we show the name of 2 users
-                    "${it.key()}_${lastCacheUpdateTime[it.userHandle]}_${lastCacheUpdateTime[it.handleOfAction]}"
-                } else {
-                    "${it.key()}_${lastCacheUpdateTime[it.userHandle]}"
-                }
-            },
-            contentType = pagingItems.itemContentType()
-        ) { index ->
-            pagingItems[index]?.MessageListItem(
-                uiState = uiState,
-                lastUpdatedCache = lastCacheUpdateTime[pagingItems[index]?.userHandle] ?: 0L,
-                timeFormatter = TimeUtils::formatTime,
-                dateFormatter = {
-                    TimeUtils.formatDate(
-                        it,
-                        TimeUtils.DATE_SHORT_FORMAT,
-                        context
-                    )
-                },
-                onLongClick = {
-                    if (uiState.haveWritePermission) onMessageLongClick(it)
-                },
-            )
-        }
-
-        if (pagingItems.loadState.append is LoadState.Loading || pagingItems.loadState.refresh is LoadState.Loading) {
+        if (pagingItems.itemSnapshotList.isEmpty() && pagingItems.loadState.refresh is LoadState.Loading) {
             item {
                 LoadingMessagesHeader()
             }
+        } else {
+            items(
+                count = pagingItems.itemCount,
+                key = pagingItems.itemKey {
+                    if (it is ParticipantUiMessage) {
+                        // some messages we show the name of 2 users
+                        "${it.key()}_${lastCacheUpdateTime[it.userHandle]}_${lastCacheUpdateTime[it.handleOfAction]}"
+                    } else {
+                        "${it.key()}_${lastCacheUpdateTime[it.userHandle]}"
+                    }
+                },
+                contentType = pagingItems.itemContentType()
+            ) { index ->
+
+                pagingItems[index]?.MessageListItem(
+                    uiState = uiState,
+                    lastUpdatedCache = lastCacheUpdateTime[pagingItems[index]?.userHandle] ?: 0L,
+                    timeFormatter = TimeUtils::formatTime,
+                    dateFormatter = {
+                        TimeUtils.formatDate(
+                            it,
+                            TimeUtils.DATE_SHORT_FORMAT,
+                            context
+                        )
+                    },
+                    onLongClick = {
+                        if (uiState.haveWritePermission) onMessageLongClick(it)
+                    },
+                )
+            }
         }
+
+
     }
 }
+
+

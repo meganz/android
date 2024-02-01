@@ -67,6 +67,14 @@ class MessageListViewModel @Inject constructor(
         ) {
             getChatPagingSourceUseCase(chatId)
         }.flow
+            .map { pagingData ->
+                pagingData.map {
+                    uiChatMessageMapper(it)
+                }
+                    .insertFooterItem(
+                    item = ChatHeaderMessage()
+                )
+            }
             .cachedIn(viewModelScope)
 
 
@@ -74,13 +82,7 @@ class MessageListViewModel @Inject constructor(
      * Paged messages
      */
     val pagedMessages: Flow<PagingData<UiChatMessage>> = pagedFlow
-        .map { pagingData ->
-            pagingData.map {
-                uiChatMessageMapper(it)
-            }.insertFooterItem(
-                item = ChatHeaderMessage()
-            )
-        }
+
 
     /**
      * Update latest message id

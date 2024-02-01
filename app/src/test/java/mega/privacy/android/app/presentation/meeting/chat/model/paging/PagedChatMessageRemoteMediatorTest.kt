@@ -8,10 +8,10 @@ import androidx.paging.RemoteMediator
 import com.google.common.truth.Truth.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.paging.FetchMessagePageResponse
-import mega.privacy.android.domain.usecase.chat.message.paging.ChatHasMoreMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.paging.ClearChatMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.paging.FetchMessagePageUseCase
 import mega.privacy.android.domain.usecase.chat.message.paging.SaveChatMessagesUseCase
@@ -34,7 +34,6 @@ class PagedChatMessageRemoteMediatorTest {
     private val messageFlow: MutableStateFlow<ChatMessage?> = MutableStateFlow(null)
     private val fetchMessages = mock<FetchMessagePageUseCase>()
     private val saveChatMessagesUseCase = mock<SaveChatMessagesUseCase>()
-    private val chatHasMoreMessagesUseCase = mock<ChatHasMoreMessagesUseCase>()
     private val clearChatMessagesUseCase = mock<ClearChatMessagesUseCase>()
 
     private val state = PagingState<Int, TypedMessage>(
@@ -49,7 +48,6 @@ class PagedChatMessageRemoteMediatorTest {
         underTest =
             PagedChatMessageRemoteMediator(
                 chatId = chatId,
-                chatHasMoreMessagesUseCase = chatHasMoreMessagesUseCase,
                 fetchMessages = fetchMessages,
                 saveMessages = saveChatMessagesUseCase,
                 coroutineScope = mock(),
@@ -61,7 +59,6 @@ class PagedChatMessageRemoteMediatorTest {
     internal fun tearDown() {
         messageFlow.value = null
         Mockito.reset(
-            chatHasMoreMessagesUseCase,
             fetchMessages,
             saveChatMessagesUseCase,
             clearChatMessagesUseCase
@@ -69,20 +66,23 @@ class PagedChatMessageRemoteMediatorTest {
     }
 
     @Test
-    internal fun `test that end of pagination is true if the loading type is append`() = runTest {
-        val result = underTest.load(LoadType.APPEND, state)
-        assertThat(result).isInstanceOf(RemoteMediator.MediatorResult.Success::class.java)
-        assertThat((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
-            .isTrue()
-    }
-
-    @Test
     internal fun `test that end of pagination is true if chat has no more messages`() =
         runTest {
-            chatHasMoreMessagesUseCase.stub {
-                onBlocking { invoke(chatId) }.thenReturn(false)
-            }
 
+            fetchMessages.stub {
+                onBlocking {
+                    invoke(
+                        any(),
+                        any()
+                    )
+                }.thenReturn(
+                    FetchMessagePageResponse(
+                        chatId = 1L,
+                        messages = emptyList(),
+                        loadResponse = ChatHistoryLoadStatus.NONE
+                    )
+                )
+            }
             val result = underTest.load(LoadType.PREPEND, state)
 
             assertThat(result).isInstanceOf(RemoteMediator.MediatorResult.Success::class.java)
@@ -92,9 +92,6 @@ class PagedChatMessageRemoteMediatorTest {
 
     @Test
     internal fun `test fetched response is saved`() = runTest {
-        chatHasMoreMessagesUseCase.stub {
-            onBlocking { invoke(chatId) }.thenReturn(true)
-        }
 
         val response = mock<FetchMessagePageResponse>()
         fetchMessages.stub {
@@ -113,10 +110,6 @@ class PagedChatMessageRemoteMediatorTest {
 
     @Test
     internal fun `test that error response is returned if an error is thrown`() = runTest {
-        chatHasMoreMessagesUseCase.stub {
-            onBlocking { invoke(chatId) }.thenReturn(true)
-        }
-
         val exception = Exception("This is the issue")
         fetchMessages.stub {
             onBlocking {
@@ -136,10 +129,6 @@ class PagedChatMessageRemoteMediatorTest {
 
     @Test
     internal fun `test that message database is cleared when load type is refresh`() = runTest {
-        chatHasMoreMessagesUseCase.stub {
-            onBlocking { invoke(chatId) }.thenReturn(true)
-        }
-
         underTest.load(LoadType.REFRESH, state)
 
         verify(clearChatMessagesUseCase).invoke(chatId)
