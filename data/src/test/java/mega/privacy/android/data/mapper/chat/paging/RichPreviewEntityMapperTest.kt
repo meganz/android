@@ -1,7 +1,7 @@
 package mega.privacy.android.data.mapper.chat.paging
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.domain.entity.chat.messages.ChatRichPreviewInfo
+import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock

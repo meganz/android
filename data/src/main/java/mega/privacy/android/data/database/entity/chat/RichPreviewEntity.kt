@@ -2,7 +2,7 @@ package mega.privacy.android.data.database.entity.chat
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import mega.privacy.android.domain.entity.chat.messages.ChatRichPreviewInfo
+import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
 
 /**
  * Entity to store a rich preview.

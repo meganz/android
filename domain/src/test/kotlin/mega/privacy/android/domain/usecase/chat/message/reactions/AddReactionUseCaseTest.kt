@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.chat.message
+package mega.privacy.android.domain.usecase.chat.message.reactions
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.ChatRepository

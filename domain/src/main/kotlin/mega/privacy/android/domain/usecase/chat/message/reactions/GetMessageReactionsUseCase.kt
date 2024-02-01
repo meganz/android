@@ -1,0 +1,30 @@
+package mega.privacy.android.domain.usecase.chat.message.reactions
+
+import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.repository.ChatRepository
+import javax.inject.Inject
+
+/**
+ * Use case for getting reactions of a chat message.
+ */
+class GetMessageReactionsUseCase @Inject constructor(
+    private val chatRepository: ChatRepository,
+) {
+
+    /**
+     * Invoke.
+     *
+     * @param chatId Chat ID.
+     * @param msgId Message ID.
+     * @return List of [MessageReaction].
+     */
+    suspend operator fun invoke(chatId: Long, msgId: Long) = buildList {
+        val myUserHandle = chatRepository.getMyUserHandle()
+        chatRepository.getMessageReactions(chatId, msgId).forEach { reaction ->
+            val count = chatRepository.getMessageReactionCount(chatId, msgId, reaction)
+            val userHandles = chatRepository.getReactionUsers(chatId, msgId, reaction)
+            val hasMe = myUserHandle in userHandles
+            add(MessageReaction(reaction, count, userHandles, hasMe))
+        }
+    }
+}

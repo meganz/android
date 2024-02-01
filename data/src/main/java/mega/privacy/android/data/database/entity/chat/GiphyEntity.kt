@@ -2,7 +2,7 @@ package mega.privacy.android.data.database.entity.chat
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import mega.privacy.android.domain.entity.chat.messages.ChatGifInfo
+import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 
 /**
  * Entity to store a giphy.

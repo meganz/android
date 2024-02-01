@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.chat
 
-import mega.privacy.android.domain.entity.chat.messages.ChatGeolocationInfo
+import mega.privacy.android.domain.entity.chat.messages.meta.ChatGeolocationInfo
 
 /**
  * Data class for storing geolocation data.

@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.entity.chat.messages
+package mega.privacy.android.domain.entity.chat.messages.meta
 
 /**
  * Chat gif info

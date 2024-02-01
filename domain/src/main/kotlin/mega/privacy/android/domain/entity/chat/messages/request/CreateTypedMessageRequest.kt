@@ -2,10 +2,10 @@ package mega.privacy.android.domain.entity.chat.messages.request
 
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
-import mega.privacy.android.domain.entity.chat.messages.ChatGeolocationInfo
-import mega.privacy.android.domain.entity.chat.messages.ChatGifInfo
 import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
-import mega.privacy.android.domain.entity.chat.messages.ChatRichPreviewInfo
+import mega.privacy.android.domain.entity.chat.messages.meta.ChatGeolocationInfo
+import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
+import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
 import mega.privacy.android.domain.entity.node.Node
 
 /**
