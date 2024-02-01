@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.chat
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -48,7 +47,7 @@ import javax.inject.Inject
 /**
  * Use case to retrieve Chat Rooms.
  */
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class GetChatsUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
     private val pushesRepository: PushesRepository,
@@ -148,9 +147,7 @@ class GetChatsUseCase @Inject constructor(
         }
             .sortedByDescending(CombinedChatRoom::lastTimestamp)
             .forEach { chatRoom ->
-                if (chatRoomType == ChatRoomType.ARCHIVED_CHATS
-                    || (!chatRoom.isArchived && chatRoom.isActive)
-                ) {
+                if (chatRoomType == ChatRoomType.ARCHIVED_CHATS || !chatRoom.isArchived) {
                     put(chatRoom.chatId, chatRoomItemMapper(chatRoom))
                 }
             }.let { values.toList() }
@@ -323,7 +320,7 @@ class GetChatsUseCase @Inject constructor(
     ): Flow<List<ChatRoomItem>> =
         chatRepository.monitorChatListItemUpdates().mapNotNull { chatListItem ->
             if (((chatRoomType == ChatRoomType.ARCHIVED_CHATS && !chatListItem.isArchived) ||
-                        chatListItem.isArchived) || chatListItem.isDeleted || !chatListItem.isActive
+                        chatListItem.isArchived) || chatListItem.isDeleted
                 || chatListItem.changes == ChatListItemChanges.Deleted ||
                 chatListItem.changes == ChatListItemChanges.Closed
             ) {
