@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
@@ -125,6 +126,23 @@ class DeviceCenterFragment : Fragment() {
                         onRenameDeviceSuccessfulSnackbarShown = viewModel::resetRenameDeviceSuccessEvent,
                         onBackPressHandled = viewModel::handleBackPress,
                         onFeatureExited = viewModel::resetExitFeature,
+                        onActionPressed = { menuAction ->
+                            when (menuAction) {
+                                is DeviceMenuAction.Rename -> {
+                                    uiState.selectedDevice?.let { device ->
+                                        viewModel.setDeviceToRename(deviceToRename = device)
+                                    }
+                                }
+
+                                is DeviceMenuAction.Info -> {
+                                    //TODO when the device info screen is ready
+                                }
+
+                                is DeviceMenuAction.CameraUploads -> {
+                                    megaNavigator.openSettingsCameraUploads(requireActivity())
+                                }
+                            }
+                        }
                     )
                 }
             }

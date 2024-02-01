@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
+import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceBottomSheet
@@ -33,6 +34,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINo
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
@@ -81,6 +83,7 @@ internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
  * @param onBackPressHandled Lambda that performs a specific action when the Composable handles the
  * Back Press
  * @param onFeatureExited Lambda that performs a specific action when the Device Center is exited
+ * @param onActionPressed Action for each available option of the app bar menu
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -100,6 +103,7 @@ internal fun DeviceCenterScreen(
     onRenameDeviceSuccessfulSnackbarShown: () -> Unit,
     onBackPressHandled: () -> Unit,
     onFeatureExited: () -> Unit,
+    onActionPressed: ((MenuAction) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val selectedDevice = uiState.selectedDevice
@@ -150,6 +154,17 @@ internal fun DeviceCenterScreen(
                         onBackPressHandled()
                     }
                 },
+                actions = selectedDevice?.let {
+                    val list =
+                        mutableListOf<MenuAction>(DeviceMenuAction.Rename, DeviceMenuAction.Info)
+
+                    if (uiState.selectedDevice is OwnDeviceUINode) {
+                        list.add(DeviceMenuAction.CameraUploads)
+                    }
+
+                    return@let list
+                },
+                onActionPressed = onActionPressed,
             )
         },
         snackbarHost = {
@@ -177,15 +192,6 @@ internal fun DeviceCenterScreen(
                     modifier = Modifier.padding(paddingValues),
                 )
             }
-            DeviceBottomSheet(
-                coroutineScope = coroutineScope,
-                modalSheetState = modalSheetState,
-                device = uiState.menuClickedDevice ?: return@Scaffold,
-                isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
-                onCameraUploadsClicked = onCameraUploadsClicked,
-                onRenameDeviceClicked = onRenameDeviceOptionClicked,
-                onInfoClicked = {},
-            )
             uiState.deviceToRename?.let { nonNullDevice ->
                 RenameDeviceDialog(
                     deviceId = nonNullDevice.id,
@@ -195,6 +201,15 @@ internal fun DeviceCenterScreen(
                     onRenameCancelled = onRenameDeviceCancelled,
                 )
             }
+            DeviceBottomSheet(
+                coroutineScope = coroutineScope,
+                modalSheetState = modalSheetState,
+                device = uiState.menuClickedDevice ?: return@Scaffold,
+                isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
+                onCameraUploadsClicked = onCameraUploadsClicked,
+                onRenameDeviceClicked = onRenameDeviceOptionClicked,
+                onInfoClicked = {},
+            )
         },
     )
 }

@@ -148,4 +148,10 @@
     <string name="device_center_snackbar_message_rename_device_successful">Device renamed</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
     <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">Maximum 32 characters</string>
+    <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the Camera uploads feature settings -->
+    <string name="device_center_device_top_menu_option_camera_uploads">Camera uploads</string>
+    <!-- Label of the top app bar menu option of selected device in Device Center which opens the dialog to rename the selected Device -->
+    <string name="device_center_device_top_menu_option_rename">Rename</string>
+    <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the device info screen -->
+    <string name="device_center_device_top_menu_option_info">Info</string>
 </resources>
