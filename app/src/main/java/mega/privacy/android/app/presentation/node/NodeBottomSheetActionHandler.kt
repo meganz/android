@@ -3,11 +3,13 @@ package mega.privacy.android.app.presentation.node
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
+import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.MoveMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.RestoreMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.core.ui.model.MenuAction
@@ -89,6 +91,17 @@ class NodeBottomSheetActionHandler(
             }
         }
 
+    private val sendToChatLauncher =
+        (activity as? AppCompatActivity)?.registerForActivityResult(
+            SendToChatActivityContract()
+        ) { result ->
+            result?.let { chatIds ->
+                nodeOptionsBottomSheetViewModel.attachNodeToChats(
+                    chatIds = chatIds,
+                )
+            }
+        }
+
     /**
      * handles actions
      *
@@ -102,6 +115,7 @@ class NodeBottomSheetActionHandler(
             is CopyMenuAction -> selectCopyNodeActivityLauncher?.launch(longArrayOf(node.id.longValue))
             is ShareFolderMenuAction -> shareFolderActivityLauncher?.launch(longArrayOf(node.id.longValue))
             is RestoreMenuAction -> restoreFromRubbishLauncher?.launch(longArrayOf(node.id.longValue))
+            is SendToChatMenuAction -> sendToChatLauncher?.launch(longArrayOf(node.id.longValue))
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }
     }

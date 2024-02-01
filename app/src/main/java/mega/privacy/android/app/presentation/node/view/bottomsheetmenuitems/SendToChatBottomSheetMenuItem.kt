@@ -1,10 +1,17 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
+import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
+import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.filenode.IsMyNodeUseCase
 import javax.inject.Inject
 
 /**
@@ -14,6 +21,8 @@ import javax.inject.Inject
  */
 class SendToChatBottomSheetMenuItem @Inject constructor(
     override val menuAction: SendToChatMenuAction,
+    private val isMyNodeUseCase: IsMyNodeUseCase,
+    @ApplicationScope private val scope: CoroutineScope,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -27,4 +36,20 @@ class SendToChatBottomSheetMenuItem @Inject constructor(
             && isNodeInRubbish.not()
 
     override val groupId = 7
+
+    override fun getOnClickFunction(
+        node: TypedNode,
+        onDismiss: () -> Unit,
+        actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
+        navController: NavHostController,
+    ): () -> Unit = {
+        if (node is FileNode) {
+            scope.launch {
+                if (isMyNodeUseCase(node)) {
+                    actionHandler(menuAction, node)
+                }
+            }
+        }
+        onDismiss()
+    }
 }

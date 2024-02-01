@@ -13,21 +13,23 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.presentation.chat.mapper.ChatRequestMessageMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.model.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
+import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
@@ -67,6 +69,8 @@ class NodeOptionsBottomSheetViewModelTest {
     private val versionHistoryRemoveMessageMapper = mock<VersionHistoryRemoveMessageMapper>()
     private val snackBarHandler = mock<SnackBarHandler>()
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase = mock()
+    private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
+    private val chatRequestMessageMapper: ChatRequestMessageMapper = mock()
 
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
@@ -98,7 +102,9 @@ class NodeOptionsBottomSheetViewModelTest {
             moveRequestMessageMapper = moveRequestMessageMapper,
             versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper,
             applicationScope = applicationScope,
-            checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase
+            checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase,
+            attachMultipleNodesUseCase = attachMultipleNodesUseCase,
+            chatRequestMessageMapper = chatRequestMessageMapper
         )
     }
 
@@ -216,6 +222,36 @@ class NodeOptionsBottomSheetViewModelTest {
             viewModel.state.test {
                 val state = awaitItem()
                 assertThat(state.contactsData).isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that chatRequestMessageMapper is called when chatIds is selected`() =
+        runTest {
+            initViewModel()
+            val chatIds = longArrayOf(1234L)
+            val request = ChatRequestResult.ChatRequestAttachNode(
+                count = 1,
+                errorCount = 0
+            )
+
+            viewModel.state.value.node?.let {
+                whenever(
+                    attachMultipleNodesUseCase(
+                        listOf(it.id),
+                        longArrayOf(1234L)
+                    )
+                ).thenReturn(request)
+                whenever(chatRequestMessageMapper(request)).thenReturn("Some value")
+
+                viewModel.attachNodeToChats(chatIds)
+
+                verify(attachMultipleNodesUseCase).invoke(
+                    listOf(it.id),
+                    longArrayOf(1234L)
+                )
+                verify(chatRequestMessageMapper).invoke(request)
+                verify(snackBarHandler).postSnackbarMessage("Some value")
             }
         }
 }

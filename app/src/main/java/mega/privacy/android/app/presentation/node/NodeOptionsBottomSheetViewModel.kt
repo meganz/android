@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.chat.mapper.ChatRequestMessageMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.model.NodeBottomSheetState
 import mega.privacy.android.app.presentation.node.model.mapper.NodeBottomSheetActionMapper
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
@@ -78,6 +80,8 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val moveRequestMessageMapper: MoveRequestMessageMapper,
     private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper,
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase,
+    private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase,
+    private val chatRequestMessageMapper: ChatRequestMessageMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -296,6 +300,25 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
                             )
                         )
                     )
+                }
+            }
+        }
+    }
+
+    /**
+     * attach node to chat
+     * @param chatIds [LongArray] chat ids where [Node] is attached
+     */
+    fun attachNodeToChats(
+        chatIds: LongArray,
+    ) {
+        state.value.node?.let { node ->
+            viewModelScope.launch {
+                val attachNodeRequest =
+                    attachMultipleNodesUseCase(nodeIds = listOf(node.id), chatIds)
+                val message = chatRequestMessageMapper(attachNodeRequest)
+                message?.let {
+                    snackBarHandler.postSnackbarMessage(it)
                 }
             }
         }

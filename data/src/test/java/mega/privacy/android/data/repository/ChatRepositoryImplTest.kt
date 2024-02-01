@@ -1025,7 +1025,7 @@ class ChatRepositoryImplTest {
     @Test
     fun `test that the default chat folder name is retrieved`() = runTest {
         val expected = "Default chat folder name"
-        whenever(context.getString(R.string.section_photo_sync)).thenReturn(expected)
+        whenever(context.getString(R.string.my_chat_files_folder)).thenReturn(expected)
         val actual = underTest.getDefaultChatFolderName()
         assertThat(actual).isEqualTo(expected)
     }

@@ -1324,7 +1324,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             .filterNotNull()
     }
 
-    override fun getDefaultChatFolderName() = context.getString(R.string.section_photo_sync)
+    override fun getDefaultChatFolderName() = context.getString(R.string.my_chat_files_folder)
 
     override suspend fun addReaction(chatId: Long, msgId: Long, reaction: String) =
         withContext(ioDispatcher) {
