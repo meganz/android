@@ -36,7 +36,7 @@ internal fun getFileTypeInfo(node: MegaNode, mimeTypeMapper: MimeTypeMapper): Fi
 private fun getFileExtension(node: MegaNode) =
     node.name.substringAfterLast('.', "")
 
-private fun getFileTypeInfoForExtension(
+internal fun getFileTypeInfoForExtension(
     mimeType: String,
     extension: String,
     duration: Int,
@@ -44,39 +44,46 @@ private fun getFileTypeInfoForExtension(
     mimeType.startsWith(PdfFileTypeInfo.mimeType) -> {
         PdfFileTypeInfo
     }
+
     mimeType.isZipMimeType() -> {
         ZipFileTypeInfo(
             mimeType = mimeType,
             extension = extension,
         )
     }
+
     mimeType.startsWith("web/url") -> {
         UrlFileTypeInfo
     }
+
     extension.lowercase().isGifExtension() -> {
         GifFileTypeInfo(
             mimeType = mimeType,
             extension = extension,
         )
     }
+
     extension.lowercase().isRawExtension() -> {
         RawFileTypeInfo(
             mimeType = mimeType,
             extension = extension,
         )
     }
+
     extension.lowercase().isSVGExtension() -> {
         SvgFileTypeInfo(
             mimeType = mimeType,
             extension = extension,
         )
     }
+
     mimeType.startsWith("image/") -> {
         StaticImageFileTypeInfo(
             mimeType = mimeType,
             extension = extension,
         )
     }
+
     mimeType.isAudioMimeType(extension) -> {
         AudioFileTypeInfo(
             mimeType = mimeType,
@@ -84,12 +91,14 @@ private fun getFileTypeInfoForExtension(
             duration = duration.seconds
         )
     }
+
     mimeType.isTextMimeType(extension) -> {
         TextFileTypeInfo(
             mimeType = mimeType,
             extension = extension,
         )
     }
+
     mimeType.isVideoMimeType(extension) -> {
         VideoFileTypeInfo(
             mimeType = mimeType,
@@ -97,9 +106,11 @@ private fun getFileTypeInfoForExtension(
             duration = duration.seconds
         )
     }
+
     mimeType.isUnMappedMimeType(extension) -> {
         UnMappedFileTypeInfo(extension = extension)
     }
+
     else -> {
         UnknownFileTypeInfo(
             mimeType = mimeType,

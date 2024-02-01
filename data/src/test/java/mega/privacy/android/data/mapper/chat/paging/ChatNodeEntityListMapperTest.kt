@@ -1,8 +1,9 @@
 package mega.privacy.android.data.mapper.chat.paging
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
@@ -28,8 +29,18 @@ class ChatNodeEntityListMapperTest {
         val expectedSerializedData = "serializedData"
         val expectedIsAvailableOffline = false
         val expectedVersionCount = 0
+        val expectedSize = 1567L
+        val expectedModificationTime = 1676L
+        val expectedType = StaticImageFileTypeInfo("image/jpeg", "jpg")
+        val expectedThumbnailPath = "thumbnailPath"
+        val expectedPreviewPath = "previewPath"
+        val expectedFullSizePath = "fullSizePath"
+        val expectedFingerprint = "fingerPrint"
+        val expectedOriginalFingerPrint = "originalFingerPrint"
+        val expectedHasThumbnail = true
+        val expectedHasPreview = true
 
-        val node = mock<Node> {
+        val node = mock<FileNode> {
             on { id } doReturn expectedId
             on { name } doReturn expectedName
             on { parentId } doReturn expectedParentId
@@ -44,6 +55,16 @@ class ChatNodeEntityListMapperTest {
             on { serializedData } doReturn expectedSerializedData
             on { isAvailableOffline } doReturn expectedIsAvailableOffline
             on { versionCount } doReturn expectedVersionCount
+            on { size } doReturn expectedSize
+            on { modificationTime } doReturn expectedModificationTime
+            on { type } doReturn expectedType
+            on { thumbnailPath } doReturn expectedThumbnailPath
+            on { previewPath } doReturn expectedPreviewPath
+            on { fullSizePath } doReturn expectedFullSizePath
+            on { fingerprint } doReturn expectedFingerprint
+            on { originalFingerprint } doReturn expectedOriginalFingerPrint
+            on { hasThumbnail } doReturn expectedHasThumbnail
+            on { hasPreview } doReturn expectedHasPreview
         }
 
         val actual = underTest(expectedMessageId, listOf(node))
@@ -65,6 +86,16 @@ class ChatNodeEntityListMapperTest {
         assertThat(chatNodeEntity.serializedData).isEqualTo(expectedSerializedData)
         assertThat(chatNodeEntity.isAvailableOffline).isEqualTo(expectedIsAvailableOffline)
         assertThat(chatNodeEntity.versionCount).isEqualTo(expectedVersionCount)
+        assertThat(chatNodeEntity.size).isEqualTo(expectedSize)
+        assertThat(chatNodeEntity.modificationTime).isEqualTo(expectedModificationTime)
+        assertThat(chatNodeEntity.type).isEqualTo(expectedType)
+        assertThat(chatNodeEntity.thumbnailPath).isEqualTo(expectedThumbnailPath)
+        assertThat(chatNodeEntity.previewPath).isEqualTo(expectedPreviewPath)
+        assertThat(chatNodeEntity.fullSizePath).isEqualTo(expectedFullSizePath)
+        assertThat(chatNodeEntity.fingerprint).isEqualTo(expectedFingerprint)
+        assertThat(chatNodeEntity.originalFingerprint).isEqualTo(expectedOriginalFingerPrint)
+        assertThat(chatNodeEntity.hasThumbnail).isEqualTo(expectedHasThumbnail)
+        assertThat(chatNodeEntity.hasPreview).isEqualTo(expectedHasPreview)
 
     }
 }

@@ -3,8 +3,11 @@ package mega.privacy.android.data.database.entity.chat
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import mega.privacy.android.data.database.converter.ChatNodeEntityConverters
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -27,6 +30,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property versionCount Version count.
  */
 @Entity(tableName = "chat_node")
+@TypeConverters(ChatNodeEntityConverters::class)
 data class ChatNodeEntity(
     @PrimaryKey override val id: NodeId,
     val messageId: Long,
@@ -44,5 +48,15 @@ data class ChatNodeEntity(
     override val serializedData: String?,
     override val isAvailableOffline: Boolean,
     override val versionCount: Int,
-) : Node
+    override val size: Long,
+    override val modificationTime: Long,
+    override val type: FileTypeInfo,
+    override val thumbnailPath: String?,
+    override val previewPath: String?,
+    override val fullSizePath: String?,
+    override val fingerprint: String?,
+    override val originalFingerprint: String?,
+    override val hasThumbnail: Boolean,
+    override val hasPreview: Boolean,
+) : FileNode
 
