@@ -3766,6 +3766,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     setToolbarTitle()
                     showFabButton()
                     showHideBottomNavigationView(hide = false)
+                    changeAppBarElevation(false)
                     if (!comesFromNotifications) {
                         bottomNavigationCurrentItem = CLOUD_DRIVE_BNV
                     }
@@ -3803,6 +3804,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setToolbarTitle()
                 showFabButton()
                 hideAdsView()
+                changeAppBarElevation(false)
             }
 
             DrawerItem.DEVICE_CENTER -> {
@@ -3877,6 +3879,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                     setBottomNavigationMenuItemChecked(PHOTOS_BNV)
                     handleShowingAds(TAB_PHOTOS_SLOT_ID)
+                    changeAppBarElevation(false)
                 }
             }
 
@@ -3948,6 +3951,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
                 hideFabButton()
                 hideAdsView()
+                changeAppBarElevation(false)
             }
 
             else -> {}

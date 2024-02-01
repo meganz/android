@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.clouddrive.ui
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
@@ -98,6 +100,7 @@ fun FileBrowserComposeView(
                     onDisputeTakeDownClicked = onDisputeTakeDownClicked,
                     showMediaDiscoveryButton = uiState.showMediaDiscoveryIcon,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                    listContentPadding = PaddingValues(top = 18.dp)
                 )
             }
         } else {
