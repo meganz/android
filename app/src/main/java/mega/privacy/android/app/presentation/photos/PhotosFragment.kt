@@ -229,6 +229,7 @@ class PhotosFragment : Fragment() {
                     }
 
                     handleMenuIcons(isShowing = isMenuShowing)
+                    handleFilterIcons(timelineViewModel.state.value)
                 }
             }
         }
@@ -267,7 +268,7 @@ class PhotosFragment : Fragment() {
         // CU default menu
         val showCameraUploadsButton = state.enableCameraUploadButtonShowing
         this.menu?.findItem(R.id.action_cu_status_default)?.isVisible =
-            showCameraUploadsButton
+            showCameraUploadsButton && photosViewModel.state.value.selectedTab != PhotosTab.Albums
 
         // CU complete menu
         val showCameraUploadsComplete = state.showCameraUploadsComplete
@@ -281,8 +282,9 @@ class PhotosFragment : Fragment() {
     }
 
     private fun handleFilterIcons(timelineViewState: TimelineViewState) {
-        this.menu?.findItem(R.id.action_photos_filter)?.isVisible =
-            isNewCUEnabled && timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
+        this.menu?.findItem(R.id.action_photos_filter)?.isVisible = isNewCUEnabled &&
+                timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU &&
+                photosViewModel.state.value.selectedTab != PhotosTab.Albums
     }
 
     /**
