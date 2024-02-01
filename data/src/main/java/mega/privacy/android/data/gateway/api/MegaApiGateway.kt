@@ -3365,4 +3365,21 @@ interface MegaApiGateway {
      * @return owner handle [Long]
      */
     fun getOwner(handle: Long): Long?
+
+    /**
+     * Close a MEGA session.
+     *
+     * All clients using this session will be automatically logged out.
+     *
+     * You can get session information using MegaApiJava.getExtendedAccountDetails().
+     * Then use MegaAccountDetails.getNumSessions and MegaAccountDetails.getSession
+     * to get session info.
+     * MegaAccountSession.getHandle provides the handle that this function needs.
+     *
+     * If you use mega.INVALID_HANDLE, all sessions except the current one will be closed.
+     *
+     * @param sessionHandle of the session. Use mega.INVALID_HANDLE to cancel all sessions except the current one.
+     * @param listener      MegaRequestListenerInterface to track this request.
+     */
+    fun killSession(sessionHandle: Long, listener: MegaRequestListenerInterface)
 }

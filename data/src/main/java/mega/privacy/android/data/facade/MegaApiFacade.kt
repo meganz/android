@@ -1528,4 +1528,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun getOwner(handle: Long): Long? =
         megaApi.getNodeByHandle(handle)?.owner
+
+    override fun killSession(sessionHandle: Long, listener: MegaRequestListenerInterface) =
+        megaApi.killSession(sessionHandle, listener)
 }

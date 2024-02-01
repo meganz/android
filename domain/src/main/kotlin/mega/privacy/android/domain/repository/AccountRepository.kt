@@ -572,4 +572,9 @@ interface AccountRepository {
      * Should show copyright
      */
     suspend fun shouldShowCopyright(): Boolean
+
+    /**
+     * Kills all other active Sessions except the current Session
+     */
+    suspend fun killOtherSessions()
 }

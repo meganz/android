@@ -1314,4 +1314,46 @@ class DefaultAccountRepositoryTest {
             verify(appEventGateway).broadcastCookieSettings(cookieSettings)
         }
 
+    @Test
+    fun `test that the kill other sessions call is successful`() = runTest {
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        whenever(megaApiGateway.getInvalidHandle()).thenReturn(-1L)
+        whenever(
+            megaApiGateway.killSession(
+                sessionHandle = any(),
+                listener = any(),
+            )
+        ).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = megaError,
+            )
+        }
+        underTest.killOtherSessions()
+    }
+
+    @Test
+    fun `test that the kill other sessions call throws a mega exception when the sdk returns an error`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EFAILED)
+            }
+            whenever(megaApiGateway.getInvalidHandle()).thenReturn(-1L)
+            whenever(
+                megaApiGateway.killSession(
+                    sessionHandle = any(),
+                    listener = any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = megaError,
+                )
+            }
+            assertThrows<MegaException> { underTest.killOtherSessions() }
+        }
 }

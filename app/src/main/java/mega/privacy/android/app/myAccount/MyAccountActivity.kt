@@ -450,20 +450,6 @@ class MyAccountActivity : PasscodeActivity(),
     }
 
     /**
-     * Shows the result of the kill sessions action.
-     *
-     * @param success True if the request finishes with success, false otherwise.
-     */
-    private fun showKillSessionsResult(success: Boolean) {
-        showSnackbar(
-            getString(
-                if (success) R.string.success_kill_all_sessions
-                else R.string.error_kill_all_sessions
-            )
-        )
-    }
-
-    /**
      * Shows the result of the cancel subscriptions action.
      *
      * @param success True if the request finishes with success, false otherwise.
@@ -491,7 +477,7 @@ class MyAccountActivity : PasscodeActivity(),
             .setTitle(getString(R.string.confirmation_close_sessions_title))
             .setMessage(getString(R.string.confirmation_close_sessions_text))
             .setPositiveButton(getString(R.string.contact_accept)) { _, _ ->
-                viewModel.killSessions { success -> showKillSessionsResult(success) }
+                viewModel.killOtherSessions()
             }.setNegativeButton(getString(R.string.general_cancel), null)
             .show()
     }

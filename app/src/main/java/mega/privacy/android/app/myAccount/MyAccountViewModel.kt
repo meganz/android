@@ -49,9 +49,10 @@ import mega.privacy.android.app.myAccount.usecase.Check2FAUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmCancelAccountUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmChangeEmailUseCase
 import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
-import mega.privacy.android.app.myAccount.usecase.KillSessionUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
+import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -91,6 +92,7 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
+import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
@@ -121,7 +123,7 @@ import javax.inject.Inject
  * @property setAvatarUseCase
  * @property check2FAUseCase
  * @property checkVersionsUseCase
- * @property killSessionUseCase
+ * @property killOtherSessionsUseCase [KillOtherSessionsUseCase]
  * @property cancelSubscriptionsUseCase
  * @property getMyAvatarFileUseCase
  * @property checkPasswordReminderUseCase
@@ -143,6 +145,7 @@ import javax.inject.Inject
  * @property getCurrentUserEmail
  * @property monitorVerificationStatus
  * @property getFeatureFlagValueUseCase
+ * @property snackBarHandler Handler used to display a Snackbar
  */
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
@@ -153,7 +156,7 @@ class MyAccountViewModel @Inject constructor(
     private val setAvatarUseCase: SetAvatarUseCase,
     private val check2FAUseCase: Check2FAUseCase,
     private val checkVersionsUseCase: CheckVersionsUseCase,
-    private val killSessionUseCase: KillSessionUseCase,
+    private val killOtherSessionsUseCase: KillOtherSessionsUseCase,
     private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
@@ -182,6 +185,7 @@ class MyAccountViewModel @Inject constructor(
     private val getFolderTreeInfo: GetFolderTreeInfo,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val snackBarHandler: SnackBarHandler,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -629,23 +633,24 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Kill sessions
-     *
-     * @param action
-     * @receiver
+     * Kills all other active Sessions except the current Session
      */
-    fun killSessions(action: (Boolean) -> Unit) {
-        killSessionUseCase.kill()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { action.invoke(true) },
-                onError = { error ->
-                    Timber.w("Error when killing sessions: ${error.message}")
-                    action.invoke(false)
-                }
+    fun killOtherSessions() = viewModelScope.launch {
+        runCatching {
+            killOtherSessionsUseCase()
+        }.onSuccess {
+            Timber.d("Successfully killed all other sessions")
+            snackBarHandler.postSnackbarMessage(
+                resId = R.string.success_kill_all_sessions,
+                snackbarDuration = MegaSnackbarDuration.Long,
             )
-            .addTo(composite)
+        }.onFailure {
+            Timber.w("Error killing all other sessions: ${it.message}")
+            snackBarHandler.postSnackbarMessage(
+                resId = R.string.error_kill_all_sessions,
+                snackbarDuration = MegaSnackbarDuration.Long,
+            )
+        }
     }
 
     /**
