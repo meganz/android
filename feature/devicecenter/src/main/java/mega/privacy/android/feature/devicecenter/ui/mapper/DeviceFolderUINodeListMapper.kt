@@ -42,6 +42,7 @@ internal class DeviceFolderUINodeListMapper @Inject constructor(
                     icon = deviceFolderUINodeIconMapper(folder.type),
                     status = deviceCenterUINodeStatusMapper(folder.status),
                     rootHandle = folder.rootHandle,
+                    localFolderPath = folder.localFolderPath
                 )
             }
         }

@@ -22,6 +22,12 @@ internal class BackupInfoHeartbeatStatusMapper @Inject constructor() {
         MegaBackupInfo.BACKUP_STATUS_PENDING -> BackupInfoHeartbeatStatus.PENDING
         MegaBackupInfo.BACKUP_STATUS_INACTIVE -> BackupInfoHeartbeatStatus.INACTIVE
         MegaBackupInfo.BACKUP_STATUS_UNKNOWN -> BackupInfoHeartbeatStatus.UNKNOWN
+        BACKUP_STATUS_STALLED -> BackupInfoHeartbeatStatus.STALLED
         else -> throw IllegalArgumentException("The sync heartbeat status value $sdkHeartbeatStatus is invalid")
+    }
+
+    internal companion object {
+        // SDK team has not added a constant for this status yet
+        const val BACKUP_STATUS_STALLED = 6
     }
 }

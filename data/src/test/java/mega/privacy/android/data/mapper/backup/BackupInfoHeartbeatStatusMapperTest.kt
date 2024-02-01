@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper.backup
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.data.mapper.backup.BackupInfoHeartbeatStatusMapper.Companion.BACKUP_STATUS_STALLED
 import mega.privacy.android.domain.entity.backup.BackupInfoHeartbeatStatus
 import nz.mega.sdk.MegaBackupInfo
 import org.junit.jupiter.api.BeforeAll
@@ -48,5 +49,6 @@ internal class BackupInfoHeartbeatStatusMapperTest {
         Arguments.of(MegaBackupInfo.BACKUP_STATUS_PENDING, BackupInfoHeartbeatStatus.PENDING),
         Arguments.of(MegaBackupInfo.BACKUP_STATUS_INACTIVE, BackupInfoHeartbeatStatus.INACTIVE),
         Arguments.of(MegaBackupInfo.BACKUP_STATUS_UNKNOWN, BackupInfoHeartbeatStatus.UNKNOWN),
+        Arguments.of(BACKUP_STATUS_STALLED, BackupInfoHeartbeatStatus.STALLED),
     )
 }

@@ -12,12 +12,14 @@ import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
  * @property rootHandle The Device Folder Root Handle
  * @property type The Device Folder Type
  * @property userAgent The Device Folder User Agent
+ * @property localFolderPath The Device Folder Local Folder Path
  */
 data class DeviceFolderNode(
     override val id: String,
     override val name: String,
     override val status: DeviceCenterNodeStatus,
     val rootHandle: Long,
+    val localFolderPath: String,
     val type: BackupInfoType,
     val userAgent: BackupInfoUserAgent,
 ) : DeviceCenterNode

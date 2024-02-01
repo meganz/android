@@ -84,7 +84,13 @@ internal fun DeviceCenterListViewItem(
             applySecondaryColorIconTint = uiNode.icon.applySecondaryColorTint,
             fileSize = null,
             modifiedDate = null,
-            name = uiNode.name.ifBlank { stringResource(R.string.device_center_list_view_item_title_unknown_device) },
+            name = uiNode.name.ifBlank {
+                when (uiNode) {
+                    is DeviceUINode -> stringResource(R.string.device_center_list_view_item_title_unknown_device)
+                    is NonBackupDeviceFolderUINode -> uiNode.localFolderPath
+                    else -> ""
+                }
+            },
             infoColor = getStatusColor(uiNode.status),
             infoIcon = uiNode.status.icon,
             infoIconTint = getStatusColor(uiNode.status),

@@ -50,6 +50,7 @@ internal class DeviceFolderUINodeListMapperTest {
         val folderType = BackupInfoType.BACKUP_UPLOAD
         val folderUserAgent = BackupInfoUserAgent.WINDOWS
         val folderRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val folderList = listOf(
             DeviceFolderNode(
                 id = folderId,
@@ -58,6 +59,7 @@ internal class DeviceFolderUINodeListMapperTest {
                 rootHandle = folderRootHandle,
                 type = folderType,
                 userAgent = folderUserAgent,
+                localFolderPath = localPath
             )
         )
         val expectedUINodeStatus = DeviceCenterUINodeStatus.UpToDate
@@ -92,6 +94,7 @@ internal class DeviceFolderUINodeListMapperTest {
         val folderStatus = DeviceCenterNodeStatus.UpToDate
         val folderUserAgent = BackupInfoUserAgent.WINDOWS
         val folderRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val folderList = listOf(
             DeviceFolderNode(
                 id = folderId,
@@ -100,6 +103,7 @@ internal class DeviceFolderUINodeListMapperTest {
                 rootHandle = folderRootHandle,
                 type = folderType,
                 userAgent = folderUserAgent,
+                localFolderPath = localPath
             )
         )
         val expectedUINodeStatus = DeviceCenterUINodeStatus.UpToDate
@@ -116,6 +120,7 @@ internal class DeviceFolderUINodeListMapperTest {
                     icon = expectedFolderUINodeIcon,
                     status = expectedUINodeStatus,
                     rootHandle = folderRootHandle,
+                    localFolderPath = localPath
                 )
             )
         )

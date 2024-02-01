@@ -30,6 +30,7 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
                 name = backupInfo.name.orEmpty(),
                 status = backupInfo.getDeviceFolderStatus(currentTimeInSeconds),
                 rootHandle = backupInfo.rootHandle,
+                localFolderPath = backupInfo.localFolderPath.orEmpty(),
                 type = backupInfo.type,
                 userAgent = backupInfo.userAgent,
             )
@@ -43,13 +44,14 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
      * 1. Stopped - [isStopped]
      * 2. Overquota - [isOverquota]
      * 3. Blocked - [isBlocked]
-     * 4. Disabled - [isDisabled]
-     * 5. Offline - [isOffline]
-     * 6. Paused - [isPaused]
-     * 7. Up to Date - [isUpToDate]
-     * 8. Initializing - [isInitializing]
-     * 9. Syncing - [isSyncing]
-     * 10. Scanning - [isScanning]
+     * 4. Stalled - [isStalled]
+     * 5. Disabled - [isDisabled]
+     * 6. Offline - [isOffline]
+     * 7. Paused - [isPaused]
+     * 8. Up to Date - [isUpToDate]
+     * 9. Initializing - [isInitializing]
+     * 10. Syncing - [isSyncing]
+     * 11. Scanning - [isScanning]
      *
      * If there is no matching Folder Status, [DeviceCenterNodeStatus.Unknown] is returned
      *
@@ -61,6 +63,7 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
         isStopped() -> DeviceCenterNodeStatus.Stopped
         isOverquota() -> DeviceCenterNodeStatus.Overquota(subState)
         isBlocked() -> DeviceCenterNodeStatus.Blocked(subState)
+        isStalled() -> DeviceCenterNodeStatus.Stalled
         isDisabled() -> DeviceCenterNodeStatus.Disabled
         isOffline(currentTimeInSeconds) -> DeviceCenterNodeStatus.Offline
         isPaused() -> DeviceCenterNodeStatus.Paused
@@ -97,6 +100,13 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
         BackupInfoState.FAILED,
         BackupInfoState.TEMPORARY_DISABLED,
     ) && subState != BackupInfoSubState.STORAGE_OVERQUOTA
+
+    /**
+     * Checks whether the Backup is Stalled or not, which is only applied for Syncs
+     *
+     * @return true if the following conditions are met, and false if otherwise
+     */
+    private fun BackupInfo.isStalled() = status == BackupInfoHeartbeatStatus.STALLED
 
     /**
      * Checks whether the Backup is Disabled or not

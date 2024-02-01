@@ -58,13 +58,14 @@ internal class DeviceNodeStatusMapper @Inject constructor() {
     private fun List<DeviceFolderNode>.calculateDeviceStatus(): DeviceCenterNodeStatus =
         when (this.maxOfOrNull { folder -> folder.status.priority }) {
             // Syncing Devices do not need to display the syncing progress in the UI
-            10 -> DeviceCenterNodeStatus.Syncing(0)
-            9 -> DeviceCenterNodeStatus.Scanning
-            8 -> DeviceCenterNodeStatus.Initializing
-            7 -> DeviceCenterNodeStatus.Paused
+            11 -> DeviceCenterNodeStatus.Syncing(0)
+            10 -> DeviceCenterNodeStatus.Scanning
+            9 -> DeviceCenterNodeStatus.Initializing
+            8 -> DeviceCenterNodeStatus.Paused
             // Blocked and Overquota Devices do not need to display the error sub state in the UI
-            6 -> DeviceCenterNodeStatus.Overquota(null)
-            5 -> DeviceCenterNodeStatus.Blocked(null)
+            7 -> DeviceCenterNodeStatus.Overquota(null)
+            6 -> DeviceCenterNodeStatus.Blocked(null)
+            5 -> DeviceCenterNodeStatus.Stalled
             4 -> DeviceCenterNodeStatus.UpToDate
             3 -> DeviceCenterNodeStatus.Offline
             2 -> DeviceCenterNodeStatus.Disabled

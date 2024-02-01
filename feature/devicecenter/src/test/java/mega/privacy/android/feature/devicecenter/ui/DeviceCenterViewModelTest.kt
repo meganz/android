@@ -48,6 +48,7 @@ internal class DeviceCenterViewModelTest {
         icon = FolderIconType.CameraUploads,
         status = DeviceCenterUINodeStatus.UpToDate,
         rootHandle = 789012L,
+        localFolderPath = "storage/emulated/0/DCIM/Camera",
     )
     private val ownDeviceUINode = OwnDeviceUINode(
         id = "1234-5678",

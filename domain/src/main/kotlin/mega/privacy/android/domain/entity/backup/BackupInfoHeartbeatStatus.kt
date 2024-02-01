@@ -35,4 +35,9 @@ enum class BackupInfoHeartbeatStatus {
      * Represents an Unknown Heartbeat Status
      */
     UNKNOWN,
+
+    /**
+     * Represents a Stalled Heartbeat Status, which is only applied to Syncs
+     */
+    STALLED,
 }

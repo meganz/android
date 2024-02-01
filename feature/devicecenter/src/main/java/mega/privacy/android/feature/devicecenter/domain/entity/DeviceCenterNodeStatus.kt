@@ -38,44 +38,49 @@ sealed class DeviceCenterNodeStatus(val priority: Int) {
     data object UpToDate : DeviceCenterNodeStatus(4)
 
     /**
+     * The Device has Stalled Issues
+     */
+    data object Stalled : DeviceCenterNodeStatus(5)
+
+    /**
      * The Device is Blocked
      *
      * @property errorSubState The corresponding Error Sub State
      */
-    data class Blocked(val errorSubState: BackupInfoSubState?) : DeviceCenterNodeStatus(5)
+    data class Blocked(val errorSubState: BackupInfoSubState?) : DeviceCenterNodeStatus(6)
 
     /**
      * The Device is Overquota
      *
      * @property errorSubState The corresponding Error Sub State
      */
-    data class Overquota(val errorSubState: BackupInfoSubState?) : DeviceCenterNodeStatus(6)
+    data class Overquota(val errorSubState: BackupInfoSubState?) : DeviceCenterNodeStatus(7)
 
     /**
      * The Device is Paused
      */
-    data object Paused : DeviceCenterNodeStatus(7)
+    data object Paused : DeviceCenterNodeStatus(8)
 
     /**
      * The Device is Initializing
      */
-    data object Initializing : DeviceCenterNodeStatus(8)
+    data object Initializing : DeviceCenterNodeStatus(9)
 
     /**
      * The Device is Scanning
      */
-    data object Scanning : DeviceCenterNodeStatus(9)
+    data object Scanning : DeviceCenterNodeStatus(10)
 
     /**
      * The Device is Syncing
      *
      * @property progress The progress value
      */
-    data class Syncing(val progress: Int) : DeviceCenterNodeStatus(10)
+    data class Syncing(val progress: Int) : DeviceCenterNodeStatus(11)
 
     /**
      * The Device is found to have its Camera Uploads disabled. This is only applicable for the
      * User's Current Device, and has the highest priority amongst all Device Statuses
      */
-    data object NoCameraUploads : DeviceCenterNodeStatus(11)
+    data object NoCameraUploads : DeviceCenterNodeStatus(12)
 }

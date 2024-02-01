@@ -69,6 +69,7 @@ internal class DeviceUINodeListMapperTest {
                 rootHandle = folderRootHandle,
                 type = folderType,
                 userAgent = folderUserAgent,
+                localFolderPath = "storage/emulated/0/DCIM/Camera"
             ),
         )
         val deviceList = if (isCurrentDevice) {

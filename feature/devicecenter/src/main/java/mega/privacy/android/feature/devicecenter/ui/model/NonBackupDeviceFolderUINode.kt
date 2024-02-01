@@ -14,6 +14,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUIN
  * @property icon The Folder Icon
  * @property status The Folder Status
  * @property rootHandle The Folder Root Handle
+ * @property localFolderPath The Folder Local Path
  */
 data class NonBackupDeviceFolderUINode(
     override val id: String,
@@ -21,4 +22,5 @@ data class NonBackupDeviceFolderUINode(
     override val icon: DeviceCenterUINodeIcon,
     override val status: DeviceCenterUINodeStatus,
     val rootHandle: Long,
+    val localFolderPath: String
 ) : DeviceFolderUINode

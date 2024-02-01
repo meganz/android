@@ -108,6 +108,10 @@ internal class DeviceCenterUINodeStatusMapperTest {
             DeviceCenterNodeStatus.NoCameraUploads,
             DeviceCenterUINodeStatus.CameraUploadsDisabled,
         ),
+        Arguments.of(
+            DeviceCenterNodeStatus.Stalled,
+            DeviceCenterUINodeStatus.Blocked(null),
+        ),
     )
 
     @Test

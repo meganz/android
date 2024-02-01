@@ -465,6 +465,7 @@ private val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
     icon = FolderIconType.CameraUploads,
     status = DeviceCenterUINodeStatus.UpToDate,
     rootHandle = 789012L,
+    localFolderPath = ""
 )
 
 private val ownDeviceFolderUINodeTwo = NonBackupDeviceFolderUINode(
@@ -473,6 +474,7 @@ private val ownDeviceFolderUINodeTwo = NonBackupDeviceFolderUINode(
     icon = FolderIconType.CameraUploads,
     status = DeviceCenterUINodeStatus.UpToDate,
     rootHandle = 789012L,
+    localFolderPath = ""
 )
 
 private val ownDeviceUINode = OwnDeviceUINode(

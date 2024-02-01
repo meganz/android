@@ -37,6 +37,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -45,6 +46,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { state }.thenReturn(BackupInfoState.NOT_INITIALIZED)
                 on { type }.thenReturn(backupType)
                 on { rootHandle }.thenReturn(backupRootHandle)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -55,6 +57,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -69,6 +72,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupSubState = BackupInfoSubState.STORAGE_OVERQUOTA
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -78,6 +82,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { userAgent }.thenReturn(backupUserAgent)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -88,6 +93,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -106,6 +112,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -115,6 +122,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { userAgent }.thenReturn(backupUserAgent)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -125,6 +133,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -143,6 +152,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -152,6 +162,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { userAgent }.thenReturn(backupUserAgent)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -162,6 +173,41 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath,
+            )
+        )
+        assertThat(underTest(backupInfoList)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that the mapped device folder has a stalled status`() {
+        val backupId = 123456L
+        val backupName = "Some Sync"
+        val backupType = BackupInfoType.TWO_WAY_SYNC
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
+        val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
+        val backupInfoList = listOf<BackupInfo>(
+            mock {
+                on { id }.thenReturn(backupId)
+                on { name }.thenReturn(backupName)
+                on { userAgent }.thenReturn(backupUserAgent)
+                on { state }.thenReturn(BackupInfoState.ACTIVE)
+                on { status }.thenReturn(BackupInfoHeartbeatStatus.STALLED)
+                on { type }.thenReturn(backupType)
+                on { rootHandle }.thenReturn(backupRootHandle)
+                on { localFolderPath }.thenReturn(localPath)
+            },
+        )
+        val expected = listOf(
+            DeviceFolderNode(
+                id = backupId.toString(),
+                name = backupName,
+                status = DeviceCenterNodeStatus.Stalled,
+                rootHandle = backupRootHandle,
+                type = backupType,
+                userAgent = backupUserAgent,
+                localFolderPath = localPath,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -174,6 +220,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -182,6 +229,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { type }.thenReturn(backupType)
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { userAgent }.thenReturn(backupUserAgent)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -192,6 +240,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -210,6 +259,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -219,6 +269,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { lastActivityTimestamp }.thenReturn(0L)
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { userAgent }.thenReturn(backupUserAgent)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -229,6 +280,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -246,6 +298,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupUserAgent = BackupInfoUserAgent.ANDROID
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -255,6 +308,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { lastActivityTimestamp }.thenReturn(0L)
                 on { rootHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
                 on { userAgent }.thenReturn(backupUserAgent)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -265,6 +319,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = MegaApiJava.INVALID_HANDLE,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -284,6 +339,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupUserAgent = BackupInfoUserAgent.WINDOWS
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -293,6 +349,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { lastActivityTimestamp }.thenReturn(0L)
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { userAgent }.thenReturn(backupUserAgent)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -303,6 +360,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -321,6 +379,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupId = 123456L
         val backupName = "Backup One"
         val backupUserAgent = BackupInfoUserAgent.WINDOWS
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -330,6 +389,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { lastActivityTimestamp }.thenReturn(0L)
                 on { rootHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
                 on { userAgent }.thenReturn(backupUserAgent)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -340,6 +400,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = MegaApiJava.INVALID_HANDLE,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath,
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -423,6 +484,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupUserAgent = BackupInfoUserAgent.UNKNOWN
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -433,6 +495,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { rootHandle }.thenReturn(backupRootHandle)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -442,7 +505,8 @@ internal class DeviceFolderNodeMapperTest {
                 status = DeviceCenterNodeStatus.Paused,
                 rootHandle = backupRootHandle,
                 type = backupType,
-                userAgent = backupUserAgent
+                userAgent = backupUserAgent,
+                localFolderPath = localPath
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -462,6 +526,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupType = BackupInfoType.INVALID
         val backupUserAgent = BackupInfoUserAgent.WINDOWS
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -473,6 +538,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { rootHandle }.thenReturn(backupRootHandle)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -483,6 +549,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -502,6 +569,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupType = BackupInfoType.INVALID
         val backupUserAgent = BackupInfoUserAgent.WINDOWS
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -513,6 +581,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { rootHandle }.thenReturn(backupRootHandle)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -523,6 +592,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -536,6 +606,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -546,6 +617,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { rootHandle }.thenReturn(backupRootHandle)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -556,6 +628,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -570,6 +643,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupUserAgent = BackupInfoUserAgent.ANDROID
         val backupProgress = 75
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -581,6 +655,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { rootHandle }.thenReturn(backupRootHandle)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -591,6 +666,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
@@ -604,6 +680,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.WINDOWS
         val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
             mock {
                 on { id }.thenReturn(backupId)
@@ -614,6 +691,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { lastActivityTimestamp }.thenReturn(currentTimeInSeconds)
                 on { userAgent }.thenReturn(backupUserAgent)
                 on { rootHandle }.thenReturn(backupRootHandle)
+                on { localFolderPath }.thenReturn(localPath)
             },
         )
         val expected = listOf(
@@ -624,6 +702,7 @@ internal class DeviceFolderNodeMapperTest {
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
+                localFolderPath = localPath
             )
         )
         assertThat(underTest(backupInfoList)).isEqualTo(expected)
