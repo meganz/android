@@ -1010,4 +1010,40 @@ interface ChatRepository {
      * @return flow of chat messages received
      */
     fun monitorChatMessages(): Flow<ChatMessageNotification?>
+
+    /**
+     * Gets a list of reactions associated to a message
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatId MegaChatHandle that identifies the chatroom
+     * @param msgId MegaChatHandle that identifies the message
+     * @return return a list with the reactions associated to a message.
+     */
+    suspend fun getMessageReactions(chatId: Long, msgId: Long): List<String>
+
+    /**
+     * Returns the number of users that reacted to a message with a specific reaction
+     *
+     * @param chatId MegaChatHandle that identifies the chatroom
+     * @param msgId MegaChatHandle that identifies the message
+     * @param reaction UTF-8 NULL terminated string that represents the reactiongaC
+     *
+     * @return return the number of users that reacted to a message with a specific reaction,
+     * or -1 if the chatroom or message is not found.
+     */
+    suspend fun getMessageReactionCount(chatId: Long, msgId: Long, reaction: String): Int
+
+    /**
+     * Gets a list of users that reacted to a message with a specific reaction
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatId MegaChatHandle that identifies the chatroom
+     * @param msgId MegaChatHandle that identifies the message
+     * @param reaction UTF-8 NULL terminated string that represents the reaction
+     *
+     * @return return a list with the users that reacted to a message with a specific reaction.
+     */
+    suspend fun getReactionUsers(chatId: Long, msgId: Long, reaction: String): List<Long>
 }

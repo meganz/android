@@ -43,6 +43,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
@@ -62,6 +63,7 @@ import mega.privacy.android.data.mapper.chat.paging.MessagePagingInfoMapper
 import mega.privacy.android.data.mapper.chat.paging.RichPreviewEntityMapper
 import mega.privacy.android.data.mapper.chat.paging.TypedMessageEntityMapper
 import mega.privacy.android.data.mapper.chat.paging.TypedMessagePagingSourceMapper
+import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
@@ -168,6 +170,8 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val giphyEntityMapper: GiphyEntityMapper,
     private val chatGeolocationEntityMapper: ChatGeolocationEntityMapper,
     private val chatNodeEntityListMapper: ChatNodeEntityListMapper,
+    private val stringListMapper: StringListMapper,
+    private val handleListMapper: HandleListMapper,
     @ApplicationContext private val context: Context,
 ) : ChatRepository {
     private val richLinkConfig = MutableStateFlow(RichLinkConfig())
@@ -1351,4 +1355,18 @@ internal class ChatRepositoryImpl @Inject constructor(
             message?.let { ChatMessageNotification(chatId, chatMessageMapper(it)) }
         }.flowOn(ioDispatcher)
 
+    override suspend fun getMessageReactions(chatId: Long, msgId: Long) =
+        withContext(ioDispatcher) {
+            stringListMapper(megaChatApiGateway.getMessageReactions(chatId, msgId))
+        }
+
+    override suspend fun getMessageReactionCount(chatId: Long, msgId: Long, reaction: String) =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getMessageReactionCount(chatId, msgId, reaction)
+        }
+
+    override suspend fun getReactionUsers(chatId: Long, msgId: Long, reaction: String) =
+        withContext(ioDispatcher) {
+            handleListMapper(megaChatApiGateway.getReactionUsers(chatId, msgId, reaction))
+        }
 }

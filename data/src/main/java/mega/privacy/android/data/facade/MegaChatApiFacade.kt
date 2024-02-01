@@ -35,6 +35,7 @@ import nz.mega.sdk.MegaChatScheduledRules
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaChatVideoListenerInterface
 import nz.mega.sdk.MegaHandleList
+import nz.mega.sdk.MegaStringList
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -769,4 +770,13 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun deregisterChatNotificationListener(listener: MegaChatNotificationListenerInterface) =
         chatApi.removeChatNotificationListener(listener)
+
+    override fun getMessageReactions(chatId: Long, msgId: Long): MegaStringList =
+        chatApi.getMessageReactions(chatId, msgId)
+
+    override fun getMessageReactionCount(chatId: Long, msgId: Long, reaction: String) =
+        chatApi.getMessageReactionCount(chatId, msgId, reaction)
+
+    override fun getReactionUsers(chatId: Long, msgId: Long, reaction: String): MegaHandleList =
+        chatApi.getReactionUsers(chatId, msgId, reaction)
 }

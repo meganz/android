@@ -4,24 +4,11 @@ import nz.mega.sdk.MegaStringList
 import javax.inject.Inject
 
 /**
- * Map [MegaStringList] to [List]
+ * Map [List] to [MegaStringList]
  */
-internal class MegaStringListMapper @Inject constructor() {
-
-    /**
-     * Convert [MegaStringList] to [List]
-     *
-     * @param megaStringList [MegaStringList]
-     * @return              [List]
-     */
-    operator fun invoke(
-        megaStringList: MegaStringList,
-    ): List<String> =
-        mutableListOf<String>().apply {
-            for (i in 0 until megaStringList.size()) {
-                add(megaStringList.get(i))
-            }
-        }
+internal class MegaStringListMapper @Inject constructor(
+    private val megaStringListProvider: MegaStringListProvider,
+) {
 
     /**
      * Convert [List] to [MegaStringList]
@@ -29,10 +16,8 @@ internal class MegaStringListMapper @Inject constructor() {
      * @param list   [List]
      * @return      [MegaStringList]
      */
-    operator fun invoke(list: List<String>): MegaStringList =
-        MegaStringList.createInstance().apply {
-            list.forEach { value ->
-                add(value)
-            }
+    operator fun invoke(list: List<String>): MegaStringList? =
+        megaStringListProvider()?.also { megaStringList ->
+            list.forEach { megaStringList.add(it) }
         }
 }

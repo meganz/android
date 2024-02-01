@@ -41,12 +41,14 @@ internal class AdsRepositoryImpl @Inject constructor(
                         }
                     }
                 )
-                adsGateway.fetchAds(
-                    adFlags = MegaApiJava.ADS_DEFAULT,
-                    adUnits = megaStringListMapper(adSlots),
-                    publicHandle = linkHandle ?: MegaApiJava.INVALID_HANDLE,
-                    listener = listener
-                )
+                megaStringListMapper(adSlots)?.let {
+                    adsGateway.fetchAds(
+                        adFlags = MegaApiJava.ADS_DEFAULT,
+                        adUnits = it,
+                        publicHandle = linkHandle ?: MegaApiJava.INVALID_HANDLE,
+                        listener = listener
+                    )
+                }
                 continuation.invokeOnCancellation {
                     megaApiGateway.removeRequestListener(listener)
                 }
