@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.videosection.mapper.UIVideoPlaylist
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
@@ -28,6 +29,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
@@ -65,6 +67,7 @@ class VideoSectionViewModelTest {
     private val getVideoPlaylistsUseCase = mock<GetVideoPlaylistsUseCase>()
     private val uiVideoPlaylistMapper = mock<UIVideoPlaylistMapper>()
     private val createVideoPlaylistUseCase = mock<CreateVideoPlaylistUseCase>()
+    private val addVideosToPlaylistUseCase = mock<AddVideosToPlaylistUseCase>()
 
     private val expectedVideo = mock<UIVideo> { on { name }.thenReturn("video name") }
 
@@ -98,7 +101,8 @@ class VideoSectionViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             getVideoPlaylistsUseCase = getVideoPlaylistsUseCase,
             uiVideoPlaylistMapper = uiVideoPlaylistMapper,
-            createVideoPlaylistUseCase = createVideoPlaylistUseCase
+            createVideoPlaylistUseCase = createVideoPlaylistUseCase,
+            addVideosToPlaylistUseCase = addVideosToPlaylistUseCase
         )
     }
 
@@ -116,7 +120,8 @@ class VideoSectionViewModelTest {
             getNodeByIdUseCase,
             getVideoPlaylistsUseCase,
             uiVideoPlaylistMapper,
-            createVideoPlaylistUseCase
+            createVideoPlaylistUseCase,
+            addVideosToPlaylistUseCase
         )
     }
 
@@ -356,6 +361,24 @@ class VideoSectionViewModelTest {
                 val actual = awaitItem()
                 assertThat(actual.currentVideoPlaylist).isNull()
                 assertThat(actual.isVideoPlaylistCreatedSuccessfully).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the number of added videos is correct when adding videos to a playlist`() =
+        runTest {
+            val testPlaylistID = NodeId(1L)
+            val testVideoIDs = listOf(NodeId(1L), NodeId(2L), NodeId(3L))
+            whenever(addVideosToPlaylistUseCase(testPlaylistID, testVideoIDs)).thenReturn(
+                testVideoIDs.size
+            )
+
+            initUnderTest()
+
+            underTest.addVideosToPlaylist(testPlaylistID, testVideoIDs)
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.numberOfAddedVideos).isEqualTo(testVideoIDs.size)
             }
         }
 }

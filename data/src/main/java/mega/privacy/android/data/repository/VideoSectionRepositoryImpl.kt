@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.CreateSetElementListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.UserSetMapper
@@ -14,6 +15,7 @@ import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.data.mapper.videosection.VideoPlaylistMapper
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
@@ -145,6 +147,26 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                     type = MegaSet.SET_TYPE_PLAYLIST,
                     listener = listener
                 )
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
+
+    override suspend fun addVideosToPlaylist(playlistID: NodeId, videoIDs: List<NodeId>) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = CreateSetElementListenerInterface(
+                    target = videoIDs.size,
+                    onCompletion = { success, _ ->
+                        continuation.resumeWith(Result.success(success))
+                    }
+                )
+                for (videoID in videoIDs) {
+                    megaApiGateway.createSetElement(
+                        sid = playlistID.longValue,
+                        node = videoID.longValue,
+                        listener = listener
+                    )
+                }
                 continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }

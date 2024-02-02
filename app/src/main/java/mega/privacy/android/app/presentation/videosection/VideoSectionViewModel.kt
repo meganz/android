@@ -36,6 +36,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
@@ -63,6 +64,7 @@ class VideoSectionViewModel @Inject constructor(
     private val getVideoPlaylistsUseCase: GetVideoPlaylistsUseCase,
     private val uiVideoPlaylistMapper: UIVideoPlaylistMapper,
     private val createVideoPlaylistUseCase: CreateVideoPlaylistUseCase,
+    private val addVideosToPlaylistUseCase: AddVideosToPlaylistUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -355,4 +357,23 @@ class VideoSectionViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Add videos to the playlist
+     *
+     * @param playlistID playlist id
+     * @param videoIDs added video ids
+     */
+    internal fun addVideosToPlaylist(playlistID: NodeId, videoIDs: List<NodeId>) =
+        viewModelScope.launch {
+            runCatching {
+                addVideosToPlaylistUseCase(playlistID, videoIDs)
+            }.onSuccess { numberOfAddedVideos ->
+                _state.update {
+                    it.copy(
+                        numberOfAddedVideos = numberOfAddedVideos
+                    )
+                }
+            }
+        }
 }

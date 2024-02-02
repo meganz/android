@@ -278,4 +278,48 @@ class VideoSectionRepositoryImplTest {
                     && isExported == otherSet.isExported
         }
     }
+
+    @Test
+    fun `test that addVideosToPlaylist returns correctly`() =
+        runTest {
+            val testPlaylistId = NodeId(1L)
+            val testVideoIDs = listOf(NodeId(1L), NodeId(2L))
+
+            whenever(megaApiGateway.createSetElement(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock {
+                        on { errorCode }.thenReturn(MegaError.API_OK)
+                    }
+                )
+            }
+
+            initUnderTest()
+            val actual =
+                underTest.addVideosToPlaylist(playlistID = testPlaylistId, videoIDs = testVideoIDs)
+            assertThat(actual).isEqualTo(testVideoIDs.size)
+        }
+
+    @Test
+    fun `test that addVideosToPlaylist returns 0 when createSetElement returns a MegaError`() =
+        runTest {
+            val testPlaylistId = NodeId(1L)
+            val testVideoIDs = listOf(NodeId(1L), NodeId(2L))
+
+            whenever(megaApiGateway.createSetElement(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock {
+                        on { errorCode }.thenReturn(MegaError.API_EBLOCKED)
+                    }
+                )
+            }
+
+            initUnderTest()
+            val actual =
+                underTest.addVideosToPlaylist(playlistID = testPlaylistId, videoIDs = testVideoIDs)
+            assertThat(actual).isEqualTo(0)
+        }
 }
