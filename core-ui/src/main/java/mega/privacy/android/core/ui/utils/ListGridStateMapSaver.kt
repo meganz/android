@@ -6,12 +6,12 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import mega.privacy.android.core.ui.model.ListGridState
-import mega.privacy.android.core.ui.utils.ListGridMap.Companion.Saver
+import mega.privacy.android.core.ui.utils.ListGridStateMap.Companion.Saver
 
 /**
  * The default [Saver] implementation for both LazyGridState and LazyListState.
  */
-class ListGridMap {
+class ListGridStateMap {
     companion object {
         private const val LIST_GRID_MAP_ENTRY_SIZE = 5
 
@@ -52,3 +52,25 @@ class ListGridMap {
         )
     }
 }
+
+/**
+ * Sync the [ListGridState] map with the opened folder node handles and the current node handle
+ */
+fun Map<Long, ListGridState>.sync(
+    openedHandles: Set<Long>,
+    currentHandle: Long,
+) = filterKeys { openedHandles.contains(it) || it == currentHandle }
+    .toMutableMap()
+    .apply {
+        if (!containsKey(currentHandle)) {
+            this[currentHandle] = ListGridState()
+        }
+    }
+
+
+/**
+ * Get the [ListGridState] for the given node handle
+ */
+fun Map<Long, ListGridState>.getState(
+    handle: Long,
+) = this[handle] ?: ListGridState()

@@ -38,7 +38,6 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorFolderNodeDeleteUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
 import timber.log.Timber
-import java.util.Stack
 import javax.inject.Inject
 
 /**
@@ -64,9 +63,6 @@ class LinksViewModel @Inject constructor(
 
     /** Public immutable UI State */
     val state = _state.asStateFlow()
-
-    /** Stack to maintain folder navigation clicks */
-    private val handleStack = Stack<Long>()
 
     init {
         viewModelScope.launch {
@@ -103,16 +99,18 @@ class LinksViewModel @Inject constructor(
             nodesList = getNodeUiItems(list),
             sortOrder = getSortOrder(),
             parentNode = null,
-            isLoading = false
+            isLoading = false,
+            openedFolderNodeHandles = setOf(-1L),
         )
     }
 
     private fun openFolder(parentNode: PublicLinkFolder) {
-        handleStack.push(parentNode.id.longValue)
         _state.update {
             it.copy(
                 parentNode = parentNode,
-                isLoading = true
+                isLoading = true,
+                openedFolderNodeHandles = it.openedFolderNodeHandles.toMutableSet()
+                    .apply { add(parentNode.id.longValue) },
             )
         }
         observeFlow(childLinks(parentNode))
@@ -124,6 +122,14 @@ class LinksViewModel @Inject constructor(
             currentFolder.parent?.takeIf {
                 it.id.longValue != -1L
             }?.let { parent ->
+                _state.update { state ->
+                    state.copy(
+                        openedFolderNodeHandles = state.openedFolderNodeHandles.toMutableSet()
+                            .apply {
+                                remove(currentFolder.id.longValue)
+                            }
+                    )
+                }
                 val isNodeInRubbish = getIsNodeInRubbish(parent.node.id.longValue)
                 if (isNodeInRubbish) {
                     _state.update {
@@ -199,7 +205,6 @@ class LinksViewModel @Inject constructor(
      * This will reset the stack and will fetch the root links nodes
      */
     fun resetToRoot() {
-        handleStack.clear()
         viewModelScope.launch {
             _state.update {
                 it.copy(
@@ -271,7 +276,6 @@ class LinksViewModel @Inject constructor(
     fun performBackNavigation() {
         _state.value.parentNode?.let {
             closeFolder(it)
-            handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
             _state.update { it.copy(updateToolbarTitleEvent = triggered) }
         } ?: run {
             _state.update { it.copy(exitLinksPageEvent = triggered) }
@@ -419,7 +423,7 @@ class LinksViewModel @Inject constructor(
     /**
      * Returns current node handle from UI state
      */
-    fun getCurrentNodeHandle(): Long = _state.value.parentNode?.id?.longValue ?: -1
+    fun getCurrentNodeHandle(): Long = _state.value.currentFolderNodeHandle
 
     /**
      * Clear the selections of items from NodesUiList

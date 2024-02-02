@@ -2,12 +2,14 @@ package mega.privacy.android.app.presentation.shares.links.view
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -17,6 +19,9 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.shares.links.model.LinksUiState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
+import mega.privacy.android.core.ui.utils.ListStateMap
+import mega.privacy.android.core.ui.utils.getState
+import mega.privacy.android.core.ui.utils.sync
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
@@ -42,21 +47,33 @@ fun LinksView(
     sortOrder: String,
     onSortOrderClick: () -> Unit,
 ) {
-    val listState = rememberLazyListState()
+    var listStateMap by rememberSaveable(saver = ListStateMap.Saver) {
+        mutableStateOf(emptyMap())
+    }
 
-    val isListAtTop by remember {
+    /**
+     * When back navigation performed from a folder, remove the listState of that node handle
+     */
+    LaunchedEffect(
+        uiState.openedFolderNodeHandles,
+        uiState.nodesList,
+    ) {
+        listStateMap = listStateMap.sync(
+            uiState.openedFolderNodeHandles,
+            uiState.currentFolderNodeHandle
+        )
+    }
+
+    val currentListState = listStateMap.getState(uiState.currentFolderNodeHandle)
+
+    val isListAtTop by remember(currentListState) {
         derivedStateOf {
-            listState.firstVisibleItemIndex == 0
+            currentListState.firstVisibleItemIndex == 0
         }
     }
 
-    LaunchedEffect(isListAtTop, uiState.isInSelection) {
+    LaunchedEffect(isListAtTop, uiState.isInSelection, uiState.currentFolderNodeHandle) {
         onToggleAppBarElevation(!uiState.isInSelection && !isListAtTop)
-    }
-
-    // reset scroll position when parent node changes (a folder is opened)
-    LaunchedEffect(uiState.parentNode) {
-        listState.scrollToItem(0)
     }
 
     val gridState = rememberLazyGridState()
@@ -75,7 +92,7 @@ fun LinksView(
                 showLinkIcon = false,
                 onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClick = { },
-                listState = listState,
+                listState = currentListState,
                 gridState = gridState,
                 onLinkClicked = { },
                 onDisputeTakeDownClicked = { },

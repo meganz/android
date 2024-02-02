@@ -315,6 +315,18 @@ class FileBrowserViewModel @Inject constructor(
         val rootNode = getRootNodeUseCase()?.id?.longValue
         val isRootNode = fileBrowserHandle == rootNode
 
+        /**
+         * When a folder is opened, and user clicks on cloud drive bottom drawer item, clear the openedFolderNodeHandles
+         */
+        if ((fileBrowserHandle == -1L || isRootNode) && state.value.openedFolderNodeHandles.isNotEmpty()) {
+            _state.update {
+                it.copy(
+                    isLoading = true,
+                    openedFolderNodeHandles = emptySet()
+                )
+            }
+        }
+
         val childrenNodes = getFileBrowserNodeChildrenUseCase(fileBrowserHandle)
         val showMediaDiscoveryIcon = !isRootNode && containsMediaItemUseCase(childrenNodes)
         val nodeUIItems = getNodeUiItems(childrenNodes)

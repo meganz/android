@@ -18,8 +18,9 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.app.presentation.view.OverQuotaView
-import mega.privacy.android.core.ui.model.ListGridState
-import mega.privacy.android.core.ui.utils.ListGridMap
+import mega.privacy.android.core.ui.utils.ListGridStateMap
+import mega.privacy.android.core.ui.utils.getState
+import mega.privacy.android.core.ui.utils.sync
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
@@ -54,26 +55,21 @@ fun FileBrowserComposeView(
     onEnterMediaDiscoveryClick: () -> Unit,
 ) {
 
-    var listStateMap by rememberSaveable(saver = ListGridMap.Saver) {
+    var listStateMap by rememberSaveable(saver = ListGridStateMap.Saver) {
         mutableStateOf(emptyMap())
     }
 
     /**
      * When back navigation performed from a folder, remove the listState/gridState of that node handle
      */
-    LaunchedEffect(uiState.openedFolderNodeHandles, uiState.nodesList) {
-        listStateMap = listStateMap
-            .filterKeys { uiState.openedFolderNodeHandles.contains(it) || it == uiState.fileBrowserHandle }
-            .toMutableMap()
-            .apply {
-                if (!containsKey(uiState.fileBrowserHandle)) {
-                    this[uiState.fileBrowserHandle] = ListGridState()
-                }
-            }
+    LaunchedEffect(uiState.openedFolderNodeHandles, uiState.nodesList, uiState.fileBrowserHandle) {
+        listStateMap = listStateMap.sync(
+            uiState.openedFolderNodeHandles,
+            uiState.fileBrowserHandle
+        )
     }
 
-    val currentListState =
-        listStateMap[uiState.fileBrowserHandle] ?: ListGridState()
+    val currentListState = listStateMap.getState(uiState.fileBrowserHandle)
 
     if (!uiState.isLoading) {
         if (uiState.nodesList.isNotEmpty()) {
