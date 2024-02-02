@@ -4,16 +4,17 @@ import mega.privacy.android.domain.repository.AccountRepository
 import javax.inject.Inject
 
 /**
- * Fetch multi factor auth setting
+ * Use Case that checks if Multi-Factor Authentication has been enabled on the current Account or not
  *
+ * @property accountRepository [AccountRepository]
  */
 class FetchMultiFactorAuthSettingUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
 ) {
     /**
-     * Invoke
+     * Invocation function
      *
-     * @return
+     * @return true if Multi-Factor Authentication has been enabled on the current Account
      */
     suspend operator fun invoke() = accountRepository.isMultiFactorAuthEnabled()
 }

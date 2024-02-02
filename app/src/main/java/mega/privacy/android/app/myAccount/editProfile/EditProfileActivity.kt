@@ -246,7 +246,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
 
         binding.changeEmail.setOnClickListener {
-            viewModel.check2FA()
+            viewModel.checkMultiFactorAuthenticationState()
             showChangeEmailDialog(null)
         }
 

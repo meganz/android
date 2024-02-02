@@ -45,7 +45,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.myAccount.usecase.CancelSubscriptionsUseCase
-import mega.privacy.android.app.myAccount.usecase.Check2FAUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmCancelAccountUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmChangeEmailUseCase
 import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
@@ -80,6 +79,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
@@ -121,7 +121,7 @@ import javax.inject.Inject
  * @property myAccountInfo
  * @property megaApi
  * @property setAvatarUseCase
- * @property check2FAUseCase
+ * @property fetchMultiFactorAuthSettingUseCase [FetchMultiFactorAuthSettingUseCase]
  * @property checkVersionsUseCase
  * @property killOtherSessionsUseCase [KillOtherSessionsUseCase]
  * @property cancelSubscriptionsUseCase
@@ -154,7 +154,7 @@ class MyAccountViewModel @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val setAvatarUseCase: SetAvatarUseCase,
-    private val check2FAUseCase: Check2FAUseCase,
+    private val fetchMultiFactorAuthSettingUseCase: FetchMultiFactorAuthSettingUseCase,
     private val checkVersionsUseCase: CheckVersionsUseCase,
     private val killOtherSessionsUseCase: KillOtherSessionsUseCase,
     private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase,
@@ -737,22 +737,6 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Prepares a file to be set as avatar.
-     *
-     * @param data Intent containing the file to be set as avatar.
-     */
-    private fun prepareAvatarFile(data: Intent) {
-        filePrepareUseCase.prepareFile(data)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { info -> addProfileAvatar(info.fileAbsolutePath) },
-                onError = Timber::w
-            )
-            .addTo(composite)
-    }
-
-    /**
      * Cancel subscriptions
      *
      * @param feedback
@@ -928,15 +912,19 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Check2f a
-     *
+     * Checks if Multi-Factor Authentication has been enabled or not
      */
-    fun check2FA() {
-        check2FAUseCase.check()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy { result -> is2FaEnabled = result }
-            .addTo(composite)
+    fun checkMultiFactorAuthenticationState() {
+        viewModelScope.launch {
+            runCatching {
+                fetchMultiFactorAuthSettingUseCase()
+            }.onSuccess {
+                Timber.d("Multi-Factor Authentication check successful")
+                is2FaEnabled = it
+            }.onFailure {
+                Timber.w("Error checking the Multi-Factor Authentication state: ${it.message}")
+            }
+        }
     }
 
     /**
