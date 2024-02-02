@@ -8,9 +8,11 @@ import de.palm.composestateevents.consumed
  *
  * @property oneOffViewEvent Event for showing any snackbar update.
  * @property jobInProgressState Job storing the download progress if any.
+ * @property transferTriggerEvent Event to trigger the start of a transfer.
  * @constructor Create empty Start download transfer view state
  */
 data class StartDownloadTransferViewState(
     val oneOffViewEvent: StateEventWithContent<StartDownloadTransferEvent> = consumed(),
     val jobInProgressState: StartDownloadTransferJobInProgress? = null,
+    val transferTriggerEvent: TransferTriggerEvent? = null
 )

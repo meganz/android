@@ -159,7 +159,13 @@ private fun StartDownloadComponent(
         action = {
             when (it) {
                 is StartDownloadTransferEvent.FinishProcessing ->
-                    consumeFinishProcessing(it, snackBarHostState, showQuotaExceededDialog, context)
+                    consumeFinishProcessing(
+                        event = it,
+                        snackBarHostState = snackBarHostState,
+                        showQuotaExceededDialog = showQuotaExceededDialog,
+                        context = context,
+                        transferTriggerEvent = uiState.transferTriggerEvent
+                    )
 
                 is StartDownloadTransferEvent.Message ->
                     consumeMessage(it, snackBarHostState, context)
@@ -231,15 +237,22 @@ private suspend fun consumeFinishProcessing(
     snackBarHostState: SnackbarHostState,
     showQuotaExceededDialog: MutableState<StorageState?>,
     context: Context,
+    transferTriggerEvent: TransferTriggerEvent?,
 ) {
     when (event.exception) {
         null -> {
-            val msg = context.resources.getQuantityString(
-                R.plurals.download_started,
-                event.totalNodes,
-                event.totalNodes,
-            )
-            snackBarHostState.showSnackbar(msg)
+            val message = when (transferTriggerEvent) {
+                is TransferTriggerEvent.StartDownloadForPreview -> {
+                    context.resources.getString(R.string.cloud_drive_snackbar_preparing_file_for_preview_context)
+                }
+
+                else -> context.resources.getQuantityString(
+                    R.plurals.download_started,
+                    event.totalNodes,
+                    event.totalNodes,
+                )
+            }
+            snackBarHostState.showSnackbar(message)
         }
 
         is QuotaExceededMegaException -> {

@@ -78,4 +78,16 @@ interface CacheFolderGateway {
      * create a default download location file
      */
     suspend fun buildDefaultDownloadDir(): File
+
+    /**
+     * Get the path to download file for preview
+     */
+    suspend fun getPreviewDownloadPathForNode(): String
+
+    /**
+     * Get the path of the file preview download
+     *
+     * @param fileName Name of the file
+     */
+    suspend fun getFilePreviewPath(fileName: String): String
 }

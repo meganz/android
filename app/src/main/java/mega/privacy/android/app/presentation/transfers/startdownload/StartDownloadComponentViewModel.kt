@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
@@ -51,6 +52,7 @@ import javax.inject.Inject
 internal class StartDownloadComponentViewModel @Inject constructor(
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase,
     private val getOrCreateStorageDownloadLocationUseCase: GetOrCreateStorageDownloadLocationUseCase,
+    private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
     private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase,
     private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase,
     private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase,
@@ -116,6 +118,9 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             Timber.e("Node in $transferTriggerEvent must exist")
             _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
         } else {
+            _uiState.update {
+                it.copy(transferTriggerEvent = transferTriggerEvent)
+            }
             when (transferTriggerEvent) {
                 is TransferTriggerEvent.StartDownloadForOffline -> {
                     startDownloadForOffline(node)
@@ -124,7 +129,26 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                 is TransferTriggerEvent.StartDownloadNode -> {
                     startDownloadNodes(transferTriggerEvent.nodes)
                 }
+
+                is TransferTriggerEvent.StartDownloadForPreview -> {
+                    startDownloadNodeForPreview(node)
+                }
             }
+        }
+    }
+
+    /**
+     * It starts downloading the node for preview with the appropriate use case
+     * @param node the [Node] to be downloaded for preview
+     */
+    private fun startDownloadNodeForPreview(node: TypedNode) {
+        currentInProgressJob = viewModelScope.launch {
+            startDownloadNodes(
+                nodes = listOf(node),
+                getPath = {
+                    getFilePreviewDownloadPathUseCase()
+                },
+            )
         }
     }
 

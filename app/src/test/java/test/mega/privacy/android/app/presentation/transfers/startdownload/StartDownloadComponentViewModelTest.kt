@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
@@ -76,6 +77,7 @@ class StartDownloadComponentViewModelTest {
         mock<GetOrCreateStorageDownloadLocationUseCase>()
     private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
     private val getCurrentDownloadSpeedUseCase = mock<GetCurrentDownloadSpeedUseCase>()
+    private val getFilePreviewDownloadPathUseCase = mock<GetFilePreviewDownloadPathUseCase>()
 
 
     private val node: TypedFileNode = mock()
@@ -89,6 +91,7 @@ class StartDownloadComponentViewModelTest {
         underTest = StartDownloadComponentViewModel(
             getOfflinePathForNodeUseCase,
             getOrCreateStorageDownloadLocationUseCase,
+            getFilePreviewDownloadPathUseCase,
             startDownloadsWithWorkerUseCase,
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
@@ -109,6 +112,7 @@ class StartDownloadComponentViewModelTest {
         reset(
             getOrCreateStorageDownloadLocationUseCase,
             startDownloadsWithWorkerUseCase,
+            getOfflinePathForNodeUseCase,
             saveOfflineNodeInformationUseCase,
             broadcastOfflineFileAvailabilityUseCase,
             isConnectedToInternetUseCase,
@@ -152,6 +156,8 @@ class StartDownloadComponentViewModelTest {
         commonStub()
         if (startEvent is TransferTriggerEvent.StartDownloadForOffline) {
             whenever(getOfflinePathForNodeUseCase(any())).thenReturn(destination)
+        } else if (startEvent is TransferTriggerEvent.StartDownloadForPreview) {
+            whenever(getFilePreviewDownloadPathUseCase()).thenReturn(destination)
         }
         underTest.startDownload(startEvent)
         verify(startDownloadsWithWorkerUseCase).invoke(nodes, destination, false)
@@ -289,6 +295,7 @@ class StartDownloadComponentViewModelTest {
     private fun provideStartEvents() = listOf(
         TransferTriggerEvent.StartDownloadNode(nodes),
         TransferTriggerEvent.StartDownloadForOffline(node),
+        TransferTriggerEvent.StartDownloadForPreview(node),
     )
 
     private fun assertCurrentEventIsEqualTo(event: StartDownloadTransferEvent) {

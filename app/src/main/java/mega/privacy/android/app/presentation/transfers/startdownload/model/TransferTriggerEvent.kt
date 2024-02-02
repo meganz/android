@@ -28,4 +28,13 @@ sealed interface TransferTriggerEvent {
      */
     data class StartDownloadNode(override val nodes: List<TypedNode>) : TransferTriggerEvent
 
+    /**
+     * Event to start downloading node for preview
+     *
+     * @param node the node to be downloaded for preview
+     */
+    data class StartDownloadForPreview(val node: TypedNode?) : TransferTriggerEvent {
+        override val nodes = node?.let { listOf(node) } ?: emptyList()
+    }
+
 }

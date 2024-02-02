@@ -112,4 +112,10 @@ internal class CacheFolderFacade @Inject constructor(
     }
 
     override suspend fun buildDefaultDownloadDir(): File = fileGateway.buildDefaultDownloadDir()
+
+    override suspend fun getPreviewDownloadPathForNode(): String =
+        (context.externalCacheDir ?: context.cacheDir).path + File.separator
+
+    override suspend fun getFilePreviewPath(fileName: String) =
+        getPreviewDownloadPathForNode() + fileName
 }
