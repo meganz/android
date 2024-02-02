@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.mapNotNull
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
+import mega.privacy.android.domain.entity.Feature
 import javax.inject.Inject
 
 /**
@@ -28,8 +28,8 @@ class MonitorFeatureFlagForQuickSettingsTileUseCase @Inject constructor(
                     flowOf(null)
                 } else {
                     getAllFeatureFlags().mapNotNull { features ->
-                        val feature = AppFeatures.valueOf(current)
-                        feature to features[feature]
+                        val feature: Feature? = features.keys.firstOrNull { it.name == current }
+                        feature?.to(features[feature])
                     }.distinctUntilChanged()
                 }
             }

@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.MonitorFeatureFlagForQuickSettingsTileUseCase
 import mega.privacy.android.app.domain.usecase.SetFeatureFlagForQuickSettingsTileUseCase
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagMapper
+import mega.privacy.android.domain.entity.Feature
 import javax.inject.Inject
 
 /**
@@ -58,12 +58,9 @@ class FeatureFlagForQuickSettingsTileViewModel @Inject constructor(
         }
         viewModelScope.launch {
             getAllFeatureFlags()
-                .map {
-                    it.keys.filterIsInstance<AppFeatures>()
-                }
-                .collect { features ->
+                .collect { map ->
                     _state.update {
-                        it.copy(features = features)
+                        it.copy(features = map.keys)
                     }
                 }
         }
@@ -72,11 +69,13 @@ class FeatureFlagForQuickSettingsTileViewModel @Inject constructor(
 
     /**
      * Sets feature flag value
-     * @param feature
+     * @param featureName
      */
-    fun setFeatureEnabled(feature: AppFeatures) {
+    fun setFeatureEnabled(featureName: String) {
         viewModelScope.launch {
-            setFeatureFlagForQuickSettingsTileUseCase(feature)
+            _state.value.features.firstOrNull { it.name == featureName }?.let { feature ->
+                setFeatureFlagForQuickSettingsTileUseCase(feature)
+            }
         }
     }
 
@@ -91,8 +90,8 @@ class FeatureFlagForQuickSettingsTileViewModel @Inject constructor(
 }
 
 internal data class FeatureFlagForQuickSettingsTileState(
-    val features: List<AppFeatures> = emptyList(),
-    val selectedFeature: AppFeatures? = null,
+    val features: Set<Feature> = emptySet(),
+    val selectedFeature: Feature? = null,
     val filter: String? = null,
     val showDescription: Boolean = true,
 )

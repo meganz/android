@@ -1,7 +1,7 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
+import mega.privacy.android.domain.entity.Feature
 import javax.inject.Inject
 
 /**
@@ -14,6 +14,6 @@ class SetFeatureFlagForQuickSettingsTileUseCase @Inject constructor(
     /**
      * Invoke
      */
-    suspend operator fun invoke(appFeatures: AppFeatures) =
-        featureFlagPreferencesGateway.setFeatureFlagForQuickSettingsTile(appFeatures.name)
+    suspend operator fun invoke(feature: Feature) =
+        featureFlagPreferencesGateway.setFeatureFlagForQuickSettingsTile(feature.name)
 }

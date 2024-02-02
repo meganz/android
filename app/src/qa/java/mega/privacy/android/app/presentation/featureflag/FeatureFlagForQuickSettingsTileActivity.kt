@@ -12,7 +12,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
@@ -61,9 +60,7 @@ class FeatureFlagForQuickSettingsTileActivity : BaseActivity() {
                             FeatureFlagBody(
                                 featureFlags = uiState.filteredFeatureFlags,
                                 onFeatureFlagChecked = { name, _ ->
-                                    featureFlagForQuickSettingsTileViewModel.setFeatureEnabled(
-                                        AppFeatures.valueOf(name)
-                                    )
+                                    featureFlagForQuickSettingsTileViewModel.setFeatureEnabled(name)
                                 },
                                 displayDescriptions = uiState.showDescription,
                                 filter = uiState.filter,

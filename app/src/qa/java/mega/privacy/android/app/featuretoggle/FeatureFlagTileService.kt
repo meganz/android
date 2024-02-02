@@ -10,6 +10,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.MonitorFeatureFlagForQuickSettingsTileUseCase
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Inject
 
@@ -35,7 +36,7 @@ class FeatureFlagTileService : TileService() {
     private var readJob: Job? = null
     private var writeJob: Job? = null
 
-    private var feature: AppFeatures? = null
+    private var feature: Feature? = null
 
     /**
      * On Start listening event.
@@ -70,7 +71,7 @@ class FeatureFlagTileService : TileService() {
         readJob?.cancel()
     }
 
-    private fun updateUI(feature: AppFeatures?, featureFlagActive: Boolean?) {
+    private fun updateUI(feature: Feature?, featureFlagActive: Boolean?) {
         this.feature = feature
         qsTile.label = feature?.name ?: "Long tap to configure"
         qsTile.contentDescription = when (featureFlagActive) {
