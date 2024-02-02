@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -16,8 +17,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
-import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -174,6 +175,8 @@ fun NodeListViewItem(
                         .clickable { onMoreClicked() }
                         .testTag(MORE_ICON_TAG)
                 )
+            } else {
+                Spacer(modifier = Modifier.size(24.dp))
             }
         }
     )

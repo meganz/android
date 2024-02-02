@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.chat.mapper.ChatRequestMessageMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.node.model.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.app.presentation.node.model.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
@@ -37,14 +39,16 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
+import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.GetOutShareByNodeIdUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.Mockito.mock
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -71,6 +75,10 @@ class NodeOptionsBottomSheetViewModelTest {
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase = mock()
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
     private val chatRequestMessageMapper: ChatRequestMessageMapper = mock()
+    private val nodeAccessPermissionIconMapper: NodeAccessPermissionIconMapper = mock()
+    private val getContactItemFromInShareFolder: DefaultGetContactItemFromInShareFolder = mock()
+    private val getOutShareByNodeIdUseCase: GetOutShareByNodeIdUseCase = mock()
+    private val getContactFromEmailUseCase: GetContactFromEmailUseCase = mock()
 
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
@@ -104,7 +112,11 @@ class NodeOptionsBottomSheetViewModelTest {
             applicationScope = applicationScope,
             checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase,
             attachMultipleNodesUseCase = attachMultipleNodesUseCase,
-            chatRequestMessageMapper = chatRequestMessageMapper
+            chatRequestMessageMapper = chatRequestMessageMapper,
+            nodeAccessPermissionIconMapper = nodeAccessPermissionIconMapper,
+            getContactItemFromInShareFolder = getContactItemFromInShareFolder,
+            getOutShareByNodeIdUseCase = getOutShareByNodeIdUseCase,
+            getContactFromEmailUseCase = getContactFromEmailUseCase,
         )
     }
 
