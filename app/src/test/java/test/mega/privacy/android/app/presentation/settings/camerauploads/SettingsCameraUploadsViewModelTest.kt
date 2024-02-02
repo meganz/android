@@ -707,6 +707,40 @@ internal class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
+    fun `test that an error snackbar is shown when setting the new secondary folder and the new setting is invalid`() =
+        runTest {
+            setupUnderTest()
+            // Simulate an invalid setting (e.g. the new secondary folder is the same as the primary
+            // folder that was set)
+            underTest.setSecondaryFolder("/path/to/CU")
+            verify(snackBarHandler).postSnackbarMessage(
+                resId = R.string.error_invalid_folder_selected,
+                snackbarDuration = MegaSnackbarDuration.Long,
+            )
+            verifyNoInteractions(
+                isSecondaryFolderPathValidUseCase,
+                clearCameraUploadsRecordUseCase,
+                stopCameraUploadsUseCase,
+            )
+        }
+
+    @Test
+    fun `test that an error snackbar is shown when setting the new secondary folder with an invalid folder path`() =
+        runTest {
+            setupUnderTest()
+            whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(false)
+            underTest.setSecondaryFolder("new/MU/folder/path")
+            verify(snackBarHandler).postSnackbarMessage(
+                resId = R.string.error_invalid_folder_selected,
+                snackbarDuration = MegaSnackbarDuration.Long,
+            )
+            verifyNoInteractions(
+                clearCameraUploadsRecordUseCase,
+                stopCameraUploadsUseCase,
+            )
+        }
+
+    @Test
     fun `test that camera upload node and name is updated when updatePrimaryUploadNode is invoked`() =
         runTest {
             setupUnderTest()

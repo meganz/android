@@ -778,10 +778,10 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun setSecondaryFolder(newPath: String?) {
         viewModelScope.launch {
             runCatching {
-                if (isSecondaryFolderPathValidUseCase(newPath)) {
-                    newPath?.let {
-                        setSecondaryFolderLocalPathUseCase(newPath)
-                    }
+                if (isNewSettingValid(secondaryPath = newPath)
+                    && isSecondaryFolderPathValidUseCase(newPath)
+                ) {
+                    newPath?.let { setSecondaryFolderLocalPathUseCase(it) }
                     clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Secondary))
                     stopCameraUploads()
                     _state.update {

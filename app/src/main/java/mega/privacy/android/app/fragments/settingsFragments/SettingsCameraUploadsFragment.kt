@@ -414,14 +414,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
 
             REQUEST_SECONDARY_FOLDER -> {
                 val secondaryPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
-                if (!viewModel.isNewSettingValid(secondaryPath = secondaryPath)) {
-                    Toast.makeText(
-                        context,
-                        getString(R.string.error_invalid_folder_selected),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    return
-                }
                 viewModel.setSecondaryFolder(secondaryPath)
             }
 
