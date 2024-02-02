@@ -15,17 +15,17 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 /**
- * Test class for [FetchMultiFactorAuthSettingUseCase]
+ * Test class for [IsMultiFactorAuthEnabledUseCase]
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class FetchMultiFactorAuthSettingUseCaseTest {
-    private lateinit var underTest: FetchMultiFactorAuthSettingUseCase
+internal class IsMultiFactorAuthEnabledUseCaseTest {
+    private lateinit var underTest: IsMultiFactorAuthEnabledUseCase
 
     private val accountRepository = mock<AccountRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = FetchMultiFactorAuthSettingUseCase(accountRepository)
+        underTest = IsMultiFactorAuthEnabledUseCase(accountRepository)
     }
 
     @BeforeEach

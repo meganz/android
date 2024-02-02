@@ -19,7 +19,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePasswordUseCase
-import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
+import mega.privacy.android.domain.usecase.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
@@ -50,7 +50,7 @@ internal class ChangePasswordViewModelTest {
     private val getPasswordStrengthUseCase = mock<GetPasswordStrengthUseCase>()
     private val isCurrentPasswordUseCase = mock<IsCurrentPasswordUseCase>()
     private val resetPasswordUseCase = mock<ResetPasswordUseCase>()
-    private val multiFactorAuthSetting = mock<FetchMultiFactorAuthSettingUseCase>()
+    private val isMultiFactorAuthEnabledUseCase = mock<IsMultiFactorAuthEnabledUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val logoutUseCase = mock<LogoutUseCase>()
 
@@ -68,7 +68,7 @@ internal class ChangePasswordViewModelTest {
             changePasswordUseCase = changePasswordUseCase,
             resetPasswordUseCase = resetPasswordUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
-            multiFactorAuthSetting = multiFactorAuthSetting,
+            isMultiFactorAuthEnabledUseCase = isMultiFactorAuthEnabledUseCase,
             logoutUseCase = logoutUseCase,
         )
     }
@@ -82,7 +82,7 @@ internal class ChangePasswordViewModelTest {
             changePasswordUseCase,
             resetPasswordUseCase,
             getRootNodeUseCase,
-            multiFactorAuthSetting,
+            isMultiFactorAuthEnabledUseCase,
             logoutUseCase,
         )
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
@@ -140,7 +140,7 @@ internal class ChangePasswordViewModelTest {
     @Test
     fun `test that when multi factor auth enabled ui state should be true and isPasswordChanged should be false`() =
         runTest {
-            whenever(multiFactorAuthSetting()).thenReturn(true)
+            whenever(isMultiFactorAuthEnabledUseCase()).thenReturn(true)
             initTestClass()
             underTest.onUserClickChangePassword("")
 
@@ -491,7 +491,7 @@ internal class ChangePasswordViewModelTest {
 
     @Test
     fun `test that an exception from change password is not propagated`() = runTest {
-        whenever(multiFactorAuthSetting()).thenReturn(false)
+        whenever(isMultiFactorAuthEnabledUseCase()).thenReturn(false)
         whenever(changePasswordUseCase(any())).thenAnswer { throw MegaException(1, "It's broken") }
         initTestClass()
         with(underTest) {
@@ -510,7 +510,7 @@ internal class ChangePasswordViewModelTest {
         expected: Boolean,
     ) = runTest {
         whenever(changePasswordUseCase(any())).thenReturn(isSuccessChangePassword)
-        whenever(multiFactorAuthSetting()).thenReturn(false)
+        whenever(isMultiFactorAuthEnabledUseCase()).thenReturn(false)
         initTestClass()
         underTest.onUserClickChangePassword("")
 

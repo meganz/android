@@ -25,7 +25,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
-import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
+import mega.privacy.android.domain.usecase.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
@@ -69,7 +69,7 @@ class SettingsViewModelTest {
     private lateinit var underTest: SettingsViewModel
 
     private val toggleAutoAcceptQRLinks = mock<ToggleAutoAcceptQRLinks>()
-    private val fetchMultiFactorAuthSettingUseCase = mock<FetchMultiFactorAuthSettingUseCase>()
+    private val isMultiFactorAuthEnabledUseCase = mock<IsMultiFactorAuthEnabledUseCase>()
     private val isChatLoggedInValue = MutableStateFlow(true)
     private val setHideRecentActivityUseCase = mock<SetHideRecentActivityUseCase>()
     private val setMediaDiscoveryView = mock<SetMediaDiscoveryView>()
@@ -168,7 +168,7 @@ class SettingsViewModelTest {
             rootNodeExistsUseCase = mock { on { runBlocking { invoke() } }.thenReturn(true) },
             isMultiFactorAuthAvailable = isMultiFactorAuthAvailable,
             monitorAutoAcceptQRLinks = monitorAutoAcceptQRLinks,
-            fetchMultiFactorAuthSettingUseCase = fetchMultiFactorAuthSettingUseCase,
+            isMultiFactorAuthEnabledUseCase = isMultiFactorAuthEnabledUseCase,
             startScreen = monitorStartScreenPreference,
             monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
             setHideRecentActivityUseCase = setHideRecentActivityUseCase,
@@ -215,7 +215,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `test that the subsequent value auto accept is returned from the use case`() = runTest {
-        fetchMultiFactorAuthSettingUseCase.stub {
+        isMultiFactorAuthEnabledUseCase.stub {
             onBlocking { invoke() }.thenReturn(false)
             monitorAutoAcceptQRLinks.stub {
                 on { invoke() }.thenReturn(
@@ -239,7 +239,7 @@ class SettingsViewModelTest {
 
         @Test
         fun `test that logging out of chat disables chat settings`() = runTest {
-            fetchMultiFactorAuthSettingUseCase.stub {
+            isMultiFactorAuthEnabledUseCase.stub {
                 onBlocking { invoke() }.thenReturn(false)
             }
         }
@@ -306,7 +306,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that multi factor is enabled when fetching multi factor enabled returns true`() =
         runTest {
-            fetchMultiFactorAuthSettingUseCase.stub {
+            isMultiFactorAuthEnabledUseCase.stub {
                 onBlocking { invoke() }.thenReturn(true)
             }
             underTest.refreshMultiFactorAuthSetting()
@@ -322,7 +322,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that multi factor is disabled when fetching multi factor enabled returns false`() =
         runTest {
-            fetchMultiFactorAuthSettingUseCase.stub {
+            isMultiFactorAuthEnabledUseCase.stub {
                 onBlocking { invoke() }.thenReturn(false)
             }
 
@@ -350,7 +350,7 @@ class SettingsViewModelTest {
                 on { invoke() }.thenReturn(recentActivityFlow)
             }
 
-            fetchMultiFactorAuthSettingUseCase.stub {
+            isMultiFactorAuthEnabledUseCase.stub {
                 onBlocking { invoke() }.thenReturn(false)
             }
 
@@ -381,7 +381,7 @@ class SettingsViewModelTest {
             monitorHideRecentActivityUseCase.stub {
                 on { invoke() }.thenReturn(false.asHotFlow())
             }
-            fetchMultiFactorAuthSettingUseCase.stub {
+            isMultiFactorAuthEnabledUseCase.stub {
                 onBlocking { invoke() }.thenReturn(false)
             }
 
@@ -407,7 +407,7 @@ class SettingsViewModelTest {
             monitorHideRecentActivityUseCase.stub {
                 on { invoke() }.thenReturn(false.asHotFlow())
             }
-            fetchMultiFactorAuthSettingUseCase.stub {
+            isMultiFactorAuthEnabledUseCase.stub {
                 onBlocking { invoke() }.thenReturn(false)
             }
 

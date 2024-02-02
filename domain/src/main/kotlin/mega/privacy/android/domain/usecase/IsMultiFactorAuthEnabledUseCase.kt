@@ -8,7 +8,7 @@ import javax.inject.Inject
  *
  * @property accountRepository [AccountRepository]
  */
-class FetchMultiFactorAuthSettingUseCase @Inject constructor(
+class IsMultiFactorAuthEnabledUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
 ) {
     /**

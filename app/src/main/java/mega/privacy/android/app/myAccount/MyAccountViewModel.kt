@@ -79,7 +79,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
+import mega.privacy.android.domain.usecase.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
@@ -121,7 +121,7 @@ import javax.inject.Inject
  * @property myAccountInfo
  * @property megaApi
  * @property setAvatarUseCase
- * @property fetchMultiFactorAuthSettingUseCase [FetchMultiFactorAuthSettingUseCase]
+ * @property isMultiFactorAuthEnabledUseCase [IsMultiFactorAuthEnabledUseCase]
  * @property checkVersionsUseCase
  * @property killOtherSessionsUseCase [KillOtherSessionsUseCase]
  * @property cancelSubscriptionsUseCase
@@ -154,7 +154,7 @@ class MyAccountViewModel @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val setAvatarUseCase: SetAvatarUseCase,
-    private val fetchMultiFactorAuthSettingUseCase: FetchMultiFactorAuthSettingUseCase,
+    private val isMultiFactorAuthEnabledUseCase: IsMultiFactorAuthEnabledUseCase,
     private val checkVersionsUseCase: CheckVersionsUseCase,
     private val killOtherSessionsUseCase: KillOtherSessionsUseCase,
     private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase,
@@ -917,7 +917,7 @@ class MyAccountViewModel @Inject constructor(
     fun checkMultiFactorAuthenticationState() {
         viewModelScope.launch {
             runCatching {
-                fetchMultiFactorAuthSettingUseCase()
+                isMultiFactorAuthEnabledUseCase()
             }.onSuccess {
                 Timber.d("Multi-Factor Authentication check successful")
                 is2FaEnabled = it

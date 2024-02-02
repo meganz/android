@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.CanDeleteAccount
-import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
+import mega.privacy.android.domain.usecase.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
@@ -67,7 +67,7 @@ class SettingsViewModel @Inject constructor(
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val setMediaDiscoveryView: SetMediaDiscoveryView,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
-    private val fetchMultiFactorAuthSettingUseCase: FetchMultiFactorAuthSettingUseCase,
+    private val isMultiFactorAuthEnabledUseCase: IsMultiFactorAuthEnabledUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val requestAccountDeletion: RequestAccountDeletion,
     private val isChatLoggedIn: IsChatLoggedIn,
@@ -132,7 +132,7 @@ class SettingsViewModel @Inject constructor(
                 }.map { enabled ->
                     { state: SettingsState -> state.copy(autoAcceptChecked = enabled) }
                 },
-                flow { emit(fetchMultiFactorAuthSettingUseCase()) }
+                flow { emit(isMultiFactorAuthEnabledUseCase()) }
                     .map { enabled ->
                         { state: SettingsState -> state.copy(multiFactorAuthChecked = enabled) }
                     },
@@ -231,10 +231,13 @@ class SettingsViewModel @Inject constructor(
 
     }
 
+    /**
+     * Retrieves the Multi-Factor Authenticator State
+     */
     fun refreshMultiFactorAuthSetting() {
         viewModelScope.launch {
             state.update {
-                it.copy(multiFactorAuthChecked = fetchMultiFactorAuthSettingUseCase())
+                it.copy(multiFactorAuthChecked = isMultiFactorAuthEnabledUseCase())
             }
         }
     }
