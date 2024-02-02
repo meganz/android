@@ -74,6 +74,7 @@ import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUs
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
@@ -381,7 +382,7 @@ class ChatUploadService : LifecycleService() {
                 for (attachFile in attachFiles) {
                     for (idChat in idChats!!) {
                         requestSent++
-                        runCatching { attachNodeUseCase(idChat, attachFile) }
+                        runCatching { attachNodeUseCase(idChat, NodeId(attachFile)) }
                             .onSuccess { handleSuccessAttachment(attachFile, it) }
                             .onFailure { handleFailureAttachment(it, attachFile) }
                     }
@@ -1204,7 +1205,7 @@ class ChatUploadService : LifecycleService() {
         requestSent++
         pendMsg.nodeHandle = nodeHandle
         pendMsg.state = PendingMessageState.ATTACHING.value
-        runCatching { attachNodeUseCase(pendMsg.chatId, nodeHandle) }
+        runCatching { attachNodeUseCase(pendMsg.chatId, NodeId(nodeHandle)) }
             .onSuccess { handleSuccessAttachment(nodeHandle, it) }
             .onFailure { handleFailureAttachment(it, nodeHandle) }
 

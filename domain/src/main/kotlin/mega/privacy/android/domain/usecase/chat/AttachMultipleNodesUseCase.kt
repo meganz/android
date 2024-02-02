@@ -29,7 +29,7 @@ class AttachMultipleNodesUseCase @Inject constructor(
                 async {
                     runCatching {
                         chatIds.map { chatId ->
-                            attachNodeUseCase(chatId = chatId, nodeHandle = nodeId.longValue)
+                            attachNodeUseCase(chatId = chatId, nodeId = nodeId)
                         }
                     }.recover {
                         return@async Result.failure(it)

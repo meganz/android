@@ -3360,13 +3360,6 @@ interface MegaApiGateway {
     fun getNodesByFingerprint(fingerprint: String): List<MegaNode>
 
     /**
-     * Get owner of node
-     * @param handle [Long]
-     * @return owner handle [Long]
-     */
-    fun getOwner(handle: Long): Long?
-
-    /**
      * Close a MEGA session.
      *
      * All clients using this session will be automatically logged out.

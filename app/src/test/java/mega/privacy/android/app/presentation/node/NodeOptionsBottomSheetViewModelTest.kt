@@ -242,28 +242,28 @@ class NodeOptionsBottomSheetViewModelTest {
         runTest {
             initViewModel()
             val chatIds = longArrayOf(1234L)
+            val nodeIds = longArrayOf(sampleNode.id.longValue)
             val request = ChatRequestResult.ChatRequestAttachNode(
                 count = 1,
                 errorCount = 0
             )
 
-            viewModel.state.value.node?.let {
-                whenever(
-                    attachMultipleNodesUseCase(
-                        listOf(it.id),
-                        longArrayOf(1234L)
-                    )
-                ).thenReturn(request)
-                whenever(chatRequestMessageMapper(request)).thenReturn("Some value")
-
-                viewModel.attachNodeToChats(chatIds)
-
-                verify(attachMultipleNodesUseCase).invoke(
-                    listOf(it.id),
+            whenever(
+                attachMultipleNodesUseCase(
+                    listOf(sampleNode.id),
                     longArrayOf(1234L)
                 )
-                verify(chatRequestMessageMapper).invoke(request)
-                verify(snackBarHandler).postSnackbarMessage("Some value")
-            }
+            ).thenReturn(request)
+            whenever(chatRequestMessageMapper(request)).thenReturn("Some value")
+
+            viewModel.attachNodeToChats(nodeHandles = nodeIds, chatIds = chatIds)
+
+            verify(attachMultipleNodesUseCase).invoke(
+                listOf(sampleNode.id),
+                longArrayOf(1234L)
+            )
+            verify(chatRequestMessageMapper).invoke(request)
+            verify(snackBarHandler).postSnackbarMessage("Some value")
+
         }
 }

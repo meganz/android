@@ -950,7 +950,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getNodesFromFingerPrint(fingerprint: String): List<Node> {
+    override suspend fun getNodesFromFingerPrint(fingerprint: String): List<UnTypedNode> {
         return withContext(ioDispatcher) {
             megaApiGateway.getNodesByFingerprint(fingerprint).map {
                 convertToUnTypedNode(it)
@@ -958,9 +958,9 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getOwnerNode(nodeId: NodeId): Long? {
+    override suspend fun getOwnerNodeHandle(nodeId: NodeId): Long? {
         return withContext(ioDispatcher) {
-            megaApiGateway.getOwner(nodeId.longValue)
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.owner
         }
     }
 }

@@ -381,15 +381,24 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
 
     /**
      * attach node to chat
-     * @param chatIds [LongArray] chat ids where Node is attached
+     *
+     * @param nodeHandles [LongArray] on which node is attached
+     * @param chatIds [LongArray] chat ids
      */
     fun attachNodeToChats(
-        chatIds: LongArray,
+        nodeHandles: LongArray?,
+        chatIds: LongArray?,
     ) {
-        state.value.node?.let { node ->
+        if (nodeHandles != null && chatIds != null) {
+            val nodeIds = nodeHandles.map {
+                NodeId(it)
+            }
             viewModelScope.launch {
                 val attachNodeRequest =
-                    attachMultipleNodesUseCase(nodeIds = listOf(node.id), chatIds)
+                    attachMultipleNodesUseCase(
+                        nodeIds = nodeIds,
+                        chatIds = chatIds
+                    )
                 val message = chatRequestMessageMapper(attachNodeRequest)
                 message?.let {
                     snackBarHandler.postSnackbarMessage(it)

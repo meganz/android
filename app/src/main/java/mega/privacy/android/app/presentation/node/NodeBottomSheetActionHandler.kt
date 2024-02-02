@@ -95,8 +95,9 @@ class NodeBottomSheetActionHandler(
         (activity as? AppCompatActivity)?.registerForActivityResult(
             SendToChatActivityContract()
         ) { result ->
-            result?.let { chatIds ->
+            result?.let { (nodeHandles, chatIds) ->
                 nodeOptionsBottomSheetViewModel.attachNodeToChats(
+                    nodeHandles = nodeHandles,
                     chatIds = chatIds,
                 )
             }

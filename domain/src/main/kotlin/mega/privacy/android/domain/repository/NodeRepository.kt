@@ -660,14 +660,14 @@ interface NodeRepository {
     /**
      * Gets nodes from fingerprint
      * @param fingerprint
-     * @return list of [Node]
+     * @return list of [UnTypedNode]
      */
-    suspend fun getNodesFromFingerPrint(fingerprint: String): List<Node>
+    suspend fun getNodesFromFingerPrint(fingerprint: String): List<UnTypedNode>
 
     /**
      * Gets owner of node
      * @param nodeId [NodeId]
      * @return owner node [Long]
      */
-    suspend fun getOwnerNode(nodeId: NodeId): Long?
+    suspend fun getOwnerNodeHandle(nodeId: NodeId): Long?
 }

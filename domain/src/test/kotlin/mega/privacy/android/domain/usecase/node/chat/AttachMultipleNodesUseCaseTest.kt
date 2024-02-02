@@ -31,37 +31,37 @@ class AttachMultipleNodesUseCaseTest {
     ) = runTest {
         whenever(
             attachNodeUseCase(
-                nodeHandle = SUCCESS_NODE_HANDLE_1,
+                nodeId = NodeId(SUCCESS_NODE_HANDLE_1),
                 chatId = CHAT_HANDLE_1
             )
         ).thenReturn(12L)
         whenever(
             attachNodeUseCase(
-                nodeHandle = SUCCESS_NODE_HANDLE_1,
+                nodeId = NodeId(SUCCESS_NODE_HANDLE_1),
                 chatId = CHAT_HANDLE_2
             )
         ).thenReturn(12L)
         whenever(
             attachNodeUseCase(
-                nodeHandle = SUCCESS_NODE_HANDLE_2,
+                nodeId = NodeId(SUCCESS_NODE_HANDLE_2),
                 chatId = CHAT_HANDLE_1
             )
         ).thenReturn(12L)
         whenever(
             attachNodeUseCase(
-                nodeHandle = SUCCESS_NODE_HANDLE_2,
+                nodeId = NodeId(SUCCESS_NODE_HANDLE_2),
                 chatId = CHAT_HANDLE_2
             )
         ).thenReturn(12L)
         whenever(
             attachNodeUseCase(
-                nodeHandle = FAILED_NODE_HANDLE,
+                nodeId = NodeId(FAILED_NODE_HANDLE),
                 chatId = CHAT_HANDLE_1
             )
         ).thenThrow(RuntimeException::class.java)
         whenever(
             attachNodeUseCase(
-                nodeHandle = FAILED_NODE_HANDLE,
+                nodeId = NodeId(FAILED_NODE_HANDLE),
                 chatId = CHAT_HANDLE_2
             )
         ).thenThrow(RuntimeException::class.java)
