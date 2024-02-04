@@ -2,7 +2,6 @@ package mega.privacy.android.app.globalmanagement
 
 import android.Manifest
 import android.app.Application
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings.System.DEFAULT_NOTIFICATION_URI
@@ -10,9 +9,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import me.leolin.shortcutbadger.ShortcutBadger
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.main.megachat.BadgeIntentService
 import mega.privacy.android.app.presentation.notifications.chat.ChatMessageNotification
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -27,7 +24,6 @@ import nz.mega.sdk.MegaChatNotificationListenerInterface
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.abs
 
 /**
  * Mega chat notification handler
@@ -67,8 +63,6 @@ class MegaChatNotificationHandler @Inject constructor(
                 Timber.d("No notification required $type")
                 return
             }
-
-            updateAppBadge()
 
             val seenMessage = status == MegaChatMessage.STATUS_SEEN
 
@@ -141,31 +135,4 @@ class MegaChatNotificationHandler @Inject constructor(
                 } else {
                     true
                 }
-
-    /**
-     * Update app badge
-     */
-    fun updateAppBadge() = applicationScope.launch {
-        Timber.d("updateAppBadge")
-        val totalNotifications = runCatching { getNotificationCountUseCase(true) }.getOrNull() ?: 0
-
-        //Add Android version check if needed
-        if (totalNotifications == 0) {
-            //Remove badge indicator - no unread chats
-            ShortcutBadger.applyCount(application, 0)
-            //Xiaomi support
-            application.startService(
-                Intent(application, BadgeIntentService::class.java)
-                    .putExtra("badgeCount", 0)
-            )
-        } else {
-            //Show badge with indicator = unread
-            ShortcutBadger.applyCount(application, abs(totalNotifications))
-            //Xiaomi support
-            application.startService(
-                Intent(application, BadgeIntentService::class.java)
-                    .putExtra("badgeCount", totalNotifications)
-            )
-        }
-    }
 }

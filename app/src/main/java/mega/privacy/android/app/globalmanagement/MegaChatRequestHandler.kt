@@ -6,10 +6,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.leolin.shortcutbadger.ShortcutBadger
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.main.megachat.BadgeIntentService
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
@@ -95,17 +93,6 @@ class MegaChatRequestHandler @Inject constructor(
             Timber.d("CHAT_TYPE_LOGOUT: %d__%s", e.errorCode, e.errorString)
             resetDefaults()
             MegaApplication.getInstance().disableMegaChatApi()
-            try {
-                ShortcutBadger.applyCount(application, 0)
-                application.startService(
-                    Intent(
-                        application,
-                        BadgeIntentService::class.java
-                    ).putExtra("badgeCount", 0)
-                )
-            } catch (exc: Exception) {
-                Timber.e(exc, "EXCEPTION removing badge indicator")
-            }
             val loggedState: Int = megaApi.isLoggedIn
             Timber.d("Login status on %s", loggedState)
             if (loggedState == 0) {

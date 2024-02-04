@@ -423,11 +423,6 @@ dependencies {
     implementation(lib.blurry)
     implementation(lib.documentscanner)
     implementation(lib.simplestorage)
-    implementation(lib.shortcutbadger) {
-        artifact {
-            type = "aar"
-        }
-    }
     implementation(lib.compose.state.events)
     implementation(testlib.hamcrest)
     implementation(lib.mega.analytics)

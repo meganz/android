@@ -162,7 +162,6 @@ class GlobalListener @Inject constructor(
      * onUserAlertsUpdate
      */
     override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
-        megaChatNotificationHandler.updateAppBadge()
         notifyNotificationCountChange()
     }
 
@@ -215,7 +214,6 @@ class GlobalListener @Inject constructor(
         requests: ArrayList<MegaContactRequest>?,
     ) {
         if (requests == null) return
-        megaChatNotificationHandler.updateAppBadge()
         notifyNotificationCountChange()
 
         requests.toList().forEach { cr ->
