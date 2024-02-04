@@ -40,6 +40,7 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentBackupsBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
@@ -49,6 +50,10 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.managerSections.RotatableFragment
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.BackupsImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
@@ -62,7 +67,9 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -83,6 +90,12 @@ class BackupsFragment : RotatableFragment() {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
+
+    /**
+     * Inject [GetFeatureFlagValueUseCase] to the Fragment
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * Retrieves the UI state from [BackupsViewModel]
@@ -508,21 +521,38 @@ class BackupsFragment : RotatableFragment() {
      */
     private fun openFile(node: MegaNode, position: Int) {
         if (MimeTypeList.typeForName(node.name).isImage) {
-            val intent = getIntentForParentNode(
-                context = requireContext(),
-                parentNodeHandle = megaApi.getParentNode(node)?.handle,
-                childOrder = viewModel.getOrder(),
-                currentNodeHandle = node.handle,
-            )
-            putThumbnailLocation(
-                launchIntent = intent,
-                rv = binding?.backupsRecyclerView,
-                position = position,
-                viewerFrom = Constants.VIEWER_FROM_BACKUPS,
-                thumbnailGetter = megaNodeAdapter
-            )
-            startActivity(intent)
-            (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
+            lifecycleScope.launch {
+                if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                    val parentNodeLongValue = megaApi.getParentNode(node)?.handle ?: 0
+                    ImagePreviewActivity.createIntent(
+                        context = requireContext(),
+                        imageSource = ImagePreviewFetcherSource.BACKUPS,
+                        menuOptionsSource = ImagePreviewMenuSource.BACKUPS,
+                        anchorImageNodeId = NodeId(node.handle),
+                        params = mapOf(
+                            BackupsImageNodeFetcher.PARENT_ID to parentNodeLongValue,
+                        ),
+                    ).run {
+                        requireContext().startActivity(this)
+                    }
+                } else {
+                    val intent = getIntentForParentNode(
+                        context = requireContext(),
+                        parentNodeHandle = megaApi.getParentNode(node)?.handle,
+                        childOrder = viewModel.getOrder(),
+                        currentNodeHandle = node.handle,
+                    )
+                    putThumbnailLocation(
+                        launchIntent = intent,
+                        rv = binding?.backupsRecyclerView,
+                        position = position,
+                        viewerFrom = Constants.VIEWER_FROM_BACKUPS,
+                        thumbnailGetter = megaNodeAdapter
+                    )
+                    startActivity(intent)
+                    (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
+                }
+            }
         } else if (MimeTypeList.typeForName(node.name).isVideoMimeType ||
             MimeTypeList.typeForName(node.name).isAudio
         ) {

@@ -7,6 +7,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.multibindings.IntoMap
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumSharingImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.BackupsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImageNodeFetcher
@@ -82,4 +83,9 @@ internal interface ImagePreviewModule {
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.SHARED_ITEMS)
     fun SharedItemsImageNodeFetcher.bindSharedItemsFetcher(): ImageNodeFetcher
+
+    @Binds
+    @IntoMap
+    @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.BACKUPS)
+    fun BackupsImageNodeFetcher.bindBackupsFetcher(): ImageNodeFetcher
 }

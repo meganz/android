@@ -7,6 +7,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.multibindings.IntoMap
 import mega.privacy.android.app.presentation.imagepreview.menu.AlbumContentImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.AlbumSharingImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.BackupsImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.CloudDriveImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.DefaultImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.FavouriteImagePreviewMenu
@@ -82,4 +83,9 @@ internal interface ImagePreviewMenuModule {
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.SHARED_ITEMS)
     fun SharedItemsImagePreviewMenu.bindSharedItemsMenu(): ImagePreviewMenu
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.BACKUPS)
+    fun BackupsImagePreviewMenu.bindBackupsMenu(): ImagePreviewMenu
 }

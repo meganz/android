@@ -16,4 +16,5 @@ enum class ImagePreviewFetcherSource {
     PUBLIC_FILE,
     FOLDER_LINK_MEDIA_DISCOVERY,
     SHARED_ITEMS,
+    BACKUPS,
 }
