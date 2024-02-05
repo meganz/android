@@ -649,7 +649,7 @@ class PhotosFragment : Fragment() {
                     imageSource = ImagePreviewFetcherSource.TIMELINE,
                     menuOptionsSource = ImagePreviewMenuSource.TIMELINE,
                     anchorImageNodeId = NodeId(photo.id),
-                    showScreenLabel = false,
+                    showScreenLabel = true,
                 )
                 startActivity(intent)
             } else {

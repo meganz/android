@@ -282,13 +282,7 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun saveNode(node: MegaNode) {
         PermissionUtils.checkNotificationsPermission(this)
-        nodeSaver.saveNode(
-            node,
-            highPriority = false,
-            isFolderLink = isForeign,
-            fromMediaViewer = true,
-            needSerialize = true,
-        )
+        viewModel.saveToDevice(nodeSaver = nodeSaver, node = node, isForeign = isForeign)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

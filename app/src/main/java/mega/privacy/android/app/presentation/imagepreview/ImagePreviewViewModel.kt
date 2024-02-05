@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -50,7 +51,9 @@ import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloadsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -80,6 +83,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
+    private val resetTotalDownloadsUseCase: ResetTotalDownloadsUseCase,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
@@ -612,6 +616,19 @@ class ImagePreviewViewModel @Inject constructor(
                 Timber.e(it)
                 setCopyMoveException(it)
             }
+        }
+    }
+
+    fun saveToDevice(nodeSaver: NodeSaver, node: MegaNode, isForeign: Boolean) {
+        viewModelScope.launch {
+            resetTotalDownloadsUseCase()
+            nodeSaver.saveNode(
+                node,
+                highPriority = false,
+                isFolderLink = isForeign,
+                fromMediaViewer = false,
+                needSerialize = true,
+            )
         }
     }
 
