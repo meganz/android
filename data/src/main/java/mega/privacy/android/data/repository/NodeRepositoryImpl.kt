@@ -140,6 +140,26 @@ internal class NodeRepositoryImpl @Inject constructor(
                 .map { shareDataMapper(it) }
         }
 
+    override suspend fun getAllOutgoingShares(
+        order: SortOrder,
+    ) = withContext(ioDispatcher) {
+        megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order))
+            .filter { it.user != null }
+            .let { outgoingShares ->
+                val (verifiedShares, unverifiedShares) = outgoingShares.partition { it.isVerified }
+                val shareCount = verifiedShares
+                    .groupBy { it.nodeHandle }
+                    .mapValues { it.value.size }
+                // Set count to 0, so that UI can show unverified icon based on it
+                val unverifiedSharesMapped = unverifiedShares
+                    .filter { isValidNode(NodeId(it.nodeHandle)) }
+                    .map { shareDataMapper(it, 0) }
+                unverifiedSharesMapped + outgoingShares
+                    .distinctBy { it.nodeHandle }
+                    .map { shareDataMapper(it, shareCount.getOrDefault(it.nodeHandle, 1)) }
+            }
+    }
+
     override suspend fun getVerifiedIncomingShares(order: SortOrder) =
         withContext(ioDispatcher) {
             megaApiGateway.getVerifiedIncomingShares(sortOrderIntMapper(order)).map {
@@ -458,6 +478,10 @@ internal class NodeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
+
+    override suspend fun isValidNode(nodeId: NodeId) = withContext(ioDispatcher) {
+        nodeId.longValue != getInvalidHandle() && megaApiGateway.getMegaNodeByHandle(nodeId.longValue) != null
+    }
 
     override suspend fun getRootNode() = withContext(ioDispatcher) {
         megaApiGateway.getRootNode()?.let {

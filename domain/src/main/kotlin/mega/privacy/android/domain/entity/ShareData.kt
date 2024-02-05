@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  * @property timeStamp
  * @property isPending
  * @param isVerified
+ * @property count
  */
 data class ShareData(
     val user: String?,
@@ -19,4 +20,5 @@ data class ShareData(
     val timeStamp: Long,
     val isPending: Boolean,
     val isVerified: Boolean,
+    val count: Int
 )

@@ -68,6 +68,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -454,6 +455,59 @@ class NodeRepositoryImplTest {
 
             val expected = listOf(share1, share2)
             val actual = underTest.getVerifiedIncomingShares(any())
+
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that getAllOutgoingShares returns correctly mapped result from api gateway`() =
+        runTest {
+            val sortOrder = SortOrder.ORDER_NONE
+            val sortOrderInt = 0
+            whenever(sortOrderIntMapper(sortOrder)).thenReturn(sortOrderInt)
+
+            val megaShare1 = mock<MegaShare> {
+                on { isVerified } doReturn false
+                on { nodeHandle } doReturn 1
+                on { user } doReturn "user1"
+            }
+            val megaShare2 = mock<MegaShare> {
+                on { isVerified } doReturn true
+                on { nodeHandle } doReturn 2
+                on { user } doReturn "user2"
+            }
+            val megaShare3 = mock<MegaShare> {
+                on { isVerified } doReturn true
+                on { nodeHandle } doReturn 3
+                on { user } doReturn "user3"
+            }
+            val megaShare4 = mock<MegaShare> {
+                on { isVerified } doReturn true
+                on { nodeHandle } doReturn 2
+                on { user } doReturn null
+            }
+            val megaShare5 = mock<MegaShare> {
+                on { isVerified } doReturn true
+                on { nodeHandle } doReturn 2
+                on { user } doReturn "user4"
+            }
+
+            val megaShares = listOf(megaShare1, megaShare2, megaShare3, megaShare4, megaShare5)
+
+            whenever(megaApiGateway.getInvalidHandle()).thenReturn(-1L)
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            whenever(megaApiGateway.getOutgoingSharesNode(sortOrderInt)).thenReturn(megaShares)
+
+            val share1 = mock<ShareData>()
+            val share2 = mock<ShareData>()
+            val share3 = mock<ShareData>()
+            whenever(shareDataMapper(megaShare1, 0)).thenReturn(share1)
+            whenever(shareDataMapper(megaShare1, 1)).thenReturn(share1)
+            whenever(shareDataMapper(megaShare2, 2)).thenReturn(share2)
+            whenever(shareDataMapper(megaShare3, 1)).thenReturn(share3)
+
+            val expected = listOf(share1, share1, share2, share3)
+            val actual = underTest.getAllOutgoingShares(sortOrder)
 
             assertThat(actual).isEqualTo(expected)
         }

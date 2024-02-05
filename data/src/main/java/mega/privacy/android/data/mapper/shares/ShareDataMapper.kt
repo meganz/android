@@ -10,12 +10,13 @@ import javax.inject.Inject
 internal class ShareDataMapper @Inject constructor(
     private val accessPermissionMapper: AccessPermissionMapper,
 ) {
-    operator fun invoke(share: MegaShare) = ShareData(
+    operator fun invoke(share: MegaShare, shareCount: Int = 1) = ShareData(
         user = share.user,
         isPending = share.isPending,
         timeStamp = share.timestamp,
         access = accessPermissionMapper(share.access),
         nodeHandle = share.nodeHandle,
         isVerified = share.isVerified,
+        count = shareCount
     )
 }

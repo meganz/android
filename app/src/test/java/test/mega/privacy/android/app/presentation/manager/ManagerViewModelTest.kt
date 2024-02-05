@@ -201,6 +201,7 @@ class ManagerViewModelTest {
             timeStamp = 987654678L,
             isPending = true,
             isVerified = false,
+            count = 0
         ),
         ShareData(
             user = "user",
@@ -209,6 +210,7 @@ class ManagerViewModelTest {
             timeStamp = 987654678L,
             isPending = true,
             isVerified = false,
+            count = 0
         )
     )
     private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {

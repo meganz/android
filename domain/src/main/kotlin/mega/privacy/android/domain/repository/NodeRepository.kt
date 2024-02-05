@@ -62,6 +62,13 @@ interface NodeRepository {
     suspend fun getVerifiedIncomingShares(order: SortOrder): List<ShareData>
 
     /**
+     * Provides all outgoing shares from SDK with proper sorting and filtering
+     *
+     * @return List of [ShareData]
+     */
+    suspend fun getAllOutgoingShares(order: SortOrder): List<ShareData>
+
+    /**
      * check whether the node is in rubbish bin or not
      *
      * @return Boolean
@@ -260,6 +267,11 @@ interface NodeRepository {
      * Gets invalid handle
      */
     suspend fun getInvalidHandle(): Long
+
+    /**
+     * Checks if a node is valid
+     */
+    suspend fun isValidNode(nodeId: NodeId): Boolean
 
     /**
      * Creates a new share key for the node if there is no share key already created and returns a lambda that can be used to set permissions to this node
