@@ -41,10 +41,10 @@ interface ThumbnailPreviewRepository {
 
     /**
      * Check preview from local
-     * @param handle node handle
+     * @param typedNode
      * @return preview file
      */
-    suspend fun getPreviewFromLocal(handle: Long): File?
+    suspend fun getPreviewFromLocal(typedNode: TypedNode): File?
 
     /**
      * Check preview from server

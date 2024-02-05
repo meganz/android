@@ -4,18 +4,20 @@ import android.content.ContentResolver
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
@@ -40,7 +42,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 @Composable
 fun FileMessageView(
     isMe: Boolean,
-    fileTypeResId: Int,
+    fileTypeResId: Int?,
     imageUri: Uri?,
     modifier: Modifier = Modifier,
     loadProgress: Float? = null,
@@ -57,12 +59,9 @@ fun FileMessageView(
             fileSize,
         )
     }
-    var intrinsicSize by remember {
-        mutableStateOf<Size?>(null)
-    }
+
     FileContainerMessageView(
         modifier = Modifier.padding(12.dp),
-        imageIntrinsicSize = intrinsicSize,
         loadProgress = loadProgress,
         onClick = onClick
     ) {
@@ -73,17 +72,22 @@ fun FileMessageView(
                     .data(imageUri)
                     .build(),
                 contentDescription = fileName,
-                modifier = Modifier,
                 contentScale = ContentScale.Inside,
                 loading = { noPreviewContent() },
                 error = { noPreviewContent() },
                 success = {
-                    intrinsicSize = it.painter.intrinsicSize
+                    val intrinsicSize = it.painter.intrinsicSize
                     Image(
                         painter = it.painter,
                         contentDescription = "Image",
                         contentScale = ContentScale.Inside,
-                        modifier = Modifier.testTag(FILE_PREVIEW_MESSAGE_VIEW_IMAGE_TEST_TAG)
+                        modifier = Modifier
+                            .sizeIn(
+                                maxWidth = MAX_SIZE.dp.coerceAtMostPixels(intrinsicSize.width),
+                                maxHeight = MAX_SIZE.dp.coerceAtMostPixels(intrinsicSize.height),
+                            )
+                            .aspectRatio(intrinsicSize.aspectRatio())
+                            .testTag(FILE_PREVIEW_MESSAGE_VIEW_IMAGE_TEST_TAG)
                     )
                 },
             )
@@ -124,3 +128,17 @@ private fun FileNoPreviewMessageViewPreview(
 }
 
 internal const val FILE_PREVIEW_MESSAGE_VIEW_IMAGE_TEST_TAG = "chat_file_preview_message_view:image"
+private const val MAX_SIZE = 212
+
+@Composable
+private fun Dp.coerceAtMostPixels(pixels: Float): Dp {
+    val density = LocalDensity.current
+    return if (pixels.isFinite()) {
+        this.coerceAtMost(with(density) { pixels.toDp() })
+    } else {
+        this
+    }
+}
+
+private fun Size.aspectRatio() =
+    if (this.height == 0f) 1f else this.width / this.height

@@ -18,6 +18,6 @@ class GetPreviewUseCase @Inject constructor(
      * @param typedNode
      */
     suspend operator fun invoke(typedNode: TypedNode) =
-        thumbnailPreviewRepository.getPreviewFromLocal(typedNode.id.longValue)
+        thumbnailPreviewRepository.getPreviewFromLocal(typedNode)
             ?: thumbnailPreviewRepository.getPreviewFromServer(typedNode)
 }

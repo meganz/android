@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.meeting.chat.view
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
@@ -99,21 +101,24 @@ internal fun MessageListView(
                 contentType = pagingItems.itemContentType()
             ) { index ->
 
-                pagingItems[index]?.MessageListItem(
-                    uiState = uiState,
-                    lastUpdatedCache = lastCacheUpdateTime[pagingItems[index]?.userHandle] ?: 0L,
-                    timeFormatter = TimeUtils::formatTime,
-                    dateFormatter = {
-                        TimeUtils.formatDate(
-                            it,
-                            TimeUtils.DATE_SHORT_FORMAT,
-                            context
-                        )
-                    },
-                    onLongClick = {
-                        if (uiState.haveWritePermission) onMessageLongClick(it)
-                    },
-                )
+                Box(modifier = Modifier.sizeIn(minHeight = 42.dp)) {
+                    pagingItems[index]?.MessageListItem(
+                        uiState = uiState,
+                        lastUpdatedCache = lastCacheUpdateTime[pagingItems[index]?.userHandle]
+                            ?: 0L,
+                        timeFormatter = TimeUtils::formatTime,
+                        dateFormatter = {
+                            TimeUtils.formatDate(
+                                it,
+                                TimeUtils.DATE_SHORT_FORMAT,
+                                context
+                            )
+                        },
+                        onLongClick = {
+                            if (uiState.haveWritePermission) onMessageLongClick(it)
+                        },
+                    )
+                }
             }
         }
 

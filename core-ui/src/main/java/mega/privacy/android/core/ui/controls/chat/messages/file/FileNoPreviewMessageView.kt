@@ -40,7 +40,7 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
 @Composable
 internal fun FileNoPreviewMessageView(
     isMe: Boolean,
-    fileTypeResId: Int,
+    fileTypeResId: Int?,
     modifier: Modifier = Modifier,
     fileName: String = "",
     fileSize: String = "",
@@ -86,16 +86,18 @@ private fun FileNameText(fileName: String, isMe: Boolean) {
 }
 
 @Composable
-private fun FileIcon(fileTypeResId: Int, modifier: Modifier = Modifier) {
+private fun FileIcon(fileTypeResId: Int?, modifier: Modifier = Modifier) {
     Box(
         modifier = Modifier.size(48.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(
-            imageVector = ImageVector.vectorResource(fileTypeResId),
-            contentDescription = null,
-            modifier = modifier.testTag(FILE_MESSAGE_VIEW_FILE_TYPE_ICON_TEST_TAG),
-        )
+        fileTypeResId?.let {
+            Icon(
+                imageVector = ImageVector.vectorResource(fileTypeResId),
+                contentDescription = null,
+                modifier = modifier.testTag(FILE_MESSAGE_VIEW_FILE_TYPE_ICON_TEST_TAG),
+            )
+        }
     }
 }
 
@@ -115,7 +117,6 @@ private fun FileNoPreviewMessageViewPreview(
                     fileSize = params.fileSize,
                 )
             },
-            imageIntrinsicSize = null,
             loadProgress = params.loadProgress,
         )
     }

@@ -1,16 +1,13 @@
 package mega.privacy.android.core.ui.controls.chat.messages.file
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,7 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,7 +29,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -41,8 +36,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 
 /**
- * File message container, utility composable to animate the content size and apply size restrictions to file previews
- * @param imageIntrinsicSize if set, the aspect ratio will be kept an max size will be applied
+ * File message container, utility composable to animate the content size and apply load overly to file previews
  * @param loadProgress if set, a linear progress indicator and an overly will be shown
  * @param modifier
  * @param onClick handle click when file message is clicked
@@ -51,7 +45,6 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  */
 @Composable
 internal fun FileContainerMessageView(
-    imageIntrinsicSize: Size?,
     loadProgress: Float?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
@@ -64,15 +57,6 @@ internal fun FileContainerMessageView(
     val density = LocalDensity.current
     Box(
         modifier = modifier
-            .animateContentSize()
-            .then(imageIntrinsicSize?.let {
-                Modifier
-                    .sizeIn(
-                        maxWidth = MAX_SIZE.dp.coerceAtMostPixels(imageIntrinsicSize.width),
-                        maxHeight = MAX_SIZE.dp.coerceAtMostPixels(imageIntrinsicSize.height),
-                    )
-                    .aspectRatio(imageIntrinsicSize.aspectRatio())
-            } ?: Modifier)
             .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
             .background(MegaTheme.colors.background.surface2)
@@ -114,19 +98,6 @@ private fun LoadOverlay(
     )
 }
 
-private fun Size.aspectRatio() =
-    if (this.height == 0f) 1f else this.width / this.height
-
-@Composable
-private fun Dp.coerceAtMostPixels(pixels: Float): Dp {
-    val density = LocalDensity.current
-    return if (pixels.isFinite()) {
-        this.coerceAtMost(with(density) { pixels.toDp() })
-    } else {
-        this
-    }
-}
-
 /**
  * This preview are useful to check the behaviour of the component depending on intrinsic size of the content
  */
@@ -146,7 +117,6 @@ private fun FileMessageViewLoadingPreview(
                     contentScale = ContentScale.Inside,
                 )
             },
-            imageIntrinsicSize = painter.intrinsicSize,
             loadProgress = params.progress,
         )
     }
@@ -185,8 +155,6 @@ private fun createPath(): List<PathNode> {
         PathNode.Close
     )
 }
-
-internal const val MAX_SIZE = 212
 
 internal const val FILE_MESSAGE_VIEW_ROOT_TEST_TAG = "chat_file_message_view:root_view"
 internal const val FILE_MESSAGE_VIEW_OVERLAY_TEST_TAG =

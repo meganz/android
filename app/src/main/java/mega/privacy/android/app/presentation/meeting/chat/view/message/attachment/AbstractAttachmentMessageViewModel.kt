@@ -23,34 +23,29 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
         ConcurrentHashMap()
 
     /**
-     * Get the [MutableStateFlow] for a given attachment message which has [msgId]
+     * Get or create the [MutableStateFlow] for a given attachment message and chat id
      */
-    internal fun getUiStateFlow(msgId: Long): MutableStateFlow<AttachmentMessageUiState> =
-        _uiStateFlowMap.getOrPut(msgId) {
-            MutableStateFlow(AttachmentMessageUiState())
+    internal fun getOrPutUiStateFlow(
+        attachmentMessage: T,
+        chatId: Long,
+    ): MutableStateFlow<AttachmentMessageUiState> =
+        _uiStateFlowMap.getOrPut(attachmentMessage.msgId) {
+            MutableStateFlow(
+                AttachmentMessageUiState(
+                    fileName = attachmentMessage.fileName,
+                    fileSize = fileSizeStringMapper(attachmentMessage.fileSize),
+                )
+            ).also {
+                onMessageAdded(it, attachmentMessage, chatId)
+            }
         }
-
-    /**
-     * Add attachment message, so view model can start handling it.
-     */
-    fun addAttachmentMessage(attachmentMessage: T, chatId: Long) {
-        if (_uiStateFlowMap.contains(attachmentMessage.msgId)) {
-            //already handled, we can skip this
-            return
-        }
-        getUiStateFlow(attachmentMessage.msgId).update {
-            it.copy(
-                fileName = attachmentMessage.fileName,
-                fileSize = fileSizeStringMapper(attachmentMessage.fileSize),
-            )
-        }
-        onMessageAdded(attachmentMessage, chatId)
-    }
 
     /**
      * Event to handle message added
      */
-    abstract fun onMessageAdded(attachmentMessage: T, chatId: Long)
-
-
+    abstract fun onMessageAdded(
+        mutableStateFlow: MutableStateFlow<AttachmentMessageUiState>,
+        attachmentMessage: T,
+        chatId: Long,
+    )
 }

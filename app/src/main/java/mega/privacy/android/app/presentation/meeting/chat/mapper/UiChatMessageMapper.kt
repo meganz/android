@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting.chat.mapper
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.CallUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.ContactAttachmentUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.InvalidUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.NodeAttachmentUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.AlterParticipantsUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ChatLinkCreatedUiMessage
@@ -20,6 +21,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.VoiceClipUiMessage
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
@@ -132,6 +134,11 @@ class UiChatMessageMapper @Inject constructor() {
             )
 
             is VoiceClipMessage -> VoiceClipUiMessage(
+                message = message,
+                chatId = chatId,
+            )
+
+            is NodeAttachmentMessage -> NodeAttachmentUiMessage(
                 message = message,
                 chatId = chatId,
             )

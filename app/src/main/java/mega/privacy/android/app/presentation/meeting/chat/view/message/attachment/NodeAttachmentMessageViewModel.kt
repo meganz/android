@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.attachme
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
@@ -22,20 +23,27 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     private val addChatFileTypeUseCase: AddChatFileTypeUseCase,
     fileSizeStringMapper: FileSizeStringMapper,
 ) : AbstractAttachmentMessageViewModel<NodeAttachmentMessage>(fileSizeStringMapper) {
-    override fun onMessageAdded(attachmentMessage: NodeAttachmentMessage, chatId: Long) {
-        updatePreview(attachmentMessage, chatId)
+    override fun onMessageAdded(
+        mutableStateFlow: MutableStateFlow<AttachmentMessageUiState>,
+        attachmentMessage: NodeAttachmentMessage,
+        chatId: Long,
+    ) {
+        updatePreview(mutableStateFlow, attachmentMessage, chatId)
     }
 
-    private fun updatePreview(nodeAttachmentMessage: NodeAttachmentMessage, chatId: Long) {
+    private fun updatePreview(
+        mutableStateFlow: MutableStateFlow<AttachmentMessageUiState>,
+        nodeAttachmentMessage: NodeAttachmentMessage, chatId: Long,
+    ) {
         viewModelScope.launch {
             val node = nodeAttachmentMessage.fileNode
             val msgId = nodeAttachmentMessage.msgId
-            if (node.hasPreview && getUiStateFlow(msgId).value.imageUri == null) {
+            if (node.hasPreview && mutableStateFlow.value.imageUri == null) {
                 runCatching {
                     val typedNode = addChatFileTypeUseCase(node, chatId, msgId)
-                    getPreviewUseCase(typedNode) //getPreview doesn't work with chat nodes form others, we need to get the node with GetChatFileUseCase and then update repository to get the preview from node
+                    getPreviewUseCase(typedNode)
                 }.onSuccess { previewFile ->
-                    getUiStateFlow(msgId).update {
+                    mutableStateFlow.update {
                         it.copy(
                             imageUri = previewFile?.toString(),
                             loadProgress = null,

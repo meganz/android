@@ -38,11 +38,6 @@ class NodeAttachmentMessageViewModelTest {
     @BeforeAll
     internal fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = NodeAttachmentMessageViewModel(
-            getPreviewUseCase,
-            addChatFileTypeUseCase,
-            fileSizeStringMapper,
-        )
     }
 
     @AfterAll
@@ -53,7 +48,11 @@ class NodeAttachmentMessageViewModelTest {
     @BeforeEach
     internal fun initTests() {
         resetMocks()
-
+        underTest = NodeAttachmentMessageViewModel(
+            getPreviewUseCase,
+            addChatFileTypeUseCase,
+            fileSizeStringMapper,
+        )
     }
 
     fun resetMocks() {
@@ -68,7 +67,10 @@ class NodeAttachmentMessageViewModelTest {
     fun `test that preview is added when message is added`() = runTest {
         val fileNode = mock<FileNode> {
             on { hasPreview } doReturn true
+            on { name } doReturn "name"
+            on { size } doReturn 123L
         }
+        whenever(fileSizeStringMapper(any())).thenReturn("size")
         val chatFile = mock<ChatDefaultFile>()
         val expected = "file://image.jpg"
         val previewFile = mock<File> {
@@ -77,16 +79,14 @@ class NodeAttachmentMessageViewModelTest {
         whenever(addChatFileTypeUseCase(fileNode, CHAT_ID, MSG_ID)).thenReturn(chatFile)
         whenever(getPreviewUseCase(chatFile)).thenReturn(previewFile)
         val msg = buildNodeAttachmentMessage(fileNode)
-        underTest.getUiStateFlow(MSG_ID).test {
-            assertThat(awaitItem().imageUri).isNull()
-            underTest.onMessageAdded(msg, CHAT_ID)
+        underTest.getOrPutUiStateFlow(msg, CHAT_ID).test {
             val actual = awaitItem().imageUri
             assertThat(actual).isEqualTo(expected)
         }
     }
 
     @Test
-    fun `test that ui state is updated when attachment message is added`() = runTest {
+    fun `test that ui state initial state has correct name and size`() = runTest {
         val expectedName = "attachment.jpg"
         val expectedSize = "a lot of bytes"
         val fileNode = mock<FileNode> {
@@ -97,11 +97,7 @@ class NodeAttachmentMessageViewModelTest {
         whenever(fileSizeStringMapper(any())).thenReturn(expectedSize)
 
         val msg = buildNodeAttachmentMessage(fileNode)
-        underTest.getUiStateFlow(MSG_ID).test {
-            val initial = awaitItem()
-            assertThat(initial.fileName).isEmpty()
-            assertThat(initial.fileSize).isEmpty()
-            underTest.addAttachmentMessage(msg, CHAT_ID)
+        underTest.getOrPutUiStateFlow(msg, CHAT_ID).test {
             val actual = awaitItem()
             assertThat(actual.fileName).isEqualTo(expectedName)
             assertThat(actual.fileSize).isEqualTo(expectedSize)

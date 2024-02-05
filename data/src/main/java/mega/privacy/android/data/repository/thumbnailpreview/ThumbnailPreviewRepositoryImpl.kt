@@ -95,9 +95,9 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
         )
 
 
-    override suspend fun getPreviewFromLocal(handle: Long): File? =
+    override suspend fun getPreviewFromLocal(typedNode: TypedNode): File? =
         withContext(ioDispatcher) {
-            megaApi.getMegaNodeByHandle(handle)?.run {
+            megaNodeMapper(typedNode)?.run {
                 getPreviewFile(this).takeIf {
                     it?.exists() ?: false
                 }

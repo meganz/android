@@ -84,7 +84,6 @@ class FileContainerMessageViewTest {
     ) {
         composeRule.setContent {
             FileContainerMessageView(
-                imageIntrinsicSize = null,
                 loadProgress = loadProgress,
                 onClick = onClick,
             ) {
