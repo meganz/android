@@ -11,7 +11,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
-import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import kotlin.time.Duration
 
 /**
@@ -50,7 +50,7 @@ import kotlin.time.Duration
  * @property shouldShowTime True if the time should be shown, false otherwise.
  * @property shouldShowDate True if the date should be shown, false otherwise.
  * @property textMessage Text message.
- * @property reactions list of [MessageReaction]
+ * @property reactions list of [Reaction]
  */
 @Entity(tableName = "typed_messages")
 @TypeConverters(TypedMessageEntityConverters::class)
@@ -88,6 +88,6 @@ data class TypedMessageEntity(
     val shouldShowTime: Boolean,
     val shouldShowDate: Boolean,
     val textMessage: String?,
-    val reactions: List<MessageReaction>
+    val reactions: List<Reaction>
 ) : ChatMessageInfo
 

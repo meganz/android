@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages
 
-import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
  * Contact attachment message
@@ -16,7 +16,7 @@ data class ContactAttachmentMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val shouldShowDate: Boolean,
-    override val reactions: List<MessageReaction>,
+    override val reactions: List<Reaction>,
     val contactEmail: String,
     val contactUserName: String,
     val contactHandle: Long,

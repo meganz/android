@@ -8,7 +8,7 @@ package mega.privacy.android.domain.entity.chat.messages.reactions
  * @param userHandles List of user handles who reacted with this reaction
  * @param hasMe Whether the current user has reacted with this reaction
  */
-data class MessageReaction(
+data class Reaction(
     val reaction: String,
     val count: Int,
     val userHandles: List<Long>,

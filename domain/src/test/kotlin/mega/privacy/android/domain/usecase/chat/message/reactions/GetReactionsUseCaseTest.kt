@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.chat.message.reactions
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.repository.ChatRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
@@ -16,7 +16,7 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetMessageReactionsUseCaseTest {
+class GetReactionsUseCaseTest {
 
     private lateinit var underTest: GetMessageReactionsUseCase
 
@@ -48,9 +48,9 @@ class GetMessageReactionsUseCaseTest {
         val count3 = 1
         val users3 = listOf(user2)
         val reactionsList = listOf(reaction1, reaction2, reaction3)
-        val messageReaction1 = MessageReaction(reaction1, count1, users1, true)
-        val messageReaction2 = MessageReaction(reaction2, count2, users2, true)
-        val messageReaction3 = MessageReaction(reaction3, count3, users3, false)
+        val messageReaction1 = Reaction(reaction1, count1, users1, true)
+        val messageReaction2 = Reaction(reaction2, count2, users2, true)
+        val messageReaction3 = Reaction(reaction3, count3, users3, false)
         val expectedList = listOf(messageReaction1, messageReaction2, messageReaction3)
         whenever(chatRepository.getMessageReactions(chatId, msgId)).thenReturn(reactionsList)
         whenever(chatRepository.getMessageReactionCount(chatId, msgId, reaction1))

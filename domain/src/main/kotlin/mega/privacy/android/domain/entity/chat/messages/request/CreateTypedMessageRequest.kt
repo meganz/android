@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGeolocationInfo
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
-import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.Node
 
 /**
@@ -37,7 +37,7 @@ data class CreateTypedMessageRequest(
     override val chatGeolocationInfo: ChatGeolocationInfo?,
     override val chatGifInfo: ChatGifInfo?,
     override val nodeList: List<Node>,
-    override val reactions: List<MessageReaction>,
+    override val reactions: List<Reaction>,
 ) : ChatMessageInfo by message, CreateTypedMessageInfo {
     constructor(
         chatMessage: ChatMessage,
@@ -45,7 +45,7 @@ data class CreateTypedMessageRequest(
         shouldShowAvatar: Boolean,
         shouldShowTime: Boolean,
         shouldShowDate: Boolean,
-        reactions: List<MessageReaction>,
+        reactions: List<Reaction>,
     ) : this(
         message = chatMessage,
         isMine = isMine,

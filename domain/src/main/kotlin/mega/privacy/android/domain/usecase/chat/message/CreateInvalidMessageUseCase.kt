@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMes
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.SignatureInvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.UnrecognizableInvalidMessage
-import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageInfo
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
                 Boolean,
                 Boolean,
                 Boolean,
-                List<MessageReaction>,
+                List<Reaction>,
             ) -> InvalidMessage = when {
                 type == ChatMessageType.INVALID -> {
                     ::UnrecognizableInvalidMessage

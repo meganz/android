@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
-import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.usecase.chat.message.reactions.GetMessageReactionsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -275,8 +275,8 @@ class CreateSaveMessageRequestUseCaseTest {
         val message = mock<ChatMessage> {
             on { hasConfirmedReactions }.thenReturn(true)
         }
-        val reaction1 = mock<MessageReaction>()
-        val reaction2 = mock<MessageReaction>()
+        val reaction1 = mock<Reaction>()
+        val reaction2 = mock<Reaction>()
         val reactions = listOf(reaction1, reaction2)
         whenever(getMessageReactionsUseCase(chatId, message.msgId, myHandle)).thenReturn(reactions)
 
@@ -301,7 +301,7 @@ class CreateSaveMessageRequestUseCaseTest {
             currentUserHandle = myHandle,
             nextMessageUserHandle = null,
         )
-        assertThat(actual.map { it.reactions }).containsExactly(emptyList<MessageReaction>())
+        assertThat(actual.map { it.reactions }).containsExactly(emptyList<Reaction>())
         verifyNoInteractions(getMessageReactionsUseCase)
     }
 }

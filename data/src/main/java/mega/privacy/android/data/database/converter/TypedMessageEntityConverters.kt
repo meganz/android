@@ -3,7 +3,7 @@ package mega.privacy.android.data.database.converter
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import mega.privacy.android.domain.entity.chat.ChatMessageChange
-import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -90,24 +90,24 @@ class TypedMessageEntityConverters {
     fun convertToDuration(long: Long): Duration = long.seconds
 
     /**
-     * Convert a list of [MessageReaction] to String.
+     * Convert a list of [Reaction] to String.
      *
-     * @param list List of [MessageReaction].
+     * @param list List of [Reaction].
      * @return [String].
      */
     @TypeConverter
-    fun convertFromMessageReactionList(list: List<MessageReaction>): String =
+    fun convertFromMessageReactionList(list: List<Reaction>): String =
         list.joinToString(";") { Gson().toJson(it) }
 
     /**
-     * Convert String to a list of [MessageReaction]
+     * Convert String to a list of [Reaction]
      *
      * @param string [String].
-     * @return list List of [MessageReaction].
+     * @return list List of [Reaction].
      */
     @TypeConverter
-    fun convertToMessageReactionList(string: String): List<MessageReaction> =
+    fun convertToMessageReactionList(string: String): List<Reaction> =
         string.split(";").mapNotNull {
-            Gson().fromJson(it, MessageReaction::class.java)
+            Gson().fromJson(it, Reaction::class.java)
         }
 }

@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
-import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
  * Invalid meta message
@@ -13,5 +13,5 @@ data class InvalidMetaMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val shouldShowDate: Boolean,
-    override val reactions: List<MessageReaction>,
+    override val reactions: List<Reaction>,
 ) : MetaMessage

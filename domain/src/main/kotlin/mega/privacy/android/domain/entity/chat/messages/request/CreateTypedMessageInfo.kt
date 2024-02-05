@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGeolocationInfo
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
-import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.Node
 
 /**
@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.node.Node
  * @property chatGeolocationInfo [ChatGeolocationInfo]
  * @property chatGifInfo [ChatGifInfo]
  * @property nodeList List of nodes
- * @property reactions List of [MessageReaction]
+ * @property reactions List of [Reaction]
  */
 interface CreateTypedMessageInfo : ChatMessageInfo {
     val isMine: Boolean
@@ -34,5 +34,5 @@ interface CreateTypedMessageInfo : ChatMessageInfo {
     val chatGeolocationInfo: ChatGeolocationInfo?
     val chatGifInfo: ChatGifInfo?
     val nodeList: List<Node>
-    val reactions: List<MessageReaction>
+    val reactions: List<Reaction>
 }

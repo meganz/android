@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.ContainsMeta
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
-import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
@@ -55,7 +55,7 @@ class TypedMessageEntityMapperTest {
         val expectedShouldShowDate = false
         val expectedIsMine = false
         val expectedTextMessage = "textMessage"
-        val expectedReactions = emptyList<MessageReaction>()
+        val expectedReactions = emptyList<Reaction>()
 
         val chatMessage = mock<ChatMessage> {
             on { status } doReturn expectedStatus

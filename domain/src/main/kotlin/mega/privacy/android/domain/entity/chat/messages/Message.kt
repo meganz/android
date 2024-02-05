@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages
 
-import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
  * Message
@@ -45,5 +45,5 @@ interface Message {
     /**
      * List of reactions
      */
-    val reactions: List<MessageReaction>
+    val reactions: List<Reaction>
 }
