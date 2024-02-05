@@ -6,4 +6,6 @@
     <string name="backup_recovery_key_subtitle">Do you remember your password?\nMEGA cannot reset your password if you forget it.</string>
     <string name="manual_retry_alert">Message not sent. Tap for options</string>
     <string name="edit_chat_message">Edit message</string>
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your gallery</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Grant access</string>
 </resources>

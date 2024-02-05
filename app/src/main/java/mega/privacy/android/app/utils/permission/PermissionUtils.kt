@@ -461,6 +461,25 @@ object PermissionUtils {
     }
 
     /**
+     * Has partial media permission
+     * It returns true if the app has partial media permission but not full media permission
+     *
+     * @param context
+     */
+    fun hasPartialMediaPermission(context: Context) =
+        Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(
+            context,
+            getPartialMediaPermission()
+        ) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(
+            context, READ_MEDIA_IMAGES
+        ) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(
+            context, READ_MEDIA_VIDEO
+        ) != PackageManager.PERMISSION_GRANTED
+
+    /**
      * Callback interface to receive the results of permissions request
      */
     interface PermissionCallbacks {

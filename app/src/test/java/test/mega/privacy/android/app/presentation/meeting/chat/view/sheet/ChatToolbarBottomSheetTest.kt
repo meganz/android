@@ -3,11 +3,18 @@ package test.mega.privacy.android.app.presentation.meeting.chat.view.sheet
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.flow.MutableStateFlow
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryState
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_CONTACT
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_FILE
@@ -16,11 +23,12 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_AT
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_LOCATION
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_SCAN
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_GALLERY_LIST
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_LOADING_GALLERY
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -32,6 +40,17 @@ class ChatToolbarBottomSheetTest {
     private val onAttachFileClicked: () -> Unit = mock()
     private val onAttachContactClicked: () -> Unit = mock()
     private val onPickLocation: () -> Unit = mock()
+
+    private val chatGalleryViewModel = mock<ChatGalleryViewModel> {
+        on { state } doReturn MutableStateFlow(ChatGalleryState())
+    }
+
+    private val viewModelStore = mock<ViewModelStore> {
+        on { get(argThat<String> { contains(ChatGalleryViewModel::class.java.canonicalName.orEmpty()) }) } doReturn chatGalleryViewModel
+    }
+    private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
+        on { viewModelStore } doReturn viewModelStore
+    }
 
     @Test
     fun `test that gallery list shows`() {
@@ -96,28 +115,19 @@ class ChatToolbarBottomSheetTest {
         verify(onPickLocation).invoke()
     }
 
-    @Test
-    fun `test that progress bar is shown if isLoadingGalleryFiles is true`() {
-        initComposeRuleContent(isLoadingGalleryFiles = true)
-        composeTestRule.onNodeWithTag(TEST_TAG_LOADING_GALLERY).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that progress bar is not shown if isLoadingGalleryFiles is false`() {
-        initComposeRuleContent(isLoadingGalleryFiles = false)
-        composeTestRule.onNodeWithTag(TEST_TAG_LOADING_GALLERY).assertDoesNotExist()
-    }
-
-    private fun initComposeRuleContent(isLoadingGalleryFiles: Boolean = false) {
+    private fun initComposeRuleContent() {
         composeTestRule.setContent {
-            ChatToolbarBottomSheet(
-                onAttachFileClicked = onAttachFileClicked,
-                onAttachContactClicked = onAttachContactClicked,
-                onPickLocation = onPickLocation,
-                isLoadingGalleryFiles = isLoadingGalleryFiles,
-                sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
-                onTakePicture = {},
-            )
+            CompositionLocalProvider(
+                LocalViewModelStoreOwner provides viewModelStoreOwner
+            ) {
+                ChatToolbarBottomSheet(
+                    onAttachFileClicked = onAttachFileClicked,
+                    onAttachContactClicked = onAttachContactClicked,
+                    onPickLocation = onPickLocation,
+                    sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+                    onTakePicture = {},
+                )
+            }
         }
     }
 }

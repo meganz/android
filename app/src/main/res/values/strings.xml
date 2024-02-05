@@ -139,11 +139,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Create account</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Please enter your email address</string>
+    <string name="error_enter_email">Enter your email address</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">Invalid email address</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">Please enter your password</string>
+    <string name="error_enter_password">Enter your password</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">No network connection</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -161,7 +161,7 @@
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
     <string name="login_preparing_filelist">Preparing file list</string>
     <!-- when the user tries to share something to MEGA without being logged -->
-    <string name="login_before_share">Please log in to share with MEGA</string>
+    <string name="login_before_share">Log in to share with MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Your confirmation link is no longer valid. Your account may already be activated or you may have cancelled your registration.</string>
     <!-- First Name of the user -->
@@ -177,9 +177,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">You need to agree that you understand the danger of losing your password</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">Please enter your first name</string>
+    <string name="error_enter_username">Enter your first name</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Please enter your last name.</string>
+    <string name="error_enter_userlastname">Enter your last name</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Passwords do not match</string>
     <!-- when creating the account -->
@@ -396,7 +396,7 @@
     <!-- error message -->
     <string name="context_no_copied">Error. Not copied</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
-    <string name="context_no_destination_folder">Please choose a destination folder</string>
+    <string name="context_no_destination_folder">Choose a destination folder</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Moved</string>
     <!-- success message when moving a node -->
@@ -428,7 +428,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Thank you for your feedback. Are you sure you want to cancel your MEGA subscription?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">Your subscription has not been cancelled. Please provide a reason for your cancellation</string>
+    <string name="reason_cancel_subscriptions">Your subscription has not been cancelled. Provide a reason for your cancellation</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Your new subscription will take effect once the current one expires, the new price will be charged at that time.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -446,7 +446,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Decryption Key</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Please enter the decryption key for the link</string>
+    <string name="message_decryption_key">Enter the decryption key for the link</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Invalid decryption key</string>
     <!-- upload to. Then choose an Audio file -->
@@ -483,7 +483,7 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Copied link to clipboard</string>
     <!-- alert when clicking a newsignup link being logged -->
-    <string name="log_out_warning">Please log out before creating the account</string>
+    <string name="log_out_warning">Log out before creating the account</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">Pause transfers</string>
     <!-- menu item -->
@@ -517,7 +517,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Passcode options</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Video compression uses considerable amounts of power. Please plug in your device to charge if the videos to be compressed are larger than %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Video compression uses considerable amounts of power. Plug in your device to charge if the videos to be compressed are larger than %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">If enabled, location information will be included with your pictures. Please be careful when sharing them.</string>
     <!-- Settings category title for cache and offline files -->
@@ -4473,18 +4473,12 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -5273,5 +5267,8 @@
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Subscription details</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA&#160;Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your gallery</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Grant access</string>
 </resources>

@@ -8,15 +8,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
@@ -34,7 +31,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItem
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
-import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.documentscanner.DocumentScannerActivity
@@ -51,7 +47,6 @@ fun ChatToolbarBottomSheet(
     onAttachContactClicked: () -> Unit,
     onTakePicture: () -> Unit,
     onPickLocation: () -> Unit,
-    isLoadingGalleryFiles: Boolean,
     modifier: Modifier = Modifier,
     onCameraPermissionDenied: () -> Unit = {},
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
@@ -96,24 +91,10 @@ fun ChatToolbarBottomSheet(
             onCameraPermissionDenied = onCameraPermissionDenied,
         )
 
-        AnimatedVisibility(visible = isLoadingGalleryFiles) {
-            MegaLinearProgressIndicator(
-                modifier = Modifier
-                    .testTag(TEST_TAG_LOADING_GALLERY)
-                    .padding(horizontal = 4.dp)
-            )
-        }
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .run {
-                    if (isLoadingGalleryFiles) {
-                        padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 24.dp)
-                    } else {
-                        padding(24.dp)
-                    }
-                },
+                .padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 24.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             AttachItem(
@@ -188,32 +169,6 @@ private fun openDocumentScanner(
         }
 }
 
-/**
- * Chat gallery
- *
- * @param modifier
- */
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun ChatGallery(
-    sheetState: ModalBottomSheetState,
-    modifier: Modifier = Modifier,
-    onTakePicture: () -> Unit = {},
-    onCameraPermissionDenied: () -> Unit = {},
-) = LazyRow(
-    modifier = modifier.testTag(TEST_TAG_GALLERY_LIST),
-    horizontalArrangement = Arrangement.spacedBy(4.dp)
-) {
-    item("camera_button") {
-        ChatCameraButton(
-            modifier = Modifier.size(88.dp),
-            sheetState = sheetState,
-            onTakePicture = onTakePicture,
-            onCameraPermissionDenied = onCameraPermissionDenied,
-        )
-    }
-}
-
 @OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews
 @Composable
@@ -224,7 +179,6 @@ private fun ChatToolbarBottomSheetPreview() {
             onAttachContactClicked = {},
             onPickLocation = {},
             onTakePicture = {},
-            isLoadingGalleryFiles = true,
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
         )
     }

@@ -1,13 +1,18 @@
 package test.mega.privacy.android.app.presentation.meeting.chat
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_ADD_PARTICIPANTS_ACTION
@@ -19,6 +24,8 @@ import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBarContent
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_ENABLE_GEOLOCATION_DIALOG
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryState
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_LOCATION
 import mega.privacy.android.core.ui.controls.chat.TEST_TAG_ATTACHMENT_ICON
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
@@ -28,6 +35,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
@@ -38,6 +46,17 @@ class ChatViewTest {
 
     @get:Rule
     var composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val chatGalleryViewModel = mock<ChatGalleryViewModel> {
+        on { state } doReturn MutableStateFlow(ChatGalleryState())
+    }
+
+    private val viewModelStore = mock<ViewModelStore> {
+        on { get(argThat<String> { contains(ChatGalleryViewModel::class.java.canonicalName.orEmpty()) }) } doReturn chatGalleryViewModel
+    }
+    private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
+        on { viewModelStore } doReturn viewModelStore
+    }
 
     @Test
     fun `test that participating in a call dialog show when click to audio call and user is in another call`() {
@@ -175,27 +194,43 @@ class ChatViewTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun `test that last green label shows if the chat is 1to1 and the contacts last green is not null`() {
+        initComposeRuleContent(
+            ChatUiState(
+                chat = mock<ChatRoom> { on { isGroup } doReturn false },
+                isConnected = true,
+                userLastGreen = 123456
+            )
+        )
+        composeTestRule.onNodeWithText("Last seen a long time ago").assertIsDisplayed()
+    }
+
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
-            ChatView(
-                uiState = state,
-                onBackPressed = {},
-                onMenuActionPressed = actionPressed,
-                messageListView = { _, _, _, _ -> },
-                bottomBar = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, onCloseEditing, interactionSourceTextInput ->
-                    ChatBottomBarContent(
-                        uiState = state,
-                        textFieldValue = TextFieldValue(state.sendingText),
-                        showEmojiPicker = showEmojiPicker,
-                        onSendClick = onSendClicked,
-                        onAttachmentClick = onAttachmentClick,
-                        onEmojiClick = onEmojiClick,
-                        onTextChange = {},
-                        interactionSourceTextInput = interactionSourceTextInput,
-                        onCloseEditing = onCloseEditing
-                    )
-                }
-            )
+            CompositionLocalProvider(
+                LocalViewModelStoreOwner provides viewModelStoreOwner
+            ) {
+                ChatView(
+                    uiState = state,
+                    onBackPressed = {},
+                    onMenuActionPressed = actionPressed,
+                    messageListView = { _, _, _, _ -> },
+                    bottomBar = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, onCloseEditing, interactionSourceTextInput ->
+                        ChatBottomBarContent(
+                            uiState = state,
+                            textFieldValue = TextFieldValue(state.sendingText),
+                            showEmojiPicker = showEmojiPicker,
+                            onSendClick = onSendClicked,
+                            onAttachmentClick = onAttachmentClick,
+                            onEmojiClick = onEmojiClick,
+                            onTextChange = {},
+                            interactionSourceTextInput = interactionSourceTextInput,
+                            onCloseEditing = onCloseEditing
+                        )
+                    }
+                )
+            }
         }
     }
 }

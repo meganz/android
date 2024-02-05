@@ -43,7 +43,7 @@
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">Invalid characters</string>
     <!-- Snackbar text for incorrect name -->
-    <string name="scan_snackbar_incorrect_name">Please correct your filename before proceeding</string>
+    <string name="scan_snackbar_incorrect_name">Correct your filename before proceeding</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">Preparing %1$s. Please wait&#8230;</string>
     <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->

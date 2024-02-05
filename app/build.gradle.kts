@@ -346,6 +346,7 @@ dependencies {
     implementation(lib.coil)
     implementation(lib.coil.gif)
     implementation(lib.coil.svg)
+    implementation(lib.coil.video)
     implementation(lib.coil.compose)
     implementation(androidx.paging.compose)
 

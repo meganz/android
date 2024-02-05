@@ -6,10 +6,14 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
 import mega.privacy.android.domain.entity.chat.FileGalleryItem
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import timber.log.Timber
 import java.util.Locale
@@ -21,6 +25,7 @@ import javax.inject.Inject
  */
 internal class DefaultGalleryFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : GalleryFilesRepository {
 
     companion object {
@@ -59,6 +64,7 @@ internal class DefaultGalleryFilesRepository @Inject constructor(
                 val dataColumn = cursor.getColumnIndexOrThrow(DATA)
 
                 while (cursor.moveToNext()) {
+                    ensureActive()
                     val id = cursor.getLong(idColumn)
                     val date = cursor.getString(dateColumn)
                     val title = cursor.getString(titleColumn)
@@ -86,9 +92,10 @@ internal class DefaultGalleryFilesRepository @Inject constructor(
             } ?: kotlin.run {
                 Timber.e("Cursor is null")
             }
+            close()
 
             awaitClose {}
-        }
+        }.flowOn(ioDispatcher)
 
     /**
      * Method to get the images from the gallery
@@ -121,6 +128,7 @@ internal class DefaultGalleryFilesRepository @Inject constructor(
                 val dataColumn = cursor.getColumnIndexOrThrow(DATA)
 
                 while (cursor.moveToNext()) {
+                    ensureActive()
                     val id = cursor.getLong(idColumn)
                     val date = cursor.getString(dateColumn)
                     val title = cursor.getString(titleColumn)
@@ -163,10 +171,11 @@ internal class DefaultGalleryFilesRepository @Inject constructor(
             } ?: kotlin.run {
                 Timber.e("Cursor is null")
             }
+            close()
             awaitClose {
                 retriever.release()
             }
-        }
+        }.flowOn(ioDispatcher)
 
     /**
      * Method of getting the appropriate string from a given duration

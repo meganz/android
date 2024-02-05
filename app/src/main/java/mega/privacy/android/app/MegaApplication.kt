@@ -14,6 +14,7 @@ import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
+import coil.decode.VideoFrameDecoder
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -258,6 +259,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                 } else {
                     add(GifDecoder.Factory())
                 }
+                add(VideoFrameDecoder.Factory())
                 add(SvgDecoder.Factory())
                 add(thumbnailFactory)
                 add(avatarFactory)

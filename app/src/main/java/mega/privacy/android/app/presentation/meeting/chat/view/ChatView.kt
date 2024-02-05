@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalComposeUiApi::class)
-
 package mega.privacy.android.app.presentation.meeting.chat.view
 
 import android.Manifest
@@ -44,7 +42,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -444,7 +441,6 @@ internal fun ChatView(
                                     toolbarModalSheetState.hide()
                                 }
                             },
-                            isLoadingGalleryFiles = isLoadingGalleryFiles,
                             sheetState = toolbarModalSheetState,
                             onCameraPermissionDenied = {
                                 showPermissionNotAllowedSnackbar(

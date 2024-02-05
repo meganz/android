@@ -564,18 +564,6 @@ class ChatAppBarTest {
     }
 
     @Test
-    fun `test that last green label shows if the chat is 1to1 and the contacts last green is not null`() {
-        val lastGreen = initComposeRuleContentWithLastGreen(
-            ChatUiState(
-                chat = mock<ChatRoom> { on { isGroup } doReturn false },
-                isConnected = true,
-                userLastGreen = 123456
-            )
-        )
-        composeTestRule.onNodeWithText(lastGreen).assertIsDisplayed()
-    }
-
-    @Test
     fun `test that number of participants shows if the chat is a group and does not have a custom subtitle`() {
         val count = 5
         initComposeRuleContent(
@@ -1357,19 +1345,5 @@ class ChatAppBarTest {
                 showGroupOrContactInfoActivity = showGroupOrContactInfoActivity
             )
         }
-    }
-
-    private fun initComposeRuleContentWithLastGreen(state: ChatUiState): String {
-        var lastGreen = "last green"
-        composeTestRule.setContent {
-            ChatView(
-                uiState = state,
-                onBackPressed = {},
-                onMenuActionPressed = actionPressed,
-                messageListView = { _, _, _, _ -> },
-            )
-            lastGreen = getLastSeenString(lastGreen = state.userLastGreen) ?: ""
-        }
-        return lastGreen
     }
 }
