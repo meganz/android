@@ -33,7 +33,8 @@ class SendLocationMessageUseCase @Inject constructor(
             isMine = true,
             shouldShowAvatar = false,
             shouldShowTime = false,
-            shouldShowDate = false
+            shouldShowDate = false,
+            reactions = emptyList(),
         )
         return createMetaMessageUseCase(request)
     }

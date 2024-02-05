@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGeolocationInfo
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
+import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
 import mega.privacy.android.domain.entity.node.Node
 
 /**
@@ -16,10 +17,11 @@ import mega.privacy.android.domain.entity.node.Node
  * @property shouldShowDate True if the date should be shown.
  * @property metaType [ContainsMetaType]
  * @property textMessage
- * @property chatRichPreviewInfo [RichPreview]
- * @property chatGeolocationInfo [ChatGeolocation]
- * @property chatGifInfo [Giphy]
+ * @property chatRichPreviewInfo [ChatRichPreviewInfo]
+ * @property chatGeolocationInfo [ChatGeolocationInfo]
+ * @property chatGifInfo [ChatGifInfo]
  * @property nodeList List of nodes
+ * @property reactions List of [MessageReaction]
  */
 interface CreateTypedMessageInfo : ChatMessageInfo {
     val isMine: Boolean
@@ -32,4 +34,5 @@ interface CreateTypedMessageInfo : ChatMessageInfo {
     val chatGeolocationInfo: ChatGeolocationInfo?
     val chatGifInfo: ChatGifInfo?
     val nodeList: List<Node>
+    val reactions: List<MessageReaction>
 }

@@ -18,8 +18,7 @@ class GetMessageReactionsUseCase @Inject constructor(
      * @param msgId Message ID.
      * @return List of [MessageReaction].
      */
-    suspend operator fun invoke(chatId: Long, msgId: Long) = buildList {
-        val myUserHandle = chatRepository.getMyUserHandle()
+    suspend operator fun invoke(chatId: Long, msgId: Long, myUserHandle: Long) = buildList {
         chatRepository.getMessageReactions(chatId, msgId).forEach { reaction ->
             val count = chatRepository.getMessageReactionCount(chatId, msgId, reaction)
             val userHandles = chatRepository.getReactionUsers(chatId, msgId, reaction)

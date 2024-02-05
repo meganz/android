@@ -39,6 +39,7 @@ class SaveChatMessagesUseCaseTest {
     @Test
     internal fun `test that next message handle is not passed if no next message is returned`() =
         runTest {
+            val chatId = 123L
             chatRepository.stub {
                 onBlocking { getMyUserHandle() } doReturn myUserHandle
                 onBlocking { getNextMessagePagingInfo(any(), any()) } doReturn null
@@ -46,13 +47,14 @@ class SaveChatMessagesUseCaseTest {
 
             underTest(
                 FetchMessagePageResponse(
-                    chatId = 123L,
+                    chatId = chatId,
                     messages = emptyList(),
                     loadResponse = ChatHistoryLoadStatus.REMOTE
                 )
             )
 
             verify(createSaveMessageRequestUseCase).invoke(
+                chatId = chatId,
                 chatMessages = emptyList(),
                 currentUserHandle = myUserHandle,
                 nextMessageUserHandle = null

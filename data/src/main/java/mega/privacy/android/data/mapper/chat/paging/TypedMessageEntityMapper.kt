@@ -50,7 +50,8 @@ class TypedMessageEntityMapper @Inject constructor() {
                 shouldShowTime = shouldShowTime,
                 shouldShowDate = shouldShowDate,
                 isMine = isMine,
-                textMessage = textMessage
+                textMessage = textMessage,
+                reactions = reactions
             )
         }
 }

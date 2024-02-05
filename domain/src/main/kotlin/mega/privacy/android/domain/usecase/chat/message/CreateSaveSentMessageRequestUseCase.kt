@@ -22,5 +22,6 @@ class CreateSaveSentMessageRequestUseCase @Inject constructor() {
         shouldShowAvatar = false,
         shouldShowTime = false,
         shouldShowDate = false,
+        reactions = emptyList(),
     )
 }

@@ -44,6 +44,7 @@ class CreateNormalChatMessageUseCaseTest {
                     shouldShowAvatar = true,
                     shouldShowTime = true,
                     shouldShowDate = true,
+                    reactions = emptyList(),
                 )
             )
         )
@@ -69,6 +70,7 @@ class CreateNormalChatMessageUseCaseTest {
                     shouldShowAvatar = true,
                     shouldShowTime = true,
                     shouldShowDate = true,
+                    reactions = emptyList(),
                 )
             )
         )

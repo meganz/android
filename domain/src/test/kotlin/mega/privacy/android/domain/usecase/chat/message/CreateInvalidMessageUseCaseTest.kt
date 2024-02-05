@@ -36,6 +36,7 @@ class CreateInvalidMessageUseCaseTest {
                     shouldShowAvatar = true,
                     shouldShowTime = true,
                     shouldShowDate = true,
+                    reactions = emptyList(),
                 )
             )
         ).isInstanceOf(UnrecognizableInvalidMessage::class.java)
@@ -58,6 +59,7 @@ class CreateInvalidMessageUseCaseTest {
                     shouldShowAvatar = true,
                     shouldShowTime = true,
                     shouldShowDate = true,
+                    reactions = emptyList(),
                 )
             )
         ).isInstanceOf(FormatInvalidMessage::class.java)
@@ -80,6 +82,7 @@ class CreateInvalidMessageUseCaseTest {
                     shouldShowAvatar = true,
                     shouldShowTime = true,
                     shouldShowDate = true,
+                    reactions = emptyList(),
                 )
             )
         ).isInstanceOf(SignatureInvalidMessage::class.java)
@@ -102,6 +105,7 @@ class CreateInvalidMessageUseCaseTest {
                     shouldShowAvatar = true,
                     shouldShowTime = true,
                     shouldShowDate = true,
+                    reactions = emptyList(),
                 )
             )
         ).isInstanceOf(UnrecognizableInvalidMessage::class.java)

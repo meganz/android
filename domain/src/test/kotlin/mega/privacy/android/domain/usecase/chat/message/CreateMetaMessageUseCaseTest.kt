@@ -45,6 +45,7 @@ class CreateMetaMessageUseCaseTest {
                     shouldShowAvatar = true,
                     shouldShowTime = true,
                     shouldShowDate = true,
+                    reactions = emptyList(),
                 )
             )
         ).isInstanceOf(
@@ -74,6 +75,7 @@ class CreateMetaMessageUseCaseTest {
                     shouldShowAvatar = true,
                     shouldShowTime = true,
                     shouldShowDate = true,
+                    reactions = emptyList(),
                 )
             )
         ).isInstanceOf(

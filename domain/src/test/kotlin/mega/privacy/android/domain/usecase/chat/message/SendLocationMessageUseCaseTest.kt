@@ -47,7 +47,8 @@ class SendLocationMessageUseCaseTest {
                 isMine = true,
                 shouldShowAvatar = false,
                 shouldShowTime = false,
-                shouldShowDate = false
+                shouldShowDate = false,
+                reactions = emptyList(),
             )
             val expectedMessage = mock<MetaMessage>()
             whenever(chatRepository.sendGeolocation(chatId, longitude, latitude, image))

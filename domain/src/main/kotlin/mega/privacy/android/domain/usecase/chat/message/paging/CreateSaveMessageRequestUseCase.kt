@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.chat.message.paging
 
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.usecase.chat.message.reactions.GetMessageReactionsUseCase
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -9,7 +10,9 @@ import javax.inject.Inject
 /**
  * Create save message request use case
  */
-class CreateSaveMessageRequestUseCase @Inject constructor() {
+class CreateSaveMessageRequestUseCase @Inject constructor(
+    private val getMessageReactionsUseCase: GetMessageReactionsUseCase,
+) {
 
     /**
      * Invoke
@@ -18,7 +21,8 @@ class CreateSaveMessageRequestUseCase @Inject constructor() {
      * @param currentUserHandle Current user handle
      * @return List of [CreateTypedMessageRequest]
      */
-    operator fun invoke(
+    suspend operator fun invoke(
+        chatId: Long,
         chatMessages: List<ChatMessage>,
         currentUserHandle: Long,
         nextMessageUserHandle: Long?,
@@ -45,6 +49,11 @@ class CreateSaveMessageRequestUseCase @Inject constructor() {
                     chatMessage,
                     previous
                 )
+                val reactions = if (chatMessage.hasConfirmedReactions) {
+                    getMessageReactionsUseCase(chatId, chatMessage.msgId, currentUserHandle)
+                } else {
+                    emptyList()
+                }
 
                 CreateTypedMessageRequest(
                     chatMessage = chatMessage,
@@ -52,6 +61,7 @@ class CreateSaveMessageRequestUseCase @Inject constructor() {
                     shouldShowAvatar = shouldShowAvatar,
                     shouldShowTime = shouldShowTime,
                     shouldShowDate = shouldShowDate,
+                    reactions = reactions,
                 )
             }
     }
