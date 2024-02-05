@@ -106,7 +106,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         val elementList = megaApiGateway.getSetElements(sid = id)
         val videoNodeList = (0 until elementList.size()).mapNotNull { index ->
             val element = elementList[index]
-            megaApiGateway.getMegaNodeByHandle(element.id())?.let { megaNode ->
+            megaApiGateway.getMegaNodeByHandle(element.node())?.let { megaNode ->
                 typedVideoNodeMapper(
                     fileNode = megaNode.convertToFileNode(
                         null

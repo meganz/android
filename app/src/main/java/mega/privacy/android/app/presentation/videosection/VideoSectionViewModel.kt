@@ -19,6 +19,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
 import mega.privacy.android.app.presentation.videosection.mapper.UIVideoPlaylistMapper
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
+import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionState
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTabState
@@ -82,12 +83,12 @@ class VideoSectionViewModel @Inject constructor(
 
     private var searchQuery = ""
     private val originalData = mutableListOf<UIVideo>()
+    private val originalPlaylistData = mutableListOf<UIVideoPlaylist>()
 
     private var createVideoPlaylistJob: Job? = null
 
     init {
         refreshNodesIfAnyUpdates()
-        loadVideoPlaylists()
     }
 
     private fun refreshNodesIfAnyUpdates() {
@@ -106,14 +107,33 @@ class VideoSectionViewModel @Inject constructor(
 
     private fun loadVideoPlaylists() {
         viewModelScope.launch {
-            val videoPlaylists = getVideoPlaylistsUseCase()
+            val videoPlaylists =
+                getVideoPlaylists().updateOriginalPlaylistData().filterVideoPlaylistsBySearchQuery()
             _state.update {
-                it.copy(videoPlaylists = videoPlaylists.map { videoPlaylist ->
-                    uiVideoPlaylistMapper(videoPlaylist)
-                })
+                it.copy(
+                    videoPlaylists = videoPlaylists,
+                    isPlaylistProgressBarShown = false,
+                    scrollToTop = false
+                )
             }
         }
     }
+
+    private suspend fun getVideoPlaylists() = getVideoPlaylistsUseCase().map { videoPlaylist ->
+        uiVideoPlaylistMapper(videoPlaylist)
+    }
+
+    private fun List<UIVideoPlaylist>.updateOriginalPlaylistData() = also { data ->
+        if (originalPlaylistData.isNotEmpty()) {
+            originalPlaylistData.clear()
+        }
+        originalPlaylistData.addAll(data)
+    }
+
+    private fun List<UIVideoPlaylist>.filterVideoPlaylistsBySearchQuery() =
+        filter { playlist ->
+            playlist.title.contains(searchQuery, true)
+        }
 
     private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
@@ -146,8 +166,16 @@ class VideoSectionViewModel @Inject constructor(
 
     internal fun markHandledPendingRefresh() = _state.update { it.copy(isPendingRefresh = false) }
 
-    internal fun onTabSelected(selectTab: VideoSectionTab) = _tabState.update {
-        it.copy(selectedTab = selectTab)
+    internal fun onTabSelected(selectTab: VideoSectionTab) {
+        if (selectTab == VideoSectionTab.Playlists && originalPlaylistData.isEmpty()) {
+            loadVideoPlaylists()
+        }
+        if (_state.value.searchMode) {
+            exitSearch()
+        }
+        _tabState.update {
+            it.copy(selectedTab = selectTab)
+        }
     }
 
     internal fun refreshWhenOrderChanged() =
@@ -177,13 +205,12 @@ class VideoSectionViewModel @Inject constructor(
             return
 
         searchQuery = query
-        searchNodeByQueryString()
-    }
 
-    internal fun exitSearch() {
-        _state.update { it.copy(searchMode = false) }
-        searchQuery = ""
-        refreshNodes()
+        if (_tabState.value.selectedTab == VideoSectionTab.All) {
+            searchNodeByQueryString()
+        } else {
+            searchPlaylistByQueryString()
+        }
     }
 
     private fun searchNodeByQueryString() {
@@ -195,6 +222,29 @@ class VideoSectionViewModel @Inject constructor(
                 allVideos = videos,
                 scrollToTop = true
             )
+        }
+    }
+
+    private fun searchPlaylistByQueryString() {
+        val playlists = originalPlaylistData.filter { playlist ->
+            playlist.title.contains(searchQuery, true)
+        }
+        _state.update {
+            it.copy(
+                videoPlaylists = playlists,
+                scrollToTop = true
+            )
+        }
+    }
+
+    internal fun exitSearch() {
+        _state.update { it.copy(searchMode = false) }
+        searchQuery = ""
+
+        if (_tabState.value.selectedTab == VideoSectionTab.All) {
+            refreshNodes()
+        } else {
+            loadVideoPlaylists()
         }
     }
 

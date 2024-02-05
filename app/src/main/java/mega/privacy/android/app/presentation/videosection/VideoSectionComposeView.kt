@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
+import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -25,6 +26,9 @@ internal fun VideoSectionComposeView(
     onSortOrderClick: () -> Unit = {},
     onMenuClick: (UIVideo) -> Unit = {},
     onLongClick: (item: UIVideo, index: Int) -> Unit = { _, _ -> },
+    onPlaylistItemClick: (item: UIVideoPlaylist, index: Int) -> Unit = { _, _ -> },
+    onPlaylistItemMenuClick: (UIVideoPlaylist) -> Unit = { _ -> },
+    onPlaylistItemLongClick: (UIVideoPlaylist, index: Int) -> Unit = { _, _ -> },
 ) {
     val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
     val tabState by videoSectionViewModel.tabState.collectAsStateWithLifecycle()
@@ -70,7 +74,22 @@ internal fun VideoSectionComposeView(
             )
         },
         playlistsView = {
-            VideoPlaylistsView(modifier = Modifier)
+            VideoPlaylistsView(
+                items = uiState.videoPlaylists,
+                progressBarShowing = uiState.isPlaylistProgressBarShown,
+                searchMode = uiState.searchMode,
+                scrollToTop = uiState.scrollToTop,
+                lazyListState = playlistsLazyListState,
+                sortOrder = stringResource(
+                    id = SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
+                        ?: R.string.sortby_name
+                ),
+                modifier = Modifier,
+                onSortOrderClick = onSortOrderClick,
+                onClick = onPlaylistItemClick,
+                onLongClick = onPlaylistItemLongClick,
+                onMenuClick = onPlaylistItemMenuClick
+            )
         },
         selectedTab = tabState.selectedTab,
         allLazyListState = allLazyListState,

@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.videosection.VideoPlaylist
  * @property currentVideoPlaylist the current video playlist
  * @property isVideoPlaylistCreatedSuccessfully the video playlist created successfully state
  * @property numberOfAddedVideos the number of added videos
+ * @property isPlaylistProgressBarShown true if the playlist progress bar is being shown
  */
 data class VideoSectionState(
     val allVideos: List<UIVideo> = emptyList(),
@@ -31,5 +32,6 @@ data class VideoSectionState(
     val videoPlaylists: List<UIVideoPlaylist> = emptyList(),
     val currentVideoPlaylist: VideoPlaylist? = null,
     val isVideoPlaylistCreatedSuccessfully: Boolean = false,
-    val numberOfAddedVideos: Int = 0
+    val numberOfAddedVideos: Int = 0,
+    val isPlaylistProgressBarShown: Boolean = true,
 )

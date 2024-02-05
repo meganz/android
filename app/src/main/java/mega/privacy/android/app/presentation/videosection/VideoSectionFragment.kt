@@ -119,6 +119,14 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                 }
             }
         }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.searchMode }.distinctUntilChanged()
+        ) { isSearchMode ->
+            if (!isSearchMode) {
+                (activity as? ManagerActivity)?.closeSearchView()
+            }
+        }
     }
 
     private fun initVideoSectionComposeView() {
