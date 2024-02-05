@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.AlterParticipantsMessageView
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.management.AlterParticipantsMessage
 
 /**
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.entity.chat.messages.management.AlterParticip
 data class AlterParticipantsUiMessage(
     override val message: AlterParticipantsMessage,
     override val showDate: Boolean,
+    override val reactions: List<UIReaction>,
 ) : ParticipantUiMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {
         AlterParticipantsMessageView(message = message, modifier = Modifier.padding(start = 32.dp))

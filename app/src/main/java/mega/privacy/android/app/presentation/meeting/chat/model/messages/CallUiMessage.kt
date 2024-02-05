@@ -7,6 +7,7 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatCallMessageView
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
 
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
  */
 data class CallUiMessage(
     private val message: CallMessage,
+    override val reactions: List<UIReaction>,
 ) : UiChatMessage {
 
     override val showDate = message.shouldShowDate
@@ -37,6 +39,7 @@ data class CallUiMessage(
             modifier = Modifier.fillMaxWidth(),
             isMine = displayAsMine,
             showForwardIcon = canForward,
+            reactions = reactions,
             time = getTimeOrNull(timeFormatter),
             date = getDateOrNull(dateFormatter),
             content = {

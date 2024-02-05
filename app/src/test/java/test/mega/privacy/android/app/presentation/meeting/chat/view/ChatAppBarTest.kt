@@ -10,12 +10,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.InvalidUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_NOTIFICATION_MUTE
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_PRIVATE_ICON
@@ -1292,7 +1290,7 @@ class ChatAppBarTest {
     @Ignore("Need to implement a new solution that works with paged loading")
     @Test
     fun `test that select menu action is available if messages contains text message`() {
-        val textMessage = TextUiMessage(mock())
+        val textMessage = TextUiMessage(mock(), mock())
         initComposeRuleContent(
             ChatUiState(
                 chat = mock<ChatRoom> { on { isPreview } doReturn false },

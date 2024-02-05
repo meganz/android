@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
@@ -89,6 +90,11 @@ interface UiChatMessage {
      * Show date
      */
     val showDate: Boolean
+
+    /**
+     * Reactions
+     */
+    val reactions: List<UIReaction>
 
     /**
      * Key

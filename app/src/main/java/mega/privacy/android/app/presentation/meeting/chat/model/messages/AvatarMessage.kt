@@ -56,6 +56,7 @@ abstract class AvatarMessage : UiChatMessage {
             modifier = Modifier.fillMaxWidth(),
             isMine = displayAsMine,
             showForwardIcon = canForward,
+            reactions = reactions,
             time = this.getTimeOrNull(timeFormatter),
             date = this.getDateOrNull(dateFormatter),
             avatarOrIcon = {

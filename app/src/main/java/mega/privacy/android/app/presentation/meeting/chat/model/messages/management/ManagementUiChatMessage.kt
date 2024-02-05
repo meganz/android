@@ -27,7 +27,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
     /**
      * Content composable
      */
-    abstract val contentComposable: @Composable() (RowScope.() -> Unit)
+    abstract val contentComposable: @Composable (RowScope.() -> Unit)
 
     @Composable
     override fun MessageListItem(
@@ -41,6 +41,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
             modifier = Modifier.fillMaxWidth(),
             isMine = displayAsMine,
             showForwardIcon = canForward,
+            reactions = reactions,
             time = getTimeOrNull(timeFormatter),
             date = getDateOrNull(dateFormatter),
             content = contentComposable,

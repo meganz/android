@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinksMessageView
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 
@@ -18,6 +19,7 @@ import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
  */
 data class TextLinkUiMessage(
     private val message: TextLinkMessage,
+    override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable

@@ -1,11 +1,15 @@
 package mega.privacy.android.core.ui.controls.chat
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.TEST_TAG_REACTIONS_VIEW
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.reactionsList
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,16 +76,42 @@ class ChatMessageContainerTest {
         ).assertDoesNotExist()
     }
 
+    @Test
+    fun `test that reactions are shown if list is not empty`() {
+        initComposeRuleContent(
+            isMine = false,
+            showForwardIcon = false,
+            time = null,
+            isSendError = false,
+            reactions = reactionsList,
+        )
+        composeRule.onNodeWithTag(TEST_TAG_REACTIONS_VIEW).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that reactions are not shown if list is empty`() {
+        initComposeRuleContent(
+            isMine = false,
+            showForwardIcon = false,
+            time = null,
+            isSendError = false,
+            reactions = emptyList(),
+        )
+        composeRule.onNodeWithTag(TEST_TAG_REACTIONS_VIEW).assertDoesNotExist()
+    }
+
     private fun initComposeRuleContent(
         isMine: Boolean,
         showForwardIcon: Boolean,
         time: String?,
         isSendError: Boolean = false,
+        reactions: List<UIReaction> = emptyList(),
     ) {
         composeRule.setContent {
             ChatMessageContainer(
                 isMine = isMine,
                 showForwardIcon = showForwardIcon,
+                reactions = reactions,
                 time = time,
                 isSendError = isSendError,
                 avatarOrIcon = {},

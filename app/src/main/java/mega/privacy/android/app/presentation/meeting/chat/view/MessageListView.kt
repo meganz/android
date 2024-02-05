@@ -121,8 +121,6 @@ internal fun MessageListView(
                 }
             }
         }
-
-
     }
 }
 

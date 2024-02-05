@@ -6,6 +6,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.core.ui.controls.chat.messages.ChatErrorBubble
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 
@@ -62,6 +63,7 @@ sealed class InvalidUiMessage : AvatarMessage() {
      */
     data class FormatInvalidUiMessage(
         override val message: InvalidMessage,
+        override val reactions: List<UIReaction>,
     ) : InvalidUiMessage() {
         @Composable
         override fun getErrorMessage() =
@@ -78,6 +80,7 @@ sealed class InvalidUiMessage : AvatarMessage() {
      */
     data class SignatureInvalidUiMessage(
         override val message: InvalidMessage,
+        override val reactions: List<UIReaction>,
     ) : InvalidUiMessage() {
 
         @Composable
@@ -95,6 +98,7 @@ sealed class InvalidUiMessage : AvatarMessage() {
      */
     data class MetaInvalidUiMessage(
         override val message: TypedMessage,
+        override val reactions: List<UIReaction>,
     ) : InvalidUiMessage() {
 
         @Composable
@@ -112,6 +116,7 @@ sealed class InvalidUiMessage : AvatarMessage() {
      */
     data class UnrecognizableInvalidUiMessage(
         override val message: TypedMessage,
+        override val reactions: List<UIReaction>,
     ) : InvalidUiMessage() {
 
         @Composable

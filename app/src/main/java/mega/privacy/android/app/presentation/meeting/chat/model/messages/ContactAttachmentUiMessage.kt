@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.ContactAttachmentMessageView
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
  */
 data class ContactAttachmentUiMessage(
     private val message: ContactAttachmentMessage,
+    override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable

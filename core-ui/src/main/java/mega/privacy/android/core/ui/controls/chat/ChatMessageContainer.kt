@@ -23,6 +23,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.ReactionsView
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.reactionsList
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -39,6 +42,7 @@ internal const val TEST_TAG_FORWARD_ICON = "chat_message_container:forward_icon"
  * @param modifier
  * @param isMine
  * @param showForwardIcon
+ * @param reactions
  * @param avatarOrIcon
  * @param time
  * @param content
@@ -47,6 +51,7 @@ internal const val TEST_TAG_FORWARD_ICON = "chat_message_container:forward_icon"
 fun ChatMessageContainer(
     isMine: Boolean,
     showForwardIcon: Boolean,
+    reactions: List<UIReaction>,
     modifier: Modifier = Modifier,
     time: String? = null,
     date: String? = null,
@@ -97,9 +102,20 @@ fun ChatMessageContainer(
                 }
             }
         }
+        if (reactions.isNotEmpty()) {
+            ReactionsView(
+                modifier = Modifier.padding(
+                    start = if (isMine) 16.dp else 48.dp,
+                    end = if (isMine) 48.dp else 16.dp
+                ),
+                reactions = reactions,
+                isMine = isMine
+            )
+        }
         if (isSendError) {
             MegaText(
-                modifier = Modifier.padding(top = 2.dp)
+                modifier = Modifier
+                    .padding(top = 2.dp)
                     .padding(start = 48.dp, end = 16.dp)
                     .clickable(enabled = true, onClick = onSendErrorClick),
                 text = stringResource(id = R.string.manual_retry_alert),
@@ -132,6 +148,7 @@ private fun TextMessageContainerPreview(
         ChatMessageContainer(
             modifier = Modifier,
             isMine = isMe,
+            reactions = reactionsList,
             avatarOrIcon = {
                 Icon(
                     modifier = Modifier
@@ -166,6 +183,7 @@ private fun TextMessageContainerSendErrorPreview(
         ChatMessageContainer(
             modifier = Modifier,
             isMine = isMe,
+            reactions = emptyList(),
             avatarOrIcon = {
                 Icon(
                     modifier = Modifier

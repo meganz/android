@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +24,7 @@ class ReactionChipTest {
         val expectedReactionString = "A"
         composeRule.setContent {
             ReactionChip(
-                reaction = Reaction(expectedReactionString, 1, false),
+                reaction = UIReaction(expectedReactionString, 1, false),
                 onClick = callback,
                 systemLayoutDirection = LayoutDirection.Ltr,
             )

@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.voiceclip.VoiceClipMessageView
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 
@@ -19,7 +20,8 @@ import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
  */
 class VoiceClipUiMessage(
     val message: VoiceClipMessage,
-    val chatId: Long
+    val chatId: Long,
+    override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
 
     @OptIn(ExperimentalFoundationApi::class)

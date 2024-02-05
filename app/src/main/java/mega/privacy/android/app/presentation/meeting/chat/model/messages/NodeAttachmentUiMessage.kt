@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageView
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 data class NodeAttachmentUiMessage(
     private val message: NodeAttachmentMessage,
     private val chatId: Long,
+    override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
 
     @Composable

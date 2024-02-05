@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -34,13 +35,13 @@ internal const val TEST_TAG_CHAT_MESSAGE_REACTION_CHIP =
 /**
  * Reaction chip
  *
- * @param reaction [Reaction]
+ * @param reaction [UIReaction]
  * @param onClick
  * @param systemLayoutDirection internal layout of Reaction should follow system layout direction
  */
 @Composable
 fun ReactionChip(
-    reaction: Reaction,
+    reaction: UIReaction,
     onClick: (String) -> Unit,
     systemLayoutDirection: LayoutDirection,
 ) {
@@ -85,7 +86,7 @@ private fun ReactionChipWithRtlCountPreview(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ReactionChip(
-            reaction = Reaction("\uD83C\uDF77", 1, hasMe),
+            reaction = UIReaction("\uD83C\uDF77", 1, hasMe),
             onClick = {},
             systemLayoutDirection = LayoutDirection.Rtl,
         )
@@ -99,7 +100,7 @@ private fun ReactionChipWithCountPreview(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ReactionChip(
-            reaction = Reaction("\uD83C\uDF77", 1, hasMe),
+            reaction = UIReaction("\uD83C\uDF77", 1, hasMe),
             onClick = {},
             systemLayoutDirection = LayoutDirection.Ltr,
         )

@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.ChatLocationMessageView
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
  */
 class LocationUiMessage(
     private val message: LocationMessage,
+    override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable

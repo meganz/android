@@ -9,6 +9,7 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.GiphyMessageView
 import mega.privacy.android.app.utils.GiphyUtil
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 
@@ -24,6 +25,7 @@ private const val MAX_SIZE_FOR_AUTO_PLAY = 1024 * 1024 * 4  // 4MB
  */
 class ChatGiphyUiMessage(
     private val message: GiphyMessage,
+    override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
