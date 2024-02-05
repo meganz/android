@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.node.model.mapper.NodeAccessPermiss
 import mega.privacy.android.app.presentation.node.model.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.NodeBottomSheetMenuItem
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.NodeId
@@ -413,6 +414,27 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     fun markShareFolderAccessDialogShown() {
         _state.update {
             it.copy(contactsData = consumed())
+        }
+    }
+
+    /**
+     * Download node
+     * Triggers TransferTriggerEvent.StartDownloadNode with parameter [TypedNode]
+     */
+    fun downloadNode() {
+        state.value.node?.let { node ->
+            _state.update {
+                it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(node)))
+            }
+        }
+    }
+
+    /**
+     * Mark download event consumed
+     */
+    fun markDownloadEventConsumed() {
+        _state.update {
+            it.copy(downloadEvent = consumed())
         }
     }
 }

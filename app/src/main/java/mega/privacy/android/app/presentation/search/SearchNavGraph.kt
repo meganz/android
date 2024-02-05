@@ -7,6 +7,7 @@ import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.cannotOpenFileDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.cannotVerifyUserNavigation
 import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetNavigation
 import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
@@ -99,6 +100,10 @@ internal fun NavGraphBuilder.searchNavGraph(
         navHostController = navHostController,
         searchActivityViewModel = searchActivityViewModel,
         nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
+    )
+    cannotOpenFileDialogNavigation(
+        navHostController = navHostController,
+        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
     )
 }
 

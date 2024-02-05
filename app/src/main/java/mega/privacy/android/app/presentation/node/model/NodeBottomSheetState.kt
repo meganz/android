@@ -5,6 +5,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.node.view.BottomSheetMenuItem
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @property shareInfo
  * @property outgoingShares
  * @property contactsData
+ * @property downloadEvent
  */
 data class NodeBottomSheetState(
     val name: String = "",
@@ -37,4 +39,5 @@ data class NodeBottomSheetState(
     val shareInfo: String? = null,
     val outgoingShares: List<ShareData> = emptyList(),
     val contactsData: StateEventWithContent<Pair<List<String>, Boolean>> = consumed(),
+    val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
 )

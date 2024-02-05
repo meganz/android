@@ -434,7 +434,12 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun getUriForFile(file: File, authority: String): String =
         withContext(ioDispatcher) {
-            fileGateway.getUriForFile(file, authority).toString()
+            runCatching { fileGateway.getUriForFile(file, authority).toString() }
+                .onFailure {
+                    if (it !is IllegalArgumentException) {
+                        throw it
+                    }
+                }.getOrNull() ?: Uri.fromFile(file).toString()
         }
 
     override suspend fun deleteFolderAndItsFiles(path: String) {

@@ -7,6 +7,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -29,14 +35,20 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.filelink.view.animationScale
+import mega.privacy.android.app.presentation.filelink.view.animationSpecs
+import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
@@ -48,6 +60,8 @@ import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDi
 import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialog
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
@@ -73,16 +87,32 @@ import javax.inject.Inject
  * Search activity to search Nodes and display
  */
 @AndroidEntryPoint
-class SearchActivity : BaseActivity(), MegaSnackbarShower {
+class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private val viewModel: SearchActivityViewModel by viewModels()
     private val nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
+    private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
 
     /**
      * Application Theme Mode
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * Transfers management
+     */
+    @Inject
+    lateinit var transfersManagement: TransfersManagement
+
+    private val nameCollisionActivityContract =
+        registerForActivityResult(NameCollisionActivityContract()) { result: String? ->
+            if (result != null) {
+                lifecycleScope.launch {
+                    snackbarHostState.showSnackbar(result)
+                }
+            }
+        }
 
     /**
      * Move request message mapper
@@ -149,6 +179,7 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             val nodeOptionsBottomSheetState by nodeOptionsBottomSheetViewModel.state.collectAsStateWithLifecycle()
+            val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
 
             // Remember a SystemUiController
             val systemUiController = rememberSystemUiController()
@@ -173,7 +204,21 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
                         ) { data ->
                             MegaSnackbar(snackbarData = data)
                         }
-                    }
+                    },
+                    floatingActionButton = {
+                        AnimatedVisibility(
+                            visible = transferState.widgetVisible,
+                            enter = scaleIn(animationSpecs, initialScale = animationScale) +
+                                    fadeIn(animationSpecs),
+                            exit = scaleOut(animationSpecs, targetScale = animationScale) +
+                                    fadeOut(animationSpecs),
+                        ) {
+                            TransfersWidgetView(
+                                transfersData = transferState.transfersInfo,
+                                onClick = ::transfersWidgetClicked,
+                            )
+                        }
+                    },
                 ) { padding ->
                     SearchNavHostController(
                         modifier = Modifier
@@ -225,7 +270,13 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
                         navHostController.navigate(
                             shareFolderAccessDialog.plus("/${contactList}").plus("/${it.second}")
                         )
-                    })
+                    },
+                )
+                StartDownloadComponent(
+                    event = nodeOptionsBottomSheetState.downloadEvent,
+                    onConsumeEvent = nodeOptionsBottomSheetViewModel::markDownloadEventConsumed,
+                    snackBarHostState = snackbarHostState,
+                )
             }
         }
 
@@ -341,7 +392,7 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
     private fun handleNodesNameCollisionResult(result: NodeNameCollisionResult) {
         if (result.conflictNodes.isNotEmpty()) {
             nameCollisionActivityContract
-                ?.launch(
+                .launch(
                     ArrayList(
                         result.conflictNodes.values.map {
                             when (result.type) {
@@ -381,4 +432,19 @@ class SearchActivity : BaseActivity(), MegaSnackbarShower {
             )
         }
     }
+
+    private fun transfersWidgetClicked() {
+        transfersManagement.setAreFailedTransfers(false)
+        startActivity(
+            Intent(this, ManagerActivity::class.java)
+                .setAction(Constants.ACTION_SHOW_TRANSFERS)
+                .putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        )
+        finish()
+        if (transfersManagement.isOnTransferOverQuota()) {
+            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
+        }
+    }
+
 }

@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuActio
 import mega.privacy.android.app.presentation.node.model.menuaction.MoveMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.RestoreMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.OpenWithMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.core.ui.model.MenuAction
@@ -117,6 +118,7 @@ class NodeBottomSheetActionHandler(
             is ShareFolderMenuAction -> shareFolderActivityLauncher?.launch(longArrayOf(node.id.longValue))
             is RestoreMenuAction -> restoreFromRubbishLauncher?.launch(longArrayOf(node.id.longValue))
             is SendToChatMenuAction -> sendToChatLauncher?.launch(longArrayOf(node.id.longValue))
+            is OpenWithMenuAction -> nodeOptionsBottomSheetViewModel.downloadNode()
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }
     }
