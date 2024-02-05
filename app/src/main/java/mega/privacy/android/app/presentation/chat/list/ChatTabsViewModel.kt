@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
@@ -103,6 +104,7 @@ class ChatTabsViewModel @Inject constructor(
     private val monitorScheduledMeetingCanceledUseCase: MonitorScheduledMeetingCanceledUseCase,
     private val getChatsUnreadStatusUseCase: GetChatsUnreadStatusUseCase,
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
+    private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -119,10 +121,41 @@ class ChatTabsViewModel @Inject constructor(
         retrieveChatStatus()
         retrieveTooltips()
         retrieveChatsUnreadStatus()
+        monitorLeaveChat()
 
         viewModelScope.launch {
             monitorScheduledMeetingCanceledUseCase().conflate()
                 .collect { messageResId -> triggerSnackbarMessage(messageResId) }
+        }
+    }
+
+    private fun monitorLeaveChat() {
+        viewModelScope.launch {
+            monitorLeaveChatUseCase()
+                .catch {
+                    Timber.e(it)
+                }.collect { chatId ->
+                    if (chatId != -1L) {
+                        performLeaveChat(chatId)
+                    }
+                }
+        }
+    }
+
+    /**
+     * Leave a chat
+     *
+     * @param chatId    [Long] ID of the chat to leave.
+     */
+    private suspend fun performLeaveChat(chatId: Long) {
+        runCatching {
+            chatManagement.addLeavingChatId(chatId)
+            leaveChatUseCase(chatId)
+        }.onFailure { exception ->
+            Timber.e("Leaving chat $exception")
+            chatManagement.removeLeavingChatId(chatId)
+        }.onSuccess {
+            chatManagement.removeLeavingChatId(chatId)
         }
     }
 

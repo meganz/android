@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -25,6 +26,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
@@ -44,6 +46,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
@@ -76,6 +79,7 @@ internal class ChatTabsViewModelTest {
         mock()
     private val getChatsUnreadStatusUseCase: GetChatsUnreadStatusUseCase = mock()
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase = mock()
+    private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase = mock()
 
 
     @BeforeAll
@@ -141,6 +145,7 @@ internal class ChatTabsViewModelTest {
             monitorScheduledMeetingCanceledUseCase,
             getChatsUnreadStatusUseCase,
             startMeetingInWaitingRoomChatUseCase,
+            monitorLeaveChatUseCase,
         )
     }
 
@@ -173,5 +178,17 @@ internal class ChatTabsViewModelTest {
                 underTest.markHandleIsParticipatingInChatCall()
                 Truth.assertThat(awaitItem().isParticipatingInChatCallResult).isNull()
             }
+        }
+
+    @Test
+    fun `test that a chat is removed when event is collected in monitorLeaveChat`() =
+        runTest {
+            val chatId = 1L
+            val flow = MutableSharedFlow<Long>()
+            whenever(monitorLeaveChatUseCase()).thenReturn(flow)
+            initTestClass()
+            flow.emit(chatId)
+            verify(chatManagement).addLeavingChatId(chatId)
+            verify(leaveChatUseCase).invoke(chatId)
         }
 }
