@@ -1528,4 +1528,10 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun killSession(sessionHandle: Long, listener: MegaRequestListenerInterface) =
         megaApi.killSession(sessionHandle, listener)
+
+    override fun confirmCancelAccount(
+        link: String,
+        pwd: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.confirmCancelAccount(link, pwd, listener)
 }

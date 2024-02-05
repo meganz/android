@@ -447,6 +447,13 @@ class MyAccountActivity : PasscodeActivity(),
                 }
             }
         }
+
+        collectFlow(viewModel.state) { state ->
+            state.cancelAccountErrorMessage?.let { errorMessageRes ->
+                showErrorAlert(getString(errorMessageRes))
+                viewModel.resetCancelAccountErrorMessage()
+            }
+        }
     }
 
     /**
@@ -725,12 +732,7 @@ class MyAccountActivity : PasscodeActivity(),
                         )
                     } else {
                         when (dialogType) {
-                            TYPE_CANCEL_ACCOUNT -> {
-                                viewModel.finishConfirmCancelAccount(password) { message ->
-                                    showErrorAlert(message)
-                                }
-                            }
-
+                            TYPE_CANCEL_ACCOUNT -> viewModel.finishAccountCancellation(password)
                             TYPE_CHANGE_EMAIL -> {
                                 viewModel.finishConfirmChangeEmail(
                                     password,

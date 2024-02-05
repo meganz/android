@@ -3375,4 +3375,27 @@ interface MegaApiGateway {
      * @param listener      MegaRequestListenerInterface to track this request.
      */
     fun killSession(sessionHandle: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Effectively parks the user's account without creating a new fresh account.
+     *
+     * If no user is logged in, you will get the error code MegaError::API_EACCESS in onRequestFinish().
+     *
+     * The contents of the account will then be purged after 60 days. Once the account is
+     * parked, the user needs to contact MEGA support to restore the account.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_CONFIRM_CANCEL_LINK.
+     * Valid data in the MegaRequest object received on all callbacks:
+     * - MegaRequest::getLink - Returns the recovery link
+     * - MegaRequest::getPassword - Returns the new password
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getEmail - Return the email associated with the link
+     *
+     * @param link Cancellation link sent to the user's email address;
+     * @param pwd Password for the account.
+     * @param listener MegaRequestListener to track this request
+     */
+    fun confirmCancelAccount(link: String, pwd: String, listener: MegaRequestListenerInterface)
 }
