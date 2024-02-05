@@ -550,7 +550,7 @@ internal class SettingsCameraUploadsViewModelTest {
             setupUnderTest()
             val newMegaPrimaryFolderHandle = 123456L
 
-            // Set Cloud Drive Secondary Folder to be the same as the Cloud Drive Primary Folder
+            // Set Cloud Drive Secondary Folder to be the same as the new Cloud Drive Primary Folder
             underTest.updateSecondaryUploadNode(newMegaPrimaryFolderHandle)
             underTest.setPrimaryUploadNode(newMegaPrimaryFolderHandle)
 
@@ -638,6 +638,27 @@ internal class SettingsCameraUploadsViewModelTest {
             underTest.startCameraUploads()
 
             verify(listenToNewMediaUseCase).invoke(forceEnqueue = false)
+        }
+
+    @Test
+    fun `test that an error snackbar is shown when setting the new cloud drive secondary folder and the new setting is invalid`() =
+        runTest {
+            setupUnderTest()
+            val newMegaSecondaryFolderHandle = 123456L
+
+            // Set Cloud Drive Primary Folder to be the same as the new Cloud Drive Secondary Folder
+            underTest.updatePrimaryUploadNode(newMegaSecondaryFolderHandle)
+            underTest.setSecondaryUploadNode(newMegaSecondaryFolderHandle)
+
+            underTest.state.test {
+                assertThat(awaitItem().primaryUploadSyncHandle).isEqualTo(
+                    newMegaSecondaryFolderHandle
+                )
+            }
+            verify(snackBarHandler).postSnackbarMessage(
+                resId = R.string.error_invalid_folder_selected,
+                snackbarDuration = MegaSnackbarDuration.Long,
+            )
         }
 
     @Test
@@ -789,6 +810,14 @@ internal class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
             val actual = underTest.isNewSettingValid(primaryHandle = -1L)
+            assertThat(actual).isFalse()
+        }
+
+    @Test
+    fun `test that the new settings are invalid when media uploads is enabled and the new cloud drive secondary folder does not exist`() =
+        runTest {
+            setupUnderTest()
+            val actual = underTest.isNewSettingValid(secondaryHandle = -1L)
             assertThat(actual).isFalse()
         }
 

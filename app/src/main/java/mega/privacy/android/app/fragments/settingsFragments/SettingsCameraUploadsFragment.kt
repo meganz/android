@@ -53,8 +53,8 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_LOCAL_SECONDARY_
 import mega.privacy.android.app.constants.SettingsConstants.KEY_MEGA_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.KEY_SECONDARY_MEDIA_FOLDER_ON
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_PRIMARY_FOLDER
-import mega.privacy.android.app.constants.SettingsConstants.REQUEST_SECONDARY_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_PRIMARY_UPLOAD_NODE
+import mega.privacy.android.app.constants.SettingsConstants.REQUEST_SECONDARY_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_SECONDARY_UPLOAD_NODE
 import mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER
 import mega.privacy.android.app.extensions.navigateToAppSettings
@@ -418,22 +418,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
             }
 
             REQUEST_SECONDARY_UPLOAD_NODE -> {
-                val secondaryHandle =
-                    intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
-                if (!viewModel.isNewSettingValid(secondaryHandle = secondaryHandle)) {
-                    Toast.makeText(
-                        context,
-                        getString(R.string.error_invalid_folder_selected),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    return
-                }
-                if (secondaryHandle != MegaApiJava.INVALID_HANDLE) {
-                    Timber.d("Set Camera Uploads Secondary Attribute: %s", secondaryHandle)
-                    viewModel.setSecondaryUploadNode(secondaryHandle)
-                } else {
-                    Timber.e("Error choosing the Mega folder for Secondary Uploads")
-                }
+                val secondaryHandle = intent.getLongExtra(SELECTED_MEGA_FOLDER, -1L)
+                viewModel.setSecondaryUploadNode(secondaryHandle)
             }
         }
     }

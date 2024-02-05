@@ -291,15 +291,25 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      *
      * @param newHandle The handle of the new Secondary Folder from Cloud Drive
      */
-    fun setSecondaryUploadNode(newHandle: Long) = viewModelScope.launch {
-        runCatching {
-            setupSecondaryFolderUseCase(newHandle)
-        }.onFailure {
-            Timber.w(it)
-            snackBarHandler.postSnackbarMessage(
-                resId = R.string.general_error,
-                snackbarDuration = MegaSnackbarDuration.Long,
-            )
+    fun setSecondaryUploadNode(newHandle: Long) {
+        viewModelScope.launch {
+            if (isNewSettingValid(secondaryHandle = newHandle)) {
+                runCatching {
+                    setupSecondaryFolderUseCase(newHandle)
+                }.onFailure {
+                    Timber.w(it)
+                    snackBarHandler.postSnackbarMessage(
+                        resId = R.string.general_error,
+                        snackbarDuration = MegaSnackbarDuration.Long,
+                    )
+                }
+            } else {
+                Timber.e("Error choosing the Cloud Drive Folder for Secondary Uploads")
+                snackBarHandler.postSnackbarMessage(
+                    resId = R.string.error_invalid_folder_selected,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
         }
     }
 
@@ -517,7 +527,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                     )
                 }
             } else {
-                Timber.e("Error choosing the MEGA Folder for Primary Uploads")
+                Timber.e("Error choosing the Cloud Drive Folder for Primary Uploads")
                 snackBarHandler.postSnackbarMessage(
                     resId = R.string.error_invalid_folder_selected,
                     snackbarDuration = MegaSnackbarDuration.Long,
@@ -800,13 +810,15 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Is New Settings Valid
+     * Checks the new Camera Uploads configuration set by the User
      *
      * @param primaryPath Defines the Primary Folder path
      * @param secondaryPath Defines the Secondary Folder path
      * @param primaryHandle Defines the Primary Folder handle
      * @param secondaryHandle Defines the Secondary Folder handle
      * @param isSecondaryEnabled whether isSecondaryFolder is enabled or not
+     *
+     * @return true if the new Camera Uploads configuration is valid
      */
     fun isNewSettingValid(
         primaryPath: String? = _state.value.primaryFolderPath,
@@ -817,8 +829,8 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     ): Boolean {
         with(_state.value) {
             // if primary uploads is enabled, then local path of primary upload can't be empty.
-            // The primary upload cloud folder must exist
-            return primaryHandle != -1L && !((isCameraUploadsEnabled && primaryPath.isNullOrBlank())
+            // The primary and secondary upload cloud folders must exist
+            return primaryHandle != -1L && secondaryHandle != -1L && !((isCameraUploadsEnabled && primaryPath.isNullOrBlank())
                     // if secondary uploads is enabled, local path of secondary upload can't be empty
                     || (isSecondaryEnabled && secondaryPath.isNullOrBlank())
                     // if secondary upload is enabled primary upload and secondary upload cloud folder can't be the same
