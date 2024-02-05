@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages.invalid
 
+import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+
 /**
  * Unrecognizable invalid message
  *
@@ -16,4 +18,5 @@ data class UnrecognizableInvalidMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val shouldShowDate: Boolean,
+    override val reactions: List<MessageReaction>,
 ) : InvalidMessage

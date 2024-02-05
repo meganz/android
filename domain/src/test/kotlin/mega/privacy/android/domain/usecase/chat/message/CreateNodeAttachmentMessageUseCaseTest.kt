@@ -70,6 +70,7 @@ class CreateNodeAttachmentMessageUseCaseTest {
                 shouldShowTime = shouldShowTime,
                 shouldShowDate = shouldShowDate,
                 fileNode = fileNode,
+                reactions = emptyList(),
             )
         }
         val actual = underTest(request)
@@ -83,5 +84,6 @@ class CreateNodeAttachmentMessageUseCaseTest {
             shouldShowAvatar = true,
             shouldShowTime = true,
             shouldShowDate = true,
+            reactions = emptyList(),
         )
 }

@@ -25,6 +25,7 @@ internal class CreateVoiceClipMessageUseCase @Inject constructor() : CreateTyped
             shouldShowAvatar = shouldShowAvatar,
             shouldShowTime = shouldShowTime,
             shouldShowDate = shouldShowDate,
+            reactions = reactions,
         )
     }
 }

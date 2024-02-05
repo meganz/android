@@ -136,6 +136,7 @@ private fun PermissionChangeMessageViewPreview(
             shouldShowAvatar = false,
             shouldShowTime = false,
             shouldShowDate = false,
+            reactions = emptyList(),
         ),
         ownerActionFullName = "Owner",
         targetActionFullName = "Target",

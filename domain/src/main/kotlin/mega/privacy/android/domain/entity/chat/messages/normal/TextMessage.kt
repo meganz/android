@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages.normal
 
+import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+
 /**
  * Text message
  *
@@ -15,6 +17,7 @@ data class TextMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val shouldShowDate: Boolean,
+    override val reactions: List<MessageReaction>,
     val content: String?,
     val hasOtherLink: Boolean,
 ) : NormalMessage

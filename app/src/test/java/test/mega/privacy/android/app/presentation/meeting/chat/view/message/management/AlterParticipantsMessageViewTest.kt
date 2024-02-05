@@ -123,6 +123,7 @@ class AlterParticipantsMessageViewTest {
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     shouldShowDate = false,
+                    reactions = emptyList(),
                 ),
                 ownerActionFullName = ownerActionFullName,
                 targetActionFullName = targetActionFullName,

@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.Node
  * @property chatGeolocationInfo
  * @property chatGifInfo
  * @property nodeList
+ * @property reactions
  */
 data class CreateTypedMessageRequest(
     val message: ChatMessageInfo,

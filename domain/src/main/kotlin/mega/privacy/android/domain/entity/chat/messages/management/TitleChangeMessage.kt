@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages.management
 
+import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+
 /**
  * Title change message
  * @property content The new title
@@ -12,5 +14,6 @@ data class TitleChangeMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val shouldShowDate: Boolean,
+    override val reactions: List<MessageReaction>,
     val content: String,
 ) : ManagementMessage

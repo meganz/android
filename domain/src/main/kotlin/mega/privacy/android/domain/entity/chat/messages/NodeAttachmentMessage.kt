@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages
 
+import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+
 import mega.privacy.android.domain.entity.node.FileNode
 
 /**
@@ -14,6 +16,7 @@ data class NodeAttachmentMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val shouldShowDate: Boolean,
+    override val reactions: List<MessageReaction>,
     val fileNode: FileNode,
 ) : AttachmentMessage {
     override val fileSize = fileNode.size

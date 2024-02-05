@@ -173,6 +173,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     shouldShowDate = false,
+                    reactions = emptyList(),
                 ),
                 isOneToOneChat = true
             ),
@@ -187,6 +188,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     shouldShowDate = false,
+                    reactions = emptyList(),
                 ),
                 isOneToOneChat = true
             ),
@@ -201,6 +203,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     shouldShowDate = false,
+                    reactions = emptyList(),
                 ),
                 isOneToOneChat = false
             ),
@@ -215,6 +218,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     shouldShowDate = false,
+                    reactions = emptyList(),
                 ),
                 isOneToOneChat = true
             ),
@@ -229,6 +233,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     shouldShowDate = false,
+                    reactions = emptyList(),
                 ),
                 isOneToOneChat = false
             ),
@@ -243,6 +248,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     shouldShowDate = false,
+                    reactions = emptyList(),
                 ),
                 isOneToOneChat = true
             ),
@@ -257,6 +263,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     shouldShowDate = false,
+                    reactions = emptyList(),
                 ),
                 isOneToOneChat = false
             ),
@@ -271,6 +278,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     shouldShowDate = false,
+                    reactions = emptyList(),
                 ),
                 isOneToOneChat = true
             ),
@@ -285,6 +293,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     shouldShowDate = false,
+                    reactions = emptyList(),
                 ),
                 isOneToOneChat = false
             ),

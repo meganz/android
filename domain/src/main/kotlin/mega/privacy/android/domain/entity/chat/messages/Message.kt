@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages
 
+import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
+
 /**
  * Message
  */
@@ -39,4 +41,9 @@ interface Message {
      * Should show date
      */
     val shouldShowDate: Boolean
+
+    /**
+     * List of reactions
+     */
+    val reactions: List<MessageReaction>
 }

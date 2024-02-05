@@ -60,6 +60,7 @@ class VoiceClipMessageViewModelTest {
         shouldShowAvatar = true,
         shouldShowTime = true,
         shouldShowDate = true,
+        reactions = emptyList(),
     )
 
     private val chatFileNode: ChatDefaultFile = mock()

@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
 import mega.privacy.android.domain.entity.chat.ChatGeolocation
+import mega.privacy.android.domain.entity.chat.messages.reactions.MessageReaction
 
 /**
  * Location message
@@ -15,5 +16,6 @@ data class LocationMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val shouldShowDate: Boolean,
+    override val reactions: List<MessageReaction>,
     val chatGeolocationInfo: ChatGeolocationInfo?,
 ) : MetaMessage

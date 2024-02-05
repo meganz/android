@@ -32,6 +32,7 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                         shouldShowAvatar = shouldShowAvatar,
                         shouldShowTime = shouldShowTime,
                         shouldShowDate = shouldShowDate,
+                        reactions = reactions,
                     )
 
                 else -> TextMessage(
@@ -45,6 +46,7 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                     shouldShowAvatar = shouldShowAvatar,
                     shouldShowTime = shouldShowTime,
                     shouldShowDate = shouldShowDate,
+                    reactions = reactions,
                 )
             }
         }
