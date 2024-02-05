@@ -1530,4 +1530,28 @@ interface MegaChatApiGateway {
      * @return return a list with the users that reacted to a message with a specific reaction.
      */
     fun getReactionUsers(chatId: Long, msgId: Long, reaction: String): MegaHandleList
+
+    /**
+     * Sets the last-seen-by-us pointer to the specified message
+     *
+     * The last-seen-by-us pointer is persisted in the account, so every client will
+     * be aware of the last-seen message.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param msgId MegaChatHandle that identifies the message
+     *
+     * @return False if the \c chatid is invalid or the message is older
+     * than last-seen-by-us message. True if success.
+     */
+    fun setMessageSeen(chatId: Long, msgId: Long): Boolean
+
+    /**
+     * Returns message id of the last-seen-by-us message
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     *
+     * @return Message id for the last-seen-by-us, or invalid handle if \c chatid is invalid or
+     * the user has not seen any message in that chat
+     */
+    fun getLastMessageSeenId(chatId: Long): Long
 }

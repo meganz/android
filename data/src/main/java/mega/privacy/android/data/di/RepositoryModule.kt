@@ -61,6 +61,7 @@ import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.data.repository.apiserver.ApiServerRepositoryImpl
+import mega.privacy.android.data.repository.chat.ChatMessageRepositoryImpl
 import mega.privacy.android.data.repository.filemanagement.ShareRepositoryImpl
 import mega.privacy.android.data.repository.files.PdfRepositoryImpl
 import mega.privacy.android.data.repository.monitoring.PerformanceReporterRepositoryImpl
@@ -119,6 +120,7 @@ import mega.privacy.android.domain.repository.VideoRepository
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import mega.privacy.android.domain.repository.ViewTypeRepository
 import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
+import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
 import mega.privacy.android.domain.repository.files.PdfRepository
 import mega.privacy.android.domain.repository.monitoring.PerformanceReporterRepository
@@ -339,4 +341,6 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindRegexRepository(implementation: RegexRepositoryImpl): RegexRepository
+    @Binds
+    abstract fun bindChatMessageRepository(implementation: ChatMessageRepositoryImpl): ChatMessageRepository
 }
