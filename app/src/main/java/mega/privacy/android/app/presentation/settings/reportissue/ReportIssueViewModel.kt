@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueState
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.GetSupportEmail
 import mega.privacy.android.domain.usecase.SubmitIssue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -53,6 +55,7 @@ class ReportIssueViewModel @Inject constructor(
     private val areChatLogsEnabled: AreChatLogsEnabled,
     private val submitIssue: SubmitIssue,
     private val getSupportEmail: GetSupportEmail,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
@@ -112,14 +115,19 @@ class ReportIssueViewModel @Inject constructor(
         }
 
         viewModelScope.launch(ioDispatcher) {
-            combine(
-                areSdkLogsEnabled(),
-                areChatLogsEnabled()
-            ) { sdk, chat -> sdk || chat }
-                .collectLatest {
-                    includeLogsVisible.update { _ -> it }
-                    includeLogs.update { _ -> it }
-                }
+            if (getFeatureFlagValueUseCase(AppFeatures.PermanentLogging)) {
+                includeLogsVisible.update { _ -> true }
+                includeLogs.update { _ -> true }
+            } else {
+                combine(
+                    areSdkLogsEnabled(),
+                    areChatLogsEnabled()
+                ) { sdk, chat -> sdk || chat }
+                    .collectLatest {
+                        includeLogsVisible.update { _ -> it }
+                        includeLogs.update { _ -> it }
+                    }
+            }
         }
     }
 
@@ -149,15 +157,19 @@ class ReportIssueViewModel @Inject constructor(
         if (isConnected.value) {
             if (submitReportJob?.isActive != true) {
                 submitReportJob = viewModelScope.launch(ioDispatcher) {
-                    submitIssue(SubmitIssueRequest(description.value, includeLogs.value))
-                        .cancellable()
-                        .onCompletion { error ->
-                            onSubmitCompleted(error)
-                        }
-                        .catch { Timber.e(it) }
-                        .collect { progress ->
-                            _state.update { it.copy(uploadProgress = progress.floatValue) }
-                        }
+                    try {
+                        submitIssue(SubmitIssueRequest(description.value, includeLogs.value))
+                            .cancellable()
+                            .onCompletion { error ->
+                                onSubmitCompleted(error)
+                            }
+                            .catch { Timber.e(it) }
+                            .collect { progress ->
+                                _state.update { it.copy(uploadProgress = progress.floatValue) }
+                            }
+                    } catch (exception: Throwable) {
+                        onSubmitCompleted(exception)
+                    }
                 }
             }
         } else {
@@ -170,6 +182,7 @@ class ReportIssueViewModel @Inject constructor(
             is CancellationException -> {
                 _state.update { it.copy(uploadProgress = null) }
             }
+
             null -> {
                 _state.update {
                     it.copy(
@@ -179,6 +192,7 @@ class ReportIssueViewModel @Inject constructor(
                     )
                 }
             }
+
             else -> {
                 _state.update {
                     it.copy(
