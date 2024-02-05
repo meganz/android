@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.chat.message.reactions
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
-import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -18,18 +18,18 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetReactionsUseCaseTest {
 
-    private lateinit var underTest: GetMessageReactionsUseCase
+    private lateinit var underTest: GetReactionsUseCase
 
-    private val chatRepository = mock<ChatRepository>()
+    private val chatMessageRepository = mock<ChatMessageRepository>()
 
     @BeforeEach
     fun setup() {
-        underTest = GetMessageReactionsUseCase(chatRepository)
+        underTest = GetReactionsUseCase(chatMessageRepository)
     }
 
     @AfterEach
     fun resetMocks() {
-        reset(chatRepository)
+        reset(chatMessageRepository)
     }
 
     @Test
@@ -52,24 +52,24 @@ class GetReactionsUseCaseTest {
         val messageReaction2 = Reaction(reaction2, count2, users2, true)
         val messageReaction3 = Reaction(reaction3, count3, users3, false)
         val expectedList = listOf(messageReaction1, messageReaction2, messageReaction3)
-        whenever(chatRepository.getMessageReactions(chatId, msgId)).thenReturn(reactionsList)
-        whenever(chatRepository.getMessageReactionCount(chatId, msgId, reaction1))
+        whenever(chatMessageRepository.getMessageReactions(chatId, msgId)).thenReturn(reactionsList)
+        whenever(chatMessageRepository.getMessageReactionCount(chatId, msgId, reaction1))
             .thenReturn(count1)
-        whenever(chatRepository.getReactionUsers(chatId, msgId, reaction1)).thenReturn(users1)
-        whenever(chatRepository.getMessageReactionCount(chatId, msgId, reaction2))
+        whenever(chatMessageRepository.getReactionUsers(chatId, msgId, reaction1)).thenReturn(users1)
+        whenever(chatMessageRepository.getMessageReactionCount(chatId, msgId, reaction2))
             .thenReturn(count2)
-        whenever(chatRepository.getReactionUsers(chatId, msgId, reaction2)).thenReturn(users2)
-        whenever(chatRepository.getMessageReactionCount(chatId, msgId, reaction3))
+        whenever(chatMessageRepository.getReactionUsers(chatId, msgId, reaction2)).thenReturn(users2)
+        whenever(chatMessageRepository.getMessageReactionCount(chatId, msgId, reaction3))
             .thenReturn(count3)
-        whenever(chatRepository.getReactionUsers(chatId, msgId, reaction3)).thenReturn(users3)
+        whenever(chatMessageRepository.getReactionUsers(chatId, msgId, reaction3)).thenReturn(users3)
         Truth.assertThat(underTest.invoke(chatId, msgId, myUserHandle)).isEqualTo(expectedList)
-        verify(chatRepository).getMessageReactions(chatId, msgId)
-        verify(chatRepository).getMessageReactionCount(chatId, msgId, reaction1)
-        verify(chatRepository).getReactionUsers(chatId, msgId, reaction1)
-        verify(chatRepository).getMessageReactionCount(chatId, msgId, reaction2)
-        verify(chatRepository).getReactionUsers(chatId, msgId, reaction2)
-        verify(chatRepository).getMessageReactionCount(chatId, msgId, reaction3)
-        verify(chatRepository).getReactionUsers(chatId, msgId, reaction3)
-        verifyNoMoreInteractions(chatRepository)
+        verify(chatMessageRepository).getMessageReactions(chatId, msgId)
+        verify(chatMessageRepository).getMessageReactionCount(chatId, msgId, reaction1)
+        verify(chatMessageRepository).getReactionUsers(chatId, msgId, reaction1)
+        verify(chatMessageRepository).getMessageReactionCount(chatId, msgId, reaction2)
+        verify(chatMessageRepository).getReactionUsers(chatId, msgId, reaction2)
+        verify(chatMessageRepository).getMessageReactionCount(chatId, msgId, reaction3)
+        verify(chatMessageRepository).getReactionUsers(chatId, msgId, reaction3)
+        verifyNoMoreInteractions(chatMessageRepository)
     }
 }

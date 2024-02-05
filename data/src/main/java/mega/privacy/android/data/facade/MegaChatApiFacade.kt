@@ -781,6 +781,14 @@ internal class MegaChatApiFacade @Inject constructor(
         chatApi.getReactionUsers(chatId, msgId, reaction)
 
     override fun getLastMessageSeenId(chatId: Long): Long = chatApi.getLastMessageSeenId(chatId)
+
     override fun setMessageSeen(chatId: Long, msgId: Long) =
         chatApi.setMessageSeen(chatId, msgId)
+
+    override fun delReaction(
+        chatId: Long,
+        msgId: Long,
+        reaction: String,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.delReaction(chatId, msgId, reaction, listener)
 }

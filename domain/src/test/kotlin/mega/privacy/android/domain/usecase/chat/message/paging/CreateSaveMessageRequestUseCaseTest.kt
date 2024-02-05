@@ -5,7 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
-import mega.privacy.android.domain.usecase.chat.message.reactions.GetMessageReactionsUseCase
+import mega.privacy.android.domain.usecase.chat.message.reactions.GetReactionsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,19 +21,19 @@ class CreateSaveMessageRequestUseCaseTest {
 
     private lateinit var underTest: CreateSaveMessageRequestUseCase
 
-    private val getMessageReactionsUseCase = mock<GetMessageReactionsUseCase>()
+    private val getReactionsUseCase = mock<GetReactionsUseCase>()
 
     private val myHandle = 123L
     private val chatId = 456L
 
     @BeforeAll
     internal fun setUp() {
-        underTest = CreateSaveMessageRequestUseCase(getMessageReactionsUseCase)
+        underTest = CreateSaveMessageRequestUseCase(getReactionsUseCase)
     }
 
     @BeforeEach
     internal fun resetMocks() {
-        reset(getMessageReactionsUseCase)
+        reset(getReactionsUseCase)
     }
 
     @Test
@@ -278,7 +278,7 @@ class CreateSaveMessageRequestUseCaseTest {
         val reaction1 = mock<Reaction>()
         val reaction2 = mock<Reaction>()
         val reactions = listOf(reaction1, reaction2)
-        whenever(getMessageReactionsUseCase(chatId, message.msgId, myHandle)).thenReturn(reactions)
+        whenever(getReactionsUseCase(chatId, message.msgId, myHandle)).thenReturn(reactions)
 
         val actual = underTest(
             chatId = chatId,
@@ -302,6 +302,6 @@ class CreateSaveMessageRequestUseCaseTest {
             nextMessageUserHandle = null,
         )
         assertThat(actual.map { it.reactions }).containsExactly(emptyList<Reaction>())
-        verifyNoInteractions(getMessageReactionsUseCase)
+        verifyNoInteractions(getReactionsUseCase)
     }
 }

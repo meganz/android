@@ -22,7 +22,6 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
@@ -34,7 +33,6 @@ import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
-import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.chat.NonContactInfo
@@ -57,9 +55,7 @@ import nz.mega.sdk.MegaChatNotificationListenerInterface
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -68,7 +64,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -117,8 +112,6 @@ class ChatRepositoryImplTest {
     private val chatPreviewMapper = mock<ChatPreviewMapper>()
     private val databaseHandler = mock<DatabaseHandler>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
-    private val stringListMapper = mock<StringListMapper>()
-    private val handleListMapper = mock<HandleListMapper>()
     private val context = mock<Context>()
 
     @BeforeEach
@@ -155,8 +148,6 @@ class ChatRepositoryImplTest {
             giphyEntityMapper = mock(),
             chatGeolocationEntityMapper = mock(),
             chatNodeEntityListMapper = mock(),
-            stringListMapper = stringListMapper,
-            handleListMapper = handleListMapper,
             context = context,
         )
 
@@ -1043,23 +1034,6 @@ class ChatRepositoryImplTest {
     }
 
     @Test
-    fun `test that add reaction invokes correctly`() = runTest {
-        val chatId = 123L
-        val msgId = 456L
-        val reaction = "reaction"
-        whenever(megaChatApiGateway.addReaction(any(), any(), any(), any())).thenAnswer {
-            ((it.arguments[3]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
-                mock(),
-                mock(),
-                megaChatErrorSuccess,
-            )
-        }
-        underTest.addReaction(chatId, msgId, reaction)
-        verify(megaChatApiGateway).addReaction(eq(chatId), eq(msgId), eq(reaction), any())
-        verifyNoMoreInteractions(megaChatApiGateway)
-    }
-
-    @Test
     fun `test that null is returned from monitor chat notification if the message is null`() =
         runTest {
             megaChatApiGateway.stub {
@@ -1096,59 +1070,4 @@ class ChatRepositoryImplTest {
                 assertThat(actual?.message).isEqualTo(chatMessage)
             }
         }
-
-    @Test
-    fun `test that get message reactions invokes and returns correctly`() = runTest {
-        val chatId = 123L
-        val msgId = 456L
-        val reaction1 = "reaction1"
-        val reaction2 = "reaction2"
-        val reaction3 = "reaction3"
-        val reactions = mock<MegaStringList> {
-            on { size() } doReturn 3
-            on { get(0) } doReturn reaction1
-            on { get(1) } doReturn reaction2
-            on { get(2) } doReturn reaction3
-        }
-        val reactionsList = listOf(reaction1, reaction2, reaction3)
-        whenever(megaChatApiGateway.getMessageReactions(chatId, msgId)).thenReturn(reactions)
-        whenever(stringListMapper(reactions)).thenReturn(reactionsList)
-        assertThat(underTest.getMessageReactions(chatId, msgId)).isEqualTo(reactionsList)
-        verify(megaChatApiGateway).getMessageReactions(chatId, msgId)
-        verifyNoMoreInteractions(megaChatApiGateway)
-    }
-
-    @Test
-    fun `test that get message reaction count invokes and returns correctly`() = runTest {
-        val chatId = 123L
-        val msgId = 456L
-        val reaction = "reaction"
-        val count = 3
-        whenever(megaChatApiGateway.getMessageReactionCount(any(), any(), any())).thenReturn(count)
-        assertThat(underTest.getMessageReactionCount(chatId, msgId, reaction)).isEqualTo(count)
-        verify(megaChatApiGateway).getMessageReactionCount(chatId, msgId, reaction)
-        verifyNoMoreInteractions(megaChatApiGateway)
-    }
-
-    @Test
-    fun `test that get reaction users invokes and returns correctly`() = runTest {
-        val chatId = 123L
-        val msgId = 456L
-        val reaction = "reaction"
-        val user1 = 5L
-        val user2 = 6L
-        val user3 = 7L
-        val users = mock<MegaHandleList> {
-            on { size() } doReturn 3
-            on { get(0) } doReturn user1
-            on { get(1) } doReturn user2
-            on { get(2) } doReturn user3
-        }
-        val usersList = listOf(user1, user2, user3)
-        whenever(megaChatApiGateway.getReactionUsers(any(), any(), any())).thenReturn(users)
-        whenever(handleListMapper(users)).thenReturn(usersList)
-        assertThat(underTest.getReactionUsers(chatId, msgId, reaction)).isEqualTo(usersList)
-        verify(megaChatApiGateway).getReactionUsers(chatId, msgId, reaction)
-        verifyNoMoreInteractions(megaChatApiGateway)
-    }
 }

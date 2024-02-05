@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.chat.message.paging
 
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
-import mega.privacy.android.domain.usecase.chat.message.reactions.GetMessageReactionsUseCase
+import mega.privacy.android.domain.usecase.chat.message.reactions.GetReactionsUseCase
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -11,7 +11,7 @@ import javax.inject.Inject
  * Create save message request use case
  */
 class CreateSaveMessageRequestUseCase @Inject constructor(
-    private val getMessageReactionsUseCase: GetMessageReactionsUseCase,
+    private val getReactionsUseCase: GetReactionsUseCase,
 ) {
 
     /**
@@ -50,7 +50,7 @@ class CreateSaveMessageRequestUseCase @Inject constructor(
                     previous
                 )
                 val reactions = if (chatMessage.hasConfirmedReactions) {
-                    getMessageReactionsUseCase(chatId, chatMessage.msgId, currentUserHandle)
+                    getReactionsUseCase(chatId, chatMessage.msgId, currentUserHandle)
                 } else {
                     emptyList()
                 }

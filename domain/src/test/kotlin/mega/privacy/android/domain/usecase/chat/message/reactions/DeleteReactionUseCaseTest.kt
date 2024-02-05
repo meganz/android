@@ -14,15 +14,15 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AddReactionUseCaseTest {
+class DeleteReactionUseCaseTest {
 
-    private lateinit var underTest: AddReactionUseCase
+    private lateinit var underTest: DeleteReactionUseCase
 
     private val chatMessageRepository = mock<ChatMessageRepository>()
 
     @BeforeEach
     fun setup() {
-        underTest = AddReactionUseCase(chatMessageRepository)
+        underTest = DeleteReactionUseCase(chatMessageRepository)
     }
 
     @AfterEach
@@ -31,13 +31,13 @@ class AddReactionUseCaseTest {
     }
 
     @Test
-    fun `test that add reaction use case invokes addReaction in repository`() = runTest {
+    fun `test that delete reaction use case invokes deleteReaction in repository`() = runTest {
         val chatId = 1L
         val msgId = 2L
         val reaction = "reaction"
-        whenever(chatMessageRepository.addReaction(chatId, msgId, reaction)).thenReturn(Unit)
+        whenever(chatMessageRepository.deleteReaction(chatId, msgId, reaction)).thenReturn(Unit)
         underTest.invoke(chatId, msgId, reaction)
-        verify(chatMessageRepository).addReaction(chatId, msgId, reaction)
+        verify(chatMessageRepository).deleteReaction(chatId, msgId, reaction)
         verifyNoMoreInteractions(chatMessageRepository)
     }
 }
