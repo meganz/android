@@ -192,6 +192,7 @@ import mega.privacy.android.app.presentation.meeting.view.CallRecordingConsentDi
 import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.node.NodeSourceTypeMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
 import mega.privacy.android.app.presentation.offline.OfflineFragment
@@ -210,7 +211,6 @@ import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchFragment
 import mega.privacy.android.app.presentation.search.SearchViewModel
-import mega.privacy.android.app.presentation.node.NodeSourceTypeMapper
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
@@ -296,9 +296,9 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.psa.Psa
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
@@ -5761,14 +5761,34 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         fromMediaViewer: Boolean, fromChat: Boolean,
     ) {
         if (nodes == null) return
-        PermissionUtils.checkNotificationsPermission(this)
-        nodeSaver.saveNodes(
-            nodes.filterNotNull(),
-            highPriority,
-            isFolderLink,
-            fromMediaViewer,
-            fromChat
-        )
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                when {
+                    isFolderLink || fromChat -> {
+                        startDownloadViewModel.onMultipleSerializedNodesDownloadClicked(
+                            nodes.mapNotNull { it?.serialize() },
+                            highPriority,
+                        )
+                    }
+
+                    else -> {
+                        startDownloadViewModel.onDownloadClicked(
+                            nodes.mapNotNull { megaNode -> megaNode?.handle?.let { NodeId(it) } },
+                            highPriority,
+                        )
+                    }
+                }
+            } else {
+                PermissionUtils.checkNotificationsPermission(this@ManagerActivity)
+                nodeSaver.saveNodes(
+                    nodes.filterNotNull(),
+                    highPriority,
+                    isFolderLink,
+                    fromMediaViewer,
+                    fromChat
+                )
+            }
+        }
     }
 
     /**
@@ -5778,15 +5798,21 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param node Node to be downloaded.
      */
     fun saveNodeByTap(node: MegaNode) {
-        PermissionUtils.checkNotificationsPermission(this)
-        nodeSaver.saveNodes(
-            nodes = listOf(element = node),
-            highPriority = true,
-            isFolderLink = false,
-            fromMediaViewer = false,
-            needSerialize = false,
-            downloadForPreview = true
-        )
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                startDownloadViewModel.onDownloadForPreviewClicked(NodeId(node.handle))
+            } else {
+                PermissionUtils.checkNotificationsPermission(this@ManagerActivity)
+                nodeSaver.saveNodes(
+                    nodes = listOf(element = node),
+                    highPriority = true,
+                    isFolderLink = false,
+                    fromMediaViewer = false,
+                    needSerialize = false,
+                    downloadForPreview = true
+                )
+            }
+        }
     }
 
     /**
@@ -5796,16 +5822,22 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param node Node to be downloaded.
      */
     fun saveNodeByOpenWith(node: MegaNode) {
-        PermissionUtils.checkNotificationsPermission(this)
-        nodeSaver.saveNodes(
-            nodes = listOf(node),
-            highPriority = true,
-            isFolderLink = false,
-            fromMediaViewer = false,
-            needSerialize = false,
-            downloadForPreview = true,
-            downloadByOpenWith = true
-        )
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                startDownloadViewModel.onDownloadForPreviewClicked(NodeId(node.handle))
+            } else {
+                PermissionUtils.checkNotificationsPermission(this@ManagerActivity)
+                nodeSaver.saveNodes(
+                    nodes = listOf(node),
+                    highPriority = true,
+                    isFolderLink = false,
+                    fromMediaViewer = false,
+                    needSerialize = false,
+                    downloadForPreview = true,
+                    downloadByOpenWith = true
+                )
+            }
+        }
     }
 
     /**
@@ -5818,18 +5850,26 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param fromChat        whether this download is from chat
      */
     fun saveHandlesToDevice(
-        handles: List<Long?>?, highPriority: Boolean, isFolderLink: Boolean,
-        fromMediaViewer: Boolean, fromChat: Boolean,
+        handles: List<Long?>?, highPriority: Boolean,
     ) {
         if (handles == null) return
-        PermissionUtils.checkNotificationsPermission(this)
-        nodeSaver.saveHandles(
-            handles.filterNotNull(),
-            highPriority,
-            isFolderLink,
-            fromMediaViewer,
-            fromChat
-        )
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                startDownloadViewModel.onDownloadClicked(
+                    handles.mapNotNull { it?.let { NodeId(it) } },
+                    highPriority
+                )
+            } else {
+                PermissionUtils.checkNotificationsPermission(this@ManagerActivity)
+                nodeSaver.saveHandles(
+                    handles.filterNotNull(),
+                    highPriority,
+                    false,
+                    false,
+                    false
+                )
+            }
+        }
     }
 
     /**

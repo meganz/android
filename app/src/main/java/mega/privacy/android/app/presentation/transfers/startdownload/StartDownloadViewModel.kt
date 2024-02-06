@@ -54,11 +54,36 @@ class StartDownloadViewModel @Inject constructor(
      * Triggers the event related to download a node with [nodeId]
      * @param nodeId
      */
-    fun onDownloadClicked(nodeId: NodeId) {
+    fun onDownloadClicked(nodeId: NodeId, isHighPriority: Boolean = false) {
         viewModelScope.launch {
             val nodes = listOfNotNull(getNodeByIdUseCase(nodeId))
             _state.update {
-                triggered(TransferTriggerEvent.StartDownloadNode(nodes))
+                triggered(TransferTriggerEvent.StartDownloadNode(nodes, isHighPriority))
+            }
+        }
+    }
+
+    /**
+     * Triggers the event related to download a node for preview with its [nodeId]
+     */
+    fun onDownloadForPreviewClicked(nodeId: NodeId) {
+        viewModelScope.launch {
+            val node = getNodeByIdUseCase(nodeId)
+            _state.update {
+                triggered(TransferTriggerEvent.StartDownloadForPreview(node))
+            }
+        }
+    }
+
+    /**
+     * Triggers the event related to download nods with [nodeIds]
+     * @param nodeIds
+     */
+    fun onDownloadClicked(nodeIds: List<NodeId>, isHighPriority: Boolean = false) {
+        viewModelScope.launch {
+            val nodes = nodeIds.mapNotNull { getNodeByIdUseCase(it) }
+            _state.update {
+                triggered(TransferTriggerEvent.StartDownloadNode(nodes, isHighPriority))
             }
         }
     }
@@ -77,7 +102,7 @@ class StartDownloadViewModel @Inject constructor(
     }
 
     /**
-     * Triggers the event related to download a node with its serialized data for link nodes
+     * Triggers the event related to download a node with its serialized data
      * @param serializedData of the link node
      */
     fun onDownloadClicked(serializedData: String) {
@@ -85,6 +110,22 @@ class StartDownloadViewModel @Inject constructor(
             val nodes = listOfNotNull(getPublicNodeFromSerializedDataUseCase(serializedData))
             _state.update {
                 triggered(TransferTriggerEvent.StartDownloadNode(nodes))
+            }
+        }
+    }
+
+    /**
+     * Triggers the event related to download multiple nodes with their serialized data
+     * @param serializedData of the link node
+     */
+    fun onMultipleSerializedNodesDownloadClicked(
+        serializedData: List<String>,
+        isHighPriority: Boolean = false,
+    ) {
+        viewModelScope.launch {
+            val nodes = serializedData.mapNotNull { getPublicNodeFromSerializedDataUseCase(it) }
+            _state.update {
+                triggered(TransferTriggerEvent.StartDownloadNode(nodes, isHighPriority))
             }
         }
     }

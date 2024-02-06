@@ -123,11 +123,14 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             }
             when (transferTriggerEvent) {
                 is TransferTriggerEvent.StartDownloadForOffline -> {
-                    startDownloadForOffline(node)
+                    startDownloadForOffline(node, transferTriggerEvent.isHighPriority)
                 }
 
                 is TransferTriggerEvent.StartDownloadNode -> {
-                    startDownloadNodes(transferTriggerEvent.nodes)
+                    startDownloadNodes(
+                        transferTriggerEvent.nodes,
+                        transferTriggerEvent.isHighPriority
+                    )
                 }
 
                 is TransferTriggerEvent.StartDownloadForPreview -> {
@@ -145,6 +148,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         currentInProgressJob = viewModelScope.launch {
             startDownloadNodes(
                 nodes = listOf(node),
+                isHighPriority = true,
                 getPath = {
                     getFilePreviewDownloadPathUseCase()
                 },
@@ -156,7 +160,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
      * It starts downloading the nodes with the appropriate use case
      * @param siblingNodes the [Node]s to be download, they must belong to same parent folder
      */
-    private fun startDownloadNodes(siblingNodes: List<TypedNode>) {
+    private fun startDownloadNodes(siblingNodes: List<TypedNode>, isHighPriority: Boolean) {
         if (siblingNodes.isEmpty()) return
         val firstSibling = siblingNodes.first()
         val parentId = firstSibling.parentId
@@ -166,7 +170,8 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         } else {
             currentInProgressJob = viewModelScope.launch {
                 startDownloadNodes(
-                    siblingNodes,
+                    nodes = siblingNodes,
+                    isHighPriority = isHighPriority,
                     getPath = {
                         getOrCreateStorageDownloadLocationUseCase()?.ensureSuffix(File.separator)
                     },
@@ -179,10 +184,11 @@ internal class StartDownloadComponentViewModel @Inject constructor(
      * It starts downloading the node for offline with the appropriate use case
      * @param node the [Node] to be saved offline
      */
-    private fun startDownloadForOffline(node: TypedNode) {
+    private fun startDownloadForOffline(node: TypedNode, isHighPriority: Boolean) {
         currentInProgressJob = viewModelScope.launch {
             startDownloadNodes(
                 nodes = listOf(node),
+                isHighPriority,
                 getPath = {
                     getOfflinePathForNodeUseCase(node)
                 },
@@ -199,6 +205,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
      */
     private suspend fun startDownloadNodes(
         nodes: List<TypedNode>,
+        isHighPriority: Boolean,
         toDoAfterProcessing: (suspend () -> Unit)? = null,
         getPath: suspend () -> String?,
     ) {
@@ -218,7 +225,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                 startDownloadsWithWorkerUseCase(
                     destinationPath = path,
                     nodes = nodes,
-                    isHighPriority = false
+                    isHighPriority = isHighPriority
                 ).catch {
                     lastError = it
                     Timber.e(it)

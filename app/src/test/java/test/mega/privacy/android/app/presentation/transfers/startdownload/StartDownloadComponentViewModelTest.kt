@@ -150,7 +150,7 @@ class StartDownloadComponentViewModelTest {
 
     @ParameterizedTest
     @MethodSource("provideStartEvents")
-    fun `test that start download use case is invoked with correct parameters when startDownloadNod is invoked`(
+    fun `test that start download use case is invoked with correct parameters when startDownloadNode is invoked`(
         startEvent: TransferTriggerEvent,
     ) = runTest {
         commonStub()
@@ -160,7 +160,11 @@ class StartDownloadComponentViewModelTest {
             whenever(getFilePreviewDownloadPathUseCase()).thenReturn(destination)
         }
         underTest.startDownload(startEvent)
-        verify(startDownloadsWithWorkerUseCase).invoke(nodes, destination, false)
+        verify(startDownloadsWithWorkerUseCase).invoke(
+            nodes,
+            destination,
+            startEvent.isHighPriority
+        )
     }
 
     @Test
