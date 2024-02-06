@@ -88,7 +88,9 @@ fun ChatToolbarBottomSheet(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
         ) {
-            // Manage scanned files here
+            it.data?.data?.let { uri ->
+                onAttachFiles(listOf(uri))
+            }
             coroutineScope.launch { sheetState.hide() }
         }
 
