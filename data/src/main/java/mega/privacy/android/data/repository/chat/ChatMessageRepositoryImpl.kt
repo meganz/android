@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.mapper.StringListMapper
+import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
@@ -16,6 +17,7 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val stringListMapper: StringListMapper,
     private val handleListMapper: HandleListMapper,
+    private val chatMessageMapper: ChatMessageMapper,
 ) : ChatMessageRepository {
     override suspend fun setMessageSeen(chatId: Long, messageId: Long) = withContext(ioDispatcher) {
         megaChatApiGateway.setMessageSeen(chatId, messageId)
@@ -61,4 +63,28 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             handleListMapper(megaChatApiGateway.getReactionUsers(chatId, msgId, reaction))
         }
+
+    override suspend fun sendGiphy(
+        chatId: Long,
+        srcMp4: String?,
+        srcWebp: String?,
+        sizeMp4: Long,
+        sizeWebp: Long,
+        width: Int,
+        height: Int,
+        title: String?,
+    ) = withContext(ioDispatcher) {
+        chatMessageMapper(
+            megaChatApiGateway.sendGiphy(
+                chatId,
+                srcMp4,
+                srcWebp,
+                sizeMp4,
+                sizeWebp,
+                width,
+                height,
+                title
+            )
+        )
+    }
 }

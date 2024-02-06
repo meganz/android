@@ -18,7 +18,6 @@ class SendLocationMessageUseCase @Inject constructor(
      * @param longitude Location longitude.
      * @param latitude Location latitude.
      * @param image Image to be sent.
-     * @return Temporal [] for showing in UI.
      */
     suspend operator fun invoke(
         chatId: Long,

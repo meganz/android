@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
@@ -82,6 +83,7 @@ import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
@@ -244,6 +246,7 @@ internal class ChatViewModelTest {
     private val addReactionUseCase = mock<AddReactionUseCase>()
     private val getChatMessageUseCase = mock<GetChatMessageUseCase>()
     private val deleteReactionUseCase = mock<DeleteReactionUseCase>()
+    private val sendGiphyMessageUseCase = mock<SendGiphyMessageUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -300,6 +303,7 @@ internal class ChatViewModelTest {
             addReactionUseCase,
             getChatMessageUseCase,
             deleteReactionUseCase,
+            sendGiphyMessageUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -388,6 +392,7 @@ internal class ChatViewModelTest {
             addReactionUseCase = addReactionUseCase,
             getChatMessageUseCase = getChatMessageUseCase,
             deleteReactionUseCase = deleteReactionUseCase,
+            sendGiphyMessageUseCase = sendGiphyMessageUseCase,
         )
     }
 
@@ -2436,6 +2441,41 @@ internal class ChatViewModelTest {
                 assertThat(item.editingMessageContent).isNull()
             }
         }
+
+    @Test
+    fun `test that on send giphy message invokes use case`() = runTest {
+        val srcMp4 = "srcMp4"
+        val srcWebp = "srcWebp"
+        val sizeMp4 = 350L
+        val sizeWebp = 250L
+        val width = 250
+        val height = 500
+        val title = "title"
+        val gifData = GifData(srcMp4, srcWebp, sizeMp4, sizeWebp, width, height, title)
+        whenever(
+            sendGiphyMessageUseCase(
+                chatId,
+                srcMp4,
+                srcWebp,
+                sizeMp4,
+                sizeWebp,
+                width,
+                height,
+                title
+            )
+        ).thenReturn(Unit)
+        underTest.onSendGiphyMessage(gifData)
+        verify(sendGiphyMessageUseCase).invoke(
+            chatId,
+            srcMp4,
+            srcWebp,
+            sizeMp4,
+            sizeWebp,
+            width,
+            height,
+            title
+        )
+    }
 
     @Test
     fun `test that delete reaction invokes use case`() = runTest {

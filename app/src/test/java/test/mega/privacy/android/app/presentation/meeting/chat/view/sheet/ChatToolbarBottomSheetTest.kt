@@ -124,6 +124,7 @@ class ChatToolbarBottomSheetTest {
                     onAttachFileClicked = onAttachFileClicked,
                     onAttachContactClicked = onAttachContactClicked,
                     onPickLocation = onPickLocation,
+                    onSendGiphyMessage = { },
                     sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
                     onTakePicture = {},
                 )

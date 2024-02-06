@@ -791,4 +791,16 @@ internal class MegaChatApiFacade @Inject constructor(
         reaction: String,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.delReaction(chatId, msgId, reaction, listener)
+
+    override fun sendGiphy(
+        chatId: Long,
+        srcMp4: String?,
+        srcWebp: String?,
+        sizeMp4: Long,
+        sizeWebp: Long,
+        width: Int,
+        height: Int,
+        title: String?,
+    ): MegaChatMessage =
+        chatApi.sendGiphy(chatId, srcMp4, srcWebp, sizeMp4, sizeWebp, width, height, title)
 }

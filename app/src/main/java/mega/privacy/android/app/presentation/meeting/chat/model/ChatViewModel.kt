@@ -26,6 +26,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.main.megachat.MapsActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
@@ -71,6 +72,7 @@ import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
@@ -185,6 +187,7 @@ class ChatViewModel @Inject constructor(
     private val addReactionUseCase: AddReactionUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val deleteReactionUseCase: DeleteReactionUseCase,
+    private val sendGiphyMessageUseCase: SendGiphyMessageUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1140,6 +1143,28 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching { deleteReactionUseCase(chatId, msgId, reaction) }
                 .onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Send giphy message.
+     */
+    fun onSendGiphyMessage(gifData: GifData?) {
+        gifData?.let {
+            with(gifData) {
+                viewModelScope.launch {
+                    sendGiphyMessageUseCase(
+                        chatId = chatId,
+                        srcMp4 = mp4Url,
+                        srcWebp = webpUrl,
+                        sizeMp4 = mp4Size,
+                        sizeWebp = webpSize,
+                        width = width,
+                        height = height,
+                        title = title
+                    )
+                }
+            }
         }
     }
 

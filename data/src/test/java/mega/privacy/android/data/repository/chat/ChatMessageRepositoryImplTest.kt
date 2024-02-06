@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.StringListMapper
+import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaHandleList
@@ -33,10 +34,13 @@ class ChatMessageRepositoryImplTest {
     private val megaChatApiGateway: MegaChatApiGateway = mock()
     private val stringListMapper = mock<StringListMapper>()
     private val handleListMapper = mock<HandleListMapper>()
+    private val chatMessageMapper = mock<ChatMessageMapper>()
 
     private val megaChatErrorSuccess = mock<MegaChatError> {
         on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
     }
+    private val chatId = 123L
+    private val msgId = 456L
 
     @BeforeAll
     fun setUp() {
@@ -45,6 +49,7 @@ class ChatMessageRepositoryImplTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             stringListMapper = stringListMapper,
             handleListMapper = handleListMapper,
+            chatMessageMapper = chatMessageMapper,
         )
     }
 
@@ -57,7 +62,6 @@ class ChatMessageRepositoryImplTest {
 
     @Test
     fun `test that setMessageSeen invoke correctly`() = runTest {
-        val chatId = 1L
         val messageId = 2L
         underTest.setMessageSeen(chatId, messageId)
         verify(megaChatApiGateway).setMessageSeen(chatId, messageId)
@@ -65,15 +69,12 @@ class ChatMessageRepositoryImplTest {
 
     @Test
     fun `test that getLastMessageSeenId invoke correctly`() = runTest {
-        val chatId = 1L
         underTest.getLastMessageSeenId(chatId)
         verify(megaChatApiGateway).getLastMessageSeenId(chatId)
     }
 
     @Test
     fun `test that add reaction invokes correctly`() = runTest {
-        val chatId = 123L
-        val msgId = 456L
         val reaction = "reaction"
         whenever(megaChatApiGateway.addReaction(any(), any(), any(), any())).thenAnswer {
             ((it.arguments[3]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
@@ -89,8 +90,6 @@ class ChatMessageRepositoryImplTest {
 
     @Test
     fun `test that delete reaction invokes correctly`() = runTest {
-        val chatId = 123L
-        val msgId = 456L
         val reaction = "reaction"
         whenever(megaChatApiGateway.delReaction(any(), any(), any(), any())).thenAnswer {
             ((it.arguments[3]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
@@ -106,8 +105,6 @@ class ChatMessageRepositoryImplTest {
 
     @Test
     fun `test that get message reactions invokes and returns correctly`() = runTest {
-        val chatId = 123L
-        val msgId = 456L
         val reaction1 = "reaction1"
         val reaction2 = "reaction2"
         val reaction3 = "reaction3"
@@ -127,8 +124,6 @@ class ChatMessageRepositoryImplTest {
 
     @Test
     fun `test that get message reaction count invokes and returns correctly`() = runTest {
-        val chatId = 123L
-        val msgId = 456L
         val reaction = "reaction"
         val count = 3
         whenever(megaChatApiGateway.getMessageReactionCount(any(), any(), any())).thenReturn(count)
@@ -139,8 +134,6 @@ class ChatMessageRepositoryImplTest {
 
     @Test
     fun `test that get reaction users invokes and returns correctly`() = runTest {
-        val chatId = 123L
-        val msgId = 456L
         val reaction = "reaction"
         val user1 = 5L
         val user2 = 6L
@@ -157,5 +150,48 @@ class ChatMessageRepositoryImplTest {
         assertThat(underTest.getReactionUsers(chatId, msgId, reaction)).isEqualTo(usersList)
         verify(megaChatApiGateway).getReactionUsers(chatId, msgId, reaction)
         verifyNoMoreInteractions(megaChatApiGateway)
+    }
+
+    @Test
+    fun `test that send giphy invokes chat api`() = runTest {
+        val srcMp4 = "srcMp4"
+        val srcWebp = "srcWebp"
+        val sizeMp4 = 350L
+        val sizeWebp = 250L
+        val width = 250
+        val height = 500
+        val title = "title"
+        whenever(
+            megaChatApiGateway.sendGiphy(
+                chatId = chatId,
+                srcMp4 = srcMp4,
+                srcWebp = srcWebp,
+                sizeMp4 = sizeMp4,
+                sizeWebp = sizeWebp,
+                width = width,
+                height = height,
+                title = title
+            )
+        ).thenReturn(mock())
+        underTest.sendGiphy(
+            chatId = chatId,
+            srcMp4 = srcMp4,
+            srcWebp = srcWebp,
+            sizeMp4 = sizeMp4,
+            sizeWebp = sizeWebp,
+            width = width,
+            height = height,
+            title = title
+        )
+        verify(megaChatApiGateway).sendGiphy(
+            chatId = chatId,
+            srcMp4 = srcMp4,
+            srcWebp = srcWebp,
+            sizeMp4 = sizeMp4,
+            sizeWebp = sizeWebp,
+            width = width,
+            height = height,
+            title = title
+        )
     }
 }

@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -29,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
+import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
+import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItem
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -47,6 +50,7 @@ fun ChatToolbarBottomSheet(
     onAttachContactClicked: () -> Unit,
     onTakePicture: () -> Unit,
     onPickLocation: () -> Unit,
+    onSendGiphyMessage: (GifData?) -> Unit,
     modifier: Modifier = Modifier,
     onCameraPermissionDenied: () -> Unit = {},
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
@@ -69,7 +73,14 @@ fun ChatToolbarBottomSheet(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
         ) {
-            // Manage gif picked files here
+            onSendGiphyMessage(
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    it.data?.getParcelableExtra(GIF_DATA, GifData::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    it.data?.getParcelableExtra(GIF_DATA)
+                }
+            )
             coroutineScope.launch { sheetState.hide() }
         }
 
@@ -178,6 +189,7 @@ private fun ChatToolbarBottomSheetPreview() {
             onAttachFileClicked = {},
             onAttachContactClicked = {},
             onPickLocation = {},
+            onSendGiphyMessage = {},
             onTakePicture = {},
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
         )

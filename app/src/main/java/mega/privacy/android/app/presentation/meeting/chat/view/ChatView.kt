@@ -60,6 +60,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
+import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
 import mega.privacy.android.app.presentation.meeting.chat.extension.toInfoText
@@ -141,6 +142,7 @@ internal fun ChatView(
         onCloseEditing = viewModel::onCloseEditing,
         onAddReaction = viewModel::onAddReaction,
         onDeleteReaction = viewModel::onDeleteReaction,
+        onSendGiphyMessage = viewModel::onSendGiphyMessage,
     )
 }
 
@@ -219,6 +221,7 @@ internal fun ChatView(
     onCloseEditing: () -> Unit = {},
     onAddReaction: (Long, String) -> Unit = { _, _ -> },
     onDeleteReaction: (Long, String) -> Unit = { _, _ -> },
+    onSendGiphyMessage: (GifData?) -> Unit = { _ -> },
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -441,6 +444,7 @@ internal fun ChatView(
                                     }
                                 )
                             },
+                            onSendGiphyMessage = onSendGiphyMessage,
                             onTakePicture = {
                                 coroutineScope.launch {
                                     createNewImage()?.let {
