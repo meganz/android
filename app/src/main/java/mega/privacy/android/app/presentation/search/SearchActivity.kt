@@ -72,7 +72,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchCategory
-import mega.privacy.android.domain.entity.search.SearchType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
@@ -148,12 +148,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
          */
         fun getIntent(
             context: Context,
-            searchType: SearchType,
+            nodeSourceType: NodeSourceType,
             parentHandle: Long,
             isFirstNavigationLevel: Boolean = false,
         ): Intent = Intent(context, SearchActivity::class.java).apply {
             putExtra(IS_FIRST_LEVEL, isFirstNavigationLevel)
-            putExtra(SEARCH_TYPE, searchType)
+            putExtra(SEARCH_TYPE, nodeSourceType)
             putExtra(PARENT_HANDLE, parentHandle)
         }
     }

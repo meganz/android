@@ -52,7 +52,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
-import mega.privacy.android.domain.entity.search.SearchType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -1187,7 +1187,7 @@ class ManagerViewModelTest {
                 incomingParentHandle = 456789,
                 outgoingParentHandle = 567890,
                 linksParentHandle = 678901,
-                searchType = SearchType.LINKS
+                nodeSourceType = NodeSourceType.LINKS
             )
             assertThat(actual).isEqualTo(expectedParentHandle)
         }

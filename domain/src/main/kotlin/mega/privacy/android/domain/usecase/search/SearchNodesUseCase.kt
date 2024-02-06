@@ -4,7 +4,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchCategory
-import mega.privacy.android.domain.entity.search.SearchType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -38,7 +38,7 @@ class SearchNodesUseCase @Inject constructor(
      *
      * @param query search query
      * @param parentHandle search parent
-     * @param searchType search type [SearchType]
+     * @param nodeSourceType search type [NodeSourceType]
      * @param searchCategory search category [SearchCategory]
      * @param isFirstLevel checks if user is on first level navigation
      *
@@ -47,7 +47,7 @@ class SearchNodesUseCase @Inject constructor(
     suspend operator fun invoke(
         query: String,
         parentHandle: Long,
-        searchType: SearchType,
+        nodeSourceType: NodeSourceType,
         isFirstLevel: Boolean,
         searchCategory: SearchCategory = SearchCategory.ALL,
     ): List<TypedNode> {
@@ -56,16 +56,16 @@ class SearchNodesUseCase @Inject constructor(
             parentNodeId = NodeId(longValue = parentHandle),
             order = getCloudSortOrder()
         )
-        return when (searchType) {
-            SearchType.INCOMING_SHARES -> incomingSharesTabSearchUseCase(query = query)
-            SearchType.OUTGOING_SHARES -> outgoingSharesTabSearchUseCase(query = query)
-            SearchType.LINKS -> linkSharesTabSearchUseCase(
+        return when (nodeSourceType) {
+            NodeSourceType.INCOMING_SHARES -> incomingSharesTabSearchUseCase(query = query)
+            NodeSourceType.OUTGOING_SHARES -> outgoingSharesTabSearchUseCase(query = query)
+            NodeSourceType.LINKS -> linkSharesTabSearchUseCase(
                 query = query,
                 isFirstLevel = isFirstLevel
             )
 
             else -> {
-                val node = getSearchParentNode(searchType, parentHandle, invalidNodeHandle)
+                val node = getSearchParentNode(nodeSourceType, parentHandle, invalidNodeHandle)
                 searchInNodesUseCase(
                     nodeId = node?.id,
                     query = query,
@@ -76,21 +76,21 @@ class SearchNodesUseCase @Inject constructor(
     }
 
     /**
-     * This method Returns [Node] for respective selected [SearchType]
+     * This method Returns [Node] for respective selected [NodeSourceType]
      *
-     * @param searchType
+     * @param nodeSourceType
      * @param parentHandle
      * @return [Node]
      */
     private suspend fun getSearchParentNode(
-        searchType: SearchType,
+        nodeSourceType: NodeSourceType,
         parentHandle: Long,
         invalidNodeHandle: Long,
     ): Node? = if (parentHandle == invalidNodeHandle) {
-        when (searchType) {
-            SearchType.CLOUD_DRIVE -> getRootNodeUseCase()
-            SearchType.RUBBISH_BIN -> getRubbishNodeUseCase()
-            SearchType.BACKUPS -> getBackupsNodeUseCase()
+        when (nodeSourceType) {
+            NodeSourceType.CLOUD_DRIVE -> getRootNodeUseCase()
+            NodeSourceType.RUBBISH_BIN -> getRubbishNodeUseCase()
+            NodeSourceType.BACKUPS -> getBackupsNodeUseCase()
             else -> null
         }
     } else {

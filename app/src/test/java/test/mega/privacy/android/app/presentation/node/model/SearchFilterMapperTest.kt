@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.search.mapper
+package test.mega.privacy.android.app.presentation.node.model
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider

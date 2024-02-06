@@ -14,41 +14,23 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.di.ui.toolbaritem.qualifier.CloudDrive
-import mega.privacy.android.app.di.ui.toolbaritem.qualifier.IncomingShares
-import mega.privacy.android.app.di.ui.toolbaritem.qualifier.Links
-import mega.privacy.android.app.di.ui.toolbaritem.qualifier.OutgoingShares
-import mega.privacy.android.app.di.ui.toolbaritem.qualifier.RubbishBin
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
-import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchCategory
-import mega.privacy.android.domain.entity.search.SearchType
-import mega.privacy.android.domain.entity.search.SearchType.INCOMING_SHARES
-import mega.privacy.android.domain.entity.search.SearchType.LINKS
-import mega.privacy.android.domain.entity.search.SearchType.OTHER
-import mega.privacy.android.domain.entity.search.SearchType.OUTGOING_SHARES
-import mega.privacy.android.domain.entity.search.SearchType.RUBBISH_BIN
-import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodeSourceType.OTHER
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
-import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -59,11 +41,14 @@ import javax.inject.Inject
  * SearchActivity View Model
  * @property monitorNodeUpdatesUseCase [MonitorNodeUpdatesUseCase]
  * @property searchNodesUseCase [SearchNodesUseCase]
- * @property setViewType [SetViewType]
  * @property getSearchCategoriesUseCase [GetSearchCategoriesUseCase]
  * @property searchFilterMapper [SearchFilterMapper]
  * @property emptySearchViewMapper [EmptySearchViewMapper]
  * @property cancelCancelTokenUseCase [CancelCancelTokenUseCase]
+ * @property setViewType [SetViewType]
+ * @property monitorViewType [MonitorViewType]
+ * @property getCloudSortOrder [GetCloudSortOrder]
+ * @property monitorOfflineNodeUpdatesUseCase [MonitorOfflineNodeUpdatesUseCase]
  */
 @HiltViewModel
 class SearchActivityViewModel @Inject constructor(
@@ -76,16 +61,6 @@ class SearchActivityViewModel @Inject constructor(
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
-    @CloudDrive private val cloudDriveToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
-    @IncomingShares private val incomingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
-    @OutgoingShares private val outgoingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
-    @Links private val linksToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
-    @RubbishBin private val rubbishBinToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
-    private val nodeToolbarActionMapper: NodeToolbarActionMapper,
-    private val getNodeAccessPermission: GetNodeAccessPermission,
-    private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
-    private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
-    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     stateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -104,11 +79,9 @@ class SearchActivityViewModel @Inject constructor(
      */
     private var searchJob: Job? = null
 
-    private var rubbishBinNode: UnTypedNode? = null
-
     private val isFirstLevel = stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL) ?: false
-    private val searchType =
-        stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE) ?: OTHER
+    private val nodeSourceType =
+        stateHandle.get<NodeSourceType>(SearchActivity.SEARCH_TYPE) ?: OTHER
     private val parentHandle =
         stateHandle.get<Long>(SearchActivity.PARENT_HANDLE) ?: MegaApiJava.INVALID_HANDLE
 
@@ -116,23 +89,10 @@ class SearchActivityViewModel @Inject constructor(
         monitorNodeUpdatesForSearch()
         initializeSearch()
         checkViewType()
-        getRubbishBinNode()
-    }
-
-    private fun getRubbishBinNode() {
-        viewModelScope.launch {
-            runCatching {
-                getRubbishNodeUseCase()
-            }.onSuccess { rubbishBin ->
-                rubbishBinNode = rubbishBin
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
     }
 
     private fun initializeSearch() {
-        _state.update { it.copy(searchType = searchType) }
+        _state.update { it.copy(nodeSourceType = nodeSourceType) }
         runCatching {
             getSearchCategoriesUseCase().map { searchFilterMapper(it) }
                 .filterNot { it.filter == SearchCategory.ALL }
@@ -168,7 +128,7 @@ class SearchActivityViewModel @Inject constructor(
                 searchNodesUseCase(
                     query = state.value.searchQuery,
                     parentHandle = parentHandle,
-                    searchType = searchType,
+                    nodeSourceType = nodeSourceType,
                     isFirstLevel = isFirstLevel,
                     searchCategory = state.value.selectedFilter?.filter ?: SearchCategory.ALL
                 )
@@ -310,69 +270,14 @@ class SearchActivityViewModel @Inject constructor(
             }
             val newNodesList =
                 _state.value.searchItemList.updateItemAt(index = index, item = nodeUIItem)
-            val menuActions = updateToolbarState(selectedNod, newNodesList.size)
             _state.update {
                 it.copy(
                     searchItemList = newNodesList,
                     optionsItemInfo = null,
                     selectedNodes = selectedNod,
-                    menuActions = menuActions,
                 )
             }
         }
-
-    private suspend fun updateToolbarState(
-        selectedNodes: Set<TypedNode>,
-        searchResultCount: Int,
-    ): List<MenuAction> {
-        val toolbarOptions = getToolbarOptions()
-        val canBeMovedToTarget = if (state.value.searchType != RUBBISH_BIN) {
-            nodeCanBeMovedToRubbishBin(selectedNodes)
-        } else false
-        val anyNodeInBackups = if (state.value.searchType != RUBBISH_BIN) {
-            selectedNodes.any { isNodeInBackupsUseCase(handle = it.id.longValue) }
-        } else false
-        val hasAccessPermission = if (state.value.searchType == INCOMING_SHARES) {
-            checkIfNodeHasFullAccessPermission(selectedNodes)
-        } else true
-        return nodeToolbarActionMapper(
-            toolbarOptions = toolbarOptions,
-            hasNodeAccessPermission = hasAccessPermission,
-            selectedNodes = selectedNodes,
-            resultCount = searchResultCount,
-            allNodeCanBeMovedToTarget = canBeMovedToTarget,
-            noNodeInBackups = anyNodeInBackups.not()
-        )
-    }
-
-    private fun getToolbarOptions() = when (state.value.searchType) {
-        INCOMING_SHARES -> incomingSharesToolbarOptions
-        OUTGOING_SHARES -> outgoingSharesToolbarOptions
-        LINKS -> linksToolbarOptions
-        RUBBISH_BIN -> rubbishBinToolbarOptions
-        else -> cloudDriveToolbarOptions
-    }
-
-    private suspend fun checkIfNodeHasFullAccessPermission(selectedNodes: Set<TypedNode>): Boolean {
-        var hasFullAccess = true
-        runCatching {
-            selectedNodes.all { getNodeAccessPermission(it.id) == AccessPermission.FULL }
-        }.onSuccess {
-            hasFullAccess = it
-        }.onFailure {
-            Timber.e(it)
-            hasFullAccess = false
-        }
-        return hasFullAccess
-    }
-
-    private suspend fun nodeCanBeMovedToRubbishBin(
-        selectedNodes: Set<TypedNode>,
-    ) = rubbishBinNode?.let { rubbishBinNode ->
-        selectedNodes.any { node ->
-            checkNodeCanBeMovedToTargetNode(nodeId = node.id, targetNodeId = rubbishBinNode.id)
-        }
-    } ?: true
 
     /**
      * This method will handle Long click on a NodesView and check the selected item
@@ -435,5 +340,4 @@ class SearchActivityViewModel @Inject constructor(
     fun errorMessageShown() {
         _state.update { it.copy(errorMessageId = null) }
     }
-
 }

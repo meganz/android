@@ -44,7 +44,7 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
-import mega.privacy.android.domain.entity.search.SearchType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
@@ -986,15 +986,15 @@ class ManagerViewModel @Inject constructor(
         incomingParentHandle: Long,
         outgoingParentHandle: Long,
         linksParentHandle: Long,
-        searchType: SearchType,
-    ): Long = when (searchType) {
-        SearchType.CLOUD_DRIVE -> browserParentHandle
-        SearchType.INCOMING_SHARES -> incomingParentHandle
-        SearchType.OUTGOING_SHARES -> outgoingParentHandle
-        SearchType.LINKS -> linksParentHandle
-        SearchType.RUBBISH_BIN -> rubbishBinParentHandle
-        SearchType.BACKUPS -> backupsParentHandle
-        SearchType.OTHER -> getRootNodeUseCase()?.id?.longValue ?: MegaApiJava.INVALID_HANDLE
+        nodeSourceType: NodeSourceType,
+    ): Long = when (nodeSourceType) {
+        NodeSourceType.CLOUD_DRIVE -> browserParentHandle
+        NodeSourceType.INCOMING_SHARES -> incomingParentHandle
+        NodeSourceType.OUTGOING_SHARES -> outgoingParentHandle
+        NodeSourceType.LINKS -> linksParentHandle
+        NodeSourceType.RUBBISH_BIN -> rubbishBinParentHandle
+        NodeSourceType.BACKUPS -> backupsParentHandle
+        NodeSourceType.OTHER -> getRootNodeUseCase()?.id?.longValue ?: MegaApiJava.INVALID_HANDLE
     }
 
     /**

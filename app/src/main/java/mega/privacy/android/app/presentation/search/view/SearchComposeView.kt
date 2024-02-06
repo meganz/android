@@ -27,7 +27,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.entity.search.SearchType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 
 /**
  * View for Search compose
@@ -81,11 +81,11 @@ fun SearchComposeView(
         modifier = modifier,
         topBar = {
             SearchToolBar(
-                selectionCount = state.selectedNodes.size,
                 searchQuery = state.searchQuery,
                 updateSearchQuery = updateSearchQuery,
-                menuActions = state.menuActions,
-                onBackPressed = onBackPressed
+                onBackPressed = onBackPressed,
+                selectedNodes = state.selectedNodes,
+                totalCount = state.searchItemList.size
             )
         },
         snackbarHost = {
@@ -95,7 +95,7 @@ fun SearchComposeView(
         }
     ) { padding ->
         Column {
-            if (state.searchType == SearchType.CLOUD_DRIVE) {
+            if (state.nodeSourceType == NodeSourceType.CLOUD_DRIVE) {
                 SearchFilterChipsView(
                     filters = state.filters,
                     selectedFilter = state.selectedFilter,

@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.search.SearchCategory
-import mega.privacy.android.domain.entity.search.SearchType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -73,8 +73,8 @@ class SearchNodesUseCaseTest {
     )
 
     @ParameterizedTest(name = "test that when search type is {0} search results are returned correctly")
-    @EnumSource(SearchType::class)
-    fun `test that search results are available for given search type`(searchType: SearchType) =
+    @EnumSource(NodeSourceType::class)
+    fun `test that search results are available for given search type`(nodeSourceType: NodeSourceType) =
         runTest {
             val query = "query"
             val parentHandle = 12345L
@@ -97,14 +97,14 @@ class SearchNodesUseCaseTest {
                 query = query,
                 parentHandle = parentHandle,
                 isFirstLevel = false,
-                searchType = searchType
+                nodeSourceType = nodeSourceType
             )
         }
 
     @ParameterizedTest(name = "test that when search type is {0} search results are returned correctly when parent handle is invalid")
-    @EnumSource(SearchType::class)
+    @EnumSource(NodeSourceType::class)
     fun `test that search results are available for given search type when parent handle is invalid`(
-        searchType: SearchType,
+        nodeSourceType: NodeSourceType,
     ) =
         runTest {
             val query = "query"
@@ -130,7 +130,7 @@ class SearchNodesUseCaseTest {
                 query = query,
                 parentHandle = parentHandle,
                 isFirstLevel = false,
-                searchType = searchType
+                nodeSourceType = nodeSourceType
             )
         }
 

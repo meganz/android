@@ -20,7 +20,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class SearchNodesUseCaseTest {
     private lateinit var underTest: SearchNodesUseCase
     private val getSearchLinkSharesNodes: GetSearchLinkSharesNodesUseCase = mock()

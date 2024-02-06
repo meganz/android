@@ -14,10 +14,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
-import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Download
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
@@ -31,7 +27,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchCategory
-import mega.privacy.android.domain.entity.search.SearchType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
@@ -73,23 +69,13 @@ class SearchActivityViewModelTest {
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode = mock()
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
-    private val nodeToolbarActionMapper = NodeToolbarActionMapper()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
-    private val cloudDriveToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(Download(DownloadMenuAction()))
-    private val incomingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(Download(DownloadMenuAction()))
-    private val outgoingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(Download(DownloadMenuAction()))
-    private val linksToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(Download(DownloadMenuAction()))
-    private val rubbishBinToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(Download(DownloadMenuAction()))
+
     private val nodeList = mutableListOf<TypedNode>()
 
     private val parentHandle = 123456L
     private val isFirstLevel = false
-    private val searchType = SearchType.CLOUD_DRIVE
+    private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
 
     @BeforeEach
     fun setUp() {
@@ -112,16 +98,6 @@ class SearchActivityViewModelTest {
             getSearchCategoriesUseCase = getSearchCategoriesUseCase,
             searchFilterMapper = searchFilterMapper,
             emptySearchViewMapper = emptySearchViewMapper,
-            cloudDriveToolbarOptions = cloudDriveToolbarOptions,
-            incomingSharesToolbarOptions = incomingSharesToolbarOptions,
-            outgoingSharesToolbarOptions = outgoingSharesToolbarOptions,
-            rubbishBinToolbarOptions = rubbishBinToolbarOptions,
-            linksToolbarOptions = linksToolbarOptions,
-            getRubbishNodeUseCase = getRubbishNodeUseCase,
-            getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            nodeToolbarActionMapper = nodeToolbarActionMapper,
-            isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
         )
     }
@@ -264,7 +240,7 @@ class SearchActivityViewModelTest {
                 searchNodesUseCase(
                     query = "",
                     parentHandle = parentHandle,
-                    searchType = searchType,
+                    nodeSourceType = nodeSourceType,
                     isFirstLevel = isFirstLevel,
                     searchCategory = filter.filter
                 )
@@ -294,7 +270,7 @@ class SearchActivityViewModelTest {
 
             val parentHandle = 123456L
             val isFirstLevel = false
-            val searchType = SearchType.CLOUD_DRIVE
+            val nodeSourceType = NodeSourceType.CLOUD_DRIVE
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
 
@@ -305,7 +281,7 @@ class SearchActivityViewModelTest {
                 searchNodesUseCase(
                     query = query,
                     parentHandle = parentHandle,
-                    searchType = searchType,
+                    nodeSourceType = nodeSourceType,
                     isFirstLevel = isFirstLevel,
                 )
             ).thenReturn(nodeList)
@@ -324,14 +300,14 @@ class SearchActivityViewModelTest {
             val filter = SearchFilter(name = "Images", filter = SearchCategory.IMAGES)
             val parentHandle = 123456L
             val isFirstLevel = false
-            val searchType = SearchType.CLOUD_DRIVE
+            val nodeSourceType = NodeSourceType.CLOUD_DRIVE
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             whenever(
                 searchNodesUseCase(
                     query = "",
                     parentHandle = parentHandle,
-                    searchType = searchType,
+                    nodeSourceType = nodeSourceType,
                     isFirstLevel = isFirstLevel,
                     searchCategory = filter.filter
                 )
@@ -379,7 +355,7 @@ class SearchActivityViewModelTest {
                 searchNodesUseCase(
                     query = query,
                     parentHandle = parentHandle,
-                    searchType = searchType,
+                    nodeSourceType = nodeSourceType,
                     isFirstLevel = isFirstLevel,
                 )
             ).thenReturn(listOf(typedFileNode, typedFolderNode))
@@ -406,7 +382,8 @@ class SearchActivityViewModelTest {
         whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
 
-        whenever(stateHandle.get<SearchType>(SearchActivity.SEARCH_TYPE)).thenReturn(SearchType.CLOUD_DRIVE)
+        whenever(stateHandle.get<NodeSourceType>(SearchActivity.SEARCH_TYPE)).thenReturn(
+            NodeSourceType.CLOUD_DRIVE)
         whenever(stateHandle.get<Long>(SearchActivity.PARENT_HANDLE)).thenReturn(123456L)
         whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
             false

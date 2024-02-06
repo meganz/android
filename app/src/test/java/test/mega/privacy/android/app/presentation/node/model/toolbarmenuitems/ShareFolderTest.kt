@@ -47,6 +47,7 @@ class ShareFolderTest {
         Arguments.of(false, multipleNodes, false),
         Arguments.of(true, multipleNodes, false),
         Arguments.of(true, setOf(oneFileNodeSelected), false),
-        Arguments.of(true, setOf(oneFolderNodeSelected), true)
+        Arguments.of(true, setOf(oneFolderNodeSelected), true),
+        Arguments.of(false, setOf(oneFolderNodeSelected), false)
     )
 }

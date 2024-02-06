@@ -6,7 +6,7 @@
     "entities": [
       {
         "tableName": "typed_messages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`msgId` INTEGER NOT NULL, `chatId` INTEGER NOT NULL, `status` TEXT NOT NULL, `tempId` INTEGER NOT NULL, `msgIndex` INTEGER NOT NULL, `userHandle` INTEGER NOT NULL, `type` TEXT NOT NULL, `hasConfirmedReactions` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `content` TEXT, `isEdited` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `isEditable` INTEGER NOT NULL, `isDeletable` INTEGER NOT NULL, `isManagementMessage` INTEGER NOT NULL, `handleOfAction` INTEGER NOT NULL, `privilege` TEXT NOT NULL, `code` TEXT NOT NULL, `usersCount` INTEGER NOT NULL, `userHandles` TEXT NOT NULL, `userNames` TEXT NOT NULL, `userEmails` TEXT NOT NULL, `handleList` TEXT NOT NULL, `duration` INTEGER NOT NULL, `retentionTime` INTEGER NOT NULL, `termCode` TEXT NOT NULL, `rowId` INTEGER NOT NULL, `changes` TEXT NOT NULL, `isMine` INTEGER NOT NULL, `shouldShowAvatar` INTEGER NOT NULL, `shouldShowTime` INTEGER NOT NULL, `shouldShowDate` INTEGER NOT NULL, `textMessage` TEXT, PRIMARY KEY(`msgId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`msgId` INTEGER NOT NULL, `chatId` INTEGER NOT NULL, `status` TEXT NOT NULL, `tempId` INTEGER NOT NULL, `msgIndex` INTEGER NOT NULL, `userHandle` INTEGER NOT NULL, `type` TEXT NOT NULL, `hasConfirmedReactions` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `content` TEXT, `isEdited` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `isEditable` INTEGER NOT NULL, `isDeletable` INTEGER NOT NULL, `isManagementMessage` INTEGER NOT NULL, `handleOfAction` INTEGER NOT NULL, `privilege` TEXT NOT NULL, `code` TEXT NOT NULL, `usersCount` INTEGER NOT NULL, `userHandles` TEXT NOT NULL, `userNames` TEXT NOT NULL, `userEmails` TEXT NOT NULL, `handleList` TEXT NOT NULL, `duration` INTEGER NOT NULL, `retentionTime` INTEGER NOT NULL, `termCode` TEXT NOT NULL, `rowId` INTEGER NOT NULL, `changes` TEXT NOT NULL, `isMine` INTEGER NOT NULL, `shouldShowAvatar` INTEGER NOT NULL, `shouldShowTime` INTEGER NOT NULL, `shouldShowDate` INTEGER NOT NULL, `textMessage` TEXT, `reactions` TEXT NOT NULL, PRIMARY KEY(`msgId`))",
         "fields": [
           {
             "fieldPath": "msgId",
@@ -205,6 +205,12 @@
             "columnName": "textMessage",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "reactions",
+            "columnName": "reactions",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -564,7 +570,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4f8c43a6323b4eb76ddd6bca0b014228')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b1e7fbffe892b47c8d1af6e00e4de964')"
     ]
   }
 }

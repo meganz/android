@@ -210,7 +210,7 @@ import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchFragment
 import mega.privacy.android.app.presentation.search.SearchViewModel
-import mega.privacy.android.app.presentation.search.mapper.SearchTypeMapper
+import mega.privacy.android.app.presentation.node.NodeSourceTypeMapper
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
@@ -298,7 +298,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.psa.Psa
-import mega.privacy.android.domain.entity.search.SearchType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
@@ -451,7 +451,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     lateinit var inAppUpdateHandler: InAppUpdateHandler
 
     @Inject
-    lateinit var searchTypeMapper: SearchTypeMapper
+    lateinit var nodeSourceTypeMapper: NodeSourceTypeMapper
 
     @Inject
     lateinit var navigator: MegaNavigator
@@ -532,7 +532,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     var turnOnNotifications = false
 
     override var drawerItem: DrawerItem? = null
-    private var searchType: SearchType = SearchType.OTHER
+    private var nodeSourceType: NodeSourceType = NodeSourceType.OTHER
     private lateinit var fragmentLayout: LinearLayout
     private lateinit var waitingRoomComposeView: ComposeView
     private lateinit var callRecordingConsentDialogComposeView: ComposeView
@@ -3987,13 +3987,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             incomingParentHandle = incomingSharesViewModel.state.value.incomingHandle,
             outgoingParentHandle = outgoingSharesViewModel.state.value.outgoingHandle,
             linksParentHandle = getHandleFromLinksViewModel(),
-            searchType = searchType,
+            nodeSourceType = nodeSourceType,
         )
 
         val searchActivityIntent = SearchActivity.getIntent(
             context = this,
             isFirstNavigationLevel = isFirstNavigationLevel,
-            searchType = searchType,
+            nodeSourceType = nodeSourceType,
             parentHandle = parentHandle
         )
 
@@ -7999,7 +7999,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun setSearchDrawerItem() {
         if (drawerItem === DrawerItem.SEARCH) return
-        searchType = searchTypeMapper(drawerItem = drawerItem, sharesTab = tabItemShares)
+        nodeSourceType = nodeSourceTypeMapper(drawerItem = drawerItem, sharesTab = tabItemShares)
         drawerItem?.let { searchViewModel.setSearchDrawerItem(it) }
         searchViewModel.setSearchSharedTab(tabItemShares)
         drawerItem = DrawerItem.SEARCH
