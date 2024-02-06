@@ -6,7 +6,9 @@ import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityCo
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
+import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.MoveMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.RestoreMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
@@ -118,7 +120,9 @@ class NodeBottomSheetActionHandler(
             is ShareFolderMenuAction -> shareFolderActivityLauncher?.launch(longArrayOf(node.id.longValue))
             is RestoreMenuAction -> restoreFromRubbishLauncher?.launch(longArrayOf(node.id.longValue))
             is SendToChatMenuAction -> sendToChatLauncher?.launch(longArrayOf(node.id.longValue))
-            is OpenWithMenuAction -> nodeOptionsBottomSheetViewModel.downloadNode()
+            is OpenWithMenuAction -> nodeOptionsBottomSheetViewModel.downloadNodeForPreview()
+            is DownloadMenuAction -> nodeOptionsBottomSheetViewModel.downloadNode()
+            is AvailableOfflineMenuAction -> nodeOptionsBottomSheetViewModel.downloadNodeForOffline()
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }
     }

@@ -424,6 +424,30 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     fun downloadNode() {
         state.value.node?.let { node ->
             _state.update {
+                it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(listOf(node))))
+            }
+        }
+    }
+
+    /**
+     * Download node for offline
+     * Triggers TransferTriggerEvent.StartDownloadNode with parameter [TypedNode]
+     */
+    fun downloadNodeForOffline() {
+        state.value.node?.let { node ->
+            _state.update {
+                it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForOffline(node)))
+            }
+        }
+    }
+
+    /**
+     * Download node for preview
+     * Triggers TransferTriggerEvent.StartDownloadNode with parameter [TypedNode]
+     */
+    fun downloadNodeForPreview() {
+        state.value.node?.let { node ->
+            _state.update {
                 it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(node)))
             }
         }

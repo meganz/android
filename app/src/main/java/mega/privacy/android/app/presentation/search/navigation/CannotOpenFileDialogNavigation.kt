@@ -13,7 +13,7 @@ internal fun NavGraphBuilder.cannotOpenFileDialogNavigation(
     dialog(route = cannotOpenFileDialog) {
         CannotOpenFileDialog(
             onDismiss = { navHostController.navigateUp() },
-            onDownload = nodeOptionsBottomSheetViewModel::downloadNode
+            onDownload = nodeOptionsBottomSheetViewModel::downloadNodeForPreview
         )
     }
 }

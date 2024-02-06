@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -111,6 +110,17 @@ class ShareFolderBottomSheetMenuItemTest {
             },
             false,
             true,
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.READWRITE,
+            false,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isPendingShare } doReturn false
+            },
+            false,
+            false,
         ),
     )
 }

@@ -75,7 +75,7 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
                 }.onFailure { Timber.e(it) }
             }
         } else {
-            Timber.d("Save offline")
+            actionHandler(menuAction, node)
         }
     }
 
