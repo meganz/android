@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
+import mega.privacy.android.domain.usecase.chat.message.paging.CreateSaveMessageRequestUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.GetReactionsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -268,6 +269,23 @@ class CreateSaveMessageRequestUseCaseTest {
         )
 
         assertThat(actual.map { it.shouldShowDate }).containsExactly(true, true)
+    }
+
+    @Test
+    fun `test that date is displayed for first message`() = runTest {
+        val myMessage = mock<ChatMessage> {
+            on { userHandle }.thenReturn(myHandle)
+            on { type }.thenReturn(ChatMessageType.NORMAL)
+        }
+
+        val actual = underTest(
+            chatId = chatId,
+            chatMessages = listOf(myMessage),
+            currentUserHandle = myHandle,
+            nextMessageUserHandle = null,
+        )
+
+        assertThat(actual.all { it.shouldShowDate }).isTrue()
     }
 
     @Test
