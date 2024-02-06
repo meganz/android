@@ -497,7 +497,9 @@ class BottomFloatingPanelViewHolder(
                         onRingParticipantClicked = { chatParticipant ->
                             meetingViewModel.ringParticipant(chatParticipant.handle)
                         },
-                        onMuteAllParticipantsClick = {},
+                        onMuteAllParticipantsClick = {
+                            meetingViewModel.muteAllParticipants()
+                        },
                         onRingAllParticipantsClicked = {
                             meetingViewModel.ringAllAbsentsParticipants()
                         })

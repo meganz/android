@@ -102,6 +102,18 @@
                 android:show="@{viewModel.showDividerContactInfo()}" />
 
             <TextView
+                android:id="@+id/mute_participant"
+                style="@style/BottomSheetItem"
+                android:show="@{viewModel.showMuteParticipant()}"
+                android:text="@string/meetings_bottom_panel_in_call_participants_mute_a_participant_button"
+                app:drawableStartCompat="@drawable/mute_participant_icon" />
+
+            <View
+                android:id="@+id/divider_mute_participant"
+                style="@style/BottomSheetItemDivider"
+                android:show="@{viewModel.showDividerMuteParticipant()}" />
+
+            <TextView
                 android:id="@+id/send_message"
                 style="@style/BottomSheetItem"
                 android:show="@{viewModel.showSendMessage()}"

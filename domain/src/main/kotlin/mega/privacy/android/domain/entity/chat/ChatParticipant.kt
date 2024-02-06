@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallSta
  * @property privilegesUpdated          Check if privilege are updated.
  * @property isContact                  True, if it's my contact. False, if not.
  * @property callStatus                 [MeetingParticipantNotInCallStatus]
+ * @property isMuted                    True, if it's muted. False, if not.
  */
 data class ChatParticipant(
     val handle: Long,
@@ -39,4 +40,5 @@ data class ChatParticipant(
     val callParticipantData: CallParticipantData = CallParticipantData(),
     val isContact: Boolean = false,
     var callStatus: MeetingParticipantNotInCallStatus = MeetingParticipantNotInCallStatus.NotInCall,
+    val isMuted: Boolean = false,
 )

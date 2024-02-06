@@ -231,7 +231,6 @@ fun ParticipantsBottomPanelView(
                                         overflow = TextOverflow.Ellipsis
                                     )
                                 }
-
                                 if (state.shouldMuteAllItemBeShown()) {
                                     Box(
                                         modifier = Modifier

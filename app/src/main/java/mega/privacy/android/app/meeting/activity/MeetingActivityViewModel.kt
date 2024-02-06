@@ -1943,6 +1943,31 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
+     * Mute all participants
+     */
+    fun muteAllParticipants() {
+
+    }
+
+    /**
+     * Mute one participant
+     */
+    fun muteParticipant() {
+        _state.value.chatParticipantSelected?.let { participant ->
+            muteParticipant(participant.callParticipantData.clientId)
+        }
+    }
+
+    /**
+     * Mute participant
+     *
+     * @param clientId   Client id of a participant
+     */
+    fun muteParticipant(clientId: Long) {
+
+    }
+
+    /**
      * Update the status of a not in call participant
      *
      * @param userId    The not in call participant ID

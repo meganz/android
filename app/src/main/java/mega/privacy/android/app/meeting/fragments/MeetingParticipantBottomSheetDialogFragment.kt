@@ -108,6 +108,8 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
 
         listenAction(binding.contactInfo) { onContactInfoOrEditProfile() }
 
+        listenAction(binding.muteParticipant) { onMuteParticipant()}
+
         listenAction(binding.sendMessage) {
             // Open chat page
             val chatId = bottomViewModel.sendMessage()
@@ -181,6 +183,13 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
             setNegativeButton(R.string.general_cancel, null)
             show()
         }
+    }
+
+    /**
+     * Mute participant from this meeting
+     */
+    private fun onMuteParticipant() {
+        sharedViewModel.muteParticipant(participantItem.clientId)
     }
 
     /**

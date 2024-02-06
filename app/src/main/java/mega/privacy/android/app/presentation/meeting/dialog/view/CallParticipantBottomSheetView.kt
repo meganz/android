@@ -60,8 +60,10 @@ internal fun CallParticipantBottomSheetView(
     onMakeHostClick: () -> Unit = {},
     onRemoveAsHostClick: () -> Unit = {},
     onDisplayInMainViewClick: () -> Unit = {},
+    onMuteParticipantClick: () -> Unit = {},
     onRemoveParticipantClick: () -> Unit = {},
 ) {
+
     ModalBottomSheetLayout(
         sheetState = modalSheetState,
         scrimColor = black.copy(alpha = 0.32f),
@@ -77,6 +79,7 @@ internal fun CallParticipantBottomSheetView(
                 onMakeHostClick = onMakeHostClick,
                 onRemoveAsHostClick = onRemoveAsHostClick,
                 onDisplayInMainViewClick = onDisplayInMainViewClick,
+                onMuteParticipantClick = onMuteParticipantClick,
                 onRemoveParticipantClick = onRemoveParticipantClick,
             )
         }
@@ -97,6 +100,7 @@ private fun BottomSheetContent(
     onRemoveAsHostClick: () -> Unit = {},
     onDisplayInMainViewClick: () -> Unit = {},
     onRemoveParticipantClick: () -> Unit = {},
+    onMuteParticipantClick: () -> Unit = {},
 ) {
 
     state.chatParticipantSelected?.let { participant ->
@@ -237,6 +241,24 @@ private fun BottomSheetContent(
                         onClick = {
                             coroutineScope.launch { modalSheetState.hide() }
                             onSendMessageClick()
+                        }
+                    )
+                    ChatDivider()
+                }
+
+                val shouldShowMuteOption =
+                    state.isMuteFeatureFlagEnabled && state.hasHostPermission() && !participant.isMe && !participant.isMuted
+
+                if (shouldShowMuteOption) {
+                    BottomSheetMenuItemView(
+                        modifier = Modifier,
+                        res = R.drawable.mute_participant_icon,
+                        text = R.string.general_mute,
+                        description = "Mute participant",
+                        tintRed = false,
+                        onClick = {
+                            coroutineScope.launch { modalSheetState.hide() }
+                            onMuteParticipantClick()
                         }
                     )
                     ChatDivider()

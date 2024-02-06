@@ -330,6 +330,9 @@ class MeetingActivity : PasscodeActivity() {
                         },
                         onRingAllParticipantsClicked = {
                             meetingViewModel.ringAllAbsentsParticipants()
+                        },
+                        onMuteParticipantClick = {
+                            meetingViewModel.muteParticipant()
                         }
                     )
                 }

@@ -92,8 +92,16 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      * @return if should show return true, else false
      */
     fun showDividerContactInfo(): Boolean = (showAddContact() || showContactInfoOrEditProfile())
-            && (showSendMessage() || showPinItem() || showMakeModeratorItem() || showRemoveItem())
+            && (showDividerMuteParticipant() || showSendMessage() || showPinItem() || showMakeModeratorItem() || showRemoveItem())
 
+    /**
+     * Determine if show the divider between info item and option items
+     *
+     * @return if should show return true, else false
+     */
+    fun showDividerMuteParticipant(): Boolean =
+        (showMuteParticipant() || showContactInfoOrEditProfile())
+                && (showSendMessage() || showPinItem() || showMakeModeratorItem() || showRemoveItem())
 
     /**
      * Determine if show the divider between seng message item and option items
@@ -102,7 +110,6 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      */
     fun showDividerSendMessage(): Boolean =
         showSendMessage() && (showPinItem() || showMakeModeratorItem() || showRemoveItem())
-
 
     /**
      * Determine if show the divider between ping to speaker item and option items
@@ -143,6 +150,13 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
     fun showSendMessage(): Boolean =
         !isGuest && !isParticipantGuest() && participant?.isContact == true && participant?.isMe == false && participant?.peerId != megaChatApi.myUserHandle
 
+    /**
+     * Determine if show the `Muted` item
+     *
+     * @return if should show `muted` item, return true, else false
+     */
+    fun showMuteParticipant(): Boolean =
+        participant?.isMe == false && !isGuest && isModerator && participant?.isMuted == false
 
     /**
      * Determine if show the `Pin to speaker view` item

@@ -74,6 +74,7 @@ fun ParticipantsFullListView(
     onMakeHostClicked: () -> Unit,
     onRemoveAsHostClicked: () -> Unit,
     onDisplayInMainViewClicked: () -> Unit,
+    onMuteParticipantClick: () -> Unit,
     onRemoveParticipantClicked: () -> Unit,
     onBottomPanelHiddenClicked: () -> Unit,
     onRemoveParticipant: () -> Unit,
@@ -253,6 +254,7 @@ fun ParticipantsFullListView(
             onMakeHostClick = onMakeHostClicked,
             onRemoveAsHostClick = onRemoveAsHostClicked,
             onDisplayInMainViewClick = onDisplayInMainViewClicked,
+            onMuteParticipantClick = onMuteParticipantClick,
             onRemoveParticipantClick = onRemoveParticipantClicked,
         )
     }
@@ -381,6 +383,7 @@ fun PreviewUsersListViewWaitingRoom() {
             onDismissRemoveParticipantDialog = {},
             onDisplayInMainViewClicked = {},
             onRemoveParticipant = {},
+            onMuteParticipantClick = {},
             onSendMessageClicked = {})
     }
 }
@@ -415,6 +418,7 @@ fun PreviewUsersListViewInCall() {
             onDismissRemoveParticipantDialog = {},
             onDisplayInMainViewClicked = {},
             onRemoveParticipant = {},
+            onMuteParticipantClick = {},
             onSendMessageClicked = {})
     }
 }
@@ -449,6 +453,7 @@ fun PreviewUsersListViewNotInCall() {
             onDismissRemoveParticipantDialog = {},
             onDisplayInMainViewClicked = {},
             onRemoveParticipant = {},
+            onMuteParticipantClick = {},
             onSendMessageClicked = {})
     }
 

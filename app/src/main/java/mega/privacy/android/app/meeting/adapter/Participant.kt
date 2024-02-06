@@ -33,6 +33,7 @@ import java.io.Serializable
  * @param isScreenShared        True if this participant is the screen shared. False, if not.
  * @param isCameraOn            True if camera is on. False if camera is off.
  * @param isScreenShareOn       True if screen share is on. False if screen share is off.
+ * @param isMuted               True, if it's muted. False, if not.
  */
 data class Participant(
     val peerId: Long,
@@ -55,6 +56,7 @@ data class Participant(
     var isScreenShared: Boolean = false,
     var isCameraOn: Boolean = false,
     var isScreenShareOn: Boolean = false,
+    var isMuted: Boolean = false,
 ) : Serializable {
 
     /**
