@@ -4,14 +4,19 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
+import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
+import mega.privacy.android.domain.entity.chat.ChatMessage
 import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaStringList
+import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,9 +37,11 @@ class ChatMessageRepositoryImplTest {
     private lateinit var underTest: ChatMessageRepositoryImpl
 
     private val megaChatApiGateway: MegaChatApiGateway = mock()
+    private val megaApiGateway = mock<MegaApiGateway>()
     private val stringListMapper = mock<StringListMapper>()
     private val handleListMapper = mock<HandleListMapper>()
     private val chatMessageMapper = mock<ChatMessageMapper>()
+    private val megaHandleListMapper = mock<MegaHandleListMapper>()
 
     private val megaChatErrorSuccess = mock<MegaChatError> {
         on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
@@ -46,10 +53,12 @@ class ChatMessageRepositoryImplTest {
     fun setUp() {
         underTest = ChatMessageRepositoryImpl(
             megaChatApiGateway = megaChatApiGateway,
+            megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             stringListMapper = stringListMapper,
             handleListMapper = handleListMapper,
             chatMessageMapper = chatMessageMapper,
+            megaHandleListMapper = megaHandleListMapper,
         )
     }
 
@@ -193,5 +202,27 @@ class ChatMessageRepositoryImplTest {
             height = height,
             title = title
         )
+    }
+
+    @Test
+    fun `test that attach contact invokes apis and mappers correctly`() = runTest {
+        val contactEmail = "contactEmail"
+        val contactHandle = 123L
+        val user = mock<MegaUser> {
+            on { handle } doReturn contactHandle
+        }
+        val userList = listOf(contactHandle)
+        val handleList = mock<MegaHandleList>()
+        val message = mock<MegaChatMessage>()
+        val chatMessage = mock<ChatMessage>()
+        whenever(megaApiGateway.getContact(contactEmail)).thenReturn(user)
+        whenever(megaHandleListMapper(userList)).thenReturn(handleList)
+        whenever(megaChatApiGateway.attachContacts(chatId, handleList)).thenReturn(message)
+        whenever(chatMessageMapper(message)).thenReturn(chatMessage)
+        assertThat(underTest.attachContact(chatId, contactEmail)).isEqualTo(chatMessage)
+        verify(megaApiGateway).getContact(contactEmail)
+        verify(megaHandleListMapper).invoke(userList)
+        verify(megaChatApiGateway).attachContacts(chatId, handleList)
+        verify(chatMessageMapper).invoke(message)
     }
 }

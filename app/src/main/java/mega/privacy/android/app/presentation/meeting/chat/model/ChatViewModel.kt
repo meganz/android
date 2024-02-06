@@ -71,6 +71,7 @@ import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
+import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
@@ -188,6 +189,7 @@ class ChatViewModel @Inject constructor(
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val deleteReactionUseCase: DeleteReactionUseCase,
     private val sendGiphyMessageUseCase: SendGiphyMessageUseCase,
+    private val attachContactsUseCase: AttachContactsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1165,6 +1167,15 @@ class ChatViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    /**
+     * Attach one or more contacts to the chat.
+     */
+    fun onAttachContacts(contacts: List<String>) {
+        viewModelScope.launch {
+            attachContactsUseCase(chatId, contacts)
         }
     }
 

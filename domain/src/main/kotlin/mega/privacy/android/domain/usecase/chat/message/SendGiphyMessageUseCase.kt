@@ -5,7 +5,7 @@ import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import javax.inject.Inject
 
 /**
- * Use case for sending a location message to a chat.
+ * Use case for sending a giphy message to a chat.
  */
 class SendGiphyMessageUseCase @Inject constructor(
     private val chatRepository: ChatRepository,

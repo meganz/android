@@ -803,4 +803,7 @@ internal class MegaChatApiFacade @Inject constructor(
         title: String?,
     ): MegaChatMessage =
         chatApi.sendGiphy(chatId, srcMp4, srcWebp, sizeMp4, sizeWebp, width, height, title)
+
+    override fun attachContacts(chatId: Long, contactHandles: MegaHandleList): MegaChatMessage =
+        chatApi.attachContacts(chatId, contactHandles)
 }

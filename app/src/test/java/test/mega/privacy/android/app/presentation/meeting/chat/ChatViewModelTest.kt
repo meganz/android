@@ -82,6 +82,7 @@ import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
+import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
@@ -247,6 +248,7 @@ internal class ChatViewModelTest {
     private val getChatMessageUseCase = mock<GetChatMessageUseCase>()
     private val deleteReactionUseCase = mock<DeleteReactionUseCase>()
     private val sendGiphyMessageUseCase = mock<SendGiphyMessageUseCase>()
+    private val attachContactsUseCase = mock<AttachContactsUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -304,6 +306,7 @@ internal class ChatViewModelTest {
             getChatMessageUseCase,
             deleteReactionUseCase,
             sendGiphyMessageUseCase,
+            attachContactsUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -393,6 +396,7 @@ internal class ChatViewModelTest {
             getChatMessageUseCase = getChatMessageUseCase,
             deleteReactionUseCase = deleteReactionUseCase,
             sendGiphyMessageUseCase = sendGiphyMessageUseCase,
+            attachContactsUseCase = attachContactsUseCase,
         )
     }
 
@@ -2484,6 +2488,14 @@ internal class ChatViewModelTest {
         whenever(deleteReactionUseCase(chatId, msgId, reaction)).thenReturn(Unit)
         underTest.onDeleteReaction(msgId, reaction)
         verify(deleteReactionUseCase).invoke(chatId, msgId, reaction)
+    }
+
+    @Test
+    fun `test that attach contacts invokes use case`() = runTest {
+        val contactList = listOf("contact1, contact2")
+        whenever(attachContactsUseCase(chatId, contactList)).thenReturn(Unit)
+        underTest.onAttachContacts(contactList)
+        verify(attachContactsUseCase).invoke(chatId, contactList)
     }
 
     private fun ChatRoom.getNumberParticipants() =

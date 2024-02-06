@@ -4,20 +4,25 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getChatRequestListener
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
+import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
+import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import javax.inject.Inject
 
 internal class ChatMessageRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
+    private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val stringListMapper: StringListMapper,
     private val handleListMapper: HandleListMapper,
     private val chatMessageMapper: ChatMessageMapper,
+    private val megaHandleListMapper: MegaHandleListMapper,
 ) : ChatMessageRepository {
     override suspend fun setMessageSeen(chatId: Long, messageId: Long) = withContext(ioDispatcher) {
         megaChatApiGateway.setMessageSeen(chatId, messageId)
@@ -87,4 +92,13 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             )
         )
     }
+
+    override suspend fun attachContact(chatId: Long, contactEmail: String): ChatMessage? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getContact(contactEmail)?.let { user ->
+                megaHandleListMapper(listOf(user.handle))?.let {
+                    chatMessageMapper(megaChatApiGateway.attachContacts(chatId, it))
+                }
+            }
+        }
 }

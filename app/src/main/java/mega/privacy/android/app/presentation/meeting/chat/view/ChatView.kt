@@ -143,6 +143,7 @@ internal fun ChatView(
         onAddReaction = viewModel::onAddReaction,
         onDeleteReaction = viewModel::onDeleteReaction,
         onSendGiphyMessage = viewModel::onSendGiphyMessage,
+        onAttachContacts = viewModel::onAttachContacts,
     )
 }
 
@@ -222,6 +223,7 @@ internal fun ChatView(
     onAddReaction: (Long, String) -> Unit = { _, _ -> },
     onDeleteReaction: (Long, String) -> Unit = { _, _ -> },
     onSendGiphyMessage: (GifData?) -> Unit = { _ -> },
+    onAttachContacts: (List<String>) -> Unit = { _ -> },
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -362,7 +364,10 @@ internal fun ChatView(
             rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()
             ) { result ->
-                // TODO attach contact to chat room
+                result.data?.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
+                    ?.let { contactList ->
+                        onAttachContacts(contactList.toList())
+                    }
             }
         var takePictureUri by remember { mutableStateOf(Uri.EMPTY) }
         val takePictureLauncher =
