@@ -85,6 +85,7 @@ import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCa
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
+import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
@@ -242,6 +243,7 @@ internal class ChatViewModelTest {
     }
     private val addReactionUseCase = mock<AddReactionUseCase>()
     private val getChatMessageUseCase = mock<GetChatMessageUseCase>()
+    private val deleteReactionUseCase = mock<DeleteReactionUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -296,7 +298,8 @@ internal class ChatViewModelTest {
             sendLocationMessageUseCase,
             sendChatAttachmentsUseCase,
             addReactionUseCase,
-            getChatMessageUseCase
+            getChatMessageUseCase,
+            deleteReactionUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -383,7 +386,8 @@ internal class ChatViewModelTest {
             sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
             monitorChatPendingChangesUseCase = monitorChatPendingChangesUseCase,
             addReactionUseCase = addReactionUseCase,
-            getChatMessageUseCase = getChatMessageUseCase
+            getChatMessageUseCase = getChatMessageUseCase,
+            deleteReactionUseCase = deleteReactionUseCase,
         )
     }
 
@@ -2432,6 +2436,15 @@ internal class ChatViewModelTest {
                 assertThat(item.editingMessageContent).isNull()
             }
         }
+
+    @Test
+    fun `test that delete reaction invokes use case`() = runTest {
+        val msgId = 1234L
+        val reaction = "reaction"
+        whenever(deleteReactionUseCase(chatId, msgId, reaction)).thenReturn(Unit)
+        underTest.onDeleteReaction(msgId, reaction)
+        verify(deleteReactionUseCase).invoke(chatId, msgId, reaction)
+    }
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

@@ -26,7 +26,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  *                          per row can be calculated dynamically.
  * @param reactions List of [UIReaction]
  * @param isMine Whether the current user is the sender of the message
- * @param onAddReactionClicked Callback when the add reaction button is clicked
+ * @param onMoreReactionsClicked Callback when the add more reactions button is clicked
  * @param onReactionClicked Callback when a reaction is clicked
  */
 @OptIn(ExperimentalLayoutApi::class)
@@ -35,7 +35,7 @@ fun ReactionsView(
     modifier: Modifier,
     reactions: List<UIReaction> = emptyList(),
     isMine: Boolean = false,
-    onAddReactionClicked: () -> Unit = {},
+    onMoreReactionsClicked: () -> Unit = {},
     onReactionClicked: (String) -> Unit = {},
 ) {
     val systemLayoutDirection = LocalLayoutDirection.current
@@ -54,7 +54,7 @@ fun ReactionsView(
                 )
             }
             AddReactionChip(
-                onAddClicked = onAddReactionClicked,
+                onAddClicked = onMoreReactionsClicked,
             )
         }
     }

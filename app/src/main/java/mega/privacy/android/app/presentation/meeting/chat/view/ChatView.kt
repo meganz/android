@@ -93,6 +93,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.chat.ChatObserverIndicator
 import mega.privacy.android.core.ui.controls.chat.ScrollToBottomFab
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
@@ -139,6 +140,7 @@ internal fun ChatView(
         onAttachFiles = viewModel::onAttachFiles,
         onCloseEditing = viewModel::onCloseEditing,
         onAddReaction = viewModel::onAddReaction,
+        onDeleteReaction = viewModel::onDeleteReaction,
     )
 }
 
@@ -175,15 +177,18 @@ internal fun ChatView(
     onAnswerCall: () -> Unit = {},
     onEnableGeolocation: () -> Unit = {},
     onUserUpdateHandled: () -> Unit = {},
-    messageListView: @Composable (ChatUiState, LazyListState, Dp, (TypedMessage) -> Unit) -> Unit = { state, listState, bottomPadding, onMessageLongClick ->
-        MessageListView(
-            uiState = state,
-            scrollState = listState,
-            bottomPadding = bottomPadding,
-            onUserUpdateHandled = onUserUpdateHandled,
-            onMessageLongClick = onMessageLongClick,
-        )
-    },
+    messageListView: @Composable (ChatUiState, LazyListState, Dp, (TypedMessage) -> Unit, (Long) -> Unit, (Long, String, List<UIReaction>) -> Unit) -> Unit =
+        { state, listState, bottomPadding, onMessageLongClick, onMoreReactionsClick, onReactionClick ->
+            MessageListView(
+                uiState = state,
+                scrollState = listState,
+                bottomPadding = bottomPadding,
+                onUserUpdateHandled = onUserUpdateHandled,
+                onMessageLongClick = onMessageLongClick,
+                onMoreReactionsClicked = onMoreReactionsClick,
+                onReactionClicked = onReactionClick,
+            )
+        },
     bottomBar: @Composable (
         uiState: ChatUiState,
         showEmojiPicker: Boolean,
@@ -213,6 +218,7 @@ internal fun ChatView(
     onAttachFiles: (List<Uri>) -> Unit = {},
     onCloseEditing: () -> Unit = {},
     onAddReaction: (Long, String) -> Unit = { _, _ -> },
+    onDeleteReaction: (Long, String) -> Unit = { _, _ -> },
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -229,6 +235,7 @@ internal fun ChatView(
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
     var showReactionPicker by rememberSaveable { mutableStateOf(false) }
     var messageClicked by rememberSaveable { mutableStateOf<TypedMessage?>(null) }
+    var addingReactionTo by rememberSaveable { mutableStateOf<Long?>(null) }
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val keyboardController = LocalSoftwareKeyboardController.current
     val toolbarModalSheetState =
@@ -256,6 +263,7 @@ internal fun ChatView(
                 keyboardController?.hide()
             } else {
                 messageClicked = null
+                addingReactionTo = null
             }
             true
         }
@@ -369,7 +377,7 @@ internal fun ChatView(
             messageOptionsModalSheetState.currentValue != ModalBottomSheetValue.Hidden
         }
 
-        if (!isMessageOptionsModalShown) {
+        if (!isMessageOptionsModalShown && addingReactionTo == null) {
             showReactionPicker = false
         }
 
@@ -393,6 +401,7 @@ internal fun ChatView(
                             showReactionPicker = showReactionPicker,
                             onReactionClicked = {
                                 messageClicked?.let { message -> onAddReaction(message.msgId, it) }
+                                addingReactionTo?.let { msgId -> onAddReaction(msgId, it) }
                                 coroutineScope.launch { messageOptionsModalSheetState.hide() }
                             },
                             onMoreReactionsClicked = { showReactionPicker = true },
@@ -598,14 +607,32 @@ internal fun ChatView(
                             messageListView(
                                 uiState,
                                 scrollState,
-                                bottomPadding
-                            ) { message ->
-                                messageClicked = message
-                                // Use message for showing correct available options
-                                coroutineScope.launch {
-                                    messageOptionsModalSheetState.show()
-                                }
-                            }
+                                bottomPadding,
+                                { message ->
+                                    messageClicked = message
+                                    // Use message for showing correct available options
+                                    coroutineScope.launch {
+                                        messageOptionsModalSheetState.show()
+                                    }
+                                },
+                                { msgId ->
+                                    addingReactionTo = msgId
+                                    showReactionPicker = true
+                                    coroutineScope.launch {
+                                        messageOptionsModalSheetState.show()
+                                    }
+                                },
+                                { msgId, clickedReaction, reactions ->
+                                    reactions.find { reaction -> reaction.reaction == clickedReaction }
+                                        ?.let {
+                                            if (it.hasMe) {
+                                                onDeleteReaction(msgId, clickedReaction)
+                                            } else {
+                                                onAddReaction(msgId, clickedReaction)
+                                            }
+                                        }
+                                },
+                            )
                         },
                     )
                 }
@@ -711,7 +738,7 @@ internal fun ChatView(
                 onConsumed = onInfoToShowConsumed
             ) { info ->
                 info?.let {
-                    getInfoToShow(info, context)?.let { snackBarHostState.showSnackbar(it) }
+                    getInfoToShow(info, context).let { snackBarHostState.showSnackbar(it) }
                 } ?: context.findActivity()?.finish()
             }
 

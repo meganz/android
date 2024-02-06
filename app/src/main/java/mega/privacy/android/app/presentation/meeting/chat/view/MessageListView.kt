@@ -29,6 +29,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewM
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ParticipantUiMessage
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import timber.log.Timber
 
@@ -37,6 +38,8 @@ internal fun MessageListView(
     uiState: ChatUiState,
     scrollState: LazyListState,
     bottomPadding: Dp,
+    onMoreReactionsClicked: (Long) -> Unit,
+    onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
     viewModel: MessageListViewModel = hiltViewModel(),
     onUserUpdateHandled: () -> Unit = {},
     onMessageLongClick: (TypedMessage) -> Unit = {},
@@ -117,6 +120,8 @@ internal fun MessageListView(
                         onLongClick = {
                             if (uiState.haveWritePermission) onMessageLongClick(it)
                         },
+                        onMoreReactionsClicked = onMoreReactionsClicked,
+                        onReactionClicked = onReactionClicked,
                     )
                 }
             }

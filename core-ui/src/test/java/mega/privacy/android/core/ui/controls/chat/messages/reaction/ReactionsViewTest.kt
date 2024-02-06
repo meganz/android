@@ -25,7 +25,7 @@ class ReactionsViewTest {
             ReactionsView(
                 modifier = Modifier,
                 reactions = reactions,
-                onAddReactionClicked = {},
+                onMoreReactionsClicked = {},
                 onReactionClicked = {},
             )
         }
@@ -43,7 +43,7 @@ class ReactionsViewTest {
             ReactionsView(
                 modifier = Modifier,
                 reactions = reactions,
-                onAddReactionClicked = {},
+                onMoreReactionsClicked = {},
                 onReactionClicked = {},
             )
         }
@@ -58,7 +58,7 @@ class ReactionsViewTest {
             ReactionsView(
                 modifier = Modifier,
                 reactions = reactions,
-                onAddReactionClicked = addReactionCallBack,
+                onMoreReactionsClicked = addReactionCallBack,
                 onReactionClicked = {},
             )
         }
@@ -77,7 +77,7 @@ class ReactionsViewTest {
             ReactionsView(
                 modifier = Modifier,
                 reactions = reactions,
-                onAddReactionClicked = {},
+                onMoreReactionsClicked = {},
                 onReactionClicked = reactionChipCallback,
             )
         }

@@ -215,7 +215,7 @@ class ChatViewTest {
                     uiState = state,
                     onBackPressed = {},
                     onMenuActionPressed = actionPressed,
-                    messageListView = { _, _, _, _ -> },
+                    messageListView = { _, _, _, _, _, _ -> },
                     bottomBar = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, onCloseEditing, interactionSourceTextInput ->
                         ChatBottomBarContent(
                             uiState = state,

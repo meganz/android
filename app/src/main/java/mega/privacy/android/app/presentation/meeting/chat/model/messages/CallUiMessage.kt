@@ -34,12 +34,16 @@ data class CallUiMessage(
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,
+        onMoreReactionsClicked: (Long) -> Unit,
+        onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
     ) {
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),
             isMine = displayAsMine,
             showForwardIcon = canForward,
             reactions = reactions,
+            onMoreReactionsClicked = { onMoreReactionsClicked(id) },
+            onReactionClicked = { onReactionClicked(id, it, reactions) },
             time = getTimeOrNull(timeFormatter),
             date = getDateOrNull(dateFormatter),
             content = {

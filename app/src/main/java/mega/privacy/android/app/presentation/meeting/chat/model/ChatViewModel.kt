@@ -74,6 +74,7 @@ import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCa
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
+import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
@@ -183,6 +184,7 @@ class ChatViewModel @Inject constructor(
     private val monitorChatPendingChangesUseCase: MonitorChatPendingChangesUseCase,
     private val addReactionUseCase: AddReactionUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
+    private val deleteReactionUseCase: DeleteReactionUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1124,6 +1126,19 @@ class ChatViewModel @Inject constructor(
     fun onAddReaction(msgId: Long, reaction: String) {
         viewModelScope.launch {
             runCatching { addReactionUseCase(chatId, msgId, reaction) }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Delete reaction in a message.
+     *
+     * @param msgId The message id.
+     * @param reaction The reaction to remove.
+     */
+    fun onDeleteReaction(msgId: Long, reaction: String) {
+        viewModelScope.launch {
+            runCatching { deleteReactionUseCase(chatId, msgId, reaction) }
                 .onFailure { Timber.e(it) }
         }
     }
