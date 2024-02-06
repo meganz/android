@@ -31,7 +31,8 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  *
  * @param isMe whether message is sent from me
  * @param fileTypeResId resource id of file type icon
- * @param imageUri uri of the file to be loaded, usually something like ["file://xxx.xxx".toUri()]
+ * @param previewUri uri of the file to be loaded, usually something like ["file://xxx.xxx".toUri()]
+ * @param duration String representation of the duration of the file in case it's playable, null otherwise
  * @param modifier
  * @param loadProgress loading progress of the message. null if already loaded. The value can be 0-1.
  * @param fileName name of file
@@ -43,7 +44,8 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 fun FileMessageView(
     isMe: Boolean,
     fileTypeResId: Int?,
-    imageUri: Uri?,
+    previewUri: Uri?,
+    duration: String?,
     modifier: Modifier = Modifier,
     loadProgress: Float? = null,
     fileName: String = "",
@@ -65,11 +67,11 @@ fun FileMessageView(
         loadProgress = loadProgress,
         onClick = onClick
     ) {
-        if (imageUri != null) {
+        if (previewUri != null) {
             SubcomposeAsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .crossfade(true)
-                    .data(imageUri)
+                    .data(previewUri)
                     .build(),
                 contentDescription = fileName,
                 contentScale = ContentScale.Inside,
@@ -77,18 +79,25 @@ fun FileMessageView(
                 error = { noPreviewContent() },
                 success = {
                     val intrinsicSize = it.painter.intrinsicSize
+                    val previewModifier = Modifier
+                        .sizeIn(
+                            maxWidth = MAX_SIZE.dp.coerceAtMostPixels(intrinsicSize.width),
+                            maxHeight = MAX_SIZE.dp.coerceAtMostPixels(intrinsicSize.height),
+                        )
+                        .aspectRatio(intrinsicSize.aspectRatio())
                     Image(
                         painter = it.painter,
                         contentDescription = "Image",
                         contentScale = ContentScale.Inside,
-                        modifier = Modifier
-                            .sizeIn(
-                                maxWidth = MAX_SIZE.dp.coerceAtMostPixels(intrinsicSize.width),
-                                maxHeight = MAX_SIZE.dp.coerceAtMostPixels(intrinsicSize.height),
-                            )
-                            .aspectRatio(intrinsicSize.aspectRatio())
+                        modifier = previewModifier
                             .testTag(FILE_PREVIEW_MESSAGE_VIEW_IMAGE_TEST_TAG)
                     )
+                    duration?.let {
+                        PlayPreviewOverlay(
+                            duration = duration,
+                            modifier = previewModifier,
+                        )
+                    }
                 },
             )
         } else {
@@ -119,7 +128,8 @@ private fun FileNoPreviewMessageViewPreview(
         FileMessageView(
             isMe = isMe,
             fileTypeResId = R.drawable.ic_alert_circle,
-            imageUri = resourceUri,
+            previewUri = resourceUri,
+            duration = null,
             loadProgress = 0.6f.takeIf { isMe },
             fileName = "Hello.pdf",
             fileSize = "30 MB",

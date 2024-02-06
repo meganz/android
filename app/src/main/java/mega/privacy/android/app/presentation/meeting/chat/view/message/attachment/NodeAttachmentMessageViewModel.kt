@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.usecase.node.chat.AddChatFileTypeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
@@ -22,7 +23,11 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     private val getPreviewUseCase: GetPreviewUseCase,
     private val addChatFileTypeUseCase: AddChatFileTypeUseCase,
     fileSizeStringMapper: FileSizeStringMapper,
-) : AbstractAttachmentMessageViewModel<NodeAttachmentMessage>(fileSizeStringMapper) {
+    durationInSecondsTextMapper: DurationInSecondsTextMapper,
+) : AbstractAttachmentMessageViewModel<NodeAttachmentMessage>(
+    fileSizeStringMapper,
+    durationInSecondsTextMapper
+) {
     override fun onMessageAdded(
         mutableStateFlow: MutableStateFlow<AttachmentMessageUiState>,
         attachmentMessage: NodeAttachmentMessage,
@@ -38,14 +43,14 @@ class NodeAttachmentMessageViewModel @Inject constructor(
         viewModelScope.launch {
             val node = nodeAttachmentMessage.fileNode
             val msgId = nodeAttachmentMessage.msgId
-            if (node.hasPreview && mutableStateFlow.value.imageUri == null) {
+            if (node.hasPreview && mutableStateFlow.value.previewUri == null) {
                 runCatching {
                     val typedNode = addChatFileTypeUseCase(node, chatId, msgId)
                     getPreviewUseCase(typedNode)
                 }.onSuccess { previewFile ->
                     mutableStateFlow.update {
                         it.copy(
-                            imageUri = previewFile?.toString(),
+                            previewUri = previewFile?.toString(),
                             loadProgress = null,
                         )
                     }

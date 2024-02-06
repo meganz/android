@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
@@ -34,6 +35,7 @@ class NodeAttachmentMessageViewModelTest {
     private val getPreviewUseCase = mock<GetPreviewUseCase>()
     private val addChatFileTypeUseCase = mock<AddChatFileTypeUseCase>()
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
+    private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
 
     @BeforeAll
     internal fun setUp() {
@@ -52,6 +54,7 @@ class NodeAttachmentMessageViewModelTest {
             getPreviewUseCase,
             addChatFileTypeUseCase,
             fileSizeStringMapper,
+            durationInSecondsTextMapper,
         )
     }
 
@@ -60,6 +63,7 @@ class NodeAttachmentMessageViewModelTest {
             getPreviewUseCase,
             addChatFileTypeUseCase,
             fileSizeStringMapper,
+            durationInSecondsTextMapper,
         )
     }
 
@@ -80,7 +84,7 @@ class NodeAttachmentMessageViewModelTest {
         whenever(getPreviewUseCase(chatFile)).thenReturn(previewFile)
         val msg = buildNodeAttachmentMessage(fileNode)
         underTest.getOrPutUiStateFlow(msg, CHAT_ID).test {
-            val actual = awaitItem().imageUri
+            val actual = awaitItem().previewUri
             assertThat(actual).isEqualTo(expected)
         }
     }

@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages
 
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
-
 import mega.privacy.android.domain.entity.node.FileNode
 
 /**
@@ -21,4 +21,5 @@ data class NodeAttachmentMessage(
 ) : AttachmentMessage {
     override val fileSize = fileNode.size
     override val fileName = fileNode.name
+    override val duration = (fileNode.type as? VideoFileTypeInfo)?.duration
 }
