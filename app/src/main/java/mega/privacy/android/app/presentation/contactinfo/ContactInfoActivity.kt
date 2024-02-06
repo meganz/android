@@ -82,6 +82,7 @@ import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewMo
 import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -98,14 +99,15 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
@@ -151,6 +153,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private val callInProgress get() = contentContactProperties.callInProgress
     private val viewModel by viewModels<ContactInfoViewModel>()
+    private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
     private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
 
     private var permissionsDialog: AlertDialog? = null
@@ -1449,14 +1452,23 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Method responsible for downloading file
      */
     fun downloadFile(nodes: List<MegaNode>) {
-        checkNotificationsPermission(this)
-        nodeSaver.saveNodes(
-            nodes,
-            highPriority = true,
-            isFolderLink = false,
-            fromMediaViewer = false,
-            needSerialize = false
-        )
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                startDownloadViewModel.onDownloadClicked(
+                    nodes.map { NodeId(it.handle) },
+                    true
+                )
+            } else {
+                checkNotificationsPermission(this@ContactInfoActivity)
+                nodeSaver.saveNodes(
+                    nodes,
+                    highPriority = true,
+                    isFolderLink = false,
+                    fromMediaViewer = false,
+                    needSerialize = false
+                )
+            }
+        }
     }
 
     /**

@@ -22,9 +22,11 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.ContactFileBaseFragment
 import mega.privacy.android.app.main.ContactFileListActivity
-import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -51,6 +53,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
 
     private val handler = Handler(Looper.getMainLooper())
     private val viewModel by activityViewModels<ContactInfoViewModel>()
+    private val startDownloadViewModel by activityViewModels<StartDownloadViewModel>()
     private val contactInfoActivity: ContactInfoActivity
         get() = (requireActivity() as ContactInfoActivity)
 
@@ -96,9 +99,22 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                 i.putExtra(Constants.NAME, userEmail)
                 startActivity(i)
             }
+            addStartDownloadView(binding.root)
             binding.root
         } else {
             null
+        }
+    }
+
+    private fun addStartDownloadView(rootView: ViewGroup) {
+        activity?.let { activity ->
+            rootView.addView(
+                createStartDownloadView(
+                    activity,
+                    startDownloadViewModel.state,
+                    startDownloadViewModel::consumeDownloadEvent
+                )
+            )
         }
     }
 
@@ -365,6 +381,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                 R.id.cab_menu_download -> {
                     contactInfoActivity.downloadFile(documents)
                 }
+
                 R.id.cab_menu_copy -> {
                     val handleList = arrayListOf<Long>()
                     documents.forEach {
@@ -372,12 +389,15 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                     }
                     contactInfoActivity.showCopy(handleList)
                 }
+
                 R.id.cab_menu_select_all -> {
                     selectAll()
                 }
+
                 R.id.cab_menu_unselect_all -> {
                     clearSelections()
                 }
+
                 R.id.cab_menu_leave_multiple_share -> {
                     val handleList = arrayListOf<Long>()
                     documents.forEach {
@@ -388,6 +408,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                         (requireActivity() as SnackbarShower), handleList
                     )
                 }
+
                 R.id.cab_menu_rename -> {
                     if (documents.isNotEmpty()) {
                         val node = documents[0]
@@ -397,6 +418,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                         )
                     }
                 }
+
                 else -> {}
             }
             return false

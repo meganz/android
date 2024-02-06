@@ -2,6 +2,7 @@ package mega.privacy.android.app.main;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponentKt.createStartDownloadView;
 import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
@@ -43,6 +44,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.FileProvider;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -55,6 +57,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
+import kotlin.Unit;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -64,6 +67,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -92,6 +96,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
         this.currNodePosition = currNodePosition;
     }
 
+    private StartDownloadViewModel startDownloadViewModel;
     Handler handler;
 
     public void activateActionMode() {
@@ -373,7 +378,24 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
             itemClick(currNodePosition);
         }
         showFabButton(megaApi.getNodeByHandle(parentHandle));
+        addStartDownloadTransferView( v);
         return v;
+    }
+
+    private void addStartDownloadTransferView(View root) {
+        if (root instanceof ViewGroup && getActivity() != null) {
+            startDownloadViewModel = new ViewModelProvider(requireActivity()).get(StartDownloadViewModel.class);
+            ((ViewGroup) root).addView(
+                    createStartDownloadView(
+                            requireActivity(),
+                            startDownloadViewModel.getState(),
+                            () -> {
+                                startDownloadViewModel.consumeDownloadEvent();
+                                return Unit.INSTANCE;
+                            }
+                    )
+            );
+        }
     }
 
     @Override

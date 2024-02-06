@@ -21,11 +21,13 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -49,6 +51,7 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.extensions.uploadFilesManually
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
@@ -80,6 +83,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import nz.mega.documentscanner.DocumentScannerActivity
 import nz.mega.sdk.MegaApiJava
@@ -124,6 +128,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     @Inject
     lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
     private val viewModel: ContactFileListViewModel by viewModels()
+    private val startDownloadViewModel: StartDownloadViewModel by viewModels()
     private lateinit var fragmentContainer: FrameLayout
     private var userEmail: String? = null
     private var contact: MegaUser? = null
@@ -520,14 +525,23 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     }
 
     fun downloadFile(nodes: List<MegaNode>) {
-        checkNotificationsPermission(this)
-        nodeSaver.saveNodes(
-            nodes = nodes,
-            highPriority = true,
-            isFolderLink = false,
-            fromMediaViewer = false,
-            needSerialize = false
-        )
+        lifecycleScope.launch {
+            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                startDownloadViewModel.onDownloadClicked(
+                    nodes.map { NodeId(it.handle) },
+                    true
+                )
+            } else {
+                checkNotificationsPermission(this@ContactFileListActivity)
+                nodeSaver.saveNodes(
+                    nodes = nodes,
+                    highPriority = true,
+                    isFolderLink = false,
+                    fromMediaViewer = false,
+                    needSerialize = false
+                )
+            }
+        }
     }
 
     private fun moveToTrash(handleList: ArrayList<Long>) {
