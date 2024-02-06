@@ -1099,7 +1099,7 @@ class ChatViewModel @Inject constructor(
 
             viewModelScope.launch {
                 val encodedSnapshot = Base64.encodeToString(byteArray, Base64.DEFAULT)
-                val tempMessage = sendLocationMessageUseCase(
+                sendLocationMessageUseCase(
                     chatId = chatId,
                     latitude = latitude,
                     longitude = longitude,

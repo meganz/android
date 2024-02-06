@@ -1,7 +1,5 @@
 package mega.privacy.android.domain.usecase.chat.message
 
-import mega.privacy.android.domain.entity.chat.messages.meta.MetaMessage
-import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
@@ -10,7 +8,7 @@ import javax.inject.Inject
  */
 class SendLocationMessageUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
-    private val createMetaMessageUseCase: CreateMetaMessageUseCase,
+    private val createSaveSentMessageRequestUseCase: CreateSaveSentMessageRequestUseCase,
 ) {
 
     /**
@@ -27,15 +25,9 @@ class SendLocationMessageUseCase @Inject constructor(
         longitude: Float,
         latitude: Float,
         image: String,
-    ): MetaMessage {
-        val request = CreateTypedMessageRequest(
-            chatMessage = chatRepository.sendGeolocation(chatId, longitude, latitude, image),
-            isMine = true,
-            shouldShowAvatar = false,
-            shouldShowTime = false,
-            shouldShowDate = false,
-            reactions = emptyList(),
-        )
-        return createMetaMessageUseCase(request)
+    ) {
+        val sentMessage = chatRepository.sendGeolocation(chatId, longitude, latitude, image)
+        val request = createSaveSentMessageRequestUseCase(sentMessage)
+        chatRepository.storeMessages(chatId, listOf(request))
     }
 }
