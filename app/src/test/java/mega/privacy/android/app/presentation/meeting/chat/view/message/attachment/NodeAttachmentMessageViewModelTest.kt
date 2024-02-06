@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
@@ -69,10 +70,15 @@ class NodeAttachmentMessageViewModelTest {
 
     @Test
     fun `test that preview is added when message is added`() = runTest {
+        val expectedType = UnknownFileTypeInfo(
+            mimeType = "application/jpg",
+            extension = "jpg"
+        )
         val fileNode = mock<FileNode> {
             on { hasPreview } doReturn true
             on { name } doReturn "name"
             on { size } doReturn 123L
+            on { type } doReturn expectedType
         }
         whenever(fileSizeStringMapper(any())).thenReturn("size")
         val chatFile = mock<ChatDefaultFile>()
@@ -93,10 +99,15 @@ class NodeAttachmentMessageViewModelTest {
     fun `test that ui state initial state has correct name and size`() = runTest {
         val expectedName = "attachment.jpg"
         val expectedSize = "a lot of bytes"
+        val expectedType = UnknownFileTypeInfo(
+            mimeType = "application/jpg",
+            extension = "jpg"
+        )
         val fileNode = mock<FileNode> {
             on { name } doReturn expectedName
             on { size } doReturn 123L
             on { hasPreview } doReturn false
+            on { type } doReturn expectedType
         }
         whenever(fileSizeStringMapper(any())).thenReturn(expectedSize)
 

@@ -2,7 +2,6 @@ package mega.privacy.android.core.ui.controls.chat.messages.file
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,7 +38,6 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  * File message container, utility composable to animate the content size and apply load overly to file previews
  * @param loadProgress if set, a linear progress indicator and an overly will be shown
  * @param modifier
- * @param onClick handle click when file message is clicked
  * @param content composable function to draw the content: [FileNoPreviewMessageView] or an [Image] with the preview
  *
  */
@@ -47,7 +45,6 @@ import mega.privacy.android.core.ui.theme.MegaTheme
 internal fun FileContainerMessageView(
     loadProgress: Float?,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
 
@@ -58,7 +55,6 @@ internal fun FileContainerMessageView(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick)
             .background(MegaTheme.colors.background.surface2)
             .testTag(FILE_MESSAGE_VIEW_ROOT_TEST_TAG)
             .onGloballyPositioned {

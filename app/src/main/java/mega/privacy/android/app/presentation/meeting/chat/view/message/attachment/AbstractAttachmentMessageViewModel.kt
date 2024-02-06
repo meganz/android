@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.attachme
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
+import mega.privacy.android.app.presentation.node.model.mapper.getFileIconChat
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.chat.messages.AttachmentMessage
 import java.util.concurrent.ConcurrentHashMap
@@ -35,7 +36,8 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
                 AttachmentMessageUiState(
                     fileName = attachmentMessage.fileName,
                     fileSize = fileSizeStringMapper(attachmentMessage.fileSize),
-                    duration = durationInSecondsTextMapper(attachmentMessage.duration)
+                    duration = durationInSecondsTextMapper(attachmentMessage.duration),
+                    fileTypeResId = getFileIconChat(attachmentMessage.fileType),
                 )
             ).also {
                 onMessageAdded(it, attachmentMessage, chatId)

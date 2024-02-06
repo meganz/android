@@ -5,30 +5,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 class FileContainerMessageViewTest {
     @get:Rule
     var composeRule = createComposeRule()
-
-    @Test
-    fun `test that click is handled properly`() {
-        val onFileMessageClicked: () -> Unit = mock()
-        initComposeRuleContent(
-            onClick = onFileMessageClicked,
-        )
-        composeRule.onNodeWithTag(FILE_MESSAGE_VIEW_ROOT_TEST_TAG, useUnmergedTree = true)
-            .performClick()
-        verify(onFileMessageClicked).invoke()
-    }
 
     @Test
     fun `test that load progress indicator is shown when loadProgress is not null`() {
@@ -80,12 +66,10 @@ class FileContainerMessageViewTest {
 
     private fun initComposeRuleContent(
         loadProgress: Float? = null,
-        onClick: () -> Unit = {},
     ) {
         composeRule.setContent {
             FileContainerMessageView(
                 loadProgress = loadProgress,
-                onClick = onClick,
             ) {
                 Box(modifier = Modifier.size(10.dp))
             }

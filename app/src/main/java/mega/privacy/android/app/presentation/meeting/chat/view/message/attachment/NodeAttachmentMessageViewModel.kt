@@ -26,7 +26,7 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : AbstractAttachmentMessageViewModel<NodeAttachmentMessage>(
     fileSizeStringMapper,
-    durationInSecondsTextMapper
+    durationInSecondsTextMapper,
 ) {
     override fun onMessageAdded(
         mutableStateFlow: MutableStateFlow<AttachmentMessageUiState>,

@@ -1,7 +1,10 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
@@ -20,9 +23,15 @@ data class NodeAttachmentUiMessage(
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
-        NodeAttachmentMessageView(message, chatId)
+        NodeAttachmentMessageView(
+            message = message, chatId = chatId,
+            modifier = Modifier.combinedClickable(
+                onClick = {},
+                onLongClick = { onLongClick(message) }
+            ))
     }
 
     override val showDate = message.shouldShowDate

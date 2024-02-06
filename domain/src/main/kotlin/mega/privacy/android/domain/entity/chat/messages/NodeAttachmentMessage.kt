@@ -22,4 +22,5 @@ data class NodeAttachmentMessage(
     override val fileSize = fileNode.size
     override val fileName = fileNode.name
     override val duration = (fileNode.type as? VideoFileTypeInfo)?.duration
+    override val fileType = fileNode.type
 }

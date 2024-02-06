@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -37,7 +36,6 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  * @param loadProgress loading progress of the message. null if already loaded. The value can be 0-1.
  * @param fileName name of file
  * @param fileSize size string of file. It can be "Uploading" when message is loading.
- * @param onClick handle click when file message is clicked
  */
 
 @Composable
@@ -50,22 +48,20 @@ fun FileMessageView(
     loadProgress: Float? = null,
     fileName: String = "",
     fileSize: String = "",
-    onClick: () -> Unit = {},
 ) {
     val noPreviewContent: @Composable () -> Unit = {
         FileNoPreviewMessageView(
             isMe,
             fileTypeResId,
-            modifier,
+            Modifier,
             fileName,
             fileSize,
         )
     }
 
     FileContainerMessageView(
-        modifier = Modifier.padding(12.dp),
+        modifier = modifier,
         loadProgress = loadProgress,
-        onClick = onClick
     ) {
         if (previewUri != null) {
             SubcomposeAsyncImage(
