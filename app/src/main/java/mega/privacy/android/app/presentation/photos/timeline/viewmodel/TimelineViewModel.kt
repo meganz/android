@@ -208,6 +208,14 @@ class TimelineViewModel @Inject constructor(
         else setTriggerMediaPermissionsDeniedLogicState(shouldTrigger = true)
     }
 
+    fun handleCameraUploadsPermissionsResult() {
+        val hasPermissions = hasMediaPermissionUseCase()
+
+        setCameraUploadsLimitedAccess(isLimitedAccess = !hasPermissions)
+        setCameraUploadsWarningMenu(isVisible = !hasPermissions)
+        setTriggerMediaPermissionsDeniedLogicState(shouldTrigger = !hasPermissions)
+    }
+
     /**
      * Checks whether Camera Uploads can be enabled and handles the Status accordingly, as
      * determined by the Use Case [checkEnableCameraUploadsStatus]

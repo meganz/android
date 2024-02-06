@@ -104,6 +104,7 @@ fun TimelineView(
     onClickCameraUploadsComplete: () -> Unit,
     onClickCameraUploadsWarning: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
+    onCloseCameraUploadsLimitedAccess: () -> Unit,
     clearCameraUploadsMessage: () -> Unit = {},
     clearCameraUploadsChangePermissionsMessage: () -> Unit,
 ) {
@@ -239,6 +240,8 @@ fun TimelineView(
                             onCardClick = onCardClick,
                             onTimeBarTabSelected = onTimeBarTabSelected,
                             isNewCUEnabled = isNewCUEnabled,
+                            onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                            onCloseCameraUploadsLimitedAccess = onCloseCameraUploadsLimitedAccess,
                         )
                     }
                 } else {
@@ -287,6 +290,8 @@ private fun HandlePhotosGridView(
     photoDownload: PhotoDownload,
     onCardClick: (DateCard) -> Unit,
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
+    onChangeCameraUploadsPermissions: () -> Unit,
+    onCloseCameraUploadsLimitedAccess: () -> Unit,
 ) {
     LaunchedEffect(
         timelineViewState.scrollStartIndex,
@@ -332,6 +337,14 @@ private fun HandlePhotosGridView(
                     dateCards = dateCards,
                     photoDownload = photoDownload,
                     onCardClick = onCardClick,
+                    cardListViewHeaderView = {
+                        if (timelineViewState.isCameraUploadsLimitedAccess && isNewCUEnabled) {
+                            CameraUploadsLimitedAccess(
+                                onClick = onChangeCameraUploadsPermissions,
+                                onClose = onCloseCameraUploadsLimitedAccess,
+                            )
+                        }
+                    }
                 )
             }
         }
@@ -495,6 +508,7 @@ fun NewEnableCameraUploadsButton(onClick: () -> Unit) {
 @Composable
 fun CameraUploadsLimitedAccess(
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
     onClose: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -502,6 +516,7 @@ fun CameraUploadsLimitedAccess(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .clickable { onClick() }
             .background(yellow_100.takeIf { isLight } ?: yellow_700_alpha_015),
         content = {
             Row(

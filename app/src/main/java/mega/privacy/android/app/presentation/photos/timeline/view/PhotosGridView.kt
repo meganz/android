@@ -51,6 +51,7 @@ fun PhotosGridView(
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
     onEnableCameraUploads: () -> Unit,
+    onChangeCameraUploadsPermissions: () -> Unit,
     onCloseCameraUploadsLimitedAccess: () -> Unit,
 ) {
     val configuration = LocalConfiguration.current
@@ -80,12 +81,13 @@ fun PhotosGridView(
                 span = { GridItemSpan(maxLineSpan) },
             ) {
                 CameraUploadsLimitedAccess(
+                    onClick = onChangeCameraUploadsPermissions,
                     onClose = onCloseCameraUploadsLimitedAccess,
                 )
             }
         }
 
-        if (timelineViewState.enableCameraUploadButtonShowing && !timelineViewState.isCameraUploadsLimitedAccess && timelineViewState.selectedPhotoCount == 0 && isNewCUEnabled) {
+        if (timelineViewState.enableCameraUploadButtonShowing && !timelineViewState.showCameraUploadsWarning && timelineViewState.selectedPhotoCount == 0 && isNewCUEnabled) {
             item(
                 key = "enable-camera-uploads-banner",
                 span = { GridItemSpan(maxLineSpan) },

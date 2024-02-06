@@ -119,7 +119,7 @@ class PhotosFragment : Fragment() {
     private lateinit var timelineActionModeCallback: TimelineActionModeCallback
     private lateinit var albumsActionModeCallback: AlbumsActionModeCallback
 
-    private val cameraUploadsPermissionsLauncher =
+    private val legacyCameraUploadsPermissionsLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             with(timelineViewModel) {
                 if (isEnableCameraUploadsViewShown() && doesAccountHavePhotos()) {
@@ -128,6 +128,11 @@ class PhotosFragment : Fragment() {
                 }
                 handlePermissionsResult()
             }
+        }
+
+    private val cameraUploadsPermissionsLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            timelineViewModel.handleCameraUploadsPermissionsResult()
         }
 
     @Inject
@@ -139,6 +144,28 @@ class PhotosFragment : Fragment() {
 
     private var isNewCUEnabled: Boolean = false
 
+    private val cameraUploadsPermissions: Array<String> by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            arrayOf(
+                getNotificationsPermission(),
+                getImagePermissionByVersion(),
+                getVideoPermissionByVersion(),
+                getPartialMediaPermission(),
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(
+                getNotificationsPermission(),
+                getImagePermissionByVersion(),
+                getVideoPermissionByVersion()
+            )
+        } else {
+            arrayOf(
+                getImagePermissionByVersion(),
+                getVideoPermissionByVersion()
+            )
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         managerActivity = activity as ManagerActivity
@@ -146,8 +173,19 @@ class PhotosFragment : Fragment() {
         albumsActionModeCallback = AlbumsActionModeCallback(this)
         lifecycleScope.launch {
             isNewCUEnabled = getFeatureFlagUseCase(AppFeatures.NewCU)
-            if (isNewCUEnabled) activity?.invalidateMenu()
+            if (isNewCUEnabled) {
+                activity?.invalidateMenu()
+                initializeCameraUploads()
+            }
         }
+    }
+
+    private fun initializeCameraUploads() {
+        if (arguments?.getBoolean(firstLoginKey) == true) {
+            timelineViewModel.setInitialPreferences()
+            arguments?.putBoolean(firstLoginKey, false)
+        }
+        MegaApplication.getInstance().sendSignalPresenceActivity()
     }
 
     override fun onCreateView(
@@ -176,6 +214,7 @@ class PhotosFragment : Fragment() {
                         onZoomIn = ::handleZoomIn,
                         onZoomOut = ::handleZoomOut,
                         onNavigateCameraUploadsSettings = ::openCameraUploadsSettings,
+                        onChangeCameraUploadsPermissions = ::changeCameraUploadsPermissions,
                     )
                 }
             }
@@ -188,6 +227,21 @@ class PhotosFragment : Fragment() {
         Analytics.tracker.trackEvent(PhotoScreenEvent)
         Firebase.crashlytics.log("Screen: ${PhotoScreenEvent.eventName}")
         super.onResume()
+        checkCameraUploadsPermissions()
+    }
+
+    private fun checkCameraUploadsPermissions(showAction: Boolean = false) {
+        val hasPermissions = PermissionUtils.hasPermissions(context, *cameraUploadsPermissions)
+        timelineViewModel.setCameraUploadsLimitedAccess(isLimitedAccess = !hasPermissions)
+        timelineViewModel.setCameraUploadsWarningMenu(isVisible = !hasPermissions)
+
+        if (!hasPermissions && showAction) {
+            timelineViewModel.showCameraUploadsChangePermissionsMessage(true)
+        }
+    }
+
+    private fun changeCameraUploadsPermissions() {
+        cameraUploadsPermissionsLauncher.launch(cameraUploadsPermissions)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -265,20 +319,20 @@ class PhotosFragment : Fragment() {
     ) {
         if (!isNewCUEnabled) return
 
+        // CU warning menu
+        val showCameraUploadsWarning = state.showCameraUploadsWarning
+        this.menu?.findItem(R.id.action_cu_status_warning)?.isVisible =
+            showCameraUploadsWarning && photosViewModel.state.value.selectedTab != PhotosTab.Albums
+
         // CU default menu
         val showCameraUploadsButton = state.enableCameraUploadButtonShowing
         this.menu?.findItem(R.id.action_cu_status_default)?.isVisible =
-            showCameraUploadsButton && photosViewModel.state.value.selectedTab != PhotosTab.Albums
+            showCameraUploadsButton && !showCameraUploadsWarning && photosViewModel.state.value.selectedTab != PhotosTab.Albums
 
         // CU complete menu
         val showCameraUploadsComplete = state.showCameraUploadsComplete
         this.menu?.findItem(R.id.action_cu_status_complete)?.isVisible =
             showCameraUploadsComplete && isMenuVisible
-
-        // CU warning menu
-        val showCameraUploadsWarning = state.showCameraUploadsWarning
-        this.menu?.findItem(R.id.action_cu_status_warning)?.isVisible =
-            showCameraUploadsWarning && isMenuVisible
     }
 
     private fun handleFilterIcons(timelineViewState: TimelineViewState) {
@@ -538,7 +592,6 @@ class PhotosFragment : Fragment() {
 
             R.id.action_cu_status_default -> {
                 openCameraUploadsSettings()
-                timelineViewModel.setCameraUploadsSyncFab(isVisible = true)
                 true
             }
 
@@ -548,7 +601,7 @@ class PhotosFragment : Fragment() {
             }
 
             R.id.action_cu_status_warning -> {
-                /* TODO */
+                checkCameraUploadsPermissions(showAction = true)
                 true
             }
 
@@ -676,34 +729,10 @@ class PhotosFragment : Fragment() {
      * Performs actions when the Button to enable Camera Uploads has been clicked
      */
     private fun onCameraUploadsButtonClicked() {
-        if (arguments?.getBoolean(firstLoginKey) == true) {
-            timelineViewModel.setInitialPreferences()
-            arguments?.putBoolean(firstLoginKey, false)
-        }
-        MegaApplication.getInstance().sendSignalPresenceActivity()
+        initializeCameraUploads()
 
         // Check and request the needed permissions
-        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            arrayOf(
-                getNotificationsPermission(),
-                getImagePermissionByVersion(),
-                getVideoPermissionByVersion(),
-                getPartialMediaPermission(),
-            )
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arrayOf(
-                getNotificationsPermission(),
-                getImagePermissionByVersion(),
-                getVideoPermissionByVersion()
-            )
-        } else {
-            arrayOf(
-                getImagePermissionByVersion(),
-                getVideoPermissionByVersion()
-            )
-        }
-
-        if (PermissionUtils.hasPermissions(context, *permissions)) {
+        if (PermissionUtils.hasPermissions(context, *cameraUploadsPermissions)) {
             with(timelineViewModel) {
                 if (isEnableCameraUploadsViewShown()) {
                     shouldEnableCUPage(false)
@@ -711,7 +740,9 @@ class PhotosFragment : Fragment() {
                 }
                 handleEnableCameraUploads()
             }
-        } else cameraUploadsPermissionsLauncher.launch(permissions)
+        } else {
+            legacyCameraUploadsPermissionsLauncher.launch(cameraUploadsPermissions)
+        }
     }
 
     /**

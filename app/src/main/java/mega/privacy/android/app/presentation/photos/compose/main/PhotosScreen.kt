@@ -62,6 +62,7 @@ fun PhotosScreen(
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
     onNavigateCameraUploadsSettings: () -> Unit,
+    onChangeCameraUploadsPermissions: () -> Unit,
 ) {
     val photosViewState by photosViewModel.state.collectAsStateWithLifecycle()
     val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
@@ -147,6 +148,7 @@ fun PhotosScreen(
                             onLongPress = timelineViewModel::onLongPress,
                             isNewCUEnabled = isNewCUEnabled,
                             onEnableCameraUploads = onNavigateCameraUploadsSettings,
+                            onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
                             onCloseCameraUploadsLimitedAccess = {
                                 timelineViewModel.setCameraUploadsLimitedAccess(false)
                             }
@@ -166,13 +168,16 @@ fun PhotosScreen(
                 onClickCameraUploadsUploading ={ /* TODO */ },
                 onClickCameraUploadsComplete = { /* TODO */ },
                 onClickCameraUploadsWarning = { /* TODO */ },
-                onChangeCameraUploadsPermissions = onNavigateCameraUploadsSettings,
+                onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                onCloseCameraUploadsLimitedAccess = {
+                    timelineViewModel.setCameraUploadsLimitedAccess(false)
+                },
                 clearCameraUploadsMessage = {
                     timelineViewModel.setCameraUploadsMessage("")
                 },
                 clearCameraUploadsChangePermissionsMessage = {
                     timelineViewModel.showCameraUploadsChangePermissionsMessage(false)
-                }
+                },
             )
         },
         albumsView = {
