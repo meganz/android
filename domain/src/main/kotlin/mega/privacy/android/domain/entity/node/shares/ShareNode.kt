@@ -6,11 +6,9 @@ import mega.privacy.android.domain.entity.node.TypedNode
 /**
  * Share Node, used in outgoing and incoming shares
  *
- * @property node
- * @property shareData
+ * @property shareData [ShareData] associated with the node
  * @constructor Create empty ShareNode
  */
-class ShareNode(
-    val node: TypedNode,
-    val shareData: ShareData? = null,
-) : TypedNode by node
+sealed interface ShareNode : TypedNode {
+    val shareData: ShareData?
+}

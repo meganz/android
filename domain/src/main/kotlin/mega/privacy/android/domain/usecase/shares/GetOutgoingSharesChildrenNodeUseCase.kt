@@ -21,6 +21,7 @@ import javax.inject.Inject
 class GetOutgoingSharesChildrenNodeUseCase @Inject constructor(
     private val getNodeByHandle: GetNodeByIdUseCase,
     private val getChildrenNode: GetTypedChildrenNodeUseCase,
+    private val mapNodeToShareUseCase: MapNodeToShareUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
     private val nodeRepository: NodeRepository,
@@ -29,19 +30,19 @@ class GetOutgoingSharesChildrenNodeUseCase @Inject constructor(
     /**
      * Get children nodes of the outgoing shares parent handle or root list of outgoing shares node
      */
-    suspend operator fun invoke(parentHandle: Long): List<ShareNode>? {
+    suspend operator fun invoke(parentHandle: Long): List<ShareNode> {
         return if (parentHandle == -1L) {
             nodeRepository.getAllOutgoingShares(getOthersSortOrder()).mapNotNull { shareData ->
                 getNodeByHandle(NodeId(shareData.nodeHandle))?.let { node ->
-                    ShareNode(node, shareData)
+                    mapNodeToShareUseCase(node, shareData)
                 }
             }
         } else {
             getNodeByHandle(NodeId(parentHandle))?.let {
                 getChildrenNode(it.id, getCloudSortOrder()).map { node ->
-                    ShareNode(node)
+                    mapNodeToShareUseCase(node)
                 }
-            }
+            } ?: emptyList()
         }
     }
 }
