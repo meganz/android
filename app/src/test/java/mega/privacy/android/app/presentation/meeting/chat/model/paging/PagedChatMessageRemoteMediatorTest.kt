@@ -105,7 +105,7 @@ class PagedChatMessageRemoteMediatorTest {
 
         underTest.load(LoadType.PREPEND, state)
 
-        verify(saveChatMessagesUseCase).invoke(response)
+        verify(saveChatMessagesUseCase).invoke(response.chatId, response.messages)
     }
 
     @Test

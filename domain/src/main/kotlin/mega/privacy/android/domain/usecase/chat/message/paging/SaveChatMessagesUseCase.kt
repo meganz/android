@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.chat.message.paging
 
-import mega.privacy.android.domain.entity.chat.messages.paging.FetchMessagePageResponse
+import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
@@ -17,24 +17,24 @@ class SaveChatMessagesUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param response
+     * @param chatId
+     * @param messages
      */
     suspend operator fun invoke(
-        response: FetchMessagePageResponse,
+        chatId: Long,
+        messages: List<ChatMessage>,
     ) {
-        with(response) {
-            val currentUserHandle = chatRepository.getMyUserHandle()
-            val nextMessage = messages.lastOrNull()?.let {
-                chatRepository.getNextMessagePagingInfo(chatId, it.timestamp)
-            }
-            val requestList = createSaveMessageRequestUseCase(
-                chatId = chatId,
-                chatMessages = messages,
-                currentUserHandle = currentUserHandle,
-                nextMessageUserHandle = nextMessage?.userHandle
-            )
-
-            chatRepository.storeMessages(chatId, requestList)
+        val currentUserHandle = chatRepository.getMyUserHandle()
+        val nextMessage = messages.lastOrNull()?.let {
+            chatRepository.getNextMessagePagingInfo(chatId, it.timestamp)
         }
+        val requestList = createSaveMessageRequestUseCase(
+            chatId = chatId,
+            chatMessages = messages,
+            currentUserHandle = currentUserHandle,
+            nextMessageUserHandle = nextMessage?.userHandle
+        )
+
+        chatRepository.storeMessages(chatId, requestList)
     }
 }

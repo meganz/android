@@ -1,8 +1,6 @@
 package mega.privacy.android.domain.usecase.chat.message.paging
 
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
-import mega.privacy.android.domain.entity.chat.messages.paging.FetchMessagePageResponse
 import mega.privacy.android.domain.repository.ChatRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -46,11 +44,8 @@ class SaveChatMessagesUseCaseTest {
             }
 
             underTest(
-                FetchMessagePageResponse(
-                    chatId = chatId,
-                    messages = emptyList(),
-                    loadResponse = ChatHistoryLoadStatus.REMOTE
-                )
+                chatId = chatId,
+                messages = emptyList(),
             )
 
             verify(createSaveMessageRequestUseCase).invoke(
