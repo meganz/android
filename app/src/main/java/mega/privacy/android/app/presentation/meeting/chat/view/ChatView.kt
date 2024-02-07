@@ -248,6 +248,7 @@ internal fun ChatView(
             confirmValueChange = {
                 if (it != ModalBottomSheetValue.Hidden) {
                     keyboardController?.hide()
+                    showEmojiPicker = false
                 }
                 true
             }
@@ -257,6 +258,7 @@ internal fun ChatView(
         confirmValueChange = {
             if (it != ModalBottomSheetValue.Hidden) {
                 keyboardController?.hide()
+                showEmojiPicker = false
             }
             true
         }
@@ -266,6 +268,7 @@ internal fun ChatView(
         confirmValueChange = {
             if (it != ModalBottomSheetValue.Hidden) {
                 keyboardController?.hide()
+                showEmojiPicker = false
             } else {
                 messageClicked = null
                 addingReactionTo = null
