@@ -23,6 +23,13 @@ class CreateSaveSentMessageRequestUseCaseTest {
         assertThat(actual.message.msgId).isEqualTo(tempId)
     }
 
+    @Test
+    fun `test that should displayTime is true`() {
+        val chatMessage = createChatMessage(123L, 123L)
+        val actual = underTest(chatMessage)
+        assertThat(actual.shouldShowTime).isTrue()
+    }
+
     private fun createChatMessage(
         msgId: Long,
         tempId: Long,

@@ -20,7 +20,7 @@ class CreateSaveSentMessageRequestUseCase @Inject constructor() {
         chatMessage = chatMessage.copy(msgId = chatMessage.tempId),
         isMine = true,
         shouldShowAvatar = false,
-        shouldShowTime = false,
+        shouldShowTime = true,
         shouldShowDate = false,
         reactions = emptyList(),
     )
