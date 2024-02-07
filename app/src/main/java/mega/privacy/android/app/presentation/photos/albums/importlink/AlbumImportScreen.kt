@@ -64,10 +64,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
+import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
-import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.core.ui.theme.dark_grey
@@ -84,6 +83,8 @@ import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
+import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.mobile.analytics.event.AlbumImportInputDecryptionKeyDialogEvent
 import mega.privacy.mobile.analytics.event.AlbumImportSaveToCloudDriveButtonEvent
 import mega.privacy.mobile.analytics.event.AlbumImportSaveToDeviceButtonEvent
@@ -246,20 +247,21 @@ internal fun AlbumImportScreen(
                         }
                     },
                     onSaveToDevice = {
-                        if (state.isNetworkConnected) {
-                            val photos = state.selectedPhotos.ifEmpty { state.photos }
-                            val nodes = albumImportViewModel.mapPhotosToNodes(photos)
-                            onSaveToDevice(nodes)
-
-                            albumImportViewModel.clearSelection()
-                        } else {
-                            coroutineScope.launch {
-                                scaffoldState.snackbarHostState.showSnackbar(
-                                    message = context.resources.getString(R.string.error_server_connection_problem),
-                                )
-                            }
-                        }
-                    },
+                        albumImportViewModel.startDownload(
+                            legacyDownload = { nodes ->
+                                if (state.isNetworkConnected) {
+                                    onSaveToDevice(nodes)
+                                    albumImportViewModel.clearSelection()
+                                } else {
+                                    coroutineScope.launch {
+                                        scaffoldState.snackbarHostState.showSnackbar(
+                                            message = context.resources.getString(R.string.error_server_connection_problem),
+                                        )
+                                    }
+                                }
+                            },
+                        )
+                    }
                 )
             }
         },
@@ -319,6 +321,11 @@ internal fun AlbumImportScreen(
                 onAlbumLoaded = {
                     Analytics.tracker.trackEvent(ImportAlbumContentLoadedEvent)
                 }
+            )
+            StartDownloadComponent(
+                event = state.downloadEvent,
+                onConsumeEvent = albumImportViewModel::consumeDownloadEvent,
+                snackBarHostState = scaffoldState.snackbarHostState
             )
         },
     )

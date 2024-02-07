@@ -1,27 +1,37 @@
 package test.mega.privacy.android.app.presentation.photos.albums.importlink
 
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_LINK
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
 import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetUserAlbums
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
@@ -30,11 +40,15 @@ import mega.privacy.android.domain.usecase.photos.GetPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.IsAlbumLinkValidUseCase
+import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -53,9 +67,11 @@ class AlbumImportViewModelTest {
 
     private val mockLegacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider = mock()
 
-    private val mockDownloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase = mock()
+    private val mockDownloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase =
+        mock()
 
-    private val mockDownloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase = mock()
+    private val mockDownloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase =
+        mock()
 
     private val mockMonitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
 
@@ -68,6 +84,11 @@ class AlbumImportViewModelTest {
     private val mockIsAlbumLinkValidUseCase: IsAlbumLinkValidUseCase = mock()
 
     private val mockMonitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+
+    private val mockGetFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+
+    private val mockGetPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase =
+        mock()
 
     @Before
     fun setup() {
@@ -90,6 +111,8 @@ class AlbumImportViewModelTest {
             isAlbumLinkValidUseCase = mockIsAlbumLinkValidUseCase,
             monitorConnectivityUseCase = mockMonitorConnectivityUseCase,
             defaultDispatcher = StandardTestDispatcher(),
+            getFeatureFlagValueUseCase = mockGetFeatureFlagValueUseCase,
+            getPublicNodeFromSerializedDataUseCase = mockGetPublicNodeFromSerializedDataUseCase,
         )
     }
 
@@ -391,5 +414,100 @@ class AlbumImportViewModelTest {
             val state = awaitItem()
             assertThat(state.showStorageExceededDialog).isFalse()
         }
+    }
+
+    @Test
+    fun `test that start download invokes legacy code when DownloadWorker feature flag is false`() =
+        runTest {
+            stubSelectedMegaNode()
+            whenever(mockGetFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
+            val legacyDownload = mock<(megaNodes: List<MegaNode>) -> Unit>()
+            underTest.startDownload(legacyDownload)
+            advanceUntilIdle()
+            verify(legacyDownload).invoke(any())
+        }
+
+    @Test
+    fun `test that start download does not invoke legacy code when DownloadWorker feature flag is true`() =
+        runTest {
+            stubSelectedMegaNode()
+            whenever(mockGetFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
+            val legacyDownload = mock<(megaNodes: List<MegaNode>) -> Unit>()
+            underTest.startDownload(legacyDownload)
+            advanceUntilIdle()
+            verifyNoInteractions(legacyDownload)
+        }
+
+    @Test
+    fun `test that start download triggers the correct download event when DownloadWorker feature flag is true`() =
+        runTest {
+            val megaNode = stubSelectedMegaNode()
+            val node = mock<PublicLinkFile>()
+            whenever(mockGetFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
+            whenever(mockGetPublicNodeFromSerializedDataUseCase(megaNode.serialize()))
+                .thenReturn(node)
+            underTest.stateFlow.test {
+                awaitItem() //initial
+                underTest.startDownload(mock())
+                val actual = awaitItem().downloadEvent
+                assertThat(actual).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val content = (actual as StateEventWithContentTriggered).content
+                assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
+                val triggerEvent = content as TransferTriggerEvent.StartDownloadNode
+                assertThat(triggerEvent.nodes).containsExactly(node)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that selection is cleared when start download is invoked and DownloadWorker feature flag is true`() =
+        runTest {
+            stubSelectedTypedNode()
+            underTest.stateFlow.test {
+                underTest.startDownload(mock())
+                assertThat(awaitItem().selectedPhotos).isNotEmpty()
+                underTest.clearSelection()
+                val actual =
+                    (cancelAndConsumeRemainingEvents().last() as Event.Item).value.selectedPhotos
+                assertThat(actual).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that download event is consumed properly`() =
+        runTest {
+            stubSelectedTypedNode()
+            underTest.stateFlow.test {
+                awaitItem() //initial
+                underTest.startDownload(mock())
+                assertThat(awaitItem().downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                awaitItem() //clear selection
+                underTest.consumeDownloadEvent()
+                assertThat(awaitItem().downloadEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    private suspend fun stubSelectedTypedNode(): TypedNode {
+        val megaNode = stubSelectedMegaNode()
+        val node = mock<PublicLinkFile>()
+        whenever(mockGetFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
+        whenever(mockGetPublicNodeFromSerializedDataUseCase(megaNode.serialize()))
+            .thenReturn(node)
+        return node
+    }
+
+    private fun stubSelectedMegaNode(): MegaNode {
+        val handle = 1L
+        val photo = mock<Photo.Image> {
+            on { id } doReturn handle
+        }
+        val serializedData = "serializedNode"
+        val megaNode = mock<MegaNode> {
+            on { serialize() } doReturn serializedData
+        }
+        whenever(mockLegacyPublicAlbumPhotoNodeProvider.getPublicNode(handle))
+            .thenReturn(megaNode)
+        underTest.selectPhoto(photo)
+        return megaNode
     }
 }
