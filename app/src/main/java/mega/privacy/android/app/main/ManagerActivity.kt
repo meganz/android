@@ -233,7 +233,7 @@ import mega.privacy.android.app.presentation.shares.links.LinksActionListener
 import mega.privacy.android.app.presentation.shares.links.LinksComposeFragment
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
-import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
+import mega.privacy.android.app.presentation.shares.outgoing.model.LegacyOutgoingSharesState
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
@@ -1997,7 +1997,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         this.collectFlow(
             outgoingSharesViewModel.state,
             Lifecycle.State.STARTED
-        ) { outgoingSharesState: OutgoingSharesState ->
+        ) { outgoingSharesState: LegacyOutgoingSharesState ->
             addUnverifiedOutgoingCountBadge(
                 outgoingSharesState.nodes.count { it.second != null },
             )

@@ -10,9 +10,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
-import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
+import mega.privacy.android.app.presentation.shares.outgoing.model.LegacyOutgoingSharesState
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -21,6 +20,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -46,10 +46,10 @@ class OutgoingSharesViewModel @Inject constructor(
 ) : ViewModel() {
 
     /** private UI state */
-    private val _state = MutableStateFlow(OutgoingSharesState())
+    private val _state = MutableStateFlow(LegacyOutgoingSharesState())
 
     /** public UI state */
-    val state: StateFlow<OutgoingSharesState> = _state
+    val state: StateFlow<LegacyOutgoingSharesState> = _state
 
     /** stack of scroll position for each depth */
     private val lastPositionStack: Stack<Int> = Stack<Int>()
@@ -74,9 +74,9 @@ class OutgoingSharesViewModel @Inject constructor(
     }
 
     /**
-     * A shorthand way of retrieving the [OutgoingSharesState]
+     * A shorthand way of retrieving the [LegacyOutgoingSharesState]
      *
-     * @return the [OutgoingSharesState]
+     * @return the [LegacyOutgoingSharesState]
      */
     fun state() = _state.value
 
