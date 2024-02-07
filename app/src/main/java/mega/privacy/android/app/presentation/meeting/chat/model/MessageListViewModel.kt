@@ -11,11 +11,13 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.insertFooterItem
+import androidx.paging.insertSeparators
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.di.meeting.chat.paging.PagedChatMessageRemoteMediatorFactory
+import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageDateSeparatorMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatHeaderMessage
@@ -38,6 +40,7 @@ import javax.inject.Inject
 class MessageListViewModel @Inject constructor(
     private val uiChatMessageMapper: UiChatMessageMapper,
     private val getChatPagingSourceUseCase: GetChatPagingSourceUseCase,
+    private val chatMessageDateSeparatorMapper: ChatMessageDateSeparatorMapper,
     remoteMediatorFactory: PagedChatMessageRemoteMediatorFactory,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -70,10 +73,14 @@ class MessageListViewModel @Inject constructor(
             .map { pagingData ->
                 pagingData.map {
                     uiChatMessageMapper(it, chatId)
-                }
-                    .insertFooterItem(
-                        item = ChatHeaderMessage()
-                    )
+                }.insertSeparators { before, after ->
+                    chatMessageDateSeparatorMapper(
+                        firstMessage = after,
+                        secondMessage = before
+                    ) //Messages are passed in reverse order as the list is reversed in the ui
+                }.insertFooterItem(
+                    item = ChatHeaderMessage()
+                )
             }
             .cachedIn(viewModelScope)
 
