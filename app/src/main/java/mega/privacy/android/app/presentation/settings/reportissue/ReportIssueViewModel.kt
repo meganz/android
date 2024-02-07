@@ -30,7 +30,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.GetSupportEmail
-import mega.privacy.android.domain.usecase.SubmitIssue
+import mega.privacy.android.domain.usecase.SubmitIssueUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
@@ -41,7 +41,7 @@ import javax.inject.Inject
  *
  * @property areSdkLogsEnabled
  * @property areChatLogsEnabled
- * @property submitIssue
+ * @property submitIssueUseCase
  * @property ioDispatcher
  *
  * @param monitorConnectivityUseCase
@@ -53,7 +53,7 @@ import javax.inject.Inject
 class ReportIssueViewModel @Inject constructor(
     private val areSdkLogsEnabled: AreSdkLogsEnabled,
     private val areChatLogsEnabled: AreChatLogsEnabled,
-    private val submitIssue: SubmitIssue,
+    private val submitIssueUseCase: SubmitIssueUseCase,
     private val getSupportEmail: GetSupportEmail,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -158,7 +158,7 @@ class ReportIssueViewModel @Inject constructor(
             if (submitReportJob?.isActive != true) {
                 submitReportJob = viewModelScope.launch(ioDispatcher) {
                     try {
-                        submitIssue(SubmitIssueRequest(description.value, includeLogs.value))
+                        submitIssueUseCase(SubmitIssueRequest(description.value, includeLogs.value))
                             .cancellable()
                             .onCompletion { error ->
                                 onSubmitCompleted(error)

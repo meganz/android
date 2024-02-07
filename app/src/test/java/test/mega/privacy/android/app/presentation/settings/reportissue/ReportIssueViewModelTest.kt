@@ -27,7 +27,7 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.GetSupportEmail
-import mega.privacy.android.domain.usecase.SubmitIssue
+import mega.privacy.android.domain.usecase.SubmitIssueUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.jupiter.api.AfterAll
@@ -55,7 +55,7 @@ import test.mega.privacy.android.app.extensions.withCoroutineExceptions
 class ReportIssueViewModelTest {
     private lateinit var underTest: ReportIssueViewModel
 
-    private val submitIssue = mock<SubmitIssue>()
+    private val submitIssueUseCase = mock<SubmitIssueUseCase>()
     private val areSdkLogsEnabled = mock<AreSdkLogsEnabled>()
     private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
 
@@ -95,7 +95,7 @@ class ReportIssueViewModelTest {
 
     private fun initViewModel() {
         underTest = ReportIssueViewModel(
-            submitIssue = submitIssue,
+            submitIssueUseCase = submitIssueUseCase,
             areSdkLogsEnabled = areSdkLogsEnabled,
             areChatLogsEnabled = areChatLogsEnabled,
             savedStateHandle = savedStateHandle,
@@ -110,7 +110,7 @@ class ReportIssueViewModelTest {
     fun resetTests() {
         savedStateHandle = SavedStateHandle(mapOf())
         reset(
-            submitIssue,
+            submitIssueUseCase,
             areSdkLogsEnabled,
             areChatLogsEnabled,
             monitorConnectivityUseCase,
@@ -272,7 +272,7 @@ class ReportIssueViewModelTest {
     @Test
     fun `test that a success message is returned if submit report completes without an error`() =
         runTest {
-            whenever(submitIssue(any())).thenReturn(emptyFlow())
+            whenever(submitIssueUseCase(any())).thenReturn(emptyFlow())
             initViewModel()
             scheduler.advanceUntilIdle()
             underTest.state.map { it.result }.distinctUntilChanged()
@@ -287,7 +287,7 @@ class ReportIssueViewModelTest {
     fun `test that an error message is returned if submit report completes with an error`() =
         withCoroutineExceptions {
             runTest {
-                submitIssue.stub {
+                submitIssueUseCase.stub {
                     onBlocking { invoke(any()) }.thenAnswer { throw Exception() }
                 }
                 getSupportEmail.stub {
@@ -317,12 +317,12 @@ class ReportIssueViewModelTest {
         underTest.submit()
         scheduler.advanceUntilIdle()
 
-        verify(submitIssue).invoke(argThat { description == newDescription && includeLogs })
+        verify(submitIssueUseCase).invoke(argThat { description == newDescription && includeLogs })
     }
 
     @Test
     fun `test that upload progress from 0 to 100 is returned`() = runTest {
-        whenever(submitIssue(any())).thenReturn(getProgressFlow())
+        whenever(submitIssueUseCase(any())).thenReturn(getProgressFlow())
         initViewModel()
         scheduler.advanceUntilIdle()
         underTest.state.mapNotNull { it.uploadProgress }.distinctUntilChanged()
@@ -336,7 +336,7 @@ class ReportIssueViewModelTest {
 
     @Test
     fun `test that no progress is returned after upload is cancelled`() = runTest {
-        whenever(submitIssue(any())).thenReturn(
+        whenever(submitIssueUseCase(any())).thenReturn(
             getProgressFlow().onEach {
                 if (it.floatValue > 0.5f) underTest.cancelUpload()
             })
@@ -354,7 +354,7 @@ class ReportIssueViewModelTest {
 
     @Test
     fun `test that cancelling an upload does not return an error`() = runTest {
-        whenever(submitIssue(any())).thenReturn(
+        whenever(submitIssueUseCase(any())).thenReturn(
             getProgressFlow()
                 .onEach { if (it.floatValue > 0.1f) underTest.cancelUpload() }
         )
@@ -372,7 +372,7 @@ class ReportIssueViewModelTest {
 
     @Test
     fun `test that cancelling upload clears progress`() = runTest {
-        whenever(submitIssue(any())).thenReturn(
+        whenever(submitIssueUseCase(any())).thenReturn(
             getProgressFlow()
                 .onEach {
                     if (it.floatValue == 0.01f) underTest.cancelUpload()

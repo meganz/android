@@ -14,20 +14,26 @@ import mega.privacy.android.domain.repository.SupportRepository
 import javax.inject.Inject
 
 /**
- * Default submit issue
+ * SubmitIssueUseCase
  *
  * @property loggingRepository
  * @property supportRepository
  * @property createSupportTicket
  * @property formatSupportTicket
  */
-class DefaultSubmitIssue @Inject constructor(
+class SubmitIssueUseCase @Inject constructor(
     private val loggingRepository: LoggingRepository,
     private val supportRepository: SupportRepository,
     private val createSupportTicket: CreateSupportTicket,
     private val formatSupportTicket: FormatSupportTicket,
-) : SubmitIssue {
-    override suspend fun invoke(request: SubmitIssueRequest): Flow<Progress> {
+) {
+    /**
+     * Invoke
+     *
+     * @param request
+     * @return
+     */
+    suspend operator fun invoke(request: SubmitIssueRequest): Flow<Progress> {
         return flow {
             val logFileName = uploadLogs(request.includeLogs)
             if (currentCoroutineContext().isActive) {

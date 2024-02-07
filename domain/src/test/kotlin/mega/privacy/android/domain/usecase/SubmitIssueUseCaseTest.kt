@@ -12,19 +12,24 @@ import mega.privacy.android.domain.entity.SubmitIssueRequest
 import mega.privacy.android.domain.entity.SupportTicket
 import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.SupportRepository
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
 @ExperimentalCoroutinesApi
-class DefaultSubmitIssueTest {
-    private lateinit var underTest: SubmitIssue
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class SubmitIssueUseCaseTest {
+    private lateinit var underTest: SubmitIssueUseCase
     private val supportTicket = SupportTicket(
         androidAppVersion = "appVersion",
         sdkVersion = "sdkVersion",
@@ -42,36 +47,35 @@ class DefaultSubmitIssueTest {
     private val percentage = 1F
     private val formattedSupportTicket = "formattedSupportTicket"
 
-    private val loggingRepository = mock<LoggingRepository> {
-        onBlocking { compressLogs() }.thenReturn(compressedLogs)
-    }
+    private val loggingRepository = mock<LoggingRepository>()
+    private val supportRepository = mock<SupportRepository>()
+    private val createSupportTicket = mock<CreateSupportTicket>()
+    private val formatSupportTicket = mock<FormatSupportTicket>()
 
-    private val supportRepository = mock<SupportRepository> {
-        on { uploadFile(compressedLogs) }.thenReturn(flowOf(percentage))
-    }
 
-    private val createSupportTicket = mock<CreateSupportTicket> {
-        onBlocking {
-            invoke(supportTicket.description, supportTicket.logFileName)
-        }.thenReturn(supportTicket)
-    }
-
-    private val formatSupportTicket = mock<FormatSupportTicket> {
-        on {
-            invoke(any())
-        }.thenReturn(formattedSupportTicket)
-    }
-
-    @Before
+    @BeforeEach
     fun setUp() {
-        Mockito.clearInvocations(
-            loggingRepository,
-            supportRepository,
-            createSupportTicket,
-            formatSupportTicket,
-        )
+        loggingRepository.stub {
+            onBlocking { compressLogs() }.thenReturn(compressedLogs)
+        }
 
-        underTest = DefaultSubmitIssue(
+        supportRepository.stub {
+            on { uploadFile(compressedLogs) }.thenReturn(flowOf(percentage))
+        }
+
+        createSupportTicket.stub {
+            onBlocking {
+                invoke(supportTicket.description, supportTicket.logFileName)
+            }.thenReturn(supportTicket)
+        }
+
+        formatSupportTicket.stub {
+            on {
+                invoke(any())
+            }.thenReturn(formattedSupportTicket)
+        }
+
+        underTest = SubmitIssueUseCase(
             loggingRepository = loggingRepository,
             supportRepository = supportRepository,
             createSupportTicket = createSupportTicket,
@@ -79,6 +83,21 @@ class DefaultSubmitIssueTest {
         )
     }
 
+    @AfterEach
+    fun resetMocks() {
+        Mockito.clearInvocations(
+            loggingRepository,
+            supportRepository,
+            createSupportTicket,
+            formatSupportTicket,
+        )
+        reset(
+            loggingRepository,
+            supportRepository,
+            createSupportTicket,
+            formatSupportTicket,
+        )
+    }
 
     @Test
     fun `test that logs are compressed when include logs is set to true`() = runTest {
@@ -154,7 +173,7 @@ class DefaultSubmitIssueTest {
         verify(supportRepository, never()).logTicket(any())
     }
 
-    private suspend fun SubmitIssue.call(includeLogs: Boolean) = invoke(
+    private suspend fun SubmitIssueUseCase.call(includeLogs: Boolean) = invoke(
         SubmitIssueRequest(
             description = supportTicket.description,
             includeLogs = includeLogs
