@@ -24,8 +24,9 @@ class ReactionChipTest {
         val expectedReactionString = "A"
         composeRule.setContent {
             ReactionChip(
-                reaction = UIReaction(expectedReactionString, 1, false),
+                reaction = UIReaction(expectedReactionString, count = 1, hasMe = false),
                 onClick = callback,
+                onLongClick = {},
                 systemLayoutDirection = LayoutDirection.Ltr,
             )
         }

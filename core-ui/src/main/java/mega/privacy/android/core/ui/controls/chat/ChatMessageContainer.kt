@@ -52,8 +52,9 @@ fun ChatMessageContainer(
     isMine: Boolean,
     showForwardIcon: Boolean,
     reactions: List<UIReaction>,
-    onMoreReactionsClicked: () -> Unit,
-    onReactionClicked: (String) -> Unit,
+    onMoreReactionsClick: () -> Unit,
+    onReactionClick: (String) -> Unit,
+    onReactionLongClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     time: String? = null,
     isSendError: Boolean = false,
@@ -101,8 +102,9 @@ fun ChatMessageContainer(
                 ),
                 reactions = reactions,
                 isMine = isMine,
-                onMoreReactionsClicked = onMoreReactionsClicked,
-                onReactionClicked = onReactionClicked,
+                onMoreReactionsClick = onMoreReactionsClick,
+                onReactionClick = onReactionClick,
+                onReactionLongClick = onReactionLongClick,
             )
         }
         if (isSendError) {
@@ -142,8 +144,9 @@ private fun TextMessageContainerPreview(
             modifier = Modifier,
             isMine = isMe,
             reactions = reactionsList,
-            onMoreReactionsClicked = { },
-            onReactionClicked = { },
+            onMoreReactionsClick = { },
+            onReactionClick = { },
+            onReactionLongClick = {},
             avatarOrIcon = {
                 Icon(
                     modifier = Modifier
@@ -178,8 +181,9 @@ private fun TextMessageContainerSendErrorPreview(
             modifier = Modifier,
             isMine = isMe,
             reactions = emptyList(),
-            onMoreReactionsClicked = { },
-            onReactionClicked = { },
+            onMoreReactionsClick = { },
+            onReactionClick = { },
+            onReactionLongClick = {},
             avatarOrIcon = {
                 Icon(
                     modifier = Modifier

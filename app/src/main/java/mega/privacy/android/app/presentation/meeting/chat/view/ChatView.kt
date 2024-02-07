@@ -88,6 +88,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startW
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatAttachFileBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageOptionsBottomSheet
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ReactionsInfoBottomSheet
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -144,6 +145,8 @@ internal fun ChatView(
         onDeleteReaction = viewModel::onDeleteReaction,
         onSendGiphyMessage = viewModel::onSendGiphyMessage,
         onAttachContacts = viewModel::onAttachContacts,
+        getUserInfoIntoReactionList = viewModel::getUserInfoIntoReactionList,
+        onReactionUserClick = { }
     )
 }
 
@@ -180,8 +183,8 @@ internal fun ChatView(
     onAnswerCall: () -> Unit = {},
     onEnableGeolocation: () -> Unit = {},
     onUserUpdateHandled: () -> Unit = {},
-    messageListView: @Composable (ChatUiState, LazyListState, Dp, (TypedMessage) -> Unit, (Long) -> Unit, (Long, String, List<UIReaction>) -> Unit) -> Unit =
-        { state, listState, bottomPadding, onMessageLongClick, onMoreReactionsClick, onReactionClick ->
+    messageListView: @Composable (ChatUiState, LazyListState, Dp, (TypedMessage) -> Unit, (Long) -> Unit, (Long, String, List<UIReaction>) -> Unit, (String, List<UIReaction>) -> Unit) -> Unit =
+        { state, listState, bottomPadding, onMessageLongClick, onMoreReactionsClick, onReactionClick, onReactionLongClick ->
             MessageListView(
                 uiState = state,
                 scrollState = listState,
@@ -190,6 +193,7 @@ internal fun ChatView(
                 onMessageLongClick = onMessageLongClick,
                 onMoreReactionsClicked = onMoreReactionsClick,
                 onReactionClicked = onReactionClick,
+                onReactionLongClick = onReactionLongClick,
             )
         },
     bottomBar: @Composable (
@@ -224,6 +228,8 @@ internal fun ChatView(
     onDeleteReaction: (Long, String) -> Unit = { _, _ -> },
     onSendGiphyMessage: (GifData?) -> Unit = { _ -> },
     onAttachContacts: (List<String>) -> Unit = { _ -> },
+    getUserInfoIntoReactionList: suspend (List<UIReaction>) -> List<UIReaction> = { emptyList() },
+    onReactionUserClick: (Long) -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -241,6 +247,8 @@ internal fun ChatView(
     var showReactionPicker by rememberSaveable { mutableStateOf(false) }
     var messageClicked by rememberSaveable { mutableStateOf<TypedMessage?>(null) }
     var addingReactionTo by rememberSaveable { mutableStateOf<Long?>(null) }
+    var selectedReaction by rememberSaveable { mutableStateOf("") }
+    var reactionList by rememberSaveable { mutableStateOf(emptyList<UIReaction>()) }
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val keyboardController = LocalSoftwareKeyboardController.current
     val toolbarModalSheetState =
@@ -275,6 +283,9 @@ internal fun ChatView(
             }
             true
         }
+    )
+    val reactionInfoBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden
     )
     var showEnableGeolocationDialog by rememberSaveable { mutableStateOf(false) }
     var waitingForPickLocation by rememberSaveable { mutableStateOf(false) }
@@ -383,9 +394,14 @@ internal fun ChatView(
                 takePictureUri = Uri.EMPTY
             }
 
-        val isFileModalShown by derivedStateOf { fileModalSheetState.currentValue != ModalBottomSheetValue.Hidden }
+        val isFileModalShown by derivedStateOf {
+            fileModalSheetState.currentValue != ModalBottomSheetValue.Hidden
+        }
         val isMessageOptionsModalShown by derivedStateOf {
             messageOptionsModalSheetState.currentValue != ModalBottomSheetValue.Hidden
+        }
+        val isReactionInfoModalShown by derivedStateOf {
+            reactionInfoBottomSheetState.currentValue != ModalBottomSheetValue.Hidden
         }
 
         if (!isMessageOptionsModalShown && addingReactionTo == null) {
@@ -396,6 +412,7 @@ internal fun ChatView(
             modalSheetState = when {
                 isFileModalShown -> fileModalSheetState
                 isMessageOptionsModalShown -> messageOptionsModalSheetState
+                isReactionInfoModalShown -> reactionInfoBottomSheetState
                 else -> toolbarModalSheetState
             },
             sheetBody = {
@@ -417,6 +434,16 @@ internal fun ChatView(
                             },
                             onMoreReactionsClicked = { showReactionPicker = true },
                             sheetState = messageOptionsModalSheetState,
+                        )
+                    }
+
+                    isReactionInfoModalShown -> {
+                        ReactionsInfoBottomSheet(
+                            selectedReaction = selectedReaction,
+                            reactions = reactionList,
+                            sheetState = reactionInfoBottomSheetState,
+                            getDetailsInReactionList = getUserInfoIntoReactionList,
+                            onUserClick = onReactionUserClick,
                         )
                     }
 
@@ -644,6 +671,13 @@ internal fun ChatView(
                                             }
                                         }
                                 },
+                                { clickedReaction, reactions ->
+                                    selectedReaction = clickedReaction
+                                    reactionList = reactions
+                                    coroutineScope.launch {
+                                        reactionInfoBottomSheetState.show()
+                                    }
+                                }
                             )
                         },
                     )

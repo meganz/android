@@ -65,6 +65,8 @@ import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatParticipantEmailUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatParticipantFullNameUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
@@ -89,6 +91,7 @@ import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCa
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
@@ -249,6 +252,8 @@ internal class ChatViewModelTest {
     private val deleteReactionUseCase = mock<DeleteReactionUseCase>()
     private val sendGiphyMessageUseCase = mock<SendGiphyMessageUseCase>()
     private val attachContactsUseCase = mock<AttachContactsUseCase>()
+    private val getChatParticipantEmailUseCase = mock<GetChatParticipantEmailUseCase>()
+    private val getChatParticipantFullNameUseCase = mock<GetChatParticipantFullNameUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -307,6 +312,8 @@ internal class ChatViewModelTest {
             deleteReactionUseCase,
             sendGiphyMessageUseCase,
             attachContactsUseCase,
+            getChatParticipantEmailUseCase,
+            getChatParticipantFullNameUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -397,6 +404,8 @@ internal class ChatViewModelTest {
             deleteReactionUseCase = deleteReactionUseCase,
             sendGiphyMessageUseCase = sendGiphyMessageUseCase,
             attachContactsUseCase = attachContactsUseCase,
+            getChatParticipantEmailUseCase = getChatParticipantEmailUseCase,
+            getChatParticipantFullNameUseCase = getChatParticipantFullNameUseCase,
         )
     }
 

@@ -112,12 +112,13 @@ class ChatMessageContainerTest {
                 isMine = isMine,
                 showForwardIcon = showForwardIcon,
                 reactions = reactions,
-                onMoreReactionsClicked = {},
-                onReactionClicked = {},
+                onMoreReactionsClick = {},
+                onReactionClick = {},
                 time = time,
                 isSendError = isSendError,
                 avatarOrIcon = {},
                 content = {},
+                onReactionLongClick = {},
             )
         }
     }

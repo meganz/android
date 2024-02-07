@@ -20,13 +20,14 @@ class ReactionsViewTest {
 
     @Test
     fun `test that add reaction chip is always shown when there is no reactions`() {
+
         val reactions = emptyList<UIReaction>()
         composeRule.setContent {
             ReactionsView(
                 modifier = Modifier,
                 reactions = reactions,
-                onMoreReactionsClicked = {},
-                onReactionClicked = {},
+                onMoreReactionsClick = {},
+                onReactionClick = {},
             )
         }
         composeRule.onNodeWithTag(TEST_TAG_CHAT_MESSAGE_ADD_REACTION_CHIP).assertExists()
@@ -34,17 +35,18 @@ class ReactionsViewTest {
 
     @Test
     fun `test that add reaction chip is always shown when there are reactions`() {
+
         val reactions = listOf(
-            UIReaction("ReactionA", 1, false),
-            UIReaction("ReactionB", 2, false),
-            UIReaction("ReactionC", 3, false),
+            UIReaction("ReactionA", 1, ":short_code:", false),
+            UIReaction("ReactionB", 2, ":short_code:", false),
+            UIReaction("ReactionC", 3, ":short_code:", false),
         )
         composeRule.setContent {
             ReactionsView(
                 modifier = Modifier,
                 reactions = reactions,
-                onMoreReactionsClicked = {},
-                onReactionClicked = {},
+                onMoreReactionsClick = {},
+                onReactionClick = {},
             )
         }
         composeRule.onNodeWithTag(TEST_TAG_CHAT_MESSAGE_ADD_REACTION_CHIP).assertExists()
@@ -58,8 +60,8 @@ class ReactionsViewTest {
             ReactionsView(
                 modifier = Modifier,
                 reactions = reactions,
-                onMoreReactionsClicked = addReactionCallBack,
-                onReactionClicked = {},
+                onMoreReactionsClick = addReactionCallBack,
+                onReactionClick = {},
             )
         }
         composeRule.onNodeWithTag(TEST_TAG_CHAT_MESSAGE_ADD_REACTION_CHIP).performClick()
@@ -69,7 +71,7 @@ class ReactionsViewTest {
     @Test
     fun `test that reaction chip callback is invoked when it is clicked`() {
         val reactions = listOf(
-            UIReaction("ReactionA", 1, false),
+            UIReaction("ReactionA", 1, ":shortcode:", false),
         )
         val reactionChipCallback: (String) -> Unit = mock()
 
@@ -77,8 +79,8 @@ class ReactionsViewTest {
             ReactionsView(
                 modifier = Modifier,
                 reactions = reactions,
-                onMoreReactionsClicked = {},
-                onReactionClicked = reactionChipCallback,
+                onMoreReactionsClick = {},
+                onReactionClick = reactionChipCallback,
             )
         }
         composeRule.onNodeWithTag(TEST_TAG_CHAT_MESSAGE_REACTION_CHIP).performClick()

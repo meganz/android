@@ -52,16 +52,18 @@ abstract class AvatarMessage : UiChatMessage {
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,
-        onMoreReactionsClicked: (Long) -> Unit,
-        onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
+        onMoreReactionsClick: (Long) -> Unit,
+        onReactionClick: (Long, String, List<UIReaction>) -> Unit,
+        onReactionLongClick: (String, List<UIReaction>) -> Unit,
     ) {
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),
             isMine = displayAsMine,
             showForwardIcon = canForward,
             reactions = reactions,
-            onMoreReactionsClicked = { onMoreReactionsClicked(id) },
-            onReactionClicked = { onReactionClicked(id, it, reactions) },
+            onMoreReactionsClick = { onMoreReactionsClick(id) },
+            onReactionClick = { onReactionClick(id, it, reactions) },
+            onReactionLongClick = { onReactionLongClick(it, reactions) },
             time = this.getTimeOrNull(timeFormatter),
             avatarOrIcon = {
                 MessageAvatar(

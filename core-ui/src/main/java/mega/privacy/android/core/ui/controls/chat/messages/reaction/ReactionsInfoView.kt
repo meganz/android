@@ -1,0 +1,199 @@
+package mega.privacy.android.core.ui.controls.chat.messages.reaction
+
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ScrollableTabRow
+import androidx.compose.material.Tab
+import androidx.compose.material.TabPosition
+import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReactionUser
+import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.core.ui.controls.text.MegaText
+import mega.privacy.android.core.ui.preview.BooleanProvider
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.tokens.TextColor
+
+/**
+ * View to show the information of reactions.
+ * User can swipe to see the users who gave the reaction.
+ *
+ * @param currentReaction the reaction user selected
+ * @param reactionList the list of reactions for the message
+ * @param modifier
+ * @param onUserClick the callback when a certain user clicked
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ReactionsInfoView(
+    currentReaction: String,
+    reactionList: List<UIReaction>,
+    onUserClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (reactionList.isEmpty()) return
+
+    val initialPage =
+        reactionList.indexOfFirst { it.reaction == currentReaction }.takeIf { it != -1 } ?: 0
+    val pagerState = rememberPagerState(initialPage = initialPage) { reactionList.size }
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        ScrollableTabRow(
+            modifier = modifier
+                .padding(start = 16.dp)
+                .fillMaxWidth()
+                .height(56.dp),
+            selectedTabIndex = pagerState.currentPage,
+            indicator = { tabPositions: List<TabPosition> ->
+                TabRowDefaults.Indicator(
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+                    color = MegaTheme.colors.components.selectionControl
+                )
+            },
+            edgePadding = 0.dp,
+        ) {
+            reactionList.forEachIndexed { index, reaction ->
+                Tab(
+                    modifier = Modifier.width(72.dp),
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    },
+                    text = {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            val counterColor =
+                                if (reaction.hasMe) TextColor.Accent else TextColor.Secondary
+                            Text(text = reaction.reaction, modifier = Modifier.padding(end = 4.dp))
+                            MegaText(
+                                text = reaction.userList.size.toString(),
+                                textColor = counterColor,
+                                style = MaterialTheme.typography.subtitle2,
+                            )
+                        }
+                    }
+                )
+            }
+        }
+
+        HorizontalPager(
+            modifier = Modifier.fillMaxWidth(),
+            state = pagerState,
+            beyondBoundsPageCount = 3,
+            verticalAlignment = Alignment.Top,
+        ) { page: Int ->
+            val reaction = reactionList[page]
+            Column(
+                Modifier.padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.Top,
+            ) {
+
+                Row(
+                    modifier = Modifier.height(32.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    MegaText(
+                        text = reaction.shortCode,
+                        textColor = TextColor.Secondary,
+                        style = MaterialTheme.typography.caption,
+                    )
+                }
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    items(count = reaction.userList.size) {
+                        val reactionGiver = reaction.userList[it]
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .clickable { onUserClick(reactionGiver.userHandle) },
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            reactionGiver.avatarContent(
+                                reactionGiver.userHandle,
+                                Modifier.size(40.dp)
+                            )
+
+                            MegaText(
+                                modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                                text = reactionGiver.name,
+                                textColor = TextColor.Primary,
+                                style = MaterialTheme.typography.subtitle1,
+                                overflow = LongTextBehaviour.Ellipsis(maxLines = 1),
+                            )
+                        }
+                        Divider(modifier = Modifier.padding(start = 56.dp))
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ReactionsInfoViewPreview(
+    @PreviewParameter(BooleanProvider::class) hasMe: Boolean,
+) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+
+        val reactionList = listOf(
+            SLIGHT_SMILE_REACTION,
+            ROLLING_EYES_REACTION,
+            ROLLING_ON_THE_FLOOR_LAUGHING_REACTION,
+            THUMBS_UP_REACTION,
+            CLAP_REACTION
+        ).map {
+            UIReaction(
+                reaction = it,
+                hasMe = hasMe,
+                count = 2,
+                userList = listOf(
+                    UIReactionUser(name = "Jack London", userHandle = 1L),
+                    UIReactionUser(name = "Alexandre Dumas", userHandle = 2L),
+                    UIReactionUser(
+                        name = "William Shakespeare with very very very long name",
+                        userHandle = 3L
+                    ),
+                )
+            )
+        }
+        ReactionsInfoView(
+            currentReaction = THUMBS_UP_REACTION,
+            reactionList = reactionList,
+            onUserClick = {},
+        )
+    }
+}

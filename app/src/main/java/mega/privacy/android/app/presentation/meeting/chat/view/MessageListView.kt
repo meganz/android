@@ -40,6 +40,7 @@ internal fun MessageListView(
     bottomPadding: Dp,
     onMoreReactionsClicked: (Long) -> Unit,
     onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
+    onReactionLongClick: (String, List<UIReaction>) -> Unit,
     viewModel: MessageListViewModel = hiltViewModel(),
     onUserUpdateHandled: () -> Unit = {},
     onMessageLongClick: (TypedMessage) -> Unit = {},
@@ -122,6 +123,7 @@ internal fun MessageListView(
                         },
                         onMoreReactionsClicked = onMoreReactionsClicked,
                         onReactionClicked = onReactionClicked,
+                        onReactionLongClick = onReactionLongClick,
                     )
                 }
             }

@@ -25,6 +25,7 @@ import javax.inject.Inject
  *
  * @property megaApi MegaApiAndroid instance to use.
  */
+@Deprecated("This use case should be deleted once Chat Rewrite is done.")
 class GetAvatarUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {

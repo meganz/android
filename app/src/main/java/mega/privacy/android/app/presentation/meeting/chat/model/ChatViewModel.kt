@@ -32,6 +32,8 @@ import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReactionUser
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
@@ -54,6 +56,8 @@ import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatParticipantEmailUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatParticipantFullNameUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
@@ -190,6 +194,8 @@ class ChatViewModel @Inject constructor(
     private val deleteReactionUseCase: DeleteReactionUseCase,
     private val sendGiphyMessageUseCase: SendGiphyMessageUseCase,
     private val attachContactsUseCase: AttachContactsUseCase,
+    private val getChatParticipantFullNameUseCase: GetChatParticipantFullNameUseCase,
+    private val getChatParticipantEmailUseCase: GetChatParticipantEmailUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1178,6 +1184,33 @@ class ChatViewModel @Inject constructor(
             attachContactsUseCase(chatId, contacts)
         }
     }
+
+    /**
+     * Fill the user name in the [UIReactionUser] of [UIReaction]
+     *
+     * @param reactions list of [UIReaction]
+     * @return another list of [UIReaction] in which user info has been filled.
+     */
+    suspend fun getUserInfoIntoReactionList(reactions: List<UIReaction>): List<UIReaction> =
+        reactions.map { reaction ->
+            reaction.copy(
+                userList = reaction.userList.map { user ->
+                    user.copy(
+                        name = getChatParticipantFullNameUseCase(user.userHandle).orEmpty(),
+                    )
+                }
+            )
+        }
+
+    /**
+     * Get user email by handle
+     *
+     * @param userHandle
+     * @return
+     */
+    suspend fun getParticipantEmail(userHandle: Long): String =
+        getChatParticipantEmailUseCase(userHandle).orEmpty()
+
 
     override fun onCleared() {
         if (state.value.isPreviewMode) {

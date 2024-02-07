@@ -26,8 +26,8 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  *                          per row can be calculated dynamically.
  * @param reactions List of [UIReaction]
  * @param isMine Whether the current user is the sender of the message
- * @param onMoreReactionsClicked Callback when the add more reactions button is clicked
- * @param onReactionClicked Callback when a reaction is clicked
+ * @param onMoreReactionsClick Callback when the add more reactions button is clicked
+ * @param onReactionClick Callback when a reaction is clicked
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -35,39 +35,43 @@ fun ReactionsView(
     modifier: Modifier,
     reactions: List<UIReaction> = emptyList(),
     isMine: Boolean = false,
-    onMoreReactionsClicked: () -> Unit = {},
-    onReactionClicked: (String) -> Unit = {},
+    onMoreReactionsClick: () -> Unit = {},
+    onReactionClick: (String) -> Unit = {},
+    onReactionLongClick: (String) -> Unit = {},
 ) {
     val systemLayoutDirection = LocalLayoutDirection.current
     val flowDirection = if (isMine) LayoutDirection.Rtl else LayoutDirection.Ltr
     CompositionLocalProvider(LocalLayoutDirection provides flowDirection) {
         FlowRow(
-            modifier = modifier.padding(4.dp).testTag(TEST_TAG_REACTIONS_VIEW),
+            modifier = modifier
+                .padding(4.dp)
+                .testTag(TEST_TAG_REACTIONS_VIEW),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             reactions.forEach {
                 ReactionChip(
                     reaction = it,
-                    onClick = onReactionClicked,
+                    onClick = onReactionClick,
+                    onLongClick = onReactionLongClick,
                     systemLayoutDirection = systemLayoutDirection,
                 )
             }
             AddReactionChip(
-                onAddClicked = onMoreReactionsClicked,
+                onAddClicked = onMoreReactionsClick,
             )
         }
     }
 }
 
 internal val reactionsList = listOf(
-    UIReaction("😀", 1, true),
-    UIReaction("😀", 2, false),
-    UIReaction("😀", 3, false),
-    UIReaction("😀", 4, false),
-    UIReaction("😀", 11, true),
-    UIReaction("😀", 33, false),
-    UIReaction("😀", 44, false),
+    UIReaction("😀", 1, hasMe = true),
+    UIReaction("😀", 2, hasMe = false),
+    UIReaction("😀", 3, hasMe = false),
+    UIReaction("😀", 4, hasMe = false),
+    UIReaction("😀", 11, hasMe = true),
+    UIReaction("😀", 33, hasMe = false),
+    UIReaction("😀", 44, hasMe = false),
 )
 
 @CombinedThemeRtlPreviews

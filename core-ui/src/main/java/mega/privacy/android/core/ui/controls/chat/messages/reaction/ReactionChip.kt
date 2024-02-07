@@ -1,8 +1,9 @@
 package mega.privacy.android.core.ui.controls.chat.messages.reaction
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -39,10 +40,12 @@ internal const val TEST_TAG_CHAT_MESSAGE_REACTION_CHIP =
  * @param onClick
  * @param systemLayoutDirection internal layout of Reaction should follow system layout direction
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ReactionChip(
     reaction: UIReaction,
     onClick: (String) -> Unit,
+    onLongClick: (String) -> Unit,
     systemLayoutDirection: LayoutDirection,
 ) {
     CompositionLocalProvider(LocalLayoutDirection provides systemLayoutDirection) {
@@ -52,7 +55,10 @@ fun ReactionChip(
             modifier = Modifier
                 .size(44.dp, 24.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .clickable { onClick(reaction.reaction) }
+                .combinedClickable(
+                    onClick = { onClick(reaction.reaction) },
+                    onLongClick = { onLongClick(reaction.reaction) }
+                )
                 .border(
                     width = 1.dp,
                     color = if (reaction.hasMe) MegaTheme.colors.border.strongSelected else MegaTheme.colors.border.disabled,
@@ -69,7 +75,7 @@ fun ReactionChip(
                 fontSize = 14.sp,
             )
             Text(
-                text = "${reaction.count}",
+                text = "${reaction.userList.size}",
                 color = if (reaction.hasMe) MegaTheme.colors.border.strongSelected else MegaTheme.colors.text.secondary,
                 style = MaterialTheme.typography.subtitle2,
             )
@@ -86,8 +92,15 @@ private fun ReactionChipWithRtlCountPreview(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ReactionChip(
-            reaction = UIReaction("\uD83C\uDF77", 1, hasMe),
+            reaction = UIReaction(
+                reaction = "\uD83C\uDF77",
+                hasMe = hasMe,
+                count = 1,
+                shortCode = ":wine_glass:",
+            ),
+
             onClick = {},
+            onLongClick = {},
             systemLayoutDirection = LayoutDirection.Rtl,
         )
     }
@@ -100,8 +113,14 @@ private fun ReactionChipWithCountPreview(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ReactionChip(
-            reaction = UIReaction("\uD83C\uDF77", 1, hasMe),
+            reaction = UIReaction(
+                reaction = "\uD83C\uDF77",
+                count = 1,
+                hasMe = hasMe,
+                shortCode = ":wine_glass:"
+            ),
             onClick = {},
+            onLongClick = {},
             systemLayoutDirection = LayoutDirection.Ltr,
         )
     }

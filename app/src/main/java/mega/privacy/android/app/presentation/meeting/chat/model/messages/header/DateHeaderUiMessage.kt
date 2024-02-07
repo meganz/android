@@ -23,6 +23,7 @@ class DateHeaderUiMessage(override val timeSent: Long) : UiChatMessage {
         onLongClick: (TypedMessage) -> Unit,
         onMoreReactionsClicked: (Long) -> Unit,
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
+        onReactionLongClick: (String, List<UIReaction>) -> Unit,
     ) {
         DateHeader(dateFormatter(timeSent))
     }
