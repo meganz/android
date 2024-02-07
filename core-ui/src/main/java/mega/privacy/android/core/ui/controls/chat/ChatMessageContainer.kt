@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
+import mega.privacy.android.core.ui.controls.chat.messages.DateHeader
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.ReactionsView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.reactionsList
@@ -68,14 +69,7 @@ fun ChatMessageContainer(
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         date?.let {
-            Text(
-                modifier = Modifier
-                    .padding(top = 8.dp, bottom = 16.dp)
-                    .align(Alignment.CenterHorizontally),
-                text = date,
-                style = MaterialTheme.typography.subtitle2,
-                color = MegaTheme.colors.text.secondary
-            )
+            DateHeader(dateString = date)
         }
         time?.let {
             Text(
