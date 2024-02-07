@@ -23,7 +23,6 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 chatRichPreviewInfo = chatRichPreviewInfo,
                 shouldShowAvatar = shouldShowAvatar,
                 shouldShowTime = shouldShowTime,
-                shouldShowDate = shouldShowDate,
                 reactions = reactions,
             )
 
@@ -35,7 +34,6 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 chatGeolocationInfo = chatGeolocationInfo,
                 shouldShowAvatar = shouldShowAvatar,
                 shouldShowTime = shouldShowTime,
-                shouldShowDate = shouldShowDate,
                 reactions = reactions,
             )
 
@@ -47,7 +45,6 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 chatGifInfo = chatGifInfo,
                 shouldShowAvatar = shouldShowAvatar,
                 shouldShowTime = shouldShowTime,
-                shouldShowDate = shouldShowDate,
                 reactions = reactions,
             )
 
@@ -58,7 +55,6 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 userHandle = userHandle,
                 shouldShowAvatar = shouldShowAvatar,
                 shouldShowTime = shouldShowTime,
-                shouldShowDate = shouldShowDate,
                 reactions = reactions,
             )
         }

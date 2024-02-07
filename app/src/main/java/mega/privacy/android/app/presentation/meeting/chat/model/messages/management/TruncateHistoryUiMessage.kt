@@ -15,7 +15,6 @@ import mega.privacy.android.domain.entity.chat.messages.management.TruncateHisto
  */
 data class TruncateHistoryUiMessage(
     override val message: TruncateHistoryMessage,
-    override val showDate: Boolean,
     override val reactions: List<UIReaction>,
 ) : ManagementUiChatMessage() {
 

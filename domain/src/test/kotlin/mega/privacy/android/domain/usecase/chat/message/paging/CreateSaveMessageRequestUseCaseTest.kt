@@ -5,7 +5,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
-import mega.privacy.android.domain.usecase.chat.message.paging.CreateSaveMessageRequestUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.GetReactionsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -216,77 +215,6 @@ class CreateSaveMessageRequestUseCaseTest {
             assertThat(actual.map { it.shouldShowTime }).containsExactly(true, true)
         }
 
-
-    @Test
-    fun `test that date is not shown for second message sent on the same date`() = runTest {
-        val initialTime = 100L
-        val notMyHandle = myHandle + 1
-        val firstMessage = mock<ChatMessage> {
-            on { userHandle }.thenReturn(notMyHandle)
-            on { type }.thenReturn(ChatMessageType.NORMAL)
-            on { timestamp }.thenReturn(initialTime)
-        }
-
-        val newTime = initialTime + TimeUnit.MINUTES.toSeconds(3) - 1
-        val secondMessage = mock<ChatMessage> {
-            on { userHandle }.thenReturn(notMyHandle)
-            on { type }.thenReturn(ChatMessageType.NORMAL)
-            on { timestamp }.thenReturn(newTime)
-        }
-
-        val actual = underTest(
-            chatId = chatId,
-            chatMessages = listOf(firstMessage, secondMessage),
-            currentUserHandle = myHandle,
-            nextMessageUserHandle = null,
-        )
-
-        assertThat(actual.map { it.shouldShowDate }).containsExactly(true, false)
-    }
-
-    @Test
-    fun `test that date is shown for two messages sent on different dates`() = runTest {
-        val initialTime = 100L
-        val notMyHandle = myHandle + 1
-        val firstMessage = mock<ChatMessage> {
-            on { userHandle }.thenReturn(notMyHandle)
-            on { type }.thenReturn(ChatMessageType.NORMAL)
-            on { timestamp }.thenReturn(initialTime)
-        }
-
-        val newTime = initialTime + TimeUnit.DAYS.toSeconds(1) + 1
-        val secondMessage = mock<ChatMessage> {
-            on { userHandle }.thenReturn(notMyHandle)
-            on { type }.thenReturn(ChatMessageType.NORMAL)
-            on { timestamp }.thenReturn(newTime)
-        }
-
-        val actual = underTest(
-            chatId = chatId,
-            chatMessages = listOf(firstMessage, secondMessage),
-            currentUserHandle = myHandle,
-            nextMessageUserHandle = null,
-        )
-
-        assertThat(actual.map { it.shouldShowDate }).containsExactly(true, true)
-    }
-
-    @Test
-    fun `test that date is displayed for first message`() = runTest {
-        val myMessage = mock<ChatMessage> {
-            on { userHandle }.thenReturn(myHandle)
-            on { type }.thenReturn(ChatMessageType.NORMAL)
-        }
-
-        val actual = underTest(
-            chatId = chatId,
-            chatMessages = listOf(myMessage),
-            currentUserHandle = myHandle,
-            nextMessageUserHandle = null,
-        )
-
-        assertThat(actual.all { it.shouldShowDate }).isTrue()
-    }
 
     @Test
     fun `test that reactions are retrieved for messages with confirmed reactions`() = runTest {

@@ -59,7 +59,6 @@ class VoiceClipMessageViewModelTest {
         userHandle = 1L,
         shouldShowAvatar = true,
         shouldShowTime = true,
-        shouldShowDate = true,
         reactions = emptyList(),
     )
 

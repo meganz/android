@@ -37,9 +37,6 @@ sealed class InvalidUiMessage : AvatarMessage() {
     override val showTime: Boolean
         get() = message.shouldShowTime
 
-    override val showDate: Boolean
-        get() = message.shouldShowDate
-
     override val displayAsMine: Boolean
         get() = message.isMine
     override val canForward: Boolean
@@ -59,7 +56,6 @@ sealed class InvalidUiMessage : AvatarMessage() {
      * @property message
      * @property showAvatar
      * @property showTime
-     * @property showDate
      */
     data class FormatInvalidUiMessage(
         override val message: InvalidMessage,
@@ -76,7 +72,6 @@ sealed class InvalidUiMessage : AvatarMessage() {
      * @property message
      * @property showAvatar
      * @property showTime
-     * @property showDate
      */
     data class SignatureInvalidUiMessage(
         override val message: InvalidMessage,
@@ -94,7 +89,6 @@ sealed class InvalidUiMessage : AvatarMessage() {
      * @property message
      * @property showAvatar
      * @property showTime
-     * @property showDate
      */
     data class MetaInvalidUiMessage(
         override val message: TypedMessage,
@@ -112,7 +106,6 @@ sealed class InvalidUiMessage : AvatarMessage() {
      * @property message
      * @property showAvatar
      * @property showTime
-     * @property showDate
      */
     data class UnrecognizableInvalidUiMessage(
         override val message: TypedMessage,

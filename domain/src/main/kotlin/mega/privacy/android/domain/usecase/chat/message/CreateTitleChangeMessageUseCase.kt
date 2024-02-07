@@ -16,7 +16,6 @@ internal class CreateTitleChangeMessageUseCase @Inject constructor() : CreateTyp
             content = content.orEmpty(),
             shouldShowAvatar = shouldShowAvatar,
             shouldShowTime = shouldShowTime,
-            shouldShowDate = shouldShowDate,
             reactions = reactions,
         )
     }

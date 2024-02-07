@@ -13,11 +13,9 @@ import mega.privacy.android.domain.entity.chat.messages.management.ScheduledMeet
  * Scheduled meeting update ui message
  *
  * @property message
- * @property showDate
  */
 data class ScheduledMeetingUpdateUiMessage(
     override val message: ScheduledMeetingUpdatedMessage,
-    override val showDate: Boolean,
     override val reactions: List<UIReaction>,
 ) : ManagementUiChatMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {

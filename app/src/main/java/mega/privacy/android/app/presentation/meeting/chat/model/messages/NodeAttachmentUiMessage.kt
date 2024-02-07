@@ -34,7 +34,6 @@ data class NodeAttachmentUiMessage(
             ))
     }
 
-    override val showDate = message.shouldShowDate
     override val showTime = message.shouldShowTime
     override val showAvatar = message.shouldShowAvatar
     override val displayAsMine = message.isMine

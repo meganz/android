@@ -38,11 +38,6 @@ interface Message {
     val shouldShowTime: Boolean
 
     /**
-     * Should show date
-     */
-    val shouldShowDate: Boolean
-
-    /**
      * List of reactions
      */
     val reactions: List<Reaction>

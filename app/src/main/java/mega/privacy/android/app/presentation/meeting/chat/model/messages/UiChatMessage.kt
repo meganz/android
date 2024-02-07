@@ -47,17 +47,6 @@ interface UiChatMessage {
         } else null
 
     /**
-     * Get date or null
-     *
-     * @param dateFormatter
-     */
-    fun getDateOrNull(
-        dateFormatter: (Long) -> String,
-    ) = if (showDate) timeSent?.let {
-        dateFormatter(it)
-    } else null
-
-    /**
      * Modifier
      */
     val modifier: Modifier
@@ -89,11 +78,6 @@ interface UiChatMessage {
     val showTime: Boolean
 
     /**
-     * Show date
-     */
-    val showDate: Boolean
-
-    /**
      * Reactions
      */
     val reactions: List<UIReaction>
@@ -101,5 +85,5 @@ interface UiChatMessage {
     /**
      * Key
      */
-    fun key(): String = "${id}_${showTime}_${showDate}"
+    fun key(): String = "${id}_${showTime}"
 }

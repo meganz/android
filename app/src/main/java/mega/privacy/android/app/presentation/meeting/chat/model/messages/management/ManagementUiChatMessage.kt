@@ -48,7 +48,6 @@ abstract class ManagementUiChatMessage : UiChatMessage {
             onMoreReactionsClicked = { onMoreReactionsClicked(id) },
             onReactionClicked = { onReactionClicked(id, it, reactions) },
             time = getTimeOrNull(timeFormatter),
-            date = getDateOrNull(dateFormatter),
             content = contentComposable,
         )
     }

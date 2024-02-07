@@ -63,7 +63,6 @@ abstract class AvatarMessage : UiChatMessage {
             onMoreReactionsClicked = { onMoreReactionsClicked(id) },
             onReactionClicked = { onReactionClicked(id, it, reactions) },
             time = this.getTimeOrNull(timeFormatter),
-            date = this.getDateOrNull(dateFormatter),
             avatarOrIcon = {
                 MessageAvatar(
                     lastUpdatedCache = lastUpdatedCache

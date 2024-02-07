@@ -35,7 +35,6 @@ class ChatCallMessageViewTest {
                 userHandle = 1234567890L,
                 shouldShowAvatar = false,
                 shouldShowTime = false,
-                shouldShowDate = false,
                 reactions = emptyList(),
             ),
             isOneToOneChat = true
@@ -57,7 +56,6 @@ class ChatCallMessageViewTest {
                 userHandle = 1234567890L,
                 shouldShowAvatar = false,
                 shouldShowTime = false,
-                shouldShowDate = false,
                 reactions = emptyList(),
             ),
             isOneToOneChat = true
@@ -79,7 +77,6 @@ class ChatCallMessageViewTest {
                 userHandle = 1234567890L,
                 shouldShowAvatar = false,
                 shouldShowTime = false,
-                shouldShowDate = false,
                 reactions = emptyList(),
             ),
             isOneToOneChat = false
@@ -105,7 +102,6 @@ class ChatCallMessageViewTest {
                 userHandle = 1234567890L,
                 shouldShowAvatar = false,
                 shouldShowTime = false,
-                shouldShowDate = false,
                 reactions = emptyList(),
             ),
             isOneToOneChat = true
@@ -131,7 +127,6 @@ class ChatCallMessageViewTest {
                 userHandle = 1234567890L,
                 shouldShowAvatar = false,
                 shouldShowTime = false,
-                shouldShowDate = false,
                 reactions = emptyList(),
             ),
             isOneToOneChat = true
@@ -157,7 +152,6 @@ class ChatCallMessageViewTest {
                 userHandle = 1234567890L,
                 shouldShowAvatar = false,
                 shouldShowTime = false,
-                shouldShowDate = false,
                 reactions = emptyList(),
             ),
             isOneToOneChat = true
@@ -183,7 +177,6 @@ class ChatCallMessageViewTest {
                 userHandle = 1234567890L,
                 shouldShowAvatar = false,
                 shouldShowTime = false,
-                shouldShowDate = false,
                 reactions = emptyList(),
             ),
             isOneToOneChat = true
@@ -209,7 +202,6 @@ class ChatCallMessageViewTest {
                 userHandle = 1234567890L,
                 shouldShowAvatar = false,
                 shouldShowTime = false,
-                shouldShowDate = false,
                 reactions = emptyList(),
             ),
             isOneToOneChat = true
@@ -235,7 +227,6 @@ class ChatCallMessageViewTest {
                 userHandle = 1234567890L,
                 shouldShowAvatar = false,
                 shouldShowTime = false,
-                shouldShowDate = false,
                 reactions = emptyList(),
             ),
             isOneToOneChat = true

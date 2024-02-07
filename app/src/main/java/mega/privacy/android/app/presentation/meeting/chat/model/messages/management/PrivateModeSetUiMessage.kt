@@ -16,7 +16,6 @@ import mega.privacy.android.domain.entity.chat.messages.management.PrivateModeSe
  */
 data class PrivateModeSetUiMessage(
     override val message: PrivateModeSetMessage,
-    override val showDate: Boolean,
     override val reactions: List<UIReaction>,
 ) : ManagementUiChatMessage() {
 

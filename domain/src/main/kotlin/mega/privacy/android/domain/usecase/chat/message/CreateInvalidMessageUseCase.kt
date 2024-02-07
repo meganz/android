@@ -24,7 +24,6 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
                 Long,
                 Boolean,
                 Boolean,
-                Boolean,
                 List<Reaction>,
             ) -> InvalidMessage = when {
                 type == ChatMessageType.INVALID -> {
@@ -51,7 +50,6 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
                 userHandle,
                 shouldShowAvatar,
                 shouldShowTime,
-                shouldShowDate,
                 reactions,
             )
         }

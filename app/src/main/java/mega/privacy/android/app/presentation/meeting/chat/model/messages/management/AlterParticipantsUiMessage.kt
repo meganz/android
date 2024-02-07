@@ -13,11 +13,9 @@ import mega.privacy.android.domain.entity.chat.messages.management.AlterParticip
  * Alter participants ui message
  *
  * @property message
- * @property showDate
  */
 data class AlterParticipantsUiMessage(
     override val message: AlterParticipantsMessage,
-    override val showDate: Boolean,
     override val reactions: List<UIReaction>,
 ) : ParticipantUiMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {

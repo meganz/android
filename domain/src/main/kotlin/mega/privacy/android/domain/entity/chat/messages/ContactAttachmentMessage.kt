@@ -15,7 +15,6 @@ data class ContactAttachmentMessage(
     override val userHandle: Long,
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
-    override val shouldShowDate: Boolean,
     override val reactions: List<Reaction>,
     val contactEmail: String,
     val contactUserName: String,

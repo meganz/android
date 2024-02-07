@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
-import mega.privacy.android.core.ui.controls.chat.messages.DateHeader
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.ReactionsView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.reactionsList
@@ -57,7 +56,6 @@ fun ChatMessageContainer(
     onReactionClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
     time: String? = null,
-    date: String? = null,
     isSendError: Boolean = false,
     onSendErrorClick: () -> Unit = {},
     avatarOrIcon: @Composable (RowScope.() -> Unit)? = null,
@@ -68,9 +66,6 @@ fun ChatMessageContainer(
         horizontalAlignment = if (isMine) Alignment.End else Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        date?.let {
-            DateHeader(dateString = date)
-        }
         time?.let {
             Text(
                 modifier = if (isMine) Modifier.padding(end = 16.dp) else Modifier.padding(start = 48.dp),
@@ -160,7 +155,6 @@ private fun TextMessageContainerPreview(
                 )
             },
             time = "12:00",
-            date = "Today",
             showForwardIcon = true,
             content = {
                 ChatBubble(isMe = isMe, modifier = Modifier.weight(1f)) {
@@ -197,7 +191,6 @@ private fun TextMessageContainerSendErrorPreview(
                 )
             },
             time = "12:00",
-            date = "Today",
             showForwardIcon = true,
             isSendError = isMe,
             content = {

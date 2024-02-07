@@ -15,7 +15,6 @@ import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkCreat
  */
 data class ChatLinkCreatedUiMessage(
     override val message: ChatLinkCreatedMessage,
-    override val showDate: Boolean,
     override val reactions: List<UIReaction>,
 ) : ManagementUiChatMessage() {
 

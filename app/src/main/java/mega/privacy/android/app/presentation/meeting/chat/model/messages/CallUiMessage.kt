@@ -21,8 +21,6 @@ data class CallUiMessage(
     override val reactions: List<UIReaction>,
 ) : UiChatMessage {
 
-    override val showDate = message.shouldShowDate
-
     override val showTime: Boolean = true
 
     override val displayAsMine = false
@@ -45,7 +43,6 @@ data class CallUiMessage(
             onMoreReactionsClicked = { onMoreReactionsClicked(id) },
             onReactionClicked = { onReactionClicked(id, it, reactions) },
             time = getTimeOrNull(timeFormatter),
-            date = getDateOrNull(dateFormatter),
             content = {
                 ChatCallMessageView(
                     message = message,

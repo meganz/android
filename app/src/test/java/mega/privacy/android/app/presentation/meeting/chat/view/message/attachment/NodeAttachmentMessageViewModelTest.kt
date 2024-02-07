@@ -127,7 +127,6 @@ class NodeAttachmentMessageViewModelTest {
             userHandle = 23L,
             shouldShowAvatar = true,
             shouldShowTime = true,
-            shouldShowDate = true,
             fileNode = fileNode,
             reactions = emptyList(),
         )

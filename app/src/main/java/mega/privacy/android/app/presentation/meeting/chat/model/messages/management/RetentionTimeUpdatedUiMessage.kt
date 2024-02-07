@@ -13,11 +13,9 @@ import mega.privacy.android.domain.entity.chat.messages.management.RetentionTime
  * Retention time updated ui message
  *
  * @property message
- * @property showDate
  */
 data class RetentionTimeUpdatedUiMessage(
     override val message: RetentionTimeUpdatedMessage,
-    override val showDate: Boolean,
     override val reactions: List<UIReaction>,
 ) : ManagementUiChatMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {

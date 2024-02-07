@@ -48,7 +48,6 @@ import kotlin.time.Duration
  * @property isMine True if the message is mine, false otherwise.
  * @property shouldShowAvatar True if the avatar should be shown, false otherwise.
  * @property shouldShowTime True if the time should be shown, false otherwise.
- * @property shouldShowDate True if the date should be shown, false otherwise.
  * @property textMessage Text message.
  * @property reactions list of [Reaction]
  */
@@ -86,7 +85,6 @@ data class TypedMessageEntity(
     val isMine: Boolean,
     val shouldShowAvatar: Boolean,
     val shouldShowTime: Boolean,
-    val shouldShowDate: Boolean,
     val textMessage: String?,
     val reactions: List<Reaction>
 ) : ChatMessageInfo

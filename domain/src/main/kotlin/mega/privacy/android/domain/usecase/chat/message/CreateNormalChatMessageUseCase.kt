@@ -30,7 +30,6 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                         content = content.orEmpty(),
                         shouldShowAvatar = shouldShowAvatar,
                         shouldShowTime = shouldShowTime,
-                        shouldShowDate = shouldShowDate,
                         reactions = reactions,
                     )
 
@@ -43,7 +42,6 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                     hasOtherLink = allLinks.any { it.type !in supportedTypes },
                     shouldShowAvatar = shouldShowAvatar,
                     shouldShowTime = shouldShowTime,
-                    shouldShowDate = shouldShowDate,
                     reactions = reactions,
                 )
             }

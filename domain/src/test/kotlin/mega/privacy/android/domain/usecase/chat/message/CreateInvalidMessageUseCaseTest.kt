@@ -35,7 +35,6 @@ class CreateInvalidMessageUseCaseTest {
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,
-                    shouldShowDate = true,
                     reactions = emptyList(),
                 )
             )
@@ -58,7 +57,6 @@ class CreateInvalidMessageUseCaseTest {
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,
-                    shouldShowDate = true,
                     reactions = emptyList(),
                 )
             )
@@ -81,7 +79,6 @@ class CreateInvalidMessageUseCaseTest {
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,
-                    shouldShowDate = true,
                     reactions = emptyList(),
                 )
             )
@@ -104,7 +101,6 @@ class CreateInvalidMessageUseCaseTest {
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,
-                    shouldShowDate = true,
                     reactions = emptyList(),
                 )
             )

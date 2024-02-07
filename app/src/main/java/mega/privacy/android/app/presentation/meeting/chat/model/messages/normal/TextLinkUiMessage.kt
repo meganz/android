@@ -37,7 +37,6 @@ data class TextLinkUiMessage(
 
     override val showAvatar = message.shouldShowAvatar
     override val showTime = message.shouldShowTime
-    override val showDate = message.shouldShowDate
     override val displayAsMine = message.isMine
     override val canForward = message.canForward
     override val timeSent = message.time

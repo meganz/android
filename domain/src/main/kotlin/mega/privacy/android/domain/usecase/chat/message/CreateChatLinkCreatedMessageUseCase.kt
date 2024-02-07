@@ -16,7 +16,6 @@ internal class CreateChatLinkCreatedMessageUseCase @Inject constructor() :
                 userHandle = userHandle,
                 shouldShowAvatar = shouldShowAvatar,
                 shouldShowTime = shouldShowTime,
-                shouldShowDate = shouldShowDate,
                 reactions = reactions,
             )
         }

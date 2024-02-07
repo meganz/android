@@ -19,7 +19,6 @@ private const val MAX_SIZE_FOR_AUTO_PLAY = 1024 * 1024 * 4  // 4MB
  * Ui message for Giphy message
  *
  * @property message
- * @property showDate
  * @property showAvatar
  * @property showTime
  */
@@ -48,7 +47,6 @@ class ChatGiphyUiMessage(
 
     override val showAvatar = message.shouldShowAvatar
     override val showTime = message.shouldShowTime
-    override val showDate = message.shouldShowDate
     override val displayAsMine = message.isMine
     override val canForward = message.canForward
     override val timeSent = message.time

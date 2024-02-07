@@ -16,7 +16,6 @@ import mega.privacy.android.domain.entity.node.Node
  * @property isMine
  * @property shouldShowAvatar
  * @property shouldShowTime
- * @property shouldShowDate
  * @property metaType
  * @property textMessage
  * @property chatRichPreviewInfo
@@ -30,7 +29,6 @@ data class CreateTypedMessageRequest(
     override val isMine: Boolean,
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
-    override val shouldShowDate: Boolean,
     override val metaType: ContainsMetaType?,
     override val textMessage: String?,
     override val chatRichPreviewInfo: ChatRichPreviewInfo?,
@@ -44,14 +42,12 @@ data class CreateTypedMessageRequest(
         isMine: Boolean,
         shouldShowAvatar: Boolean,
         shouldShowTime: Boolean,
-        shouldShowDate: Boolean,
         reactions: List<Reaction>,
     ) : this(
         message = chatMessage,
         isMine = isMine,
         shouldShowAvatar = shouldShowAvatar,
         shouldShowTime = shouldShowTime,
-        shouldShowDate = shouldShowDate,
         metaType = chatMessage.containsMeta?.type,
         textMessage = chatMessage.containsMeta?.textMessage,
         chatRichPreviewInfo = chatMessage.containsMeta?.richPreview,

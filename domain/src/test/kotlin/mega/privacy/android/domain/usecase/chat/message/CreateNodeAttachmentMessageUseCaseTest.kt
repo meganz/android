@@ -68,7 +68,6 @@ class CreateNodeAttachmentMessageUseCaseTest {
                 userHandle = userHandle,
                 shouldShowAvatar = shouldShowAvatar,
                 shouldShowTime = shouldShowTime,
-                shouldShowDate = shouldShowDate,
                 fileNode = fileNode,
                 reactions = emptyList(),
             )
@@ -83,7 +82,6 @@ class CreateNodeAttachmentMessageUseCaseTest {
             isMine = true,
             shouldShowAvatar = true,
             shouldShowTime = true,
-            shouldShowDate = true,
             reactions = emptyList(),
         )
 }

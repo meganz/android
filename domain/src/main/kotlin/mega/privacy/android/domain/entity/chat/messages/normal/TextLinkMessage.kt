@@ -15,7 +15,6 @@ data class TextLinkMessage(
     override val userHandle: Long,
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
-    override val shouldShowDate: Boolean,
     override val reactions: List<Reaction>,
     val links: List<LinkDetail>,
     val content: String,

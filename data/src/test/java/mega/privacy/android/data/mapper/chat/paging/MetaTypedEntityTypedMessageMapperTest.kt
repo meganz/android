@@ -39,15 +39,13 @@ class MetaTypedEntityTypedMessageMapperTest {
     @ParameterizedTest(
         name = "Test isMine {0} " +
                 "shouldShowAvatar {1} " +
-                "shouldShowTime {2} " +
-                "shouldShowDate {3} "
+                "shouldShowTime {2} "
     )
     @MethodSource("booleanParameterProvider")
     fun `test that request object is created with the correct parameters`(
         isMineParam: Boolean,
         shouldShowAvatarParam: Boolean,
         shouldShowTimeParam: Boolean,
-        shouldShowDateParam: Boolean,
     ) {
         val mock = mock<TypedMessage>()
         createTypedMessageUseCase.stub {
@@ -64,7 +62,6 @@ class MetaTypedEntityTypedMessageMapperTest {
             on { isMine } doReturn isMineParam
             on { shouldShowAvatar } doReturn shouldShowAvatarParam
             on { shouldShowTime } doReturn shouldShowTimeParam
-            on { shouldShowDate } doReturn shouldShowDateParam
             on { textMessage } doReturn expectedTextMessage
         }
 
@@ -86,14 +83,13 @@ class MetaTypedEntityTypedMessageMapperTest {
                     && isMine == isMineParam
                     && shouldShowAvatar == shouldShowAvatarParam
                     && shouldShowTime == shouldShowTimeParam
-                    && shouldShowDate == shouldShowDateParam
         })
     }
 
     private fun booleanParameterProvider() = Stream.of(
-        Arguments.of(true, false, false, false),
-        Arguments.of(false, true, false, false),
-        Arguments.of(false, false, true, false),
-        Arguments.of(false, false, false, true),
+        Arguments.of(true, false, false),
+        Arguments.of(false, true, false),
+        Arguments.of(false, false, true),
+        Arguments.of(false, false, false),
     )
 }

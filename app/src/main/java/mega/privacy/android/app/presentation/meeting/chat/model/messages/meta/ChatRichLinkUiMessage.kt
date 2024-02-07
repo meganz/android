@@ -19,7 +19,6 @@ import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
  * Chat rich link ui message
  *
  * @property message
- * @property showDate
  * @property showAvatar
  * @property showTime
  */
@@ -55,7 +54,6 @@ data class ChatRichLinkUiMessage(
 
     override val showAvatar = message.shouldShowAvatar
     override val showTime = message.shouldShowTime
-    override val showDate = message.shouldShowDate
     override val displayAsMine = message.isMine
     override val canForward = message.canForward
     override val timeSent = message.time

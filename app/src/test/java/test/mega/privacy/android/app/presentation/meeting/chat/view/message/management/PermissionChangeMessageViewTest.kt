@@ -102,7 +102,6 @@ class PermissionChangeMessageViewTest {
                     time = System.currentTimeMillis(),
                     shouldShowAvatar = false,
                     shouldShowTime = false,
-                    shouldShowDate = false,
                     reactions = emptyList(),
                 ),
                 ownerActionFullName = ownerActionFullName,

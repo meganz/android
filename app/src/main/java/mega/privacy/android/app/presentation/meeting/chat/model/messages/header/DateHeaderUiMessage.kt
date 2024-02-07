@@ -27,12 +27,12 @@ class DateHeaderUiMessage(override val timeSent: Long) : UiChatMessage {
         DateHeader(dateFormatter(timeSent))
     }
 
+    override fun key() = timeSent.toString()
+
     override val id = -1L
     override val displayAsMine = false
     override val canForward = false
     override val userHandle = -1L
     override val showTime = false
-    override val showDate = false
     override val reactions = emptyList<UIReaction>()
-    override fun key() = timeSent.toString()
 }

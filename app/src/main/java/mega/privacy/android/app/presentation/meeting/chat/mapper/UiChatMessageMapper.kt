@@ -85,55 +85,46 @@ class UiChatMessageMapper @Inject constructor(
 
             is AlterParticipantsMessage -> AlterParticipantsUiMessage(
                 message = message,
-                showDate = message.shouldShowDate,
                 reactions = uiReactionListMapper(message.reactions),
             )
 
             is PermissionChangeMessage -> PermissionChangeUiMessage(
                 message = message,
-                showDate = message.shouldShowDate,
                 reactions = uiReactionListMapper(message.reactions),
             )
 
             is TitleChangeMessage -> TitleChangeUiMessage(
                 message = message,
-                showDate = message.shouldShowDate,
                 reactions = uiReactionListMapper(message.reactions),
             )
 
             is TruncateHistoryMessage -> TruncateHistoryUiMessage(
                 message = message,
-                showDate = message.shouldShowDate,
                 reactions = uiReactionListMapper(message.reactions),
             )
 
             is ChatLinkCreatedMessage -> ChatLinkCreatedUiMessage(
                 message = message,
-                showDate = message.shouldShowDate,
                 reactions = uiReactionListMapper(message.reactions),
             )
 
             is ChatLinkRemovedMessage -> ChatLinkRemovedUiMessage(
                 message = message,
-                showDate = message.shouldShowDate,
                 reactions = uiReactionListMapper(message.reactions),
             )
 
             is ScheduledMeetingUpdatedMessage -> ScheduledMeetingUpdateUiMessage(
                 message = message,
-                showDate = message.shouldShowDate,
                 reactions = uiReactionListMapper(message.reactions),
             )
 
             is PrivateModeSetMessage -> PrivateModeSetUiMessage(
                 message = message,
-                showDate = message.shouldShowDate,
                 reactions = uiReactionListMapper(message.reactions),
             )
 
             is RetentionTimeUpdatedMessage -> RetentionTimeUpdatedUiMessage(
                 message = message,
-                showDate = message.shouldShowDate,
                 reactions = uiReactionListMapper(message.reactions),
             )
 

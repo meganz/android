@@ -24,7 +24,6 @@ internal class CreateVoiceClipMessageUseCase @Inject constructor() : CreateTyped
             duration = (fileNode?.type as? AudioFileTypeInfo)?.duration ?: 0.seconds,
             shouldShowAvatar = shouldShowAvatar,
             shouldShowTime = shouldShowTime,
-            shouldShowDate = shouldShowDate,
             reactions = reactions,
         )
     }

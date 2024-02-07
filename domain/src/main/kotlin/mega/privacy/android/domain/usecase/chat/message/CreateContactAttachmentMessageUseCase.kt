@@ -18,7 +18,6 @@ internal class CreateContactAttachmentMessageUseCase @Inject constructor() :
             contactHandle = userHandles.firstOrNull() ?: -1,
             shouldShowAvatar = shouldShowAvatar,
             shouldShowTime = shouldShowTime,
-            shouldShowDate = shouldShowDate,
             reactions = reactions,
         )
     }

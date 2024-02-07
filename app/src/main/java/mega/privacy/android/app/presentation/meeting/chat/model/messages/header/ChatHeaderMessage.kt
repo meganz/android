@@ -31,6 +31,5 @@ class ChatHeaderMessage : UiChatMessage {
     override val timeSent = null
     override val userHandle = -1L
     override val showTime = false
-    override val showDate = false
     override val reactions = emptyList<UIReaction>()
 }

@@ -13,11 +13,9 @@ import mega.privacy.android.domain.entity.chat.messages.management.TitleChangeMe
  * Title change ui message
  *
  * @property message
- * @property showDate
  */
 data class TitleChangeUiMessage(
     override val message: TitleChangeMessage,
-    override val showDate: Boolean,
     override val reactions: List<UIReaction>,
 ) : ManagementUiChatMessage() {
     override val contentComposable: @Composable (RowScope.() -> Unit) = {

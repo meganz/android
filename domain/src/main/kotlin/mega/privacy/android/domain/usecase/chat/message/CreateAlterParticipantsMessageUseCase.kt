@@ -17,7 +17,6 @@ internal class CreateAlterParticipantsMessageUseCase @Inject constructor() :
             handleOfAction = handleOfAction,
             shouldShowAvatar = shouldShowAvatar,
             shouldShowTime = shouldShowTime,
-            shouldShowDate = shouldShowDate,
             reactions = reactions,
         )
     }

@@ -15,7 +15,6 @@ import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkRemov
  */
 data class ChatLinkRemovedUiMessage(
     override val message: ChatLinkRemovedMessage,
-    override val showDate: Boolean,
     override val reactions: List<UIReaction>,
 ) : ManagementUiChatMessage() {
 
