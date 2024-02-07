@@ -49,6 +49,7 @@ import kotlin.time.Duration
  * @property hasSpeakPermission True, has speaker permission. False, if not.
  * @property isSpeakRequestEnabled True, is speak request enabled. False, if not.
  * @property sessionByClientId  List of sessions by client Id.
+ * @property auxHandle  Handle of the participant who muted me
  */
 data class ChatCall(
     val status: ChatCallStatus? = null,
@@ -69,6 +70,7 @@ data class ChatCall(
     val isOwnModerator: Boolean = false,
     val sessionsClientId: List<Long>? = emptyList(),
     val sessionByClientId: Map<Long, ChatSession> = emptyMap(),
+    val auxHandle: Long? = null,
     val peerIdCallCompositionChange: Long? = null,
     val callCompositionChange: CallCompositionChanges? = null,
     val peerIdParticipants: List<Long>? = emptyList(),

@@ -725,4 +725,23 @@ internal class CallRepositoryImpl @Inject constructor(
             continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
+
+    override suspend fun muteAllPeers(
+        chatId: Long,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val callback = continuation.getChatRequestListener(
+                methodName = "muteAllPeers",
+                chatRequestMapper::invoke
+            )
+
+            megaChatApiGateway.mutePeers(
+                chatId,
+                megaChatApiGateway.getChatInvalidHandle(),
+                callback
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
+        }
+    }
 }

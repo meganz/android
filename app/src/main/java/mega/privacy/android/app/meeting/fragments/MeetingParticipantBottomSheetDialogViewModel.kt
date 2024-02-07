@@ -100,7 +100,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      * @return if should show return true, else false
      */
     fun showDividerMuteParticipant(): Boolean =
-        (showMuteParticipant() || showContactInfoOrEditProfile())
+        showMuteParticipant()
                 && (showSendMessage() || showPinItem() || showMakeModeratorItem() || showRemoveItem())
 
     /**
@@ -156,7 +156,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      * @return if should show `muted` item, return true, else false
      */
     fun showMuteParticipant(): Boolean =
-        participant?.isMe == false && !isGuest && isModerator && participant?.isMuted == false
+        participant?.isMe == false && !isGuest && isModerator && participant?.isAudioOn == true
 
     /**
      * Determine if show the `Pin to speaker view` item

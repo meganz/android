@@ -98,7 +98,6 @@ data class MeetingState(
     val chatScheduledMeeting: ChatScheduledMeeting? = null,
     val isRingingAll: Boolean = false,
     val newInvitedParticipants: List<String> = emptyList(),
-    val allParticipantsAreMuted: Boolean = false,
     val isMuteFeatureFlagEnabled: Boolean = false,
 ) {
     /**
@@ -106,6 +105,20 @@ data class MeetingState(
      */
     fun isWaitingRoomOpened() =
         participantsSection == ParticipantsSection.WaitingRoomSection && (shouldWaitingRoomListBeShown || isBottomPanelExpanded)
+
+    /**
+     * Check if all participants are muted
+     *
+     * @return True, if all are muted, false if not.
+     */
+    fun areAllParticipantsMuted(): Boolean {
+        chatParticipantsInCall.find { it.callParticipantData.isAudioOn && it.callParticipantData.clientId != -1L }
+            ?.let {
+                return false
+            }
+
+        return true
+    }
 
     /**
      * Check if has host permission

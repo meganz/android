@@ -33,6 +33,7 @@ internal class ChatCallMapper @Inject constructor(
         endCallReason = endCallReasonMapper(megaChatCall.endCallReason),
         callCompositionChange = callCompositionChangesMapper(megaChatCall.callCompositionChange),
         peerIdCallCompositionChange = megaChatCall.peeridCallCompositionChange,
+        auxHandle = megaChatCall.auxHandle,
         peerIdParticipants = handleListMapper(megaChatCall.peeridParticipants),
         moderators = handleListMapper(megaChatCall.moderators),
         sessionsClientId = handleListMapper(megaChatCall.sessionsClientid),

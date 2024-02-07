@@ -474,4 +474,14 @@ interface CallRepository {
         chatId: Long,
         clientId: Long,
     ): ChatRequest
+
+    /**
+     * Mute all peers
+     *
+     * @param chatId            The chat id.
+     * @return                  [ChatRequest]
+     */
+    suspend fun muteAllPeers(
+        chatId: Long,
+    ): ChatRequest
 }

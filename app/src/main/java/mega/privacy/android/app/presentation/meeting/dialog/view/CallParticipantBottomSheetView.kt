@@ -247,7 +247,7 @@ private fun BottomSheetContent(
                 }
 
                 val shouldShowMuteOption =
-                    state.isMuteFeatureFlagEnabled && state.hasHostPermission() && !participant.isMe && !participant.isMuted
+                    state.isMuteFeatureFlagEnabled && state.hasHostPermission() && !participant.isMe && participant.callParticipantData.isAudioOn
 
                 if (shouldShowMuteOption) {
                     BottomSheetMenuItemView(

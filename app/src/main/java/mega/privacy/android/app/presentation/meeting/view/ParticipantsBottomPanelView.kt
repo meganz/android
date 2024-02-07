@@ -241,12 +241,13 @@ fun ParticipantsBottomPanelView(
                                             },
 
                                         ) {
+                                        val allMuted = state.areAllParticipantsMuted()
                                         Text(
-                                            text = if (state.allParticipantsAreMuted)
+                                            text = if (allMuted)
                                                 stringResource(id = R.string.meetings_bottom_panel_in_call_participants_all_muted_label)
                                             else
                                                 stringResource(id = R.string.meetings_bottom_panel_in_call_participants_mute_all_participants_button),
-                                            style = MaterialTheme.typography.subtitle2.copy(color = if (state.allParticipantsAreMuted) MaterialTheme.colors.grey_020_grey_700 else MaterialTheme.colors.teal_300_teal_200),
+                                            style = MaterialTheme.typography.subtitle2.copy(color = if (allMuted) MaterialTheme.colors.grey_020_grey_700 else MaterialTheme.colors.teal_300_teal_200),
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
