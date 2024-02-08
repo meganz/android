@@ -8,4 +8,8 @@
     <string name="edit_chat_message">Edit message</string>
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your gallery</string>
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Grant access</string>
+    <plurals name="number_unread_messages">
+        <item quantity="one">%1$s unread message</item>
+        <item quantity="other">%1$s unread messages</item>
+    </plurals>
 </resources>

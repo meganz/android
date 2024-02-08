@@ -15,10 +15,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -46,24 +49,42 @@ internal fun MessageListView(
     onMessageLongClick: (TypedMessage) -> Unit = {},
 ) {
     val pagingItems = viewModel.pagedMessages.collectAsLazyPagingItems()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     Timber.d("Paging pagingItems load state: \n ${pagingItems.printLoadStates()}")
     Timber.d("Paging pagingItems count ${pagingItems.itemCount}")
+    val screenHeight = with(LocalDensity.current) {
+        LocalConfiguration.current.screenHeightDp.dp.toPx()
+    }
 
     var lastCacheUpdateTime by remember {
         mutableStateOf(emptyMap<Long, Long>())
     }
 
-    LaunchedEffect(pagingItems.itemSnapshotList) {
-        viewModel.updateLatestMessageId(pagingItems.itemSnapshotList.lastOrNull()?.id ?: -1L)
+    LaunchedEffect(uiState.chat) {
+        if (uiState.chat != null) {
+            viewModel.setUnreadCount(uiState.chat.unreadCount)
+        }
     }
 
-    LaunchedEffect(pagingItems) {
-        snapshotFlow { scrollState.firstVisibleItemIndex }
-            .collect {
-                if (it <= 1) {
-                    scrollState.scrollToItem(0)
+    LaunchedEffect(pagingItems.itemSnapshotList) {
+        if (state.lastSeenMessageId != -1L
+            && !state.isJumpingToLastSeenMessage
+            && pagingItems.loadState.refresh is LoadState.NotLoading
+            && pagingItems.loadState.append is LoadState.NotLoading
+            && (uiState.chat?.unreadCount ?: 0) > 0
+        ) {
+            pagingItems.itemSnapshotList.indexOfFirst {
+                it?.id == state.lastSeenMessageId
+            }.takeIf { it != -1 }?.let {
+                scrollState.scrollToItem(it - 1, -(screenHeight * 2 / 3).toInt())
+                // make sure the list is scrolled to the correct position
+                viewModel.onScrolledToLastSeenMessage()
+                pagingItems.itemSnapshotList.firstOrNull()?.id?.let { lastMessageId ->
+                    viewModel.setMessageSeen(lastMessageId)
                 }
             }
+        }
+        viewModel.updateLatestMessageId(pagingItems.itemSnapshotList.firstOrNull()?.id ?: -1L)
     }
 
     LaunchedEffect(uiState.userUpdate) {
@@ -75,6 +96,15 @@ internal fun MessageListView(
             lastCacheUpdateTime = newLastCacheUpdateTime
             onUserUpdateHandled()
         }
+    }
+
+    LaunchedEffect(pagingItems) {
+        snapshotFlow { scrollState.firstVisibleItemIndex }
+            .collect {
+                if (it <= 1) {
+                    scrollState.scrollToItem(0)
+                }
+            }
     }
 
     val context = LocalContext.current
@@ -104,7 +134,6 @@ internal fun MessageListView(
                 },
                 contentType = pagingItems.itemContentType()
             ) { index ->
-
                 Box(modifier = Modifier.sizeIn(minHeight = 42.dp)) {
                     pagingItems[index]?.MessageListItem(
                         uiState = uiState,
