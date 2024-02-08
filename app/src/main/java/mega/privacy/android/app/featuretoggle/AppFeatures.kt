@@ -228,6 +228,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ChooseAccountScreenVariantA(
         "Enable new design (Variant A) for ChooseAccount screen (Onboarding Upselling dialog)",
         false
+    ),
+
+    /**
+     * To show promotional dynamic messages in Notifications
+     */
+    NotificationCenter(
+        "To show promotional dynamic messages in Notifications",
+        false
     );
 
     companion object : FeatureFlagValueProvider {
