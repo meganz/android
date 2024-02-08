@@ -12,9 +12,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.presentation.notifications.chat.ChatMessageNotification
 import mega.privacy.android.data.mapper.FileDurationMapper
+import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
+import mega.privacy.android.domain.usecase.chat.message.paging.SaveChatMessagesUseCase
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
 import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
 import nz.mega.sdk.MegaChatApiAndroid
@@ -37,12 +38,13 @@ class MegaChatNotificationHandler @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val application: Application,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
-    private val getNotificationCountUseCase: GetNotificationCountUseCase,
     private val notificationManager: NotificationManagerCompat,
     private val pushReceivedUseCase: PushReceivedUseCase,
     private val isChatNotifiableUseCase: IsChatNotifiableUseCase,
     private val getChatMessageNotificationDataUseCase: GetChatMessageNotificationDataUseCase,
     private val fileDurationMapper: FileDurationMapper,
+    private val chatMessageMapper: @JvmSuppressWildcards suspend (@JvmSuppressWildcards MegaChatMessage) -> @JvmSuppressWildcards ChatMessage,
+    private val saveChatMessagesUseCase: SaveChatMessagesUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : MegaChatNotificationListenerInterface {
     /**
@@ -56,6 +58,8 @@ class MegaChatNotificationHandler @Inject constructor(
         Timber.d("onChatNotification")
 
         msg?.apply {
+            saveMessage(chatId, this)
+
             if (type != MegaChatMessage.TYPE_NORMAL && type != MegaChatMessage.TYPE_NODE_ATTACHMENT &&
                 type != MegaChatMessage.TYPE_CONTACT_ATTACHMENT && type != MegaChatMessage.TYPE_CONTAINS_META &&
                 type != MegaChatMessage.TYPE_VOICE_CLIP
@@ -118,6 +122,13 @@ class MegaChatNotificationHandler @Inject constructor(
             }
 
         } ?: Timber.w("Message is null, no way to notify")
+    }
+
+    private fun saveMessage(chatId: Long, megaChatMessage: MegaChatMessage) {
+        applicationScope.launch {
+            val message = chatMessageMapper(megaChatMessage)
+            saveChatMessagesUseCase(chatId, listOf(message))
+        }
     }
 
     /**

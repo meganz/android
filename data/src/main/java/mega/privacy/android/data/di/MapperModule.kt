@@ -52,6 +52,7 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapperImpl
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapperImpl
+import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
@@ -90,7 +91,9 @@ import mega.privacy.android.data.mapper.verification.SmsPermissionMapperImpl
 import mega.privacy.android.data.mapper.viewtype.ViewTypeMapper
 import mega.privacy.android.data.mapper.viewtype.ViewTypeMapperImpl
 import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.preference.StartScreen
+import nz.mega.sdk.MegaChatMessage
 
 /**
  * Module for providing mapper dependencies
@@ -348,5 +351,9 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideGsonBuilder(): GsonBuilder = GsonBuilder()
+
+        @Provides
+        fun provideChatMessageMapper(mapper: ChatMessageMapper): @JvmSuppressWildcards suspend (@JvmSuppressWildcards MegaChatMessage) -> @JvmSuppressWildcards ChatMessage =
+            mapper::invoke
     }
 }
