@@ -18,7 +18,7 @@ import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
  *
  */
 data class TextLinkUiMessage(
-    private val message: TextLinkMessage,
+    override val message: TextLinkMessage,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)

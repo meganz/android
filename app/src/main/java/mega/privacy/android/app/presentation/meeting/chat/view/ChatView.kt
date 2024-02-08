@@ -80,6 +80,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactT
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAddContactActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatPicker
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openLocationPicker
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.showGroupOrContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startLoginActivity
@@ -91,6 +92,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageOpti
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ReactionsInfoBottomSheet
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.chat.ChatObserverIndicator
@@ -146,7 +148,8 @@ internal fun ChatView(
         onSendGiphyMessage = viewModel::onSendGiphyMessage,
         onAttachContacts = viewModel::onAttachContacts,
         getUserInfoIntoReactionList = viewModel::getUserInfoIntoReactionList,
-        onReactionUserClick = { }
+        onReactionUserClick = { },
+        onForwardMessages = viewModel::onForwardMessages,
     )
 }
 
@@ -183,8 +186,8 @@ internal fun ChatView(
     onAnswerCall: () -> Unit = {},
     onEnableGeolocation: () -> Unit = {},
     onUserUpdateHandled: () -> Unit = {},
-    messageListView: @Composable (ChatUiState, LazyListState, Dp, (TypedMessage) -> Unit, (Long) -> Unit, (Long, String, List<UIReaction>) -> Unit, (String, List<UIReaction>) -> Unit) -> Unit =
-        { state, listState, bottomPadding, onMessageLongClick, onMoreReactionsClick, onReactionClick, onReactionLongClick ->
+    messageListView: @Composable (ChatUiState, LazyListState, Dp, (TypedMessage) -> Unit, (Long) -> Unit, (Long, String, List<UIReaction>) -> Unit, (String, List<UIReaction>) -> Unit, (TypedMessage) -> Unit) -> Unit =
+        { state, listState, bottomPadding, onMessageLongClick, onMoreReactionsClick, onReactionClick, onReactionLongClick, onForwardClick ->
             MessageListView(
                 uiState = state,
                 scrollState = listState,
@@ -194,6 +197,7 @@ internal fun ChatView(
                 onMoreReactionsClicked = onMoreReactionsClick,
                 onReactionClicked = onReactionClick,
                 onReactionLongClick = onReactionLongClick,
+                onForwardClicked = onForwardClick
             )
         },
     bottomBar: @Composable (
@@ -230,6 +234,7 @@ internal fun ChatView(
     onAttachContacts: (List<String>) -> Unit = { _ -> },
     getUserInfoIntoReactionList: suspend (List<UIReaction>) -> List<UIReaction> = { emptyList() },
     onReactionUserClick: (Long) -> Unit = {},
+    onForwardMessages: (List<TypedMessage>, List<Long>?, List<Long>?) -> Unit = { _, _, _ -> },
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -249,6 +254,7 @@ internal fun ChatView(
     var addingReactionTo by rememberSaveable { mutableStateOf<Long?>(null) }
     var selectedReaction by rememberSaveable { mutableStateOf("") }
     var reactionList by rememberSaveable { mutableStateOf(emptyList<UIReaction>()) }
+    var forwardingMessages by rememberSaveable { mutableStateOf<List<TypedMessage>?>(null) }
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val keyboardController = LocalSoftwareKeyboardController.current
     val toolbarModalSheetState =
@@ -357,6 +363,18 @@ internal fun ChatView(
             )
         }
     }
+    val chatPickerLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            forwardingMessages?.let { messages ->
+                result.data?.let {
+                    val chatHandles = it.getLongArrayExtra(Constants.SELECTED_CHATS)?.toList()
+                    val contactHandles = it.getLongArrayExtra(Constants.SELECTED_USERS)?.toList()
+                    onForwardMessages(messages, chatHandles, contactHandles)
+                }
+            }
+        }
 
     with(uiState) {
         val addContactLauncher =
@@ -682,6 +700,10 @@ internal fun ChatView(
                                     coroutineScope.launch {
                                         reactionInfoBottomSheetState.show()
                                     }
+                                },
+                                { message ->
+                                    forwardingMessages = listOf(message)
+                                    openChatPicker(context, chatPickerLauncher)
                                 }
                             )
                         },

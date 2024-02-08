@@ -18,7 +18,7 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
  * @param chatId
  */
 data class NodeAttachmentUiMessage(
-    private val message: NodeAttachmentMessage,
+    override val message: NodeAttachmentMessage,
     private val chatId: Long,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {

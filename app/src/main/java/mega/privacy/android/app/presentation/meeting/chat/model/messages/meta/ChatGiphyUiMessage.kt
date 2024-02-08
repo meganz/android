@@ -23,7 +23,7 @@ private const val MAX_SIZE_FOR_AUTO_PLAY = 1024 * 1024 * 4  // 4MB
  * @property showTime
  */
 class ChatGiphyUiMessage(
-    private val message: GiphyMessage,
+    override val message: GiphyMessage,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)

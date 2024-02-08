@@ -18,6 +18,12 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
  * Avatar message
  */
 abstract class AvatarMessage : UiChatMessage {
+
+    /**
+     * Message
+     */
+    internal abstract val message: TypedMessage
+
     /**
      * Content composable
      */
@@ -52,18 +58,20 @@ abstract class AvatarMessage : UiChatMessage {
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,
-        onMoreReactionsClick: (Long) -> Unit,
-        onReactionClick: (Long, String, List<UIReaction>) -> Unit,
+        onMoreReactionsClicked: (Long) -> Unit,
+        onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
+        onForwardClicked: (TypedMessage) -> Unit,
     ) {
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),
             isMine = displayAsMine,
             showForwardIcon = canForward,
             reactions = reactions,
-            onMoreReactionsClick = { onMoreReactionsClick(id) },
-            onReactionClick = { onReactionClick(id, it, reactions) },
+            onMoreReactionsClick = { onMoreReactionsClicked(id) },
+            onReactionClick = { onReactionClicked(id, it, reactions) },
             onReactionLongClick = { onReactionLongClick(it, reactions) },
+            onForwardClicked = { onForwardClicked(message) },
             time = this.getTimeOrNull(timeFormatter),
             avatarOrIcon = {
                 MessageAvatar(

@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
  * @property showTime
  */
 data class ChatRichLinkUiMessage(
-    private val message: RichPreviewMessage,
+    override val message: RichPreviewMessage,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)

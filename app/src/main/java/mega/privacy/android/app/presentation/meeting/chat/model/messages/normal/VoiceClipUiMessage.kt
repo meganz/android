@@ -19,8 +19,8 @@ import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
  * @property chatId
  */
 class VoiceClipUiMessage(
-    val message: VoiceClipMessage,
-    val chatId: Long,
+    override val message: VoiceClipMessage,
+    private val chatId: Long,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
 

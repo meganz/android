@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.TEST_TAG_REACTIONS_VIEW
@@ -13,11 +14,15 @@ import mega.privacy.android.core.ui.controls.chat.messages.reaction.reactionsLis
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class ChatMessageContainerTest {
     @get:Rule
     var composeRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val onForwardClicked = mock<() -> Unit>()
 
     @Test
     fun `test that forward icon show correctly`() {
@@ -100,6 +105,17 @@ class ChatMessageContainerTest {
         composeRule.onNodeWithTag(TEST_TAG_REACTIONS_VIEW).assertDoesNotExist()
     }
 
+    @Test
+    fun `test that forward click is invoked if icon is clicked`() {
+        initComposeRuleContent(
+            isMine = false,
+            showForwardIcon = true,
+            time = null,
+        )
+        composeRule.onNodeWithTag(TEST_TAG_FORWARD_ICON).performClick()
+        verify(onForwardClicked).invoke()
+    }
+
     private fun initComposeRuleContent(
         isMine: Boolean,
         showForwardIcon: Boolean,
@@ -114,6 +130,7 @@ class ChatMessageContainerTest {
                 reactions = reactions,
                 onMoreReactionsClick = {},
                 onReactionClick = {},
+                onForwardClicked = onForwardClicked,
                 time = time,
                 isSendError = isSendError,
                 avatarOrIcon = {},

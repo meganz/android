@@ -22,6 +22,7 @@ class ChatHeaderMessage : UiChatMessage {
         onMoreReactionsClicked: (Long) -> Unit,
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
+        onForwardClicked: (TypedMessage) -> Unit,
     ) {
         FirstMessageHeader(uiState.title, uiState.scheduledMeeting)
     }

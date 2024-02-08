@@ -18,7 +18,7 @@ import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
  * @property message Text message
  */
 data class TextUiMessage(
-    private val message: TextMessage,
+    override val message: TextMessage,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)

@@ -16,7 +16,6 @@ import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
  * @property message
  */
 sealed class InvalidUiMessage : AvatarMessage() {
-    internal abstract val message: TypedMessage
 
     /**
      * Get error message

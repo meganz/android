@@ -22,9 +22,10 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
  * @property showTime
  */
 data class ContactAttachmentUiMessage(
-    private val message: ContactAttachmentMessage,
+    override val message: ContactAttachmentMessage,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
+
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {

@@ -47,6 +47,7 @@ internal fun MessageListView(
     viewModel: MessageListViewModel = hiltViewModel(),
     onUserUpdateHandled: () -> Unit = {},
     onMessageLongClick: (TypedMessage) -> Unit = {},
+    onForwardClicked: (TypedMessage) -> Unit = {},
 ) {
     val pagingItems = viewModel.pagedMessages.collectAsLazyPagingItems()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -150,6 +151,7 @@ internal fun MessageListView(
                         onLongClick = {
                             if (uiState.haveWritePermission) onMessageLongClick(it)
                         },
+                        onForwardClicked = onForwardClicked,
                         onMoreReactionsClicked = onMoreReactionsClicked,
                         onReactionClicked = onReactionClicked,
                         onReactionLongClick = onReactionLongClick,

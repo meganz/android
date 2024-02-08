@@ -35,6 +35,7 @@ data class CallUiMessage(
         onMoreReactionsClicked: (Long) -> Unit,
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
+        onForwardClicked: (TypedMessage) -> Unit,
     ) {
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),
@@ -44,6 +45,7 @@ data class CallUiMessage(
             onMoreReactionsClick = { onMoreReactionsClicked(id) },
             onReactionClick = { onReactionClicked(id, it, reactions) },
             onReactionLongClick = { onReactionLongClick(it, reactions) },
+            onForwardClicked = { onForwardClicked(message) },
             time = getTimeOrNull(timeFormatter),
             content = {
                 ChatCallMessageView(

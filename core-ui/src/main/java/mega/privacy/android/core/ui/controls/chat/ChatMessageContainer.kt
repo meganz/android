@@ -55,6 +55,7 @@ fun ChatMessageContainer(
     onMoreReactionsClick: () -> Unit,
     onReactionClick: (String) -> Unit,
     onReactionLongClick: (String) -> Unit,
+    onForwardClicked: () -> Unit,
     modifier: Modifier = Modifier,
     time: String? = null,
     isSendError: Boolean = false,
@@ -83,14 +84,14 @@ fun ChatMessageContainer(
         ) {
             if (isMine) {
                 if (showForwardIcon && !isSendError) {
-                    ForwardIcon()
+                    ForwardIcon(onForwardClicked)
                 }
                 content()
             } else {
                 avatarOrIcon?.let { it() }
                 content()
                 if (showForwardIcon) {
-                    ForwardIcon()
+                    ForwardIcon(onForwardClicked)
                 }
             }
         }
@@ -122,12 +123,15 @@ fun ChatMessageContainer(
 }
 
 @Composable
-private fun RowScope.ForwardIcon() {
+private fun RowScope.ForwardIcon(
+    onForwardClicked: () -> Unit,
+) {
     Icon(
         modifier = Modifier
             .size(24.dp)
             .align(Alignment.CenterVertically)
-            .testTag(TEST_TAG_FORWARD_ICON),
+            .testTag(TEST_TAG_FORWARD_ICON)
+            .clickable { onForwardClicked() },
         painter = painterResource(id = R.drawable.ic_forward_circle),
         contentDescription = "Icon Forward",
         tint = MegaTheme.colors.icon.secondary
@@ -147,6 +151,7 @@ private fun TextMessageContainerPreview(
             onMoreReactionsClick = { },
             onReactionClick = { },
             onReactionLongClick = {},
+            onForwardClicked = {},
             avatarOrIcon = {
                 Icon(
                     modifier = Modifier
@@ -184,6 +189,7 @@ private fun TextMessageContainerSendErrorPreview(
             onMoreReactionsClick = { },
             onReactionClick = { },
             onReactionLongClick = {},
+            onForwardClicked = {},
             avatarOrIcon = {
                 Icon(
                     modifier = Modifier

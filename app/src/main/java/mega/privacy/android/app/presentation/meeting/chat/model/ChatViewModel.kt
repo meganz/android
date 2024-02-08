@@ -40,6 +40,7 @@ import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
@@ -1211,6 +1212,16 @@ class ChatViewModel @Inject constructor(
     suspend fun getParticipantEmail(userHandle: Long): String =
         getChatParticipantEmailUseCase(userHandle).orEmpty()
 
+    /**
+     * Forward messages.
+     */
+    fun onForwardMessages(
+        messages: List<TypedMessage>,
+        chatHandles: List<Long>?,
+        contactHandles: List<Long>?,
+    ) {
+
+    }
 
     override fun onCleared() {
         if (state.value.isPreviewMode) {

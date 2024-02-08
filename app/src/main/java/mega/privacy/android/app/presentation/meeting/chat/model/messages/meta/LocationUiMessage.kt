@@ -19,7 +19,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
  * Location ui message
  */
 class LocationUiMessage(
-    private val message: LocationMessage,
+    override val message: LocationMessage,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)
