@@ -2,15 +2,21 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "51c231ed744c4b0ae1c3a5feab0a51b2",
+    "identityHash": "05395404b2cd37a3e4190024c3af5d46",
     "entities": [
       {
         "tableName": "typed_messages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`msgId` INTEGER NOT NULL, `chatId` INTEGER NOT NULL, `status` TEXT NOT NULL, `tempId` INTEGER NOT NULL, `msgIndex` INTEGER NOT NULL, `userHandle` INTEGER NOT NULL, `type` TEXT NOT NULL, `hasConfirmedReactions` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `content` TEXT, `isEdited` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `isEditable` INTEGER NOT NULL, `isDeletable` INTEGER NOT NULL, `isManagementMessage` INTEGER NOT NULL, `handleOfAction` INTEGER NOT NULL, `privilege` TEXT NOT NULL, `code` TEXT NOT NULL, `usersCount` INTEGER NOT NULL, `userHandles` TEXT NOT NULL, `userNames` TEXT NOT NULL, `userEmails` TEXT NOT NULL, `handleList` TEXT NOT NULL, `duration` INTEGER NOT NULL, `retentionTime` INTEGER NOT NULL, `termCode` TEXT NOT NULL, `rowId` INTEGER NOT NULL, `changes` TEXT NOT NULL, `isMine` INTEGER NOT NULL, `shouldShowAvatar` INTEGER NOT NULL, `shouldShowTime` INTEGER NOT NULL, `textMessage` TEXT, `reactions` TEXT NOT NULL, PRIMARY KEY(`msgId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`msgId` INTEGER NOT NULL, `pendingMessageId` INTEGER NOT NULL, `chatId` INTEGER NOT NULL, `status` TEXT NOT NULL, `tempId` INTEGER NOT NULL, `msgIndex` INTEGER NOT NULL, `userHandle` INTEGER NOT NULL, `type` TEXT NOT NULL, `hasConfirmedReactions` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `content` TEXT, `isEdited` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `isEditable` INTEGER NOT NULL, `isDeletable` INTEGER NOT NULL, `isManagementMessage` INTEGER NOT NULL, `handleOfAction` INTEGER NOT NULL, `privilege` TEXT NOT NULL, `code` TEXT NOT NULL, `usersCount` INTEGER NOT NULL, `userHandles` TEXT NOT NULL, `userNames` TEXT NOT NULL, `userEmails` TEXT NOT NULL, `handleList` TEXT NOT NULL, `duration` INTEGER NOT NULL, `retentionTime` INTEGER NOT NULL, `termCode` TEXT NOT NULL, `rowId` INTEGER NOT NULL, `changes` TEXT NOT NULL, `isMine` INTEGER NOT NULL, `shouldShowAvatar` INTEGER NOT NULL, `shouldShowTime` INTEGER NOT NULL, `textMessage` TEXT, `reactions` TEXT NOT NULL, PRIMARY KEY(`msgId`, `pendingMessageId`))",
         "fields": [
           {
             "fieldPath": "msgId",
             "columnName": "msgId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pendingMessageId",
+            "columnName": "pendingMessageId",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -210,7 +216,8 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "msgId"
+            "msgId",
+            "pendingMessageId"
           ]
         },
         "indices": [],
@@ -559,12 +566,98 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "pending_messages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pendingMessageId` INTEGER PRIMARY KEY AUTOINCREMENT, `chatId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `uploadTimestamp` INTEGER NOT NULL, `state` TEXT NOT NULL, `tempIdKarere` INTEGER NOT NULL, `videoDownSampled` TEXT, `filePath` TEXT NOT NULL, `nodeHandle` INTEGER NOT NULL, `fingerprint` TEXT, `name` TEXT, `transferTag` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "pendingMessageId",
+            "columnName": "pendingMessageId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "chatId",
+            "columnName": "chatId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uploadTimestamp",
+            "columnName": "uploadTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tempIdKarere",
+            "columnName": "tempIdKarere",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "videoDownSampled",
+            "columnName": "videoDownSampled",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "filePath",
+            "columnName": "filePath",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nodeHandle",
+            "columnName": "nodeHandle",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fingerprint",
+            "columnName": "fingerprint",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transferTag",
+            "columnName": "transferTag",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "pendingMessageId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '51c231ed744c4b0ae1c3a5feab0a51b2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '05395404b2cd37a3e4190024c3af5d46')"
     ]
   }
 }

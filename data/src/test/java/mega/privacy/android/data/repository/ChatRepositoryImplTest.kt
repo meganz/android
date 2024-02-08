@@ -20,6 +20,7 @@ import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
@@ -113,6 +114,7 @@ class ChatRepositoryImplTest {
     private val databaseHandler = mock<DatabaseHandler>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val context = mock<Context>()
+    private val chatStorageGateway = mock<ChatStorageGateway>()
 
     @BeforeEach
     fun setUp() {
@@ -140,7 +142,7 @@ class ChatRepositoryImplTest {
             chatPreviewMapper = chatPreviewMapper,
             databaseHandler = databaseHandler,
             megaLocalRoomGateway = megaLocalRoomGateway,
-            chatStorageGateway = mock(),
+            chatStorageGateway = chatStorageGateway,
             typedMessagePagingSourceMapper = mock(),
             typedMessageEntityMapper = mock(),
             messagePagingInfoMapper = mock(),

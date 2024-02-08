@@ -5,6 +5,7 @@ import mega.privacy.android.data.database.entity.chat.ChatGeolocationEntity
 import mega.privacy.android.data.database.entity.chat.ChatNodeEntity
 import mega.privacy.android.data.database.entity.chat.GiphyEntity
 import mega.privacy.android.data.database.entity.chat.MetaTypedMessageEntity
+import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.data.database.entity.chat.RichPreviewEntity
 import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
 
@@ -53,4 +54,30 @@ interface ChatStorageGateway {
      */
     suspend fun getNextMessage(chatId: Long, timestamp: Long): TypedMessageEntity?
 
+    /**
+     * Store pending message
+     *
+     * @param message
+     * @param pendingMessageEntity
+     *
+     * @return the id of the inserted [PendingMessageEntity]
+     */
+    suspend fun storePendingMessage(
+        message: TypedMessageEntity,
+        pendingMessageEntity: PendingMessageEntity,
+    ): Long
+
+    /**
+     * Update pending message
+     *
+     * @param pendingMessage
+     */
+    suspend fun updatePendingMessage(pendingMessage: PendingMessageEntity)
+
+    /**
+     * Delete pending message
+     *
+     * @param pendingMessage
+     */
+    suspend fun deletePendingMessage(pendingMessage: PendingMessageEntity)
 }

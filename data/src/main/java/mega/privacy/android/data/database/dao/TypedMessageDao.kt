@@ -50,9 +50,9 @@ interface TypedMessageDao {
     suspend fun deleteMessagesByChatId(chatId: Long)
 
     /**
-     * Delete messages by msg id
+     * Delete messages by chat id
      *
-     * @param msgIds
+     * @param chatId
      */
     @Query("SELECT msgId FROM typed_messages WHERE chatId = :chatId")
     suspend fun getMsgIdsByChatId(chatId: Long): List<Long>
@@ -70,4 +70,11 @@ interface TypedMessageDao {
         timestamp: Long,
     ): TypedMessageEntity?
 
+    /**
+     * Delete message by pending id
+     *
+     * @param pendingId
+     */
+    @Query("DELETE FROM typed_messages WHERE pendingMessageId > ${TypedMessageEntity.DEFAULT_ID} AND pendingMessageId = :pendingId")
+    fun deleteMessageByPendingId(pendingId: Long)
 }

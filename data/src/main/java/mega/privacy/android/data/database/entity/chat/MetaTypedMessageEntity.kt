@@ -11,6 +11,7 @@ import androidx.room.Relation
  * @property richPreviewEntity Rich preview entity
  * @property geolocationEntity Chat geolocation entity
  * @property giphyEntity Giphy entity
+ * @property pendingMessageEntity Pending message entity
  */
 data class MetaTypedMessageEntity(
     @Embedded val typedMessageEntity: TypedMessageEntity,
@@ -38,4 +39,10 @@ data class MetaTypedMessageEntity(
         entity = GiphyEntity::class
     )
     val giphyEntity: GiphyEntity?,
+    @Relation(
+        parentColumn = "pendingMessageId",
+        entityColumn = "pendingMessageId",
+        entity = PendingMessageEntity::class
+    )
+    val pendingMessageEntity: PendingMessageEntity?
 )

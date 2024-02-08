@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.repository.chat
 
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 
 /**
  * Chat message repository
@@ -185,4 +187,12 @@ interface ChatMessageRepository {
      * @return ChatMessage that will be sent. The message id is not definitive, but temporal.
      */
     suspend fun attachContact(chatId: Long, contactEmail: String): ChatMessage?
+
+    /**
+     * Save pending message
+     *
+     * @param savePendingMessageRequest
+     * @return saved PendingMessage
+     */
+    suspend fun savePendingMessage(savePendingMessageRequest: SavePendingMessageRequest): PendingMessage
 }

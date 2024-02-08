@@ -26,6 +26,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * Chat repository
+ *
+ * @constructor Create empty Chat repository
  */
 interface ChatRepository {
     /**
