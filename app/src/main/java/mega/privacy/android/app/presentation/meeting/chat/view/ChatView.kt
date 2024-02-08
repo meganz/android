@@ -403,6 +403,10 @@ internal fun ChatView(
         val isReactionInfoModalShown by derivedStateOf {
             reactionInfoBottomSheetState.currentValue != ModalBottomSheetValue.Hidden
         }
+        val isToolbarModalShown by derivedStateOf {
+            toolbarModalSheetState.currentValue != ModalBottomSheetValue.Hidden
+        }
+        val noBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
         if (!isMessageOptionsModalShown && addingReactionTo == null) {
             showReactionPicker = false
@@ -413,7 +417,8 @@ internal fun ChatView(
                 isFileModalShown -> fileModalSheetState
                 isMessageOptionsModalShown -> messageOptionsModalSheetState
                 isReactionInfoModalShown -> reactionInfoBottomSheetState
-                else -> toolbarModalSheetState
+                isToolbarModalShown -> toolbarModalSheetState
+                else -> noBottomSheetState
             },
             sheetBody = {
                 when {
@@ -447,7 +452,7 @@ internal fun ChatView(
                         )
                     }
 
-                    else -> {
+                    isToolbarModalShown -> {
                         ChatToolbarBottomSheet(
                             onAttachFileClicked = {
                                 onBackPressed()

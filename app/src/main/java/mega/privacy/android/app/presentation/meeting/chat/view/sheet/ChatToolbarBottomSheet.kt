@@ -103,7 +103,6 @@ fun ChatToolbarBottomSheet(
             onTakePicture = onTakePicture,
             onCameraPermissionDenied = onCameraPermissionDenied,
         )
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -116,7 +115,6 @@ fun ChatToolbarBottomSheet(
                 onItemClick = { galleryPicker.launch(PickVisualMediaRequest()) },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_GALLERY)
             )
-
             AttachItem(
                 iconId = R.drawable.ic_attach_from_file,
                 itemName = pluralStringResource(id = R.plurals.general_num_files, count = 1),
