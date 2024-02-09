@@ -22,13 +22,13 @@ class ShareFolderTest {
         on { isTakenDown }.thenReturn(false)
     }
     private val oneFolderNodeSelected = mock<TypedFolderNode>()
-    private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
+    private val multipleNodes = listOf(oneFileNodeSelected, oneFolderNodeSelected)
 
     @ParameterizedTest(name = "when noNodeTakenDown: {0} and selected nodes are {1} then visibility is {2}")
     @MethodSource("provideArguments")
     fun `test that share folder item visibility is updated`(
         noNodeTakenDown: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -46,8 +46,8 @@ class ShareFolderTest {
     private fun provideArguments() = Stream.of(
         Arguments.of(false, multipleNodes, false),
         Arguments.of(true, multipleNodes, false),
-        Arguments.of(true, setOf(oneFileNodeSelected), false),
-        Arguments.of(true, setOf(oneFolderNodeSelected), true),
-        Arguments.of(false, setOf(oneFolderNodeSelected), false)
+        Arguments.of(true, listOf(oneFileNodeSelected), false),
+        Arguments.of(true, listOf(oneFolderNodeSelected), true),
+        Arguments.of(false, listOf(oneFolderNodeSelected), false)
     )
 }

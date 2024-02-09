@@ -28,14 +28,14 @@ class ManageLinkTest {
     private val nodeWithoutExportedData = mock<TypedFolderNode> {
         on { exportedData }.thenReturn(null)
     }
-    private val multipleNodes = setOf(nodeWithExportedData, nodeWithoutExportedData)
+    private val multipleNodes = listOf(nodeWithExportedData, nodeWithoutExportedData)
 
     @ParameterizedTest(name = "when is selected node taken down is {1} and has node access permission is {0} and selected nodes are {2}, then is manage link visible is {3}")
     @MethodSource("provideArguments")
     fun `test that the manage link item visibility is adjusted`(
         hasNodeAccessPermission: Boolean,
         noNodeTakenDown: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -51,21 +51,21 @@ class ManageLinkTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(false, false, emptySet<TypedFolderNode>(), false),
-        Arguments.of(false, false, setOf(nodeWithExportedData), false),
-        Arguments.of(false, false, setOf(nodeWithoutExportedData), false),
+        Arguments.of(false, false, emptyList<TypedFolderNode>(), false),
+        Arguments.of(false, false, listOf(nodeWithExportedData), false),
+        Arguments.of(false, false, listOf(nodeWithoutExportedData), false),
         Arguments.of(false, false, multipleNodes, false),
-        Arguments.of(true, false, emptySet<TypedFolderNode>(), false),
-        Arguments.of(true, false, setOf(nodeWithExportedData), false),
-        Arguments.of(true, false, setOf(nodeWithoutExportedData), false),
+        Arguments.of(true, false, emptyList<TypedFolderNode>(), false),
+        Arguments.of(true, false, listOf(nodeWithExportedData), false),
+        Arguments.of(true, false, listOf(nodeWithoutExportedData), false),
         Arguments.of(true, false, multipleNodes, false),
-        Arguments.of(true, true, emptySet<TypedFolderNode>(), false),
-        Arguments.of(true, true, setOf(nodeWithExportedData), true),
-        Arguments.of(true, true, setOf(nodeWithoutExportedData), false),
+        Arguments.of(true, true, emptyList<TypedFolderNode>(), false),
+        Arguments.of(true, true, listOf(nodeWithExportedData), true),
+        Arguments.of(true, true, listOf(nodeWithoutExportedData), false),
         Arguments.of(true, true, multipleNodes, false),
-        Arguments.of(false, true, emptySet<TypedFolderNode>(), false),
-        Arguments.of(false, true, setOf(nodeWithExportedData), false),
-        Arguments.of(false, true, setOf(nodeWithoutExportedData), false),
+        Arguments.of(false, true, emptyList<TypedFolderNode>(), false),
+        Arguments.of(false, true, listOf(nodeWithExportedData), false),
+        Arguments.of(false, true, listOf(nodeWithoutExportedData), false),
         Arguments.of(false, true, multipleNodes, false),
     )
 }

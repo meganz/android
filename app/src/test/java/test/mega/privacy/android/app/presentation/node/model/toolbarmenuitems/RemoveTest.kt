@@ -19,12 +19,12 @@ class RemoveTest {
 
     private val oneFileNodeSelected = mock<TypedFolderNode>()
     private val oneFolderNodeSelected = mock<TypedFolderNode>()
-    private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
+    private val multipleNodes = listOf(oneFileNodeSelected, oneFolderNodeSelected)
 
     @ParameterizedTest(name = "when selected nodes are {0} then visibility is {1}")
     @MethodSource("provideArguments")
     fun `test that remove item visibility is updated`(
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -40,7 +40,7 @@ class RemoveTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(emptySet<TypedFolderNode>(), false),
+        Arguments.of(emptyList<TypedFolderNode>(), false),
         Arguments.of(multipleNodes, true)
     )
 }

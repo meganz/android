@@ -21,17 +21,17 @@ class ClearSelectionTest {
         on { isTakenDown }.thenReturn(false)
     }
     private val oneFolderNodeSelected = mock<TypedFolderNode>()
-    private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
+    private val multipleNodes = listOf(oneFileNodeSelected, oneFolderNodeSelected)
 
     @ParameterizedTest(name = "when selected nodes are {0}, then is clear selection item visible is {1}")
     @MethodSource("provideArguments")
     fun `test that the clear selection item visibility is adjusted`(
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
             hasNodeAccessPermission = false,
-            selectedNodes = selectedNodes,
+            selectedNodes = selectedNodes.toList(),
             canBeMovedToTarget = false,
             noNodeInBackups = false,
             noNodeTakenDown = false,
@@ -42,7 +42,7 @@ class ClearSelectionTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(emptySet<TypedFolderNode>(), false),
+        Arguments.of(emptyList<TypedFolderNode>(), false),
         Arguments.of(multipleNodes, true)
     )
 }

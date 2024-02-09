@@ -16,7 +16,7 @@ class RemoveLink @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon>
     override val menuAction: RemoveLinkMenuAction = RemoveLinkMenuAction(170)
     override fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,

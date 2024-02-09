@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
+import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.node.model.menuaction.RenameMenuAction
+import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
@@ -13,7 +15,7 @@ class Rename @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon> {
     override val menuAction = RenameMenuAction(220)
     override fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,

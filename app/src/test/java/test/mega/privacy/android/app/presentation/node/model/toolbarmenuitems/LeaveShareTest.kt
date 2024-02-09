@@ -32,7 +32,7 @@ class LeaveShareTest {
     @MethodSource("provideArguments")
     fun `test that the leave share item visibility is adjusted`(
         noNodeTakenDown: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -48,15 +48,15 @@ class LeaveShareTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(false, emptySet<TypedFolderNode>(), false),
-        Arguments.of(false, setOf(folder1), false),
-        Arguments.of(false, setOf(folder1, folder2), false),
-        Arguments.of(false, setOf(folderNotIncomingShare), false),
-        Arguments.of(false, setOf(folder1, folder2, folderNotIncomingShare), false),
-        Arguments.of(true, emptySet<TypedFolderNode>(), false),
-        Arguments.of(true, setOf(folder1), true),
-        Arguments.of(true, setOf(folder1, folder2), true),
-        Arguments.of(true, setOf(folderNotIncomingShare), false),
-        Arguments.of(true, setOf(folder1, folder2, folderNotIncomingShare), false)
+        Arguments.of(false, emptyList<TypedFolderNode>(), false),
+        Arguments.of(false, listOf(folder1), false),
+        Arguments.of(false, listOf(folder1, folder2), false),
+        Arguments.of(false, listOf(folderNotIncomingShare), false),
+        Arguments.of(false, listOf(folder1, folder2, folderNotIncomingShare), false),
+        Arguments.of(true, emptyList<TypedFolderNode>(), false),
+        Arguments.of(true, listOf(folder1), true),
+        Arguments.of(true, listOf(folder1, folder2), true),
+        Arguments.of(true, listOf(folderNotIncomingShare), false),
+        Arguments.of(true, listOf(folder1, folder2, folderNotIncomingShare), false)
     )
 }

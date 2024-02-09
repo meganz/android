@@ -39,7 +39,7 @@ import javax.inject.Inject
  * @property checkNodeCanBeMovedToTargetNode [CheckNodeCanBeMovedToTargetNode]
  */
 @HiltViewModel
-class ToolbarViewModel @Inject constructor(
+class NodeToolbarViewModel @Inject constructor(
     @CloudDrive private val cloudDriveToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
     @IncomingShares private val incomingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
     @OutgoingShares private val outgoingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
@@ -109,13 +109,13 @@ class ToolbarViewModel @Inject constructor(
             val list = nodeToolbarActionMapper(
                 toolbarOptions = toolbarOptions,
                 hasNodeAccessPermission = hasAccessPermission,
-                selectedNodes = selectedNodes,
+                selectedNodes = selectedNodes.toList(),
                 resultCount = resultCount,
                 allNodeCanBeMovedToTarget = canBeMovedToTarget,
                 noNodeInBackups = anyNodeInBackups.not()
             )
             _state.update {
-                it.copy(menuActions = list)
+                it.copy(toolbarMenuItems = list)
             }
         }
     }

@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.node.model.mapper
 
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
-import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.app.presentation.node.view.ToolbarMenuItem
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
@@ -24,11 +24,11 @@ class NodeToolbarActionMapper @Inject constructor() {
     operator fun invoke(
         toolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
         hasNodeAccessPermission: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         allNodeCanBeMovedToTarget: Boolean,
         noNodeInBackups: Boolean,
         resultCount: Int,
-    ): List<MenuAction> {
+    ): List<ToolbarMenuItem> {
         val noNodeTakenDown = selectedNodes.none { node -> node.isTakenDown }
         val allFileNodes = selectedNodes.all { node -> node is FileNode }
         return toolbarOptions
@@ -42,7 +42,12 @@ class NodeToolbarActionMapper @Inject constructor() {
                     allFileNodes = allFileNodes,
                     resultCount = resultCount,
                 )
-            }.map { it.menuAction }
+            }.map { toolbarMenuItem ->
+                ToolbarMenuItem(
+                    action = toolbarMenuItem.menuAction,
+                    control = toolbarMenuItem.setControl(selectedNodes),
+                )
+            }
 
     }
 }

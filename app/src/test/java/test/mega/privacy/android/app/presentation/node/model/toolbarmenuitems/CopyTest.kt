@@ -24,7 +24,7 @@ class CopyTest {
     ) {
         val result = underTest.shouldDisplay(
             hasNodeAccessPermission = false,
-            selectedNodes = setOf(mock<TypedFolderNode>()),
+            selectedNodes = listOf(mock<TypedFolderNode>()),
             canBeMovedToTarget = false,
             noNodeInBackups = false,
             noNodeTakenDown = noNodeTakenDown,

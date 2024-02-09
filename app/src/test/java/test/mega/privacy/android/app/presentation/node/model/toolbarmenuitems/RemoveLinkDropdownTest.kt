@@ -29,13 +29,13 @@ class RemoveLinkDropdownTest {
     private val nodeWithoutExportedData = mock<TypedFolderNode> {
         on { exportedData }.thenReturn(null)
     }
-    private val multipleNodes = setOf(nodeWithExportedData, nodeWithoutExportedData)
+    private val multipleNodes = listOf(nodeWithExportedData, nodeWithoutExportedData)
 
     @ParameterizedTest(name = "when is selected node taken down is {0} and selected nodes are {1}, then is remove link item visible is {2}")
     @MethodSource("provideArguments")
     fun `test that the remove link item visibility is adjusted`(
         noNodeTakenDown: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -51,13 +51,13 @@ class RemoveLinkDropdownTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(false, emptySet<TypedFolderNode>(), false),
-        Arguments.of(false, setOf(nodeWithExportedData), false),
-        Arguments.of(false, setOf(nodeWithoutExportedData), false),
+        Arguments.of(false, emptyList<TypedFolderNode>(), false),
+        Arguments.of(false, listOf(nodeWithExportedData), false),
+        Arguments.of(false, listOf(nodeWithoutExportedData), false),
         Arguments.of(false, multipleNodes, false),
-        Arguments.of(true, emptySet<TypedFolderNode>(), false),
-        Arguments.of(true, setOf(nodeWithExportedData), true),
-        Arguments.of(true, setOf(nodeWithoutExportedData), false),
+        Arguments.of(true, emptyList<TypedFolderNode>(), false),
+        Arguments.of(true, listOf(nodeWithExportedData), true),
+        Arguments.of(true, listOf(nodeWithoutExportedData), false),
         Arguments.of(true, multipleNodes, false),
     )
 }

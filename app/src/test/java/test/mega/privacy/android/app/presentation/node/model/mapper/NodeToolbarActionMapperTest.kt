@@ -76,12 +76,12 @@ class NodeToolbarActionMapperTest {
         val mappedOptions = underTest.invoke(
             toolbarOptions = toolbarList,
             hasNodeAccessPermission = true,
-            selectedNodes = setOf(mock<TypedFileNode>()),
+            selectedNodes = listOf(mock<TypedFileNode>()),
             allNodeCanBeMovedToTarget = true,
             noNodeInBackups = true,
             resultCount = 10,
         )
-        Truth.assertThat(mappedOptions.first()).isInstanceOf(MenuAction::class.java)
+        Truth.assertThat(mappedOptions.first().action).isInstanceOf(MenuAction::class.java)
     }
 
     @Test
@@ -89,7 +89,7 @@ class NodeToolbarActionMapperTest {
         val mappedOptions = underTest.invoke(
             toolbarOptions = toolbarList,
             hasNodeAccessPermission = true,
-            selectedNodes = setOf(mock<TypedFolderNode>()),
+            selectedNodes = listOf(mock<TypedFolderNode>()),
             allNodeCanBeMovedToTarget = true,
             noNodeInBackups = true,
             resultCount = 10,
@@ -102,7 +102,7 @@ class NodeToolbarActionMapperTest {
         val mappedOptions = underTest.invoke(
             toolbarOptions = toolbarList,
             hasNodeAccessPermission = true,
-            selectedNodes = setOf(mock<TypedFolderNode> {
+            selectedNodes = listOf(mock<TypedFolderNode> {
                 on { isTakenDown }.thenReturn(true)
             }),
             allNodeCanBeMovedToTarget = true,

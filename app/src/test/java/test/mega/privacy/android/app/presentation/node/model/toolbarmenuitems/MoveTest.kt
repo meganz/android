@@ -23,13 +23,13 @@ class MoveTest {
     private val notIncomingNode = mock<TypedFolderNode> {
         on { isIncomingShare }.thenReturn(false)
     }
-    private val multipleNodes = setOf(incomingNode, notIncomingNode)
+    private val multipleNodes = listOf(incomingNode, notIncomingNode)
 
     @ParameterizedTest(name = "when are selected nodes in backups is {0} and selected nodes are {1}, then is move item visible is {2}")
     @MethodSource("provideArguments")
     fun `test that the move item visibility is adjusted`(
         noNodeInBackups: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -45,11 +45,11 @@ class MoveTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(false, setOf(incomingNode), false),
-        Arguments.of(false, setOf(notIncomingNode), false),
+        Arguments.of(false, listOf(incomingNode), false),
+        Arguments.of(false, listOf(notIncomingNode), false),
         Arguments.of(false, multipleNodes, false),
-        Arguments.of(true, setOf(incomingNode), false),
-        Arguments.of(true, setOf(notIncomingNode), true),
+        Arguments.of(true, listOf(incomingNode), false),
+        Arguments.of(true, listOf(notIncomingNode), true),
         Arguments.of(true, multipleNodes, false),
     )
 }

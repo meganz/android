@@ -20,7 +20,7 @@ class SendToChatTest {
         on { isTakenDown }.thenReturn(false)
     }
     private val oneFolderNodeSelected = mock<TypedFolderNode>()
-    private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
+    private val multipleNodes = listOf(oneFileNodeSelected, oneFolderNodeSelected)
 
     @ParameterizedTest(name = "when noNodeTakenDown: {0} and allFileNodes: {1} then visibility is {2}")
     @MethodSource("provideArguments")

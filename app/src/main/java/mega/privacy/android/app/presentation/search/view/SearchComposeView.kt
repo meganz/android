@@ -14,20 +14,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavHostController
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.node.NodeToolbarActionHandler
+import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.view.NodesView
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
 
 /**
  * View for Search compose
@@ -56,8 +60,9 @@ fun SearchComposeView(
     updateFilter: (SearchFilter) -> Unit,
     trackAnalytics: (SearchFilter) -> Unit,
     updateSearchQuery: (String) -> Unit,
+    onBackPressed: () -> Unit,
+    navHostController: NavHostController,
     modifier: Modifier = Modifier,
-    onBackPressed: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -85,7 +90,11 @@ fun SearchComposeView(
                 updateSearchQuery = updateSearchQuery,
                 onBackPressed = onBackPressed,
                 selectedNodes = state.selectedNodes,
-                totalCount = state.searchItemList.size
+                totalCount = state.searchItemList.size,
+                navHostController = navHostController,
+                nodeToolbarActionHandler = NodeToolbarActionHandler(
+                    LocalContext.current as SearchActivity,
+                ),
             )
         },
         snackbarHost = {
@@ -159,6 +168,7 @@ private fun PreviewSearchComposeView() {
         trackAnalytics = {},
         updateSearchQuery = {},
         modifier = Modifier,
-        onBackPressed = {}
+        onBackPressed = {},
+        navHostController = NavHostController(LocalContext.current)
     )
 }

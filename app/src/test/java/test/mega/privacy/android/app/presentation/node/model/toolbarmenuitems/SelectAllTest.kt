@@ -21,12 +21,12 @@ class SelectAllTest {
         on { isTakenDown }.thenReturn(false)
     }
     private val oneFolderNodeSelected = mock<TypedFolderNode>()
-    private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
+    private val multipleNodes = listOf(oneFileNodeSelected, oneFolderNodeSelected)
 
     @ParameterizedTest(name = "when selected nodes are {0} and result count is {1} then visibility is {2}")
     @MethodSource("provideArguments")
     fun `test that select all item visibility is updated`(
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         resultCount: Int,
         expected: Boolean,
     ) {
@@ -43,7 +43,7 @@ class SelectAllTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(emptySet<TypedFolderNode>(), 10, false),
+        Arguments.of(emptyList<TypedFolderNode>(), 10, false),
         Arguments.of(multipleNodes, 2, true)
     )
 }

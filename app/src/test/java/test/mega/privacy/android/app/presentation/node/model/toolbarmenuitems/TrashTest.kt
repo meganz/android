@@ -27,7 +27,7 @@ class TrashTest {
     private val oneFolderNodeSelected = mock<TypedFolderNode> {
         on { isIncomingShare }.thenReturn(false)
     }
-    private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
+    private val multipleNodes = listOf(oneFileNodeSelected, oneFolderNodeSelected)
 
     @ParameterizedTest(name = "when selected nodes are in backups is {0} can be moved is {1} permission is {2} and nodes are {3} then visibility is {4}")
     @MethodSource("provideArguments")
@@ -35,7 +35,7 @@ class TrashTest {
         noNodeInBackups: Boolean,
         canBeMovedToTarget: Boolean,
         hasNodeAccessPermission: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -56,7 +56,7 @@ class TrashTest {
             false,
             false,
             false,
-            setOf(oneFileNodeSelected, oneFolderNodeSelected, incomingShareFolderNode),
+            listOf(oneFileNodeSelected, oneFolderNodeSelected, incomingShareFolderNode),
             false
         ),
         Arguments.of(true, false, false, multipleNodes, false),
@@ -64,7 +64,7 @@ class TrashTest {
             true,
             false,
             false,
-            setOf(oneFileNodeSelected, oneFolderNodeSelected, incomingShareFolderNode),
+            listOf(oneFileNodeSelected, oneFolderNodeSelected, incomingShareFolderNode),
             false
         ),
         Arguments.of(true, true, false, multipleNodes, false),
@@ -72,7 +72,7 @@ class TrashTest {
             true,
             true,
             false,
-            setOf(oneFileNodeSelected, oneFolderNodeSelected, incomingShareFolderNode),
+            listOf(oneFileNodeSelected, oneFolderNodeSelected, incomingShareFolderNode),
             false
         ),
         Arguments.of(true, true, true, multipleNodes, true),
@@ -80,7 +80,7 @@ class TrashTest {
             true,
             true,
             true,
-            setOf(oneFileNodeSelected, oneFolderNodeSelected, incomingShareFolderNode),
+            listOf(oneFileNodeSelected, oneFolderNodeSelected, incomingShareFolderNode),
             false
         ),
     )

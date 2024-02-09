@@ -20,13 +20,13 @@ class RemoveLinkTest {
         on { isTakenDown }.thenReturn(false)
     }
     private val oneFolderNodeSelected = mock<TypedFolderNode>()
-    private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
+    private val multipleNodes = listOf(oneFileNodeSelected, oneFolderNodeSelected)
 
     @ParameterizedTest(name = "when selected nodes are not taken down{0} and nodes are {1} then visibility is {2}")
     @MethodSource("provideArguments")
     fun `test that remove link item visibility is adjusted`(
         notTakenDown: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -42,11 +42,11 @@ class RemoveLinkTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(false, emptySet<TypedFolderNode>(), false),
+        Arguments.of(false, emptyList<TypedFolderNode>(), false),
         Arguments.of(false, multipleNodes, false),
-        Arguments.of(false, setOf(oneFileNodeSelected), false),
-        Arguments.of(true, emptySet<TypedFolderNode>(), false),
+        Arguments.of(false, listOf(oneFileNodeSelected), false),
+        Arguments.of(true, emptyList<TypedFolderNode>(), false),
         Arguments.of(true, multipleNodes, true),
-        Arguments.of(true, setOf(oneFileNodeSelected), false)
+        Arguments.of(true, listOf(oneFileNodeSelected), false)
     )
 }

@@ -12,8 +12,8 @@ import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuA
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Download
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
@@ -71,7 +71,7 @@ class ToolbarViewModelTest {
 
     private val selectedNodes = setOf(generalNode, backUpNode, rubbishNode, accessNode)
 
-    private lateinit var underTest: ToolbarViewModel
+    private lateinit var underTest: NodeToolbarViewModel
 
     @BeforeAll
     fun setDispatchers() {
@@ -87,7 +87,7 @@ class ToolbarViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = ToolbarViewModel(
+        underTest = NodeToolbarViewModel(
             cloudDriveToolbarOptions = cloudDriveToolbarOptions,
             incomingSharesToolbarOptions = incomingSharesToolbarOptions,
             outgoingSharesToolbarOptions = outgoingSharesToolbarOptions,
@@ -127,17 +127,23 @@ class ToolbarViewModelTest {
             resultCount = RESULT_COUNT,
             nodeSourceType = nodeSourceType
         )
-        if (nodeSourceType == NodeSourceType.RUBBISH_BIN) {
-            verifyNoInteractions(
-                checkNodeCanBeMovedToTargetNode,
-                isNodeInBackupsUseCase,
-                getNodeAccessPermission,
-            )
-        } else if (nodeSourceType == NodeSourceType.INCOMING_SHARES) {
-            verify(isNodeInBackupsUseCase, Times(selectedNodes.size)).invoke(any())
-        } else {
-            verify(isNodeInBackupsUseCase, Times(selectedNodes.size)).invoke(any())
-            verifyNoInteractions(getNodeAccessPermission)
+        when (nodeSourceType) {
+            NodeSourceType.RUBBISH_BIN -> {
+                verifyNoInteractions(
+                    checkNodeCanBeMovedToTargetNode,
+                    isNodeInBackupsUseCase,
+                    getNodeAccessPermission,
+                )
+            }
+
+            NodeSourceType.INCOMING_SHARES -> {
+                verify(isNodeInBackupsUseCase, Times(selectedNodes.size)).invoke(any())
+            }
+
+            else -> {
+                verify(isNodeInBackupsUseCase, Times(selectedNodes.size)).invoke(any())
+                verifyNoInteractions(getNodeAccessPermission)
+            }
         }
     }
 

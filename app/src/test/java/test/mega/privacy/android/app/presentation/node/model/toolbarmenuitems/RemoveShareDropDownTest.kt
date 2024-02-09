@@ -25,13 +25,13 @@ class RemoveShareDropDownTest {
     private val notSharedFolder = mock<TypedFolderNode> {
         on { isPendingShare }.thenReturn(false)
     }
-    private val sharedFolders = setOf(sharedFolder1, sharedFolder2)
-    private val mixedFoldersList = setOf(sharedFolder1, sharedFolder2, notSharedFolder)
+    private val sharedFolders = listOf(sharedFolder1, sharedFolder2)
+    private val mixedFoldersList = listOf(sharedFolder1, sharedFolder2, notSharedFolder)
 
     @ParameterizedTest(name = "when selected nodes are {0} then visibility is {1}")
     @MethodSource("provideArguments")
     fun `test that remove share dropdown item visibility is adjusted`(
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -47,7 +47,7 @@ class RemoveShareDropDownTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(emptySet<TypedFolderNode>(), false),
+        Arguments.of(emptyList<TypedFolderNode>(), false),
         Arguments.of(sharedFolders, true),
         Arguments.of(mixedFoldersList, false)
     )

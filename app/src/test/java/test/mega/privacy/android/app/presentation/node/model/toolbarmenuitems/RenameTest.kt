@@ -18,14 +18,14 @@ class RenameTest {
 
     private val nodeOne = mock<TypedFolderNode>()
     private val nodeTwo = mock<TypedFolderNode>()
-    private val multipleNodes = setOf(nodeOne, nodeTwo)
+    private val multipleNodes = listOf(nodeOne, nodeTwo)
 
     @ParameterizedTest(name = "when selected node hasNodeAccessPermission: {0}, noNodeInBackups: {1}, and selected nodes are {2} then visibility is {3}")
     @MethodSource("provideArguments")
     fun `test that rename item visibility is updated`(
         hasNodeAccessPermission: Boolean,
         noNodeInBackups: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -41,17 +41,17 @@ class RenameTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(false, false, emptySet<TypedFolderNode>(), false),
-        Arguments.of(false, false, setOf(nodeOne), false),
+        Arguments.of(false, false, emptyList<TypedFolderNode>(), false),
+        Arguments.of(false, false, listOf(nodeOne), false),
         Arguments.of(false, false, multipleNodes, false),
-        Arguments.of(true, false, emptySet<TypedFolderNode>(), false),
-        Arguments.of(true, false, setOf(nodeOne), false),
+        Arguments.of(true, false, listOf<TypedFolderNode>(), false),
+        Arguments.of(true, false, listOf(nodeOne), false),
         Arguments.of(true, false, multipleNodes, false),
-        Arguments.of(true, true, emptySet<TypedFolderNode>(), false),
-        Arguments.of(true, true, setOf(nodeOne), true),
+        Arguments.of(true, true, listOf<TypedFolderNode>(), false),
+        Arguments.of(true, true, listOf(nodeOne), true),
         Arguments.of(true, true, multipleNodes, false),
-        Arguments.of(false, true, emptySet<TypedFolderNode>(), false),
-        Arguments.of(false, true, setOf(nodeOne), false),
+        Arguments.of(false, true, emptyList<TypedFolderNode>(), false),
+        Arguments.of(false, true, listOf(nodeOne), false),
         Arguments.of(false, true, multipleNodes, false),
     )
 }

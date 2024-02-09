@@ -21,13 +21,13 @@ class RestoreTest {
         on { isTakenDown }.thenReturn(false)
     }
     private val oneFolderNodeSelected = mock<TypedFolderNode>()
-    private val multipleNodes = setOf(oneFileNodeSelected, oneFolderNodeSelected)
+    private val multipleNodes = listOf(oneFileNodeSelected, oneFolderNodeSelected)
 
     @ParameterizedTest(name = "when noNodeIsTakenDown: {0} and selected nodes are {1} then visibility is {2}")
     @MethodSource("provideArguments")
     fun `test that restore item visibility is updated`(
         noNodeIsTakenDown: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
         val result = underTest.shouldDisplay(
@@ -43,9 +43,9 @@ class RestoreTest {
     }
 
     private fun provideArguments() = Stream.of(
-        Arguments.of(false, emptySet<TypedFolderNode>(), false),
+        Arguments.of(false, emptyList<TypedFolderNode>(), false),
         Arguments.of(false, multipleNodes, false),
-        Arguments.of(true, emptySet<TypedFolderNode>(), false),
+        Arguments.of(true, emptyList<TypedFolderNode>(), false),
         Arguments.of(true, multipleNodes, true),
     )
 }

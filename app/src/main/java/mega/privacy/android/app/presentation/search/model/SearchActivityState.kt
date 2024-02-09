@@ -3,12 +3,13 @@ package mega.privacy.android.app.presentation.search.model
 import androidx.annotation.StringRes
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
+import mega.privacy.android.app.presentation.node.view.ToolbarMenuItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.entity.node.NodeSourceType
 
 /**
  * State for SearchActivity
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
  * @property selectedFilter selected filter which is enabled on chips
  * @property nodeSourceType type of Node Source
  * @property emptyState empty state to be shown on UI
+ * @property toolbarMenuItems list of [ToolbarMenuItem] to be shown on toolbar
  * @property selectedNodes selected nodes
  * @property lastSelectedNode last selected node
  * @property nodeNameCollisionResult result of node name collision
@@ -41,6 +43,7 @@ data class SearchActivityState(
     val filters: List<SearchFilter> = emptyList(),
     val selectedFilter: SearchFilter? = null,
     val emptyState: Pair<Int, String>? = null,
+    val toolbarMenuItems: List<ToolbarMenuItem> = emptyList(),
     val nodeSourceType: NodeSourceType = NodeSourceType.OTHER,
     val nodeNameCollisionResult: NodeNameCollisionResult? = null,
     val moveRequestResult: Result<MoveRequestResult>? = null,

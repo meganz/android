@@ -15,7 +15,7 @@ class RemoveShareDropDown @Inject constructor() : NodeToolbarMenuItem<MenuAction
 
     override fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
-        selectedNodes: Set<TypedNode>,
+        selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,
