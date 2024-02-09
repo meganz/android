@@ -33,8 +33,6 @@ class RemoveOfflineNodeUseCase @Inject constructor(
                 childNodes?.let { childNode ->
                     deleteChildrenInDb(childNode)
                 }
-            } else {
-                nodeRepository.removeOfflineNode(nodeId.longValue.toString())
             }
             //remove red arrow from current item
             val parentId = it.parentId
@@ -54,35 +52,29 @@ class RemoveOfflineNodeUseCase @Inject constructor(
         fileRepository.deleteFolderAndItsFiles(path)
     }
 
-    private tailrec suspend fun deleteChildrenInDb(offlineInfoChildren: List<OfflineNodeInformation>) {
-        if (offlineInfoChildren.isEmpty()) {
-            return
-        }
-
-        val nextNodes = buildList {
-            for (node in offlineInfoChildren) {
-                val children = nodeRepository.getOfflineNodeByParentId(node.id)
-                children?.let { childNodes ->
-                    addAll(childNodes)
-                }
-                nodeRepository.removeOfflineNodeById(node.id)
+    private suspend fun deleteChildrenInDb(offlineInfoChildren: List<OfflineNodeInformation>?) {
+        var offlineChild: OfflineNodeInformation
+        offlineInfoChildren?.forEach {
+            offlineChild = it
+            val children = nodeRepository.getOfflineNodeByParentId(offlineChild.id)
+            if (offlineInfoChildren.isNotEmpty()) {
+                deleteChildrenInDb(children)
             }
+            nodeRepository.removeOfflineNodeById(offlineChild.id)
         }
-
-        deleteChildrenInDb(nextNodes)
     }
-
 
     private suspend fun updateParentOfflineStatus(parentId: Int) {
         val siblings = nodeRepository.getOfflineNodeByParentId(parentId)
         siblings?.let {
-            if (it.isEmpty()) {
+            if (it.isNotEmpty()) {
                 return
             }
             val parentNode = nodeRepository.getOfflineNodeById(parentId)
             parentNode?.let { offlineInfo ->
-                nodeRepository.removeOfflineNodeById(offlineInfo.id)
-                updateParentOfflineStatus(offlineInfo.parentId)
+                val grandParentId = offlineInfo.parentId
+                nodeRepository.removeOfflineNodeById(parentId)
+                updateParentOfflineStatus(grandParentId)
             }
         }
     }
