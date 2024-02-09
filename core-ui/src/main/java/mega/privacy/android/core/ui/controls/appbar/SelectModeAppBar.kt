@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.Dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionString
+import mega.privacy.android.core.ui.model.MenuActionWithClick
 import mega.privacy.android.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -42,6 +43,36 @@ fun SelectModeAppBar(
         onNavigationPressed = onNavigationPressed,
         actions = actions,
         onActionPressed = onActionPressed,
+        elevation = elevation
+    )
+}
+
+/**
+ * Select mode app bar
+ *
+ * @param title
+ * @param modifier [Modifier]
+ * @param onNavigationPressed Action for navigation button.
+ * @param actions Available options.
+ * @param elevation Elevation.
+ */
+@Composable
+fun SelectModeAppBar(
+    title: String,
+    modifier: Modifier = Modifier,
+    actions: List<MenuActionWithClick>? = null,
+    onNavigationPressed: (() -> Unit)? = null,
+    elevation: Dp = LocalMegaAppBarElevation.current,
+) = CompositionLocalProvider(
+    LocalMegaAppBarColors provides
+            MegaAppBarColors(MegaTheme.colors.icon.accent, MegaTheme.colors.text.accent)
+) {
+    BaseMegaAppBar(
+        appBarType = AppBarType.BACK_NAVIGATION,
+        title = { MegaAppBarTitle(title) },
+        modifier = modifier,
+        onNavigationPressed = onNavigationPressed,
+        actions = actions,
         elevation = elevation
     )
 }

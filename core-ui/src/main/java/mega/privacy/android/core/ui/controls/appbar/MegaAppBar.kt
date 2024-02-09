@@ -41,6 +41,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.menus.MenuActions
 import mega.privacy.android.core.ui.controls.text.MarqueeText
 import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.core.ui.model.MenuActionWithClick
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -216,6 +217,38 @@ internal fun BaseMegaAppBar(
 @Composable
 internal fun BaseMegaAppBar(
     appBarType: AppBarType,
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    onNavigationPressed: (() -> Unit)? = null,
+    badgeCount: Int? = null,
+    titleIcons: @Composable (RowScope.() -> Unit)? = null,
+    subtitle: @Composable (() -> Unit)? = null,
+    actions: List<MenuActionWithClick>? = null,
+    maxActionsToShow: Int = 4,
+    enabled: Boolean = true,
+    elevation: Dp = LocalMegaAppBarElevation.current,
+) = BaseMegaAppBar(
+    appBarType = appBarType,
+    titleAndSubtitle = {
+        MegaAppBarTitleAndSubtitle(
+            title = title,
+            titleIcons = titleIcons,
+            subtitle = subtitle,
+            modifier = Modifier.then(Modifier.padding(end = if (actions.isNullOrEmpty()) 12.dp else 0.dp))
+        )
+    },
+    actions = actions,
+    modifier = modifier,
+    onNavigationPressed = onNavigationPressed,
+    badgeCount = badgeCount,
+    maxActionsToShow = maxActionsToShow,
+    enabled = enabled,
+    elevation = elevation
+)
+
+@Composable
+internal fun BaseMegaAppBar(
+    appBarType: AppBarType,
     titleAndSubtitle: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     actions: List<MenuAction>? = null,
@@ -278,6 +311,76 @@ internal fun BaseMegaAppBar(
                     maxActionsToShow = maxActionsToShow,
                     enabled = enabled,
                     onActionClick = { action -> onActionPressed?.invoke(action) }
+                )
+            }
+        },
+        elevation = elevation
+    )
+}
+
+@Composable
+internal fun BaseMegaAppBar(
+    appBarType: AppBarType,
+    titleAndSubtitle: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    onNavigationPressed: (() -> Unit)? = null,
+    badgeCount: Int? = null,
+    actions: List<MenuActionWithClick>? = null,
+    maxActionsToShow: Int = 4,
+    enabled: Boolean = true,
+    elevation: Dp = LocalMegaAppBarElevation.current,
+) {
+    TopAppBar(
+        title = titleAndSubtitle,
+        backgroundColor = MegaTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha),
+        modifier = modifier.testTag(TEST_TAG_APP_BAR),
+        navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
+            Box {
+                NavigationIcon(
+                    onNavigationPressed = onNavigationPressed ?: {},
+                    enabled = enabled,
+                    iconId = when (appBarType) {
+                        AppBarType.BACK_NAVIGATION -> R.drawable.ic_back
+                        AppBarType.MENU -> R.drawable.ic_menu
+                        else -> return@Box
+                    },
+                    modifier = Modifier.testTag(APP_BAR_BACK_BUTTON_TAG),
+                )
+                badgeCount?.let {
+                    Box(
+                        modifier = Modifier
+                            .padding(3.dp)
+                            .size(24.dp)
+                            .padding(3.dp)
+                            .background(
+                                color = MegaTheme.colors.indicator.pink,
+                                shape = CircleShape
+                            )
+                            .border(
+                                2.dp,
+                                MegaTheme.colors.background.pageBackground,
+                                shape = CircleShape
+                            )
+                            .testTag(APP_BAR_BADGE)
+                            .align(Alignment.TopEnd),
+                    ) {
+                        Text(
+                            text = it.toString(),
+                            modifier = Modifier.align(Alignment.Center),
+                            color = MegaTheme.colors.text.inverse,
+                            style = MaterialTheme.typography.badge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+            }
+        },
+        actions = {
+            actions?.let {
+                MenuActions(
+                    actions = actions,
+                    maxActionsToShow = maxActionsToShow,
+                    enabled = enabled,
                 )
             }
         },

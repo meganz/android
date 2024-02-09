@@ -30,6 +30,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.appbar.LocalMegaAppBarColors
 import mega.privacy.android.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.core.ui.model.MenuActionWithClick
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.core.ui.theme.MegaTheme
 
@@ -69,6 +70,37 @@ fun MenuActions(
 
 }
 
+/**
+ * Utility function to generate actions for [TopAppBar]
+ * @param actions the actions to be added
+ * @param maxActionsToShow if there are more actions than that the extra actions will be shown in a drop down menu
+ * @param enabled if false, all actions will be disabled, if true each [MenuAction.enabled] will be used to check if the action is enabled or not
+ */
+@Composable
+fun MenuActions(
+    actions: List<MenuActionWithClick>,
+    maxActionsToShow: Int,
+    enabled: Boolean = true,
+) {
+    val sortedActions = actions.sortedBy { it.menuAction.orderInCategory }
+    val visible =
+        sortedActions.filter { it.menuAction is MenuActionWithIcon }.take(maxActionsToShow)
+    visible.forEach { (menuAction, onActionClick) ->
+        IconButtonForAction(
+            menuAction = menuAction as MenuActionWithIcon,
+            onActionClick = onActionClick,
+            enabled = enabled && menuAction.enabled,
+        )
+    }
+    sortedActions.filterNot { visible.contains(it) }.takeIf { it.isNotEmpty() }?.let { notVisible ->
+        DropDown(
+            actions = notVisible,
+            enabled = enabled,
+        )
+    }
+
+}
+
 @Composable
 private fun IconButtonForAction(
     menuAction: MenuActionWithIcon,
@@ -79,6 +111,21 @@ private fun IconButtonForAction(
         iconPainter = menuAction.getIconPainter(),
         description = menuAction.getDescription(),
         onClick = { onActionClick(menuAction) },
+        modifier = Modifier.testTag(menuAction.testTag),
+        enabled = enabled,
+    )
+}
+
+@Composable
+private fun IconButtonForAction(
+    menuAction: MenuActionWithIcon,
+    onActionClick: () -> Unit,
+    enabled: Boolean = true,
+) {
+    IconButtonWithTooltip(
+        iconPainter = menuAction.getIconPainter(),
+        description = menuAction.getDescription(),
+        onClick = { onActionClick() },
         modifier = Modifier.testTag(menuAction.testTag),
         enabled = enabled,
     )
@@ -123,7 +170,47 @@ private fun DropDown(
     }
 }
 
+@Composable
+private fun DropDown(
+    actions: List<MenuActionWithClick>,
+    enabled: Boolean = true,
+) {
+    var showMoreMenu by remember {
+        mutableStateOf(false)
+    }
+    Box(contentAlignment = Alignment.BottomEnd) {
+        IconButtonWithTooltip(
+            iconPainter = painterResource(id = R.drawable.ic_more),
+            description = stringResource(id = com.google.android.material.R.string.abc_action_menu_overflow_description),
+            onClick = { showMoreMenu = !showMoreMenu },
+            modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),
+            enabled = enabled,
+        )
 
+        DropdownMenu(
+            expanded = showMoreMenu,
+            onDismissRequest = {
+                showMoreMenu = false
+            }
+        ) {
+            actions.forEach { (menuAction, onActionClick) ->
+                DropdownMenuItem(
+                    onClick = {
+                        onActionClick()
+                        showMoreMenu = false
+                    },
+                    modifier = Modifier.testTag(menuAction.testTag)
+                ) {
+                    Text(text = menuAction.getDescription())
+                }
+            }
+        }
+    }
+}
+
+/**
+ * IconButton with a tooltip that shows the [description] when long clicked
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun IconButtonWithTooltip(
