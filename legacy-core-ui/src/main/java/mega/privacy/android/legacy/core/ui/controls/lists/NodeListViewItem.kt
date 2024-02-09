@@ -96,6 +96,7 @@ fun NodeListViewItem(
     applySecondaryColorIconTint: Boolean = false,
     infoColor: Color? = null,
     @DrawableRes infoIcon: Int? = null,
+    @DrawableRes sharesIcon: Int? = null,
     infoIconTint: Color? = null,
     labelColor: Color? = null,
     onLongClick: (() -> Unit)? = null,
@@ -114,6 +115,7 @@ fun NodeListViewItem(
         name = name,
         infoColor = infoColor,
         infoIcon = infoIcon,
+        sharesIcon = sharesIcon,
         infoIconTint = infoIconTint,
         labelColor = labelColor,
         showMenuButton = showMenuButton,
@@ -173,12 +175,15 @@ fun NodeListViewItem(
     applySecondaryColorIconTint: Boolean = false,
     infoColor: Color? = null,
     @DrawableRes infoIcon: Int? = null,
+    @DrawableRes sharesIcon: Int? = null,
     infoIconTint: Color? = null,
     labelColor: Color? = null,
+    sharesSubtitle: String? = null,
     onLongClick: (() -> Unit)? = null,
     isEnabled: Boolean = true,
     onMenuClick: () -> Unit = {},
     nodeAvailableOffline: Boolean = false,
+    isUnverifiedShare: Boolean = false,
 ) {
     Column(
         modifier = if (isEnabled) {
@@ -242,7 +247,7 @@ fun NodeListViewItem(
                     .padding(start = 12.dp)
                     .fillMaxWidth()
             ) {
-                val (nodeInfo, threeDots, infoRow, availableOffline) = createRefs()
+                val (nodeInfo, threeDots, infoRow, availableOffline, sharesStatus) = createRefs()
                 Image(
                     painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                     contentDescription = "3 dots",
@@ -276,7 +281,7 @@ fun NodeListViewItem(
                         text = name,
                         modifier = Modifier.widthIn(max = if (isScreenOrientationLandscape()) 275.dp else 190.dp),
                         style = MaterialTheme.typography.subtitle1,
-                        color = if (isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
+                        color = if (isTakenDown || isUnverifiedShare) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
                     )
                     labelColor?.let {
                         Box(
@@ -344,7 +349,7 @@ fun NodeListViewItem(
                         Spacer(modifier = Modifier.width(8.dp))
                     }
                     Text(
-                        text = folderInfo ?: "$fileSize · $modifiedDate",
+                        text = sharesSubtitle ?: folderInfo ?: "$fileSize · $modifiedDate",
                         modifier = Modifier.testTag(INFO_TEXT_TEST_TAG),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -352,6 +357,23 @@ fun NodeListViewItem(
                         color = infoColor ?: MaterialTheme.colors.textColorSecondary,
                     )
                 }
+                if (sharesIcon != null)
+                    Image(
+                        modifier = Modifier
+                            .constrainAs(sharesStatus) {
+                                top.linkTo(infoRow.top)
+                                bottom.linkTo(infoRow.top)
+                                end.linkTo(availableOffline.start)
+                                visibility = Visibility.Visible
+                            }
+                            .padding(end = 4.dp)
+                            .size(22.dp),
+                        colorFilter = ColorFilter.tint(
+                            MaterialTheme.colors.textColorSecondary
+                        ),
+                        painter = painterResource(id = sharesIcon),
+                        contentDescription = "Shares"
+                    )
                 Image(
                     modifier = Modifier
                         .constrainAs(availableOffline) {
@@ -451,6 +473,7 @@ private fun FolderPreview() {
             isSelected = false,
             folderInfo = "Empty Folder",
             icon = R.drawable.ic_folder_list,
+            sharesIcon = R.drawable.ic_alert_triangle,
             fileSize = "1.2 MB",
             modifiedDate = "Dec 29, 2022",
             name = "documentation.pdf",

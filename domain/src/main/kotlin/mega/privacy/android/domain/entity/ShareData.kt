@@ -5,20 +5,27 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 /**
  * Share data
  *
- * @property user
+ * @property user email of the user
+ * @property userFullName full name of the user, optional
  * @property nodeHandle
  * @property access
  * @property timeStamp
  * @property isPending
  * @param isVerified
  * @property count
+ * @property isUnverifiedDistinctNode
+ *
+ * @constructor Create empty Share data
  */
 data class ShareData(
     val user: String?,
+    val userFullName: String? = null,
     val nodeHandle: Long,
     val access: AccessPermission,
     val timeStamp: Long,
     val isPending: Boolean,
     val isVerified: Boolean,
     val count: Int
-)
+) {
+    val isUnverifiedDistinctNode = !isVerified && count == 0
+}
