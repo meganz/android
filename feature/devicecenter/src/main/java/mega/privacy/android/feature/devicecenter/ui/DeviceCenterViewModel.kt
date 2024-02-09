@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
@@ -29,12 +31,14 @@ import javax.inject.Inject
  * @property getDevicesUseCase [GetDevicesUseCase]
  * @property isCameraUploadsEnabledUseCase [IsCameraUploadsEnabledUseCase]
  * @property deviceUINodeListMapper [DeviceUINodeListMapper]
+ * @property monitorConnectivityUseCase [MonitorConnectivityUseCase]
  */
 @HiltViewModel
 internal class DeviceCenterViewModel @Inject constructor(
     private val getDevicesUseCase: GetDevicesUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val deviceUINodeListMapper: DeviceUINodeListMapper,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DeviceCenterState())
@@ -43,6 +47,24 @@ internal class DeviceCenterViewModel @Inject constructor(
      * The State of [DeviceCenterScreen]
      */
     val state: StateFlow<DeviceCenterState> = _state.asStateFlow()
+
+    private var monitorConnectivityJob: Job? = null
+
+    init {
+        monitorNetworkConnectivity()
+    }
+
+    private fun monitorNetworkConnectivity() {
+        monitorConnectivityJob?.cancel()
+        monitorConnectivityJob = viewModelScope.launch {
+            monitorConnectivityUseCase()
+                .collect { isNetworkConnected ->
+                    _state.update {
+                        it.copy(isNetworkConnected = isNetworkConnected)
+                    }
+                }
+        }
+    }
 
     /**
      * A Shared Flow prompting Observers to periodically retrieve the User's Backup Information

@@ -139,6 +139,7 @@ internal class DeviceCenterScreenTest {
         val uiState = DeviceCenterState(
             devices = listOf(ownDeviceUINode),
             isInitialLoadingFinished = true,
+            isNetworkConnected = true,
         )
         composeTestRule.setContent {
             DeviceCenterScreen(
@@ -175,6 +176,7 @@ internal class DeviceCenterScreenTest {
         val uiState = DeviceCenterState(
             devices = listOf(otherDeviceUINode),
             isInitialLoadingFinished = true,
+            isNetworkConnected = true,
         )
         composeTestRule.setContent {
             DeviceCenterScreen(
@@ -218,6 +220,7 @@ internal class DeviceCenterScreenTest {
         val uiState = DeviceCenterState(
             devices = listOf(ownDeviceUINode, otherDeviceUINode),
             isInitialLoadingFinished = true,
+            isNetworkConnected = true,
         )
         composeTestRule.setContent {
             DeviceCenterScreen(
@@ -291,7 +294,7 @@ internal class DeviceCenterScreenTest {
     fun `test that the loading screen is shown`() {
         composeTestRule.setContent {
             DeviceCenterScreen(
-                uiState = DeviceCenterState(),
+                uiState = DeviceCenterState(isNetworkConnected = true),
                 snackbarHostState = SnackbarHostState(),
                 onDeviceClicked = {},
                 onDeviceMenuClicked = {},
@@ -309,5 +312,29 @@ internal class DeviceCenterScreenTest {
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_LOADING_SCREEN).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the no network state is shown`() {
+        composeTestRule.setContent {
+            DeviceCenterScreen(
+                uiState = DeviceCenterState(),
+                snackbarHostState = SnackbarHostState(),
+                onDeviceClicked = {},
+                onDeviceMenuClicked = {},
+                onBackupFolderClicked = {},
+                onBackupFolderMenuClicked = {},
+                onNonBackupFolderClicked = {},
+                onNonBackupFolderMenuClicked = {},
+                onCameraUploadsClicked = {},
+                onRenameDeviceOptionClicked = {},
+                onRenameDeviceCancelled = {},
+                onRenameDeviceSuccessful = {},
+                onRenameDeviceSuccessfulSnackbarShown = {},
+                onBackPressHandled = {},
+                onFeatureExited = {},
+            )
+        }
+        composeTestRule.onNodeWithTag(DEVICE_CENTER_NO_NETWORK_STATE).assertIsDisplayed()
     }
 }

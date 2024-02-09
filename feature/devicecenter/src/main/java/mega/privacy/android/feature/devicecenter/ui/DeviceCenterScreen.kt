@@ -2,30 +2,43 @@ package mega.privacy.android.feature.devicecenter.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
+import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceBottomSheet
 import mega.privacy.android.feature.devicecenter.ui.lists.DeviceCenterListViewItem
@@ -54,6 +67,7 @@ internal const val DEVICE_CENTER_THIS_DEVICE_HEADER =
     "device_center_content:menu_action_header_this_device"
 internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
     "device_center_content:menu_action_header_other_devices"
+internal const val DEVICE_CENTER_NO_NETWORK_STATE = "device_center_content:no_network_state"
 
 /**
  * A [Composable] that serves as the main View for the Device Center
@@ -173,25 +187,34 @@ internal fun DeviceCenterScreen(
             }
         },
         content = { paddingValues ->
-            if (!uiState.isInitialLoadingFinished) {
-                DeviceCenterLoadingScreen()
-            } else {
-                DeviceCenterContent(
-                    itemsToDisplay = uiState.itemsToDisplay,
-                    onDeviceClicked = onDeviceClicked,
-                    onDeviceMenuClicked = { deviceNode ->
-                        onDeviceMenuClicked(deviceNode)
-                        if (!modalSheetState.isVisible) {
-                            coroutineScope.launch { modalSheetState.show() }
-                        }
-                    },
-                    onBackupFolderClicked = onBackupFolderClicked,
-                    onBackupFolderMenuClicked = onBackupFolderMenuClicked,
-                    onNonBackupFolderClicked = onNonBackupFolderClicked,
-                    onNonBackupFolderMenuClicked = onNonBackupFolderMenuClicked,
-                    modifier = Modifier.padding(paddingValues),
-                )
+            when {
+                !uiState.isNetworkConnected -> {
+                    DeviceCenterNoNetworkState()
+                }
+
+                !uiState.isInitialLoadingFinished -> {
+                    DeviceCenterLoadingScreen()
+                }
+
+                else -> {
+                    DeviceCenterContent(
+                        itemsToDisplay = uiState.itemsToDisplay,
+                        onDeviceClicked = onDeviceClicked,
+                        onDeviceMenuClicked = { deviceNode ->
+                            onDeviceMenuClicked(deviceNode)
+                            if (!modalSheetState.isVisible) {
+                                coroutineScope.launch { modalSheetState.show() }
+                            }
+                        },
+                        onBackupFolderClicked = onBackupFolderClicked,
+                        onBackupFolderMenuClicked = onBackupFolderMenuClicked,
+                        onNonBackupFolderClicked = onNonBackupFolderClicked,
+                        onNonBackupFolderMenuClicked = onNonBackupFolderMenuClicked,
+                        modifier = Modifier.padding(paddingValues),
+                    )
+                }
             }
+
             uiState.deviceToRename?.let { nonNullDevice ->
                 RenameDeviceDialog(
                     deviceId = nonNullDevice.id,
@@ -201,6 +224,7 @@ internal fun DeviceCenterScreen(
                     onRenameCancelled = onRenameDeviceCancelled,
                 )
             }
+
             DeviceBottomSheet(
                 coroutineScope = coroutineScope,
                 modalSheetState = modalSheetState,
@@ -212,6 +236,33 @@ internal fun DeviceCenterScreen(
             )
         },
     )
+}
+
+/**
+ * A [Composable] which displays a No network connectivity state
+ */
+@Composable
+private fun DeviceCenterNoNetworkState() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag(DEVICE_CENTER_NO_NETWORK_STATE),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_device_center_no_network_state),
+            contentDescription = "No network connectivity state",
+            modifier = Modifier
+                .size(size = 144.dp)
+                .padding(bottom = 11.dp)
+        )
+        MegaText(
+            text = stringResource(id = R.string.device_center_no_network_state),
+            textColor = TextColor.Primary,
+            style = MaterialTheme.typography.subtitle2,
+        )
+    }
 }
 
 /**
@@ -303,6 +354,33 @@ private fun DeviceCenterContent(
 }
 
 /**
+ * A Preview Composable which shows the No network connectivity state
+ */
+@CombinedThemePreviews
+@Composable
+private fun DeviceCenterNoNetworkStatePreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        DeviceCenterScreen(
+            uiState = DeviceCenterState(isInitialLoadingFinished = true),
+            snackbarHostState = SnackbarHostState(),
+            onDeviceClicked = {},
+            onDeviceMenuClicked = {},
+            onBackupFolderClicked = {},
+            onBackupFolderMenuClicked = {},
+            onNonBackupFolderClicked = {},
+            onNonBackupFolderMenuClicked = {},
+            onCameraUploadsClicked = {},
+            onRenameDeviceOptionClicked = {},
+            onRenameDeviceCancelled = {},
+            onRenameDeviceSuccessful = {},
+            onRenameDeviceSuccessfulSnackbarShown = {},
+            onBackPressHandled = {},
+            onFeatureExited = {},
+        )
+    }
+}
+
+/**
  * A Preview Composable that shows the Loading Screen
  */
 @CombinedThemePreviews
@@ -310,7 +388,7 @@ private fun DeviceCenterContent(
 private fun DeviceCenterInInitialLoadingPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
-            uiState = DeviceCenterState(),
+            uiState = DeviceCenterState(isNetworkConnected = true),
             snackbarHostState = SnackbarHostState(),
             onDeviceClicked = {},
             onDeviceMenuClicked = {},
@@ -343,6 +421,7 @@ private fun DeviceCenterInDeviceViewPreview() {
             otherDeviceUINodeThree,
         ),
         isInitialLoadingFinished = true,
+        isNetworkConnected = true,
     )
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(
@@ -375,6 +454,7 @@ private fun DeviceCenterInFolderViewPreview() {
         devices = listOf(ownDeviceUINodeTwo),
         isInitialLoadingFinished = true,
         selectedDevice = ownDeviceUINodeTwo,
+        isNetworkConnected = true,
     )
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterScreen(

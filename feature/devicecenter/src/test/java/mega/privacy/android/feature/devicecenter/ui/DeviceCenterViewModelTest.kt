@@ -6,11 +6,13 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -40,6 +43,10 @@ internal class DeviceCenterViewModelTest {
     private val getDevicesUseCase = mock<GetDevicesUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val deviceUINodeListMapper = mock<DeviceUINodeListMapper>()
+
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
+        onBlocking { invoke() } doReturn emptyFlow()
+    }
 
     private val isCameraUploadsEnabled = true
     private val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
@@ -74,6 +81,7 @@ internal class DeviceCenterViewModelTest {
             getDevicesUseCase = getDevicesUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             deviceUINodeListMapper = deviceUINodeListMapper,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
         )
     }
 

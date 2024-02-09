@@ -18,6 +18,7 @@ import de.palm.composestateevents.consumed
  * [selectedDevice] are shown
  * @property exitFeature State Event that will cause the User to leave Device Center if it is triggered
  * @property renameDeviceSuccess State Event which notifies that renaming the Device is successful
+ * @property isNetworkConnected True if has network connectivity or False otherwise
  */
 data class DeviceCenterState(
     val devices: List<DeviceCenterUINode> = emptyList(),
@@ -28,6 +29,7 @@ data class DeviceCenterState(
     val deviceToRename: DeviceUINode? = null,
     val exitFeature: StateEvent = consumed,
     val renameDeviceSuccess: StateEvent = consumed,
+    val isNetworkConnected: Boolean = false,
 ) {
     val itemsToDisplay: List<DeviceCenterUINode> = selectedDevice?.folders ?: devices
 }
