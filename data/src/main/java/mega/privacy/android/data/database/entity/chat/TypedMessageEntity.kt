@@ -1,9 +1,9 @@
 package mega.privacy.android.data.database.entity.chat
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import mega.privacy.android.data.database.converter.TypedMessageEntityConverters
-import mega.privacy.android.data.database.entity.chat.TypedMessageEntity.Companion.DEFAULT_ID
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatMessageChange
 import mega.privacy.android.domain.entity.chat.ChatMessageCode
@@ -17,14 +17,10 @@ import kotlin.time.Duration
 /**
  * Entity to store a typed message request.
  *
- * This entity has a composite primary key ["msgId", "pendingMessageId", "isPending"] to avoid id clashes between
- * ordinary messages (where the id comes from the sdk and can also be [DEFAULT_ID])
- * and pending messages (where the id is set locally by autoincrement and can't be [DEFAULT_ID]).
  *
  * @property chatId Chat ID.
  * @property status Status of the message.
- * @property msgId Message ID. It comes from SDK or [DEFAULT_ID] if this is a pending message
- * @property pendingMessageId Pending Message ID or [DEFAULT_ID] if this is NOT a pending message
+ * @property msgId Message ID. It comes from SDK
  * @property tempId Temporary ID.
  * @property msgIndex Message index.
  * @property userHandle User handle.
@@ -56,11 +52,10 @@ import kotlin.time.Duration
  * @property textMessage Text message.
  * @property reactions list of [Reaction]
  */
-@Entity(tableName = "typed_messages", primaryKeys = ["msgId", "pendingMessageId"])
+@Entity(tableName = "typed_messages")
 @TypeConverters(TypedMessageEntityConverters::class)
 data class TypedMessageEntity(
-    override val msgId: Long,
-    val pendingMessageId: Long = DEFAULT_ID,
+    @PrimaryKey override val msgId: Long,
     val chatId: Long,
     override val status: ChatMessageStatus,
     override val tempId: Long,
@@ -93,17 +88,5 @@ data class TypedMessageEntity(
     val shouldShowTime: Boolean,
     val textMessage: String?,
     val reactions: List<Reaction>
-) : ChatMessageInfo {
-
-    companion object {
-
-        /**
-         * Id to be used when there's no id as SQLite doesn't allow nulls in primary keys
-         *
-         * It should not be used to query pending messages as we can have ordinary messages with this id
-         * Auto generated keys are strictly positive, so pending messages don't have this value for pendingMessageId
-         */
-        internal const val DEFAULT_ID = 0L
-    }
-}
+) : ChatMessageInfo
 

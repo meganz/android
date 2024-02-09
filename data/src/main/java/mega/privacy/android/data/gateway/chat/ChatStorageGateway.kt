@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway.chat
 
 import androidx.paging.PagingSource
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.entity.chat.ChatGeolocationEntity
 import mega.privacy.android.data.database.entity.chat.ChatNodeEntity
 import mega.privacy.android.data.database.entity.chat.GiphyEntity
@@ -57,13 +58,11 @@ interface ChatStorageGateway {
     /**
      * Store pending message
      *
-     * @param message
      * @param pendingMessageEntity
      *
      * @return the id of the inserted [PendingMessageEntity]
      */
     suspend fun storePendingMessage(
-        message: TypedMessageEntity,
         pendingMessageEntity: PendingMessageEntity,
     ): Long
 
@@ -80,4 +79,12 @@ interface ChatStorageGateway {
      * @param pendingMessage
      */
     suspend fun deletePendingMessage(pendingMessage: PendingMessageEntity)
+
+    /**
+     * Fetch pending messages
+     *
+     * @param chatId
+     * @return flow of pending messages for the chat
+     */
+    fun fetchPendingMessages(chatId: Long): Flow<List<PendingMessageEntity>>
 }

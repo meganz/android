@@ -70,11 +70,4 @@ interface TypedMessageDao {
         timestamp: Long,
     ): TypedMessageEntity?
 
-    /**
-     * Delete message by pending id
-     *
-     * @param pendingId
-     */
-    @Query("DELETE FROM typed_messages WHERE pendingMessageId > ${TypedMessageEntity.DEFAULT_ID} AND pendingMessageId = :pendingId")
-    fun deleteMessageByPendingId(pendingId: Long)
 }

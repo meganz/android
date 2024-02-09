@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository.chat
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
@@ -195,4 +196,12 @@ interface ChatMessageRepository {
      * @return saved PendingMessage
      */
     suspend fun savePendingMessage(savePendingMessageRequest: SavePendingMessageRequest): PendingMessage
+
+    /**
+     * Monitor pending messages
+     *
+     * @param chatId
+     * @return flow of pending messages for the chat
+     */
+    fun monitorPendingMessages(chatId: Long): Flow<List<PendingMessage>>
 }

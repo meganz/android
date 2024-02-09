@@ -7,17 +7,16 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.database.chat.InMemoryChatDatabase
+import mega.privacy.android.data.database.dao.PendingMessageDao
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.NullSource
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verifyNoInteractions
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -44,18 +43,15 @@ class ChatStorageFacadeTest {
         )
     }
 
-    @ParameterizedTest(name = "pendingId = {0}")
-    @ValueSource(longs = [-10, -1, 0])
-    @NullSource
-    fun `test that pending messages cannot be deleted when pendingMsgId is not a positive number`(
-        pendingMessageId: Long?,
-    ) = runTest {
+    @Test
+    fun `test that pending messages are not deleted when the id is null`() = runTest {
         val pendingMessage = mock<PendingMessageEntity> {
-            on { this.pendingMessageId } doReturn pendingMessageId
+            on { this.pendingMessageId } doReturn null
         }
-        assertThrows<IllegalArgumentException> {
-            underTest.deletePendingMessage(pendingMessage)
-        }
-        verifyNoInteractions(database)
+        val pendingMessageDao = mock<PendingMessageDao>()
+        database.stub { on { pendingMessageDao() } doReturn pendingMessageDao }
+
+        underTest.deletePendingMessage(pendingMessage)
+        verifyNoInteractions(pendingMessageDao)
     }
 }

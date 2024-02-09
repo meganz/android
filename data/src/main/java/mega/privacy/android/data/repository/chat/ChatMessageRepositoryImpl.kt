@@ -1,6 +1,8 @@
 package mega.privacy.android.data.repository.chat
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getChatRequestListener
@@ -10,7 +12,7 @@ import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.chat.messages.PendingMessageEntityMapper
-import mega.privacy.android.data.mapper.chat.messages.PendingMessageTypedMessageEntityMapper
+import mega.privacy.android.data.mapper.chat.messages.PendingMessageMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
@@ -29,8 +31,8 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     private val handleListMapper: HandleListMapper,
     private val chatMessageMapper: ChatMessageMapper,
     private val megaHandleListMapper: MegaHandleListMapper,
-    private val pendingMessageTypedMessageEntityMapper: PendingMessageTypedMessageEntityMapper,
     private val pendingMessageEntityMapper: PendingMessageEntityMapper,
+    private val pendingMessageMapper: PendingMessageMapper,
 ) : ChatMessageRepository {
     override suspend fun setMessageSeen(chatId: Long, messageId: Long) = withContext(ioDispatcher) {
         megaChatApiGateway.setMessageSeen(chatId, messageId)
@@ -112,9 +114,8 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
 
     override suspend fun savePendingMessage(savePendingMessageRequest: SavePendingMessageRequest): PendingMessage {
         return withContext(ioDispatcher) {
-            val message = pendingMessageTypedMessageEntityMapper(savePendingMessageRequest)
             val pendingMessage = pendingMessageEntityMapper(savePendingMessageRequest)
-            val id = chatStorageGateway.storePendingMessage(message, pendingMessage)
+            val id = chatStorageGateway.storePendingMessage(pendingMessage)
 
             PendingMessage(
                 id = id,
@@ -132,4 +133,9 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             )
         }
     }
+
+    override fun monitorPendingMessages(chatId: Long) =
+        chatStorageGateway.fetchPendingMessages(chatId)
+            .map { list -> list.map { pendingMessageMapper(it) } }
+            .flowOn(ioDispatcher)
 }

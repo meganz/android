@@ -1,6 +1,7 @@
 package mega.privacy.android.data.facade.chat
 
 import androidx.room.withTransaction
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.chat.InMemoryChatDatabase
 import mega.privacy.android.data.database.entity.chat.ChatGeolocationEntity
 import mega.privacy.android.data.database.entity.chat.ChatNodeEntity
@@ -91,29 +92,17 @@ internal class ChatStorageFacade @Inject constructor(
 
 
     override suspend fun storePendingMessage(
-        message: TypedMessageEntity,
         pendingMessageEntity: PendingMessageEntity,
-    ) = with(database) {
-        withTransaction {
-            pendingMessageDao().insert(pendingMessageEntity).also {
-                val messages = listOf(message.copy(pendingMessageId = it))
-                typedMessageDao().insertAll(messages)
-            }
-        }
-    }
+    ) = database.pendingMessageDao().insert(pendingMessageEntity)
 
     override suspend fun updatePendingMessage(pendingMessage: PendingMessageEntity) {
         database.pendingMessageDao().insert(pendingMessage)
     }
 
     override suspend fun deletePendingMessage(pendingMessage: PendingMessageEntity) {
-        val pendingMessageId = pendingMessage.pendingMessageId
-        require(pendingMessageId != null && pendingMessageId > TypedMessageEntity.DEFAULT_ID) { "Cannot delete a Pending message that has no positive ID" }
-        with(database) {
-            withTransaction {
-                typedMessageDao().deleteMessageByPendingId(pendingMessage.pendingMessageId)
-                pendingMessageDao().delete(pendingMessageId)
-            }
-        }
+        pendingMessage.pendingMessageId?.let { database.pendingMessageDao().delete(it) }
     }
+
+    override fun fetchPendingMessages(chatId: Long): Flow<List<PendingMessageEntity>> =
+        database.pendingMessageDao().fetchPendingMessagesForChat(chatId)
 }

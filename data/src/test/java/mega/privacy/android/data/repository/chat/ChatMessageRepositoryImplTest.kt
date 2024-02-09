@@ -5,7 +5,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
-import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
@@ -13,7 +12,7 @@ import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.chat.messages.PendingMessageEntityMapper
-import mega.privacy.android.data.mapper.chat.messages.PendingMessageTypedMessageEntityMapper
+import mega.privacy.android.data.mapper.chat.messages.PendingMessageMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
@@ -49,15 +48,15 @@ class ChatMessageRepositoryImplTest {
     private val chatMessageMapper = mock<ChatMessageMapper>()
     private val megaHandleListMapper = mock<MegaHandleListMapper>()
     private val chatStorageGateway = mock<ChatStorageGateway>()
-    private val pendingMessageTypedMessageEntityMapper =
-        mock<PendingMessageTypedMessageEntityMapper>()
     private val pendingMessageEntityMapper = mock<PendingMessageEntityMapper>()
+    private val pendingMessageMapper = mock<PendingMessageMapper>()
 
     private val megaChatErrorSuccess = mock<MegaChatError> {
         on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
     }
     private val chatId = 123L
     private val msgId = 456L
+
 
     @BeforeAll
     fun setUp() {
@@ -70,8 +69,8 @@ class ChatMessageRepositoryImplTest {
             handleListMapper = handleListMapper,
             chatMessageMapper = chatMessageMapper,
             megaHandleListMapper = megaHandleListMapper,
-            pendingMessageTypedMessageEntityMapper = pendingMessageTypedMessageEntityMapper,
-            pendingMessageEntityMapper = pendingMessageEntityMapper
+            pendingMessageEntityMapper = pendingMessageEntityMapper,
+            pendingMessageMapper = pendingMessageMapper
         )
     }
 
@@ -80,7 +79,6 @@ class ChatMessageRepositoryImplTest {
         reset(
             megaChatApiGateway,
             chatStorageGateway,
-            pendingMessageTypedMessageEntityMapper,
             pendingMessageEntityMapper,
         )
     }
@@ -249,13 +247,10 @@ class ChatMessageRepositoryImplTest {
             on { state } doReturn mock()
             on { filePath } doReturn "file"
         }
-        val message = mock<TypedMessageEntity>()
         val pendingMessageEntity = mock<PendingMessageEntity>()
-        whenever(pendingMessageTypedMessageEntityMapper(savePendingMessageRequest))
-            .thenReturn(message)
         whenever(pendingMessageEntityMapper(savePendingMessageRequest))
             .thenReturn(pendingMessageEntity)
-        whenever(chatStorageGateway.storePendingMessage(message, pendingMessageEntity))
+        whenever(chatStorageGateway.storePendingMessage(pendingMessageEntity))
             .thenReturn(id)
         val actual = underTest.savePendingMessage(savePendingMessageRequest)
         assertThat(actual.id).isEqualTo(id)
