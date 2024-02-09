@@ -3,7 +3,7 @@ package mega.privacy.android.domain.entity.meeting
 /**
  *  Term Code type
  */
-enum class TermCodeType {
+enum class ChatCallTermCodeType {
     /**
      *  Term code invalid
      */
@@ -53,6 +53,16 @@ enum class TermCodeType {
      *  Term code Waiting Room timeout
      */
     WaitingRoomTimeout,
+
+    /**
+     *  Free plan limitations. Call duration exceeded for call
+     */
+    CallDurationLimit,
+
+    /**
+     *  Free plan limitations. Call max different users exceeded for call
+     */
+    CallUsersLimit,
 
     /**
      *  Term code Unknown

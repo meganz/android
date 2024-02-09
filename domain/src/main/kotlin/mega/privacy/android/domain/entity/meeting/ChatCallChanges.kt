@@ -50,6 +50,16 @@ enum class ChatCallChanges {
     OutgoingRingingStop,
 
     /**
+     * Indicates that own peer moderator role status has changed
+     */
+    OwnPermissions,
+
+    /**
+     * Generic notification
+     */
+    GenericNotification,
+
+    /**
      * Access to call from Waiting room, has been allowed for our own user
      */
     WaitingRoomAllow,

@@ -223,6 +223,11 @@ enum class AppFeatures(override val description: String, private val defaultValu
     MuteParticipant("Enable Mute participant", false),
 
     /**
+     * Call unlimited for pro users
+     */
+    CallUnlimitedProPlan("Call to stay unlimited when host with pro plan leaves", false),
+
+    /**
      * Enable new design Variant A for ChooseAccount screen
      */
     ChooseAccountScreenVariantA(

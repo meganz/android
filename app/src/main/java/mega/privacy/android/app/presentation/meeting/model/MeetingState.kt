@@ -54,7 +54,6 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property chatScheduledMeeting                       [ChatScheduledMeeting]
  * @property isRingingAll                               True if is ringing for all participants or False otherwise.
  * @property newInvitedParticipants                     List of emails of the new invited participants.
- * @property allParticipantsAreMuted                    True, if all participants are muted. False, if not.
  * @property isMuteFeatureFlagEnabled                   True, if Mute feature flag enabled. False, otherwise.
  */
 data class MeetingState(

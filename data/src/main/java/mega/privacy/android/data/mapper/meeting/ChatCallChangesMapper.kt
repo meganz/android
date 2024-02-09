@@ -22,6 +22,8 @@ internal class ChatCallChangesMapper @Inject constructor() {
             MegaChatCall.CHANGE_TYPE_AUDIO_LEVEL to ChatCallChanges.AudioLevel,
             MegaChatCall.CHANGE_TYPE_NETWORK_QUALITY to ChatCallChanges.NetworkQuality,
             MegaChatCall.CHANGE_TYPE_OUTGOING_RINGING_STOP to ChatCallChanges.OutgoingRingingStop,
+            MegaChatCall.CHANGE_TYPE_OWN_PERMISSIONS to ChatCallChanges.OwnPermissions,
+            MegaChatCall.CHANGE_TYPE_GENERIC_NOTIFICATION to ChatCallChanges.GenericNotification,
             MegaChatCall.CHANGE_TYPE_WR_ALLOW to ChatCallChanges.WaitingRoomAllow,
             MegaChatCall.CHANGE_TYPE_WR_DENY to ChatCallChanges.WaitingRoomDeny,
             MegaChatCall.CHANGE_TYPE_WR_COMPOSITION to ChatCallChanges.WaitingRoomComposition,

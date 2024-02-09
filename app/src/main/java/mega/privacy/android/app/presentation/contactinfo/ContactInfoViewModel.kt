@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallChanges.OnHold
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges.Status
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
-import mega.privacy.android.domain.entity.meeting.TermCodeType
+import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -279,7 +279,7 @@ class ContactInfoViewModel @Inject constructor(
         ) {
             _state.update { it.copy(callStatusChanged = true) }
             if (call.status == ChatCallStatus.TerminatingUserParticipation &&
-                call.termCode == TermCodeType.TooManyParticipants
+                call.termCode == ChatCallTermCodeType.TooManyParticipants
             ) {
                 _state.update { it.copy(snackBarMessage = R.string.call_error_too_many_participants) }
             }

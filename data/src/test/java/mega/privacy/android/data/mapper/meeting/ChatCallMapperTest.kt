@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.EndCallReason
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
-import mega.privacy.android.domain.entity.meeting.TermCodeType
+import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaHandleList
@@ -35,7 +35,7 @@ class ChatRequestMapperTest {
                 chatCallChangesMapper = ChatCallChangesMapper(),
                 chatCallStatusMapper = ChatCallStatusMapper(),
                 endCallReasonMapper = EndCallReasonMapper(),
-                callTermCodeMapper = CallTermCodeMapper(),
+                chatCallTermCodeMapper = ChatCallTermCodeMapper(),
                 callCompositionChangesMapper = CallCompositionChangesMapper(),
                 networkQualityMapper = NetworkQualityMapper(),
                 chatWaitingRoomMapper = ChatWaitingRoomMapper(
@@ -48,6 +48,8 @@ class ChatRequestMapperTest {
                     ChatSessionStatusMapper(),
                     ChatSessionTermCodeMapper()
                 ),
+                callNotificationMapper = CallNotificationMapper(),
+                speakerStatusMapper = SpeakerStatusMapper()
             )
     }
 
@@ -143,7 +145,7 @@ class ChatRequestMapperTest {
     fun `test mapping chat call when term code is hang up`() {
         val chatCall = getMockChatCall(termCode = MegaChatCall.TERM_CODE_HANGUP)
         val actual = underTest(chatCall)
-        Truth.assertThat(actual.termCode).isEqualTo(TermCodeType.Hangup)
+        Truth.assertThat(actual.termCode).isEqualTo(ChatCallTermCodeType.Hangup)
     }
 
     @Test
@@ -230,7 +232,7 @@ class ChatRequestMapperTest {
         Truth.assertThat(actual.hasPendingSpeakRequest).isEqualTo(false)
     }
 
-    private fun getMockChatSession(peerId:Long, clientId:Long): MegaChatSession{
+    private fun getMockChatSession(peerId: Long, clientId: Long): MegaChatSession {
         val session = mock<MegaChatSession> {
             on { peerid }.thenReturn(peerId)
             on { clientid }.thenReturn(clientId)
@@ -293,7 +295,7 @@ class ChatRequestMapperTest {
         networkQuality: Int = -1,
         hasPendingSpeakRequest: Boolean = false,
         waitingRoomStatus: Int? = 0,
-        sessionByClientId: Map<Long, ChatSession> = emptyMap()
+        sessionByClientId: Map<Long, ChatSession> = emptyMap(),
     ): MegaChatCall {
         val call = mock<MegaChatCall> {
             on { this.callId }.thenReturn(callId)

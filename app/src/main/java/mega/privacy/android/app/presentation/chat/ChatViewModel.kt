@@ -48,7 +48,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
-import mega.privacy.android.domain.entity.meeting.TermCodeType
+import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
@@ -600,7 +600,7 @@ class ChatViewModel @Inject constructor(
                                 -> ScheduledMeetingStatus.Joined(call.duration)
 
                                 ChatCallStatus.TerminatingUserParticipation -> {
-                                    if (call.termCode == TermCodeType.TooManyParticipants) {
+                                    if (call.termCode == ChatCallTermCodeType.TooManyParticipants) {
                                         ScheduledMeetingStatus.NotJoined(call.duration)
                                     } else {
                                         ScheduledMeetingStatus.NotStarted

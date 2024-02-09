@@ -1,13 +1,15 @@
 package mega.privacy.android.domain.entity.chat
 
 import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
+import mega.privacy.android.domain.entity.meeting.CallNotificationType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.ChatWaitingRoom
 import mega.privacy.android.domain.entity.meeting.EndCallReason
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
-import mega.privacy.android.domain.entity.meeting.TermCodeType
+import mega.privacy.android.domain.entity.meeting.SpeakerStatusType
+import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.WaitingRoomStatus
 import java.time.Instant
 import kotlin.time.Duration
@@ -63,7 +65,7 @@ data class ChatCall(
     val duration: Duration? = null,
     val initialTimestamp: Long? = null,
     val finalTimestamp: Long? = null,
-    val termCode: TermCodeType? = null,
+    val termCode: ChatCallTermCodeType? = null,
     val endCallReason: EndCallReason? = null,
     val isSpeakRequestEnabled: Boolean = false,
     val isRinging: Boolean = false,
@@ -87,6 +89,9 @@ data class ChatCall(
     val hasPendingSpeakRequest: Boolean = false,
     val waitingRoomStatus: WaitingRoomStatus? = null,
     val waitingRoom: ChatWaitingRoom? = null,
+    val notificationType: CallNotificationType? = null,
+    val speakerState : SpeakerStatusType? = null,
+    val genericMsg:String? = null
 ) {
 
     /**

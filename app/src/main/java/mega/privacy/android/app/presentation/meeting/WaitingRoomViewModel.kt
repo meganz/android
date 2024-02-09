@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.TermCodeType
+import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.WaitingRoomStatus
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
@@ -404,13 +404,13 @@ class WaitingRoomViewModel @Inject constructor(
      * Check if [ChatCall] access has been denied
      */
     private fun ChatCall.hasAccessBeenDenied(): Boolean =
-        termCode == TermCodeType.Kicked
+        termCode == ChatCallTermCodeType.Kicked
 
     /**
      * Check if [ChatCall] timeout has expired
      */
     private fun ChatCall.hasTimeoutExpired(): Boolean =
-        termCode == TermCodeType.WaitingRoomTimeout
+        termCode == ChatCallTermCodeType.WaitingRoomTimeout
 
     /**
      * Check if [ChatCall] should be answered
