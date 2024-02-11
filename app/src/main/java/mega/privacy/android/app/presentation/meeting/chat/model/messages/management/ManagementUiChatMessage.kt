@@ -25,6 +25,8 @@ abstract class ManagementUiChatMessage : UiChatMessage {
 
     override val displayAsMine = false
 
+    override val isSelectable: Boolean = false
+
     /**
      * Content composable
      */

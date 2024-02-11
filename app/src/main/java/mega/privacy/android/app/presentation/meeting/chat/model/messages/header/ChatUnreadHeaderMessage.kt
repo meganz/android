@@ -42,6 +42,7 @@ class ChatUnreadHeaderMessage(private val unreadCount: Int) : UiChatMessage {
     override val userHandle = -1L
     override val showTime = false
     override val reactions = emptyList<UIReaction>()
+    override val isSelectable = false
 
     override fun key(): String = "chat_unread_message_header"
 }

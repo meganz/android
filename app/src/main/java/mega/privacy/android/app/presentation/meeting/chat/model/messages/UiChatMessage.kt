@@ -85,6 +85,11 @@ interface UiChatMessage {
     val reactions: List<UIReaction>
 
     /**
+     * Is selectable
+     */
+    val isSelectable: Boolean
+    
+    /**
      * Key
      */
     fun key(): String = "${id}_${showTime}"

@@ -48,11 +48,15 @@ internal fun MessageListView(
     onUserUpdateHandled: () -> Unit = {},
     onMessageLongClick: (TypedMessage) -> Unit = {},
     onForwardClicked: (TypedMessage) -> Unit = {},
+    onCanSelectChanged: (Boolean) -> Unit = {},
 ) {
     val pagingItems = viewModel.pagedMessages.collectAsLazyPagingItems()
-    val state by viewModel.state.collectAsStateWithLifecycle()
     Timber.d("Paging pagingItems load state: \n ${pagingItems.printLoadStates()}")
     Timber.d("Paging pagingItems count ${pagingItems.itemCount}")
+    
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    onCanSelectChanged(pagingItems.itemSnapshotList.any { it?.isSelectable == true })
+
     val screenHeight = with(LocalDensity.current) {
         LocalConfiguration.current.screenHeightDp.dp.toPx()
     }

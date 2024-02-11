@@ -37,4 +37,5 @@ class DateHeaderUiMessage(override val timeSent: Long) : UiChatMessage {
     override val userHandle = -1L
     override val showTime = false
     override val reactions = emptyList<UIReaction>()
+    override val isSelectable = false
 }

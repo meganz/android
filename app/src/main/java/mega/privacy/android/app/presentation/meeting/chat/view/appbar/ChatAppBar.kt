@@ -64,6 +64,7 @@ internal fun ChatAppBar(
     unarchiveChat: () -> Unit = {},
     showEndCallForAllDialog: () -> Unit = {},
     enableSelectMode: () -> Unit = {},
+    canSelect: Boolean = false,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -101,7 +102,7 @@ internal fun ChatAppBar(
         onNavigationPressed = onBackPressed,
         titleIcons = { TitleIcons(uiState) },
         marqueeSubtitle = uiState.userLastGreen != null,
-        actions = getChatRoomActions(uiState),
+        actions = getChatRoomActions(uiState, canSelect),
         onActionPressed = onActionPressed@{
             when (it) {
                 is ChatRoomMenuAction.AudioCall, is ChatRoomMenuAction.VideoCall -> {
@@ -149,50 +150,54 @@ internal fun ChatAppBar(
     )
 }
 
-private fun getChatRoomActions(uiState: ChatUiState): List<ChatRoomMenuAction> = buildList {
-    with(uiState) {
-        if (isJoiningOrLeaving || isPreviewMode || !isConnected) return@buildList
+private fun getChatRoomActions(uiState: ChatUiState, canSelect: Boolean): List<ChatRoomMenuAction> =
+    buildList {
+        with(uiState) {
+            if (isJoiningOrLeaving || isPreviewMode || !isConnected) return@buildList
 
-        val hasModeratorPermission = myPermission == ChatRoomPermission.Moderator
+            val hasModeratorPermission = myPermission == ChatRoomPermission.Moderator
 
-        if (haveWritePermission) {
-            add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat && (!isWaitingRoom || hasModeratorPermission)))
+            if (haveWritePermission) {
+                add(ChatRoomMenuAction.AudioCall(!hasACallInThisChat && (!isWaitingRoom || hasModeratorPermission)))
 
-            if (!isGroup) {
-                add(ChatRoomMenuAction.VideoCall(!hasACallInThisChat))
+                if (!isGroup) {
+                    add(ChatRoomMenuAction.VideoCall(!hasACallInThisChat))
+                }
             }
-        }
 
-        if (isGroup && (hasModeratorPermission || isActive && isOpenInvite)) {
-            add(ChatRoomMenuAction.AddParticipants)
-        }
+            if (isGroup && (hasModeratorPermission || isActive && isOpenInvite)) {
+                add(ChatRoomMenuAction.AddParticipants)
+            }
 
-        if (isGroup || myPermission != ChatRoomPermission.ReadOnly) {
-            add(ChatRoomMenuAction.Info)
-        }
+            if (isGroup || myPermission != ChatRoomPermission.ReadOnly) {
+                add(ChatRoomMenuAction.Info)
+            }
 
-        if ((isGroup && hasModeratorPermission) || (!isGroup && myPermission != ChatRoomPermission.ReadOnly)) {
-            add(ChatRoomMenuAction.Clear)
-        }
+            if ((isGroup && hasModeratorPermission) || (!isGroup && myPermission != ChatRoomPermission.ReadOnly)) {
+                add(ChatRoomMenuAction.Clear)
+            }
 
-        if (isArchived) {
-            add(ChatRoomMenuAction.Unarchive)
-        } else {
-            add(ChatRoomMenuAction.Archive)
-        }
-
-        if (hasModeratorPermission && (uiState.isGroup || uiState.isMeeting) && uiState.hasACallInThisChat) {
-            add(ChatRoomMenuAction.EndCallForAll)
-        }
-
-        if ((isGroup && isActive) || (!isGroup && hasModeratorPermission)) {
-            if (isChatNotificationMute) {
-                add(ChatRoomMenuAction.Unmute)
+            if (isArchived) {
+                add(ChatRoomMenuAction.Unarchive)
             } else {
-                add(ChatRoomMenuAction.Mute)
+                add(ChatRoomMenuAction.Archive)
+            }
+
+            if (hasModeratorPermission && (uiState.isGroup || uiState.isMeeting) && uiState.hasACallInThisChat) {
+                add(ChatRoomMenuAction.EndCallForAll)
+            }
+
+            if ((isGroup && isActive) || (!isGroup && hasModeratorPermission)) {
+                if (isChatNotificationMute) {
+                    add(ChatRoomMenuAction.Unmute)
+                } else {
+                    add(ChatRoomMenuAction.Mute)
+                }
             }
         }
-    }
+        if (canSelect) {
+            add(ChatRoomMenuAction.Select)
+        }
 }
 
 private fun checkStorageState(
@@ -348,7 +353,7 @@ private fun ChatAppBarPreview() {
                 ),
                 userChatStatus = UserChatStatus.Away,
                 isChatNotificationMute = true,
-            )
+            ),
         )
     }
 }

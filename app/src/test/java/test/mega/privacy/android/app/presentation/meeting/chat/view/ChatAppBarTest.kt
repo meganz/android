@@ -1339,8 +1339,8 @@ class ChatAppBarTest {
             ChatAppBar(
                 uiState = state,
                 onBackPressed = {},
+                showGroupOrContactInfoActivity = showGroupOrContactInfoActivity,
                 onMenuActionPressed = actionPressed,
-                showGroupOrContactInfoActivity = showGroupOrContactInfoActivity
             )
         }
     }

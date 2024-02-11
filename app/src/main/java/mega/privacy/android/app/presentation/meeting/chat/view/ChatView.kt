@@ -186,8 +186,18 @@ internal fun ChatView(
     onAnswerCall: () -> Unit = {},
     onEnableGeolocation: () -> Unit = {},
     onUserUpdateHandled: () -> Unit = {},
-    messageListView: @Composable (ChatUiState, LazyListState, Dp, (TypedMessage) -> Unit, (Long) -> Unit, (Long, String, List<UIReaction>) -> Unit, (String, List<UIReaction>) -> Unit, (TypedMessage) -> Unit) -> Unit =
-        { state, listState, bottomPadding, onMessageLongClick, onMoreReactionsClick, onReactionClick, onReactionLongClick, onForwardClick ->
+    messageListView: @Composable (
+        ChatUiState,
+        LazyListState,
+        Dp,
+        (TypedMessage) -> Unit,
+        (Long) -> Unit,
+        (Long, String, List<UIReaction>) -> Unit,
+        (String, List<UIReaction>) -> Unit,
+        (TypedMessage) -> Unit,
+        (Boolean) -> Unit,
+    ) -> Unit =
+        { state, listState, bottomPadding, onMessageLongClick, onMoreReactionsClick, onReactionClick, onReactionLongClick, onForwardClick, onCanSelectChanged ->
             MessageListView(
                 uiState = state,
                 scrollState = listState,
@@ -197,7 +207,8 @@ internal fun ChatView(
                 onMoreReactionsClicked = onMoreReactionsClick,
                 onReactionClicked = onReactionClick,
                 onReactionLongClick = onReactionLongClick,
-                onForwardClicked = onForwardClick
+                onForwardClicked = onForwardClick,
+                onCanSelectChanged = onCanSelectChanged,
             )
         },
     bottomBar: @Composable (
@@ -326,6 +337,10 @@ internal fun ChatView(
     }
     val interactionSourceTextInput = remember { MutableInteractionSource() }
     val isTextInputPressed by interactionSourceTextInput.collectIsPressedAsState()
+    var canSelect by remember {
+        mutableStateOf(false)
+    }
+
     BackHandler(enabled = toolbarModalSheetState.isVisible) {
         coroutineScope.launch {
             toolbarModalSheetState.hide()
@@ -547,9 +562,11 @@ internal fun ChatView(
                                 uiState = uiState,
                                 snackBarHostState = snackBarHostState,
                                 onBackPressed = onBackPressed,
-                                onMenuActionPressed = onMenuActionPressed,
                                 showParticipatingInACallDialog = {
                                     showParticipatingInACallDialog = true
+                                },
+                                showNoContactToAddDialog = {
+                                    showNoContactToAddDialog = true
                                 },
                                 showAllContactsParticipateInChat = {
                                     showAllContactsParticipateInChat = true
@@ -557,9 +574,7 @@ internal fun ChatView(
                                 showGroupOrContactInfoActivity = {
                                     showGroupOrContactInfoActivity(context, uiState)
                                 },
-                                showNoContactToAddDialog = {
-                                    showNoContactToAddDialog = true
-                                },
+                                onMenuActionPressed = onMenuActionPressed,
                                 onStartCall = { isVideoCall ->
                                     startCall(isVideoCall)
                                 },
@@ -573,15 +588,16 @@ internal fun ChatView(
                                 showClearChatConfirmationDialog = {
                                     showClearChat = true
                                 },
+                                showMutePushNotificationDialog = { onShowMutePushNotificationDialog() },
                                 archiveChat = archiveChat,
                                 unarchiveChat = unarchiveChat,
                                 showEndCallForAllDialog = {
                                     showEndCallForAllDialog = true
                                 },
-                                showMutePushNotificationDialog = { onShowMutePushNotificationDialog() },
                                 enableSelectMode = {
                                     isSelectMode = true
                                 },
+                                canSelect = canSelect,
                             )
                             ReturnToCallBanner(
                                 uiState = uiState,
@@ -704,7 +720,8 @@ internal fun ChatView(
                                 { message ->
                                     forwardingMessages = listOf(message)
                                     openChatPicker(context, chatPickerLauncher)
-                                }
+                                },
+                                { hasSelectableMessage -> canSelect = hasSelectableMessage },
                             )
                         },
                     )
