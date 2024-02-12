@@ -41,6 +41,7 @@ fun SearchToolBar(
     onBackPressed: () -> Unit,
     navHostController: NavHostController,
     nodeActionHandler: NodeActionHandler,
+    clearSelection: () -> Unit,
     toolbarViewModel: NodeToolbarViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(key1 = selectedNodes.size) {
@@ -58,7 +59,8 @@ fun SearchToolBar(
         menuActions = toolbarState.toolbarMenuItems,
         onBackPressed = onBackPressed,
         navHostController = navHostController,
-        handler = nodeActionHandler
+        handler = nodeActionHandler,
+        clearSelection = clearSelection,
     )
 }
 
@@ -71,12 +73,13 @@ private fun SearchToolbarBody(
     onBackPressed: () -> Unit,
     navHostController: NavHostController,
     handler: NodeActionHandler,
+    clearSelection: () -> Unit,
 ) {
     if (selectedNodes.isNotEmpty()) {
         val actions = menuActions.map {
             MenuActionWithClick(
                 menuAction = it.action,
-                onClick = it.control(handler::handleAction, navHostController)
+                onClick = it.control(clearSelection, handler::handleAction, navHostController)
             )
         }
         SelectModeAppBar(
@@ -101,15 +104,16 @@ private fun PreviewSearchToolbarBody() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SearchToolbarBody(
             searchQuery = "searchQuery",
-            updateSearchQuery = {},
-            onBackPressed = {},
-            selectedNodes = emptySet(),
             menuActions = emptyList(),
+            updateSearchQuery = {},
+            selectedNodes = emptySet(),
+            onBackPressed = {},
+            navHostController = NavHostController(LocalContext.current),
             handler = NodeActionHandler(
                 LocalContext.current as SearchActivity,
                 hiltViewModel(),
             ),
-            navHostController = NavHostController(LocalContext.current)
+            clearSelection = {}
         )
     }
 }

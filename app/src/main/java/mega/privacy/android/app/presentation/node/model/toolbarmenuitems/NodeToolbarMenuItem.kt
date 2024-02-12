@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 /**
  * Toolbar click handler
  */
-typealias ToolbarClickHandler = @Composable (actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit, navController: NavHostController) -> () -> Unit
+typealias ToolbarClickHandler = @Composable (onDismiss: () -> Unit, actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit, navController: NavHostController) -> () -> Unit
 
 /**
  * Node toolbar menu item
@@ -44,8 +44,8 @@ interface NodeToolbarMenuItem<T : MenuAction> {
      * Build control
      */
     fun setControl(selectedNodes: List<TypedNode>): ToolbarClickHandler =
-        { actionHandler, navController ->
-            getOnClick(selectedNodes, actionHandler, navController)
+        { onDismiss, actionHandler, navController ->
+            getOnClick(selectedNodes, onDismiss, actionHandler, navController)
         }
 
 
@@ -54,9 +54,11 @@ interface NodeToolbarMenuItem<T : MenuAction> {
      */
     fun getOnClick(
         selectedNodes: List<TypedNode>,
+        onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit,
         navController: NavHostController,
     ): () -> Unit = {
+        onDismiss()
         actionHandler(menuAction, selectedNodes)
     }
 

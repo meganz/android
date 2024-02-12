@@ -65,6 +65,7 @@ fun SearchComposeView(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
     nodeActionHandler: NodeActionHandler,
+    clearSelection: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -95,6 +96,7 @@ fun SearchComposeView(
                 totalCount = state.searchItemList.size,
                 navHostController = navHostController,
                 nodeActionHandler = nodeActionHandler,
+                clearSelection = clearSelection
             )
         },
         snackbarHost = {
@@ -173,6 +175,7 @@ private fun PreviewSearchComposeView() {
         nodeActionHandler = NodeActionHandler(
             LocalContext.current as SearchActivity,
             hiltViewModel()
-        )
+        ),
+        clearSelection = {}
     )
 }
