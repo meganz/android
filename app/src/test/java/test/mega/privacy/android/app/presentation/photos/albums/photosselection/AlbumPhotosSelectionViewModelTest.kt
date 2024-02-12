@@ -24,13 +24,13 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.usecase.AddPhotosToAlbum
-import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
-import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.photos.AddPhotosToAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -50,7 +50,7 @@ class AlbumPhotosSelectionViewModelTest {
     private val downloadThumbnailUseCase = mock<DownloadThumbnailUseCase>()
     private val filterCloudDrivePhotos = mock<FilterCloudDrivePhotos>()
     private val filterCameraUploadPhotos = mock<FilterCameraUploadPhotos>()
-    private val addPhotosToAlbum = mock<AddPhotosToAlbum>()
+    private val addPhotosToAlbumUseCase = mock<AddPhotosToAlbumUseCase>()
 
     @Before
     fun setUp() {
@@ -175,7 +175,7 @@ class AlbumPhotosSelectionViewModelTest {
             NodeId(2L),
             NodeId(3L),
         )
-        whenever(addPhotosToAlbum(album.id, photoIds)).thenReturn(Unit)
+        whenever(addPhotosToAlbumUseCase(album.id, photoIds)).thenReturn(photoIds.size)
 
         underTest?.addPhotos(album, photoIds.map { it.longValue }.toSet())
 
@@ -193,7 +193,7 @@ class AlbumPhotosSelectionViewModelTest {
         downloadThumbnailUseCase = downloadThumbnailUseCase,
         filterCloudDrivePhotos = filterCloudDrivePhotos,
         filterCameraUploadPhotos = filterCameraUploadPhotos,
-        addPhotosToAlbum = addPhotosToAlbum,
+        addPhotosToAlbumUseCase = addPhotosToAlbumUseCase,
         defaultDispatcher = UnconfinedTestDispatcher(),
     )
 

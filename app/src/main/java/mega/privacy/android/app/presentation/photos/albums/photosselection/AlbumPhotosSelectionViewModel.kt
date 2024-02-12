@@ -31,13 +31,13 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.usecase.AddPhotosToAlbum
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.photos.AddPhotosToAlbumUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -52,7 +52,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
     private val filterCloudDrivePhotos: FilterCloudDrivePhotos,
     private val filterCameraUploadPhotos: FilterCameraUploadPhotos,
-    private val addPhotosToAlbum: AddPhotosToAlbum,
+    private val addPhotosToAlbumUseCase: AddPhotosToAlbumUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumPhotosSelectionState())
@@ -220,11 +220,9 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
 
     fun selectPhoto(photo: Photo) {
         synchronized(Unit) {
-            if (_state.value.selectedPhotoIds.size < MAX_SELECTION_NUM) {
-                _state.update {
-                    val selectedPhotoIds = it.selectedPhotoIds + photo.id
-                    it.copy(selectedPhotoIds = selectedPhotoIds)
-                }
+            _state.update {
+                val selectedPhotoIds = it.selectedPhotoIds + photo.id
+                it.copy(selectedPhotoIds = selectedPhotoIds)
             }
         }
     }
@@ -243,7 +241,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         }
 
         if (photoIds.isNotEmpty()) {
-            addPhotosToAlbum(
+            addPhotosToAlbumUseCase(
                 albumId = album.id,
                 photoIds = photoIds.map { NodeId(it) },
             )
@@ -255,10 +253,5 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
                 numCommittedPhotos = photoIds.size,
             )
         }
-    }
-
-    companion object {
-        /** Max selection number **/
-        const val MAX_SELECTION_NUM = 150
     }
 }

@@ -46,7 +46,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionViewModel.Companion.MAX_SELECTION_NUM
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
@@ -133,7 +132,11 @@ fun AlbumPhotosSelectionScreen(
                 numSelectedPhotos = state.selectedPhotoIds.size,
                 showFilterMenu = state.showFilterMenu,
                 showMoreMenu = showMoreMenu,
-                showSelectAllMenu = false,
+                showSelectAllMenu = {
+                    val selectedSize = state.selectedPhotoIds.size
+                    val photosInScreen = state.uiPhotos.filterIsInstance<UIPhoto.PhotoItem>().size
+                    selectedSize < photosInScreen
+                },
                 onBackClicked = {
                     if (state.selectedPhotoIds.isEmpty()) {
                         onBackClicked()
@@ -205,11 +208,7 @@ fun AlbumPhotosSelectionScreen(
                     if (photo.id in state.selectedPhotoIds) {
                         viewModel.unselectPhoto(photo)
                     } else {
-                        if (state.selectedPhotoIds.size < MAX_SELECTION_NUM) {
-                            viewModel.selectPhoto(photo)
-                        } else {
-                            showMaxSelectionDialog = true
-                        }
+                        viewModel.selectPhoto(photo)
                     }
                 },
             )
@@ -225,7 +224,7 @@ private fun AlbumPhotosSelectionHeader(
     numSelectedPhotos: Int,
     showFilterMenu: Boolean,
     showMoreMenu: Boolean,
-    showSelectAllMenu: Boolean,
+    showSelectAllMenu: () -> Boolean,
     onBackClicked: () -> Unit,
     onFilterClicked: () -> Unit,
     onMoreClicked: () -> Unit,
@@ -301,7 +300,7 @@ private fun AlbumPhotosSelectionHeader(
                 }
 
                 DropdownMenu(expanded = showMoreMenu, onDismissRequest = onMoreDismissed) {
-                    if (showSelectAllMenu) {
+                    if (showSelectAllMenu()) {
                         DropdownMenuItem(onClick = onSelectAllClicked) {
                             Text(text = stringResource(id = R.string.action_select_all))
                         }
@@ -334,7 +333,6 @@ private fun AlbumPhotosSelectionContent(
         onLongPress = onPhotoSelection,
         selectedPhotoIds = selectedPhotoIds,
         uiPhotoList = uiPhotos,
-        isBlurUnselectItem = selectedPhotoIds.size >= MAX_SELECTION_NUM
     )
 }
 
