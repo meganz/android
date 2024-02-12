@@ -54,9 +54,6 @@ fun ReactionsInfoBottomSheet(
         modifier = modifier,
         currentReaction = selectedReaction,
         reactionList = reactionList.value,
-        onUserClick = { userHandle ->
-            coroutineScope.launch { sheetState.hide() }
-            onUserClick(userHandle)
-        },
+        onUserClick = onUserClick,
     )
 }

@@ -235,7 +235,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 return
             }
 
-            isChatOpen = extras.getBoolean(Constants.ACTION_CHAT_OPEN, false)
+            isChatOpen = extras.getBoolean(Constants.ACTION_IS_CHAT_ALREADY_OPEN, false)
             chat = megaChatApi.getChatRoom(chatHandle)
             if (chat == null) {
                 Timber.e("Chatroom NULL cannot be recovered")

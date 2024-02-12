@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
+import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserLastGreen
@@ -404,6 +405,15 @@ interface ContactsRepository {
      * @return The username from the database, which can be potentially nullable
      */
     suspend fun getContactUserNameFromDatabase(user: String?): String?
+
+    /**
+     * Get [User] by [UserId]
+     *
+     * @param userId [UserId].
+     * @return [User] object.
+     *
+     */
+    suspend fun getUser(userId: UserId): User?
 
     /**
      * Monitor contact cache updates.

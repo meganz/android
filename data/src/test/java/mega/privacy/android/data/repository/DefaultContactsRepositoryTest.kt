@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
 import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
+import mega.privacy.android.data.mapper.contact.UserMapper
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.ContactWrapper
@@ -37,10 +38,12 @@ import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.exception.ContactDoesNotExistException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ContactsRepository
@@ -102,6 +105,7 @@ class DefaultContactsRepositoryTest {
     private val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EARGS) }
     private val testDispatcher = UnconfinedTestDispatcher()
     private val userChatStatusMapper: UserChatStatusMapper = mock()
+    private val userMapper: UserMapper = mock()
 
     private val request = mock<MegaRequest> {
         on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
@@ -142,6 +146,7 @@ class DefaultContactsRepositoryTest {
             context = context,
             megaLocalRoomGateway = megaLocalRoomGateway,
             userChatStatusMapper = userChatStatusMapper,
+            userMapper = userMapper,
             sharingScope = CoroutineScope(UnconfinedTestDispatcher()),
         )
     }
@@ -1380,6 +1385,34 @@ class DefaultContactsRepositoryTest {
             verify(megaApiGateway).getContactAvatar(any(), any(), any())
             assertThat(actual).isEqualTo(userUpdate)
         }
+    }
+
+    @Test
+    fun `test that getUser returns null if megaApiGateway returns null`() = runTest {
+        whenever(megaApiGateway.getContact(any())).thenReturn(null)
+        val user = underTest.getUser(UserId(1L))
+        assertThat(user).isNull()
+    }
+
+    @Test
+    fun `test that getUser returns user if megaApiGateway returns user`() = runTest {
+        val megaUser = mock<MegaUser>() {
+            on { handle } doReturn 1L
+            on { email } doReturn "email"
+            on { visibility } doReturn MegaUser.VISIBILITY_VISIBLE
+            on { changes } doReturn 0L
+        }
+        val expectedUser = User(
+            handle = 1L,
+            email = "email",
+            visibility = UserVisibility.Visible,
+            timestamp = 2L,
+            userChanges = emptyList(),
+        )
+        whenever(megaApiGateway.getContact("email")).thenReturn(megaUser)
+        whenever(megaApiGateway.userHandleToBase64(1L)).thenReturn("email")
+        whenever(userMapper(megaUser)).thenReturn(expectedUser)
+        assertThat(underTest.getUser(UserId(1L))).isEqualTo(expectedUser)
     }
 
     @Test

@@ -4,6 +4,9 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 
 /**
  * Data class of a MEGA user.
+ * This class contains comprehensive information about a Mega User.
+ * Refer to [User] if you only need basic information.
+ *
  *
  * @property handle                 User identifier.
  * @property email                  User email.

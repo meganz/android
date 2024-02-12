@@ -81,6 +81,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.Participat
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAddContactActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatPicker
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openLocationPicker
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.showGroupOrContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startLoginActivity
@@ -103,7 +104,11 @@ import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
@@ -148,7 +153,7 @@ internal fun ChatView(
         onSendGiphyMessage = viewModel::onSendGiphyMessage,
         onAttachContacts = viewModel::onAttachContacts,
         getUserInfoIntoReactionList = viewModel::getUserInfoIntoReactionList,
-        onReactionUserClick = { },
+        getUser = viewModel::getUser,
         onForwardMessages = viewModel::onForwardMessages,
     )
 }
@@ -244,7 +249,7 @@ internal fun ChatView(
     onSendGiphyMessage: (GifData?) -> Unit = { _ -> },
     onAttachContacts: (List<String>) -> Unit = { _ -> },
     getUserInfoIntoReactionList: suspend (List<UIReaction>) -> List<UIReaction> = { emptyList() },
-    onReactionUserClick: (Long) -> Unit = {},
+    getUser: suspend (UserId) -> User? = { null },
     onForwardMessages: (List<TypedMessage>, List<Long>?, List<Long>?) -> Unit = { _, _, _ -> },
 ) {
     val context = LocalContext.current
@@ -302,7 +307,17 @@ internal fun ChatView(
         }
     )
     val reactionInfoBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = {
+            if (it != ModalBottomSheetValue.Hidden) {
+                keyboardController?.hide()
+                showEmojiPicker = false
+            } else {
+                selectedReaction = ""
+                reactionList = emptyList()
+            }
+            true
+        }
     )
     var showEnableGeolocationDialog by rememberSaveable { mutableStateOf(false) }
     var waitingForPickLocation by rememberSaveable { mutableStateOf(false) }
@@ -481,7 +496,23 @@ internal fun ChatView(
                             reactions = reactionList,
                             sheetState = reactionInfoBottomSheetState,
                             getDetailsInReactionList = getUserInfoIntoReactionList,
-                            onUserClick = onReactionUserClick,
+                            onUserClick = { userHandle ->
+                                coroutineScope.launch {
+                                    reactionInfoBottomSheetState.hide()
+                                    val isMe = uiState.myUserHandle == userHandle
+                                    if (isMe) {
+                                        snackBarHostState.showSnackbar(context.getString(R.string.contact_is_me))
+                                    } else {
+                                        getUser(UserId(userHandle))?.let { user ->
+                                            val isUserMyContact =
+                                                user.visibility == UserVisibility.Visible
+                                            if (isUserMyContact) {
+                                                openContactInfoActivity(context, user.email)
+                                            }
+                                        }
+                                    }
+                                }
+                            },
                         )
                     }
 
@@ -711,10 +742,12 @@ internal fun ChatView(
                                         }
                                 },
                                 { clickedReaction, reactions ->
-                                    selectedReaction = clickedReaction
-                                    reactionList = reactions
-                                    coroutineScope.launch {
-                                        reactionInfoBottomSheetState.show()
+                                    if (clickedReaction.isNotEmpty() && reactions.isNotEmpty()) {
+                                        selectedReaction = clickedReaction
+                                        reactionList = reactions
+                                        coroutineScope.launch {
+                                            reactionInfoBottomSheetState.show()
+                                        }
                                     }
                                 },
                                 { message ->

@@ -691,10 +691,10 @@ interface MegaApiGateway {
     /**
      * Get contact
      *
-     * @param email
-     * @return Mega user associated with the email address
+     * @param emailOrBase64Handle Email or Base64 handle of the user
+     * @return Mega user associated with the email address or Base64 handle
      */
-    suspend fun getContact(email: String): MegaUser?
+    suspend fun getContact(emailOrBase64Handle: String): MegaUser?
 
     /**
      * Get user alerts

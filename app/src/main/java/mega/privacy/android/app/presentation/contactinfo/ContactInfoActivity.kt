@@ -487,7 +487,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun getContactData(extras: Bundle) {
         val chatHandle = extras.getLong(Constants.HANDLE, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
-        isChatOpen = extras.getBoolean(Constants.ACTION_CHAT_OPEN, false)
+        isChatOpen = extras.getBoolean(Constants.ACTION_IS_CHAT_ALREADY_OPEN, false)
         val userEmailExtra = extras.getString(Constants.NAME)
         viewModel.updateContactInfo(chatHandle, userEmailExtra)
     }

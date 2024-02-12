@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property chatLink String with the chat link.
  * @property editingMessageId Id of the message being edited.
  * @property editingMessageContent Content of the message being edited.
+ * @property myUserHandle User handle of current logged in user.
  */
 data class ChatUiState(
     val chat: ChatRoom? = null,
@@ -82,6 +83,7 @@ data class ChatUiState(
     val chatLink: String? = null,
     val editingMessageId: Long? = null,
     val editingMessageContent: String? = null,
+    val myUserHandle: Long? = null,
 ) {
 
     /**

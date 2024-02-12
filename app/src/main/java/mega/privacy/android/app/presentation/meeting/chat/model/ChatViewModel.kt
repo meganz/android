@@ -31,6 +31,7 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReactionUser
@@ -42,8 +43,10 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -57,8 +60,6 @@ import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
-import mega.privacy.android.domain.usecase.chat.GetChatParticipantEmailUseCase
-import mega.privacy.android.domain.usecase.chat.GetChatParticipantFullNameUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
@@ -85,7 +86,9 @@ import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUse
 import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
+import mega.privacy.android.domain.usecase.contact.GetParticipantFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.GetUserUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipantsInChatUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
@@ -195,8 +198,9 @@ class ChatViewModel @Inject constructor(
     private val deleteReactionUseCase: DeleteReactionUseCase,
     private val sendGiphyMessageUseCase: SendGiphyMessageUseCase,
     private val attachContactsUseCase: AttachContactsUseCase,
-    private val getChatParticipantFullNameUseCase: GetChatParticipantFullNameUseCase,
-    private val getChatParticipantEmailUseCase: GetChatParticipantEmailUseCase,
+    private val getParticipantFullNameUseCase: GetParticipantFullNameUseCase,
+    private val participantNameMapper: ParticipantNameMapper,
+    private val getUserUseCase: GetUserUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -222,6 +226,7 @@ class ChatViewModel @Inject constructor(
     private var monitorConnectivityJob: Job? = null
 
     init {
+        getMyUserHandle()
         checkGeolocation()
         monitorStorageStateEvent()
         loadChatOrPreview()
@@ -530,7 +535,7 @@ class ChatViewModel @Inject constructor(
                                 }
 
                                 ChatRoomChange.UserTyping -> {
-                                    if (userTyping != getMyUserHandleUseCase()) {
+                                    if (userTyping != state.value.myUserHandle) {
                                         handleUserTyping(userTyping)
                                     }
                                 }
@@ -1192,25 +1197,41 @@ class ChatViewModel @Inject constructor(
      * @param reactions list of [UIReaction]
      * @return another list of [UIReaction] in which user info has been filled.
      */
-    suspend fun getUserInfoIntoReactionList(reactions: List<UIReaction>): List<UIReaction> =
-        reactions.map { reaction ->
+    suspend fun getUserInfoIntoReactionList(reactions: List<UIReaction>): List<UIReaction> {
+        return reactions.map { reaction ->
             reaction.copy(
                 userList = reaction.userList.map { user ->
                     user.copy(
-                        name = getChatParticipantFullNameUseCase(user.userHandle).orEmpty(),
+                        name = participantNameMapper(
+                            isMe = user.userHandle == state.value.myUserHandle,
+                            fullName = getParticipantFullNameUseCase(user.userHandle).orEmpty()
+                        ),
                     )
                 }
             )
         }
+    }
 
     /**
-     * Get user email by handle
-     *
-     * @param userHandle
-     * @return
+     * load my user handle and save to ui state
      */
-    suspend fun getParticipantEmail(userHandle: Long): String =
-        getChatParticipantEmailUseCase(userHandle).orEmpty()
+    private fun getMyUserHandle() {
+        viewModelScope.launch {
+            runCatching {
+                val myUserHandle = getMyUserHandleUseCase()
+                _state.update { state -> state.copy(myUserHandle = myUserHandle) }
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Get [User] by the [UserId].
+     *
+     * @param userId
+     * @return [User]
+     */
+    suspend fun getUser(userId: UserId) =
+        getUserUseCase(userId)
 
     /**
      * Forward messages.
@@ -1223,6 +1244,9 @@ class ChatViewModel @Inject constructor(
 
     }
 
+    /**
+     * called when viewmodel is cleared
+     */
     override fun onCleared() {
         if (state.value.isPreviewMode) {
             applicationScope.launch {

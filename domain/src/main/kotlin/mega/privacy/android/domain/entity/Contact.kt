@@ -33,13 +33,13 @@ data class Contact @JvmOverloads constructor(
     /**
      * Full name
      */
-    val fullName: String?
-        get() {
-            if (!firstName.isNullOrEmpty() && !lastName.isNullOrEmpty()) {
-                return "$firstName $lastName"
+    val fullName: String? =
+        nickname?.takeIf { it.isNotEmpty() }
+            ?: if (!firstName.isNullOrEmpty() && !lastName.isNullOrEmpty()) {
+                "$firstName $lastName"
+            } else {
+                firstName?.takeIf { it.isNotBlank() }
+                    ?: lastName?.takeIf { it.isNotBlank() }
+                    ?: email?.takeIf { it.isNotBlank() }
             }
-            return firstName?.takeIf { it.isNotBlank() }
-                ?: lastName?.takeIf { it.isNotBlank() }
-                ?: email?.takeIf { it.isNotBlank() }
-        }
 }

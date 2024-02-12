@@ -41,6 +41,7 @@ import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
 import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
+import mega.privacy.android.data.mapper.contact.UserMapper
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.ContactWrapper
@@ -50,6 +51,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -105,6 +107,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @ApplicationContext private val context: Context,
     private val userChatStatusMapper: UserChatStatusMapper,
+    private val userMapper: UserMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) : ContactsRepository {
 
@@ -850,6 +853,11 @@ internal class DefaultContactsRepository @Inject constructor(
                     contactWrapper.getMegaUserNameDB(megaUser)
                 } ?: user
             } else null
+        }
+
+    override suspend fun getUser(userId: UserId): User? =
+        megaApiGateway.getContact(userId.id.toBase64Handle())?.let {
+            userMapper(it)
         }
 
     override val monitorContactCacheUpdates: Flow<UserUpdate> = monitorContactUpdates()

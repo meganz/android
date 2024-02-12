@@ -1059,7 +1059,10 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getParticipantFullName(handle: Long): String? = withContext(ioDispatcher) {
         megaLocalRoomGateway.getContactByHandle(handle)?.fullName?.takeIf { it.isNotBlank() }
             ?: databaseHandler.findNonContactByHandle(handle.toString())?.fullName?.takeIf { it.isNotBlank() }
+            ?: megaChatApiGateway.getUserAliasFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserFullNameFromCache(handle)?.takeIf { it.isNotBlank() }
+            ?:megaChatApiGateway.getUserFirstnameFromCache(handle)?.takeIf { it.isNotBlank() }
+            ?: megaChatApiGateway.getUserLastnameFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserEmailFromCache(handle)?.takeIf { it.isNotBlank() }
     }
 

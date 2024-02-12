@@ -25,6 +25,7 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
@@ -32,6 +33,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReactionUser
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.EventType
@@ -66,7 +69,6 @@ import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatParticipantEmailUseCase
-import mega.privacy.android.domain.usecase.chat.GetChatParticipantFullNameUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
@@ -91,10 +93,11 @@ import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCa
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
-import mega.privacy.android.domain.usecase.contact.GetContactFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
+import mega.privacy.android.domain.usecase.contact.GetParticipantFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.GetUserUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipantsInChatUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
@@ -253,7 +256,9 @@ internal class ChatViewModelTest {
     private val sendGiphyMessageUseCase = mock<SendGiphyMessageUseCase>()
     private val attachContactsUseCase = mock<AttachContactsUseCase>()
     private val getChatParticipantEmailUseCase = mock<GetChatParticipantEmailUseCase>()
-    private val getChatParticipantFullNameUseCase = mock<GetChatParticipantFullNameUseCase>()
+    private val getParticipantFullNameUseCase = mock<GetParticipantFullNameUseCase>()
+    private val participantNameMapper = mock<ParticipantNameMapper>()
+    private val getUserUseCase = mock<GetUserUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -313,7 +318,9 @@ internal class ChatViewModelTest {
             sendGiphyMessageUseCase,
             attachContactsUseCase,
             getChatParticipantEmailUseCase,
-            getChatParticipantFullNameUseCase,
+            getParticipantFullNameUseCase,
+            participantNameMapper,
+            getUserUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -404,8 +411,9 @@ internal class ChatViewModelTest {
             deleteReactionUseCase = deleteReactionUseCase,
             sendGiphyMessageUseCase = sendGiphyMessageUseCase,
             attachContactsUseCase = attachContactsUseCase,
-            getChatParticipantEmailUseCase = getChatParticipantEmailUseCase,
-            getChatParticipantFullNameUseCase = getChatParticipantFullNameUseCase,
+            getParticipantFullNameUseCase = getParticipantFullNameUseCase,
+            participantNameMapper = participantNameMapper,
+            getUserUseCase = getUserUseCase,
         )
     }
 
@@ -2505,6 +2513,77 @@ internal class ChatViewModelTest {
         whenever(attachContactsUseCase(chatId, contactList)).thenReturn(Unit)
         underTest.onAttachContacts(contactList)
         verify(attachContactsUseCase).invoke(chatId, contactList)
+    }
+
+    @Test
+    fun `test that getUser invokes use case`() = runTest {
+        val userId = UserId(1234L)
+        initTestClass()
+        underTest.getUser(userId)
+        verify(getUserUseCase).invoke(userId)
+    }
+
+    @Test
+    fun `test that get user info into UIReaction list can return proper result`() = runTest {
+        val fakeMyUserHandle = 1L
+        whenever(getMyUserHandleUseCase()).thenReturn(fakeMyUserHandle)
+        val expectedFullNameForMe = "MyName(Me)"
+        val expectedFullNameForUser1 = "username 1"
+        val userHandle1 = 1L
+        val expectedFullNameForUser2 = "username 2"
+        val userHandle2 = 2L
+        whenever(getParticipantFullNameUseCase(userHandle1)).thenReturn(expectedFullNameForUser1)
+        whenever(getParticipantFullNameUseCase(userHandle2)).thenReturn(expectedFullNameForUser2)
+        whenever(participantNameMapper(true, expectedFullNameForUser1)).thenReturn(
+            expectedFullNameForMe
+        )
+        whenever(participantNameMapper(false, expectedFullNameForUser1)).thenReturn(
+            expectedFullNameForUser1
+        )
+        whenever(participantNameMapper(false, expectedFullNameForUser2)).thenReturn(
+            expectedFullNameForUser2
+        )
+
+        val input = listOf(
+            UIReaction(
+                reaction = "reaction1",
+                shortCode = ":shortcode1:",
+                count = 1,
+                hasMe = true,
+                userList = listOf(
+                    UIReactionUser(
+                        userHandle = userHandle1,
+                    ),
+                    UIReactionUser(
+                        userHandle = userHandle2,
+                    )
+                )
+            ),
+            UIReaction(
+                reaction = "reaction2",
+                shortCode = ":shortcode2:",
+                count = 2,
+                hasMe = false,
+                userList = listOf(
+                    UIReactionUser(
+                        userHandle = userHandle1,
+                    ),
+                    UIReactionUser(
+                        userHandle = userHandle2,
+                    )
+                )
+            )
+        )
+        initTestClass()
+        val result = underTest.getUserInfoIntoReactionList(input)
+        with(result[0]) {
+            assertThat(userList[0].name).isEqualTo(expectedFullNameForMe)
+            assertThat(userList[1].name).isEqualTo(expectedFullNameForUser2)
+        }
+        with(result[1]) {
+            assertThat(userList[0].name).isEqualTo(expectedFullNameForMe)
+            assertThat(userList[1].name).isEqualTo(expectedFullNameForUser2)
+        }
     }
 
     private fun ChatRoom.getNumberParticipants() =
