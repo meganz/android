@@ -20,5 +20,11 @@ data class NodeUIItem<T : TypedNode>(
     val fileDuration: String? = null,
 ) : Node by node {
     val uniqueKey =
-        "${node.id.longValue}" + (node as? ShareFolderNode)?.shareData?.let { "_${it.count}_${it.user}_${it.isPending}_${it.isUnverifiedDistinctNode}_${it.isVerified}" }
+        "${node.id.longValue}".plus(
+            (node as? ShareFolderNode)
+                ?.shareData
+                ?.let {
+                    "_${it.count}_${it.user}_${it.isPending}_${it.isUnverifiedDistinctNode}_${it.isVerified}"
+                }
+        )
 }

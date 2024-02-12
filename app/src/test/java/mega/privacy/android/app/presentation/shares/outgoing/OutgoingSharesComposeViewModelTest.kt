@@ -28,6 +28,7 @@ import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.data.mapper.FileDurationMapper
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -55,6 +56,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -275,6 +277,78 @@ class OutgoingSharesComposeViewModelTest {
         }
 
     @Test
+    fun `test that item click is ignored and verifyContactDialog is updated when the share contact is pending`() =
+        runTest {
+            val email = "user@mail.com"
+            val shareData = mock<ShareData> {
+                on { isPending } doReturn true
+                on { count } doReturn 0
+                on { user } doReturn email
+            }
+            underTest.onItemClicked(
+                NodeUIItem(
+                    ShareFileNode(mock(), shareData),
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.currentFileNode).isNull()
+                assertThat(state.verifyContactDialog).isEqualTo(email)
+            }
+        }
+
+    @Test
+    fun `test that item click is ignored and AuthenticityCredentials is triggered when the share contact is not verified`() =
+        runTest {
+            val email = "user@mail.com"
+            val shareData = mock<ShareData> {
+                on { isPending } doReturn false
+                on { isVerified } doReturn false
+                on { count } doReturn 0
+                on { user } doReturn email
+            }
+            underTest.onItemClicked(
+                NodeUIItem(
+                    ShareFileNode(mock(), shareData),
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.currentFileNode).isNull()
+                assertThat(state.openAuthenticityCredentials).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+                assertThat((state.openAuthenticityCredentials as StateEventWithContentTriggered).content)
+                    .isEqualTo(email)
+            }
+        }
+
+
+    @Test
+    fun `test that item long click is ignored when the share contact status is not satisfied`() =
+        runTest {
+            val email = "user@mail.com"
+            val shareData = mock<ShareData> {
+                on { isPending } doReturn true
+                on { count } doReturn 0
+                on { user } doReturn email
+            }
+            val actual = underTest.onLongItemClicked(
+                NodeUIItem(
+                    ShareFileNode(mock(), shareData),
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+            assertThat(actual).isFalse()
+        }
+
+
+    @Test
     fun `test that the selected node handle count is incremented when the selected node is clicked`() =
         runTest {
             val nodesListItem1 = mock<ShareFileNode>()
@@ -391,6 +465,16 @@ class OutgoingSharesComposeViewModelTest {
             }
         }
 
+    @Test
+    fun `test that the contact dialog is dismissed when dismissVerifyContactDialog is invoked`() =
+        runTest {
+            underTest.dismissVerifyContactDialog()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.verifyContactDialog).isNull()
+            }
+        }
+
     private suspend fun onDownloadOptionClick() {
         val menuItem = mock<MenuItem>()
         val optionsItemInfo =
@@ -399,6 +483,7 @@ class OutgoingSharesComposeViewModelTest {
         whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
         underTest.onOptionItemClicked(menuItem)
     }
+
 
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)

@@ -103,7 +103,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
 
     init {
         refreshNodes()
-        monitorFileBrowserChildrenNodes()
+        monitorChildrenNodes()
         monitorContactUpdates()
         checkViewType()
         monitorRefreshSession()
@@ -153,7 +153,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
      * This will monitor node updates from [MonitorNodeUpdatesUseCase] and
      * will update [OutgoingSharesState.nodesList]
      */
-    private fun monitorFileBrowserChildrenNodes() {
+    private fun monitorChildrenNodes() {
         viewModelScope.launch {
             runCatching {
                 monitorNodeUpdatesUseCase().catch {
@@ -434,12 +434,52 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     }
 
     /**
+     * Dismiss the Verify Contact Dialog by clearing the email
+     */
+    fun dismissVerifyContactDialog() {
+        _state.update {
+            it.copy(
+                verifyContactDialog = null
+            )
+        }
+    }
+
+    private fun showVerifyContactDialog(email: String?) {
+        _state.update {
+            it.copy(
+                verifyContactDialog = email
+            )
+        }
+    }
+
+    private fun checkShareContactStatus(nodeUIItem: NodeUIItem<ShareNode>): Boolean {
+        val shareData = nodeUIItem.node.shareData
+        val email = shareData?.user ?: return true
+        if (shareData.count > 0) {
+            return true
+        } else if (shareData.isPending) {
+            // Show a dialog if the contact is pending
+            showVerifyContactDialog(nodeUIItem.node.shareData?.user)
+            return false
+        } else if (!shareData.isVerified) {
+            // Open the Authenticity Credentials if the contact is not verified
+            _state.update {
+                it.copy(openAuthenticityCredentials = triggered(email))
+            }
+            return false
+        }
+        return true
+    }
+
+    /**
      * This method will handle Item click event from NodesView and will update
      * [state] accordingly if items already selected/unselected, update check count
      *
      * @param nodeUIItem [NodeUIItem]
      */
     fun onItemClicked(nodeUIItem: NodeUIItem<ShareNode>) {
+        if (!checkShareContactStatus(nodeUIItem)) return
+
         val index =
             _state.value.nodesList.indexOfFirst { it.node == nodeUIItem.node }
         if (_state.value.isInSelection) {
@@ -447,12 +487,8 @@ class OutgoingSharesComposeViewModel @Inject constructor(
         } else {
             if (nodeUIItem.node is FileNode) {
                 _state.update {
-                    it.copy(
-                        itemIndex = index,
-                        currentFileNode = nodeUIItem.node
-                    )
+                    it.copy(itemIndex = index, currentFileNode = nodeUIItem.node)
                 }
-
             } else {
                 onFolderItemClicked(nodeUIItem.id.longValue)
             }
@@ -464,10 +500,13 @@ class OutgoingSharesComposeViewModel @Inject constructor(
      *
      * @param nodeUIItem [NodeUIItem]
      */
-    fun onLongItemClicked(nodeUIItem: NodeUIItem<ShareNode>) {
+    fun onLongItemClicked(nodeUIItem: NodeUIItem<ShareNode>): Boolean {
+        // Turn off selection if the node is unverified share
+        if (!checkShareContactStatus(nodeUIItem)) return false
         val index =
             _state.value.nodesList.indexOfFirst { it.node == nodeUIItem.node }
         updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
+        return true
     }
 
     /**
@@ -532,9 +571,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
                 }
             } else {
                 _state.update {
-                    it.copy(
-                        optionsItemInfo = optionsItemInfo
-                    )
+                    it.copy(optionsItemInfo = optionsItemInfo)
                 }
             }
         }
@@ -545,11 +582,15 @@ class OutgoingSharesComposeViewModel @Inject constructor(
      */
     fun onItemPerformedClicked() {
         _state.update {
-            it.copy(
-                currentFileNode = null,
-                itemIndex = -1,
-            )
+            it.copy(currentFileNode = null, itemIndex = -1)
         }
+    }
+
+    /**
+     * Consume open authenticity credentials
+     */
+    fun consumeOpenAuthenticityCredentials() {
+        _state.update { it.copy(openAuthenticityCredentials = consumed()) }
     }
 
     /**
@@ -564,7 +605,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     /**
      * Consumes the Exit Outgoing Shares Event
      */
-    fun consumeExitFileBrowserEvent() {
+    fun consumeExitOutgoingSharesEvent() {
         _state.update { it.copy(exitOutgoingSharesEvent = consumed) }
     }
 

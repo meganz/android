@@ -46,10 +46,12 @@ fun MegaAlertDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    title: String? = null,
     onCancel: () -> Unit = onDismiss,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
 ) = BaseMegaAlertDialog(
+    title = title,
     text = text,
     confirmButtonText = confirmButtonText,
     cancelButtonText = cancelButtonText,

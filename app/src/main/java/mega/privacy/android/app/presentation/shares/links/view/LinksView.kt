@@ -29,7 +29,7 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
  * Composable view for Links screen
  * @param uiState
  * @param emptyState
- * @param onListTopReached
+ * @param onToggleAppBarElevation
  * @param onItemClick
  * @param onLongClick
  * @param onMenuClick

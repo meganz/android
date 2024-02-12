@@ -367,7 +367,7 @@ fun NodeListViewItem(
                                 visibility = Visibility.Visible
                             }
                             .padding(end = 4.dp)
-                            .size(22.dp),
+                            .size(20.dp),
                         colorFilter = ColorFilter.tint(
                             MaterialTheme.colors.textColorSecondary
                         ),
