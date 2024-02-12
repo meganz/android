@@ -200,12 +200,14 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         else downloadThumbnailUseCase(nodeId = photo.id, callback)
     }
 
+    /**
+     * Select all photo items regardless of the current applied location filter.
+     */
     fun selectAllPhotos() = viewModelScope.launch {
         _state.update {
             val selectedPhotoIds = withContext(defaultDispatcher) {
-                val photoIds = it.uiPhotos
-                    .filterIsInstance<PhotoItem>()
-                    .map { item -> item.photo.id }
+                val photoIds = it.photos
+                    .map(Photo::id)
                 it.selectedPhotoIds + photoIds
             }
             it.copy(selectedPhotoIds = selectedPhotoIds)

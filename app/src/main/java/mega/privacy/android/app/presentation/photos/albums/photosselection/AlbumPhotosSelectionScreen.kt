@@ -132,11 +132,7 @@ fun AlbumPhotosSelectionScreen(
                 numSelectedPhotos = state.selectedPhotoIds.size,
                 showFilterMenu = state.showFilterMenu,
                 showMoreMenu = showMoreMenu,
-                showSelectAllMenu = {
-                    val selectedSize = state.selectedPhotoIds.size
-                    val photosInScreen = state.uiPhotos.filterIsInstance<UIPhoto.PhotoItem>().size
-                    selectedSize < photosInScreen
-                },
+                showSelectAllMenu = state.selectedPhotoIds.size < state.photos.size,
                 onBackClicked = {
                     if (state.selectedPhotoIds.isEmpty()) {
                         onBackClicked()
@@ -224,7 +220,7 @@ private fun AlbumPhotosSelectionHeader(
     numSelectedPhotos: Int,
     showFilterMenu: Boolean,
     showMoreMenu: Boolean,
-    showSelectAllMenu: () -> Boolean,
+    showSelectAllMenu: Boolean,
     onBackClicked: () -> Unit,
     onFilterClicked: () -> Unit,
     onMoreClicked: () -> Unit,
@@ -300,7 +296,7 @@ private fun AlbumPhotosSelectionHeader(
                 }
 
                 DropdownMenu(expanded = showMoreMenu, onDismissRequest = onMoreDismissed) {
-                    if (showSelectAllMenu()) {
+                    if (showSelectAllMenu) {
                         DropdownMenuItem(onClick = onSelectAllClicked) {
                             Text(text = stringResource(id = R.string.action_select_all))
                         }
