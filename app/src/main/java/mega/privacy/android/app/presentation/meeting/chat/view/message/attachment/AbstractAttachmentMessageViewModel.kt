@@ -36,7 +36,7 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
                 AttachmentMessageUiState(
                     fileName = attachmentMessage.fileName,
                     fileSize = fileSizeStringMapper(attachmentMessage.fileSize),
-                    duration = durationInSecondsTextMapper(attachmentMessage.duration),
+                    duration = attachmentMessage.duration?.let { durationInSecondsTextMapper(it) },
                     fileTypeResId = getFileIconChat(attachmentMessage.fileType),
                 )
             ).also {
