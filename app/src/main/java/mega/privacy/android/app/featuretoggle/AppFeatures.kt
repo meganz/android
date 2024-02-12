@@ -15,6 +15,14 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
     /**
+     * Enables new outgoing shares compose page
+     */
+    OutgoingSharesCompose(
+        "Enable new Outgoing Shares Compose page (requires app restart)",
+        false
+    ),
+
+    /**
      * Enables new links compose page
      */
     LinksCompose(

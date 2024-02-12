@@ -7,6 +7,7 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment
 import mega.privacy.android.app.presentation.shares.links.LinksComposeFragment
 import mega.privacy.android.app.presentation.shares.links.LinksFragment
+import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeFragment
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment
 
 /**
@@ -16,6 +17,7 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragm
  */
 class SharesPageAdapter(
     private val enabledLinksCompose: Boolean,
+    private val enabledOutgoingSharesCompose: Boolean,
     private val activity: FragmentActivity,
 ) :
     FragmentStateAdapter(activity) {
@@ -25,7 +27,7 @@ class SharesPageAdapter(
      */
     private val fragments = mutableMapOf(
         SharesTab.INCOMING_TAB to IncomingSharesFragment(),
-        SharesTab.OUTGOING_TAB to OutgoingSharesFragment(),
+        SharesTab.OUTGOING_TAB to if (enabledOutgoingSharesCompose) OutgoingSharesComposeFragment() else OutgoingSharesFragment(),
         SharesTab.LINKS_TAB to if (enabledLinksCompose) LinksComposeFragment() else LinksFragment()
     )
 
@@ -55,7 +57,7 @@ class SharesPageAdapter(
     fun refreshFragment(position: Int) {
         val fragment = when (SharesTab.fromPosition(position)) {
             SharesTab.INCOMING_TAB -> IncomingSharesFragment()
-            SharesTab.OUTGOING_TAB -> OutgoingSharesFragment()
+            SharesTab.OUTGOING_TAB -> if (enabledOutgoingSharesCompose) OutgoingSharesComposeFragment() else OutgoingSharesFragment()
             SharesTab.LINKS_TAB -> if (enabledLinksCompose) LinksComposeFragment() else LinksFragment()
             else -> throw Exception("Invalid position")
         }

@@ -548,6 +548,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val sharesPageAdapter: SharesPageAdapter by lazy {
         SharesPageAdapter(
             enabledLinksCompose = enabledLinksCompose,
+            enabledOutgoingSharesCompose = enabledOutgoingSharesCompose,
             activity = this
         )
     }
@@ -704,6 +705,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Feature Flag for LinksComposeFragment
      */
     private var enabledLinksCompose: Boolean = false
+
+    /**
+     * Feature Flag for OutgoingSharesComposeFragment
+     */
+    private var enabledOutgoingSharesCompose: Boolean = false
 
 
     /**
@@ -919,6 +925,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             enableOfflineCompose =
                 getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
             enabledLinksCompose = getFeatureFlagValueUseCase(AppFeatures.LinksCompose)
+            enabledOutgoingSharesCompose =
+                getFeatureFlagValueUseCase(AppFeatures.OutgoingSharesCompose)
         }
 
         Timber.d("onCreate after call super")
