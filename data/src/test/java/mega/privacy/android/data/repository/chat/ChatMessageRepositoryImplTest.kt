@@ -16,6 +16,7 @@ import mega.privacy.android.data.mapper.chat.messages.PendingMessageMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatMessage
@@ -303,5 +304,16 @@ class ChatMessageRepositoryImplTest {
         val actual = underTest.attachVoiceMessage(chatId, handle)
         assertThat(actual).isEqualTo(expectedTempId)
         verify(megaChatApiGateway).attachVoiceMessage(any(), any(), any())
+    }
+
+    @Test
+    fun `test that getPendingMessage returns the mapped entity`() = runTest {
+        val pendingMessageId = 2011L
+        val entity = mock<PendingMessageEntity>()
+        val expected = mock<PendingMessage>()
+        whenever(chatStorageGateway.getPendingMessage(pendingMessageId)).thenReturn(entity)
+        whenever(pendingMessageMapper(entity)).thenReturn(expected)
+        val actual = underTest.getPendingMessage(pendingMessageId)
+        assertThat(actual).isEqualTo(expected)
     }
 }

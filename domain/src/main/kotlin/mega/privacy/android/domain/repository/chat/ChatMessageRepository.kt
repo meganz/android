@@ -295,4 +295,19 @@ interface ChatMessageRepository {
      * @return Identifier of the temp message attached.
      */
     suspend fun attachVoiceMessage(chatId: Long, nodeHandle: Long): Long?
+
+    /**
+     * Fetch pending messages by id
+     *
+     * @param pendingMessageId
+     * @return a pending messages with [pendingMessageId] or null if not found
+     */
+    suspend fun getPendingMessage(pendingMessageId: Long): PendingMessage?
+
+    /**
+     * Delete pending message by id
+     *
+     * @param pendingMessage
+     */
+    suspend fun deletePendingMessage(pendingMessage: PendingMessage)
 }

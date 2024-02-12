@@ -9,10 +9,13 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pendingMessageId
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
@@ -20,6 +23,7 @@ import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfe
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import timber.log.Timber
 
 /**
  * Worker that will monitor current active chat upload transfers while there are some.
@@ -41,6 +45,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val chatUploadNotificationMapper: ChatUploadNotificationMapper,
+    private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
 ) : AbstractTransfersWorker(
     context,
     workerParams,
@@ -65,7 +70,19 @@ class ChatUploadsWorker @AssistedInject constructor(
     ) = chatUploadNotificationMapper(activeTransferTotals, null, paused)
 
     override suspend fun onTransferEventReceived(event: TransferEvent) {
-        // call the use case to send the node to the chat when upload is finished in AND-17905
+        (event as? TransferEvent.TransferFinishEvent)?.transfer?.pendingMessageId()
+            ?.let { pendingMessageId ->
+                runCatching {
+                    Timber.d("Node will be attached")
+                    //once uploaded, it can be attached to the chat
+                    attachNodeWithPendingMessageUseCase(
+                        pendingMessageId,
+                        NodeId(event.transfer.nodeHandle)
+                    )
+                }.onFailure {
+                    Timber.e(it, "Node could not be attached")
+                }
+            }
     }
 
     companion object {
@@ -76,4 +93,3 @@ class ChatUploadsWorker @AssistedInject constructor(
         private const val NOTIFICATION_CHAT_UPLOAD = 15
     }
 }
-

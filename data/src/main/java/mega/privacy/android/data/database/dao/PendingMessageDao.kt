@@ -20,7 +20,7 @@ interface PendingMessageDao {
      * @return id of the inserted row
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(pendingMessageEntity: PendingMessageEntity): Long
+    suspend fun insert(pendingMessageEntity: PendingMessageEntity): Long
 
     /**
      * Delete
@@ -28,7 +28,16 @@ interface PendingMessageDao {
      * @param id
      */
     @Query("DELETE FROM pending_messages WHERE pendingMessageId = :id")
-    fun delete(id: Long)
+    suspend fun delete(id: Long)
+
+    /**
+     * Get
+     *
+     * @param id
+     */
+
+    @Query("SELECT * FROM pending_messages WHERE pendingMessageId = :id")
+    suspend fun get(id: Long): PendingMessageEntity?
 
     /**
      * Fetch pending messages for chat

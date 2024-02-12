@@ -181,4 +181,17 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override suspend fun getPendingMessage(pendingMessageId: Long): PendingMessage? =
+        withContext(ioDispatcher) {
+            chatStorageGateway.getPendingMessage(pendingMessageId)?.let {
+                pendingMessageMapper(it)
+            }
+        }
+
+    override suspend fun deletePendingMessage(pendingMessage: PendingMessage) {
+        withContext(ioDispatcher) {
+            chatStorageGateway.deletePendingMessage(pendingMessage.id)
+        }
+    }
 }
