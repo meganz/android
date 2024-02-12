@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.videosection
 
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import kotlin.time.Duration
 
 /**
@@ -14,6 +15,7 @@ import kotlin.time.Duration
  * @property thumbnailList The playlist thumbnail list
  * @property numberOfVideos The number of videos in the playlist
  * @property totalDuration The total duration of videos in the playlist
+ * @property videos the videos in the playlist
  */
 data class VideoPlaylist(
     val id: NodeId,
@@ -24,4 +26,5 @@ data class VideoPlaylist(
     val thumbnailList: List<String?>?,
     val numberOfVideos: Int,
     val totalDuration: Duration,
+    val videos: List<TypedVideoNode>?,
 )

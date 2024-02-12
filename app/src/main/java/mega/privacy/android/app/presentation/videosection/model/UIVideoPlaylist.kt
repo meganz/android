@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.videosection.model
 
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import java.io.File
 
 /**
@@ -14,6 +15,7 @@ import java.io.File
  * @property thumbnailList the playlist's thumbnail list
  * @property numberOfVideos the number of videos in the playlist
  * @property totalDuration the total duration of videos in the playlist
+ * @property videos the videos in the playlist
  * @property isSelected the playlist if is selected
  */
 data class UIVideoPlaylist(
@@ -25,5 +27,6 @@ data class UIVideoPlaylist(
     val thumbnailList: List<File?>?,
     val numberOfVideos: Int,
     val totalDuration: String,
+    val videos: List<UIVideo>?,
     val isSelected: Boolean = false,
 )

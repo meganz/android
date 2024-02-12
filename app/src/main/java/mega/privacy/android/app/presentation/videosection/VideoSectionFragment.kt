@@ -137,7 +137,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
                 MegaAppTheme(isDark = themeMode.isDarkMode()) {
-                    VideoSectionComposeView(
+                    VideoSectionFeatureScreen(
                         onSortOrderClick = { showSortByPanel() },
                         videoSectionViewModel = videoSectionViewModel,
                         onClick = { item, index ->

@@ -43,6 +43,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -374,7 +375,11 @@ class VideoSectionViewModelTest {
             val expectedVideoPlaylist = mock<VideoPlaylist> {
                 on { title }.thenReturn(expectedTitle)
             }
+            val expectedUIVideoPlaylist = mock<UIVideoPlaylist> {
+                on { title }.thenReturn(expectedTitle)
+            }
             whenever(createVideoPlaylistUseCase(expectedTitle)).thenReturn(expectedVideoPlaylist)
+            whenever(uiVideoPlaylistMapper(anyOrNull())).thenReturn(expectedUIVideoPlaylist)
 
             initUnderTest()
 

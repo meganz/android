@@ -55,7 +55,8 @@ class VideoPlaylistMapperTest {
                 expectedThumbnailSize = null,
                 expectedThumbnail = null,
                 expectedNumberOfVideos = 0,
-                expectedTotalDuration = 0.seconds
+                expectedTotalDuration = 0.seconds,
+                expectedVideoSize = 0
             )
         }
 
@@ -72,7 +73,8 @@ class VideoPlaylistMapperTest {
                 expectedThumbnailSize = videoNodeList.size,
                 expectedThumbnail = videoNodeList[0].thumbnailPath,
                 expectedNumberOfVideos = videoNodeList.size,
-                expectedTotalDuration = expectedTotalDuration
+                expectedTotalDuration = expectedTotalDuration,
+                expectedVideoSize = videoNodeList.size
             )
         }
 
@@ -89,7 +91,8 @@ class VideoPlaylistMapperTest {
                 expectedThumbnailSize = videoNodeListWithNullThumbnail.size,
                 expectedThumbnail = null,
                 expectedNumberOfVideos = videoNodeListWithNullThumbnail.size,
-                expectedTotalDuration = expectedTotalDuration
+                expectedTotalDuration = expectedTotalDuration,
+                expectedVideoSize = videoNodeListWithNullThumbnail.size
             )
         }
 
@@ -107,6 +110,7 @@ class VideoPlaylistMapperTest {
         expectedThumbnail: String?,
         expectedNumberOfVideos: Int,
         expectedTotalDuration: Duration,
+        expectedVideoSize: Int?,
     ) {
         videoPlaylist.let {
             assertAll(
@@ -120,6 +124,7 @@ class VideoPlaylistMapperTest {
                 { assertThat(it.thumbnailList?.get(0)).isEqualTo(expectedThumbnail) },
                 { assertThat(it.numberOfVideos).isEqualTo(expectedNumberOfVideos) },
                 { assertThat(it.totalDuration).isEqualTo(expectedTotalDuration) },
+                { assertThat(it.videos?.size).isEqualTo(expectedVideoSize) }
             )
         }
     }

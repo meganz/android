@@ -11,6 +11,7 @@ import javax.inject.Inject
  */
 class UIVideoPlaylistMapper @Inject constructor(
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val uiVideoMapper: UIVideoMapper
 ) {
 
     /**
@@ -28,5 +29,8 @@ class UIVideoPlaylistMapper @Inject constructor(
             },
             numberOfVideos = videoPlaylist.numberOfVideos,
             totalDuration = durationInSecondsTextMapper(videoPlaylist.totalDuration),
+            videos = videoPlaylist.videos?.map {
+                uiVideoMapper(it)
+            }
         )
 }

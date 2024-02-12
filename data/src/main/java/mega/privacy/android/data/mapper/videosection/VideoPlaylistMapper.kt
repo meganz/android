@@ -24,7 +24,8 @@ internal class VideoPlaylistMapper @Inject constructor() {
             getThumbnailList(videoNodeList)
         },
         numberOfVideos = videoNodeList.size,
-        totalDuration = videoNodeList.sumOf { it.duration.inWholeSeconds }.seconds
+        totalDuration = videoNodeList.sumOf { it.duration.inWholeSeconds }.seconds,
+        videos = videoNodeList
     )
 
     private fun getThumbnailList(videoNodeList: List<TypedVideoNode>) =

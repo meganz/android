@@ -190,7 +190,8 @@ class VideoSectionViewModel @Inject constructor(
             setPendingRefreshNodes()
         }
 
-    internal fun shouldShowSearchMenu() = _state.value.allVideos.isNotEmpty()
+    internal fun shouldShowSearchMenu() =
+        _state.value.currentVideoPlaylist == null && _state.value.allVideos.isNotEmpty()
 
     internal fun searchReady() {
         if (_state.value.searchMode)
@@ -394,7 +395,11 @@ class VideoSectionViewModel @Inject constructor(
             }.onSuccess { videoPlaylist ->
                 _state.update {
                     it.copy(
-                        currentVideoPlaylist = videoPlaylist,
+                        currentVideoPlaylist = videoPlaylist?.let {
+                            uiVideoPlaylistMapper(
+                                videoPlaylist
+                            )
+                        },
                         isVideoPlaylistCreatedSuccessfully = true
                     )
                 }
@@ -426,4 +431,10 @@ class VideoSectionViewModel @Inject constructor(
                 }
             }
         }
+
+    internal fun updateCurrentVideoPlaylist(playlist: UIVideoPlaylist?) {
+        _state.update {
+            it.copy(currentVideoPlaylist = playlist)
+        }
+    }
 }

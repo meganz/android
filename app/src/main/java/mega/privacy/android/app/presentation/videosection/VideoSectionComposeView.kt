@@ -18,6 +18,8 @@ import mega.privacy.android.app.presentation.videosection.model.UIVideo
 import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 
+internal const val videoSectionRoute = "videoSection/video_section"
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun VideoSectionComposeView(
@@ -42,6 +44,10 @@ internal fun VideoSectionComposeView(
         initialPageOffsetFraction = 0f
     ) {
         tabState.tabs.size
+    }
+
+    LaunchedEffect(Unit) {
+        videoSectionViewModel.updateCurrentVideoPlaylist(null)
     }
 
     LaunchedEffect(pagerState.currentPage) {

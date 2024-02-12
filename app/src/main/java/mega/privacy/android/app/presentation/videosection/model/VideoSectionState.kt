@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.model
 
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 
 /**
  * The state is for the videos section
@@ -30,7 +29,7 @@ data class VideoSectionState(
     val selectedVideoHandles: List<Long> = emptyList(),
     val isInSelection: Boolean = false,
     val videoPlaylists: List<UIVideoPlaylist> = emptyList(),
-    val currentVideoPlaylist: VideoPlaylist? = null,
+    val currentVideoPlaylist: UIVideoPlaylist? = null,
     val isVideoPlaylistCreatedSuccessfully: Boolean = false,
     val numberOfAddedVideos: Int = 0,
     val isPlaylistProgressBarShown: Boolean = true,
