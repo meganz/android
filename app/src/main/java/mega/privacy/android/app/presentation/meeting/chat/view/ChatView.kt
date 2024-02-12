@@ -104,7 +104,6 @@ import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
-import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserId
@@ -899,6 +898,7 @@ private fun getInfoToShow(infoToShow: InfoToShow, context: Context) = with(infoT
         is InfoToShow.MuteOptionResult -> result.toInfoText(context)
         is InfoToShow.StringWithParams -> context.getString(stringId, *args.toTypedArray())
         is InfoToShow.SimpleString -> context.getString(stringId)
+        is InfoToShow.QuantityString -> context.resources.getQuantityString(stringId, count, count)
     }
 }
 
