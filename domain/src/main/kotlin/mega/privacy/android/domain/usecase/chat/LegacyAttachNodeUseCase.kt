@@ -9,6 +9,7 @@ import javax.inject.Inject
  *
  * @property chatRepository [ChatRepository]
  */
+@Deprecated("Deprecated. Replace with AttachNodeUseCase")
 class LegacyAttachNodeUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
 ) {

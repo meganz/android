@@ -806,4 +806,10 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun attachContacts(chatId: Long, contactHandles: MegaHandleList): MegaChatMessage =
         chatApi.attachContacts(chatId, contactHandles)
+
+    override suspend fun forwardContact(
+        sourceChatId: Long,
+        msgId: Long,
+        targetChatId: Long,
+    ): MegaChatMessage? = chatApi.forwardContact(sourceChatId, msgId, targetChatId)
 }

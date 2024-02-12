@@ -627,6 +627,7 @@ interface ChatRepository {
      * @param nodeHandle Handle of the node that the user wants to attach
      * @return Identifier of the temp message attached.
      */
+    @Deprecated("Deprecated. Replace with the same fun in ChatMessageRepository")
     suspend fun attachNode(chatId: Long, nodeHandle: Long): Long
 
     /**
@@ -660,6 +661,7 @@ interface ChatRepository {
      * @param nodeHandle Handle of the node that the user wants to attach
      * @return Tdentifier of the temp message attached.
      */
+    @Deprecated("Deprecated. Replace with the same fun in ChatMessageRepository")
     suspend fun attachVoiceMessage(chatId: Long, nodeHandle: Long): Long
 
     /**

@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaUser
@@ -254,5 +255,53 @@ class ChatMessageRepositoryImplTest {
             .thenReturn(id)
         val actual = underTest.savePendingMessage(savePendingMessageRequest)
         assertThat(actual.id).isEqualTo(id)
+    }
+
+    @Test
+    fun `test that forward contact invokes api and returns the message`() = runTest {
+        val chatMessage = mock<MegaChatMessage>()
+        val message = mock<ChatMessage>()
+        whenever(megaChatApiGateway.forwardContact(any(), any(), any())).thenReturn(chatMessage)
+        whenever(chatMessageMapper(chatMessage)).thenReturn(message)
+        assertThat(underTest.forwardContact(any(), any(), any())).isEqualTo(message)
+        verify(megaChatApiGateway).forwardContact(any(), any(), any())
+        verify(chatMessageMapper).invoke(chatMessage)
+    }
+
+    @Test
+    fun `test that attachNode invokes megaApi and returns the temp id`() = runTest {
+        val handle = 2L
+        val expectedTempId = 3L
+        val message = mock<MegaChatMessage> { on { tempId }.thenReturn(expectedTempId) }
+        val megaChatRequest = mock<MegaChatRequest> { on { megaChatMessage }.thenReturn(message) }
+        whenever(megaChatApiGateway.attachNode(any(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaChatRequest,
+                megaChatErrorSuccess,
+            )
+        }
+        val actual = underTest.attachNode(chatId, handle)
+        assertThat(actual).isEqualTo(expectedTempId)
+        verify(megaChatApiGateway).attachNode(any(), any(), any())
+    }
+
+    @Test
+    fun `test that attachVoiceMessage invokes megaApi returns the temp id`() = runTest {
+
+        val handle = 2L
+        val expectedTempId = 3L
+        val message = mock<MegaChatMessage> { on { tempId }.thenReturn(expectedTempId) }
+        val megaChatRequest = mock<MegaChatRequest> { on { megaChatMessage }.thenReturn(message) }
+        whenever(megaChatApiGateway.attachVoiceMessage(any(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaChatRequest,
+                megaChatErrorSuccess,
+            )
+        }
+        val actual = underTest.attachVoiceMessage(chatId, handle)
+        assertThat(actual).isEqualTo(expectedTempId)
+        verify(megaChatApiGateway).attachVoiceMessage(any(), any(), any())
     }
 }

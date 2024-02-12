@@ -204,4 +204,95 @@ interface ChatMessageRepository {
      * @return flow of pending messages for the chat
      */
     fun monitorPendingMessages(chatId: Long): Flow<List<PendingMessage>>
+
+    /**
+     * Forward a message with attach contact
+     *
+     * The MegaChatMessage object returned by this function includes a message transaction id,
+     * That id is not the definitive id, which will be assigned by the server. You can obtain the
+     * temporal id with MegaChatMessage::getTempId()
+     *
+     * When the server confirms the reception of the message, the MegaChatRoomListener::onMessageUpdate
+     * is called, including the definitive id and the new status: MegaChatMessage::STATUS_SERVER_RECEIVED.
+     * At this point, the app should refresh the message identified by the temporal id and move it to
+     * the final position in the history, based on the reported index in the callback.
+     *
+     * If the message is rejected by the server, the message will keep its temporal id and will have its
+     * a message id set to MEGACHAT_INVALID_HANDLE.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param sourceChatId MegaChatHandle that identifies the chat room where the source message is
+     * @param msgId MegaChatHandle that identifies the message that is going to be forwarded
+     * @param targetChatId MegaChatHandle that identifies the chat room where the message is going to be forwarded
+     * @return ChatMessage that will be sent. The message id is not definitive, but temporal.
+     */
+    suspend fun forwardContact(sourceChatId: Long, msgId: Long, targetChatId: Long): ChatMessage?
+
+    /**
+     * Sends a node to the specified chatroom
+     *
+     * The attachment message includes information about the node, so the receiver can download
+     * or import the node.
+     *
+     * In contrast to other functions to send messages, such as
+     * MegaChatApi::sendMessage or MegaChatApi::attachContacts, this function
+     * is asynchronous and does not return a MegaChatMessage directly. Instead, the
+     * MegaChatMessage can be obtained as a result of the corresponding MegaChatRequest.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_ATTACH_NODE_MESSAGE
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getUserHandle - Returns the handle of the node
+     *
+     * Valid data in the MegaChatRequest object received in onRequestFinish when the error code
+     * is MegaError::ERROR_OK:
+     * - MegaChatRequest::getMegaChatMessage - Returns the message that has been sent
+     *
+     * When the server confirms the reception of the message, the MegaChatRoomListener::onMessageUpdate
+     * is called, including the definitive id and the new status: MegaChatMessage::STATUS_SERVER_RECEIVED.
+     * At this point, the app should refresh the message identified by the temporal id and move it to
+     * the final position in the history, based on the reported index in the callback.
+     *
+     * If the message is rejected by the server, the message will keep its temporal id and will have its
+     * a message id set to MEGACHAT_INVALID_HANDLE.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param nodeHandle Handle of the node that the user wants to attach
+     * @return Msg id.
+     */
+    suspend fun attachNode(chatId: Long, nodeHandle: Long): Long?
+
+    /**
+     * Sends a node that contains a voice message to the specified chatroom
+     *
+     * The voice clip message includes information about the node, so the receiver can reproduce it online.
+     *
+     * In contrast to other functions to send messages, such as MegaChatApi::sendMessage or
+     * MegaChatApi::attachContacts, this function is asynchronous and does not return a MegaChatMessage
+     * directly. Instead, the MegaChatMessage can be obtained as a result of the corresponding MegaChatRequest.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_ATTACH_NODE_MESSAGE
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getUserHandle - Returns the handle of the node
+     * - MegaChatRequest::getParamType - Returns 1 (to identify the attachment as a voice message)
+     *
+     * Valid data in the MegaChatRequest object received in onRequestFinish when the error code
+     * is MegaError::ERROR_OK:
+     * - MegaChatRequest::getMegaChatMessage - Returns the message that has been sent
+     *
+     * When the server confirms the reception of the message, the MegaChatRoomListener::onMessageUpdate
+     * is called, including the definitive id and the new status: MegaChatMessage::STATUS_SERVER_RECEIVED.
+     * At this point, the app should refresh the message identified by the temporal id and move it to
+     * the final position in the history, based on the reported index in the callback.
+     *
+     * If the message is rejected by the server, the message will keep its temporal id and will have its
+     * a message id set to MEGACHAT_INVALID_HANDLE.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param nodeHandle Handle of the node that the user wants to attach
+     * @return Identifier of the temp message attached.
+     */
+    suspend fun attachVoiceMessage(chatId: Long, nodeHandle: Long): Long?
 }

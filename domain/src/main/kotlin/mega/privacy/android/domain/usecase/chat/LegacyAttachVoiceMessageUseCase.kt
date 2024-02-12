@@ -8,6 +8,8 @@ import javax.inject.Inject
  *
  * @property chatRepository [ChatRepository]
  */
+
+@Deprecated("Deprecated. Replace with AttachVoiceMessageUseCase")
 class LegacyAttachVoiceMessageUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
 ) {

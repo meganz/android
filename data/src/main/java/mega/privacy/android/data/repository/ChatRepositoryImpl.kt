@@ -990,6 +990,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    @Deprecated("Deprecated. Replace with the same fun in ChatMessageRepository")
     override suspend fun attachNode(chatId: Long, nodeHandle: Long) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getChatRequestListener("attachNode") {
@@ -1008,6 +1009,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    @Deprecated("Deprecated. Replace with the same fun in ChatMessageRepository")
     override suspend fun attachVoiceMessage(chatId: Long, nodeHandle: Long) =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->

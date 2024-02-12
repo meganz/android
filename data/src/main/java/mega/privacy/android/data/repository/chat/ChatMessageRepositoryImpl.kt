@@ -138,4 +138,47 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
         chatStorageGateway.fetchPendingMessages(chatId)
             .map { list -> list.map { pendingMessageMapper(it) } }
             .flowOn(ioDispatcher)
+
+    override suspend fun forwardContact(
+        sourceChatId: Long,
+        msgId: Long,
+        targetChatId: Long,
+    ): ChatMessage? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.forwardContact(sourceChatId, msgId, targetChatId)?.let {
+                chatMessageMapper(it)
+            }
+        }
+
+    override suspend fun attachNode(chatId: Long, nodeHandle: Long): Long? =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getChatRequestListener("attachNode") {
+                    it.megaChatMessage.tempId
+                }
+                megaChatApiGateway.attachNode(chatId, nodeHandle, listener)
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+
+    override suspend fun attachVoiceMessage(chatId: Long, nodeHandle: Long): Long? =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getChatRequestListener("attachVoiceMessage") {
+                    it.megaChatMessage.tempId
+                }
+
+                megaChatApiGateway.attachVoiceMessage(
+                    chatId = chatId,
+                    nodeHandle = nodeHandle,
+                    listener = listener,
+                )
+
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 }
