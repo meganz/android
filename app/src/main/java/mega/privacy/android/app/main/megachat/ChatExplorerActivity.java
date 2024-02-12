@@ -4,6 +4,7 @@ package mega.privacy.android.app.main.megachat;
 import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
 import static mega.privacy.android.app.utils.Constants.ACTION_FORWARD_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
+import static mega.privacy.android.app.utils.Constants.ID_CHAT_FROM;
 import static mega.privacy.android.app.utils.Constants.ID_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.NODE_HANDLES;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CREATE_CHAT;
@@ -132,8 +133,10 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
             if (intent.getAction() != null) {
                 if (intent.getAction() == ACTION_FORWARD_MESSAGES) {
                     messagesIds = intent.getLongArrayExtra(ID_MESSAGES);
-                    Timber.d("Number of messages to forward: %s", messagesIds.length);
-                    chatIdFrom = intent.getLongExtra("ID_CHAT_FROM", -1);
+                    if (messagesIds != null) {
+                        Timber.d("Number of messages to forward: %s", messagesIds.length);
+                    }
+                    chatIdFrom = intent.getLongExtra(ID_CHAT_FROM, -1);
                 }
             } else {
                 nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);

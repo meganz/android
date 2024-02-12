@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -131,6 +133,7 @@ private fun RowScope.ForwardIcon(
             .size(24.dp)
             .align(Alignment.CenterVertically)
             .testTag(TEST_TAG_FORWARD_ICON)
+            .clip(CircleShape)
             .clickable { onForwardClicked() },
         painter = painterResource(id = R.drawable.ic_forward_circle),
         contentDescription = "Icon Forward",

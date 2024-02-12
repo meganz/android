@@ -752,7 +752,7 @@ internal fun ChatView(
                                 },
                                 { message ->
                                     forwardingMessages = listOf(message)
-                                    openChatPicker(context, chatPickerLauncher)
+                                    openChatPicker(context, chatId, chatPickerLauncher)
                                 },
                                 { hasSelectableMessage -> canSelect = hasSelectableMessage },
                             )

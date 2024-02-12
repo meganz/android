@@ -6,6 +6,7 @@ import static mega.privacy.android.app.utils.ChatUtil.getMegaChatMessage;
 import static mega.privacy.android.app.utils.ChatUtil.getMutedPeriodString;
 import static mega.privacy.android.app.utils.Constants.ACTION_FORWARD_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.FROM_OTHERS;
+import static mega.privacy.android.app.utils.Constants.ID_CHAT_FROM;
 import static mega.privacy.android.app.utils.Constants.ID_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.IMPORT_TO_SHARE_OPTION;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED;
@@ -1028,7 +1029,7 @@ public class ChatController {
 
         Intent i = new Intent(context, ChatExplorerActivity.class);
         i.putExtra(ID_MESSAGES, idMessages);
-        i.putExtra("ID_CHAT_FROM", idChat);
+        i.putExtra(ID_CHAT_FROM, idChat);
         i.setAction(ACTION_FORWARD_MESSAGES);
         if (context instanceof ChatActivity) {
             ((ChatActivity) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
