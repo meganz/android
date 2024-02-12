@@ -1,10 +1,12 @@
 package mega.privacy.android.domain.entity.chat.messages
 
+import kotlinx.serialization.Polymorphic
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
  * Message
  */
+@Polymorphic
 interface Message {
 
     /**

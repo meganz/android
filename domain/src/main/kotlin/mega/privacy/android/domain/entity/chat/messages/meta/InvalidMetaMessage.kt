@@ -1,10 +1,12 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
  * Invalid meta message
  */
+@Serializable
 data class InvalidMetaMessage(
     override val msgId: Long,
     override val time: Long,

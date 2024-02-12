@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages.management
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import kotlin.time.Duration
@@ -10,6 +11,7 @@ import kotlin.time.Duration
  * @property termCode Reason of the call termination
  * @property duration Duration of the call
  */
+@Serializable
 data class CallEndedMessage(
     override val msgId: Long,
     override val time: Long,

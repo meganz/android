@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
@@ -7,6 +8,7 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  *
  * @property chatRichPreviewInfo [ChatRichPreviewInfo]
  */
+@Serializable
 data class RichPreviewMessage(
     override val msgId: Long,
     override val time: Long,

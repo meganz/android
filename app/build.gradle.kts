@@ -302,6 +302,10 @@ dependencies {
     implementation(project(":liveeventbus-x"))
     implementation(project(":analytics"))
     implementation(project(":icon-pack"))
+    implementation(project(":feature:sync"))
+    implementation(project(":feature:devicecenter"))
+
+    //Test Modules
     testImplementation(project(":core-ui-test"))
 
     // Jetbrains
@@ -337,6 +341,7 @@ dependencies {
     implementation(androidx.viewpager2)
     implementation(androidx.work.ktx)
     implementation(androidx.paging)
+    implementation(androidx.sqlite.ktx)
 
     // Compose
     implementation(platform(androidx.compose.bom))
@@ -427,6 +432,9 @@ dependencies {
     implementation(lib.compose.state.events)
     implementation(testlib.hamcrest)
     implementation(lib.mega.analytics)
+    implementation(lib.kotlin.serialisation)
+
+    // Debug
     debugImplementation(lib.nocturn)
     debugImplementation(lib.xray)
 
@@ -490,11 +498,6 @@ dependencies {
     "qaImplementation"(testlib.compose.manifest)
 
     lintChecks(project(":lint"))
-
-    implementation(project(":feature:sync"))
-    implementation(project(":feature:devicecenter"))
-
-    implementation(androidx.sqlite.ktx)
 }
 
 tasks.register("instrumentClasses") {

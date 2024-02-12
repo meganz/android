@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages.normal
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.LinkDetail
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
@@ -8,6 +9,7 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  * @property links all links in the message
  * @property content Link
  */
+@Serializable
 data class TextLinkMessage(
     override val msgId: Long,
     override val time: Long,

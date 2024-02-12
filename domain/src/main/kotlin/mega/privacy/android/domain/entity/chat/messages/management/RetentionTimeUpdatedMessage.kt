@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages.management
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
@@ -7,6 +8,7 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  *
  * @param retentionTime The retention time.
  */
+@Serializable
 data class RetentionTimeUpdatedMessage(
     override val msgId: Long,
     override val time: Long,

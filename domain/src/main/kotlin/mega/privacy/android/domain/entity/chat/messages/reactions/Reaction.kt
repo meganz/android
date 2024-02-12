@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages.reactions
 
+import kotlinx.serialization.Serializable
+
 /**
  * Data class for storing message reactions data.
  *
@@ -8,6 +10,7 @@ package mega.privacy.android.domain.entity.chat.messages.reactions
  * @param userHandles List of user handles who reacted with this reaction
  * @param hasMe Whether the current user has reacted with this reaction
  */
+@Serializable
 data class Reaction(
     val reaction: String,
     val count: Int,

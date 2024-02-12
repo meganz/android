@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.FileNode
@@ -8,6 +9,7 @@ import mega.privacy.android.domain.entity.node.FileNode
  * Node attachment message
  * @property fileNode The attached node
  */
+@Serializable
 data class NodeAttachmentMessage(
     override val msgId: Long,
     override val time: Long,

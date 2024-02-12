@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.ChatGeolocation
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
@@ -8,6 +9,7 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  *
  * @property chatGeolocationInfo [ChatGeolocation]
  */
+@Serializable
 data class LocationMessage(
     override val msgId: Long,
     override val time: Long,

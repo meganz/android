@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages
 
+import kotlinx.serialization.Polymorphic
 import mega.privacy.android.domain.entity.FileTypeInfo
 
 import kotlin.time.Duration
@@ -11,6 +12,7 @@ import kotlin.time.Duration
  * @property duration
  * @property fileType
  */
+@Polymorphic
 interface AttachmentMessage : TypedMessage {
     val fileSize: Long
     val fileName: String

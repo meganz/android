@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat.messages.invalid
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
@@ -10,6 +11,7 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  * @property isMine
  * @property userHandle
  */
+@Serializable
 data class FormatInvalidMessage(
     override val msgId: Long,
     override val time: Long,

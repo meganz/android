@@ -4,6 +4,7 @@ plugins {
     id("kotlin")
     id("com.android.lint")
     id("kotlin-kapt")
+    kotlin("plugin.serialization") version "1.9.21"
 }
 
 lint {
@@ -50,6 +51,8 @@ dependencies {
 
     implementation(google.hilt.core)
     implementation(androidx.paging.core)
+
+    implementation(lib.kotlin.serialisation)
 
     val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
     if (shouldApplyDefaultConfiguration()) {

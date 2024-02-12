@@ -1,10 +1,10 @@
 package mega.privacy.android.domain.entity.chat.messages.invalid
 
+import kotlinx.serialization.Polymorphic
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
  * Invalid message
- *
- * @property type [InvalidMessageType]
  */
+@Polymorphic
 interface InvalidMessage : TypedMessage

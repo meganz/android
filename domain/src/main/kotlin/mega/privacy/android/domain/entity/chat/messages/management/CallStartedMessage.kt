@@ -1,10 +1,12 @@
 package mega.privacy.android.domain.entity.chat.messages.management
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
  * Call started message
  */
+@Serializable
 data class CallStartedMessage(
     override val msgId: Long,
     override val time: Long,
