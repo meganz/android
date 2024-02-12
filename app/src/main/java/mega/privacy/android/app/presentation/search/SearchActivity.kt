@@ -51,7 +51,8 @@ import mega.privacy.android.app.presentation.filelink.view.animationSpecs
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
-import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionsViewModel
+import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
@@ -90,6 +91,7 @@ import javax.inject.Inject
 class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private val viewModel: SearchActivityViewModel by viewModels()
     private val nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel by viewModels()
+    private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
 
@@ -173,12 +175,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         //Should be done in onCreate to avoid the issue that the activity is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED.
         val bottomSheetActionHandler =
-            NodeBottomSheetActionHandler(this, nodeOptionsBottomSheetViewModel)
+            NodeActionHandler(this, nodeActionsViewModel)
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-            val nodeOptionsBottomSheetState by nodeOptionsBottomSheetViewModel.state.collectAsStateWithLifecycle()
+            val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
             val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
 
             // Remember a SystemUiController
@@ -226,11 +228,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             .statusBarsPadding(),
                         viewModel = viewModel,
                         nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
+                        nodeActionsViewModel = nodeActionsViewModel,
                         handleClick = ::handleClick,
                         navigateToLink = ::navigateToLink,
                         showSortOrderBottomSheet = ::showSortOrderBottomSheet,
                         trackAnalytics = ::trackAnalytics,
-                        nodeBottomSheetActionHandler = bottomSheetActionHandler,
+                        nodeActionHandler = bottomSheetActionHandler,
                         navHostController = navHostController,
                         bottomSheetNavigator = bottomSheetNavigator,
                         onBackPressed = {
@@ -244,27 +247,27 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 }
 
                 EventEffect(
-                    event = nodeOptionsBottomSheetState.nodeNameCollisionResult,
-                    onConsumed = nodeOptionsBottomSheetViewModel::markHandleNodeNameCollisionResult,
+                    event = nodeActionState.nodeNameCollisionResult,
+                    onConsumed = nodeActionsViewModel::markHandleNodeNameCollisionResult,
                     action = {
                         handleNodesNameCollisionResult(it)
                     }
                 )
                 EventEffect(
-                    event = nodeOptionsBottomSheetState.showForeignNodeDialog,
-                    onConsumed = nodeOptionsBottomSheetViewModel::markForeignNodeDialogShown,
+                    event = nodeActionState.showForeignNodeDialog,
+                    onConsumed = nodeActionsViewModel::markForeignNodeDialogShown,
                     action = { navHostController.navigate(searchForeignNodeDialog) }
                 )
                 EventEffect(
-                    event = nodeOptionsBottomSheetState.showQuotaDialog,
-                    onConsumed = nodeOptionsBottomSheetViewModel::markQuotaDialogShown,
+                    event = nodeActionState.showQuotaDialog,
+                    onConsumed = nodeActionsViewModel::markQuotaDialogShown,
                     action = {
                         navHostController.navigate(searchOverQuotaDialog.plus("/${it}"))
                     }
                 )
                 EventEffect(
-                    event = nodeOptionsBottomSheetState.contactsData,
-                    onConsumed = nodeOptionsBottomSheetViewModel::markShareFolderAccessDialogShown,
+                    event = nodeActionState.contactsData,
+                    onConsumed = nodeActionsViewModel::markShareFolderAccessDialogShown,
                     action = {
                         val contactList = it.first.joinToString(separator = contactArraySeparator)
                         navHostController.navigate(
@@ -273,8 +276,8 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                     },
                 )
                 StartDownloadComponent(
-                    event = nodeOptionsBottomSheetState.downloadEvent,
-                    onConsumeEvent = nodeOptionsBottomSheetViewModel::markDownloadEventConsumed,
+                    event = nodeActionState.downloadEvent,
+                    onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                     snackBarHostState = snackbarHostState,
                 )
             }
@@ -408,8 +411,8 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         }
         if (result.noConflictNodes.isNotEmpty()) {
             when (result.type) {
-                NodeNameCollisionType.MOVE -> nodeOptionsBottomSheetViewModel.moveNodes(result.noConflictNodes)
-                NodeNameCollisionType.COPY -> nodeOptionsBottomSheetViewModel.copyNodes(result.noConflictNodes)
+                NodeNameCollisionType.MOVE -> nodeActionsViewModel.moveNodes(result.noConflictNodes)
+                NodeNameCollisionType.COPY -> nodeActionsViewModel.copyNodes(result.noConflictNodes)
                 else -> Timber.d("Not implemented")
             }
         }

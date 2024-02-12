@@ -3,7 +3,8 @@ package mega.privacy.android.app.presentation.search
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
@@ -31,7 +32,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param navigateToLink Function to navigate to link
  * @param handleClick Function to handle click
  * @param navHostController Navigation controller
- * @param nodeBottomSheetActionHandler Node bottom sheet action handler
+ * @param nodeActionHandler Node bottom sheet action handler
  * @param searchActivityViewModel Search activity view model
  * @param onBackPressed OnBackPressed
  */
@@ -41,10 +42,11 @@ internal fun NavGraphBuilder.searchNavGraph(
     navigateToLink: (String) -> Unit,
     handleClick: (TypedNode?) -> Unit,
     navHostController: NavHostController,
-    nodeBottomSheetActionHandler: NodeBottomSheetActionHandler,
+    nodeActionHandler: NodeActionHandler,
     searchActivityViewModel: SearchActivityViewModel,
     nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
     onBackPressed: () -> Unit,
+    nodeActionsViewModel: NodeActionsViewModel,
 ) {
     composable(searchRoute) {
         SearchScreen(
@@ -54,7 +56,8 @@ internal fun NavGraphBuilder.searchNavGraph(
             showSortOrderBottomSheet = showSortOrderBottomSheet,
             navHostController = navHostController,
             searchActivityViewModel = searchActivityViewModel,
-            onBackPressed = onBackPressed
+            onBackPressed = onBackPressed,
+            nodeActionHandler = nodeActionHandler
         )
     }
     moveToRubbishOrDeleteNavigation(
@@ -64,7 +67,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     )
     renameDialogNavigation(navHostController, nodeOptionsBottomSheetViewModel)
     nodeBottomSheetNavigation(
-        nodeBottomSheetActionHandler,
+        nodeActionHandler,
         navHostController,
         nodeOptionsBottomSheetViewModel
     )
@@ -82,7 +85,7 @@ internal fun NavGraphBuilder.searchNavGraph(
         navHostController = navHostController,
         searchActivityViewModel = searchActivityViewModel,
         nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
-        nodeBottomSheetActionHandler = nodeBottomSheetActionHandler
+        nodeActionHandler = nodeActionHandler
     )
     removeShareFolderDialogNavigation(
         navHostController = navHostController,
@@ -103,7 +106,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     )
     cannotOpenFileDialogNavigation(
         navHostController = navHostController,
-        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
+        nodeActionsViewModel = nodeActionsViewModel,
     )
 }
 

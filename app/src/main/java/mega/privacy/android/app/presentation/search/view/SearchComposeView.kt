@@ -17,10 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.node.NodeToolbarActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
@@ -63,6 +64,7 @@ fun SearchComposeView(
     onBackPressed: () -> Unit,
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
+    nodeActionHandler: NodeActionHandler,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -92,9 +94,7 @@ fun SearchComposeView(
                 selectedNodes = state.selectedNodes,
                 totalCount = state.searchItemList.size,
                 navHostController = navHostController,
-                nodeToolbarActionHandler = NodeToolbarActionHandler(
-                    LocalContext.current as SearchActivity,
-                ),
+                nodeActionHandler = nodeActionHandler,
             )
         },
         snackbarHost = {
@@ -167,8 +167,12 @@ private fun PreviewSearchComposeView() {
         updateFilter = {},
         trackAnalytics = {},
         updateSearchQuery = {},
-        modifier = Modifier,
         onBackPressed = {},
-        navHostController = NavHostController(LocalContext.current)
+        navHostController = NavHostController(LocalContext.current),
+        modifier = Modifier,
+        nodeActionHandler = NodeActionHandler(
+            LocalContext.current as SearchActivity,
+            hiltViewModel()
+        )
     )
 }

@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * Node bottom sheet action handler
  *
  * @property activity
- * @property nodeOptionsBottomSheetViewModel
+ * @property nodeActionsViewModel
  */
 @Deprecated(
     """
@@ -32,9 +32,9 @@ import mega.privacy.android.domain.entity.node.TypedNode
     replaced by the individual actions defined in the NodeBottomSheetMenuItem implementations
     """
 )
-class NodeBottomSheetActionHandler(
+class NodeActionHandler(
     private val activity: Activity,
-    private val nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
+    private val nodeActionsViewModel: NodeActionsViewModel,
 ) {
 
     private val selectMoveNodeActivityLauncher =
@@ -42,7 +42,7 @@ class NodeBottomSheetActionHandler(
             SelectFolderToMoveActivityContract()
         ) { result ->
             result?.let {
-                nodeOptionsBottomSheetViewModel.checkNodesNameCollision(
+                nodeActionsViewModel.checkNodesNameCollision(
                     it.first.toList(),
                     it.second,
                     NodeNameCollisionType.MOVE
@@ -55,7 +55,7 @@ class NodeBottomSheetActionHandler(
             SelectFolderToMoveActivityContract()
         ) { result ->
             result?.let {
-                nodeOptionsBottomSheetViewModel.checkNodesNameCollision(
+                nodeActionsViewModel.checkNodesNameCollision(
                     it.first.toList(),
                     it.second,
                     NodeNameCollisionType.COPY
@@ -68,7 +68,7 @@ class NodeBottomSheetActionHandler(
             VersionsFileActivityContract()
         ) { result ->
             result?.let {
-                nodeOptionsBottomSheetViewModel.deleteVersionHistory(it)
+                nodeActionsViewModel.deleteVersionHistory(it)
             }
         }
 
@@ -77,7 +77,7 @@ class NodeBottomSheetActionHandler(
             ShareFolderActivityContract()
         ) { result ->
             result?.let {
-                nodeOptionsBottomSheetViewModel.contactSelectedForShareFolder(it)
+                nodeActionsViewModel.contactSelectedForShareFolder(it)
             }
         }
 
@@ -86,7 +86,7 @@ class NodeBottomSheetActionHandler(
             SelectFolderToMoveActivityContract()
         ) { result ->
             result?.let {
-                nodeOptionsBottomSheetViewModel.checkNodesNameCollision(
+                nodeActionsViewModel.checkNodesNameCollision(
                     it.first.toList(),
                     it.second,
                     NodeNameCollisionType.RESTORE
@@ -99,7 +99,7 @@ class NodeBottomSheetActionHandler(
             SendToChatActivityContract()
         ) { result ->
             result?.let { (nodeHandles, chatIds) ->
-                nodeOptionsBottomSheetViewModel.attachNodeToChats(
+                nodeActionsViewModel.attachNodeToChats(
                     nodeHandles = nodeHandles,
                     chatIds = chatIds,
                 )
@@ -107,12 +107,13 @@ class NodeBottomSheetActionHandler(
         }
 
     /**
-     * handles actions
+     * handles actions from bottom sheet
      *
      * @param action
      * @param node
      */
     fun handleAction(action: MenuAction, node: TypedNode) {
+        nodeActionsViewModel.updateSelectedNodes(listOf(node))
         when (action) {
             is VersionsMenuAction -> versionsActivityLauncher?.launch(node.id.longValue)
             is MoveMenuAction -> selectMoveNodeActivityLauncher?.launch(longArrayOf(node.id.longValue))
@@ -120,9 +121,25 @@ class NodeBottomSheetActionHandler(
             is ShareFolderMenuAction -> shareFolderActivityLauncher?.launch(longArrayOf(node.id.longValue))
             is RestoreMenuAction -> restoreFromRubbishLauncher?.launch(longArrayOf(node.id.longValue))
             is SendToChatMenuAction -> sendToChatLauncher?.launch(longArrayOf(node.id.longValue))
-            is OpenWithMenuAction -> nodeOptionsBottomSheetViewModel.downloadNodeForPreview()
-            is DownloadMenuAction -> nodeOptionsBottomSheetViewModel.downloadNode()
-            is AvailableOfflineMenuAction -> nodeOptionsBottomSheetViewModel.downloadNodeForOffline()
+            is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview()
+            is DownloadMenuAction -> nodeActionsViewModel.downloadNode()
+            is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline()
+            else -> throw NotImplementedError("Action $action does not have a handler.")
+        }
+    }
+
+    /**
+     * handle actions from toolbar
+     *
+     * @param action
+     * @param nodes
+     */
+    fun handleAction(action: MenuAction, nodes: List<TypedNode>) {
+        nodeActionsViewModel.updateSelectedNodes(nodes)
+        when (action) {
+            is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview()
+            is DownloadMenuAction -> nodeActionsViewModel.downloadNode()
+            is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline()
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }
     }

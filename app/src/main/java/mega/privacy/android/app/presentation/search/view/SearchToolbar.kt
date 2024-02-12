@@ -9,7 +9,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.node.NodeToolbarActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.view.ToolbarMenuItem
 import mega.privacy.android.app.presentation.node.view.toolbar.NodeToolbarViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
@@ -40,7 +40,7 @@ fun SearchToolBar(
     totalCount: Int,
     onBackPressed: () -> Unit,
     navHostController: NavHostController,
-    nodeToolbarActionHandler: NodeToolbarActionHandler,
+    nodeActionHandler: NodeActionHandler,
     toolbarViewModel: NodeToolbarViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(key1 = selectedNodes.size) {
@@ -58,7 +58,7 @@ fun SearchToolBar(
         menuActions = toolbarState.toolbarMenuItems,
         onBackPressed = onBackPressed,
         navHostController = navHostController,
-        handler = nodeToolbarActionHandler
+        handler = nodeActionHandler
     )
 }
 
@@ -70,7 +70,7 @@ private fun SearchToolbarBody(
     selectedNodes: Set<TypedNode>,
     onBackPressed: () -> Unit,
     navHostController: NavHostController,
-    handler: NodeToolbarActionHandler,
+    handler: NodeActionHandler,
 ) {
     if (selectedNodes.isNotEmpty()) {
         val actions = menuActions.map {
@@ -105,8 +105,9 @@ private fun PreviewSearchToolbarBody() {
             onBackPressed = {},
             selectedNodes = emptySet(),
             menuActions = emptyList(),
-            handler = NodeToolbarActionHandler(
+            handler = NodeActionHandler(
                 LocalContext.current as SearchActivity,
+                hiltViewModel(),
             ),
             navHostController = NavHostController(LocalContext.current)
         )

@@ -8,7 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
-import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.view.NodeOptionsBottomSheetContent
 
@@ -17,7 +17,7 @@ internal const val nodeBottomSheetRouteNodeIdArg = "node_id"
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.nodeBottomSheetNavigation(
-    nodeBottomSheetActionHandler: NodeBottomSheetActionHandler,
+    nodeActionHandler: NodeActionHandler,
     navHostController: NavHostController,
     nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
 ) {
@@ -36,7 +36,7 @@ internal fun NavGraphBuilder.nodeBottomSheetNavigation(
                 nodeOptionsBottomSheetViewModel.getBottomSheetOptions(nodeId)
             }
             NodeOptionsBottomSheetContent(
-                handler = nodeBottomSheetActionHandler,
+                handler = nodeActionHandler,
                 navHostController = navHostController,
                 viewModel = nodeOptionsBottomSheetViewModel,
                 onDismiss = {

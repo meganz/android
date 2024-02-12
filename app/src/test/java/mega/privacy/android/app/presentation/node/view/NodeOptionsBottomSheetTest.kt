@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
-import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.model.NodeBottomSheetState
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -22,7 +22,7 @@ class NodeOptionsBottomSheetTest {
     val composeTestRule = createComposeRule()
 
     private val viewModel = mock<NodeOptionsBottomSheetViewModel>()
-    private val nodeBottomSheetActionHandler = mock<NodeBottomSheetActionHandler>()
+    private val nodeActionHandler = mock<NodeActionHandler>()
     private val navHostController = mock<NavHostController>()
     private val node = mock<TypedFolderNode> {
         on { name }.thenReturn("name")
@@ -52,7 +52,7 @@ class NodeOptionsBottomSheetTest {
 
         composeTestRule.setContent {
             NodeOptionsBottomSheetContent(
-                handler = nodeBottomSheetActionHandler,
+                handler = nodeActionHandler,
                 viewModel = viewModel,
                 navHostController = navHostController,
                 onDismiss = {}
@@ -90,7 +90,7 @@ class NodeOptionsBottomSheetTest {
 
         composeTestRule.setContent {
             NodeOptionsBottomSheetContent(
-                handler = nodeBottomSheetActionHandler,
+                handler = nodeActionHandler,
                 viewModel = viewModel,
                 navHostController = navHostController,
                 onDismiss = {},

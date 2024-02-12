@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRoute
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
@@ -38,6 +39,7 @@ fun SearchScreen(
     onBackPressed: () -> Unit,
     searchActivityViewModel: SearchActivityViewModel,
     modifier: Modifier = Modifier,
+    nodeActionHandler: NodeActionHandler,
 ) {
     val uiState by searchActivityViewModel.state.collectAsStateWithLifecycle()
     val modalSheetState = rememberModalBottomSheetState(
@@ -80,7 +82,8 @@ fun SearchScreen(
         trackAnalytics = trackAnalytics,
         updateSearchQuery = searchActivityViewModel::updateSearchQuery,
         onBackPressed = onBackPressed,
-        navHostController = navHostController
+        navHostController = navHostController,
+        nodeActionHandler = nodeActionHandler,
     )
     handleClick(uiState.lastSelectedNode)
 }

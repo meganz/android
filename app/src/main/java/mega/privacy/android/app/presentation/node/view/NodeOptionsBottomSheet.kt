@@ -15,7 +15,7 @@ import androidx.navigation.NavHostController
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.view.extension.fileInfo
 import mega.privacy.android.app.presentation.view.extension.folderInfo
@@ -38,7 +38,7 @@ import timber.log.Timber
  */
 @Composable
 internal fun NodeOptionsBottomSheetContent(
-    handler: NodeBottomSheetActionHandler,
+    handler: NodeActionHandler,
     navHostController: NavHostController,
     onDismiss: () -> Unit,
     viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),

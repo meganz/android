@@ -10,7 +10,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning.ShareFolderDialog
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
@@ -23,7 +23,7 @@ internal fun NavGraphBuilder.shareFolderDialogNavigation(
     navHostController: NavHostController,
     searchActivityViewModel: SearchActivityViewModel,
     nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
-    nodeBottomSheetActionHandler: NodeBottomSheetActionHandler
+    nodeActionHandler: NodeActionHandler
 ) {
     dialog(
         route = "$searchFolderShareDialog/{$isFromToolbar}",
@@ -40,7 +40,7 @@ internal fun NavGraphBuilder.shareFolderDialogNavigation(
                         navHostController.navigateUp()
                     },
                     onOkClicked = {
-                        nodeBottomSheetActionHandler.handleAction(ShareFolderMenuAction(), node)
+                        nodeActionHandler.handleAction(ShareFolderMenuAction(), node)
                     }
                 )
             }

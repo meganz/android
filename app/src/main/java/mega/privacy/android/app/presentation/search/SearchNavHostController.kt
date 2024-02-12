@@ -9,7 +9,8 @@ import androidx.navigation.compose.NavHost
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
-import mega.privacy.android.app.presentation.node.NodeBottomSheetActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -22,7 +23,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param navigateToLink Function to navigate to link
  * @param showSortOrderBottomSheet Function to show sort order bottom sheet
  * @param trackAnalytics Function to track analytics
- * @param nodeBottomSheetActionHandler Node bottom sheet action handler
+ * @param nodeActionHandler Node bottom sheet action handler
  * @param modifier Modifier
  */
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -35,10 +36,11 @@ internal fun SearchNavHostController(
     showSortOrderBottomSheet: () -> Unit,
     trackAnalytics: (SearchFilter?) -> Unit,
     onBackPressed: () -> Unit,
-    nodeBottomSheetActionHandler: NodeBottomSheetActionHandler,
+    nodeActionHandler: NodeActionHandler,
     navHostController: NavHostController,
     bottomSheetNavigator: BottomSheetNavigator,
     modifier: Modifier = Modifier,
+    nodeActionsViewModel: NodeActionsViewModel,
 ) {
     ModalBottomSheetLayout(
         modifier = modifier.navigationBarsPadding(),
@@ -57,9 +59,10 @@ internal fun SearchNavHostController(
                 trackAnalytics = trackAnalytics,
                 navHostController = navHostController,
                 searchActivityViewModel = viewModel,
-                nodeBottomSheetActionHandler = nodeBottomSheetActionHandler,
+                nodeActionHandler = nodeActionHandler,
                 onBackPressed = onBackPressed,
                 nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
+                nodeActionsViewModel = nodeActionsViewModel
             )
         }
     }
