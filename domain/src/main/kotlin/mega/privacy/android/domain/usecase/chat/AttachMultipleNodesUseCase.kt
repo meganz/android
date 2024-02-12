@@ -9,10 +9,10 @@ import javax.inject.Inject
 
 /**
  * Use case to attach multiple node use case to chat
- * @property attachNodeUseCase [AttachNodeUseCase]
+ * @property legacyAttachNodeUseCase [LegacyAttachNodeUseCase]
  */
 class AttachMultipleNodesUseCase @Inject constructor(
-    private val attachNodeUseCase: AttachNodeUseCase,
+    private val legacyAttachNodeUseCase: LegacyAttachNodeUseCase,
 ) {
     /**
      * Invoke
@@ -29,7 +29,7 @@ class AttachMultipleNodesUseCase @Inject constructor(
                 async {
                     runCatching {
                         chatIds.map { chatId ->
-                            attachNodeUseCase(chatId = chatId, nodeId = nodeId)
+                            legacyAttachNodeUseCase(chatId = chatId, nodeId = nodeId)
                         }
                     }.recover {
                         return@async Result.failure(it)

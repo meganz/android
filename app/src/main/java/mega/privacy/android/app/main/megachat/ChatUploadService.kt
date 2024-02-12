@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.megachat
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
@@ -47,6 +48,7 @@ import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
@@ -57,8 +59,8 @@ import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.entity.transfer.pendingMessageId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
-import mega.privacy.android.domain.usecase.chat.AttachNodeUseCase
-import mega.privacy.android.domain.usecase.chat.AttachVoiceMessageUseCase
+import mega.privacy.android.domain.usecase.chat.LegacyAttachNodeUseCase
+import mega.privacy.android.domain.usecase.chat.LegacyAttachVoiceMessageUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
@@ -73,8 +75,6 @@ import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTran
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
@@ -133,10 +133,10 @@ class ChatUploadService : LifecycleService() {
     lateinit var cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase
 
     @Inject
-    lateinit var attachNodeUseCase: AttachNodeUseCase
+    lateinit var legacyAttachNodeUseCase: LegacyAttachNodeUseCase
 
     @Inject
-    lateinit var attachVoiceMessageUseCase: AttachVoiceMessageUseCase
+    lateinit var legacyAttachVoiceMessageUseCase: LegacyAttachVoiceMessageUseCase
 
     @Inject
     lateinit var getFingerprintUseCase: GetFingerprintUseCase
@@ -382,7 +382,7 @@ class ChatUploadService : LifecycleService() {
                 for (attachFile in attachFiles) {
                     for (idChat in idChats!!) {
                         requestSent++
-                        runCatching { attachNodeUseCase(idChat, NodeId(attachFile)) }
+                        runCatching { legacyAttachNodeUseCase(idChat, NodeId(attachFile)) }
                             .onSuccess { handleSuccessAttachment(attachFile, it) }
                             .onFailure { handleFailureAttachment(it, attachFile) }
                     }
@@ -1205,7 +1205,7 @@ class ChatUploadService : LifecycleService() {
         requestSent++
         pendMsg.nodeHandle = nodeHandle
         pendMsg.state = PendingMessageState.ATTACHING.value
-        runCatching { attachNodeUseCase(pendMsg.chatId, NodeId(nodeHandle)) }
+        runCatching { legacyAttachNodeUseCase(pendMsg.chatId, NodeId(nodeHandle)) }
             .onSuccess { handleSuccessAttachment(nodeHandle, it) }
             .onFailure { handleFailureAttachment(it, nodeHandle) }
 
@@ -1242,7 +1242,7 @@ class ChatUploadService : LifecycleService() {
                 if (pendMsg.id == id) {
                     pendMsg.nodeHandle = nodeHandle
                     pendMsg.state = PendingMessageState.ATTACHING.value
-                    runCatching { attachVoiceMessageUseCase(pendMsg.chatId, nodeHandle) }
+                    runCatching { legacyAttachVoiceMessageUseCase(pendMsg.chatId, nodeHandle) }
                         .onSuccess { handleSuccessAttachment(nodeHandle, it) }
                         .onFailure { handleFailureAttachment(it, nodeHandle) }
                     return@with
