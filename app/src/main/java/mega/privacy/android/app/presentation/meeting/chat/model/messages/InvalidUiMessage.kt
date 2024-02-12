@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.core.ui.controls.chat.messages.ChatErrorBubble
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
@@ -38,8 +37,7 @@ sealed class InvalidUiMessage : AvatarMessage() {
 
     override val displayAsMine: Boolean
         get() = message.isMine
-    override val canForward: Boolean
-        get() = message.canForward
+    override val shouldDisplayForwardIcon = false
     override val timeSent: Long
         get() = message.time
 

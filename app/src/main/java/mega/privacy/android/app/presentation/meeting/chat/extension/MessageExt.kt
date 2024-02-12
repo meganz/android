@@ -4,12 +4,8 @@ import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
-import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
-import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.MetaMessage
-import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
-import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 
 /**
  * Is selectable
@@ -17,18 +13,5 @@ import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 val TypedMessage.isSelectable: Boolean
     get() = when (this) {
         is NormalMessage, is MetaMessage, is VoiceClipMessage, is ContactAttachmentMessage, is NodeAttachmentMessage -> true
-        else -> false
-    }
-
-/**
- * can forward
- */
-val TypedMessage.canForward: Boolean
-    get() = when (this) {
-        is RichPreviewMessage, is GiphyMessage, is LocationMessage,
-        is TextLinkMessage, is ContactAttachmentMessage,
-        is NodeAttachmentMessage, is VoiceClipMessage,
-        -> true
-
         else -> false
     }

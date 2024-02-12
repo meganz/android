@@ -33,7 +33,7 @@ class DateHeaderUiMessage(override val timeSent: Long) : UiChatMessage {
 
     override val id = -1L
     override val displayAsMine = false
-    override val canForward = false
+    override val shouldDisplayForwardIcon = false
     override val userHandle = -1L
     override val showTime = false
     override val reactions = emptyList<UIReaction>()

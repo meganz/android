@@ -62,7 +62,7 @@ interface UiChatMessage {
     /**
      * Can forward
      */
-    val canForward: Boolean
+    val shouldDisplayForwardIcon: Boolean
 
     /**
      * Time sent

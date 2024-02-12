@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.ChatLocationMessageView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
@@ -50,7 +49,7 @@ class LocationUiMessage(
     override val showAvatar = message.shouldShowAvatar
     override val showTime = message.shouldShowTime
     override val displayAsMine = message.isMine
-    override val canForward = message.canForward
+    override val shouldDisplayForwardIcon = true
     override val timeSent = message.time
     override val userHandle = message.userHandle
     override val id = message.msgId

@@ -5,7 +5,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
@@ -37,7 +36,7 @@ data class NodeAttachmentUiMessage(
     override val showTime = message.shouldShowTime
     override val showAvatar = message.shouldShowAvatar
     override val displayAsMine = message.isMine
-    override val canForward = message.canForward
+    override val shouldDisplayForwardIcon = true
     override val timeSent = message.time
     override val userHandle = message.userHandle
     override val id = message.msgId

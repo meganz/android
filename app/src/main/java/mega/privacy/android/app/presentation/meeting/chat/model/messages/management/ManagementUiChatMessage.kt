@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import mega.privacy.android.app.presentation.meeting.chat.extension.canForward
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
@@ -47,7 +46,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),
             isMine = displayAsMine,
-            showForwardIcon = canForward,
+            showForwardIcon = shouldDisplayForwardIcon,
             reactions = reactions,
             onMoreReactionsClick = { onMoreReactionsClicked(id) },
             onReactionClick = { onReactionClicked(id, it, reactions) },
@@ -58,8 +57,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
         )
     }
 
-    override val canForward: Boolean
-        get() = message.canForward
+    override val shouldDisplayForwardIcon = false
 
     override val timeSent: Long
         get() = message.time

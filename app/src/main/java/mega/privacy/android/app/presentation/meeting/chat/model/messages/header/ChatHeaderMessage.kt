@@ -29,7 +29,7 @@ class ChatHeaderMessage : UiChatMessage {
 
     override val id = -1L
     override val displayAsMine = false
-    override val canForward = false
+    override val shouldDisplayForwardIcon = false
     override val timeSent = null
     override val userHandle = -1L
     override val showTime = false

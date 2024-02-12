@@ -67,7 +67,7 @@ abstract class AvatarMessage : UiChatMessage {
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),
             isMine = displayAsMine,
-            showForwardIcon = canForward,
+            showForwardIcon = shouldDisplayForwardIcon,
             reactions = reactions,
             onMoreReactionsClick = { onMoreReactionsClicked(id) },
             onReactionClick = { onReactionClicked(id, it, reactions) },
