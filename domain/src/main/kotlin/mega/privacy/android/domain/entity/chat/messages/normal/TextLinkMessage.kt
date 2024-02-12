@@ -6,8 +6,8 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
  * Contact link message
+ *
  * @property links all links in the message
- * @property content Link
  */
 @Serializable
 data class TextLinkMessage(
@@ -18,6 +18,6 @@ data class TextLinkMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
+    override val content: String,
     val links: List<LinkDetail>,
-    val content: String,
 ) : NormalMessage

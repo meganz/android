@@ -38,7 +38,7 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                     time = timestamp,
                     isMine = isMine,
                     userHandle = userHandle,
-                    content = content,
+                    content = content.orEmpty(),
                     hasOtherLink = allLinks.any { it.type !in supportedTypes },
                     shouldShowAvatar = shouldShowAvatar,
                     shouldShowTime = shouldShowTime,

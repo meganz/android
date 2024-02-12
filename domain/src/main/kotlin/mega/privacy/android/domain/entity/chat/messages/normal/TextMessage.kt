@@ -6,7 +6,6 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 /**
  * Text message
  *
- * @param content Message content.
  * @param hasOtherLink Whether the message contains other links. (Not contact link, file link, folder link)
  */
 @Serializable
@@ -18,6 +17,6 @@ data class TextMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
-    val content: String?,
+    override val content: String,
     val hasOtherLink: Boolean,
 ) : NormalMessage
