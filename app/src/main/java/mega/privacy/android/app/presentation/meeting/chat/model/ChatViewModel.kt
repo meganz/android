@@ -229,6 +229,7 @@ class ChatViewModel @Inject constructor(
         getMyUserHandle()
         checkGeolocation()
         monitorStorageStateEvent()
+        monitorHasAnyContact()
         loadChatOrPreview()
         checkAnonymousMode()
         monitorContactCacheUpdate()
@@ -459,7 +460,6 @@ class ChatViewModel @Inject constructor(
                                 }
                             } else {
                                 monitorAllContactParticipantsInChat(peerHandlesList)
-                                monitorHasAnyContact()
                             }
                         }
                     }
@@ -662,8 +662,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun monitorHasAnyContact() {
-        monitorHasAnyContactJob?.cancel()
-        monitorHasAnyContactJob = viewModelScope.launch {
+        viewModelScope.launch {
             monitorHasAnyContactUseCase().conflate()
                 .collect { hasAnyContact ->
                     _state.update { state -> state.copy(hasAnyContact = hasAnyContact) }
