@@ -15,8 +15,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
-import mega.privacy.android.app.presentation.videosection.model.UIVideo
-import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.view.allvideos.AllVideosView
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistsView
@@ -27,13 +27,13 @@ internal const val videoSectionRoute = "videoSection/video_section"
 @Composable
 internal fun VideoSectionComposeView(
     videoSectionViewModel: VideoSectionViewModel,
-    onClick: (item: UIVideo, index: Int) -> Unit,
+    onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onSortOrderClick: () -> Unit = {},
-    onMenuClick: (UIVideo) -> Unit = {},
-    onLongClick: (item: UIVideo, index: Int) -> Unit = { _, _ -> },
-    onPlaylistItemClick: (item: UIVideoPlaylist, index: Int) -> Unit = { _, _ -> },
-    onPlaylistItemMenuClick: (UIVideoPlaylist) -> Unit = { _ -> },
-    onPlaylistItemLongClick: (UIVideoPlaylist, index: Int) -> Unit = { _, _ -> },
+    onMenuClick: (VideoUIEntity) -> Unit = {},
+    onLongClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
+    onPlaylistItemClick: (item: VideoPlaylistUIEntity, index: Int) -> Unit = { _, _ -> },
+    onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = { _ -> },
+    onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit = { _, _ -> },
 ) {
     val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
     val tabState by videoSectionViewModel.tabState.collectAsStateWithLifecycle()

@@ -35,7 +35,7 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.Constant
 import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_TITLE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_TOTAL_DURATION_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.model.UIVideo
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
@@ -80,9 +80,9 @@ internal const val videoPlaylistDetailRoute = "videoSection/video_playlist/detai
 fun VideoPlaylistDetailView(
     modifier: Modifier = Modifier,
     videoSectionViewModel: VideoSectionViewModel = hiltViewModel(),
-    onClick: (item: UIVideo, index: Int) -> Unit = { _, _ -> },
-    onMenuClick: (UIVideo) -> Unit = { _ -> },
-    onLongClick: ((item: UIVideo, index: Int) -> Unit) = { _, _ -> },
+    onClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
+    onMenuClick: (VideoUIEntity) -> Unit = { _ -> },
+    onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     val uiState = videoSectionViewModel.state.collectAsState()
     val playlist = uiState.value.currentVideoPlaylist

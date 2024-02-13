@@ -20,7 +20,7 @@ import java.io.File
  * @property nodeAvailableOffline the audio if is available for offline
  * @property isSelected the audio if is selected
  */
-data class UIAudio(
+data class AudioUIEntity(
     val id: NodeId,
     val name: String,
     val size: Long,

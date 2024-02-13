@@ -30,7 +30,7 @@ import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
-import mega.privacy.android.app.presentation.audiosection.model.UIAudio
+import mega.privacy.android.app.presentation.audiosection.model.AudioUIEntity
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
@@ -162,7 +162,7 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
 
     private fun openAudioFile(
         activity: Activity,
-        item: UIAudio,
+        item: AudioUIEntity,
         index: Int,
     ) {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -200,7 +200,7 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
     }
 
     private fun getIntent(
-        item: UIAudio,
+        item: AudioUIEntity,
         index: Int,
     ) = getMediaIntent(activity, item.name).apply {
         putExtra(INTENT_EXTRA_KEY_POSITION, index)
@@ -246,7 +246,7 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
         }
     }
 
-    private fun showOptionsMenuForItem(item: UIAudio) {
+    private fun showOptionsMenuForItem(item: AudioUIEntity) {
         (requireActivity() as? ManagerActivity)?.showNodeOptionsPanel(
             nodeId = item.id,
             mode = NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE

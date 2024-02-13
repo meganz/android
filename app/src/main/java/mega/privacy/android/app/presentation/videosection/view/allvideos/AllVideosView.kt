@@ -16,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.videosection.model.UIVideo
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -25,17 +25,17 @@ import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 
 @Composable
 internal fun AllVideosView(
-    items: List<UIVideo>,
+    items: List<VideoUIEntity>,
     progressBarShowing: Boolean,
     searchMode: Boolean,
     scrollToTop: Boolean,
     lazyListState: LazyListState,
     sortOrder: String,
     modifier: Modifier,
-    onClick: (item: UIVideo, index: Int) -> Unit,
-    onMenuClick: (UIVideo) -> Unit,
+    onClick: (item: VideoUIEntity, index: Int) -> Unit,
+    onMenuClick: (VideoUIEntity) -> Unit,
     onSortOrderClick: () -> Unit,
-    onLongClick: ((item: UIVideo, index: Int) -> Unit) = { _, _ -> },
+    onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     LaunchedEffect(items) {
         if (scrollToTop) {

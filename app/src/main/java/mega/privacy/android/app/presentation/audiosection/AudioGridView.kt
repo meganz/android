@@ -9,22 +9,22 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.audiosection.model.UIAudio
+import mega.privacy.android.app.presentation.audiosection.model.AudioUIEntity
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 
 @Composable
 internal fun AudioGridView(
-    items: List<UIAudio>,
+    items: List<AudioUIEntity>,
     lazyGridState: LazyGridState,
     sortOrder: String,
     modifier: Modifier,
     onChangeViewTypeClick: () -> Unit,
-    onClick: (item: UIAudio, index: Int) -> Unit,
-    onMenuClick: (UIAudio) -> Unit,
+    onClick: (item: AudioUIEntity, index: Int) -> Unit,
+    onMenuClick: (AudioUIEntity) -> Unit,
     onSortOrderClick: () -> Unit,
     spanCount: Int = 2,
-    onLongClick: ((item: UIAudio, index: Int) -> Unit) = { _, _ -> },
+    onLongClick: ((item: AudioUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     LazyVerticalGrid(
         state = lazyGridState,

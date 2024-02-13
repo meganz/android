@@ -2,7 +2,7 @@ package test.mega.privacy.android.app.presentation.audiosection
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.audiosection.mapper.UIAudioMapper
+import mega.privacy.android.app.presentation.audiosection.mapper.AudioUIEntityMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
@@ -15,18 +15,18 @@ import org.mockito.kotlin.mock
 import kotlin.time.Duration.Companion.seconds
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UIAudioMapperTest {
-    private lateinit var underTest: UIAudioMapper
+class AudioUIEntityMapperTest {
+    private lateinit var underTest: AudioUIEntityMapper
 
     private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
 
     @BeforeAll
     fun setUp() {
-        underTest = UIAudioMapper(durationInSecondsTextMapper)
+        underTest = AudioUIEntityMapper(durationInSecondsTextMapper)
     }
 
     @Test
-    fun `test that UIAudio can be mapped correctly`() = runTest {
+    fun `test that AudioUIEntity can be mapped correctly`() = runTest {
         val expectedId = NodeId(123456L)
         val expectedName = "Audio file name"
         val expectedSize: Long = 100

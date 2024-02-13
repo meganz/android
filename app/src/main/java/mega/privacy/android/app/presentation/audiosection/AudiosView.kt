@@ -4,24 +4,24 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import mega.privacy.android.app.presentation.audiosection.model.UIAudio
+import mega.privacy.android.app.presentation.audiosection.model.AudioUIEntity
 
 /**
  * The compose view for displaying audios
  */
 @Composable
 fun AudiosView(
-    items: List<UIAudio>,
+    items: List<AudioUIEntity>,
     isListView: Boolean,
     sortOrder: String,
     modifier: Modifier,
     onChangeViewTypeClick: () -> Unit,
-    onClick: (item: UIAudio, index: Int) -> Unit,
-    onMenuClick: (UIAudio) -> Unit,
+    onClick: (item: AudioUIEntity, index: Int) -> Unit,
+    onMenuClick: (AudioUIEntity) -> Unit,
     onSortOrderClick: () -> Unit,
     listState: LazyListState = LazyListState(),
     gridState: LazyGridState = LazyGridState(),
-    onLongClick: ((item: UIAudio, index: Int) -> Unit) = { _, _ -> },
+    onLongClick: ((item: AudioUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     if (isListView) {
         AudioListView(

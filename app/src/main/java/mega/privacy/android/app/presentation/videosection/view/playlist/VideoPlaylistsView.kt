@@ -13,24 +13,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
+import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 
 @Composable
 internal fun VideoPlaylistsView(
-    items: List<UIVideoPlaylist>,
+    items: List<VideoPlaylistUIEntity>,
     progressBarShowing: Boolean,
     searchMode: Boolean,
     scrollToTop: Boolean,
     lazyListState: LazyListState,
     sortOrder: String,
     modifier: Modifier,
-    onClick: (item: UIVideoPlaylist, index: Int) -> Unit,
-    onMenuClick: (UIVideoPlaylist) -> Unit,
+    onClick: (item: VideoPlaylistUIEntity, index: Int) -> Unit,
+    onMenuClick: (VideoPlaylistUIEntity) -> Unit,
     onSortOrderClick: () -> Unit,
-    onLongClick: ((item: UIVideoPlaylist, index: Int) -> Unit) = { _, _ -> },
+    onLongClick: ((item: VideoPlaylistUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     LaunchedEffect(items) {
         if (scrollToTop) {

@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.audiosection.model.AudioSectionState
-import mega.privacy.android.app.presentation.audiosection.model.UIAudio
+import mega.privacy.android.app.presentation.audiosection.model.AudioUIEntity
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
@@ -28,10 +28,10 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 fun AudioSectionComposeView(
     uiState: AudioSectionState,
     onChangeViewTypeClick: () -> Unit = {},
-    onClick: (item: UIAudio, index: Int) -> Unit = { _, _ -> },
+    onClick: (item: AudioUIEntity, index: Int) -> Unit = { _, _ -> },
     onSortOrderClick: () -> Unit = {},
-    onMenuClick: (UIAudio) -> Unit = {},
-    onLongClick: (item: UIAudio, index: Int) -> Unit = { _, _ -> },
+    onMenuClick: (AudioUIEntity) -> Unit = {},
+    onLongClick: (item: AudioUIEntity, index: Int) -> Unit = { _, _ -> },
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()

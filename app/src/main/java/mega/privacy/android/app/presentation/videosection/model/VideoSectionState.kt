@@ -20,7 +20,7 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property isPlaylistProgressBarShown true if the playlist progress bar is being shown
  */
 data class VideoSectionState(
-    val allVideos: List<UIVideo> = emptyList(),
+    val allVideos: List<VideoUIEntity> = emptyList(),
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val isPendingRefresh: Boolean = false,
     val progressBarShowing: Boolean = true,
@@ -28,8 +28,8 @@ data class VideoSectionState(
     val scrollToTop: Boolean = false,
     val selectedVideoHandles: List<Long> = emptyList(),
     val isInSelection: Boolean = false,
-    val videoPlaylists: List<UIVideoPlaylist> = emptyList(),
-    val currentVideoPlaylist: UIVideoPlaylist? = null,
+    val videoPlaylists: List<VideoPlaylistUIEntity> = emptyList(),
+    val currentVideoPlaylist: VideoPlaylistUIEntity? = null,
     val isVideoPlaylistCreatedSuccessfully: Boolean = false,
     val numberOfAddedVideos: Int = 0,
     val isPlaylistProgressBarShown: Boolean = true,

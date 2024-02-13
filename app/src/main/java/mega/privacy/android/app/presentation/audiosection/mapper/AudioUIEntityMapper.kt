@@ -1,24 +1,24 @@
 package mega.privacy.android.app.presentation.audiosection.mapper
 
-import mega.privacy.android.app.presentation.audiosection.model.UIAudio
+import mega.privacy.android.app.presentation.audiosection.model.AudioUIEntity
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import java.io.File
 import javax.inject.Inject
 
 /**
- * The mapper class to convert the AudioNode to UIAudio
+ * The mapper class to convert the AudioNode to AudioUIEntity
  */
-class UIAudioMapper @Inject constructor(
+class AudioUIEntityMapper @Inject constructor(
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) {
 
     /**
-     * Convert to AudioNode to UIAudio
+     * Convert to AudioNode to AudioUIEntity
      */
     operator fun invoke(
         typedAudioNode: TypedAudioNode,
-    ) = UIAudio(
+    ) = AudioUIEntity(
         id = typedAudioNode.id,
         name = typedAudioNode.name,
         size = typedAudioNode.size,

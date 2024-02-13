@@ -3,7 +3,7 @@ package test.mega.privacy.android.app.presentation.videosection
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
+import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import org.junit.jupiter.api.BeforeAll
@@ -13,18 +13,18 @@ import org.mockito.kotlin.mock
 import kotlin.time.Duration.Companion.seconds
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UIVideoMapperTest {
-    private lateinit var underTest: UIVideoMapper
+class VideoUIEntityMapperTest {
+    private lateinit var underTest: VideoUIEntityMapper
 
     private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
 
     @BeforeAll
     fun setUp() {
-        underTest = UIVideoMapper(durationInSecondsTextMapper)
+        underTest = VideoUIEntityMapper(durationInSecondsTextMapper)
     }
 
     @Test
-    fun `test that UIVideo can be mapped correctly`() = runTest {
+    fun `test that VideoUIEntity can be mapped correctly`() = runTest {
         val expectedId = NodeId(123456L)
         val expectedName = "video file name"
         val expectedSize: Long = 100

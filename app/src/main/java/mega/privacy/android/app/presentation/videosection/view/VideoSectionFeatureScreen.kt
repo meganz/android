@@ -8,21 +8,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
-import mega.privacy.android.app.presentation.videosection.model.UIVideo
-import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailView
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 
 @Composable
 internal fun VideoSectionFeatureScreen(
     videoSectionViewModel: VideoSectionViewModel,
-    onClick: (item: UIVideo, index: Int) -> Unit,
+    onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onSortOrderClick: () -> Unit = {},
-    onMenuClick: (UIVideo) -> Unit = {},
-    onLongClick: (item: UIVideo, index: Int) -> Unit = { _, _ -> },
-    onPlaylistItemClick: (item: UIVideo, index: Int) -> Unit = { _, _ -> },
-    onPlaylistItemMenuClick: (UIVideoPlaylist) -> Unit = { _ -> },
-    onPlaylistItemLongClick: (UIVideoPlaylist, index: Int) -> Unit = { _, _ -> },
+    onMenuClick: (VideoUIEntity) -> Unit = {},
+    onLongClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
+    onPlaylistItemClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
+    onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = { _ -> },
+    onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit = { _, _ -> },
 ) {
     val navHostController = rememberNavController()
     VideoSectionNavHost(
@@ -42,13 +42,13 @@ internal fun VideoSectionFeatureScreen(
 @Composable
 internal fun VideoSectionNavHost(
     navHostController: NavHostController,
-    onClick: (item: UIVideo, index: Int) -> Unit,
+    onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onSortOrderClick: () -> Unit,
-    onMenuClick: (UIVideo) -> Unit,
-    onLongClick: (item: UIVideo, index: Int) -> Unit,
-    onPlaylistItemMenuClick: (UIVideoPlaylist) -> Unit,
-    onPlaylistItemLongClick: (UIVideoPlaylist, index: Int) -> Unit,
-    onPlaylistDetailItemClick: (item: UIVideo, index: Int) -> Unit,
+    onMenuClick: (VideoUIEntity) -> Unit,
+    onLongClick: (item: VideoUIEntity, index: Int) -> Unit,
+    onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit,
+    onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
+    onPlaylistDetailItemClick: (item: VideoUIEntity, index: Int) -> Unit,
     modifier: Modifier,
     viewModel: VideoSectionViewModel = hiltViewModel(),
 ) {

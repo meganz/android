@@ -1,23 +1,23 @@
 package mega.privacy.android.app.presentation.videosection.mapper
 
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.app.presentation.videosection.model.UIVideo
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import java.io.File
 import javax.inject.Inject
 
 /**
- * The mapper class to convert the TypedVideoNode to UIVideo
+ * The mapper class to convert the TypedVideoNode to VideoUIEntity
  */
-class UIVideoMapper @Inject constructor(
+class VideoUIEntityMapper @Inject constructor(
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) {
     /**
-     * Convert to VideoNode to UIVideo
+     * Convert to VideoNode to VideoUIEntity
      */
     operator fun invoke(
         typedVideoNode: TypedVideoNode,
-    ) = UIVideo(
+    ) = VideoUIEntity(
         id = typedVideoNode.id,
         name = typedVideoNode.name,
         size = typedVideoNode.size,

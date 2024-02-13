@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.videosection.view.playlist.Constants
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailView
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
-import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
+import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionState
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Rule
@@ -66,7 +66,7 @@ class VideoPlaylistDetailViewKtTest {
             on { state }.thenReturn(
                 MutableStateFlow(
                     VideoSectionState(
-                        currentVideoPlaylist = UIVideoPlaylist(
+                        currentVideoPlaylist = VideoPlaylistUIEntity(
                             id = NodeId(1L),
                             title = expectedTitle,
                             cover = null,

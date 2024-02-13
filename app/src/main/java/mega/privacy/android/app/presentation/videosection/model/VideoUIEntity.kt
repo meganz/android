@@ -15,7 +15,7 @@ import java.io.File
  * @property nodeAvailableOffline the video if is available for offline
  * @property isSelected the video if is selected
  */
-data class UIVideo(
+data class VideoUIEntity(
     val id: NodeId,
     val name: String,
     val size: Long,

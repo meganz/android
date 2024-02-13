@@ -12,10 +12,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
-import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
-import mega.privacy.android.app.presentation.videosection.mapper.UIVideoPlaylistMapper
-import mega.privacy.android.app.presentation.videosection.model.UIVideo
-import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
+import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
+import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
@@ -55,7 +55,7 @@ class VideoSectionViewModelTest {
     private lateinit var underTest: VideoSectionViewModel
 
     private val getAllVideosUseCase = mock<GetAllVideosUseCase>()
-    private val uiVideoMapper = mock<UIVideoMapper>()
+    private val videoUIEntityMapper = mock<VideoUIEntityMapper>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
@@ -68,11 +68,11 @@ class VideoSectionViewModelTest {
     private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getVideoPlaylistsUseCase = mock<GetVideoPlaylistsUseCase>()
-    private val uiVideoPlaylistMapper = mock<UIVideoPlaylistMapper>()
+    private val videoPlaylistUIEntityMapper = mock<VideoPlaylistUIEntityMapper>()
     private val createVideoPlaylistUseCase = mock<CreateVideoPlaylistUseCase>()
     private val addVideosToPlaylistUseCase = mock<AddVideosToPlaylistUseCase>()
 
-    private val expectedVideo = mock<UIVideo> { on { name }.thenReturn("video name") }
+    private val expectedVideo = mock<VideoUIEntity> { on { name }.thenReturn("video name") }
 
     @BeforeAll
     fun initialise() {
@@ -92,7 +92,7 @@ class VideoSectionViewModelTest {
     private fun initUnderTest() {
         underTest = VideoSectionViewModel(
             getAllVideosUseCase = getAllVideosUseCase,
-            uiVideoMapper = uiVideoMapper,
+            videoUIEntityMapper = videoUIEntityMapper,
             getCloudSortOrder = getCloudSortOrder,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
@@ -103,7 +103,7 @@ class VideoSectionViewModelTest {
             getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getVideoPlaylistsUseCase = getVideoPlaylistsUseCase,
-            uiVideoPlaylistMapper = uiVideoPlaylistMapper,
+            videoPlaylistUIEntityMapper = videoPlaylistUIEntityMapper,
             createVideoPlaylistUseCase = createVideoPlaylistUseCase,
             addVideosToPlaylistUseCase = addVideosToPlaylistUseCase
         )
@@ -113,7 +113,7 @@ class VideoSectionViewModelTest {
     fun resetMocks() {
         reset(
             getAllVideosUseCase,
-            uiVideoMapper,
+            videoUIEntityMapper,
             getCloudSortOrder,
             getNodeByHandle,
             getFingerprintUseCase,
@@ -122,7 +122,7 @@ class VideoSectionViewModelTest {
             getFileUrlByNodeHandleUseCase,
             getNodeByIdUseCase,
             getVideoPlaylistsUseCase,
-            uiVideoPlaylistMapper,
+            videoPlaylistUIEntityMapper,
             createVideoPlaylistUseCase,
             addVideosToPlaylistUseCase
         )
@@ -167,7 +167,7 @@ class VideoSectionViewModelTest {
     private suspend fun initVideosReturned() {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
         whenever(getAllVideosUseCase()).thenReturn(listOf(mock(), mock()))
-        whenever(uiVideoMapper(any())).thenReturn(expectedVideo)
+        whenever(videoUIEntityMapper(any())).thenReturn(expectedVideo)
     }
 
     @Test
@@ -217,13 +217,13 @@ class VideoSectionViewModelTest {
     fun `test that the videos returned correctly when search query is not empty`() = runTest {
         val expectedTypedVideoNode = mock<TypedVideoNode> { on { name }.thenReturn("video name") }
         val videoNode = mock<TypedVideoNode> { on { name }.thenReturn("name") }
-        val expectedVideo = mock<UIVideo> { on { name }.thenReturn("video name") }
-        val video = mock<UIVideo> { on { name }.thenReturn("name") }
+        val expectedVideo = mock<VideoUIEntity> { on { name }.thenReturn("video name") }
+        val video = mock<VideoUIEntity> { on { name }.thenReturn("name") }
 
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
         whenever(getAllVideosUseCase()).thenReturn(listOf(expectedTypedVideoNode, videoNode))
-        whenever(uiVideoMapper(expectedTypedVideoNode)).thenReturn(expectedVideo)
-        whenever(uiVideoMapper(videoNode)).thenReturn(video)
+        whenever(videoUIEntityMapper(expectedTypedVideoNode)).thenReturn(expectedVideo)
+        whenever(videoUIEntityMapper(videoNode)).thenReturn(video)
 
         underTest.refreshNodes()
 
@@ -333,11 +333,11 @@ class VideoSectionViewModelTest {
     }
 
     private suspend fun initVideoPlaylistsReturned() {
-        val uiVideoPlaylist = mock<UIVideoPlaylist> {
+        val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
             on { title }.thenReturn("playlist")
         }
         whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(mock(), mock()))
-        whenever(uiVideoPlaylistMapper(any())).thenReturn(uiVideoPlaylist)
+        whenever(videoPlaylistUIEntityMapper(any())).thenReturn(videoPlaylistUIEntity)
     }
 
     @Test
@@ -345,8 +345,8 @@ class VideoSectionViewModelTest {
         val testTitle = "new playlist"
         val expectedVideoPlaylist = mock<VideoPlaylist> { on { title }.thenReturn(testTitle) }
         val videoPlaylist = mock<VideoPlaylist> { on { title }.thenReturn("title") }
-        val expectedUIVideoPlaylist = mock<UIVideoPlaylist> { on { title }.thenReturn(testTitle) }
-        val uiVideoPlaylist = mock<UIVideoPlaylist> { on { title }.thenReturn("title") }
+        val expectedVideoPlaylistUIEntity = mock<VideoPlaylistUIEntity> { on { title }.thenReturn(testTitle) }
+        val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> { on { title }.thenReturn("title") }
 
         whenever(getVideoPlaylistsUseCase()).thenReturn(
             listOf(
@@ -354,8 +354,8 @@ class VideoSectionViewModelTest {
                 videoPlaylist
             )
         )
-        whenever(uiVideoPlaylistMapper(expectedVideoPlaylist)).thenReturn(expectedUIVideoPlaylist)
-        whenever(uiVideoPlaylistMapper(videoPlaylist)).thenReturn(uiVideoPlaylist)
+        whenever(videoPlaylistUIEntityMapper(expectedVideoPlaylist)).thenReturn(expectedVideoPlaylistUIEntity)
+        whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
 
         underTest.onTabSelected(selectTab = VideoSectionTab.Playlists)
 
@@ -375,11 +375,11 @@ class VideoSectionViewModelTest {
             val expectedVideoPlaylist = mock<VideoPlaylist> {
                 on { title }.thenReturn(expectedTitle)
             }
-            val expectedUIVideoPlaylist = mock<UIVideoPlaylist> {
+            val expectedVideoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
                 on { title }.thenReturn(expectedTitle)
             }
             whenever(createVideoPlaylistUseCase(expectedTitle)).thenReturn(expectedVideoPlaylist)
-            whenever(uiVideoPlaylistMapper(anyOrNull())).thenReturn(expectedUIVideoPlaylist)
+            whenever(videoPlaylistUIEntityMapper(anyOrNull())).thenReturn(expectedVideoPlaylistUIEntity)
 
             initUnderTest()
 

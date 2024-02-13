@@ -16,10 +16,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
-import mega.privacy.android.app.presentation.videosection.mapper.UIVideoPlaylistMapper
-import mega.privacy.android.app.presentation.videosection.model.UIVideo
-import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
+import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
+import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionState
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTabState
@@ -52,7 +52,7 @@ import javax.inject.Inject
 @HiltViewModel
 class VideoSectionViewModel @Inject constructor(
     private val getAllVideosUseCase: GetAllVideosUseCase,
-    private val uiVideoMapper: UIVideoMapper,
+    private val videoUIEntityMapper: VideoUIEntityMapper,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
@@ -63,7 +63,7 @@ class VideoSectionViewModel @Inject constructor(
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getVideoPlaylistsUseCase: GetVideoPlaylistsUseCase,
-    private val uiVideoPlaylistMapper: UIVideoPlaylistMapper,
+    private val videoPlaylistUIEntityMapper: VideoPlaylistUIEntityMapper,
     private val createVideoPlaylistUseCase: CreateVideoPlaylistUseCase,
     private val addVideosToPlaylistUseCase: AddVideosToPlaylistUseCase,
 ) : ViewModel() {
@@ -82,8 +82,8 @@ class VideoSectionViewModel @Inject constructor(
     val tabState = _tabState.asStateFlow()
 
     private var searchQuery = ""
-    private val originalData = mutableListOf<UIVideo>()
-    private val originalPlaylistData = mutableListOf<UIVideoPlaylist>()
+    private val originalData = mutableListOf<VideoUIEntity>()
+    private val originalPlaylistData = mutableListOf<VideoPlaylistUIEntity>()
 
     private var createVideoPlaylistJob: Job? = null
 
@@ -120,17 +120,17 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private suspend fun getVideoPlaylists() = getVideoPlaylistsUseCase().map { videoPlaylist ->
-        uiVideoPlaylistMapper(videoPlaylist)
+        videoPlaylistUIEntityMapper(videoPlaylist)
     }
 
-    private fun List<UIVideoPlaylist>.updateOriginalPlaylistData() = also { data ->
+    private fun List<VideoPlaylistUIEntity>.updateOriginalPlaylistData() = also { data ->
         if (originalPlaylistData.isNotEmpty()) {
             originalPlaylistData.clear()
         }
         originalPlaylistData.addAll(data)
     }
 
-    private fun List<UIVideoPlaylist>.filterVideoPlaylistsBySearchQuery() =
+    private fun List<VideoPlaylistUIEntity>.filterVideoPlaylistsBySearchQuery() =
         filter { playlist ->
             playlist.title.contains(searchQuery, true)
         }
@@ -138,7 +138,7 @@ class VideoSectionViewModel @Inject constructor(
     private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
     internal fun refreshNodes() = viewModelScope.launch {
-        val videoList = getUIVideoList().updateOriginalData().filterVideosBySearchQuery()
+        val videoList = getVideoUIEntityList().updateOriginalData().filterVideosBySearchQuery()
         val sortOrder = getCloudSortOrder()
         _state.update {
             it.copy(
@@ -150,19 +150,20 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    private fun List<UIVideo>.filterVideosBySearchQuery() =
+    private fun List<VideoUIEntity>.filterVideosBySearchQuery() =
         filter { video ->
             video.name.contains(searchQuery, true)
         }
 
-    private fun List<UIVideo>.updateOriginalData() = also { data ->
+    private fun List<VideoUIEntity>.updateOriginalData() = also { data ->
         if (originalData.isNotEmpty()) {
             originalData.clear()
         }
         originalData.addAll(data)
     }
 
-    private suspend fun getUIVideoList() = getAllVideosUseCase().map { uiVideoMapper(it) }
+    private suspend fun getVideoUIEntityList() =
+        getAllVideosUseCase().map { videoUIEntityMapper(it) }
 
     internal fun markHandledPendingRefresh() = _state.update { it.copy(isPendingRefresh = false) }
 
@@ -329,14 +330,14 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    internal fun onItemClicked(item: UIVideo, index: Int) {
+    internal fun onItemClicked(item: VideoUIEntity, index: Int) {
         updateVideoItemInSelectionState(item = item, index = index)
     }
 
-    internal fun onLongItemClicked(item: UIVideo, index: Int) =
+    internal fun onLongItemClicked(item: VideoUIEntity, index: Int) =
         updateVideoItemInSelectionState(item = item, index = index)
 
-    private fun updateVideoItemInSelectionState(item: UIVideo, index: Int) {
+    private fun updateVideoItemInSelectionState(item: VideoUIEntity, index: Int) {
         val isSelected = !item.isSelected
         val selectedHandles = updateSelectedVideoHandles(item, isSelected)
         val videos = _state.value.allVideos.updateItemSelectedState(index, isSelected)
@@ -349,7 +350,7 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    private fun List<UIVideo>.updateItemSelectedState(index: Int, isSelected: Boolean) =
+    private fun List<VideoUIEntity>.updateItemSelectedState(index: Int, isSelected: Boolean) =
         if (index in indices) {
             toMutableList().also { list ->
                 list[index] = list[index].copy(isSelected = isSelected)
@@ -357,7 +358,7 @@ class VideoSectionViewModel @Inject constructor(
         } else this
 
 
-    private fun updateSelectedVideoHandles(item: UIVideo, isSelected: Boolean) =
+    private fun updateSelectedVideoHandles(item: VideoUIEntity, isSelected: Boolean) =
         _state.value.selectedVideoHandles.toMutableList().also { selectedHandles ->
             if (isSelected) {
                 selectedHandles.add(item.id.longValue)
@@ -396,7 +397,7 @@ class VideoSectionViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         currentVideoPlaylist = videoPlaylist?.let {
-                            uiVideoPlaylistMapper(
+                            videoPlaylistUIEntityMapper(
                                 videoPlaylist
                             )
                         },
@@ -432,7 +433,7 @@ class VideoSectionViewModel @Inject constructor(
             }
         }
 
-    internal fun updateCurrentVideoPlaylist(playlist: UIVideoPlaylist?) {
+    internal fun updateCurrentVideoPlaylist(playlist: VideoPlaylistUIEntity?) {
         _state.update {
             it.copy(currentVideoPlaylist = playlist)
         }

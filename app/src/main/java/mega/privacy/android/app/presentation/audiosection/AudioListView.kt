@@ -13,7 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.audiosection.model.UIAudio
+import mega.privacy.android.app.presentation.audiosection.model.AudioUIEntity
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
@@ -26,15 +26,15 @@ import nz.mega.sdk.MegaNode
 
 @Composable
 internal fun AudioListView(
-    items: List<UIAudio>,
+    items: List<AudioUIEntity>,
     lazyListState: LazyListState,
     sortOrder: String,
     modifier: Modifier,
     onChangeViewTypeClick: () -> Unit,
-    onClick: (item: UIAudio, index: Int) -> Unit,
-    onMenuClick: (UIAudio) -> Unit,
+    onClick: (item: AudioUIEntity, index: Int) -> Unit,
+    onMenuClick: (AudioUIEntity) -> Unit,
     onSortOrderClick: () -> Unit,
-    onLongClick: ((item: UIAudio, index: Int) -> Unit) = { _, _ -> },
+    onLongClick: ((item: AudioUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     LazyColumn(state = lazyListState, modifier = modifier) {
         item(

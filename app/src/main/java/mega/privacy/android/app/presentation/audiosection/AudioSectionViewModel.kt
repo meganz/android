@@ -16,9 +16,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
-import mega.privacy.android.app.presentation.audiosection.mapper.UIAudioMapper
+import mega.privacy.android.app.presentation.audiosection.mapper.AudioUIEntityMapper
 import mega.privacy.android.app.presentation.audiosection.model.AudioSectionState
-import mega.privacy.android.app.presentation.audiosection.model.UIAudio
+import mega.privacy.android.app.presentation.audiosection.model.AudioUIEntity
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
@@ -47,7 +47,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AudioSectionViewModel @Inject constructor(
     private val getAllAudioUseCase: GetAllAudioUseCase,
-    private val uiAudioMapper: UIAudioMapper,
+    private val audioUIEntityMapper: AudioUIEntityMapper,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
@@ -68,7 +68,7 @@ class AudioSectionViewModel @Inject constructor(
     val state: StateFlow<AudioSectionState> = _state.asStateFlow()
 
     private var searchQuery = ""
-    private val originalData = mutableListOf<UIAudio>()
+    private val originalData = mutableListOf<AudioUIEntity>()
 
     init {
         checkViewType()
@@ -96,7 +96,7 @@ class AudioSectionViewModel @Inject constructor(
     private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
     internal fun refreshNodes() = viewModelScope.launch {
-        val audioList = getUIAudioList().updateOriginalData().filterAudiosBySearchQuery()
+        val audioList = getAudioUIEntityList().updateOriginalData().filterAudiosBySearchQuery()
         val sortOrder = getCloudSortOrder()
         _state.update {
             it.copy(
@@ -109,19 +109,20 @@ class AudioSectionViewModel @Inject constructor(
         }
     }
 
-    private fun List<UIAudio>.filterAudiosBySearchQuery() =
+    private fun List<AudioUIEntity>.filterAudiosBySearchQuery() =
         filter { audio ->
             audio.name.contains(searchQuery, true)
         }
 
-    private fun List<UIAudio>.updateOriginalData() = also { data ->
+    private fun List<AudioUIEntity>.updateOriginalData() = also { data ->
         if (originalData.isNotEmpty()) {
             originalData.clear()
         }
         originalData.addAll(data)
     }
 
-    private suspend fun getUIAudioList() = getAllAudioUseCase().map { uiAudioMapper(it) }
+    private suspend fun getAudioUIEntityList() =
+        getAllAudioUseCase().map { audioUIEntityMapper(it) }
 
     internal fun markHandledPendingRefresh() = _state.update { it.copy(isPendingRefresh = false) }
 
@@ -226,14 +227,14 @@ class AudioSectionViewModel @Inject constructor(
         }
     }
 
-    internal fun onItemClicked(item: UIAudio, index: Int) {
+    internal fun onItemClicked(item: AudioUIEntity, index: Int) {
         updateAudioItemInSelectionState(item = item, index = index)
     }
 
-    internal fun onItemLongClicked(item: UIAudio, index: Int) =
+    internal fun onItemLongClicked(item: AudioUIEntity, index: Int) =
         updateAudioItemInSelectionState(item = item, index = index)
 
-    private fun updateAudioItemInSelectionState(item: UIAudio, index: Int) {
+    private fun updateAudioItemInSelectionState(item: AudioUIEntity, index: Int) {
         val isSelected = !item.isSelected
         val selectedHandles = updateSelectedAudioHandles(item, isSelected)
         val audios = _state.value.allAudios.updateItemSelectedState(index, isSelected)
@@ -246,7 +247,7 @@ class AudioSectionViewModel @Inject constructor(
         }
     }
 
-    private fun List<UIAudio>.updateItemSelectedState(index: Int, isSelected: Boolean) =
+    private fun List<AudioUIEntity>.updateItemSelectedState(index: Int, isSelected: Boolean) =
         if (index in indices) {
             toMutableList().also { list ->
                 list[index] = list[index].copy(isSelected = isSelected)
@@ -254,7 +255,7 @@ class AudioSectionViewModel @Inject constructor(
         } else this
 
 
-    private fun updateSelectedAudioHandles(item: UIAudio, isSelected: Boolean) =
+    private fun updateSelectedAudioHandles(item: AudioUIEntity, isSelected: Boolean) =
         _state.value.selectedAudioHandles.toMutableList().also { selectedHandles ->
             if (isSelected) {
                 selectedHandles.add(item.id.longValue)

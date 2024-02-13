@@ -3,9 +3,9 @@ package test.mega.privacy.android.app.presentation.videosection
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.app.presentation.videosection.mapper.UIVideoMapper
-import mega.privacy.android.app.presentation.videosection.mapper.UIVideoPlaylistMapper
-import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
+import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
+import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
+import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
@@ -19,11 +19,11 @@ import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.seconds
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UIVideoPlaylistMapperTest {
-    private lateinit var underTest: UIVideoPlaylistMapper
+class VideoUIEntityPlaylistMapperTest {
+    private lateinit var underTest: VideoPlaylistUIEntityMapper
 
     private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
-    private val uiVideoMapper = mock<UIVideoMapper>()
+    private val videoUIEntityMapper = mock<VideoUIEntityMapper>()
 
     private val id = NodeId(123456L)
     private val title = "title name"
@@ -42,16 +42,16 @@ class UIVideoPlaylistMapperTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = UIVideoPlaylistMapper(
+        underTest = VideoPlaylistUIEntityMapper(
             durationInSecondsTextMapper,
-            uiVideoMapper
+            videoUIEntityMapper
         )
     }
 
     @Test
-    fun `test that UIVideoPlaylist can be mapped correctly`() = runTest {
-        whenever(uiVideoMapper(anyOrNull())).thenReturn(mock())
-        assertMappedUIVideoPlaylistObject(underTest(initVideoPlaylist()))
+    fun `test that VideoPlaylistUIEntity can be mapped correctly`() = runTest {
+        whenever(videoUIEntityMapper(anyOrNull())).thenReturn(mock())
+        assertMappedVideoPlaylistUIEntity(underTest(initVideoPlaylist()))
     }
 
     private fun initVideoPlaylist() = mock<VideoPlaylist> {
@@ -66,10 +66,10 @@ class UIVideoPlaylistMapperTest {
         on { videos }.thenReturn(videos)
     }
 
-    private fun assertMappedUIVideoPlaylistObject(uiVideoPlaylist: UIVideoPlaylist) {
-        uiVideoPlaylist.let {
+    private fun assertMappedVideoPlaylistUIEntity(videoPlaylistUIEntity: VideoPlaylistUIEntity) {
+        videoPlaylistUIEntity.let {
             assertAll(
-                "Grouped Assertions of ${UIVideoPlaylist::class.simpleName}",
+                "Grouped Assertions of ${VideoPlaylistUIEntity::class.simpleName}",
                 { assertThat(it.id).isEqualTo(id) },
                 { assertThat(it.title).isEqualTo(title) },
                 { assertThat(it.cover).isEqualTo(cover) },

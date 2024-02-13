@@ -32,7 +32,7 @@ import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
-import mega.privacy.android.app.presentation.videosection.model.UIVideo
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionFeatureScreen
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
@@ -172,7 +172,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
 
     private fun openVideoFile(
         activity: Activity,
-        item: UIVideo,
+        item: VideoUIEntity,
         index: Int,
     ) {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -210,7 +210,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
     }
 
     private fun getIntent(
-        item: UIVideo,
+        item: VideoUIEntity,
         index: Int,
     ) = Util.getMediaIntent(activity, item.name).apply {
         putExtra(INTENT_EXTRA_KEY_POSITION, index)
@@ -251,7 +251,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         }
     }
 
-    private fun showOptionsMenuForItem(item: UIVideo) {
+    private fun showOptionsMenuForItem(item: VideoUIEntity) {
         (requireActivity() as ManagerActivity).showNodeOptionsPanel(
             nodeId = item.id,
             mode = NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE

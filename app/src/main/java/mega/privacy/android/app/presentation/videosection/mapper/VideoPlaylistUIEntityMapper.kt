@@ -1,24 +1,24 @@
 package mega.privacy.android.app.presentation.videosection.mapper
 
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
+import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import java.io.File
 import javax.inject.Inject
 
 /**
- * The mapper class to convert the VideoPlaylist to UIVideoPlaylist
+ * The mapper class to convert the VideoPlaylist to VideoPlaylistUIEntity
  */
-class UIVideoPlaylistMapper @Inject constructor(
+class VideoPlaylistUIEntityMapper @Inject constructor(
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
-    private val uiVideoMapper: UIVideoMapper
+    private val videoUIEntityMapper: VideoUIEntityMapper
 ) {
 
     /**
-     * Convert to VideoPlaylist to UIVideoPlaylist
+     * Convert to VideoPlaylist to VideoPlaylistUIEntity
      */
     operator fun invoke(videoPlaylist: VideoPlaylist) =
-        UIVideoPlaylist(
+        VideoPlaylistUIEntity(
             id = videoPlaylist.id,
             title = videoPlaylist.title,
             cover = videoPlaylist.cover,
@@ -30,7 +30,7 @@ class UIVideoPlaylistMapper @Inject constructor(
             numberOfVideos = videoPlaylist.numberOfVideos,
             totalDuration = durationInSecondsTextMapper(videoPlaylist.totalDuration),
             videos = videoPlaylist.videos?.map {
-                uiVideoMapper(it)
+                videoUIEntityMapper(it)
             }
         )
 }
