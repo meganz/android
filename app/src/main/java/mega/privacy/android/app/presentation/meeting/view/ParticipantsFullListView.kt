@@ -81,6 +81,7 @@ fun ParticipantsFullListView(
     onDismissRemoveParticipantDialog: () -> Unit,
     onRingParticipantClicked: (ChatParticipant) -> Unit = {},
     onRingAllParticipantsClicked: () -> Unit = {},
+    onMuteAllParticipantsClick: () -> Unit,
 ) {
     if ((state.participantsSection == ParticipantsSection.WaitingRoomSection &&
                 state.shouldWaitingRoomListBeShown &&
@@ -225,15 +226,33 @@ fun ParticipantsFullListView(
                                 R.string.meetings_bottom_panel_not_in_call_participants_call_all_button
                             }
 
+                            state.participantsSection == ParticipantsSection.InCallSection &&
+                                    state.myPermission == ChatRoomPermission.Moderator &&
+                                    state.isMuteFeatureFlagEnabled -> {
+                                when (state.areAllParticipantsMuted()) {
+                                    true -> R.string.meetings_bottom_panel_in_call_participants_all_muted_label
+                                    false -> R.string.meetings_bottom_panel_in_call_participants_mute_all_participants_button
+                                }
+                            }
+
                             else -> if (state.callType == CallType.Meeting) R.string.meetings_scheduled_meeting_info_share_meeting_link_label else R.string.meetings_group_call_bottom_panel_share_chat_link_button
                         },
                         onClick = when {
                             state.participantsSection == ParticipantsSection.WaitingRoomSection -> onAdmitAllClicked
                             state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly -> onRingAllParticipantsClicked
+                            state.participantsSection == ParticipantsSection.InCallSection &&
+                                    state.myPermission == ChatRoomPermission.Moderator &&
+                                    state.isMuteFeatureFlagEnabled &&
+                                    !state.areAllParticipantsMuted() -> onMuteAllParticipantsClick
+
                             else -> onShareMeetingLink
                         },
                         enabled = when {
                             state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly -> !state.isRingingAll
+                            state.participantsSection == ParticipantsSection.InCallSection &&
+                                    state.myPermission == ChatRoomPermission.Moderator &&
+                                    state.isMuteFeatureFlagEnabled && state.areAllParticipantsMuted() -> false
+
                             else -> true
                         }
                     )
@@ -384,6 +403,7 @@ fun PreviewUsersListViewWaitingRoom() {
             onDisplayInMainViewClicked = {},
             onRemoveParticipant = {},
             onMuteParticipantClick = {},
+            onMuteAllParticipantsClick = {},
             onSendMessageClicked = {})
     }
 }
@@ -419,6 +439,7 @@ fun PreviewUsersListViewInCall() {
             onDisplayInMainViewClicked = {},
             onRemoveParticipant = {},
             onMuteParticipantClick = {},
+            onMuteAllParticipantsClick = {},
             onSendMessageClicked = {})
     }
 }
@@ -454,9 +475,9 @@ fun PreviewUsersListViewNotInCall() {
             onDisplayInMainViewClicked = {},
             onRemoveParticipant = {},
             onMuteParticipantClick = {},
+            onMuteAllParticipantsClick = {},
             onSendMessageClicked = {})
     }
-
 }
 
 private fun getParticipants(): List<ChatParticipant> {

@@ -74,7 +74,8 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
             isModerator,
             isGuest,
             isSpeakerMode,
-            participantItem
+            participantItem,
+            sharedViewModel.state.value.isMuteFeatureFlagEnabled
         )
 
         binding =

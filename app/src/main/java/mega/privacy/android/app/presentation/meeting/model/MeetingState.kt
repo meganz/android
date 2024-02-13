@@ -131,6 +131,24 @@ data class MeetingState(
         isMuteFeatureFlagEnabled && hasHostPermission() && participantsSection == ParticipantsSection.InCallSection
 
     /**
+     * Check if Admit all item should be shown
+     */
+    fun shouldAdmitAllItemBeShown() =
+        usersInWaitingRoomIDs.isNotEmpty() && participantsSection == ParticipantsSection.WaitingRoomSection
+
+    /**
+     * Check if Call all item should be shown
+     */
+    fun shouldCallAllItemBeShown() =
+        myPermission > ChatRoomPermission.ReadOnly && participantsSection == ParticipantsSection.NotInCallSection
+
+    /**
+     * Check if Invite participants item should be shown
+     */
+    fun shouldInviteParticipantsItemBeShown() =
+        participantsSection == ParticipantsSection.InCallSection && !isGuest && (hasHostPermission() || isOpenInvite)
+
+    /**
      * Check if Waiting room section should be shown
      */
     fun shouldWaitingRoomSectionBeShown() = hasWaitingRoom && hasHostPermission()

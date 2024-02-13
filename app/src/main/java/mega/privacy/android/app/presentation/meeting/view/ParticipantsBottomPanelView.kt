@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -42,7 +43,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.theme.extensions.black_white
-import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_700
+import mega.privacy.android.core.ui.theme.extensions.grey_200_grey_700
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.utils.isScreenOrientationLandscape
@@ -197,65 +198,35 @@ fun ParticipantsBottomPanelView(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Row(
-                                modifier = Modifier
-                                    .defaultMinSize(minHeight = 48.dp)
-                                    .fillMaxWidth(),
+                                modifier = Modifier.weight(1f),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .weight(1f),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Text(
-                                        text = when (state.participantsSection) {
-                                            ParticipantsSection.WaitingRoomSection -> stringResource(
-                                                id = R.string.meetings_bottom_panel_number_of_participants_in_the_waiting_room_label,
-                                                state.usersInWaitingRoomIDs.size
-                                            )
-
-                                            ParticipantsSection.InCallSection -> stringResource(
-                                                id = R.string.participants_number,
-                                                state.chatParticipantsInCall.size
-                                            )
-
-                                            ParticipantsSection.NotInCallSection -> pluralStringResource(
-                                                id = R.plurals.meetings_bottom_panel_number_of_participants_not_in_call_label,
-                                                count = state.chatParticipantsNotInCall.size,
-                                                state.chatParticipantsNotInCall.size
-                                            )
-
-                                        },
-                                        style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorPrimary),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
-                                if (state.shouldMuteAllItemBeShown()) {
-                                    Box(
-                                        modifier = Modifier
-                                            .wrapContentSize(Alignment.CenterEnd)
-                                            .padding(start = 22.dp)
-                                            .clickable {
-                                                onMuteAllParticipantsClick()
-                                            },
-
-                                        ) {
-                                        val allMuted = state.areAllParticipantsMuted()
-                                        Text(
-                                            text = if (allMuted)
-                                                stringResource(id = R.string.meetings_bottom_panel_in_call_participants_all_muted_label)
-                                            else
-                                                stringResource(id = R.string.meetings_bottom_panel_in_call_participants_mute_all_participants_button),
-                                            style = MaterialTheme.typography.subtitle2.copy(color = if (allMuted) MaterialTheme.colors.grey_020_grey_700 else MaterialTheme.colors.teal_300_teal_200),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
+                                Text(
+                                    text = when (state.participantsSection) {
+                                        ParticipantsSection.WaitingRoomSection -> stringResource(
+                                            id = R.string.meetings_bottom_panel_number_of_participants_in_the_waiting_room_label,
+                                            state.usersInWaitingRoomIDs.size
                                         )
-                                    }
-                                }
+
+                                        ParticipantsSection.InCallSection -> stringResource(
+                                            id = R.string.participants_number,
+                                            state.chatParticipantsInCall.size
+                                        )
+
+                                        ParticipantsSection.NotInCallSection -> pluralStringResource(
+                                            id = R.plurals.meetings_bottom_panel_number_of_participants_not_in_call_label,
+                                            count = state.chatParticipantsNotInCall.size,
+                                            state.chatParticipantsNotInCall.size
+                                        )
+
+                                    },
+                                    style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorPrimary),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
 
-                            if (state.participantsSection == ParticipantsSection.WaitingRoomSection && state.usersInWaitingRoomIDs.isNotEmpty()) {
+                            if (state.shouldAdmitAllItemBeShown()) {
                                 Box(
                                     modifier = Modifier.wrapContentSize(Alignment.CenterEnd)
                                 ) {
@@ -270,7 +241,32 @@ fun ParticipantsBottomPanelView(
                                 }
                             }
 
-                            if (state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly) {
+                            if (state.shouldMuteAllItemBeShown()) {
+                                Box(
+                                    modifier = Modifier
+                                        .wrapContentSize(Alignment.CenterEnd)
+                                        .testTag(TEST_TAG_MUTE_ALL_ITEM_VIEW)
+                                        .clickable(enabled = !state.areAllParticipantsMuted()) {
+                                            onMuteAllParticipantsClick()
+                                        },
+                                ) {
+                                    Row(modifier = Modifier.align(Alignment.Center)) {
+                                        Text(
+                                            text = if (state.areAllParticipantsMuted())
+                                                stringResource(id = R.string.meetings_bottom_panel_in_call_participants_all_muted_label)
+                                            else
+                                                stringResource(id = R.string.meetings_bottom_panel_in_call_participants_mute_all_participants_button),
+                                            style = MaterialTheme.typography.subtitle2.copy(
+                                                color = if (state.areAllParticipantsMuted()) MaterialTheme.colors.grey_200_grey_700 else MaterialTheme.colors.teal_300_teal_200
+                                            ),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (state.shouldCallAllItemBeShown()) {
                                 Box(
                                     modifier = Modifier.wrapContentSize(Alignment.CenterEnd)
                                 ) {
@@ -294,7 +290,7 @@ fun ParticipantsBottomPanelView(
                     }
                 }
 
-                if (state.participantsSection == ParticipantsSection.InCallSection && !state.isGuest && (state.hasHostPermission() || state.isOpenInvite)) {
+                if (state.shouldInviteParticipantsItemBeShown()) {
                     item(key = "Invite participants button") {
                         Row(
                             modifier = Modifier
@@ -309,6 +305,7 @@ fun ParticipantsBottomPanelView(
                         }
                     }
                 }
+
 
                 item(key = "Participants list") {
                     when (state.participantsSection) {
@@ -662,6 +659,7 @@ fun ParticipantsBottomPanelNonHostAndOpenInviteInCallSectionPreview() {
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
+            isRingingAll = true,
             myPermission = ChatRoomPermission.Standard,
             isOpenInvite = true,
             isGuest = false
@@ -834,6 +832,7 @@ fun ParticipantsBottomPanelNotInCallView4ParticipantsPreview() {
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
             hasWaitingRoom = true,
+            isRingingAll = true,
             myPermission = ChatRoomPermission.Moderator,
         ),
             onWaitingRoomClick = {},
@@ -859,6 +858,7 @@ fun ParticipantsBottomPanelNotInCallView4ParticipantsPreview() {
 fun ParticipantsBottomPanelNotInCallView6ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
         ParticipantsBottomPanelView(state = MeetingState(
+            isRingingAll = true,
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith6Participants(),
             myPermission = ChatRoomPermission.Moderator,
@@ -1204,3 +1204,5 @@ private fun getListWith6Participants(): List<ChatParticipant> {
         add(participant6)
     }
 }
+
+internal const val TEST_TAG_MUTE_ALL_ITEM_VIEW = "sync_mute_all_view"

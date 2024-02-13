@@ -97,8 +97,7 @@ private fun PreviewRaisedDefaultMegaButton() {
                 RaisedDefaultMegaButton(
                     textId = R.string.search_menu_title,
                     onClick = {},
-                    enabled = it,
-                )
+                    enabled = it)
             }
         }
     }

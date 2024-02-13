@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.widget.TextView
+
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.R
@@ -26,6 +27,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
     var isModerator = false
     var isSpeakerMode = false
     var participant: Participant? = null
+    private var isEnabledMuteFeatureFlag = false
 
     /**
      * Init value for View Model
@@ -35,11 +37,13 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
         guest: Boolean,
         speakerMode: Boolean,
         info: Participant,
+        muteFeatureFlag: Boolean,
     ) {
         isModerator = moderator
         participant = info
         isGuest = guest
         isSpeakerMode = speakerMode
+        isEnabledMuteFeatureFlag = muteFeatureFlag
     }
 
     /**
@@ -156,7 +160,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      * @return if should show `muted` item, return true, else false
      */
     fun showMuteParticipant(): Boolean =
-        participant?.isMe == false && !isGuest && isModerator && participant?.isAudioOn == true
+        participant?.isMe == false && !isGuest && isModerator && participant?.isAudioOn == true && isEnabledMuteFeatureFlag
 
     /**
      * Determine if show the `Pin to speaker view` item
@@ -218,7 +222,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      * Open sending message page
      *
      */
-    fun sendMessage() : Long {
+    fun sendMessage(): Long {
         participant?.peerId?.let {
             val chat = megaChatApi.getChatRoomByUser(it)
             val peers = MegaChatPeerList.createInstance()

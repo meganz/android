@@ -331,9 +331,8 @@ class MeetingActivity : PasscodeActivity() {
                         onRingAllParticipantsClicked = {
                             meetingViewModel.ringAllAbsentsParticipants()
                         },
-                        onMuteParticipantClick = {
-                            meetingViewModel.muteParticipant()
-                        }
+                        onMuteParticipantClick = meetingViewModel::muteParticipant,
+                        onMuteAllParticipantsClick = meetingViewModel::muteAllParticipants
                     )
                 }
             }
