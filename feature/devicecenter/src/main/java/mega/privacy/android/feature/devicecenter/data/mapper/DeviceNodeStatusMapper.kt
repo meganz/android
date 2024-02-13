@@ -16,11 +16,13 @@ import javax.inject.Inject
  * 5. Paused
  * 6. Overquota
  * 7. Blocked
- * 8. Up to Date
- * 9. Offline
- * 10. Disabled
- * 11. Stopped
- * 12. Unknown (if no matching Device Status)
+ * 8. Error
+ * 9. Stalled
+ * 10. Up to Date
+ * 11. Offline
+ * 12. Disabled
+ * 13. Stopped
+ * 14. Unknown (if no matching Device Status)
  */
 internal class DeviceNodeStatusMapper @Inject constructor() {
 
@@ -58,13 +60,14 @@ internal class DeviceNodeStatusMapper @Inject constructor() {
     private fun List<DeviceFolderNode>.calculateDeviceStatus(): DeviceCenterNodeStatus =
         when (this.maxOfOrNull { folder -> folder.status.priority }) {
             // Syncing Devices do not need to display the syncing progress in the UI
-            11 -> DeviceCenterNodeStatus.Syncing(0)
-            10 -> DeviceCenterNodeStatus.Scanning
-            9 -> DeviceCenterNodeStatus.Initializing
-            8 -> DeviceCenterNodeStatus.Paused
-            // Blocked and Overquota Devices do not need to display the error sub state in the UI
-            7 -> DeviceCenterNodeStatus.Overquota(null)
-            6 -> DeviceCenterNodeStatus.Blocked(null)
+            12 -> DeviceCenterNodeStatus.Syncing(progress = 0)
+            11 -> DeviceCenterNodeStatus.Scanning
+            10 -> DeviceCenterNodeStatus.Initializing
+            9 -> DeviceCenterNodeStatus.Paused
+            // Blocked, Overquota and Error Devices do not need to display the error sub state in the UI
+            8 -> DeviceCenterNodeStatus.Overquota(errorSubState = null)
+            7 -> DeviceCenterNodeStatus.Blocked(errorSubState = null)
+            6 -> DeviceCenterNodeStatus.Error(errorSubState = null)
             5 -> DeviceCenterNodeStatus.Stalled
             4 -> DeviceCenterNodeStatus.UpToDate
             3 -> DeviceCenterNodeStatus.Offline

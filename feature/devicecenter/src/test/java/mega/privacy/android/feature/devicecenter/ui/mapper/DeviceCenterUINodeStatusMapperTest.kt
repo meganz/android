@@ -38,6 +38,28 @@ internal class DeviceCenterUINodeStatusMapperTest {
     }
 
     @Test
+    fun `test that an error UI node status is returned without a specific error message`() {
+        assertThat(underTest(DeviceCenterNodeStatus.Error(errorSubState = null))).isEqualTo(
+            DeviceCenterUINodeStatus.Error(specificErrorMessage = null)
+        )
+        verifyNoInteractions(deviceFolderUINodeErrorMessageMapper)
+    }
+
+    @Test
+    fun `test that an error UI node status is returned with a specific error message`() {
+        val errorSubState = BackupInfoSubState.INSUFFICIENT_DISK_SPACE
+        val specificErrorMessage =
+            R.string.device_center_list_view_item_sub_state_insufficient_disk_space
+
+        whenever(deviceFolderUINodeErrorMessageMapper(errorSubState)).thenReturn(
+            specificErrorMessage
+        )
+        assertThat(underTest(DeviceCenterNodeStatus.Error(errorSubState = errorSubState))).isEqualTo(
+            DeviceCenterUINodeStatus.Error(specificErrorMessage = specificErrorMessage)
+        )
+    }
+
+    @Test
     fun `test that a blocked UI node status is returned without a specific error message`() {
         assertThat(underTest(DeviceCenterNodeStatus.Blocked(errorSubState = null))).isEqualTo(
             DeviceCenterUINodeStatus.Blocked(specificErrorMessage = null)

@@ -104,9 +104,16 @@ internal class DeviceNodeStatusMapperTest {
         Arguments.of(
             listOf<DeviceFolderNode>(
                 mock { on { status }.thenReturn(DeviceCenterNodeStatus.Blocked(BackupInfoSubState.ACCOUNT_BLOCKED)) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.UpToDate) }
+                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Error(BackupInfoSubState.INSUFFICIENT_DISK_SPACE)) },
             ),
             DeviceCenterNodeStatus.Blocked(null),
+        ),
+        Arguments.of(
+            listOf<DeviceFolderNode>(
+                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Error(BackupInfoSubState.INSUFFICIENT_DISK_SPACE)) },
+                mock { on { status }.thenReturn(DeviceCenterNodeStatus.UpToDate) }
+            ),
+            DeviceCenterNodeStatus.Error(null),
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(

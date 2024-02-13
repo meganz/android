@@ -44,14 +44,15 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
      * 1. Stopped - [isStopped]
      * 2. Overquota - [isOverquota]
      * 3. Blocked - [isBlocked]
-     * 4. Stalled - [isStalled]
-     * 5. Disabled - [isDisabled]
-     * 6. Offline - [isOffline]
-     * 7. Paused - [isPaused]
-     * 8. Up to Date - [isUpToDate]
-     * 9. Initializing - [isInitializing]
-     * 10. Syncing - [isSyncing]
-     * 11. Scanning - [isScanning]
+     * 4. Failed - [isFailed]
+     * 5. Stalled - [isStalled]
+     * 6. Disabled - [isDisabled]
+     * 7. Offline - [isOffline]
+     * 8. Paused - [isPaused]
+     * 9. Up to Date - [isUpToDate]
+     * 10. Initializing - [isInitializing]
+     * 11. Syncing - [isSyncing]
+     * 12. Scanning - [isScanning]
      *
      * If there is no matching Folder Status, [DeviceCenterNodeStatus.Unknown] is returned
      *
@@ -63,6 +64,7 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
         isStopped() -> DeviceCenterNodeStatus.Stopped
         isOverquota() -> DeviceCenterNodeStatus.Overquota(subState)
         isBlocked() -> DeviceCenterNodeStatus.Blocked(subState)
+        isFailed() -> DeviceCenterNodeStatus.Error(subState)
         isStalled() -> DeviceCenterNodeStatus.Stalled
         isDisabled() -> DeviceCenterNodeStatus.Disabled
         isOffline(currentTimeInSeconds) -> DeviceCenterNodeStatus.Offline
@@ -99,7 +101,26 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
     private fun BackupInfo.isBlocked() = state in listOf(
         BackupInfoState.FAILED,
         BackupInfoState.TEMPORARY_DISABLED,
-    ) && subState != BackupInfoSubState.STORAGE_OVERQUOTA
+    ) && subState in listOf(
+        BackupInfoSubState.ACCOUNT_EXPIRED,
+        BackupInfoSubState.ACCOUNT_BLOCKED,
+        BackupInfoSubState.NO_SYNC_ERROR
+    )
+
+    /**
+     * Checks whether the Backup has Failed or not
+     *
+     * @return true if the following conditions are met, and false if otherwise
+     */
+    private fun BackupInfo.isFailed() = state in listOf(
+        BackupInfoState.FAILED,
+        BackupInfoState.TEMPORARY_DISABLED,
+    ) && subState !in listOf(
+        BackupInfoSubState.ACCOUNT_EXPIRED,
+        BackupInfoSubState.ACCOUNT_BLOCKED,
+        BackupInfoSubState.NO_SYNC_ERROR,
+        BackupInfoSubState.STORAGE_OVERQUOTA
+    )
 
     /**
      * Checks whether the Backup is Stalled or not, which is only applied for Syncs

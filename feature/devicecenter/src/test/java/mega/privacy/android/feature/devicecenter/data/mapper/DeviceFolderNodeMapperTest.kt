@@ -101,8 +101,8 @@ internal class DeviceFolderNodeMapperTest {
 
     @ParameterizedTest(name = "and backup sub state is {0}")
     @EnumSource(
-        value = BackupInfoSubState::class, names = ["STORAGE_OVERQUOTA"],
-        mode = EnumSource.Mode.EXCLUDE,
+        value = BackupInfoSubState::class,
+        names = ["ACCOUNT_EXPIRED", "ACCOUNT_BLOCKED", "NO_SYNC_ERROR"],
     )
     fun `test that the mapped device folder has a blocked status when the backup state is failed`(
         backupSubState: BackupInfoSubState,
@@ -141,8 +141,8 @@ internal class DeviceFolderNodeMapperTest {
 
     @ParameterizedTest(name = "and backup sub state is {0}")
     @EnumSource(
-        value = BackupInfoSubState::class, names = ["STORAGE_OVERQUOTA"],
-        mode = EnumSource.Mode.EXCLUDE,
+        value = BackupInfoSubState::class,
+        names = ["ACCOUNT_EXPIRED", "ACCOUNT_BLOCKED", "NO_SYNC_ERROR"],
     )
     fun `test that the mapped device folder has a blocked status when the backup state is temporary disabled`(
         backupSubState: BackupInfoSubState,
@@ -170,6 +170,88 @@ internal class DeviceFolderNodeMapperTest {
                 id = backupId.toString(),
                 name = backupName,
                 status = DeviceCenterNodeStatus.Blocked(backupSubState),
+                rootHandle = backupRootHandle,
+                type = backupType,
+                userAgent = backupUserAgent,
+                localFolderPath = localPath,
+            )
+        )
+        assertThat(underTest(backupInfoList)).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = "and backup sub state is {0}")
+    @EnumSource(
+        value = BackupInfoSubState::class,
+        names = ["ACCOUNT_EXPIRED", "ACCOUNT_BLOCKED", "NO_SYNC_ERROR", "STORAGE_OVERQUOTA"],
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    fun `test that the mapped device folder has an error status when the backup state is failed`(
+        backupSubState: BackupInfoSubState,
+    ) {
+        val backupId = 123456L
+        val backupName = "Backup One"
+        val backupType = BackupInfoType.CAMERA_UPLOADS
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
+        val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
+        val backupInfoList = listOf<BackupInfo>(
+            mock {
+                on { id }.thenReturn(backupId)
+                on { name }.thenReturn(backupName)
+                on { state }.thenReturn(BackupInfoState.FAILED)
+                on { subState }.thenReturn(backupSubState)
+                on { type }.thenReturn(backupType)
+                on { rootHandle }.thenReturn(backupRootHandle)
+                on { userAgent }.thenReturn(backupUserAgent)
+                on { localFolderPath }.thenReturn(localPath)
+            },
+        )
+        val expected = listOf(
+            DeviceFolderNode(
+                id = backupId.toString(),
+                name = backupName,
+                status = DeviceCenterNodeStatus.Error(backupSubState),
+                rootHandle = backupRootHandle,
+                type = backupType,
+                userAgent = backupUserAgent,
+                localFolderPath = localPath,
+            )
+        )
+        assertThat(underTest(backupInfoList)).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = "and backup sub state is {0}")
+    @EnumSource(
+        value = BackupInfoSubState::class,
+        names = ["ACCOUNT_EXPIRED", "ACCOUNT_BLOCKED", "NO_SYNC_ERROR", "STORAGE_OVERQUOTA"],
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    fun `test that the mapped device folder has an error status when the backup state is temporary disabled`(
+        backupSubState: BackupInfoSubState,
+    ) {
+        val backupId = 123456L
+        val backupName = "Backup One"
+        val backupType = BackupInfoType.CAMERA_UPLOADS
+        val backupUserAgent = BackupInfoUserAgent.ANDROID
+        val backupRootHandle = 789012L
+        val localPath = "storage/emulated/0/DCIM/Camera"
+        val backupInfoList = listOf<BackupInfo>(
+            mock {
+                on { id }.thenReturn(backupId)
+                on { name }.thenReturn(backupName)
+                on { state }.thenReturn(BackupInfoState.TEMPORARY_DISABLED)
+                on { subState }.thenReturn(backupSubState)
+                on { type }.thenReturn(backupType)
+                on { rootHandle }.thenReturn(backupRootHandle)
+                on { userAgent }.thenReturn(backupUserAgent)
+                on { localFolderPath }.thenReturn(localPath)
+            },
+        )
+        val expected = listOf(
+            DeviceFolderNode(
+                id = backupId.toString(),
+                name = backupName,
+                status = DeviceCenterNodeStatus.Error(backupSubState),
                 rootHandle = backupRootHandle,
                 type = backupType,
                 userAgent = backupUserAgent,
