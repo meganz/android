@@ -5,6 +5,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +15,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.FileProvider
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -22,6 +26,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentVideoSectionBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -77,6 +82,14 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
 
     private var actionMode: ActionMode? = null
 
+    private val playlistMenuMoreProvider = object : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.fragment_playlist_menu_more, menu)
+        }
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean = true
+    }
+
     /**
      * onCreateView
      */
@@ -126,6 +139,21 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         ) { isSearchMode ->
             if (!isSearchMode) {
                 (activity as? ManagerActivity)?.closeSearchView()
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.currentVideoPlaylist }.distinctUntilChanged()
+        ) { videoPlaylist ->
+            (activity as? ManagerActivity)?.let { managerActivity ->
+                if (videoPlaylist == null) {
+                    managerActivity.removeMenuProvider(playlistMenuMoreProvider)
+                    managerActivity.setToolbarTitle(getString(R.string.sortby_type_video_first))
+                } else {
+                    managerActivity.addMenuProvider(playlistMenuMoreProvider)
+                    managerActivity.setToolbarTitle("")
+                }
+                managerActivity.invalidateOptionsMenu()
             }
         }
     }
