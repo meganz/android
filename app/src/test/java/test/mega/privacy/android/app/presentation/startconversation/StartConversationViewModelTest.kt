@@ -182,7 +182,7 @@ class StartConversationViewModelTest {
             it.searchWidgetState == SearchWidgetState.EXPANDED
                     && it.typedSearch == typedSearch
                     && it.fromChat
-        }.test(200) {
+        }.test {
             val latest = awaitItem()
             assertThat(latest.searchWidgetState).isEqualTo(SearchWidgetState.EXPANDED)
             assertThat(latest.typedSearch).isEqualTo(typedSearch)

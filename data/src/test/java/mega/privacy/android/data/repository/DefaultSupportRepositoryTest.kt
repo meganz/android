@@ -100,7 +100,7 @@ class DefaultSupportRepositoryTest {
                 mock { on { errorCode }.thenReturn(MegaError.API_OK + 1) })
         }
 
-        underTest.uploadFile(File("")).test(5) {}
+        underTest.uploadFile(File("")).test {}
     }
 
     @Test

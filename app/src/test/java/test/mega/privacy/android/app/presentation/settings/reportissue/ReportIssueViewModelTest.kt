@@ -148,7 +148,7 @@ class ReportIssueViewModelTest {
             it.description == expectedDescription &&
                     it.includeLogsVisible &&
                     it.includeLogs
-        }.test(200) {
+        }.test {
             val latest = awaitItem()
             assertThat(latest.description).isEqualTo(expectedDescription)
             assertThat(latest.includeLogsVisible).isTrue()
