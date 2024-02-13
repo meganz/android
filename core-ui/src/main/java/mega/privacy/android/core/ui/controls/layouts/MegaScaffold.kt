@@ -7,7 +7,10 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
+import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.MegaTheme
 
 @Composable
@@ -16,16 +19,30 @@ fun MegaScaffold(
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
-    snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
     floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit,
-) = Scaffold(
-    modifier = modifier,
-    scaffoldState = scaffoldState,
-    topBar = topBar,
-    bottomBar = bottomBar,
-    snackbarHost = snackbarHost,
-    floatingActionButton = floatingActionButton,
-    backgroundColor = MegaTheme.colors.background.pageBackground,
-    content = content
-)
+) {
+    CompositionLocalProvider(LocalSnackBarHostState provides scaffoldState.snackbarHostState) {
+        Scaffold(
+            modifier = modifier,
+            scaffoldState = scaffoldState,
+            topBar = topBar,
+            bottomBar = bottomBar,
+            snackbarHost = {
+                SnackbarHost(hostState = it) { data ->
+                    MegaSnackbar(snackbarData = data)
+                }
+            },
+            floatingActionButton = floatingActionButton,
+            backgroundColor = MegaTheme.colors.background.pageBackground,
+            content = content
+        )
+    }
+}
+
+/**
+ * Provides SnackbarHostState to be used to show a snackBar from any view inside this scaffold.
+ * This is a convenient accessor to [ScaffoldState.snackbarHostState] without the need to send it to all the view hierarchy
+ */
+val LocalSnackBarHostState = compositionLocalOf<SnackbarHostState?> { null }
+

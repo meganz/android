@@ -29,10 +29,10 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -101,7 +101,6 @@ import mega.privacy.android.core.ui.controls.chat.ScrollToBottomFab
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.User
@@ -253,7 +252,7 @@ internal fun ChatView(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val snackBarHostState = remember { SnackbarHostState() }
+    val scaffoldState = rememberScaffoldState()
     var showParticipatingInACallDialog by rememberSaveable { mutableStateOf(false) }
     var showNoContactToAddDialog by rememberSaveable { mutableStateOf(false) }
     var showAllContactsParticipateInChat by rememberSaveable { mutableStateOf(false) }
@@ -338,7 +337,7 @@ internal fun ChatView(
             showPermissionNotAllowedSnackbar(
                 context,
                 coroutineScope,
-                snackBarHostState,
+                scaffoldState.snackbarHostState,
                 R.string.chat_attach_location_deny_permission
             )
         }
@@ -387,7 +386,7 @@ internal fun ChatView(
             showPermissionNotAllowedSnackbar(
                 context,
                 coroutineScope,
-                snackBarHostState,
+                scaffoldState.snackbarHostState,
                 R.string.allow_acces_calls_subtitle_microphone
             )
         }
@@ -500,7 +499,8 @@ internal fun ChatView(
                                     reactionInfoBottomSheetState.hide()
                                     val isMe = uiState.myUserHandle == userHandle
                                     if (isMe) {
-                                        snackBarHostState.showSnackbar(context.getString(R.string.contact_is_me))
+                                        scaffoldState.snackbarHostState
+                                            .showSnackbar(context.getString(R.string.contact_is_me))
                                     } else {
                                         getUser(UserId(userHandle))?.let { user ->
                                             val isUserMyContact =
@@ -528,7 +528,8 @@ internal fun ChatView(
                                     openAttachContactActivity(context, attachContactLauncher)
                                 } else {
                                     coroutineScope.launch {
-                                        snackBarHostState.showSnackbar(context.getString(R.string.no_contacts_invite))
+                                        scaffoldState.snackbarHostState
+                                            .showSnackbar(context.getString(R.string.no_contacts_invite))
                                     }
                                 }
                             },
@@ -562,7 +563,7 @@ internal fun ChatView(
                                 showPermissionNotAllowedSnackbar(
                                     context,
                                     coroutineScope,
-                                    snackBarHostState,
+                                    scaffoldState.snackbarHostState,
                                     R.string.chat_attach_pick_from_camera_deny_permission
                                 )
                             },
@@ -578,6 +579,7 @@ internal fun ChatView(
                     .fillMaxSize()
                     .systemBarsPadding()
                     .imePadding(),
+                scaffoldState = scaffoldState,
                 topBar = {
                     if (isSelectMode) {
                         SelectModeAppBar(
@@ -590,7 +592,7 @@ internal fun ChatView(
                         Column {
                             ChatAppBar(
                                 uiState = uiState,
-                                snackBarHostState = snackBarHostState,
+                                snackBarHostState = scaffoldState.snackbarHostState,
                                 onBackPressed = onBackPressed,
                                 showParticipatingInACallDialog = {
                                     showParticipatingInACallDialog = true
@@ -635,11 +637,6 @@ internal fun ChatView(
                                 onAnswerCall = onAnswerCall
                             )
                         }
-                    }
-                },
-                snackbarHost = {
-                    SnackbarHost(hostState = snackBarHostState) { data ->
-                        MegaSnackbar(snackbarData = data)
                     }
                 },
                 bottomBar = {
@@ -860,7 +857,9 @@ internal fun ChatView(
                 onConsumed = onInfoToShowConsumed
             ) { info ->
                 info?.let {
-                    getInfoToShow(info, context).let { snackBarHostState.showSnackbar(it) }
+                    getInfoToShow(info, context).let {
+                        scaffoldState.snackbarHostState.showSnackbar(it)
+                    }
                 } ?: context.findActivity()?.finish()
             }
 

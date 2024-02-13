@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.extensions
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Build.VERSION_CODES.TIRAMISU
@@ -77,4 +78,13 @@ inline fun <reified T : Parcelable> Bundle.parcelableArrayList(key: String): Arr
 inline fun <reified T : Parcelable> Intent.parcelableArrayList(key: String): ArrayList<T>? = when {
     Build.VERSION.SDK_INT >= TIRAMISU -> getParcelableArrayListExtra(key, T::class.java)
     else -> @Suppress("DEPRECATION") getParcelableArrayListExtra(key)
+}
+
+/**
+ * @return true if the intent can be handled, false otherwise
+ */
+fun Intent.canBeHandled(context: Context): Boolean {
+    val packageManager = context.packageManager
+    val activities = packageManager.queryIntentActivities(this, 0)
+    return activities.isNotEmpty()
 }
