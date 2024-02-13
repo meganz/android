@@ -114,6 +114,7 @@ class AlterParticipantsMessageViewTest {
         composeTestRule.setContent {
             AlterParticipantsMessageView(
                 message = AlterParticipantsMessage(
+                    chatId = 1,
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isMine = true,

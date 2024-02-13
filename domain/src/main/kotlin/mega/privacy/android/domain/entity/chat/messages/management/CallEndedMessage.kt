@@ -13,6 +13,7 @@ import kotlin.time.Duration
  */
 @Serializable
 data class CallEndedMessage(
+    override val chatId: Long,
     override val msgId: Long,
     override val time: Long,
     override val isMine: Boolean,

@@ -106,7 +106,7 @@ class SendGiphyMessageUseCaseTest {
             )
         ).thenReturn(message)
         val request = mock<CreateTypedMessageRequest>()
-        whenever(createSaveSentMessageRequestUseCase(message)).thenReturn(request)
+        whenever(createSaveSentMessageRequestUseCase(message, chatId)).thenReturn(request)
         underTest.invoke(
             chatId = chatId,
             srcMp4 = srcMp4,
@@ -117,6 +117,6 @@ class SendGiphyMessageUseCaseTest {
             height = height,
             title = title
         )
-        verify(chatRepository).storeMessages(chatId, listOf(request))
+        verify(chatRepository).storeMessages(listOf(request))
     }
 }

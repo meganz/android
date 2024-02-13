@@ -32,6 +32,7 @@ class CreateInvalidMessageUseCaseTest {
             underTest.invoke(
                 CreateTypedMessageRequest(
                     chatMessage = message,
+                    chatId = 123L,
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,
@@ -54,6 +55,7 @@ class CreateInvalidMessageUseCaseTest {
             underTest.invoke(
                 CreateTypedMessageRequest(
                     chatMessage = message,
+                    chatId = 123L,
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,
@@ -76,6 +78,7 @@ class CreateInvalidMessageUseCaseTest {
             underTest.invoke(
                 CreateTypedMessageRequest(
                     chatMessage = message,
+                    chatId = 123L,
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,
@@ -98,6 +101,7 @@ class CreateInvalidMessageUseCaseTest {
             underTest.invoke(
                 CreateTypedMessageRequest(
                     chatMessage = message,
+                    chatId = 123L,
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,

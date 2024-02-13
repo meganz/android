@@ -121,6 +121,7 @@ class NodeAttachmentMessageViewModelTest {
 
     private fun buildNodeAttachmentMessage(fileNode: FileNode) =
         NodeAttachmentMessage(
+            chatId = CHAT_ID,
             msgId = MSG_ID,
             time = 12L,
             isMine = true,

@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.node.Node
  */
 data class CreateTypedMessageRequest(
     val message: ChatMessageInfo,
+    override val chatId: Long,
     override val isMine: Boolean,
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
@@ -39,12 +40,14 @@ data class CreateTypedMessageRequest(
 ) : ChatMessageInfo by message, CreateTypedMessageInfo {
     constructor(
         chatMessage: ChatMessage,
+        chatId: Long,
         isMine: Boolean,
         shouldShowAvatar: Boolean,
         shouldShowTime: Boolean,
         reactions: List<Reaction>,
     ) : this(
         message = chatMessage,
+        chatId = chatId,
         isMine = isMine,
         shouldShowAvatar = shouldShowAvatar,
         shouldShowTime = shouldShowTime,

@@ -75,8 +75,8 @@ class AttachNodeUseCaseTest {
         whenever(chatMessageRepository.attachNode(chatId, nodeHandle)).thenReturn(msgId)
         whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
         val request = mock<CreateTypedMessageRequest>()
-        whenever(createSaveSentMessageRequestUseCase(message)).thenReturn(request)
+        whenever(createSaveSentMessageRequestUseCase(message, chatId)).thenReturn(request)
         underTest.invoke(chatId = chatId, fileNode)
-        verify(chatRepository).storeMessages(chatId, listOf(request))
+        verify(chatRepository).storeMessages(listOf(request))
     }
 }

@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.node.Node
 /**
  * Create typed message request info
  *
+ * @property chatId Chat ID.
  * @property isMine True if the message is mine.
  * @property shouldShowAvatar True if the avatar should be shown.
  * @property shouldShowTime True if the time should be shown.
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.node.Node
  * @property reactions List of [Reaction]
  */
 interface CreateTypedMessageInfo : ChatMessageInfo {
+    val chatId: Long
     val isMine: Boolean
     val shouldShowAvatar: Boolean
     val shouldShowTime: Boolean

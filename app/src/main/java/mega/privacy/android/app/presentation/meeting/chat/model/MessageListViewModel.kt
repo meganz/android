@@ -107,7 +107,7 @@ class MessageListViewModel @Inject constructor(
                 getChatPagingSourceUseCase(chatId)
             }.flow.map { pagingData ->
                 pagingData.map {
-                    uiChatMessageMapper(it, chatId)
+                    uiChatMessageMapper(it)
                 }.insertSeparators { before, after: UiChatMessage? ->
                     chatMessageDateSeparatorMapper(
                         firstMessage = after,

@@ -53,6 +53,7 @@ class CreateSaveMessageRequestUseCase @Inject constructor(
 
                 CreateTypedMessageRequest(
                     chatMessage = chatMessage,
+                    chatId = chatId,
                     isMine = isMine,
                     shouldShowAvatar = shouldShowAvatar,
                     shouldShowTime = shouldShowTime,

@@ -14,11 +14,9 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
  * Node attachment Ui message
  *
  * @param message [NodeAttachmentMessageView]
- * @param chatId
  */
 data class NodeAttachmentUiMessage(
     override val message: NodeAttachmentMessage,
-    private val chatId: Long,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
 
@@ -26,7 +24,7 @@ data class NodeAttachmentUiMessage(
     @Composable
     override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
         NodeAttachmentMessageView(
-            message = message, chatId = chatId,
+            message = message, chatId = message.chatId,
             modifier = Modifier.combinedClickable(
                 onClick = {},
                 onLongClick = { onLongClick(message) }

@@ -16,8 +16,10 @@ class CreateSaveSentMessageRequestUseCase @Inject constructor() {
      */
     operator fun invoke(
         chatMessage: ChatMessage,
+        chatId: Long,
     ) = CreateTypedMessageRequest(
         chatMessage = chatMessage.copy(msgId = chatMessage.tempId),
+        chatId = chatId,
         isMine = true,
         shouldShowAvatar = false,
         shouldShowTime = true,

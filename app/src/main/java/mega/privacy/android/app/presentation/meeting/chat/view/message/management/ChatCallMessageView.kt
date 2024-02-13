@@ -166,6 +166,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
         get() = sequenceOf(
             PreviewParameters(
                 message = CallStartedMessage(
+                    chatId = 1L,
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isMine = true,
@@ -178,6 +179,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    chatId = 1L,
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isMine = true,
@@ -192,6 +194,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    chatId = 1L,
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isMine = true,
@@ -206,6 +209,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    chatId = 1L,
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isMine = true,
@@ -220,6 +224,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    chatId = 1L,
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isMine = true,
@@ -234,6 +239,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    chatId = 1L,
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isMine = true,
@@ -248,6 +254,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    chatId = 1L,
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isMine = true,
@@ -262,6 +269,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    chatId = 1L,
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isMine = true,
@@ -276,6 +284,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
             ),
             PreviewParameters(
                 message = CallEndedMessage(
+                    chatId = 1L,
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isMine = true,

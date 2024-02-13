@@ -9,6 +9,7 @@ internal class CreateTitleChangeMessageUseCase @Inject constructor() : CreateTyp
 
     override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         TitleChangeMessage(
+            chatId = chatId,
             msgId = msgId,
             time = timestamp,
             isMine = isMine,

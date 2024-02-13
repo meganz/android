@@ -23,13 +23,13 @@ class AttachContactsUseCase @Inject constructor(
         val requests = buildList {
             contactEmails.forEach { email ->
                 chatMessageRepository.attachContact(chatId, email)?.let {
-                    val request = createSaveSentMessageRequestUseCase(it)
+                    val request = createSaveSentMessageRequestUseCase(it, chatId)
                     add(request)
                 }
             }
         }
         if (requests.isNotEmpty()) {
-            chatRepository.storeMessages(chatId, requests)
+            chatRepository.storeMessages(requests)
         }
     }
 }

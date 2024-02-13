@@ -40,6 +40,7 @@ class CreateNormalChatMessageUseCaseTest {
             underTest.invoke(
                 CreateTypedMessageRequest(
                     chatMessage = message,
+                    chatId = 123L,
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,
@@ -65,6 +66,7 @@ class CreateNormalChatMessageUseCaseTest {
             underTest.invoke(
                 CreateTypedMessageRequest(
                     chatMessage = message,
+                    chatId = 123L,
                     isMine = true,
                     shouldShowAvatar = true,
                     shouldShowTime = true,

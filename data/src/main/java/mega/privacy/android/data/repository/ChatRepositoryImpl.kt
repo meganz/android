@@ -1227,11 +1227,11 @@ internal class ChatRepositoryImpl @Inject constructor(
     override fun getPagedMessages(chatId: Long) =
         typedMessagePagingSourceMapper(chatStorageGateway.getTypedMessageRequestPagingSource(chatId))
 
-    override suspend fun storeMessages(chatId: Long, messages: List<CreateTypedMessageRequest>) {
+    override suspend fun storeMessages(messages: List<CreateTypedMessageRequest>) {
         withContext(ioDispatcher) {
             chatStorageGateway.storeMessages(
                 messages = messages.map {
-                    typedMessageEntityMapper(it, chatId)
+                    typedMessageEntityMapper(it)
                 },
                 richPreviews = messages.mapNotNull { request ->
                     request.chatRichPreviewInfo?.let {

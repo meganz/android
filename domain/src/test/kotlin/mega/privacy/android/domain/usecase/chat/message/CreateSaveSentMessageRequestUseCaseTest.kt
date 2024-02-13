@@ -12,21 +12,24 @@ import org.junit.jupiter.api.Test
 import kotlin.time.Duration.Companion.seconds
 
 class CreateSaveSentMessageRequestUseCaseTest {
+
     private val underTest = CreateSaveSentMessageRequestUseCase()
+
+    private val chatId = 1L
 
     @Test
     fun `test that message has same temp and message id`() {
         val tempId = 123L
         val msgId = tempId + 1
         val chatMessage = createChatMessage(msgId, tempId)
-        val actual = underTest(chatMessage)
+        val actual = underTest(chatMessage, chatId)
         assertThat(actual.message.msgId).isEqualTo(tempId)
     }
 
     @Test
     fun `test that should displayTime is true`() {
         val chatMessage = createChatMessage(123L, 123L)
-        val actual = underTest(chatMessage)
+        val actual = underTest(chatMessage, chatId)
         assertThat(actual.shouldShowTime).isTrue()
     }
 

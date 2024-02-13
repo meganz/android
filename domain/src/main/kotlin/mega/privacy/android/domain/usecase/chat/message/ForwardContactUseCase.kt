@@ -22,8 +22,8 @@ class ForwardContactUseCase @Inject constructor(
      */
     suspend operator fun invoke(sourceChatId: Long, msgId: Long, targetChatId: Long) {
         chatMessageRepository.forwardContact(sourceChatId, msgId, targetChatId)?.let {
-            val request = createSaveSentMessageRequestUseCase(it)
-            chatRepository.storeMessages(targetChatId, listOf(request))
+            val request = createSaveSentMessageRequestUseCase(it, targetChatId)
+            chatRepository.storeMessages(listOf(request))
         }
     }
 }

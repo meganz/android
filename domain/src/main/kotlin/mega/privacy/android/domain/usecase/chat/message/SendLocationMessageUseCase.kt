@@ -26,7 +26,7 @@ class SendLocationMessageUseCase @Inject constructor(
         image: String,
     ) {
         val sentMessage = chatRepository.sendGeolocation(chatId, longitude, latitude, image)
-        val request = createSaveSentMessageRequestUseCase(sentMessage)
-        chatRepository.storeMessages(chatId, listOf(request))
+        val request = createSaveSentMessageRequestUseCase(sentMessage, chatId)
+        chatRepository.storeMessages(listOf(request))
     }
 }

@@ -45,7 +45,7 @@ class SendGiphyMessageUseCase @Inject constructor(
             height = height,
             title = title
         )
-        val request = createSaveSentMessageRequestUseCase(sentMessage)
-        chatRepository.storeMessages(chatId, listOf(request))
+        val request = createSaveSentMessageRequestUseCase(sentMessage, chatId)
+        chatRepository.storeMessages(listOf(request))
     }
 }

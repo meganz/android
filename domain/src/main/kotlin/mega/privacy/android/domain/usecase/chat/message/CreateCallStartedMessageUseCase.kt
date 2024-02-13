@@ -9,6 +9,7 @@ internal class CreateCallStartedMessageUseCase @Inject constructor() : CreateTyp
     override fun invoke(request: CreateTypedMessageInfo) =
         with(request) {
             CallStartedMessage(
+                chatId = chatId,
                 msgId = msgId,
                 time = timestamp,
                 isMine = isMine,

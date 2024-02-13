@@ -10,6 +10,7 @@ internal class CreatePermissionChangeMessageUseCase @Inject constructor() :
 
     override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         PermissionChangeMessage(
+            chatId = chatId,
             msgId = msgId,
             time = timestamp,
             isMine = isMine,

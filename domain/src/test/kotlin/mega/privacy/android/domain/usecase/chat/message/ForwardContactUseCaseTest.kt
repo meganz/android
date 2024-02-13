@@ -59,8 +59,8 @@ class ForwardContactUseCaseTest {
         val request = mock<CreateTypedMessageRequest>()
         whenever(chatMessageRepository.forwardContact(sourceChatId, msgId, targetChatId))
             .thenReturn(message)
-        whenever(createSaveSentMessageRequestUseCase(message)).thenReturn(request)
+        whenever(createSaveSentMessageRequestUseCase(message, targetChatId)).thenReturn(request)
         underTest.invoke(sourceChatId, msgId, targetChatId)
-        verify(chatRepository).storeMessages(targetChatId, listOf(request))
+        verify(chatRepository).storeMessages(listOf(request))
     }
 }

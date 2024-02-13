@@ -15,6 +15,7 @@ import kotlin.time.Duration
  */
 @Serializable
 data class VoiceClipMessage(
+    override val chatId: Long,
     override val msgId: Long,
     override val time: Long,
     override val isMine: Boolean,

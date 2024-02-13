@@ -31,8 +31,8 @@ class AttachNodeUseCase @Inject constructor(
         //  Better to create a new GetMyFileNodeUseCase for this purpose as it will be used in other places
         chatMessageRepository.attachNode(chatId, fileNode.id.longValue)?.let {
             getChatMessageUseCase(chatId, it)?.let { message ->
-                val request = createSaveSentMessageRequestUseCase(message)
-                chatRepository.storeMessages(chatId, listOf(request))
+                val request = createSaveSentMessageRequestUseCase(message, chatId)
+                chatRepository.storeMessages(listOf(request))
             }
         }
     }

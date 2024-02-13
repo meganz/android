@@ -95,13 +95,14 @@ class TypedMessageEntityMapperTest {
 
         val requestResolver = CreateTypedMessageRequest(
             chatMessage = chatMessage,
+            chatId = expectedChatId,
             shouldShowAvatar = expectedShouldShowAvatar,
             shouldShowTime = expectedShouldShowTime,
             isMine = expectedIsMine,
             reactions = expectedReactions,
         )
 
-        val actual = underTest(requestResolver, expectedChatId)
+        val actual = underTest(requestResolver)
 
         assertThat(actual.chatId).isEqualTo(expectedChatId)
         assertThat(actual.status).isEqualTo(expectedStatus)

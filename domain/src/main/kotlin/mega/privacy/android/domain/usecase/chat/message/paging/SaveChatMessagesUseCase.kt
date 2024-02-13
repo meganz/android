@@ -35,6 +35,6 @@ class SaveChatMessagesUseCase @Inject constructor(
             nextMessageUserHandle = nextMessage?.userHandle
         )
 
-        chatRepository.storeMessages(chatId, requestList)
+        chatRepository.storeMessages(requestList)
     }
 }

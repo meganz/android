@@ -37,8 +37,8 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
                 chatMessageRepository.attachNode(chatId, nodeId.longValue)
                     ?.let {
                         getChatMessageUseCase(chatId, it)?.let { message ->
-                            val request = createSaveSentMessageRequestUseCase(message)
-                            chatRepository.storeMessages(chatId, listOf(request))
+                            val request = createSaveSentMessageRequestUseCase(message, chatId)
+                            chatRepository.storeMessages(listOf(request))
                             chatMessageRepository.deletePendingMessage(pendingMessage)
                         }
                     } ?: run {

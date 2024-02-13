@@ -49,6 +49,7 @@ class VoiceClipMessageViewModelTest {
     lateinit var underTest: VoiceClipMessageViewModel
 
     private val voiceClipMessage = VoiceClipMessage(
+        chatId = 1,
         msgId = 1,
         name = "name",
         isMine = true,

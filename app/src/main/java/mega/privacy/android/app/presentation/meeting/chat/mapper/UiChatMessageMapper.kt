@@ -5,6 +5,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.Contact
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.InvalidUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.NodeAttachmentUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.VoiceClipUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.AlterParticipantsUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ChatLinkCreatedUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ChatLinkRemovedUiMessage
@@ -19,7 +20,6 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.Ch
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.LocationUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextLinkUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.VoiceClipUiMessage
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
@@ -60,7 +60,6 @@ class UiChatMessageMapper @Inject constructor(
      */
     operator fun invoke(
         message: TypedMessage,
-        chatId: Long,
     ): UiChatMessage {
         return when (message) {
             is TextMessage -> TextUiMessage(
@@ -145,13 +144,11 @@ class UiChatMessageMapper @Inject constructor(
 
             is VoiceClipMessage -> VoiceClipUiMessage(
                 message = message,
-                chatId = chatId,
                 reactions = uiReactionListMapper(message.reactions),
             )
 
             is NodeAttachmentMessage -> NodeAttachmentUiMessage(
                 message = message,
-                chatId = chatId,
                 reactions = uiReactionListMapper(message.reactions)
             )
 

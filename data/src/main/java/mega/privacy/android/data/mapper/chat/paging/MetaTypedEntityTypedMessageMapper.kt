@@ -28,6 +28,7 @@ class MetaTypedEntityTypedMessageMapper @Inject constructor(
     operator fun invoke(entity: MetaTypedMessageEntity): TypedMessage {
         val request = CreateTypedMessageRequest(
             message = entity.typedMessageEntity,
+            chatId = entity.typedMessageEntity.chatId,
             isMine = entity.typedMessageEntity.isMine,
             shouldShowAvatar = entity.typedMessageEntity.shouldShowAvatar,
             shouldShowTime = entity.typedMessageEntity.shouldShowTime,

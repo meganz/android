@@ -878,10 +878,9 @@ interface ChatRepository {
     /**
      * Store messages
      *
-     * @param chatId
      * @param messages
      */
-    suspend fun storeMessages(chatId: Long, messages: List<CreateTypedMessageRequest>)
+    suspend fun storeMessages(messages: List<CreateTypedMessageRequest>)
 
     /**
      * Clear chat messages

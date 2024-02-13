@@ -9,6 +9,7 @@ internal class CreateTruncateHistoryMessageUseCase @Inject constructor() :
 
     override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         TruncateHistoryMessage(
+            chatId = chatId,
             msgId = msgId,
             time = timestamp,
             isMine = isMine,

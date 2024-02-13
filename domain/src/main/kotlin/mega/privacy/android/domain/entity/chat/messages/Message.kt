@@ -10,6 +10,11 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 interface Message {
 
     /**
+     * Chat id
+     */
+    val chatId: Long
+
+    /**
      * Msg id
      */
     val msgId: Long

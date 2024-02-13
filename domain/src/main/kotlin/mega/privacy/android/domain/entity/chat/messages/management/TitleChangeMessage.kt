@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  */
 @Serializable
 data class TitleChangeMessage(
+    override val chatId: Long,
     override val msgId: Long,
     override val time: Long,
     override val isMine: Boolean,

@@ -14,6 +14,7 @@ internal class CreateVoiceClipMessageUseCase @Inject constructor() : CreateTyped
     override fun invoke(request: CreateTypedMessageInfo): TypedMessage = with(request) {
         val fileNode = nodeList.firstOrNull() as? FileNode
         return VoiceClipMessage(
+            chatId = chatId,
             msgId = msgId,
             time = timestamp,
             isMine = isMine,

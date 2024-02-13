@@ -52,8 +52,8 @@ class SendTextMessageUseCaseTest {
         val sentMessage = mock<ChatMessage>()
         whenever(chatRepository.sendMessage(chatId, content)).thenReturn(sentMessage)
         val request = mock<CreateTypedMessageRequest>()
-        whenever(createSaveSentMessageRequestUseCase(sentMessage)).thenReturn(request)
+        whenever(createSaveSentMessageRequestUseCase(sentMessage, chatId)).thenReturn(request)
         underTest.invoke(chatId, content)
-        verify(chatRepository).storeMessages(chatId, listOf(request))
+        verify(chatRepository).storeMessages(listOf(request))
     }
 }

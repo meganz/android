@@ -1,11 +1,10 @@
-package mega.privacy.android.app.presentation.meeting.chat.model.messages.normal
+package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.voiceclip.VoiceClipMessageView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
@@ -15,11 +14,9 @@ import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
  * UI message for voice clip
  *
  * @property message [VoiceClipMessage]
- * @property chatId
  */
 class VoiceClipUiMessage(
     override val message: VoiceClipMessage,
-    private val chatId: Long,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
 
@@ -28,7 +25,7 @@ class VoiceClipUiMessage(
     override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
         VoiceClipMessageView(
             message = message,
-            chatId = chatId,
+            chatId = message.chatId,
             modifier = Modifier.combinedClickable(
                 onClick = {},
                 onLongClick = { onLongClick(message) }

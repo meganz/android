@@ -10,6 +10,7 @@ internal class CreateChatLinkCreatedMessageUseCase @Inject constructor() :
     override fun invoke(request: CreateTypedMessageInfo) =
         with(request) {
             ChatLinkCreatedMessage(
+                chatId = chatId,
                 msgId = msgId,
                 time = timestamp,
                 isMine = isMine,

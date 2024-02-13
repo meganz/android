@@ -15,6 +15,7 @@ internal class CreateNodeAttachmentMessageUseCase @Inject constructor(
             ?: return@with createInvalidMessageUseCase(request)
 
         NodeAttachmentMessage(
+            chatId = chatId,
             msgId = msgId,
             time = timestamp,
             isMine = isMine,

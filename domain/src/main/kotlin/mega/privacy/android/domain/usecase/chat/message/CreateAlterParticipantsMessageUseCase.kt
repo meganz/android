@@ -9,6 +9,7 @@ internal class CreateAlterParticipantsMessageUseCase @Inject constructor() :
 
     override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         AlterParticipantsMessage(
+            chatId = chatId,
             msgId = msgId,
             time = timestamp,
             isMine = isMine,

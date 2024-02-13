@@ -57,8 +57,8 @@ class SendLocationMessageUseCaseTest {
         whenever(chatRepository.sendGeolocation(chatId, longitude, latitude, image))
             .thenReturn(sentMessage)
         val request = mock<CreateTypedMessageRequest>()
-        whenever(createSaveSentMessageRequestUseCase(sentMessage)).thenReturn(request)
+        whenever(createSaveSentMessageRequestUseCase(sentMessage, chatId)).thenReturn(request)
         underTest.invoke(chatId, longitude, latitude, image)
-        verify(chatRepository).storeMessages(chatId, listOf(request))
+        verify(chatRepository).storeMessages(listOf(request))
     }
 }

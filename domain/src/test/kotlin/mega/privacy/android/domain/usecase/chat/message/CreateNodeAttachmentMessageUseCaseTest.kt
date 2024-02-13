@@ -62,6 +62,7 @@ class CreateNodeAttachmentMessageUseCaseTest {
         val request = buildRequest(message)
         val expected = with(request) {
             NodeAttachmentMessage(
+                chatId = 123L,
                 msgId = msgId,
                 time = timestamp,
                 isMine = isMine,
@@ -79,6 +80,7 @@ class CreateNodeAttachmentMessageUseCaseTest {
     private fun buildRequest(message: ChatMessage) =
         CreateTypedMessageRequest(
             chatMessage = message,
+            chatId = 123L,
             isMine = true,
             shouldShowAvatar = true,
             shouldShowTime = true,

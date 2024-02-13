@@ -20,6 +20,7 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
             val constructor: (
                 Long,
                 Long,
+                Long,
                 Boolean,
                 Long,
                 Boolean,
@@ -44,6 +45,7 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
             }
 
             constructor(
+                chatId,
                 msgId,
                 timestamp,
                 isMine,

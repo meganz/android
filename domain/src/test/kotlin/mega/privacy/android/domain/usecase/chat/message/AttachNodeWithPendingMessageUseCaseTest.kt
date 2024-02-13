@@ -90,11 +90,11 @@ class AttachNodeWithPendingMessageUseCaseTest {
             )
             whenever(chatMessageRepository.attachNode(chatId, nodeHandle)).thenReturn(msgId)
             whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
-            whenever(createSaveSentMessageRequestUseCase(message))
+            whenever(createSaveSentMessageRequestUseCase(message, chatId))
                 .thenReturn(createTypedMessageRequest)
 
             underTest(pendingMsgId, NodeId(1L))
-            verify(chatRepository).storeMessages(chatId, listOf(createTypedMessageRequest))
+            verify(chatRepository).storeMessages(listOf(createTypedMessageRequest))
             verify(chatMessageRepository).deletePendingMessage(pendingMessage)
         }
 

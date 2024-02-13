@@ -22,6 +22,7 @@ class CreateNormalChatMessageUseCase @Inject constructor(
             return when {
                 hasSupportedLink ->
                     TextLinkMessage(
+                        chatId = chatId,
                         msgId = msgId,
                         time = timestamp,
                         isMine = isMine,
@@ -34,6 +35,7 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                     )
 
                 else -> TextMessage(
+                    chatId = chatId,
                     msgId = msgId,
                     time = timestamp,
                     isMine = isMine,

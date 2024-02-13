@@ -10,6 +10,7 @@ internal class CreateRetentionTimeUpdatedMessageUseCase @Inject constructor() :
 
     override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         RetentionTimeUpdatedMessage(
+            chatId = chatId,
             msgId = msgId,
             time = timestamp,
             isMine = isMine,

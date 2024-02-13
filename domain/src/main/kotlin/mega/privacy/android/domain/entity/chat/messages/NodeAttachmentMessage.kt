@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.node.FileNode
  */
 @Serializable
 data class NodeAttachmentMessage(
+    override val chatId: Long,
     override val msgId: Long,
     override val time: Long,
     override val isMine: Boolean,

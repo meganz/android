@@ -58,9 +58,9 @@ class AttachContactsUseCaseTest {
     fun `test that message is stored`() = runTest {
         whenever(chatMessageRepository.attachContact(chatId, contactEmail1))
             .thenReturn(sentMessage1)
-        whenever(createSaveSentMessageRequestUseCase(sentMessage1)).thenReturn(request1)
+        whenever(createSaveSentMessageRequestUseCase(sentMessage1, chatId)).thenReturn(request1)
         underTest.invoke(chatId, listOf(contactEmail1))
-        verify(chatRepository).storeMessages(chatId, listOf(request1))
+        verify(chatRepository).storeMessages(listOf(request1))
     }
 
     @Test
@@ -80,9 +80,9 @@ class AttachContactsUseCaseTest {
         whenever(chatMessageRepository.attachContact(chatId, contactEmail2))
             .thenReturn(sentMessage2)
         val request2 = mock<CreateTypedMessageRequest>()
-        whenever(createSaveSentMessageRequestUseCase(sentMessage1)).thenReturn(request1)
-        whenever(createSaveSentMessageRequestUseCase(sentMessage2)).thenReturn(request2)
+        whenever(createSaveSentMessageRequestUseCase(sentMessage1, chatId)).thenReturn(request1)
+        whenever(createSaveSentMessageRequestUseCase(sentMessage2, chatId)).thenReturn(request2)
         underTest.invoke(chatId, listOf(contactEmail1, contactEmail2))
-        verify(chatRepository).storeMessages(chatId, listOf(request1, request2))
+        verify(chatRepository).storeMessages(listOf(request1, request2))
     }
 }

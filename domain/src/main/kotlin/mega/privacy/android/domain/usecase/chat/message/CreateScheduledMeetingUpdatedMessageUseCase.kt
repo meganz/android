@@ -10,6 +10,7 @@ internal class CreateScheduledMeetingUpdatedMessageUseCase @Inject constructor()
 
     override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         ScheduledMeetingUpdatedMessage(
+            chatId = chatId,
             msgId = msgId,
             time = timestamp,
             isMine = isMine,

@@ -12,10 +12,9 @@ class TypedMessageEntityMapper @Inject constructor() {
      * Invoke
      *
      * @param request
-     * @param chatId
      * @return TypedMessageEntity
      */
-    operator fun invoke(request: CreateTypedMessageRequest, chatId: Long) =
+    operator fun invoke(request: CreateTypedMessageRequest) =
         with(request) {
             TypedMessageEntity(
                 chatId = chatId,
