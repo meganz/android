@@ -2,25 +2,26 @@ package mega.privacy.android.domain.usecase
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.repository.NotificationsRepository
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
-class DefaultMonitorUserAlertsTest {
-    private lateinit var underTest: MonitorUserAlerts
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class MonitorUserAlertsUseCaseTest {
+    private lateinit var underTest: MonitorUserAlertsUseCase
     private val notificationsRepository = mock<NotificationsRepository>()
 
-    @Before
+    @BeforeAll
     fun setUp() {
-        underTest = DefaultMonitorUserAlerts(notificationsRepository = notificationsRepository)
+        underTest = MonitorUserAlertsUseCase(notificationsRepository = notificationsRepository)
     }
 
     @Test
@@ -70,8 +71,12 @@ class DefaultMonitorUserAlertsTest {
         val alert2Update = mock<IncomingPendingContactRequestAlert> { on { id }.thenReturn(2L) }
 
         whenever(notificationsRepository.getUserAlerts()).thenReturn(listOf(alert1, alert2))
-        whenever(notificationsRepository.monitorUserAlerts()).thenReturn(flowOf(listOf(alert1Update),
-            listOf(alert2Update)))
+        whenever(notificationsRepository.monitorUserAlerts()).thenReturn(
+            flowOf(
+                listOf(alert1Update),
+                listOf(alert2Update)
+            )
+        )
 
         underTest().test {
             assertThat(awaitItem()).containsExactly(alert1, alert2)

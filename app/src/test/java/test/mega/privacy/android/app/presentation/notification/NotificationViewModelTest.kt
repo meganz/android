@@ -19,7 +19,7 @@ import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.usecase.AcknowledgeUserAlerts
-import mega.privacy.android.domain.usecase.MonitorUserAlerts
+import mega.privacy.android.domain.usecase.MonitorUserAlertsUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -34,7 +34,7 @@ import org.mockito.kotlin.whenever
 class NotificationViewModelTest {
     private lateinit var underTest: NotificationViewModel
 
-    private val monitorUserAlerts = mock<MonitorUserAlerts> {
+    private val monitorUserAlertsUseCase = mock<MonitorUserAlertsUseCase> {
         onBlocking { invoke() }.thenReturn(
             emptyFlow()
         )
@@ -58,7 +58,7 @@ class NotificationViewModelTest {
 
     private fun initViewModel() {
         underTest = NotificationViewModel(
-            monitorUserAlerts = monitorUserAlerts,
+            monitorUserAlertsUseCase = monitorUserAlertsUseCase,
             acknowledgeUserAlerts = acknowledgeUserAlerts,
             notificationMapper = notificationMapper,
         )
@@ -97,7 +97,7 @@ class NotificationViewModelTest {
         ) {}
 
         val alert = mock<IncomingPendingContactRequestAlert>()
-        whenever(monitorUserAlerts()).thenReturn(flowOf(listOf(alert)))
+        whenever(monitorUserAlertsUseCase()).thenReturn(flowOf(listOf(alert)))
         whenever(notificationMapper(alert)).thenReturn(expected)
 
         initViewModel()
@@ -130,7 +130,7 @@ class NotificationViewModelTest {
         whenever(notificationMapper(initialAlert)).thenReturn(initialNotification)
         whenever(notificationMapper(newAlert)).thenReturn(newNotification)
 
-        whenever(monitorUserAlerts()).thenReturn(
+        whenever(monitorUserAlertsUseCase()).thenReturn(
             flowOf(
                 listOf(initialAlert),
                 listOf(newAlert, initialAlert)
