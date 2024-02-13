@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.videosection
+package mega.privacy.android.app.presentation.videosection.view.allvideos
 
 import mega.privacy.android.core.R as CoreUiR
 import androidx.annotation.DrawableRes

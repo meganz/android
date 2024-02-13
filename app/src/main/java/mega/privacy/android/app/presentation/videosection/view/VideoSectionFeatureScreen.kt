@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.videosection
+package mega.privacy.android.app.presentation.videosection.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -7,8 +7,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
 import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
+import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailView
+import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 
 @Composable
 internal fun VideoSectionFeatureScreen(

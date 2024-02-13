@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.videosection
+package mega.privacy.android.app.presentation.videosection.view.playlist
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi

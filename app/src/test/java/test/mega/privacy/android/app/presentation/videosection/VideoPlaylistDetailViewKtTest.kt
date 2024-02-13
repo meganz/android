@@ -6,8 +6,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
-import mega.privacy.android.app.presentation.videosection.Constants
-import mega.privacy.android.app.presentation.videosection.VideoPlaylistDetailView
+import mega.privacy.android.app.presentation.videosection.view.playlist.Constants
+import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailView
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionState

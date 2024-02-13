@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.videosection
+package mega.privacy.android.app.presentation.videosection.view
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically

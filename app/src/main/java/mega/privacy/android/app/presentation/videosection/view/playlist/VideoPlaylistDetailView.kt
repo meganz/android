@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.videosection
+package mega.privacy.android.app.presentation.videosection.view.playlist
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
@@ -30,11 +30,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.videosection.Constants.EMPTY_VIEW_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.Constants.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.Constants.PLAYLIST_TITLE_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.Constants.PLAYLIST_TOTAL_DURATION_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
+import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.EMPTY_VIEW_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_TITLE_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_TOTAL_DURATION_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
+import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider

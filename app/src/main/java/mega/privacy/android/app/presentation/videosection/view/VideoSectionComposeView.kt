@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.videosection
+package mega.privacy.android.app.presentation.videosection.view
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -14,9 +14,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.model.UIVideo
 import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
+import mega.privacy.android.app.presentation.videosection.view.allvideos.AllVideosView
+import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistsView
 
 internal const val videoSectionRoute = "videoSection/video_section"
 

@@ -1,6 +1,5 @@
-package mega.privacy.android.app.presentation.videosection
+package mega.privacy.android.app.presentation.videosection.view.playlist
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,31 +10,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.videosection.model.UIVideo
-import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.app.presentation.videosection.model.UIVideoPlaylist
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 
 @Composable
-internal fun AllVideosView(
-    items: List<UIVideo>,
+internal fun VideoPlaylistsView(
+    items: List<UIVideoPlaylist>,
     progressBarShowing: Boolean,
     searchMode: Boolean,
     scrollToTop: Boolean,
     lazyListState: LazyListState,
     sortOrder: String,
     modifier: Modifier,
-    onClick: (item: UIVideo, index: Int) -> Unit,
-    onMenuClick: (UIVideo) -> Unit,
+    onClick: (item: UIVideoPlaylist, index: Int) -> Unit,
+    onMenuClick: (UIVideoPlaylist) -> Unit,
     onSortOrderClick: () -> Unit,
-    onLongClick: ((item: UIVideo, index: Int) -> Unit) = { _, _ -> },
+    onLongClick: ((item: UIVideoPlaylist, index: Int) -> Unit) = { _, _ -> },
 ) {
     LaunchedEffect(items) {
         if (scrollToTop) {
@@ -62,8 +57,8 @@ internal fun AllVideosView(
 
         items.isEmpty() -> LegacyMegaEmptyView(
             modifier = modifier,
-            text = stringResource(id = R.string.homepage_empty_hint_video),
-            imagePainter = painterResource(id = R.drawable.ic_homepage_empty_video)
+            text = "[B]No[/B] [A]playlists[/A] [B]found[/B]",
+            imagePainter = painterResource(id = R.drawable.ic_homepage_empty_playlists)
         )
 
         else -> {
@@ -87,23 +82,16 @@ internal fun AllVideosView(
                 }
 
                 items(count = items.size, key = { items[it].id.longValue }) {
-                    val videoItem = items[it]
-                    VideoItemView(
-                        icon = iconPackR.drawable.ic_video_list,
-                        name = videoItem.name,
-                        fileSize = formatFileSize(videoItem.size, LocalContext.current),
-                        duration = videoItem.duration,
-                        isFavourite = videoItem.isFavourite,
-                        isSelected = videoItem.isSelected,
-                        thumbnailData = if (videoItem.thumbnail?.exists() == true) {
-                            videoItem.thumbnail
-                        } else {
-                            ThumbnailRequest(videoItem.id)
-                        },
-                        nodeAvailableOffline = videoItem.nodeAvailableOffline,
-                        onClick = { onClick(videoItem, it) },
-                        onMenuClick = { onMenuClick(videoItem) },
-                        onLongClick = { onLongClick(videoItem, it) }
+                    val videoPlaylistItem = items[it]
+                    VideoPlaylistItemView(
+                        icon = R.drawable.ic_playlist_item_empty,
+                        title = videoPlaylistItem.title,
+                        numberOfVideos = videoPlaylistItem.numberOfVideos,
+                        thumbnailList = videoPlaylistItem.thumbnailList,
+                        totalDuration = videoPlaylistItem.totalDuration,
+                        onClick = { onClick(videoPlaylistItem, it) },
+                        onMenuClick = { onMenuClick(videoPlaylistItem) },
+                        onLongClick = { onLongClick(videoPlaylistItem, it) }
                     )
                 }
             }
