@@ -21,8 +21,9 @@ interface AppNavigator {
      *
      * @param activity the Activity
      * @param backupsHandle The Backups Handle used to load its contents
+     * @param errorMessage The ID of the message to display in the error banner
      */
-    fun openNodeInBackups(activity: Activity, backupsHandle: Long)
+    fun openNodeInBackups(activity: Activity, backupsHandle: Long, errorMessage: Int?)
 
     /**
      * Navigates to the Cloud Drive page to view the selected Node

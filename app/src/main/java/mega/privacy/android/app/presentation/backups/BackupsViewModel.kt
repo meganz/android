@@ -67,6 +67,12 @@ class BackupsViewModel @Inject constructor(
         NodeId(savedStateHandle.get<Long>(BackupsFragment.PARAM_BACKUPS_HANDLE) ?: -1L)
 
     /**
+     * The Backups Folder error message from [SavedStateHandle]
+     */
+    val backupErrorMessage =
+        savedStateHandle.get<Int>(BackupsFragment.PARAM_ERROR_MESSAGE)
+
+    /**
      * Performs the following actions upon ViewModel initialization
      */
     init {

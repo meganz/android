@@ -36,7 +36,7 @@ import mega.privacy.android.core.ui.theme.MegaTheme
 
 class WarningBanner : AbstractComposeView {
     var text by mutableStateOf("")
-    var onCloseClick by mutableStateOf({ })
+    var onCloseClick by mutableStateOf<(() -> Unit)?>(null)
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)

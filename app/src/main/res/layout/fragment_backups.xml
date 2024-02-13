@@ -3,21 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/homepage_background">
+    android:layout_height="match_parent">
+
+    <mega.privacy.android.core.ui.controls.banners.WarningBanner
+        android:id="@+id/backup_error_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:warning_banner_text="@string/device_center_list_view_item_sub_state_logged_out" />
 
     <mega.privacy.android.app.components.NewGridRecyclerView
         android:id="@+id/backups_recycler_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:columnWidth="@dimen/grid_node_item_width"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/backup_error_banner"
         tools:visibility="visible" />
 
     <ImageView
