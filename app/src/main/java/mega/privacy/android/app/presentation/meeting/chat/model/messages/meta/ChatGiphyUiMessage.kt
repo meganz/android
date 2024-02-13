@@ -1,10 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.meta
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.GiphyMessageView
 import mega.privacy.android.app.utils.GiphyUtil
@@ -25,7 +22,7 @@ class ChatGiphyUiMessage(
     override val message: GiphyMessage,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
-    @OptIn(ExperimentalFoundationApi::class)
+
     @Composable
     override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
         message.chatGifInfo?.let { giphy ->
@@ -36,10 +33,7 @@ class ChatGiphyUiMessage(
                 title = giphy.title,
                 autoPlayGif = if (autoPlay) true else giphy.webpSize < MAX_SIZE_FOR_AUTO_PLAY,
                 onLoaded = { autoPlay = true },
-                modifier = Modifier.combinedClickable(
-                    onClick = {},
-                    onLongClick = { onLongClick(message) }
-                ),
+                onLongClick = { onLongClick(message) }
             )
         }
     }

@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.meta
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,6 +39,7 @@ import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgr
  * @param onLoaded callback when gif is loaded
  * @param onClick callback when user clicks the loaded gif
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GiphyMessageView(
     url: String,
@@ -47,6 +50,7 @@ fun GiphyMessageView(
     title: String? = null,
     onLoaded: () -> Unit = {},
     onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
 ) {
     val maxWidth = 256
 
@@ -60,13 +64,16 @@ fun GiphyMessageView(
         modifier = modifier
             .size(width = actualWidth.dp, height = actualHeight.dp)
             .clip(RoundedCornerShape(12.dp))
-            .clickable {
-                if (!autoPlay) {
-                    autoPlay = true
-                } else {
-                    onClick()
-                }
-            }
+            .combinedClickable(
+                onClick = {
+                    if (!autoPlay) {
+                        autoPlay = true
+                    } else {
+                        onClick()
+                    }
+                },
+                onLongClick = onLongClick
+            )
     ) {
         if (autoPlay) {
             AsyncImage(
