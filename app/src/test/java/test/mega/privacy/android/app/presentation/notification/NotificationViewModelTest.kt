@@ -18,7 +18,7 @@ import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.UserAlert
-import mega.privacy.android.domain.usecase.AcknowledgeUserAlerts
+import mega.privacy.android.domain.usecase.AcknowledgeUserAlertsUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertsUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -40,7 +40,7 @@ class NotificationViewModelTest {
         )
     }
 
-    private val acknowledgeUserAlerts = mock<AcknowledgeUserAlerts>()
+    private val acknowledgeUserAlertsUseCase = mock<AcknowledgeUserAlertsUseCase>()
 
     private val scheduler = TestCoroutineScheduler()
 
@@ -58,8 +58,8 @@ class NotificationViewModelTest {
 
     private fun initViewModel() {
         underTest = NotificationViewModel(
+            acknowledgeUserAlertsUseCase = acknowledgeUserAlertsUseCase,
             monitorUserAlertsUseCase = monitorUserAlertsUseCase,
-            acknowledgeUserAlerts = acknowledgeUserAlerts,
             notificationMapper = notificationMapper,
         )
     }
@@ -151,6 +151,6 @@ class NotificationViewModelTest {
     fun `test that notifications are acknowledged once loaded`() {
         underTest.onNotificationsLoaded()
         scheduler.advanceUntilIdle()
-        verifyBlocking(acknowledgeUserAlerts, AcknowledgeUserAlerts::invoke)
+        verifyBlocking(acknowledgeUserAlertsUseCase, AcknowledgeUserAlertsUseCase::invoke)
     }
 }

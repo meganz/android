@@ -12,22 +12,22 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationState
 import mega.privacy.android.app.presentation.notification.model.mapper.NotificationMapper
-import mega.privacy.android.domain.usecase.AcknowledgeUserAlerts
+import mega.privacy.android.domain.usecase.AcknowledgeUserAlertsUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertsUseCase
 import javax.inject.Inject
 
 /**
  * Notification view model
  *
+ * @property acknowledgeUserAlertsUseCase
  * @property monitorUserAlertsUseCase
- * @property acknowledgeUserAlerts
  * @property state
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class NotificationViewModel @Inject constructor(
+    private val acknowledgeUserAlertsUseCase: AcknowledgeUserAlertsUseCase,
     private val monitorUserAlertsUseCase: MonitorUserAlertsUseCase,
-    private val acknowledgeUserAlerts: AcknowledgeUserAlerts,
     private val notificationMapper: NotificationMapper,
 ) : ViewModel() {
 
@@ -60,6 +60,6 @@ class NotificationViewModel @Inject constructor(
      *
      */
     fun onNotificationsLoaded() {
-        viewModelScope.launch { acknowledgeUserAlerts() }
+        viewModelScope.launch { acknowledgeUserAlertsUseCase() }
     }
 }

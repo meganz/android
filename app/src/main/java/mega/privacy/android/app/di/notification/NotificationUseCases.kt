@@ -7,7 +7,6 @@ import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.presentation.notification.model.mapper.NotificationMapper
 import mega.privacy.android.app.presentation.notification.model.mapper.getNotification
 import mega.privacy.android.domain.repository.NotificationsRepository
-import mega.privacy.android.domain.usecase.AcknowledgeUserAlerts
 import mega.privacy.android.domain.usecase.MonitorEvent
 
 @Module
@@ -15,10 +14,6 @@ import mega.privacy.android.domain.usecase.MonitorEvent
 abstract class NotificationUseCases {
 
     companion object {
-        @Provides
-        fun provideAcknowledgeUserAlerts(repository: NotificationsRepository): AcknowledgeUserAlerts =
-            AcknowledgeUserAlerts(repository::acknowledgeUserAlerts)
-
         @Provides
         fun provideNotificationMapper(): NotificationMapper = ::getNotification
 
