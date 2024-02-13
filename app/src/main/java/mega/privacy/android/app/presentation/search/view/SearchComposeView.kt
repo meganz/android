@@ -63,9 +63,9 @@ fun SearchComposeView(
     updateSearchQuery: (String) -> Unit,
     onBackPressed: () -> Unit,
     navHostController: NavHostController,
-    modifier: Modifier = Modifier,
     nodeActionHandler: NodeActionHandler,
     clearSelection: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()

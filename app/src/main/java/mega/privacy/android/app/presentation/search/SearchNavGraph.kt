@@ -57,7 +57,7 @@ internal fun NavGraphBuilder.searchNavGraph(
             navHostController = navHostController,
             searchActivityViewModel = searchActivityViewModel,
             onBackPressed = onBackPressed,
-            nodeActionHandler = nodeActionHandler
+            nodeActionHandler = nodeActionHandler,
         )
     }
     moveToRubbishOrDeleteNavigation(
@@ -65,18 +65,23 @@ internal fun NavGraphBuilder.searchNavGraph(
         searchActivityViewModel = searchActivityViewModel,
         nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
     )
-    renameDialogNavigation(navHostController, nodeOptionsBottomSheetViewModel)
-    nodeBottomSheetNavigation(
-        nodeActionHandler,
-        navHostController,
-        nodeOptionsBottomSheetViewModel
+    renameDialogNavigation(
+        navHostController = navHostController,
     )
-    changeLabelBottomSheetNavigation(navHostController, nodeOptionsBottomSheetViewModel)
+    nodeBottomSheetNavigation(
+        nodeActionHandler = nodeActionHandler,
+        navHostController = navHostController,
+        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
+    )
+    changeLabelBottomSheetNavigation(
+        navHostController = navHostController,
+        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
+    )
     changeNodeExtensionDialogNavigation(
         navHostController = navHostController,
         nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
     )
-    cannotVerifyUserNavigation(navHostController)
+    cannotVerifyUserNavigation(navHostController = navHostController)
     removeNodeLinkDialogNavigation(
         navHostController = navHostController,
         searchActivityViewModel = searchActivityViewModel
@@ -115,3 +120,4 @@ internal fun NavGraphBuilder.searchNavGraph(
  */
 internal const val searchRoute = "search/main"
 internal const val isFromToolbar = "isFromToolbar"
+internal const val nodeListHandle = "nodeListHandle"

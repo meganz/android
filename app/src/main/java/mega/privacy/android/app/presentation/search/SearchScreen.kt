@@ -38,8 +38,8 @@ fun SearchScreen(
     navHostController: NavHostController,
     onBackPressed: () -> Unit,
     searchActivityViewModel: SearchActivityViewModel,
-    modifier: Modifier = Modifier,
     nodeActionHandler: NodeActionHandler,
+    modifier: Modifier = Modifier,
 ) {
     val uiState by searchActivityViewModel.state.collectAsStateWithLifecycle()
     val modalSheetState = rememberModalBottomSheetState(

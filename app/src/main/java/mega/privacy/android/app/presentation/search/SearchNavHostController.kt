@@ -39,8 +39,8 @@ internal fun SearchNavHostController(
     nodeActionHandler: NodeActionHandler,
     navHostController: NavHostController,
     bottomSheetNavigator: BottomSheetNavigator,
-    modifier: Modifier = Modifier,
     nodeActionsViewModel: NodeActionsViewModel,
+    modifier: Modifier = Modifier,
 ) {
     ModalBottomSheetLayout(
         modifier = modifier.navigationBarsPadding(),
