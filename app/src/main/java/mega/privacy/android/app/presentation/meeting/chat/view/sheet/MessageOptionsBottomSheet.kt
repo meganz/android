@@ -33,6 +33,7 @@ fun MessageOptionsBottomSheet(
     onReactionClicked: (String) -> Unit,
     onMoreReactionsClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    actions: List<@Composable () -> Unit>,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -57,6 +58,7 @@ fun MessageOptionsBottomSheet(
                 modifier = Modifier.padding(8.dp),
             )
             MegaDivider(dividerSpacing = DividerSpacing.Full)
+            actions.forEach { it() }
         }
     }
     AnimatedVisibility(visible = showReactionPicker) {
@@ -78,7 +80,9 @@ private fun MessageOptionsBottomSheetPreview() {
         MessageOptionsBottomSheet(
             showReactionPicker = false,
             onReactionClicked = {},
-            onMoreReactionsClicked = {})
+            onMoreReactionsClicked = {},
+            actions = listOf(),
+        )
     }
 }
 

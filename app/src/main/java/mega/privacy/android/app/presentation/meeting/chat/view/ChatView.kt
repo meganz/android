@@ -40,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -68,6 +69,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuActi
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
+import mega.privacy.android.app.presentation.meeting.chat.saver.ChatSavers
+import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
 import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBar
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContactsAddedDialog
@@ -112,6 +115,8 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 @Composable
 internal fun ChatView(
     viewModel: ChatViewModel = hiltViewModel(),
+    actionsFactories: Set<(ChatViewModel) -> MessageAction>,
+    savers: ChatSavers,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -153,14 +158,53 @@ internal fun ChatView(
         getUserInfoIntoReactionList = viewModel::getUserInfoIntoReactionList,
         getUser = viewModel::getUser,
         onForwardMessages = viewModel::onForwardMessages,
+        actions = actionsFactories.map { it(viewModel) }.toSet(),
+        messageListSaver = savers.messageListSaver,
     )
 }
 
 /**
  * Chat view
  *
- * @param uiState [ChatUiState]
- * @param onBackPressed Action to perform for back button.
+ * @param uiState
+ * @param onBackPressed
+ * @param onMenuActionPressed
+ * @param inviteContactsToChat
+ * @param onClearChatHistory
+ * @param onInfoToShowConsumed
+ * @param enablePasscodeCheck
+ * @param archiveChat
+ * @param unarchiveChat
+ * @param endCallForAll
+ * @param startCall
+ * @param onCallStarted
+ * @param onWaitingRoomOpened
+ * @param onMutePushNotificationSelected
+ * @param onShowMutePushNotificationDialog
+ * @param onShowMutePushNotificationDialogConsumed
+ * @param onStartOrJoinMeeting
+ * @param onAnswerCall
+ * @param onEnableGeolocation
+ * @param onUserUpdateHandled
+ * @param messageListView
+ * @param bottomBar
+ * @param onSendClick
+ * @param onHoldAndAnswerCall
+ * @param onEndAndAnswerCall
+ * @param onJoinChat
+ * @param onSetPendingJoinLink
+ * @param createNewImage
+ * @param onSendLocationMessage
+ * @param onAttachFiles
+ * @param onCloseEditing
+ * @param onAddReaction
+ * @param onDeleteReaction
+ * @param onSendGiphyMessage
+ * @param onAttachContacts
+ * @param getUserInfoIntoReactionList
+ * @param onReactionUserClick
+ * @param onForwardMessages
+ * @param actions
  */
 @OptIn(
     ExperimentalMaterialApi::class,
@@ -222,7 +266,7 @@ internal fun ChatView(
         onEmojiClick: () -> Unit,
         onCloseEditing: () -> Unit,
         interactionSourceTextInput: MutableInteractionSource,
-    ) -> Unit = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, onCloseEditing, interactionSourceTextInput ->
+    ) -> Unit = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, onCloseEditingClick, interactionSourceTextInput ->
         ChatBottomBar(
             uiState = state,
             showEmojiPicker = showEmojiPicker,
@@ -230,7 +274,7 @@ internal fun ChatView(
             onAttachmentClick = onAttachmentClick,
             onEmojiClick = onEmojiClick,
             interactionSourceTextInput = interactionSourceTextInput,
-            onCloseEditing = onCloseEditing
+            onCloseEditing = onCloseEditingClick
         )
     },
     onSendClick: (String) -> Unit = {},
@@ -249,6 +293,10 @@ internal fun ChatView(
     getUserInfoIntoReactionList: suspend (List<UIReaction>) -> List<UIReaction> = { emptyList() },
     getUser: suspend (UserId) -> User? = { null },
     onForwardMessages: (List<TypedMessage>, List<Long>?, List<Long>?) -> Unit = { _, _, _ -> },
+    actions: Set<MessageAction> = setOf(),
+    messageListSaver: Saver<List<TypedMessage>, String> = Saver(
+        save = { "" },
+        restore = { emptyList() }),
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -264,15 +312,19 @@ internal fun ChatView(
     var showJoinAnswerCallDialog by rememberSaveable { mutableStateOf(false) }
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
     var showReactionPicker by rememberSaveable { mutableStateOf(false) }
-    var messageClicked by rememberSaveable { mutableStateOf<TypedMessage?>(null) }
     var addingReactionTo by rememberSaveable { mutableStateOf<Long?>(null) }
     var selectedReaction by rememberSaveable { mutableStateOf("") }
     var reactionList by rememberSaveable { mutableStateOf(emptyList<UIReaction>()) }
-    var forwardingMessages by rememberSaveable { mutableStateOf<List<TypedMessage>?>(null) }
+    var selectedMessages by rememberSaveable(stateSaver = messageListSaver) {
+        mutableStateOf(
+            emptyList()
+        )
+    }
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val keyboardController = LocalSoftwareKeyboardController.current
     val toolbarModalSheetState =
-        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden,
+        rememberModalBottomSheetState(
+            initialValue = ModalBottomSheetValue.Hidden,
             confirmValueChange = {
                 if (it != ModalBottomSheetValue.Hidden) {
                     keyboardController?.hide()
@@ -298,7 +350,7 @@ internal fun ChatView(
                 keyboardController?.hide()
                 showEmojiPicker = false
             } else {
-                messageClicked = null
+                selectedMessages = emptyList()
                 addingReactionTo = null
             }
             true
@@ -395,13 +447,15 @@ internal fun ChatView(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            forwardingMessages?.let { messages ->
+            selectedMessages.takeUnless { it.isEmpty() }?.let { messages ->
                 result.data?.let {
                     val chatHandles = it.getLongArrayExtra(Constants.SELECTED_CHATS)?.toList()
                     val contactHandles = it.getLongArrayExtra(Constants.SELECTED_USERS)?.toList()
                     onForwardMessages(messages, chatHandles, contactHandles)
                 }
             }
+
+            selectedMessages = emptyList()
         }
 
     with(uiState) {
@@ -479,11 +533,21 @@ internal fun ChatView(
                         MessageOptionsBottomSheet(
                             showReactionPicker = showReactionPicker,
                             onReactionClicked = {
-                                messageClicked?.let { message -> onAddReaction(message.msgId, it) }
+                                selectedMessages.firstOrNull()
+                                    ?.let { message -> onAddReaction(message.msgId, it) }
                                 addingReactionTo?.let { msgId -> onAddReaction(msgId, it) }
                                 coroutineScope.launch { messageOptionsModalSheetState.hide() }
                             },
                             onMoreReactionsClicked = { showReactionPicker = true },
+                            actions = actions.filter { action ->
+                                action.appliesTo(selectedMessages)
+                            }.map {
+                                it.bottomSheetMenuItem(
+                                    messages = selectedMessages,
+                                    chatId = chatId,
+                                    context = context
+                                )
+                            },
                             sheetState = messageOptionsModalSheetState,
                         )
                     }
@@ -714,7 +778,7 @@ internal fun ChatView(
                                 scrollState,
                                 bottomPadding,
                                 { message ->
-                                    messageClicked = message
+                                    selectedMessages = listOf(message)
                                     // Use message for showing correct available options
                                     coroutineScope.launch {
                                         messageOptionsModalSheetState.show()
@@ -747,7 +811,7 @@ internal fun ChatView(
                                     }
                                 },
                                 { message ->
-                                    forwardingMessages = listOf(message)
+                                    selectedMessages = listOf(message)
                                     openChatPicker(context, chatId, chatPickerLauncher)
                                 },
                                 { hasSelectableMessage -> canSelect = hasSelectableMessage },

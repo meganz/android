@@ -42,8 +42,8 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
-import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.contacts.User
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.user.UserId
@@ -1240,7 +1240,6 @@ class ChatViewModel @Inject constructor(
         chatHandles: List<Long>?,
         contactHandles: List<Long>?,
     ) {
-
     }
 
     /**

@@ -49,6 +49,7 @@ class MessageOptionsBottomSheetTest {
                 onReactionClicked = {},
                 onMoreReactionsClicked = {},
                 sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+                actions = emptyList(),
             )
         }
     }
