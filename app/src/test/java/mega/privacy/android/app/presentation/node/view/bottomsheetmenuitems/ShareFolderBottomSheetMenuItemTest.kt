@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
+import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -32,13 +33,15 @@ class ShareFolderBottomSheetMenuItemTest {
 
     private val createShareKeyUseCase: CreateShareKeyUseCase = mock()
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase = mock()
+    private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper = mock()
 
     private val shareFolderBottomSheetMenuItem = ShareFolderBottomSheetMenuItem(
         menuAction = ShareFolderMenuAction(),
         scope = applicationScope,
         mainDispatcher = mainDispatcher,
         createShareKeyUseCase = createShareKeyUseCase,
-        checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase
+        checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase,
+        listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
     )
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - isConnected {4} - expected {5}")

@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
+import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -70,6 +71,7 @@ class NodeActionsViewModel @Inject constructor(
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase,
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase,
     private val chatRequestMessageMapper: ChatRequestMessageMapper,
+    private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -221,20 +223,32 @@ class NodeActionsViewModel @Inject constructor(
     /**
      * Contact selected for folder share
      */
-    fun contactSelectedForShareFolder(contactsData: List<String>) {
-        state.value.selectedNodes.firstOrNull()?.let { node ->
-            viewModelScope.launch {
-                val isFromBackUps = checkBackupNodeTypeByHandleUseCase(node)
+    fun contactSelectedForShareFolder(contactsData: List<String>, nodeHandle: List<Long>) {
+        viewModelScope.launch {
+            val isFromBackups = state.value.selectedNodes.find {
+                runCatching {
+                    checkBackupNodeTypeByHandleUseCase(it) != BackupNodeType.NonBackupNode
+                }.getOrElse {
+                    Timber.e(it)
+                    false
+                }
+            }
+            runCatching {
+                listToStringWithDelimitersMapper(nodeHandle)
+            }.onSuccess { handles ->
                 _state.update {
                     it.copy(
                         contactsData = triggered(
-                            Pair(
+                            Triple(
                                 contactsData,
-                                isFromBackUps != BackupNodeType.NonBackupNode
+                                isFromBackups != null,
+                                handles
                             )
                         )
                     )
                 }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }

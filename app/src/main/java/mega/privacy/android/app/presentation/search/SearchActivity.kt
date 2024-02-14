@@ -276,10 +276,13 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 EventEffect(
                     event = nodeActionState.contactsData,
                     onConsumed = nodeActionsViewModel::markShareFolderAccessDialogShown,
-                    action = {
-                        val contactList = it.first.joinToString(separator = contactArraySeparator)
+                    action = { (contactData, isFromBackups, nodeHandles) ->
+                        val contactList =
+                            contactData.joinToString(separator = contactArraySeparator)
                         navHostController.navigate(
-                            shareFolderAccessDialog.plus("/${contactList}").plus("/${it.second}")
+                            shareFolderAccessDialog.plus("/${contactList}")
+                                .plus("/${isFromBackups}")
+                                .plus("/${nodeHandles}")
                         )
                     },
                 )

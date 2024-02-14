@@ -90,9 +90,8 @@ internal fun NavGraphBuilder.searchNavGraph(
     )
     shareFolderDialogNavigation(
         navHostController = navHostController,
-        searchActivityViewModel = searchActivityViewModel,
-        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
-        nodeActionHandler = nodeActionHandler
+        nodeActionHandler = nodeActionHandler,
+        stringWithDelimitersMapper = listToStringWithDelimitersMapper
     )
     removeShareFolderDialogNavigation(
         navHostController = navHostController,
@@ -108,8 +107,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     foreignNodeDialogNavigation(navHostController = navHostController)
     shareFolderAccessDialogNavigation(
         navHostController = navHostController,
-        searchActivityViewModel = searchActivityViewModel,
-        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
+        listToStringWithDelimitersMapper = listToStringWithDelimitersMapper
     )
     cannotOpenFileDialogNavigation(
         navHostController = navHostController,

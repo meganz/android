@@ -17,6 +17,8 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
+import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -30,6 +32,7 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     private val createShareKeyUseCase: CreateShareKeyUseCase,
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase,
+    private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -54,11 +57,23 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
             onDismiss()
             if (node is TypedFolderNode) {
                 createShareKeyUseCase(node)
-                val backupType = checkBackupNodeTypeByHandleUseCase(node)
+                val backupType =
+                    runCatching { checkBackupNodeTypeByHandleUseCase(node) }
+                        .getOrElse {
+                            Timber.e(it)
+                            null
+                        }
                 if (backupType != BackupNodeType.NonBackupNode) {
-                    navController.navigate(
-                        searchFolderShareDialog.plus("/${false}")
-                    )
+                    val handles = listOf(node.id.longValue)
+                    runCatching {
+                        listToStringWithDelimitersMapper(handles)
+                    }.onSuccess { handle ->
+                        navController.navigate(
+                            searchFolderShareDialog.plus("/${handle}")
+                        )
+                    }.onFailure {
+                        Timber.e(it)
+                    }
                 } else {
                     actionHandler(menuAction, node)
                 }

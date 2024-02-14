@@ -12,28 +12,37 @@ import mega.privacy.android.app.utils.Constants
  * Versions file activity contract
  */
 class ShareFolderActivityContract :
-    ActivityResultContract<LongArray, List<String>?>() {
+    ActivityResultContract<LongArray, Pair<List<String>, List<Long>>?>() {
     override fun createIntent(context: Context, input: LongArray): Intent {
         return Intent().apply {
             setClass(context, AddContactActivity::class.java)
             putExtra("contactType", Constants.CONTACT_TYPE_BOTH)
-            putExtra(AddContactActivity.EXTRA_NODE_HANDLE, input)
+            if (input.size == 1) {
+                putExtra(AddContactActivity.EXTRA_NODE_HANDLE, input.first())
+            } else {
+                putExtra(AddContactActivity.EXTRA_NODE_HANDLE, input)
+            }
+
             putExtra("MULTISELECT", if (input.size == 1) 0 else 1)
         }
     }
 
-    override fun parseResult(resultCode: Int, intent: Intent?): List<String>? {
+    override fun parseResult(resultCode: Int, intent: Intent?): Pair<List<String>, List<Long>>? {
         return when {
             resultCode == Activity.RESULT_OK &&
                     intent?.extras != null -> {
                 val contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
                 when (intent.getIntExtra("MULTISELECT", -1)) {
                     0 -> {
-                        contactsData ?: emptyList()
+                        val nodeHandle =
+                            intent.getLongExtra(AddContactActivity.EXTRA_NODE_HANDLE, -1)
+                        Pair(contactsData ?: emptyList(), listOf(nodeHandle))
                     }
 
                     1 -> {
-                        contactsData ?: emptyList()
+                        val nodeHandles =
+                            intent.getLongArrayExtra(AddContactActivity.EXTRA_NODE_HANDLE)?.toList()
+                        Pair(contactsData ?: emptyList(), nodeHandles ?: emptyList())
                     }
 
                     else -> null

@@ -76,8 +76,8 @@ class NodeActionHandler(
         (activity as? AppCompatActivity)?.registerForActivityResult(
             ShareFolderActivityContract()
         ) { result ->
-            result?.let {
-                nodeActionsViewModel.contactSelectedForShareFolder(it)
+            result?.let { (contactIds, nodeHandles) ->
+                nodeActionsViewModel.contactSelectedForShareFolder(contactIds, nodeHandles)
             }
         }
 
@@ -85,10 +85,10 @@ class NodeActionHandler(
         (activity as? AppCompatActivity)?.registerForActivityResult(
             SelectFolderToMoveActivityContract()
         ) { result ->
-            result?.let {
+            result?.let { (nodeHandles, targetHandle) ->
                 nodeActionsViewModel.checkNodesNameCollision(
-                    it.first.toList(),
-                    it.second,
+                    nodeHandles.toList(),
+                    targetHandle,
                     NodeNameCollisionType.RESTORE
                 )
             }
@@ -140,6 +140,13 @@ class NodeActionHandler(
             is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview()
             is DownloadMenuAction -> nodeActionsViewModel.downloadNode()
             is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline()
+            is ShareFolderMenuAction -> {
+                val nodeHandleArray = nodes.map {
+                    it.id.longValue
+                }.toLongArray()
+                shareFolderActivityLauncher?.launch(nodeHandleArray)
+            }
+
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }
     }

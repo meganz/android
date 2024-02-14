@@ -27,7 +27,7 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveToolbarMenuItemShareFolderViewModelTest {
+class RemoveShareFolderViewModelTest {
 
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val getOutShareByNodeIdUseCase: GetOutShareByNodeIdUseCase = mock()

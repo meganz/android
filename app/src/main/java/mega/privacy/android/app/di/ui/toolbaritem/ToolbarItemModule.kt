@@ -29,7 +29,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Restore
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAll
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChat
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Share
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolder
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
 
 /**
@@ -58,7 +58,7 @@ abstract class ToolbarItemModule {
             manageLink: ManageLink,
             removeLinkToolbarMenuItem: RemoveLinkToolbarMenuItem,
             sendToChat: SendToChat,
-            shareFolder: ShareFolder,
+            shareFolderToolbarMenuItem: ShareFolderToolbarMenuItem,
             share: Share,
             renameToolbarMenuItem: RenameToolbarMenuItem,
             copy: Copy,
@@ -73,7 +73,7 @@ abstract class ToolbarItemModule {
                 manageLink,
                 removeLinkToolbarMenuItem,
                 sendToChat,
-                shareFolder,
+                shareFolderToolbarMenuItem,
                 share,
                 renameToolbarMenuItem,
                 copy,
@@ -161,7 +161,7 @@ abstract class ToolbarItemModule {
             copy: Copy,
             move: Move,
             sendToChat: SendToChat,
-            shareFolder: ShareFolder,
+            shareFolderToolbarMenuItem: ShareFolderToolbarMenuItem,
             removeShare: RemoveShare,
             disputeTakeDown: DisputeTakeDown,
             share: Share,
@@ -176,7 +176,7 @@ abstract class ToolbarItemModule {
                 manageLink,
                 removeLinkToolbarMenuItem,
                 sendToChat,
-                shareFolder,
+                shareFolderToolbarMenuItem,
                 share,
                 renameToolbarMenuItem,
                 copy,

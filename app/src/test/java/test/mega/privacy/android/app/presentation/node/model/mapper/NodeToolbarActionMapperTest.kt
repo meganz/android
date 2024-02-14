@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.presentation.node.model.mapper
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
@@ -38,7 +39,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Restore
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAll
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChat
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Share
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolder
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -70,7 +71,13 @@ class NodeToolbarActionMapperTest {
         MultiSelectManageLink(),
         RemoveLinkToolbarMenuItem(),
         SendToChat(SendToChatMenuAction()),
-        ShareFolder(ShareFolderMenuAction()),
+        ShareFolderToolbarMenuItem(
+            scope = CoroutineScope(UnconfinedTestDispatcher()),
+            mainDispatcher = Dispatchers.Main,
+            checkBackupNodeTypeByHandleUseCase = mock(),
+            listToStringWithDelimitersMapper = mock(),
+            menuAction = ShareFolderMenuAction()
+        ),
         Share(ShareMenuAction()),
         LeaveShare(LeaveShareMenuAction()),
         RenameToolbarMenuItem(),

@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
+import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -62,7 +63,7 @@ class NodeActionsViewModelTest {
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
     private val chatRequestMessageMapper: ChatRequestMessageMapper = mock()
     private val nodeAccessPermissionIconMapper: NodeAccessPermissionIconMapper = mock()
-
+    private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper = mock()
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
     }
@@ -94,6 +95,7 @@ class NodeActionsViewModelTest {
             attachMultipleNodesUseCase = attachMultipleNodesUseCase,
             chatRequestMessageMapper = chatRequestMessageMapper,
             nodeAccessPermissionIconMapper = nodeAccessPermissionIconMapper,
+            listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
             applicationScope = applicationScope
         )
     }
@@ -195,7 +197,10 @@ class NodeActionsViewModelTest {
     fun `test that contactSelectedForShareFolder is called when contact list is selected`() =
         runTest {
             initViewModel()
-            viewModel.contactSelectedForShareFolder(listOf("sample@mega.co.nz", "test@mega.co.nz"))
+            viewModel.contactSelectedForShareFolder(
+                listOf("sample@mega.co.nz", "test@mega.co.nz"),
+                listOf(1234L, 346L)
+            )
             viewModel.state.test {
                 val state = awaitItem()
                 Truth.assertThat(state.contactsData)

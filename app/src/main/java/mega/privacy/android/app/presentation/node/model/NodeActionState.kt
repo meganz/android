@@ -31,6 +31,6 @@ data class NodeActionState(
     val accessPermissionIcon: Int? = null,
     val shareInfo: String? = null,
     val outgoingShares: List<ShareData> = emptyList(),
-    val contactsData: StateEventWithContent<Pair<List<String>, Boolean>> = consumed(),
+    val contactsData: StateEventWithContent<Triple<List<String>, Boolean, String>> = consumed(),
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
 )

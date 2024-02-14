@@ -12,6 +12,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
@@ -25,7 +26,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 fun ShareFolderDialog(
     nodeIds: List<NodeId>,
     onDismiss: () -> Unit,
-    onOkClicked: () -> Unit,
+    onOkClicked: (List<TypedNode>) -> Unit,
     shareFolderDialogViewModel: ShareFolderDialogViewModel = hiltViewModel(),
 ) {
     val shareFolderState by shareFolderDialogViewModel.state.collectAsStateWithLifecycle()
@@ -45,7 +46,7 @@ fun ShareFolderDialog(
 private fun ShareFolderDialogBody(
     state: ShareFolderDialogState,
     onDismiss: () -> Unit,
-    onOkClicked: () -> Unit,
+    onOkClicked: (List<TypedNode>) -> Unit,
 ) {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         state.info?.let { infoRes ->
@@ -57,7 +58,7 @@ private fun ShareFolderDialogBody(
                 cancelButtonText = state.negativeButton?.let { stringResource(id = it) },
                 onConfirm = {
                     onDismiss()
-                    onOkClicked()
+                    onOkClicked(state.typeNodeList)
                 },
                 onDismiss = onDismiss,
                 dismissOnClickOutside = false,
