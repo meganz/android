@@ -242,17 +242,17 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
             selectedPhotoIds - albumPhotoIds
         }
 
-        if (photoIds.isNotEmpty()) {
-            addPhotosToAlbumUseCase(
-                albumId = album.id,
-                photoIds = photoIds.map { NodeId(it) },
-            )
-        }
-
         _state.update {
             it.copy(
                 isSelectionCompleted = true,
                 numCommittedPhotos = photoIds.size,
+            )
+        }
+
+        if (photoIds.isNotEmpty()) {
+            addPhotosToAlbumUseCase(
+                albumId = album.id,
+                photoIds = photoIds.map { NodeId(it) },
             )
         }
     }
