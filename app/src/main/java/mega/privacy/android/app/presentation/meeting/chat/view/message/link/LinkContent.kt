@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import mega.privacy.android.app.presentation.meeting.chat.extension.toUiChatStatus
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatFragment
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileLinkActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFolderLinkActivity
 import mega.privacy.android.core.ui.controls.chat.messages.ContactMessageContentView
@@ -65,18 +66,29 @@ data class ContactLinkContent(val content: ContactLink, override val link: Strin
  *
  * @property numberOfParticipants Number of participants
  * @property name Group name
+ * @property chatId Chat Id
  */
 data class ChatGroupLinkContent(
     val numberOfParticipants: Long = 0L,
     val name: String = "",
+    val chatId: Long = 0L,
     override val link: String,
 ) : LinkContent {
+
+    internal val isChatAvailable = numberOfParticipants > 0
+
     @Composable
     override fun SubContentComposable(modifier: Modifier) {
         ChatLinkMessageView(
             modifier = modifier,
             linkContent = this,
         )
+    }
+
+    override fun onClick(context: Context) {
+        if (isChatAvailable) {
+            openChatFragment(context, chatId, link)
+        }
     }
 }
 

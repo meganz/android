@@ -67,7 +67,8 @@ class ChatLinksMessageViewModel @Inject constructor(
             ChatGroupLinkContent(
                 numberOfParticipants = request?.number ?: -1,
                 name = request?.text.orEmpty(),
-                link = link
+                link = link,
+                chatId = request?.chatHandle ?: -1,
             ).also { content ->
                 mutex.withLock {
                     Timber.d("loadChatLinkInfo set: $content, link: $link")

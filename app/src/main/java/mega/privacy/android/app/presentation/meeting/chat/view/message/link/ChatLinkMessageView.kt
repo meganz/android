@@ -28,7 +28,7 @@ fun ChatLinkMessageView(
     linkContent: ChatGroupLinkContent,
     modifier: Modifier = Modifier,
 ) {
-    if (linkContent.numberOfParticipants > 0) {
+    if (linkContent.isChatAvailable) {
         RichLinkContentView(
             modifier = modifier,
             image = painterResource(R.drawable.ic_group_chat_link),

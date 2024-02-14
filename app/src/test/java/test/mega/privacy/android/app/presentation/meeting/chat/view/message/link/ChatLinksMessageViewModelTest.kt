@@ -77,9 +77,11 @@ internal class ChatLinksMessageViewModelTest {
         val link = "link"
         val numberOfParticipants = 1L
         val name = "name"
+        val chatId = 12L
         val request = mock<ChatRequest> {
             on { number } doReturn numberOfParticipants
             on { text } doReturn name
+            on { chatHandle } doReturn chatId
         }
         whenever(checkChatLinkUseCase(link)).thenReturn(request)
         Truth.assertThat(underTest.loadChatLinkInfo(link))
@@ -87,7 +89,8 @@ internal class ChatLinksMessageViewModelTest {
                 ChatGroupLinkContent(
                     numberOfParticipants,
                     name,
-                    link
+                    chatId,
+                    link,
                 )
             )
     }
@@ -101,7 +104,8 @@ internal class ChatLinksMessageViewModelTest {
                 ChatGroupLinkContent(
                     numberOfParticipants = -1,
                     name = "",
-                    link = link
+                    link = link,
+                    chatId = -1,
                 )
             )
     }
