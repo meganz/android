@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.chat.message.forward
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.ForwardResult
@@ -13,7 +14,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.reset
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argWhere
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -22,23 +29,12 @@ class ForwardMessagesUseCaseTest {
     private lateinit var underTest: ForwardMessagesUseCase
 
     private val createChatRoomUseCase = mock<CreateChatRoomUseCase>()
-    private val forwardNormalMessageUseCase = mock<ForwardNormalMessageUseCase>()
-    private val forwardContactUseCase = mock<ForwardContactUseCase>()
-    private val forwardNodeAttachmentUseCase = mock<ForwardNodeAttachmentUseCase>()
-    private val forwardVoiceClipUseCase = mock<ForwardVoiceClipUseCase>()
-    private val forwardRichPreviewUseCase = mock<ForwardRichPreviewUseCase>()
-    private val forwardLocationUseCase = mock<ForwardLocationUseCase>()
-    private val forwardGiphyUseCase = mock<ForwardGiphyUseCase>()
+    private val forwardNormalMessageUseCase = mock<ForwardMessageUseCase>()
+    private val forwardContactUseCase = mock<ForwardMessageUseCase>()
 
-    private val targetChatId = 789L
     private val forwardMessageUseCases = setOf(
         forwardNormalMessageUseCase,
         forwardContactUseCase,
-        forwardNodeAttachmentUseCase,
-        forwardVoiceClipUseCase,
-        forwardRichPreviewUseCase,
-        forwardLocationUseCase,
-        forwardGiphyUseCase,
     )
     private val message1 = mock<NormalMessage>()
     private val message2 = mock<ContactAttachmentMessage>()
@@ -63,11 +59,6 @@ class ForwardMessagesUseCaseTest {
             createChatRoomUseCase,
             forwardNormalMessageUseCase,
             forwardContactUseCase,
-            forwardNodeAttachmentUseCase,
-            forwardVoiceClipUseCase,
-            forwardRichPreviewUseCase,
-            forwardLocationUseCase,
-            forwardGiphyUseCase,
         )
     }
 
@@ -106,14 +97,62 @@ class ForwardMessagesUseCaseTest {
         }
 
     @Test
-    fun `test that messages are forwarded`() = runTest {
-        val result = listOf<ForwardResult>(
-            ForwardResult.Success,
-            ForwardResult.Success,
-            ForwardResult.Success,
-            ForwardResult.Success,
-            ForwardResult.Success,
-            ForwardResult.Success,
-        )
+    fun `test that number of results match expected value if all messages are forwarded`() =
+        runTest {
+
+            forwardNormalMessageUseCase.stub {
+                onBlocking { invoke(any(), any()) } doReturn emptyList()
+                onBlocking {
+                    invoke(
+                        any(),
+                        argWhere { it is NormalMessage })
+                } doAnswer { invocationOnMock ->
+                    val chatCount = (invocationOnMock.arguments[0] as List<*>).size
+                    buildList { repeat(chatCount) { add(ForwardResult.Success) } }
+                }
+            }
+
+            forwardContactUseCase.stub {
+                onBlocking { invoke(any(), any()) } doReturn emptyList()
+                onBlocking {
+                    invoke(
+                        any(),
+                        argWhere { it is ContactAttachmentMessage })
+                } doAnswer { invocationOnMock ->
+                    val chatCount = (invocationOnMock.arguments[0] as List<*>).size
+                    buildList { repeat(chatCount) { add(ForwardResult.Success) } }
+                }
+            }
+
+            val expectedSize = messagesToForward.size * chatHandles.size
+
+            val actual = underTest(messagesToForward, chatHandles, null)
+
+            assertThat(actual.size).isEqualTo(expectedSize)
+            assertThat(actual.all { it == ForwardResult.Success }).isTrue()
+        }
+
+    @Test
+    internal fun `test that messages are forwarded in order of time sent`() = runTest {
+        message2.stub { on { time } doReturn 0 }
+        message1.stub { on { time } doReturn 10 }
+
+        forwardNormalMessageUseCase.stub {
+            onBlocking { invoke(any(), any()) } doReturn emptyList()
+        }
+
+        forwardContactUseCase.stub {
+            onBlocking { invoke(any(), any()) } doReturn emptyList()
+        }
+
+        underTest(messagesToForward, chatHandles, null)
+
+        inOrder(forwardNormalMessageUseCase, forwardContactUseCase) {
+            forwardNormalMessageUseCase(chatHandles, message2)
+            forwardContactUseCase(chatHandles, message2)
+            forwardNormalMessageUseCase(chatHandles, message1)
+            forwardContactUseCase(chatHandles, message1)
+        }
     }
+
 }
