@@ -160,6 +160,19 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
     }
 
+    override suspend fun getAllIncomingShares(
+        order: SortOrder,
+    ) = withContext(ioDispatcher) {
+        val (unverifiedShares, verifiedShares) = awaitAll(
+            async { megaApiGateway.getUnverifiedIncomingShares(sortOrderIntMapper(order)) },
+            async { megaApiGateway.getVerifiedIncomingShares(sortOrderIntMapper(order)) }
+        )
+
+        (unverifiedShares + verifiedShares)
+            .filter { isValidNode(NodeId(it.nodeHandle)) && it.user != null }
+            .map { shareDataMapper(it, 1) }
+    }
+
     override suspend fun getVerifiedIncomingShares(order: SortOrder) =
         withContext(ioDispatcher) {
             megaApiGateway.getVerifiedIncomingShares(sortOrderIntMapper(order)).map {

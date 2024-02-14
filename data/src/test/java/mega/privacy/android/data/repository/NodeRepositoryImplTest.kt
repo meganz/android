@@ -513,6 +513,49 @@ class NodeRepositoryImplTest {
         }
 
     @Test
+    fun `test that getAllIncomingShares returns correctly mapped result from api gateway`() =
+        runTest {
+            val sortOrder = SortOrder.ORDER_NONE
+            val sortOrderInt = 0
+            whenever(sortOrderIntMapper(sortOrder)).thenReturn(sortOrderInt)
+
+            val megaShare1 = mock<MegaShare> {
+                on { isVerified } doReturn false
+                on { nodeHandle } doReturn 1
+                on { user } doReturn "user1"
+            }
+            val megaShare2 = mock<MegaShare> {
+                on { isVerified } doReturn false
+                on { nodeHandle } doReturn 2
+                on { user } doReturn null
+            }
+            val megaShare3 = mock<MegaShare> {
+                on { isVerified } doReturn true
+                on { nodeHandle } doReturn 3
+                on { user } doReturn "user3"
+            }
+
+            whenever(megaApiGateway.getInvalidHandle()).thenReturn(-1L)
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            whenever(megaApiGateway.getUnverifiedIncomingShares(sortOrderInt)).thenReturn(
+                listOf(megaShare1, megaShare2)
+            )
+            whenever(megaApiGateway.getVerifiedIncomingShares(sortOrderInt)).thenReturn(
+                listOf(megaShare3)
+            )
+
+            val share1 = mock<ShareData>()
+            val share3 = mock<ShareData>()
+            whenever(shareDataMapper(megaShare1, 1)).thenReturn(share1)
+            whenever(shareDataMapper(megaShare3, 1)).thenReturn(share3)
+
+            val expected = listOf(share1, share3)
+            val actual = underTest.getAllIncomingShares(sortOrder)
+
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
     fun `test that saveOfflineNodeInformation calls api gateway saveOfflineNodeInformation with the mapped data and correct parent id`() =
         runTest {
             val parentOfflineInfoId = 2L
