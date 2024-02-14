@@ -147,7 +147,7 @@ class GetChatsUseCase @Inject constructor(
         }
             .sortedByDescending(CombinedChatRoom::lastTimestamp)
             .forEach { chatRoom ->
-                if (chatRoomType == ChatRoomType.ARCHIVED_CHATS || !chatRoom.isArchived) {
+                if (!chatRoom.isPreview && (chatRoomType == ChatRoomType.ARCHIVED_CHATS || !chatRoom.isArchived)) {
                     put(chatRoom.chatId, chatRoomItemMapper(chatRoom))
                 }
             }.let { values.toList() }
