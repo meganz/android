@@ -114,6 +114,10 @@ internal fun MessageListView(
 
     val context = LocalContext.current
 
+    var isDataLoaded by remember {
+        mutableStateOf(false)
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -122,9 +126,15 @@ internal fun MessageListView(
         reverseLayout = true,
     ) {
 
-        if (pagingItems.itemSnapshotList.isEmpty() && pagingItems.loadState.refresh is LoadState.Loading) {
+        if (!isDataLoaded) {
             item {
                 LoadingMessagesHeader()
+            }
+            if (
+                pagingItems.loadState.prepend.endOfPaginationReached
+                && pagingItems.loadState.mediator?.prepend?.endOfPaginationReached == true
+            ) {
+                isDataLoaded = true
             }
         } else {
             items(

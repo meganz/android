@@ -9,6 +9,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.TerminalSeparatorType
 import androidx.paging.cachedIn
 import androidx.paging.insertFooterItem
 import androidx.paging.insertSeparators
@@ -132,7 +133,8 @@ class MessageListViewModel @Inject constructor(
                         null
                     }
                 }.insertFooterItem(
-                    item = ChatHeaderMessage()
+                    item = ChatHeaderMessage(),
+                    terminalSeparatorType = TerminalSeparatorType.SOURCE_COMPLETE
                 )
             }
         }.cachedIn(viewModelScope)
