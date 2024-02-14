@@ -19,15 +19,14 @@ import mega.privacy.android.app.presentation.node.model.menuaction.TrashMenuActi
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ClearSelection
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Copy
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDown
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Download
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLink
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShare
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLink
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Move
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSelectManageLink
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Remove
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLink
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkDropDown
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShare
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareDropDown
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Rename
@@ -49,17 +48,16 @@ class NodeToolbarActionMapperTest {
     private val toolbarList = setOf(
         SelectAll(SelectAllMenuAction()),
         ClearSelection(ClearSelectionMenuAction()),
-        Download(DownloadMenuAction()),
+        DownloadToolbarMenuItem(DownloadMenuAction()),
         Restore(RestoreMenuAction()),
         Remove(RemoveMenuAction()),
         RemoveShare(),
         RemoveShareDropDown(),
         DisputeTakeDown(DisputeTakeDownMenuAction()),
-        GetLink(GetLinkMenuAction()),
+        GetLinkToolbarMenuItem(GetLinkMenuAction()),
         ManageLink(),
         MultiSelectManageLink(),
-        RemoveLink(),
-        RemoveLinkDropDown(),
+        RemoveLinkToolbarMenuItem(),
         SendToChat(SendToChatMenuAction()),
         ShareFolder(ShareFolderMenuAction()),
         Share(ShareMenuAction()),
@@ -109,6 +107,6 @@ class NodeToolbarActionMapperTest {
             noNodeInBackups = true,
             resultCount = 10,
         )
-        Truth.assertThat(mappedOptions).doesNotContain(GetLink(GetLinkMenuAction()))
+        Truth.assertThat(mappedOptions).doesNotContain(GetLinkToolbarMenuItem(GetLinkMenuAction()))
     }
 }

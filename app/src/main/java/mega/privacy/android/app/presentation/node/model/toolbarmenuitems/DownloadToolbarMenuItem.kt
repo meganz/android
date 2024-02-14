@@ -1,17 +1,17 @@
 package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
-import mega.privacy.android.app.presentation.node.model.menuaction.GetLinkMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
 
 /**
- * Get link menu item
+ * Download menu item
  *
- * @property menuAction [GetLinkMenuAction]
+ * @property menuAction [DownloadMenuAction]
  */
-class GetLink @Inject constructor(
-    override val menuAction: GetLinkMenuAction,
+class DownloadToolbarMenuItem @Inject constructor(
+    override val menuAction: DownloadMenuAction,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
     override fun shouldDisplay(
@@ -23,7 +23,5 @@ class GetLink @Inject constructor(
         allFileNodes: Boolean,
         resultCount: Int,
     ) = noNodeTakenDown
-            && selectedNodes.size == 1
-            && selectedNodes.first().exportedData == null
 
 }

@@ -84,7 +84,6 @@ internal fun NavGraphBuilder.searchNavGraph(
     cannotVerifyUserNavigation(navHostController = navHostController)
     removeNodeLinkDialogNavigation(
         navHostController = navHostController,
-        searchActivityViewModel = searchActivityViewModel
     )
     shareFolderDialogNavigation(
         navHostController = navHostController,

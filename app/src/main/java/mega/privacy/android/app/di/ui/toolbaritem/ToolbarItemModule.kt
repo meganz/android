@@ -14,15 +14,15 @@ import mega.privacy.android.app.di.ui.toolbaritem.qualifier.RubbishBin
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ClearSelection
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Copy
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDown
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Download
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLink
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShare
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLink
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Move
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSelectManageLink
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Remove
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkDropDown
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShare
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Rename
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Restore
@@ -52,11 +52,11 @@ abstract class ToolbarItemModule {
         fun provideOutgoingSharesToolbarItems(
             selectAll: SelectAll,
             clearSelection: ClearSelection,
-            download: Download,
+            download: DownloadToolbarMenuItem,
             removeShare: RemoveShare,
-            getLink: GetLink,
+            getLinkToolbarMenuItem: GetLinkToolbarMenuItem,
             manageLink: ManageLink,
-            removeLinkDropDown: RemoveLinkDropDown,
+            removeLinkToolbarMenuItem: RemoveLinkToolbarMenuItem,
             sendToChat: SendToChat,
             shareFolder: ShareFolder,
             share: Share,
@@ -69,9 +69,9 @@ abstract class ToolbarItemModule {
                 clearSelection,
                 download,
                 removeShare,
-                getLink,
+                getLinkToolbarMenuItem,
                 manageLink,
-                removeLinkDropDown,
+                removeLinkToolbarMenuItem,
                 sendToChat,
                 shareFolder,
                 share,
@@ -91,7 +91,7 @@ abstract class ToolbarItemModule {
             selectAll: SelectAll,
             clearSelection: ClearSelection,
             leaveShare: LeaveShare,
-            download: Download,
+            download: DownloadToolbarMenuItem,
             move: Move,
             copy: Copy,
             sendToChat: SendToChat,
@@ -120,10 +120,10 @@ abstract class ToolbarItemModule {
         fun provideSharedLinksToolbarItems(
             selectAll: SelectAll,
             clearSelection: ClearSelection,
-            download: Download,
-            getLink: GetLink,
+            download: DownloadToolbarMenuItem,
+            getLinkToolbarMenuItem: GetLinkToolbarMenuItem,
             manageLink: ManageLink,
-            removeLinkDropDown: RemoveLinkDropDown,
+            removeLinkToolbarMenuItem: RemoveLinkToolbarMenuItem,
             sendToChat: SendToChat,
             rename: Rename,
             copy: Copy,
@@ -133,9 +133,9 @@ abstract class ToolbarItemModule {
                 selectAll,
                 clearSelection,
                 download,
-                getLink,
+                getLinkToolbarMenuItem,
                 manageLink,
-                removeLinkDropDown,
+                removeLinkToolbarMenuItem,
                 sendToChat,
                 rename,
                 copy,
@@ -154,9 +154,9 @@ abstract class ToolbarItemModule {
             clearSelection: ClearSelection,
             rename: Rename,
             manageLink: MultiSelectManageLink,
-            getLink: GetLink,
-            removeLinkDropDown: RemoveLinkDropDown,
-            download: Download,
+            getLinkToolbarMenuItem: GetLinkToolbarMenuItem,
+            removeLinkToolbarMenuItem: RemoveLinkToolbarMenuItem,
+            download: DownloadToolbarMenuItem,
             trash: Trash,
             copy: Copy,
             move: Move,
@@ -172,9 +172,9 @@ abstract class ToolbarItemModule {
                 download,
                 disputeTakeDown,
                 move,
-                getLink,
+                getLinkToolbarMenuItem,
                 manageLink,
-                removeLinkDropDown,
+                removeLinkToolbarMenuItem,
                 sendToChat,
                 shareFolder,
                 share,

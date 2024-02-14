@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Download
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -42,15 +42,15 @@ class ToolbarViewModelTest {
 
     private val nodeToolbarActionMapper = NodeToolbarActionMapper()
     private val cloudDriveToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(Download(DownloadMenuAction()))
+        setOf(DownloadToolbarMenuItem(DownloadMenuAction()))
     private val incomingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(Download(DownloadMenuAction()))
+        setOf(DownloadToolbarMenuItem(DownloadMenuAction()))
     private val outgoingSharesToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(Download(DownloadMenuAction()))
+        setOf(DownloadToolbarMenuItem(DownloadMenuAction()))
     private val linksToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(Download(DownloadMenuAction()))
+        setOf(DownloadToolbarMenuItem(DownloadMenuAction()))
     private val rubbishBinToolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>> =
-        setOf(Download(DownloadMenuAction()))
+        setOf(DownloadToolbarMenuItem(DownloadMenuAction()))
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val getRubbishBinNodeUseCase: GetRubbishNodeUseCase = mock()
