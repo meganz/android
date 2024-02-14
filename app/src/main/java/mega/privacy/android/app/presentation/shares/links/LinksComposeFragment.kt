@@ -52,6 +52,7 @@ import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
+import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.links.view.LinksView
 import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
@@ -100,7 +101,7 @@ class LinksComposeFragment : Fragment() {
     /**
      * Interface that notifies the attached Activity to execute specific functions
      */
-    private var linksActionListener: LinksActionListener? = null
+    private var linksActionListener: SharesActionListener? = null
     private var fileBackupManager: FileBackupManager? = null
     private var actionMode: ActionMode? = null
 
@@ -227,7 +228,7 @@ class LinksComposeFragment : Fragment() {
             event = event,
             onConsumed = onConsumeEvent,
             action = {
-                linksActionListener?.updateLinksToolbarTitleAndFAB(invalidateOptionsMenu = true)
+                linksActionListener?.updateSharesPageToolbarTitleAndFAB(invalidateOptionsMenu = true)
             },
         )
     }
@@ -246,7 +247,7 @@ class LinksComposeFragment : Fragment() {
         EventEffect(
             event = event,
             onConsumed = onConsumeEvent,
-            action = { linksActionListener?.exitLinksFragment() },
+            action = { linksActionListener?.exitSharesPage() },
         )
     }
 
@@ -277,7 +278,7 @@ class LinksComposeFragment : Fragment() {
         viewLifecycleOwner.collectFlow(viewModel.state
             .map { it.nodesList.isEmpty() }
             .distinctUntilChanged()) {
-            linksActionListener?.updateLinksToolbarTitleAndFAB(invalidateOptionsMenu = true)
+            linksActionListener?.updateSharesPageToolbarTitleAndFAB(invalidateOptionsMenu = true)
         }
 
         viewLifecycleOwner.collectFlow(viewModel.state
@@ -329,7 +330,7 @@ class LinksComposeFragment : Fragment() {
             openFile(fileNode = it)
             viewModel.onItemPerformedClicked()
         } ?: run {
-            linksActionListener?.updateLinksToolbarTitleAndFAB(true)
+            linksActionListener?.updateSharesPageToolbarTitleAndFAB(true)
         }
     }
 
@@ -382,7 +383,7 @@ class LinksComposeFragment : Fragment() {
      */
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        linksActionListener = requireActivity() as LinksActionListener
+        linksActionListener = requireActivity() as SharesActionListener
         fileBackupManager = FileBackupManager(
             activity = requireActivity(),
             actionBackupListener = object : ActionBackupListener {
@@ -400,10 +401,16 @@ class LinksComposeFragment : Fragment() {
 
     /**
      * Check elevation
+     *
+     * @param allowDisable true if allowed to disable elevation
      */
-    fun checkScroll() {
+    fun checkScroll(allowDisable: Boolean = false) {
         if (appBarElevationEnabled) {
             toggleAppBarElevation(true)
+        } else {
+            if (allowDisable) {
+                toggleAppBarElevation(false)
+            }
         }
     }
 

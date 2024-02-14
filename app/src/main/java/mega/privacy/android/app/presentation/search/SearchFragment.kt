@@ -69,7 +69,6 @@ import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.search.view.SearchFilterChipsView
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
-import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
@@ -149,7 +148,6 @@ class SearchFragment : RotatableFragment() {
     private val managerViewModel: ManagerViewModel by activityViewModels()
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val incomingSharesViewModel: IncomingSharesViewModel by activityViewModels()
-    private val outgoingSharesViewModel: OutgoingSharesViewModel by activityViewModels()
     private val backupsViewModel: BackupsViewModel by activityViewModels()
     private val rubbishBinViewModel: RubbishBinViewModel by activityViewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
@@ -716,7 +714,7 @@ class SearchFragment : RotatableFragment() {
             rubbishBinParentHandle = rubbishBinViewModel.state.value.rubbishBinHandle,
             backupsParentHandle = backupsViewModel.state.value.currentBackupsFolderNodeId.longValue,
             incomingParentHandle = incomingSharesViewModel.state.value.incomingHandle,
-            outgoingParentHandle = outgoingSharesViewModel.state.value.outgoingHandle,
+            outgoingParentHandle = managerActivity.getHandleFromOutgoingSharesViewModel(),
             linksParentHandle = managerActivity.getHandleFromLinksViewModel(),
             isFirstNavigationLevel = managerViewModel.state.value.isFirstNavigationLevel,
         )

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.view
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -49,13 +50,15 @@ fun <T : TypedNode> NodeGridView(
     spanCount: Int = 2,
     showChangeViewType: Boolean = true,
     isPublicNode: Boolean = false,
+    listContentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     LazyVerticalGrid(
         state = gridState,
         columns = GridCells.Fixed(spanCount),
         modifier = modifier.padding(horizontal = 2.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        contentPadding = listContentPadding
     ) {
         if (showSortOrder || showChangeViewType) {
             item(

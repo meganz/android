@@ -29,7 +29,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
@@ -54,6 +53,7 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
+import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.outgoing.ui.OutgoingSharesView
 import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
@@ -93,7 +93,7 @@ class OutgoingSharesComposeFragment : Fragment() {
     /**
      * Interface that notifies the attached Activity to execute specific functions
      */
-    private var outgoingSharesActionListener: OutgoingSharesActionListener? = null
+    private var outgoingSharesActionListener: SharesActionListener? = null
 
     /**
      * Application Theme Mode
@@ -129,7 +129,7 @@ class OutgoingSharesComposeFragment : Fragment() {
         Timber.d("onAttach")
         super.onAttach(context)
 
-        outgoingSharesActionListener = requireActivity() as? OutgoingSharesActionListener
+        outgoingSharesActionListener = requireActivity() as? SharesActionListener
         fileBackupManager = FileBackupManager(
             activity = requireActivity(),
             actionBackupListener = object : ActionBackupListener {
@@ -212,6 +212,17 @@ class OutgoingSharesComposeFragment : Fragment() {
                         snackBarHostState = snackbarHostState,
                     )
                 }
+                LaunchedEffect(uiState.currentHandle) {
+                    if (!uiState.isInRoot) {
+                        toggleAppBarElevation(false)
+                    }
+                    hideTabs(!uiState.isInRoot)
+                }
+                LaunchedEffect(uiState.nodesList.isEmpty()) {
+                    outgoingSharesActionListener?.updateSharesPageToolbarTitleAndFAB(
+                        invalidateOptionsMenu = true
+                    )
+                }
                 LaunchedEffect(uiState.optionsItemInfo) {
                     performItemOptionsClick(uiState.optionsItemInfo)
                 }
@@ -248,11 +259,26 @@ class OutgoingSharesComposeFragment : Fragment() {
     }
 
     /**
-     * Check elevation
+     * Hide/Show shares tab
+     *
+     * @param hide true if needs to hide shares tabs
      */
-    fun checkScroll() {
+    private fun hideTabs(hide: Boolean) {
+        (activity as ManagerActivity?)?.hideTabs(hide, SharesTab.OUTGOING_TAB)
+    }
+
+    /**
+     * Check elevation
+     *
+     * @param allowDisable true if allowed to disable elevation
+     */
+    fun checkScroll(allowDisable: Boolean = false) {
         if (appBarElevationEnabled) {
             toggleAppBarElevation(true)
+        } else {
+            if (allowDisable) {
+                toggleAppBarElevation(false)
+            }
         }
     }
 
@@ -271,7 +297,7 @@ class OutgoingSharesComposeFragment : Fragment() {
             event = event,
             onConsumed = onConsumeEvent,
             action = {
-                outgoingSharesActionListener?.updateOutgoingSharesToolbarTitleAndFAB(
+                outgoingSharesActionListener?.updateSharesPageToolbarTitleAndFAB(
                     invalidateOptionsMenu = true
                 )
             },
@@ -292,7 +318,7 @@ class OutgoingSharesComposeFragment : Fragment() {
         EventEffect(
             event = event,
             onConsumed = onConsumeEvent,
-            action = { outgoingSharesActionListener?.exitOutgoingSharesComposeFragment() },
+            action = { outgoingSharesActionListener?.exitSharesPage() },
         )
     }
 
@@ -306,7 +332,7 @@ class OutgoingSharesComposeFragment : Fragment() {
             openFile(fileNode = it)
             viewModel.onItemPerformedClicked()
         } ?: run {
-            outgoingSharesActionListener?.updateOutgoingSharesToolbarTitleAndFAB(
+            outgoingSharesActionListener?.updateSharesPageToolbarTitleAndFAB(
                 invalidateOptionsMenu = false
             )
         }
@@ -352,29 +378,22 @@ class OutgoingSharesComposeFragment : Fragment() {
             }
         }
 
-        viewLifecycleOwner.collectFlow(viewModel.state.map { it.nodesList.isEmpty() }
-            .distinctUntilChanged()) {
-            outgoingSharesActionListener?.updateOutgoingSharesToolbarTitleAndFAB(
-                invalidateOptionsMenu = true
-            )
-        }
-
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
             viewModel.refreshNodes()
         })
     }
 
     /**
-     * Get empty state for OugoingShares
-     * @param isPageEmpty
+     * Get empty state for Outgoing Shares
+     * @param isPageEmpty true when there's no outgoing shares
      */
     private fun getEmptyFolderDrawable(isPageEmpty: Boolean): Pair<Int, Int> {
         return if (isPageEmpty) {
             Pair(
                 if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.empty_outgoing_portrait
+                    R.drawable.outgoing_shares_empty
                 } else {
-                    R.drawable.empty_outgoing_landscape
+                    R.drawable.outgoing_empty_landscape
                 }, R.string.context_empty_outgoing
             )
         } else {
@@ -638,7 +657,10 @@ class OutgoingSharesComposeFragment : Fragment() {
         startActivity(launchBrowser)
     }
 
-    private fun disableSelectMode() {
+    /**
+     * Disable select mode in OutgoingSharesComposeFragment
+     */
+    fun disableSelectMode() {
         viewModel.clearAllNodes()
         actionMode?.finish()
     }

@@ -63,7 +63,7 @@ fun <T : TypedNode> NodesView(
     showPublicLinkCreationTime: Boolean = false,
     isPublicNode: Boolean = false,
     onEnterMediaDiscoveryClick: () -> Unit = {},
-    listContentPadding: PaddingValues = PaddingValues(0.dp)
+    listContentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
     val orientation = LocalConfiguration.current.orientation
@@ -98,6 +98,7 @@ fun <T : TypedNode> NodesView(
         val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = span)
         NodeGridView(
             modifier = modifier,
+            listContentPadding = listContentPadding,
             nodeUIItems = newList,
             onMenuClick = onMenuClick,
             onItemClicked = {
@@ -145,7 +146,7 @@ private fun <T : TypedNode> rememberNodeListForGrid(
     nodeUIItems: List<NodeUIItem<T>>,
     spanCount: Int,
 ) =
-    remember(key1 = nodeUIItems.count { it.isSelected } + nodeUIItems.size + spanCount) {
+    remember(spanCount + nodeUIItems.hashCode()) {
         val folderCount = nodeUIItems.count {
             it.node is FolderNode
         }

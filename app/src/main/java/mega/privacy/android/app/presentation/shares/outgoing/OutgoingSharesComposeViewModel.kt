@@ -112,10 +112,15 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     }
 
     private fun monitorContactUpdates() {
+        val changesToObserve = setOf(
+            UserChanges.AuthenticationInformation,
+            UserChanges.Firstname,
+            UserChanges.Lastname
+        )
         viewModelScope.launch {
             monitorContactUpdatesUseCase().collectLatest { updates ->
                 Timber.d("Received contact update")
-                if (updates.changes.values.any { it.contains(UserChanges.AuthenticationInformation) }) {
+                if (updates.changes.values.any { it.any { change -> changesToObserve.contains(change) } }) {
                     refreshNodesState()
                 }
             }
@@ -198,6 +203,10 @@ class OutgoingSharesComposeViewModel @Inject constructor(
         setPendingRefreshNodes()
     }
 
+    /**
+     * Returns the count of nodes in the current folder
+     */
+    fun getNodeCount() = _state.value.nodesList.size
 
     private fun setPendingRefreshNodes() {
         _state.update { it.copy(isPendingRefresh = true) }
@@ -214,6 +223,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     currentHandle = handle,
+                    updateToolbarTitleEvent = triggered
                 )
             }
             refreshNodesState()
@@ -245,6 +255,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
          * When a folder is opened, and user clicks on Shares bottom drawer item, clear the openedFolderNodeHandles
          */
         if (isRootNode && state.value.openedFolderNodeHandles.isNotEmpty()) {
+            handleStack.clear()
             _state.update {
                 it.copy(
                     isLoading = true,
@@ -262,9 +273,15 @@ class OutgoingSharesComposeViewModel @Inject constructor(
                 nodesList = nodeUIItems,
                 isLoading = false,
                 sortOrder = sortOrder,
+                updateToolbarTitleEvent = triggered
             )
         }
     }
+
+    /**
+     * Get current tree depth
+     */
+    fun outgoingTreeDepth() = if (_state.value.isInRoot) 0 else handleStack.size
 
     /**
      * This will map list of [Node] to [NodeUIItem]
@@ -293,7 +310,8 @@ class OutgoingSharesComposeViewModel @Inject constructor(
         _state.update {
             it.copy(
                 accessedFolderHandle = null,
-                currentHandle = -1L
+                currentHandle = -1L,
+                updateToolbarTitleEvent = triggered
             )
         }
         refreshNodes()
@@ -322,10 +340,15 @@ class OutgoingSharesComposeViewModel @Inject constructor(
                 handleAccessedFolderOnBackPress()
                 getParentNodeUseCase(NodeId(_state.value.currentHandle))?.id?.longValue?.let { parentHandle ->
                     removeCurrentNodeFromUiStateSet()
-                    setCurrentHandle(parentHandle)
-                    handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
-                    // Update the Toolbar Title
-                    _state.update { it.copy(updateToolbarTitleEvent = triggered) }
+                    val rootNode = getRootNodeUseCase()?.id?.longValue
+                    if (rootNode == parentHandle) {
+                        goBackToRootLevel()
+                    } else {
+                        setCurrentHandle(parentHandle)
+                        handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
+                        // Update the Toolbar Title
+                        _state.update { it.copy(updateToolbarTitleEvent = triggered) }
+                    }
                 } ?: run {
                     // Exit OutgoingShares if there is nothing left in the Back Stack
                     _state.update {
