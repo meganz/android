@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.ChatRichLinkMessageView
@@ -28,11 +29,12 @@ data class ChatRichLinkUiMessage(
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
+        val uriHandler = LocalUriHandler.current
         ChatRichLinkMessageView(
             modifier = Modifier
                 .weight(1f)
                 .combinedClickable(
-                    onClick = {},
+                    onClick = { message.chatRichPreviewInfo?.url?.let { uriHandler.openUri(it) } },
                     onLongClick = { onLongClick(message) }
                 ),
             isMe = message.isMine,
