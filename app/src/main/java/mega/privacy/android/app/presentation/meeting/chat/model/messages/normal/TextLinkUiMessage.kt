@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.normal
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,17 +18,12 @@ data class TextLinkUiMessage(
     override val message: TextLinkMessage,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
         ChatLinksMessageView(
-            modifier = Modifier
-                .weight(1f, fill = false)
-                .combinedClickable(
-                    onClick = {},
-                    onLongClick = { onLongClick(message) }
-                ),
-            message = message
+            modifier = Modifier.weight(1f, fill = false),
+            onLongClick = onLongClick,
+            message = message,
         )
     }
 

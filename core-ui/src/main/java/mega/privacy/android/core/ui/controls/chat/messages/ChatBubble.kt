@@ -17,6 +17,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.BooleanProvider
@@ -40,10 +41,11 @@ fun ChatBubble(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .then(modifier)
             .background(
                 color = if (isMe) MegaTheme.colors.button.primary else MegaTheme.colors.background.surface2,
-                shape = RoundedCornerShape(12.dp)
             )
     ) {
         Column(modifier = Modifier.width(IntrinsicSize.Max)) {
