@@ -37,6 +37,7 @@ data class ChatRichLinkUiMessage(
                 ),
             isMe = message.isMine,
             preview = message.chatRichPreviewInfo,
+            content = message.content,
         )
     }
 

@@ -25,6 +25,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 shouldShowAvatar = shouldShowAvatar,
                 shouldShowTime = shouldShowTime,
                 reactions = reactions,
+                content = content.orEmpty(),
             )
 
             ContainsMetaType.GEOLOCATION -> LocationMessage(

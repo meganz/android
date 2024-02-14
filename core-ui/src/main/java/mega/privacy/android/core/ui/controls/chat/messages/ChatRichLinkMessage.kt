@@ -24,7 +24,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  * @param title Title
  * @param contentTitle Content title
  * @param contentDescription Content description
- * @param url Url
+ * @param content Message content
  * @param host Host
  * @param image Image
  * @param icon Icon
@@ -35,7 +35,7 @@ fun ChatRichLinkMessage(
     title: String,
     contentTitle: String,
     contentDescription: String,
-    url: String,
+    content: String,
     host: String,
     image: Painter?,
     icon: Painter?,
@@ -52,7 +52,7 @@ fun ChatRichLinkMessage(
                 )
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = url,
+                    text = content,
                     style = MaterialTheme.typography.caption
                 )
             }
@@ -81,7 +81,7 @@ private fun ChatRickLinkMessagePreview(
             title = "Title",
             contentTitle = "Content Title",
             contentDescription = "is a caldera in the Sunda Strait between the islands of Java and Sumatra in the Indonesian province of Lampung. It is located in the most densely populated island of Java. The name is Indonesian for 'Child of Krakatoa'.",
-            url = "https://mega.nz",
+            content = "https://mega.nz",
             host = "mega.nz",
             image = painterResource(R.drawable.ic_select_folder),
             icon = painterResource(R.drawable.ic_select_folder),

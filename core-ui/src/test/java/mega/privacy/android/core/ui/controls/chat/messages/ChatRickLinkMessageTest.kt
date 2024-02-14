@@ -97,7 +97,7 @@ class ChatRickLinkMessageTest {
                 title = title,
                 contentTitle = contentTitle,
                 contentDescription = contentDescription,
-                url = url,
+                content = url,
                 host = host,
                 image = null,
                 icon = null,

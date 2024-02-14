@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 /**
  * Rich preview message
  *
+ * @property content Message content
  * @property chatRichPreviewInfo [ChatRichPreviewInfo]
  */
 @Serializable
@@ -18,5 +19,6 @@ data class RichPreviewMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
+    val content: String,
     val chatRichPreviewInfo: ChatRichPreviewInfo?,
 ) : MetaMessage

@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
  *
  * @param isMe
  * @param preview
+ * @param content
  * @param modifier
  * @param viewModel
  */
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
 fun ChatRichLinkMessageView(
     isMe: Boolean,
     preview: ChatRichPreviewInfo?,
+    content: String,
     modifier: Modifier = Modifier,
     viewModel: MetaViewModel = hiltViewModel(),
 ) {
@@ -46,7 +48,7 @@ fun ChatRichLinkMessageView(
             title = preview.title,
             contentTitle = preview.description,
             contentDescription = preview.description,
-            url = preview.url,
+            content = content,
             host = preview.domainName,
             image = image.value?.let { rememberAsyncImagePainter(it) },
             icon = icon.value?.let { rememberAsyncImagePainter(it) },
