@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class SolvedIssueToSolvedIssueEntityMapperTest {
 
     private val gson = Gson()

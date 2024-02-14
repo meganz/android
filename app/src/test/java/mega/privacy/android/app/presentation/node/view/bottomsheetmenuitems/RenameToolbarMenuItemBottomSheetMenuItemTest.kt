@@ -22,7 +22,7 @@ import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RenameBottomSheetMenuItemTest {
+class RenameToolbarMenuItemBottomSheetMenuItemTest {
 
     private val renameBottomSheetMenuItem = RenameBottomSheetMenuItem()
 

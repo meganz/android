@@ -89,7 +89,7 @@ class NodeToolbarViewModel @Inject constructor(
         nodeSourceType: NodeSourceType,
     ) {
         viewModelScope.launch {
-            val toolbarOptions = getToolbarOptions(NodeSourceType.CLOUD_DRIVE)
+            val toolbarOptions = getToolbarOptions(nodeSourceType)
             val canBeMovedToTarget = if (nodeSourceType != NodeSourceType.RUBBISH_BIN) {
                 canNodeBeMovedToRubbishBin(selectedNodes)
             } else false

@@ -28,9 +28,11 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param updateSearchQuery
  * @param selectedNodes
  * @param totalCount
- * @param toolbarViewModel
  * @param onBackPressed
-
+ * @param navHostController
+ * @param nodeActionHandler
+ * @param clearSelection
+ * @param nodeSourceType
  */
 @Composable
 fun SearchToolBar(
@@ -42,13 +44,14 @@ fun SearchToolBar(
     navHostController: NavHostController,
     nodeActionHandler: NodeActionHandler,
     clearSelection: () -> Unit,
+    nodeSourceType: NodeSourceType,
     toolbarViewModel: NodeToolbarViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(key1 = selectedNodes.size) {
         toolbarViewModel.updateToolbarState(
             selectedNodes = selectedNodes,
             resultCount = totalCount,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            nodeSourceType = nodeSourceType
         )
     }
     val toolbarState by toolbarViewModel.state.collectAsStateWithLifecycle()

@@ -1,8 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.node.model.menuaction.RemoveMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Remove
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShare
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.TestInstance
@@ -13,17 +12,26 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveTest {
+class RemoveToolbarMenuItemShareTest {
 
-    private val underTest = Remove(RemoveMenuAction())
+    private val underTest = RemoveShare()
 
-    private val oneFileNodeSelected = mock<TypedFolderNode>()
-    private val oneFolderNodeSelected = mock<TypedFolderNode>()
-    private val multipleNodes = listOf(oneFileNodeSelected, oneFolderNodeSelected)
+
+    private val sharedFolder1 = mock<TypedFolderNode> {
+        on { isPendingShare }.thenReturn(true)
+    }
+    private val sharedFolder2 = mock<TypedFolderNode> {
+        on { isPendingShare }.thenReturn(true)
+    }
+    private val notSharedFolder = mock<TypedFolderNode> {
+        on { isPendingShare }.thenReturn(false)
+    }
+    private val sharedFolders = listOf(sharedFolder1, sharedFolder2)
+    private val mixedFoldersList = listOf(sharedFolder1, sharedFolder2, notSharedFolder)
 
     @ParameterizedTest(name = "when selected nodes are {0} then visibility is {1}")
     @MethodSource("provideArguments")
-    fun `test that remove item visibility is updated`(
+    fun `test that remove share item visibility is updated`(
         selectedNodes: List<TypedNode>,
         expected: Boolean,
     ) {
@@ -41,6 +49,7 @@ class RemoveTest {
 
     private fun provideArguments() = Stream.of(
         Arguments.of(emptyList<TypedFolderNode>(), false),
-        Arguments.of(multipleNodes, true)
+        Arguments.of(sharedFolders, true),
+        Arguments.of(mixedFoldersList, false)
     )
 }

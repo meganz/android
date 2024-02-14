@@ -12,7 +12,10 @@ import org.mockito.kotlin.mock
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DeletePermanentlyBottomSheetMenuItemTest {
     private val underTest =
-        DeletePermanentlyBottomSheetMenuItem(menuAction = DeletePermanentlyMenuAction())
+        DeletePermanentlyBottomSheetMenuItem(
+            menuAction = DeletePermanentlyMenuAction(),
+            listToStringWithDelimitersMapper = mock()
+        )
     private val node = mock<TypedFileNode> {
         on { isTakenDown } doReturn false
     }

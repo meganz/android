@@ -19,7 +19,7 @@ import java.io.File
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveLinkToolbarMenuItemTest {
+class RemoveToolbarMenuItemLinkToolbarMenuItemTest {
 
     private val underTest = RemoveLinkToolbarMenuItem()
 

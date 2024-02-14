@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.search.navigation.renameDialogNavig
 import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.shareFolderDialogNavigation
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 
 
 /**
@@ -35,6 +36,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param nodeActionHandler Node bottom sheet action handler
  * @param searchActivityViewModel Search activity view model
  * @param onBackPressed OnBackPressed
+ * @param nodeActionsViewModel
+ * @param listToStringWithDelimitersMapper
  */
 internal fun NavGraphBuilder.searchNavGraph(
     trackAnalytics: (SearchFilter?) -> Unit,
@@ -47,6 +50,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
     onBackPressed: () -> Unit,
     nodeActionsViewModel: NodeActionsViewModel,
+    listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper
 ) {
     composable(searchRoute) {
         SearchScreen(
@@ -62,8 +66,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     }
     moveToRubbishOrDeleteNavigation(
         navHostController = navHostController,
-        searchActivityViewModel = searchActivityViewModel,
-        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
+        listToStringWithDelimitersMapper = listToStringWithDelimitersMapper
     )
     renameDialogNavigation(
         navHostController = navHostController,

@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -49,15 +50,19 @@ class RestoreBottomSheetMenuItem @Inject constructor(
             onDismiss()
             val restoreMap = mapOf(Pair(node.id.longValue, it.longValue))
             scope.launch {
-                val result =
+                runCatching {
                     checkNodesNameCollisionUseCase(restoreMap, NodeNameCollisionType.RESTORE)
-                if (result.conflictNodes.isNotEmpty()) {
-                    actionHandler(menuAction, node)
-                }
-                if (result.noConflictNodes.isNotEmpty()) {
-                    val restoreResult = restoreNodesUseCase(result.noConflictNodes)
-                    val message = restoreNodeResultMapper(restoreResult)
-                    snackBarHandler.postSnackbarMessage(message)
+                }.onSuccess { result ->
+                    if (result.conflictNodes.isNotEmpty()) {
+                        actionHandler(menuAction, node)
+                    }
+                    if (result.noConflictNodes.isNotEmpty()) {
+                        val restoreResult = restoreNodesUseCase(result.noConflictNodes)
+                        val message = restoreNodeResultMapper(restoreResult)
+                        snackBarHandler.postSnackbarMessage(message)
+                    }
+                }.onFailure { throwable ->
+                    Timber.e(throwable)
                 }
             }
         }

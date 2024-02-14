@@ -75,6 +75,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
@@ -106,6 +107,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
      */
     @Inject
     lateinit var transfersManagement: TransfersManagement
+
+    /**
+     * Mapper to convert list to json for sending data in navigation
+     */
+    @Inject
+    lateinit var listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper
 
     private val nameCollisionActivityContract =
         registerForActivityResult(NameCollisionActivityContract()) { result: String? ->
@@ -236,6 +243,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                         nodeActionHandler = bottomSheetActionHandler,
                         navHostController = navHostController,
                         bottomSheetNavigator = bottomSheetNavigator,
+                        listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
                         onBackPressed = {
                             if (viewModel.state.value.selectedNodes.isNotEmpty()) {
                                 viewModel.clearSelection()

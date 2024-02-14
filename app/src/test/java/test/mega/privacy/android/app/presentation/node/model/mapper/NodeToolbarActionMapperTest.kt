@@ -1,6 +1,9 @@
 package test.mega.privacy.android.app.presentation.node.model.mapper
 
 import com.google.common.truth.Truth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.ClearSelectionMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
@@ -25,32 +28,40 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveSh
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLink
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Move
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSelectManageLink
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Remove
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShare
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareDropDown
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Rename
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropDown
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Restore
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAll
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChat
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Share
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolder
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Trash
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class NodeToolbarActionMapperTest {
     val underTest = NodeToolbarActionMapper()
     private val toolbarList = setOf(
         SelectAll(SelectAllMenuAction()),
         ClearSelection(ClearSelectionMenuAction()),
         DownloadToolbarMenuItem(DownloadMenuAction()),
-        Restore(RestoreMenuAction()),
-        Remove(RemoveMenuAction()),
+        RestoreToolbarMenuItem(
+            scope = CoroutineScope(UnconfinedTestDispatcher()),
+            menuAction = RestoreMenuAction(),
+            checkNodesNameCollisionUseCase = mock(),
+            restoreNodesUseCase = mock(),
+            restoreNodeResultMapper = mock(),
+            snackBarHandler = mock()
+        ),
+        RemoveToolbarMenuItem(RemoveMenuAction(), mock()),
         RemoveShare(),
         RemoveShareDropDown(),
         DisputeTakeDown(DisputeTakeDownMenuAction()),
@@ -62,11 +73,11 @@ class NodeToolbarActionMapperTest {
         ShareFolder(ShareFolderMenuAction()),
         Share(ShareMenuAction()),
         LeaveShare(LeaveShareMenuAction()),
-        Rename(),
+        RenameToolbarMenuItem(),
         RenameDropDown(),
         Move(MoveMenuAction()),
         Copy(CopyMenuAction()),
-        Trash(TrashMenuAction()),
+        TrashToolbarMenuItem(TrashMenuAction(), mock()),
     )
 
     @Test

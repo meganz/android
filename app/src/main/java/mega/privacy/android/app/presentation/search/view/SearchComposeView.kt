@@ -96,7 +96,8 @@ fun SearchComposeView(
                 totalCount = state.searchItemList.size,
                 navHostController = navHostController,
                 nodeActionHandler = nodeActionHandler,
-                clearSelection = clearSelection
+                clearSelection = clearSelection,
+                nodeSourceType = state.nodeSourceType
             )
         },
         snackbarHost = {

@@ -14,7 +14,7 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveLinkBottomSheetMenuItemTest {
+class RemoveToolbarMenuItemLinkBottomSheetMenuItemTest {
 
     private val exportedData = mock<ExportedData> {
         on { publicLink } doReturn "publicLink"

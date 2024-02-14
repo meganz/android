@@ -21,16 +21,16 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageL
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Move
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSelectManageLink
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Remove
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShare
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Rename
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Restore
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAll
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChat
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Share
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolder
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Trash
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
 
 /**
  * Toolbar module
@@ -60,9 +60,9 @@ abstract class ToolbarItemModule {
             sendToChat: SendToChat,
             shareFolder: ShareFolder,
             share: Share,
-            rename: Rename,
+            renameToolbarMenuItem: RenameToolbarMenuItem,
             copy: Copy,
-            trash: Trash,
+            trashToolbarMenuItem: TrashToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
             return setOf(
                 selectAll,
@@ -75,9 +75,9 @@ abstract class ToolbarItemModule {
                 sendToChat,
                 shareFolder,
                 share,
-                rename,
+                renameToolbarMenuItem,
                 copy,
-                trash,
+                trashToolbarMenuItem,
             )
         }
 
@@ -95,8 +95,8 @@ abstract class ToolbarItemModule {
             move: Move,
             copy: Copy,
             sendToChat: SendToChat,
-            rename: Rename,
-            trash: Trash,
+            renameToolbarMenuItem: RenameToolbarMenuItem,
+            trashToolbarMenuItem: TrashToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
             return setOf(
                 selectAll,
@@ -105,9 +105,9 @@ abstract class ToolbarItemModule {
                 leaveShare,
                 move,
                 sendToChat,
-                rename,
+                renameToolbarMenuItem,
                 copy,
-                trash,
+                trashToolbarMenuItem,
             )
         }
 
@@ -125,9 +125,9 @@ abstract class ToolbarItemModule {
             manageLink: ManageLink,
             removeLinkToolbarMenuItem: RemoveLinkToolbarMenuItem,
             sendToChat: SendToChat,
-            rename: Rename,
+            renameToolbarMenuItem: RenameToolbarMenuItem,
             copy: Copy,
-            trash: Trash,
+            trashToolbarMenuItem: TrashToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
             return setOf(
                 selectAll,
@@ -137,9 +137,9 @@ abstract class ToolbarItemModule {
                 manageLink,
                 removeLinkToolbarMenuItem,
                 sendToChat,
-                rename,
+                renameToolbarMenuItem,
                 copy,
-                trash,
+                trashToolbarMenuItem,
             )
         }
 
@@ -152,12 +152,12 @@ abstract class ToolbarItemModule {
         fun provideCloudDriveToolbarItems(
             selectAll: SelectAll,
             clearSelection: ClearSelection,
-            rename: Rename,
+            renameToolbarMenuItem: RenameToolbarMenuItem,
             manageLink: MultiSelectManageLink,
             getLinkToolbarMenuItem: GetLinkToolbarMenuItem,
             removeLinkToolbarMenuItem: RemoveLinkToolbarMenuItem,
             download: DownloadToolbarMenuItem,
-            trash: Trash,
+            trashToolbarMenuItem: TrashToolbarMenuItem,
             copy: Copy,
             move: Move,
             sendToChat: SendToChat,
@@ -178,9 +178,9 @@ abstract class ToolbarItemModule {
                 sendToChat,
                 shareFolder,
                 share,
-                rename,
+                renameToolbarMenuItem,
                 copy,
-                trash,
+                trashToolbarMenuItem,
                 removeShare,
             )
         }
@@ -194,14 +194,14 @@ abstract class ToolbarItemModule {
         fun provideBackupsToolbarItems(
             selectAll: SelectAll,
             clearSelection: ClearSelection,
-            remove: Remove,
-            restore: Restore,
+            removeToolbarMenuItem: RemoveToolbarMenuItem,
+            restoreToolbarMenuItem: RestoreToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
             return setOf(
                 selectAll,
                 clearSelection,
-                remove,
-                restore
+                removeToolbarMenuItem,
+                restoreToolbarMenuItem
             )
         }
 
@@ -214,14 +214,14 @@ abstract class ToolbarItemModule {
         fun provideRubbishBinToolbarItems(
             selectAll: SelectAll,
             clearSelection: ClearSelection,
-            remove: Remove,
-            restore: Restore,
+            removeToolbarMenuItem: RemoveToolbarMenuItem,
+            restoreToolbarMenuItem: RestoreToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
             return setOf(
                 selectAll,
                 clearSelection,
-                remove,
-                restore
+                removeToolbarMenuItem,
+                restoreToolbarMenuItem
             )
         }
     }

@@ -30,7 +30,7 @@ import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RestoreBottomSheetMenuItemTest {
+class RestoreToolbarMenuItemBottomSheetMenuItemTest {
 
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
     private val restoreNodesUseCase: RestoreNodesUseCase = mock()

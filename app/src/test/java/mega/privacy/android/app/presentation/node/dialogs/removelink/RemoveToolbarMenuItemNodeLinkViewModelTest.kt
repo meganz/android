@@ -24,7 +24,7 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveNodeLinkViewModelTest {
+class RemoveToolbarMenuItemNodeLinkViewModelTest {
 
     private val disableExportNodesUseCase: DisableExportNodesUseCase = mock()
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper = mock()

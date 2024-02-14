@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropDown
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.TestInstance
@@ -12,17 +12,17 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RenameDropDownTest {
+class RenameToolbarMenuItemTest {
 
-    private val underTest = RenameDropDown()
+    private val underTest = RenameToolbarMenuItem()
 
     private val nodeOne = mock<TypedFolderNode>()
     private val nodeTwo = mock<TypedFolderNode>()
     private val multipleNodes = listOf(nodeOne, nodeTwo)
 
-    @ParameterizedTest(name = "when selected nodes have nodeAccessPermission: {0}, noNodeInBackups : {1}, and selected nodes are {2} then visibility is {3}")
+    @ParameterizedTest(name = "when selected node hasNodeAccessPermission: {0}, noNodeInBackups: {1}, and selected nodes are {2} then visibility is {3}")
     @MethodSource("provideArguments")
-    fun `test that rename dropdown item visibility is updated`(
+    fun `test that rename item visibility is updated`(
         hasNodeAccessPermission: Boolean,
         noNodeInBackups: Boolean,
         selectedNodes: List<TypedNode>,
@@ -47,10 +47,10 @@ class RenameDropDownTest {
         Arguments.of(true, false, listOf<TypedFolderNode>(), false),
         Arguments.of(true, false, listOf(nodeOne), false),
         Arguments.of(true, false, multipleNodes, false),
-        Arguments.of(true, true, emptyList<TypedFolderNode>(), false),
+        Arguments.of(true, true, listOf<TypedFolderNode>(), false),
         Arguments.of(true, true, listOf(nodeOne), true),
         Arguments.of(true, true, multipleNodes, false),
-        Arguments.of(false, true, listOf<TypedFolderNode>(), false),
+        Arguments.of(false, true, emptyList<TypedFolderNode>(), false),
         Arguments.of(false, true, listOf(nodeOne), false),
         Arguments.of(false, true, multipleNodes, false),
     )

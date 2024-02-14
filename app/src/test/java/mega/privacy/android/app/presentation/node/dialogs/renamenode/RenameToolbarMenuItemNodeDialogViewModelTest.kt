@@ -35,7 +35,7 @@ import org.mockito.kotlin.reset
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @OptIn(ExperimentalCoroutinesApi::class)
-class RenameNodeDialogViewModelTest {
+class RenameToolbarMenuItemNodeDialogViewModelTest {
 
     private lateinit var underTest: RenameNodeDialogViewModel
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()

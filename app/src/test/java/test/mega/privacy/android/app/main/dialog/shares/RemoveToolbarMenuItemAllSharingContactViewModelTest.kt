@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.main.dialog.removelink
+package test.mega.privacy.android.app.main.dialog.shares
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
@@ -9,26 +9,26 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkViewModel
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactViewModel
+import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.shares.GetOutShareByNodeIdUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class RemovePublicLinkViewModelTest {
-    private lateinit var underTest: RemovePublicLinkViewModel
-    private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
+internal class RemoveToolbarMenuItemAllSharingContactViewModelTest {
+    private lateinit var underTest: RemoveAllSharingContactViewModel
     private val savedStateHandle: SavedStateHandle = mock()
+    private val getOutShareByNodeIdUseCase: GetOutShareByNodeIdUseCase = mock()
 
     @BeforeAll
     fun setup() {
@@ -43,27 +43,28 @@ internal class RemovePublicLinkViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(getNodeByHandleUseCase, savedStateHandle)
+        reset(savedStateHandle, getOutShareByNodeIdUseCase)
     }
 
-    private fun initTestClass() {
-        underTest = RemovePublicLinkViewModel(getNodeByHandleUseCase, savedStateHandle)
-    }
-
-    @ParameterizedTest(name = "invoked with isTakenDown = {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that isTakenDown update correctly when init view model with single node`(isDown: Boolean) =
+    @Test
+    fun `test that numberOfShareContact update correctly when init view model with single node`() =
         runTest {
-            val node = mock<FileNode> {
-                on { isTakenDown }.thenReturn(isDown)
+            val shares = List(5) {
+                mock<ShareData>()
             }
             whenever(savedStateHandle.get<LongArray>(RemoveAllSharingContactDialogFragment.EXTRA_NODE_IDS)).thenReturn(
                 longArrayOf(1)
             )
-            whenever(getNodeByHandleUseCase(1L)).thenReturn(node)
+            whenever(getOutShareByNodeIdUseCase(NodeId(1L))).thenReturn(shares)
             initTestClass()
             underTest.state.test {
-                Truth.assertThat(awaitItem().isNodeTakenDown).isEqualTo(isDown)
+                val item = awaitItem()
+                Truth.assertThat(item.numberOfShareContact).isEqualTo(shares.size)
+                Truth.assertThat(item.numberOfShareFolder).isEqualTo(1)
             }
         }
+
+    private fun initTestClass() {
+        underTest = RemoveAllSharingContactViewModel(savedStateHandle, getOutShareByNodeIdUseCase)
+    }
 }

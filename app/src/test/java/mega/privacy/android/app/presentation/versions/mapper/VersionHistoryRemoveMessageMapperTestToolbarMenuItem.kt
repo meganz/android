@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
-class VersionHistoryRemoveMessageMapperTest {
+class VersionHistoryRemoveMessageMapperTestToolbarMenuItem {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val mapper = VersionHistoryRemoveMessageMapper(context)

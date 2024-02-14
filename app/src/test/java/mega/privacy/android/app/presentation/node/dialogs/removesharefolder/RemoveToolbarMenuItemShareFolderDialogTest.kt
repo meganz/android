@@ -15,7 +15,7 @@ import test.mega.privacy.android.app.fromId
 import test.mega.privacy.android.app.fromPluralId
 
 @RunWith(AndroidJUnit4::class)
-class RemoveShareFolderDialogTest {
+class RemoveToolbarMenuItemShareFolderDialogTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()

@@ -2,7 +2,7 @@ package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.node.model.menuaction.TrashMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Trash
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -14,9 +14,9 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TrashTest {
+class TrashToolbarMenuItemTest {
 
-    private val underTest = Trash(TrashMenuAction())
+    private val underTest = TrashToolbarMenuItem(TrashMenuAction(), mock())
 
     private val oneFileNodeSelected = mock<TypedFileNode> {
         on { isIncomingShare }.thenReturn(false)
