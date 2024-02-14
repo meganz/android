@@ -28,7 +28,7 @@ internal class DeviceFolderUINodeErrorMessageMapperTest {
     @MethodSource("provideParameters")
     fun `test that the mapping is correct`(
         errorSubState: BackupInfoSubState,
-        expectedStringRes: Int,
+        expectedStringRes: Int?,
     ) {
         assertThat(underTest(errorSubState)).isEqualTo(expectedStringRes)
     }
@@ -41,7 +41,7 @@ internal class DeviceFolderUINodeErrorMessageMapperTest {
     private fun provideParameters() = Stream.of(
         Arguments.of(
             BackupInfoSubState.NO_SYNC_ERROR,
-            R.string.device_center_list_view_item_sub_state_no_sync_error,
+            null,
         ),
         Arguments.of(
             BackupInfoSubState.UNKNOWN_ERROR,

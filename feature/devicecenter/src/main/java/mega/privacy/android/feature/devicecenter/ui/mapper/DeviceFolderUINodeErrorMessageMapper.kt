@@ -17,8 +17,8 @@ internal class DeviceFolderUINodeErrorMessageMapper @Inject constructor() {
      * @param errorSubState The corresponding [BackupInfoSubState]
      * @return A [StringRes] of the specific Error Message
      */
-    operator fun invoke(errorSubState: BackupInfoSubState): Int = when (errorSubState) {
-        BackupInfoSubState.NO_SYNC_ERROR -> R.string.device_center_list_view_item_sub_state_no_sync_error
+    operator fun invoke(errorSubState: BackupInfoSubState): Int? = when (errorSubState) {
+        BackupInfoSubState.NO_SYNC_ERROR -> null
         BackupInfoSubState.UNKNOWN_ERROR -> R.string.device_center_list_view_item_sub_state_message_unknown_error
         BackupInfoSubState.UNSUPPORTED_FILE_SYSTEM -> R.string.device_center_list_view_item_sub_state_unsupported_file_system
         BackupInfoSubState.INVALID_REMOTE_TYPE -> R.string.device_center_list_view_item_sub_state_invalid_remote_type
