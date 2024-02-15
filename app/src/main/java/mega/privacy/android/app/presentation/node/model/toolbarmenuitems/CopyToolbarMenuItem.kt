@@ -10,7 +10,7 @@ import javax.inject.Inject
  *
  * @property menuAction [CopyMenuAction]
  */
-class Copy @Inject constructor(
+class CopyToolbarMenuItem @Inject constructor(
     override val menuAction: CopyMenuAction,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 

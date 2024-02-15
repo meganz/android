@@ -142,10 +142,13 @@ class NodeActionHandler(
             is DownloadMenuAction -> nodeActionsViewModel.downloadNode()
             is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline()
             is ShareFolderMenuAction -> {
-                val nodeHandleArray = nodes.map {
-                    it.id.longValue
-                }.toLongArray()
+                val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
                 shareFolderActivityLauncher?.launch(nodeHandleArray)
+            }
+
+            is CopyMenuAction -> {
+                val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
+                selectCopyNodeActivityLauncher?.launch(nodeHandleArray)
             }
 
             else -> throw NotImplementedError("Action $action does not have a handler.")

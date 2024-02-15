@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMe
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.TrashMenuAction
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ClearSelection
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Copy
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.CopyToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDown
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLinkToolbarMenuItem
@@ -88,7 +88,7 @@ class NodeToolbarActionMapperTest {
         RenameToolbarMenuItem(),
         RenameDropDown(),
         Move(MoveMenuAction()),
-        Copy(CopyMenuAction()),
+        CopyToolbarMenuItem(CopyMenuAction()),
         TrashToolbarMenuItem(TrashMenuAction(), mock()),
     )
 

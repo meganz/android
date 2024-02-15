@@ -12,7 +12,7 @@ import mega.privacy.android.app.di.ui.toolbaritem.qualifier.Links
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.OutgoingShares
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.RubbishBin
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ClearSelection
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Copy
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.CopyToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDown
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLinkToolbarMenuItem
@@ -64,7 +64,7 @@ abstract class ToolbarItemModule {
             shareFolderToolbarMenuItem: ShareFolderToolbarMenuItem,
             share: Share,
             renameToolbarMenuItem: RenameToolbarMenuItem,
-            copy: Copy,
+            copyToolbarMenuItem: CopyToolbarMenuItem,
             trashToolbarMenuItem: TrashToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
             return setOf(
@@ -79,7 +79,7 @@ abstract class ToolbarItemModule {
                 shareFolderToolbarMenuItem,
                 share,
                 renameToolbarMenuItem,
-                copy,
+                copyToolbarMenuItem,
                 trashToolbarMenuItem,
             )
         }
@@ -96,7 +96,7 @@ abstract class ToolbarItemModule {
             leaveShareToolBarMenuItem: LeaveShareToolBarMenuItem,
             download: DownloadToolbarMenuItem,
             move: Move,
-            copy: Copy,
+            copyToolbarMenuItem: CopyToolbarMenuItem,
             sendToChat: SendToChat,
             renameToolbarMenuItem: RenameToolbarMenuItem,
             trashToolbarMenuItem: TrashToolbarMenuItem,
@@ -109,7 +109,7 @@ abstract class ToolbarItemModule {
                 move,
                 sendToChat,
                 renameToolbarMenuItem,
-                copy,
+                copyToolbarMenuItem,
                 trashToolbarMenuItem,
             )
         }
@@ -131,7 +131,7 @@ abstract class ToolbarItemModule {
             share: Share,
             sendToChat: SendToChat,
             renameDropdownMenuItem: RenameDropdownMenuItem,
-            copy: Copy,
+            copyToolbarMenuItem: CopyToolbarMenuItem,
             trashToolbarMenuItem: TrashToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
             return setOf(
@@ -145,7 +145,7 @@ abstract class ToolbarItemModule {
                 share,
                 sendToChat,
                 renameDropdownMenuItem,
-                copy,
+                copyToolbarMenuItem,
                 trashToolbarMenuItem,
             )
         }
@@ -165,7 +165,7 @@ abstract class ToolbarItemModule {
             removeLinkDropDownMenuItem: RemoveLinkDropDownMenuItem,
             download: DownloadToolbarMenuItem,
             trashToolbarMenuItem: TrashToolbarMenuItem,
-            copy: Copy,
+            copyToolbarMenuItem: CopyToolbarMenuItem,
             move: Move,
             sendToChat: SendToChat,
             shareFolderToolbarMenuItem: ShareFolderToolbarMenuItem,
@@ -186,7 +186,7 @@ abstract class ToolbarItemModule {
                 shareFolderToolbarMenuItem,
                 share,
                 renameToolbarMenuItem,
-                copy,
+                copyToolbarMenuItem,
                 trashToolbarMenuItem,
                 removeShareDropDown,
             )

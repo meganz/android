@@ -2,7 +2,7 @@ package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Copy
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.CopyToolbarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -12,9 +12,9 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CopyTest {
+class CopyToolbarMenuItemTest {
 
-    private val underTest = Copy(CopyMenuAction())
+    private val underTest = CopyToolbarMenuItem(CopyMenuAction())
 
     @ParameterizedTest(name = "when are selected nodes taken down is {0}, then is copy item visible is {1}")
     @MethodSource("provideArguments")
