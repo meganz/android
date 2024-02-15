@@ -25,6 +25,8 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveL
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveToolbarMenuItem
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareDropDown
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropdownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAll
@@ -128,6 +130,7 @@ abstract class ToolbarItemModule {
             removeLinkDropDownMenuItem: RemoveLinkDropDownMenuItem,
             share: Share,
             sendToChat: SendToChat,
+            renameDropdownMenuItem: RenameDropdownMenuItem,
             copy: Copy,
             trashToolbarMenuItem: TrashToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
@@ -141,6 +144,7 @@ abstract class ToolbarItemModule {
                 removeLinkDropDownMenuItem,
                 share,
                 sendToChat,
+                renameDropdownMenuItem,
                 copy,
                 trashToolbarMenuItem,
             )
@@ -165,7 +169,7 @@ abstract class ToolbarItemModule {
             move: Move,
             sendToChat: SendToChat,
             shareFolderToolbarMenuItem: ShareFolderToolbarMenuItem,
-            removeShareToolbarMenuItem: RemoveShareToolbarMenuItem,
+            removeShareDropDown: RemoveShareDropDown,
             disputeTakeDown: DisputeTakeDown,
             share: Share,
         ): Set<NodeToolbarMenuItem<*>> {
@@ -184,7 +188,7 @@ abstract class ToolbarItemModule {
                 renameToolbarMenuItem,
                 copy,
                 trashToolbarMenuItem,
-                removeShareToolbarMenuItem,
+                removeShareDropDown,
             )
         }
 

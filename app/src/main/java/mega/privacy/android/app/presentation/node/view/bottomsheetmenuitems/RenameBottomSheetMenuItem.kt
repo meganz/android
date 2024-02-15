@@ -35,6 +35,6 @@ class RenameBottomSheetMenuItem @Inject constructor() :
         navController.navigate(searchRenameDialog.plus("/${node.id.longValue}"))
     }
 
-    override val menuAction = RenameMenuAction(220)
+    override val menuAction = RenameMenuAction()
     override val groupId = 8
 }

@@ -13,9 +13,7 @@ import javax.inject.Inject
  *
  * @property orderInCategory
  */
-class RenameMenuAction @Inject constructor(
-    override val orderInCategory: Int,
-) : MenuActionWithIcon {
+class RenameMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.context_rename)
@@ -24,4 +22,7 @@ class RenameMenuAction @Inject constructor(
     override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_rename)
 
     override val testTag: String = "menu_action:rename"
+
+    override val orderInCategory: Int
+        get() = 220
 }

@@ -7,17 +7,17 @@ import mega.privacy.android.core.ui.model.MenuAction
 import javax.inject.Inject
 
 /**
- * Remove link menu action
+ * Rename menu action
  *
  * @property orderInCategory
  */
-class RemoveLinkDropdownMenuAction @Inject constructor() : MenuAction {
+class RenameDropdownMenuAction @Inject constructor() : MenuAction {
 
     @Composable
-    override fun getDescription() = stringResource(id = R.string.context_remove_link_menu)
+    override fun getDescription() = stringResource(id = R.string.context_rename)
 
-    override val testTag: String = "menu_action:remove_link"
+    override val testTag: String = "menu_action:rename"
 
     override val orderInCategory: Int
-        get() = 170
+        get() = 220
 }

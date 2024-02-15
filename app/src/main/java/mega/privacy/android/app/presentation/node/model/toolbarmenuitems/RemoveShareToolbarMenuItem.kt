@@ -6,7 +6,6 @@ import mega.privacy.android.app.presentation.node.model.menuaction.RemoveShareMe
 import mega.privacy.android.app.presentation.search.navigation.searchRemoveFolderShareDialog
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import timber.log.Timber
@@ -17,7 +16,7 @@ import javax.inject.Inject
  * @property stringWithDelimitersMapper [ListToStringWithDelimitersMapper]
  */
 class RemoveShareToolbarMenuItem @Inject constructor(
-    private val stringWithDelimitersMapper: ListToStringWithDelimitersMapper
+    private val stringWithDelimitersMapper: ListToStringWithDelimitersMapper,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
     override fun shouldDisplay(
@@ -30,13 +29,13 @@ class RemoveShareToolbarMenuItem @Inject constructor(
         resultCount: Int,
     ): Boolean = selectedNodes.isNotEmpty() && selectedNodes.all { it.isOutShare() }
 
-    override val menuAction = RemoveShareMenuAction(210)
+    override val menuAction = RemoveShareMenuAction(150)
 
     override fun getOnClick(
         selectedNodes: List<TypedNode>,
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit,
-        navController: NavHostController
+        navController: NavHostController,
     ): () -> Unit = {
         val nodeList = selectedNodes.map {
             it.id

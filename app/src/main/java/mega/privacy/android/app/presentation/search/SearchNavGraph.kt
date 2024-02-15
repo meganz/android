@@ -50,7 +50,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
     onBackPressed: () -> Unit,
     nodeActionsViewModel: NodeActionsViewModel,
-    listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper
+    listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
 ) {
     composable(searchRoute) {
         SearchScreen(
@@ -80,13 +80,11 @@ internal fun NavGraphBuilder.searchNavGraph(
         navHostController = navHostController,
         nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
     )
-    changeNodeExtensionDialogNavigation(
-        navHostController = navHostController,
-        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
-    )
-    cannotVerifyUserNavigation(navHostController = navHostController)
+    changeNodeExtensionDialogNavigation(navHostController)
+    cannotVerifyUserNavigation(navHostController)
     removeNodeLinkDialogNavigation(
         navHostController = navHostController,
+        listToStringWithDelimitersMapper = listToStringWithDelimitersMapper
     )
     shareFolderDialogNavigation(
         navHostController = navHostController,
