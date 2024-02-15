@@ -306,6 +306,7 @@ dependencies {
     implementation(project(":feature:devicecenter"))
 
     //Test Modules
+    testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
 
     // Jetbrains

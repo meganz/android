@@ -75,6 +75,7 @@ tasks.withType<Test> {
 }
 
 dependencies {
+    testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     lintChecks(project(":lint"))
 

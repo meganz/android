@@ -81,6 +81,7 @@ dependencies {
     implementation(project(":shared:theme"))
     implementation(project(":legacy-core-ui"))
 
+    testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
 
     implementation(lib.kotlin.ktx)
