@@ -1,10 +1,9 @@
 package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import androidx.navigation.NavHostController
-import mega.privacy.android.app.presentation.node.model.menuaction.RemoveLinkMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.RemoveLinkDropdownMenuAction
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkRoute
 import mega.privacy.android.core.ui.model.MenuAction
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import java.io.File
@@ -15,11 +14,11 @@ import javax.inject.Inject
  *
  * This item will always be placed on the extras/more option
  */
-class RemoveLinkToolbarMenuItem @Inject constructor(
+class RemoveLinkDropDownMenuItem @Inject constructor(
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
-) : NodeToolbarMenuItem<MenuActionWithIcon> {
+) : NodeToolbarMenuItem<MenuAction> {
 
-    override val menuAction = RemoveLinkMenuAction(170)
+    override val menuAction = RemoveLinkDropdownMenuAction()
 
     override fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
@@ -30,7 +29,7 @@ class RemoveLinkToolbarMenuItem @Inject constructor(
         allFileNodes: Boolean,
         resultCount: Int,
     ) = noNodeTakenDown
-            && selectedNodes.size > 1
+            && selectedNodes.size == 1
             && selectedNodes.first().exportedData != null
 
     override fun getOnClick(

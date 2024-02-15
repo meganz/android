@@ -12,9 +12,7 @@ import javax.inject.Inject
  *
  * @property orderInCategory
  */
-class ManageLinkMenuAction @Inject constructor(
-    override val orderInCategory: Int,
-) : MenuActionWithIcon {
+class ManageLinkMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() =
@@ -26,4 +24,7 @@ class ManageLinkMenuAction @Inject constructor(
 
 
     override val testTag: String = "menu_action:manage_link"
+
+    override val orderInCategory: Int
+        get() = 160
 }

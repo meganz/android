@@ -26,9 +26,9 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Dispute
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShare
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLink
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Move
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSelectManageLink
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSelectManageLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShare
@@ -67,9 +67,9 @@ class NodeToolbarActionMapperTest {
         RemoveShareDropDown(),
         DisputeTakeDown(DisputeTakeDownMenuAction()),
         GetLinkToolbarMenuItem(GetLinkMenuAction()),
-        ManageLink(),
-        MultiSelectManageLink(),
-        RemoveLinkToolbarMenuItem(),
+        ManageLinkToolbarMenuItem(),
+        MultiSelectManageLinkToolbarMenuItem(),
+        RemoveLinkToolbarMenuItem(mock()),
         SendToChat(SendToChatMenuAction()),
         ShareFolderToolbarMenuItem(
             scope = CoroutineScope(UnconfinedTestDispatcher()),

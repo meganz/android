@@ -1,25 +1,21 @@
 package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
+import android.content.Intent
 import androidx.navigation.NavHostController
-import mega.privacy.android.app.presentation.node.model.menuaction.RemoveLinkMenuAction
-import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkRoute
+import mega.privacy.android.app.getLink.GetLinkActivity
+import mega.privacy.android.app.presentation.node.model.menuaction.ManageLinkMenuAction
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import java.io.File
 import javax.inject.Inject
 
 /**
- * Remove link menu item
- *
- * This item will always be placed on the extras/more option
+ * Manage link menu item
  */
-class RemoveLinkToolbarMenuItem @Inject constructor(
-    private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
-) : NodeToolbarMenuItem<MenuActionWithIcon> {
+class ManageLinkToolbarMenuItem @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override val menuAction = RemoveLinkMenuAction(170)
+    override val menuAction = ManageLinkMenuAction()
 
     override fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
@@ -30,8 +26,9 @@ class RemoveLinkToolbarMenuItem @Inject constructor(
         allFileNodes: Boolean,
         resultCount: Int,
     ) = noNodeTakenDown
-            && selectedNodes.size > 1
-            && selectedNodes.first().exportedData != null
+            && hasNodeAccessPermission
+            && selectedNodes.size == 1
+            && selectedNodes.first().exportedData != null //if size 1 and exported data null we show GetLink
 
     override fun getOnClick(
         selectedNodes: List<TypedNode>,
@@ -40,9 +37,10 @@ class RemoveLinkToolbarMenuItem @Inject constructor(
         navController: NavHostController,
     ): () -> Unit = {
         onDismiss()
-        navController.navigate(
-            removeNodeLinkRoute.plus(File.separator)
-                .plus(listToStringWithDelimitersMapper(selectedNodes.map { it.id.longValue }))
-        )
+        val nodeList = selectedNodes.map { it.id.longValue }.toLongArray()
+        val manageLinkIntent = Intent(navController.context, GetLinkActivity::class.java)
+            .putExtra(Constants.HANDLE_LIST, nodeList)
+        navController.context.startActivity(manageLinkIntent)
     }
+
 }

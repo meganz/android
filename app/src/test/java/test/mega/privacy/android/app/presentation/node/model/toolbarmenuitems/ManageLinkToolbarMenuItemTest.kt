@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLink
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLinkToolbarMenuItem
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -13,9 +13,9 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ManageLinkTest {
+class ManageLinkToolbarMenuItemTest {
 
-    private val underTest = ManageLink()
+    private val underTest = ManageLinkToolbarMenuItem()
 
     private val nodeWithExportedData = mock<TypedFolderNode> {
         on { exportedData }.thenReturn(

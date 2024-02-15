@@ -40,6 +40,6 @@ class ManageLinkBottomSheetMenuItem @Inject constructor() :
         )
     }
 
-    override val menuAction = ManageLinkMenuAction(160)
+    override val menuAction = ManageLinkMenuAction()
     override val groupId = 7
 }

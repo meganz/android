@@ -1,6 +1,11 @@
 package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
+import android.content.Intent
+import androidx.navigation.NavHostController
+import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.presentation.node.model.menuaction.ManageLinkMenuAction
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
@@ -13,9 +18,10 @@ import javax.inject.Inject
  *      or multiple items selected
  *      its only available from cloud drive screen
  */
-class MultiSelectManageLink @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon> {
+class MultiSelectManageLinkToolbarMenuItem @Inject constructor() :
+    NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override val menuAction = ManageLinkMenuAction(160)
+    override val menuAction = ManageLinkMenuAction()
     override fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
@@ -27,5 +33,18 @@ class MultiSelectManageLink @Inject constructor() : NodeToolbarMenuItem<MenuActi
     ) = noNodeTakenDown
             && hasNodeAccessPermission
             && ((selectedNodes.size == 1 && selectedNodes.first().exportedData != null) || selectedNodes.size > 1) //if size 1 and exported data null we show GetLink
+
+    override fun getOnClick(
+        selectedNodes: List<TypedNode>,
+        onDismiss: () -> Unit,
+        actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit,
+        navController: NavHostController,
+    ): () -> Unit = {
+        onDismiss()
+        val nodeList = selectedNodes.map { it.id.longValue }.toLongArray()
+        val manageLinkIntent = Intent(navController.context, GetLinkActivity::class.java)
+            .putExtra(Constants.HANDLE_LIST, nodeList)
+        navController.context.startActivity(manageLinkIntent)
+    }
 
 }
