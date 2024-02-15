@@ -525,7 +525,19 @@ class ManagerViewModel @Inject constructor(
         _state.update { it.copy(nodeUpdateReceived = update) }
     }
 
-    private val numUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
+    private val _numUnreadUserAlerts = MutableStateFlow(
+        Pair(
+            UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE,
+            0
+        )
+    )
+
+    private val legacyNumUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
+
+    /**
+     * The number of unread user alerts
+     */
+    val numUnreadUserAlerts = _numUnreadUserAlerts.asStateFlow()
 
     /**
      * Notifies about the number of unread user alerts once.
@@ -533,14 +545,15 @@ class ManagerViewModel @Inject constructor(
      * @return [SingleLiveEvent] with the number of unread user alerts.
      */
     fun onGetNumUnreadUserAlerts(): SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>> =
-        numUnreadUserAlerts
+        legacyNumUnreadUserAlerts
 
     /**
      * Checks the number of unread user alerts.
      */
     fun checkNumUnreadUserAlerts(type: UnreadUserAlertsCheckType) {
         viewModelScope.launch {
-            numUnreadUserAlerts.value = Pair(type, getNumUnreadUserAlertsUseCase())
+            _numUnreadUserAlerts.update { Pair(type, getNumUnreadUserAlertsUseCase()) }
+            legacyNumUnreadUserAlerts.value = Pair(type, getNumUnreadUserAlertsUseCase())
         }
     }
 

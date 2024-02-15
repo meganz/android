@@ -160,9 +160,7 @@ internal class ManagerDrawerFragment : Fragment() {
             binding.deviceCenterSection.isVisible =
                 uiState.enabledFlags.contains(AppFeatures.DeviceCenter)
         }
-        managerViewModel.onGetNumUnreadUserAlerts().observe(
-            viewLifecycleOwner
-        ) { result: Pair<UnreadUserAlertsCheckType, Int> ->
+        viewLifecycleOwner.collectFlow(managerViewModel.numUnreadUserAlerts) { result ->
             if (result.first != UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON) {
                 setNotificationsTitleSection(result.second)
             }

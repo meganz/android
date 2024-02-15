@@ -831,7 +831,7 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that numUnreadUserAlerts update when there is accepted contact request event`() =
+    fun `test that legacyNumUnreadUserAlerts update when there is accepted contact request event`() =
         runTest {
             advanceUntilIdle()
             assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(0)
@@ -853,6 +853,30 @@ class ManagerViewModelTest {
             monitorContactRequestUpdates.emit(contactRequests)
             advanceUntilIdle()
             assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(3)
+        }
+    @Test
+    fun `test that numUnreadUserAlerts update when there is accepted contact request event`() =
+        runTest {
+            advanceUntilIdle()
+            assertThat(underTest.numUnreadUserAlerts.value.second).isEqualTo(0)
+            val contactRequests = listOf(
+                ContactRequest(
+                    handle = 1L,
+                    sourceEmail = "",
+                    sourceMessage = null,
+                    targetEmail = "",
+                    creationTime = 1L,
+                    modificationTime = 1L,
+                    status = ContactRequestStatus.Accepted,
+                    isOutgoing = false,
+                    isAutoAccepted = false,
+                )
+            )
+            whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
+            whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
+            monitorContactRequestUpdates.emit(contactRequests)
+            advanceUntilIdle()
+            assertThat(underTest.numUnreadUserAlerts.value.second).isEqualTo(3)
         }
 
     @Test
