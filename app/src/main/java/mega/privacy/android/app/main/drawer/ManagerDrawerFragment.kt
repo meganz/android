@@ -129,6 +129,7 @@ internal class ManagerDrawerFragment : Fragment() {
             val lineCount = binding.navigationDrawerAddPhoneNumberButton.layout?.lineCount ?: 0
             binding.navigationDrawerAddPhoneNumberIcon.isGone = lineCount > 1
         }
+        managerViewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
     }
 
     private fun collectFlows() {
