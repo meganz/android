@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node
 
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
+import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
@@ -52,7 +53,7 @@ class NodeActionHandler(
 
     private val selectCopyNodeActivityLauncher =
         (activity as? AppCompatActivity)?.registerForActivityResult(
-            SelectFolderToMoveActivityContract()
+            SelectFolderToCopyActivityContract()
         ) { result ->
             result?.let {
                 nodeActionsViewModel.checkNodesNameCollision(
