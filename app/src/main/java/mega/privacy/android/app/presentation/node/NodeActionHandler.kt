@@ -151,6 +151,11 @@ class NodeActionHandler(
                 selectCopyNodeActivityLauncher?.launch(nodeHandleArray)
             }
 
+            is MoveMenuAction -> {
+                val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
+                selectMoveNodeActivityLauncher?.launch(nodeHandleArray)
+            }
+
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }
     }

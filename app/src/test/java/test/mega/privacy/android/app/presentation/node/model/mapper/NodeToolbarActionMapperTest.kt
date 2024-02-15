@@ -27,7 +27,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Downloa
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLinkToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Move
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MoveToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSelectManageLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
@@ -87,8 +87,8 @@ class NodeToolbarActionMapperTest {
         ),
         RenameToolbarMenuItem(),
         RenameDropDown(),
-        Move(MoveMenuAction()),
         CopyToolbarMenuItem(CopyMenuAction()),
+        MoveToolbarMenuItem(MoveMenuAction()),
         TrashToolbarMenuItem(TrashMenuAction(), mock()),
     )
 
