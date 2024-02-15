@@ -62,12 +62,15 @@ import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.objects.GifData
+import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
+import mega.privacy.android.app.presentation.meeting.chat.extension.getOpenChatId
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
 import mega.privacy.android.app.presentation.meeting.chat.extension.toInfoText
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesToChatsResult
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.saver.ChatSavers
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
@@ -83,6 +86,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.NoContactT
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ParticipatingInACallDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAddContactActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatFragment
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatPicker
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openLocationPicker
@@ -111,6 +115,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.theme.MegaAppTheme
+import timber.log.Timber
 
 @Composable
 internal fun ChatView(
@@ -921,8 +926,20 @@ internal fun ChatView(
                 onConsumed = onInfoToShowConsumed
             ) { info ->
                 info?.let {
-                    getInfoToShow(info, context).let {
-                        scaffoldState.snackbarHostState.showSnackbar(it)
+                    info.getInfo(context).let { text ->
+                        if (info is InfoToShow.ForwardMessagesResult) {
+                            info.result.getOpenChatId(chatId)?.let { openChatId ->
+                                val result = scaffoldState.snackbarHostState.showSnackbar(
+                                    text,
+                                    context.getString(R.string.general_confirmation_open)
+                                )
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    openChatFragment(context, openChatId, null)
+                                }
+                            } ?: scaffoldState.snackbarHostState.showSnackbar(text)
+                        } else {
+                            scaffoldState.snackbarHostState.showSnackbar(text)
+                        }
                     }
                 } ?: context.findActivity()?.finish()
             }
@@ -952,16 +969,6 @@ internal fun ChatView(
             onWaitingRoomOpened()
             startWaitingRoom(context, chatId)
         }
-    }
-}
-
-private fun getInfoToShow(infoToShow: InfoToShow, context: Context) = with(infoToShow) {
-    when (this) {
-        is InfoToShow.InviteContactResult -> result.toInfoText(context)
-        is InfoToShow.MuteOptionResult -> result.toInfoText(context)
-        is InfoToShow.StringWithParams -> context.getString(stringId, *args.toTypedArray())
-        is InfoToShow.SimpleString -> context.getString(stringId)
-        is InfoToShow.QuantityString -> context.resources.getQuantityString(stringId, count, count)
     }
 }
 

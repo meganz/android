@@ -24,12 +24,14 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
+import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesToChatsResult
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
 import mega.privacy.android.app.utils.Constants
@@ -49,12 +51,15 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.messages.ForwardResult
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.chat.CreateChatException
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -91,6 +96,7 @@ import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCa
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.forward.ForwardMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -259,6 +265,8 @@ internal class ChatViewModelTest {
     private val getParticipantFullNameUseCase = mock<GetParticipantFullNameUseCase>()
     private val participantNameMapper = mock<ParticipantNameMapper>()
     private val getUserUseCase = mock<GetUserUseCase>()
+    private val forwardMessagesUseCase = mock<ForwardMessagesUseCase>()
+    private val forwardMessagesResultMapper = mock<ForwardMessagesResultMapper>()
 
     @BeforeAll
     fun setup() {
@@ -321,6 +329,8 @@ internal class ChatViewModelTest {
             getParticipantFullNameUseCase,
             participantNameMapper,
             getUserUseCase,
+            forwardMessagesUseCase,
+            forwardMessagesResultMapper,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -414,6 +424,8 @@ internal class ChatViewModelTest {
             getParticipantFullNameUseCase = getParticipantFullNameUseCase,
             participantNameMapper = participantNameMapper,
             getUserUseCase = getUserUseCase,
+            forwardMessagesUseCase = forwardMessagesUseCase,
+            forwardMessagesResultMapper = forwardMessagesResultMapper,
         )
     }
 
@@ -2583,6 +2595,52 @@ internal class ChatViewModelTest {
         with(result[1]) {
             assertThat(userList[0].name).isEqualTo(expectedFullNameForMe)
             assertThat(userList[1].name).isEqualTo(expectedFullNameForUser2)
+        }
+    }
+
+
+    @Test
+    fun `test that forward messages invokes use case and updates state`() = runTest {
+        val message = mock<TypedMessage>()
+        val messages = listOf(message)
+        val chatId1 = 123L
+        val chatId2 = 456L
+        val contactId = 789L
+        val chatHandles = listOf(chatId1, chatId2)
+        val contactHandles = listOf(contactId)
+        val result1 = ForwardResult.Success(chatId1)
+        val result2 = ForwardResult.Success(chatId2)
+        val result3 = ForwardResult.Success(contactId)
+        val results = listOf(result1, result2, result3)
+        val forwardResult = ForwardMessagesToChatsResult.AllSucceeded(null, messages.size)
+        whenever(forwardMessagesUseCase(messages, chatHandles, contactHandles))
+            .thenReturn(results)
+        whenever(forwardMessagesResultMapper(results, messages.size)).thenReturn(forwardResult)
+        underTest.onForwardMessages(messages, chatHandles, contactHandles)
+        verify(forwardMessagesUseCase).invoke(messages, chatHandles, contactHandles)
+        underTest.state.test {
+            val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content as InfoToShow.ForwardMessagesResult).result
+            assertThat(result).isEqualTo(forwardResult)
+        }
+    }
+
+    @Test
+    fun `test that forward messages updates state if CreateChatException is thrown`() = runTest {
+        val message = mock<TypedMessage>()
+        val messages = listOf(message)
+        val chatId1 = 123L
+        val chatId2 = 456L
+        val contactId = 789L
+        val chatHandles = listOf(chatId1, chatId2)
+        val contactHandles = listOf(contactId)
+        whenever(forwardMessagesUseCase(messages, chatHandles, contactHandles))
+            .thenThrow(CreateChatException::class.java)
+        underTest.onForwardMessages(messages, chatHandles, contactHandles)
+        underTest.state.test {
+            val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                .content as InfoToShow.QuantityString).stringId
+            assertThat(result).isEqualTo(R.plurals.num_messages_not_send)
         }
     }
 

@@ -79,6 +79,6 @@ class ForwardVoiceClipUseCaseTest {
 //            underTest.invoke(listOf(targetChatId), message)
 //            verify(attachVoiceClipMessageUseCase).invoke(targetChatId, node)
             assertThat(underTest.invoke(listOf(targetChatId), message))
-                .isEqualTo(listOf(ForwardResult.Success))
+                .isEqualTo(listOf(ForwardResult.Success(targetChatId)))
         }
 }

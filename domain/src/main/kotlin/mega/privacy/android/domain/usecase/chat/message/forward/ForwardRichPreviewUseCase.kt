@@ -15,7 +15,7 @@ class ForwardRichPreviewUseCase @Inject constructor(
     override suspend fun forwardMessage(targetChatId: Long, message: TypedMessage): ForwardResult? {
         val richPreviewMessage = message as? RichPreviewMessage ?: return null
         sendTextMessageUseCase(chatId = targetChatId, message = richPreviewMessage.content)
-        return ForwardResult.Success
+        return ForwardResult.Success(targetChatId)
     }
 
 }

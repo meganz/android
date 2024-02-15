@@ -108,7 +108,7 @@ class ForwardMessagesUseCaseTest {
                         argWhere { it is NormalMessage })
                 } doAnswer { invocationOnMock ->
                     val chatCount = (invocationOnMock.arguments[0] as List<*>).size
-                    buildList { repeat(chatCount) { add(ForwardResult.Success) } }
+                    buildList { repeat(chatCount) { add(ForwardResult.Success(-1)) } }
                 }
             }
 
@@ -120,7 +120,7 @@ class ForwardMessagesUseCaseTest {
                         argWhere { it is ContactAttachmentMessage })
                 } doAnswer { invocationOnMock ->
                     val chatCount = (invocationOnMock.arguments[0] as List<*>).size
-                    buildList { repeat(chatCount) { add(ForwardResult.Success) } }
+                    buildList { repeat(chatCount) { add(ForwardResult.Success(-1)) } }
                 }
             }
 
@@ -129,7 +129,7 @@ class ForwardMessagesUseCaseTest {
             val actual = underTest(messagesToForward, chatHandles, null)
 
             assertThat(actual.size).isEqualTo(expectedSize)
-            assertThat(actual.all { it == ForwardResult.Success }).isTrue()
+            assertThat(actual.all { it == ForwardResult.Success(-1) }).isTrue()
         }
 
     @Test
@@ -154,5 +154,4 @@ class ForwardMessagesUseCaseTest {
             forwardContactUseCase(chatHandles, message1)
         }
     }
-
 }

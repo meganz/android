@@ -30,6 +30,7 @@ import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
+import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
 import mega.privacy.android.app.utils.Constants
@@ -47,6 +48,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.exception.chat.CreateChatException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -82,6 +84,7 @@ import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCa
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.forward.ForwardMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -201,6 +204,8 @@ class ChatViewModel @Inject constructor(
     private val getParticipantFullNameUseCase: GetParticipantFullNameUseCase,
     private val participantNameMapper: ParticipantNameMapper,
     private val getUserUseCase: GetUserUseCase,
+    private val forwardMessagesUseCase: ForwardMessagesUseCase,
+    private val forwardMessagesResultMapper: ForwardMessagesResultMapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1240,6 +1245,38 @@ class ChatViewModel @Inject constructor(
         chatHandles: List<Long>?,
         contactHandles: List<Long>?,
     ) {
+        viewModelScope.launch {
+            runCatching { forwardMessagesUseCase(messages, chatHandles, contactHandles) }
+                .onSuccess { results ->
+                    val result = forwardMessagesResultMapper(results, messages.size)
+                    val infoToShow = InfoToShow.ForwardMessagesResult(result)
+                    _state.update { state ->
+                        state.copy(
+                            infoToShowEvent = triggered(infoToShow)
+                        )
+                    }
+                }
+                .onFailure {
+                    when (it) {
+                        is CreateChatException -> {
+                            _state.update { state ->
+                                state.copy(
+                                    infoToShowEvent = triggered(
+                                        InfoToShow.QuantityString(
+                                            stringId = R.plurals.num_messages_not_send,
+                                            count = contactHandles?.size ?: 0
+                                        )
+                                    )
+                                )
+                            }
+                        }
+
+                        else -> {
+                            Timber.e(it)
+                        }
+                    }
+                }
+        }
     }
 
     /**

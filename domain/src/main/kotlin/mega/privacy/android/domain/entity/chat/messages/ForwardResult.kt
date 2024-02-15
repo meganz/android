@@ -9,8 +9,10 @@ sealed class ForwardResult {
 
     /**
      * Success.
+     *
+     * @property chatId Chat id where the messages were forwarded.
      */
-    data object Success : ForwardResult()
+    data class Success(val chatId: Long) : ForwardResult()
 
     /**
      * Error when the resource is not available.

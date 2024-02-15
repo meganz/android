@@ -61,6 +61,6 @@ class ForwardLocationUseCaseTest {
         underTest.invoke(listOf(targetChatId), message)
         verify(sendLocationMessageUseCase).invoke(targetChatId, longitude, latitude, image)
         assertThat(underTest.invoke(listOf(targetChatId), message))
-            .isEqualTo(listOf(ForwardResult.Success))
+            .isEqualTo(listOf(ForwardResult.Success(targetChatId)))
     }
 }

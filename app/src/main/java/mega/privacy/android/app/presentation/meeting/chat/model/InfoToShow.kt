@@ -52,4 +52,13 @@ sealed class InfoToShow {
     data class MuteOptionResult(
         val result: ChatPushNotificationMuteOption,
     ) : InfoToShow()
+
+    /**
+     * Show result of forwarding messages.
+     *
+     * @property result [ForwardMessagesResult]
+     */
+    data class ForwardMessagesResult(
+        val result: ForwardMessagesToChatsResult,
+    ) : InfoToShow()
 }

@@ -66,7 +66,7 @@ class ForwardContactUseCaseTest {
     fun `test that success is returned if message is a contact attachment`() = runTest {
         underTest.invoke(listOf(targetChatId), message)
         assertThat(underTest.invoke(listOf(targetChatId), message))
-            .isEqualTo(listOf(ForwardResult.Success))
+            .isEqualTo(listOf(ForwardResult.Success(targetChatId)))
     }
 
     @Test

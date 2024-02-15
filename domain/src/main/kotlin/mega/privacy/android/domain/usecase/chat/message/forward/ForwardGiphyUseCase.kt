@@ -26,6 +26,6 @@ class ForwardGiphyUseCase @Inject constructor(
                 title = it.title
             )
         }
-        return ForwardResult.Success
+        return ForwardResult.Success(targetChatId)
     }
 }

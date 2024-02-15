@@ -22,6 +22,6 @@ class ForwardLocationUseCase @Inject constructor(
                 image = it.image.orEmpty()
             )
         }
-        return ForwardResult.Success
+        return ForwardResult.Success(targetChatId)
     }
 }

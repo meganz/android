@@ -14,7 +14,7 @@ class ForwardVoiceClipUseCase @Inject constructor(
 ) : ForwardMessageUseCase() {
     override suspend fun forwardMessage(targetChatId: Long, message: TypedMessage): ForwardResult? {
         val voiceClipMessage = message as? VoiceClipMessage ?: return null
-//        var result: ForwardResult = ForwardResult.Success
+//        var result: ForwardResult = ForwardResult.Success(targetChatId)
 //        runCatching {
 //            attachVoiceClipMessageUseCase(
 //                chatId = targetChatId,
@@ -28,7 +28,7 @@ class ForwardVoiceClipUseCase @Inject constructor(
 //            }
 //        }
 //        return result
-        return ForwardResult.Success
+        return ForwardResult.Success(targetChatId)
     }
 
 }

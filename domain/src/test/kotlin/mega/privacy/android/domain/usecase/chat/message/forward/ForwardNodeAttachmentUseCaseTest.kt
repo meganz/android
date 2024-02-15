@@ -75,6 +75,6 @@ class ForwardNodeAttachmentUseCaseTest {
         underTest.invoke(listOf(targetChatId), message)
         verify(attachNodeUseCase).invoke(targetChatId, node)
         assertThat(underTest.invoke(listOf(targetChatId), message))
-            .isEqualTo(listOf(ForwardResult.Success))
+            .isEqualTo(listOf(ForwardResult.Success(targetChatId)))
     }
 }

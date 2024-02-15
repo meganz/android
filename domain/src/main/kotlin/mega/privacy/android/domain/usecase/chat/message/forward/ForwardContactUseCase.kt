@@ -24,6 +24,6 @@ class ForwardContactUseCase @Inject constructor(
                 val request = createSaveSentMessageRequestUseCase(it, targetChatId)
                 chatRepository.storeMessages(listOf(request))
             }
-        return ForwardResult.Success
+        return ForwardResult.Success(targetChatId)
     }
 }

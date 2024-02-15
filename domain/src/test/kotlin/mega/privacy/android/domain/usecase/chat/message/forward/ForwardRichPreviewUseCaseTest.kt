@@ -57,6 +57,6 @@ class ForwardRichPreviewUseCaseTest {
         underTest.invoke(listOf(targetChatId), message)
         verify(sendTextMessageUseCase).invoke(targetChatId, content)
         assertThat(underTest.invoke(listOf(targetChatId), message))
-            .isEqualTo(listOf(ForwardResult.Success))
+            .isEqualTo(listOf(ForwardResult.Success(targetChatId)))
     }
 }

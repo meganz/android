@@ -21,7 +21,7 @@ class ForwardNodeAttachmentUseCase @Inject constructor(
                 chatId = targetChatId,
                 fileNode = nodeAttachmentMessage.fileNode
             )
-            ForwardResult.Success
+            ForwardResult.Success(targetChatId)
         }.getOrElse {
             // API_ENOENT = -9, the file is not available
             if ((it as MegaException).errorCode == API_ENOENT) {
