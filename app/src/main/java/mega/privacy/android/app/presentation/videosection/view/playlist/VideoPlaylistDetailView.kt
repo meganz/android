@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,15 +27,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
+import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
 import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.EMPTY_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_TITLE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_TOTAL_DURATION_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
-import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
@@ -78,14 +76,12 @@ internal const val videoPlaylistDetailRoute = "videoSection/video_playlist/detai
  */
 @Composable
 fun VideoPlaylistDetailView(
+    playlist: VideoPlaylistUIEntity?,
     modifier: Modifier = Modifier,
-    videoSectionViewModel: VideoSectionViewModel = hiltViewModel(),
     onClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
     onMenuClick: (VideoUIEntity) -> Unit = { _ -> },
     onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
-    val uiState = videoSectionViewModel.state.collectAsState()
-    val playlist = uiState.value.currentVideoPlaylist
     val items = playlist?.videos ?: emptyList()
     val lazyListState = rememberLazyListState()
 
@@ -267,7 +263,7 @@ internal fun PlayAllButtonView(
 @Composable
 private fun VideoPlaylistDetailViewPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-        VideoPlaylistDetailView()
+        VideoPlaylistDetailView(null)
     }
 }
 

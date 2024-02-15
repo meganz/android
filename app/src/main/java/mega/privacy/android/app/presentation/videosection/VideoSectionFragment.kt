@@ -39,6 +39,8 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionFeatureScreen
+import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
+import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -141,21 +143,6 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                 (activity as? ManagerActivity)?.closeSearchView()
             }
         }
-
-        viewLifecycleOwner.collectFlow(
-            videoSectionViewModel.state.map { it.currentVideoPlaylist }.distinctUntilChanged()
-        ) { videoPlaylist ->
-            (activity as? ManagerActivity)?.let { managerActivity ->
-                if (videoPlaylist == null) {
-                    managerActivity.removeMenuProvider(playlistMenuMoreProvider)
-                    managerActivity.setToolbarTitle(getString(R.string.sortby_type_video_first))
-                } else {
-                    managerActivity.addMenuProvider(playlistMenuMoreProvider)
-                    managerActivity.setToolbarTitle("")
-                }
-                managerActivity.invalidateOptionsMenu()
-            }
-        }
     }
 
     private fun initVideoSectionComposeView() {
@@ -186,6 +173,9 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                         },
                         onMenuClick = { item ->
                             showOptionsMenuForItem(item)
+                        },
+                        onDestinationChanged = { route ->
+                            route?.let { updateToolbarWhenDestinationChanged(it) }
                         }
                     )
                 }
@@ -284,6 +274,23 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
             nodeId = item.id,
             mode = NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
         )
+    }
+
+    private fun updateToolbarWhenDestinationChanged(route: String) {
+        (activity as? ManagerActivity)?.let { managerActivity ->
+            when (route) {
+                videoSectionRoute -> {
+                    managerActivity.setToolbarTitle(getString(R.string.sortby_type_video_first))
+                    managerActivity.removeMenuProvider(playlistMenuMoreProvider)
+                }
+
+                videoPlaylistDetailRoute -> {
+                    managerActivity.addMenuProvider(playlistMenuMoreProvider)
+                    managerActivity.setToolbarTitle("")
+                }
+            }
+            managerActivity.invalidateOptionsMenu()
+        }
     }
 
     private fun disableSelectMode() {

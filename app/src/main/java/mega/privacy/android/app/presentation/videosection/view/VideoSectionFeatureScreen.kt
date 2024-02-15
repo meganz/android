@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.videosection.view
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -8,8 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
-import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailView
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 
@@ -17,6 +19,7 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.videoPla
 internal fun VideoSectionFeatureScreen(
     videoSectionViewModel: VideoSectionViewModel,
     onClick: (item: VideoUIEntity, index: Int) -> Unit,
+    onDestinationChanged: (String?) -> Unit,
     onSortOrderClick: () -> Unit = {},
     onMenuClick: (VideoUIEntity) -> Unit = {},
     onLongClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
@@ -25,6 +28,12 @@ internal fun VideoSectionFeatureScreen(
     onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit = { _, _ -> },
 ) {
     val navHostController = rememberNavController()
+    val route = navHostController.currentDestination?.route
+
+    LaunchedEffect(route) {
+        route?.let(onDestinationChanged)
+    }
+
     VideoSectionNavHost(
         modifier = Modifier,
         navHostController = navHostController,
@@ -80,7 +89,7 @@ internal fun VideoSectionNavHost(
             route = videoPlaylistDetailRoute
         ) {
             VideoPlaylistDetailView(
-                videoSectionViewModel = viewModel,
+                playlist = viewModel.state.collectAsState().value.currentVideoPlaylist,
                 onClick = onPlaylistDetailItemClick,
             )
         }

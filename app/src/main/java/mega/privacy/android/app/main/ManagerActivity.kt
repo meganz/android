@@ -4823,7 +4823,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         if (homepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
                             handleBackPressIfFullscreenOfflineFragmentOpened()
                         } else if (navController?.currentDestination != null &&
-                            navController?.currentDestination?.id == R.id.favouritesFolderFragment
+                            (navController?.currentDestination?.id == R.id.favouritesFolderFragment ||
+                                    navController?.currentDestination?.id == R.id.videoSectionFragment)
                         ) {
                             onBackPressedDispatcher.onBackPressed()
                         } else {

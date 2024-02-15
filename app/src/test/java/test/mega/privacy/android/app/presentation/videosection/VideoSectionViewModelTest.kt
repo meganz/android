@@ -12,11 +12,11 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
-import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
-import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
@@ -345,7 +345,8 @@ class VideoSectionViewModelTest {
         val testTitle = "new playlist"
         val expectedVideoPlaylist = mock<VideoPlaylist> { on { title }.thenReturn(testTitle) }
         val videoPlaylist = mock<VideoPlaylist> { on { title }.thenReturn("title") }
-        val expectedVideoPlaylistUIEntity = mock<VideoPlaylistUIEntity> { on { title }.thenReturn(testTitle) }
+        val expectedVideoPlaylistUIEntity =
+            mock<VideoPlaylistUIEntity> { on { title }.thenReturn(testTitle) }
         val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> { on { title }.thenReturn("title") }
 
         whenever(getVideoPlaylistsUseCase()).thenReturn(
@@ -354,7 +355,9 @@ class VideoSectionViewModelTest {
                 videoPlaylist
             )
         )
-        whenever(videoPlaylistUIEntityMapper(expectedVideoPlaylist)).thenReturn(expectedVideoPlaylistUIEntity)
+        whenever(videoPlaylistUIEntityMapper(expectedVideoPlaylist)).thenReturn(
+            expectedVideoPlaylistUIEntity
+        )
         whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
 
         underTest.onTabSelected(selectTab = VideoSectionTab.Playlists)
@@ -379,7 +382,9 @@ class VideoSectionViewModelTest {
                 on { title }.thenReturn(expectedTitle)
             }
             whenever(createVideoPlaylistUseCase(expectedTitle)).thenReturn(expectedVideoPlaylist)
-            whenever(videoPlaylistUIEntityMapper(anyOrNull())).thenReturn(expectedVideoPlaylistUIEntity)
+            whenever(videoPlaylistUIEntityMapper(anyOrNull())).thenReturn(
+                expectedVideoPlaylistUIEntity
+            )
 
             initUnderTest()
 
