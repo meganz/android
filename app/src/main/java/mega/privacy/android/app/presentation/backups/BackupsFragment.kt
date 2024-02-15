@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
@@ -1017,8 +1018,11 @@ class BackupsFragment : RotatableFragment() {
 
         /**
          * Creates a new instance of [BackupsFragment]
+         *
+         * @param backupsHandle The Node Handle to immediately access a Backups Node
+         * @param errorMessage The [StringRes] of the error message to display
          */
-        fun newInstance(backupsHandle: Long, errorMessage: Int?): BackupsFragment {
+        fun newInstance(backupsHandle: Long, @StringRes errorMessage: Int?): BackupsFragment {
             Timber.d("newInstance()")
             val fragment = BackupsFragment()
             fragment.arguments = bundleOf(

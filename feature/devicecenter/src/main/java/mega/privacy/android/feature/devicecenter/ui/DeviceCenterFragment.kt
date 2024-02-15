@@ -100,6 +100,7 @@ class DeviceCenterFragment : Fragment() {
                                 activity = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
                                 nodeHandle = nonBackupDeviceFolderUINode.rootHandle,
+                                errorMessage = nonBackupDeviceFolderUINode.status.localizedErrorMessage,
                             )
                         },
                         onNonBackupFolderMenuClicked = { nonBackupDeviceFolderUINode ->

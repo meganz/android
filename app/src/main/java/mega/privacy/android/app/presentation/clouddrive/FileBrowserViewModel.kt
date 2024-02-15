@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.clouddrive
 
 import android.view.MenuItem
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -237,14 +238,16 @@ class FileBrowserViewModel @Inject constructor(
      * Immediately opens a Node in order to display its contents
      *
      * @param folderHandle The Folder Handle
+     * @param errorMessage The [StringRes] of the message to display
      */
-    suspend fun openFileBrowserWithSpecificNode(folderHandle: Long) {
+    suspend fun openFileBrowserWithSpecificNode(folderHandle: Long, @StringRes errorMessage: Int?) {
         handleStack.push(folderHandle)
         _state.update {
             it.copy(
                 fileBrowserHandle = folderHandle,
                 accessedFolderHandle = folderHandle,
                 openedFolderNodeHandles = emptySet(),
+                errorMessage = errorMessage,
             )
         }
         refreshNodesState()
@@ -479,6 +482,7 @@ class FileBrowserViewModel @Inject constructor(
                 it.copy(
                     isAccessedFolderExited = true,
                     accessedFolderHandle = null,
+                    errorMessage = null,
                 )
             }
         }

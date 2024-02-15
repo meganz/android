@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.app.presentation.view.OverQuotaView
+import mega.privacy.android.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.core.ui.utils.ListGridStateMap
 import mega.privacy.android.core.ui.utils.getState
 import mega.privacy.android.core.ui.utils.sync
@@ -69,44 +70,48 @@ fun FileBrowserComposeView(
         )
     }
 
-    val currentListState = listStateMap.getState(uiState.fileBrowserHandle)
+    Column {
+        uiState.errorMessage?.let { errorMessage ->
+            WarningBanner(textString = stringResource(id = errorMessage), onCloseClick = null)
+        }
 
-    if (!uiState.isLoading) {
-        if (uiState.nodesList.isNotEmpty()) {
-            Column {
-                OverQuotaView(
-                    bannerTime = uiState.bannerTime,
-                    shouldShowBannerVisibility = uiState.shouldShowBannerVisibility,
-                    onUpgradeClicked = onUpgradeClicked,
-                    onDismissClicked = onDismissClicked
-                )
+        val currentListState = listStateMap.getState(uiState.fileBrowserHandle)
 
-                NodesView(
-                    nodeUIItems = uiState.nodesList,
-                    onMenuClick = onMenuClick,
-                    onItemClicked = onItemClick,
-                    onLongClick = onLongClick,
-                    sortOrder = sortOrder,
-                    isListView = uiState.currentViewType == ViewType.LIST,
-                    onSortOrderClick = onSortOrderClick,
-                    onChangeViewTypeClick = onChangeViewTypeClick,
-                    listState = currentListState.lazyListState,
-                    gridState = currentListState.lazyGridState,
-                    onLinkClicked = onLinkClicked,
-                    onDisputeTakeDownClicked = onDisputeTakeDownClicked,
-                    showMediaDiscoveryButton = uiState.showMediaDiscoveryIcon,
-                    onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                    listContentPadding = PaddingValues(top = 18.dp)
+        if (!uiState.isLoading) {
+            if (uiState.nodesList.isNotEmpty()) {
+                Column {
+                    OverQuotaView(
+                        bannerTime = uiState.bannerTime,
+                        shouldShowBannerVisibility = uiState.shouldShowBannerVisibility,
+                        onUpgradeClicked = onUpgradeClicked,
+                        onDismissClicked = onDismissClicked
+                    )
+
+                    NodesView(
+                        nodeUIItems = uiState.nodesList,
+                        onMenuClick = onMenuClick,
+                        onItemClicked = onItemClick,
+                        onLongClick = onLongClick,
+                        sortOrder = sortOrder,
+                        isListView = uiState.currentViewType == ViewType.LIST,
+                        onSortOrderClick = onSortOrderClick,
+                        onChangeViewTypeClick = onChangeViewTypeClick,
+                        listState = currentListState.lazyListState,
+                        gridState = currentListState.lazyGridState,
+                        onLinkClicked = onLinkClicked,
+                        onDisputeTakeDownClicked = onDisputeTakeDownClicked,
+                        showMediaDiscoveryButton = uiState.showMediaDiscoveryIcon,
+                        onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                        listContentPadding = PaddingValues(top = 18.dp)
+                    )
+                }
+            } else {
+                LegacyMegaEmptyView(
+                    modifier = Modifier.testTag(NODES_EMPTY_VIEW_VISIBLE),
+                    imagePainter = painterResource(id = emptyState.first),
+                    text = stringResource(id = emptyState.second)
                 )
             }
-        } else {
-            LegacyMegaEmptyView(
-                modifier = Modifier.testTag(NODES_EMPTY_VIEW_VISIBLE),
-                imagePainter = painterResource(id = emptyState.first),
-                text = stringResource(id = emptyState.second)
-            )
         }
     }
 }
-
-

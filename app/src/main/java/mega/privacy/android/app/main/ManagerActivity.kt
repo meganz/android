@@ -41,6 +41,7 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.compose.runtime.getValue
@@ -3733,7 +3734,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param backupsHandle The Node Handle to immediately access a Backups Node, which is set to
      * [INVALID_HANDLE] by default
      * The value is set to -1 by default if no other Backups Node Handle is passed
-     * @param errorMessage The error message to display
+     * @param errorMessage The [StringRes] of the error message to display
      */
     @SuppressLint("NewApi")
     @JvmOverloads
@@ -3742,7 +3743,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         chatId: Long? = null,
         cloudDriveNodeHandle: Long = INVALID_HANDLE,
         backupsHandle: Long = INVALID_HANDLE,
-        errorMessage: Int? = null,
+        @StringRes errorMessage: Int? = null,
     ) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         if (!this::drawerLayout.isInitialized) {
@@ -3778,7 +3779,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 lifecycleScope.launch {
                     if (cloudDriveNodeHandle != INVALID_HANDLE) {
                         // Set the specific Folder to Cloud Drive
-                        fileBrowserViewModel.openFileBrowserWithSpecificNode(cloudDriveNodeHandle)
+                        fileBrowserViewModel.openFileBrowserWithSpecificNode(
+                            cloudDriveNodeHandle,
+                            errorMessage
+                        )
                     } else {
                         supportInvalidateOptionsMenu()
                     }
@@ -4255,7 +4259,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val mediaDiscoveryFragment: MediaDiscoveryFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.tag) as? MediaDiscoveryFragment
 
-    private fun createBackupsFragment(backupsHandle: Long, errorMessage: Int?) =
+    private fun createBackupsFragment(backupsHandle: Long, @StringRes errorMessage: Int?) =
         BackupsFragment.newInstance(
             // Default to the User's Root Backups Folder handle if no Backups Handle is passed
             backupsHandle = if (backupsHandle == -1L) {

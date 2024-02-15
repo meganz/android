@@ -3,6 +3,7 @@ package mega.privacy.android.navigation
 import android.app.Activity
 import android.content.Context
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 
 /**
  * App module navigator
@@ -21,9 +22,9 @@ interface AppNavigator {
      *
      * @param activity the Activity
      * @param backupsHandle The Backups Handle used to load its contents
-     * @param errorMessage The ID of the message to display in the error banner
+     * @param errorMessage The [StringRes] of the message to display in the error banner
      */
-    fun openNodeInBackups(activity: Activity, backupsHandle: Long, errorMessage: Int?)
+    fun openNodeInBackups(activity: Activity, backupsHandle: Long, @StringRes errorMessage: Int?)
 
     /**
      * Navigates to the Cloud Drive page to view the selected Node
@@ -31,8 +32,13 @@ interface AppNavigator {
      * @param activity the Activity
      * @param nodeHandle The Node Handle to view the selected Node. The Root Node will be accessed
      * if no Node Handle is specified
+     * @param errorMessage The [StringRes] of the message to display in the error banner
      */
-    fun openNodeInCloudDrive(activity: Activity, nodeHandle: Long = -1L)
+    fun openNodeInCloudDrive(
+        activity: Activity,
+        nodeHandle: Long = -1L,
+        @StringRes errorMessage: Int?,
+    )
 
     /**
      * Open chat

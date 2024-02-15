@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.clouddrive.model
 
+import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
@@ -45,6 +46,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property updateToolbarTitleEvent State Event that refreshes the Toolbar Title
  * @property exitFileBrowserEvent State Event that exits the File Browser
  * @property openedFolderNodeHandles Set of opened folder node handles
+ * @property errorMessage The [StringRes] of the message to display in the error banner
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -74,4 +76,5 @@ data class FileBrowserState(
     val updateToolbarTitleEvent: StateEvent = consumed,
     val exitFileBrowserEvent: StateEvent = consumed,
     val openedFolderNodeHandles: Set<Long> = emptySet(),
+    @StringRes val errorMessage: Int? = null,
 )
