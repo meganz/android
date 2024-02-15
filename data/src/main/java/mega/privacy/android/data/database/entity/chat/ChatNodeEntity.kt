@@ -4,6 +4,8 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import mega.privacy.android.data.database.converter.ChatNodeEntityConverters
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
@@ -31,6 +33,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  */
 @Entity(tableName = "chat_node")
 @TypeConverters(ChatNodeEntityConverters::class)
+@Serializable
 data class ChatNodeEntity(
     @PrimaryKey override val id: NodeId,
     val messageId: Long,
@@ -50,7 +53,7 @@ data class ChatNodeEntity(
     override val versionCount: Int,
     override val size: Long,
     override val modificationTime: Long,
-    override val type: FileTypeInfo,
+    @SerialName("fileTypeInfo") override val type: FileTypeInfo,
     override val thumbnailPath: String?,
     override val previewPath: String?,
     override val fullSizePath: String?,

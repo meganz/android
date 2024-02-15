@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.entity.chat
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 
 /**
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
  * @property height Height of the giphy.
  */
 @Entity(tableName = "giphy")
+@Serializable
 data class GiphyEntity(
     @PrimaryKey val messageId: Long,
     override val mp4Src: String?,

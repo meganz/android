@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
 
 /**
@@ -14,6 +15,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
  * @property url Rich preview url.
  * @property domainName Domain name from rich preview url.
  */
+@Serializable
 data class RichPreview(
     override val title: String,
     override val description: String,

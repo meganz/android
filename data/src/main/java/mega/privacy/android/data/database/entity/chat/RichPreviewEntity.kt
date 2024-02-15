@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.entity.chat
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
 
 /**
@@ -18,6 +19,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.ChatRichPreviewInfo
  * @property domainName Domain name.
  */
 @Entity(tableName = "rich_preview")
+@Serializable
 data class RichPreviewEntity(
     @PrimaryKey val messageId: Long,
     override val title: String,

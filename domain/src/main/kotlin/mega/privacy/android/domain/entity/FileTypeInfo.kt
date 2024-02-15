@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity
 
+import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.PdfFileTypeInfo.extension
 import mega.privacy.android.domain.entity.PdfFileTypeInfo.mimeType
 import mega.privacy.android.domain.entity.UrlFileTypeInfo.extension
@@ -9,6 +11,7 @@ import kotlin.time.Duration
 /**
  * File type info
  */
+@Polymorphic
 sealed interface FileTypeInfo {
     /**
      * type of file
@@ -24,11 +27,13 @@ sealed interface FileTypeInfo {
 /**
  * Image file type info
  */
+@Polymorphic
 sealed interface ImageFileTypeInfo : FileTypeInfo
 
 /**
  * Text editor file type info
  */
+@Polymorphic
 sealed interface TextEditorFileTypeInfo : FileTypeInfo
 
 /**
@@ -37,6 +42,7 @@ sealed interface TextEditorFileTypeInfo : FileTypeInfo
  * @property mimeType
  * @property extension
  */
+@Serializable
 data class UnknownFileTypeInfo(
     override val mimeType: String,
     override val extension: String,
@@ -48,7 +54,8 @@ data class UnknownFileTypeInfo(
  * @property mimeType
  * @property extension
  */
-object PdfFileTypeInfo : FileTypeInfo {
+@Serializable
+data object PdfFileTypeInfo : FileTypeInfo {
     override val mimeType = "application/pdf"
     override val extension = "pdf"
 }
@@ -59,6 +66,7 @@ object PdfFileTypeInfo : FileTypeInfo {
  * @property mimeType
  * @property extension
  */
+@Serializable
 data class ZipFileTypeInfo(
     override val mimeType: String,
     override val extension: String,
@@ -70,7 +78,8 @@ data class ZipFileTypeInfo(
  * @property mimeType
  * @property extension
  */
-object UrlFileTypeInfo : FileTypeInfo {
+@Serializable
+data object UrlFileTypeInfo : FileTypeInfo {
     override val mimeType = "web/url"
     override val extension = "url"
 }
@@ -81,6 +90,7 @@ object UrlFileTypeInfo : FileTypeInfo {
  * @property mimeType
  * @property extension
  */
+@Serializable
 data class StaticImageFileTypeInfo(
     override val mimeType: String,
     override val extension: String,
@@ -92,6 +102,7 @@ data class StaticImageFileTypeInfo(
  * @property mimeType
  * @property extension
  */
+@Serializable
 data class AudioFileTypeInfo(
     override val mimeType: String,
     override val extension: String,
@@ -107,6 +118,7 @@ data class AudioFileTypeInfo(
  * @property mimeType
  * @property extension
  */
+@Serializable
 data class GifFileTypeInfo(
     override val mimeType: String,
     override val extension: String,
@@ -119,6 +131,7 @@ data class GifFileTypeInfo(
  * @property mimeType
  * @property extension
  */
+@Serializable
 data class RawFileTypeInfo(
     override val mimeType: String,
     override val extension: String,
@@ -130,6 +143,7 @@ data class RawFileTypeInfo(
  * @property mimeType
  * @property extension
  */
+@Serializable
 data class SvgFileTypeInfo(
     override val mimeType: String,
     override val extension: String,
@@ -141,6 +155,7 @@ data class SvgFileTypeInfo(
  * @property mimeType
  * @property extension
  */
+@Serializable
 data class TextFileTypeInfo(
     override val mimeType: String,
     override val extension: String,
@@ -151,6 +166,7 @@ data class TextFileTypeInfo(
  *
  * @property extension
  */
+@Serializable
 data class UnMappedFileTypeInfo(
     override val extension: String,
 ) : TextEditorFileTypeInfo {
@@ -164,6 +180,7 @@ data class UnMappedFileTypeInfo(
  * @property extension
  * @constructor Create empty Video file type info
  */
+@Serializable
 data class VideoFileTypeInfo(
     override val mimeType: String,
     override val extension: String,

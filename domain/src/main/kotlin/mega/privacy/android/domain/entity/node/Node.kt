@@ -1,9 +1,12 @@
 package mega.privacy.android.domain.entity.node
 
+import kotlinx.serialization.Polymorphic
+
 
 /**
  * Node
  */
+@Polymorphic
 interface Node {
 
     /**

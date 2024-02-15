@@ -1,11 +1,14 @@
-package mega.privacy.android.domain.di
+package mega.privacy.android.data.di
 
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.plus
+import mega.privacy.android.data.database.entity.chat.serialisation.messageInfoSerialisationModule
 import mega.privacy.android.domain.entity.chat.messages.serialisation.typedMessageSerialisationModule
+import mega.privacy.android.domain.entity.node.serialisation.fileTypeInfoSerialisationModule
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -25,7 +28,8 @@ internal abstract class SerialisationModule {
         @Provides
         fun provideJson(): Json {
             return Json {
-                serializersModule = typedMessageSerialisationModule
+                serializersModule =
+                    typedMessageSerialisationModule + messageInfoSerialisationModule + fileTypeInfoSerialisationModule
             }
         }
     }

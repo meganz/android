@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGeolocationInfo
 
 /**
@@ -9,6 +10,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.ChatGeolocationInfo
  * @property latitude ChatGeolocation latitude.
  * @property image ChatGeolocation preview as a byte array encoded in Base64URL or null if not available.
  */
+@Serializable
 data class ChatGeolocation(
     override val longitude: Float,
     override val latitude: Float,

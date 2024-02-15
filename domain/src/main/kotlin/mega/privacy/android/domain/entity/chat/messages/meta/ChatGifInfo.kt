@@ -1,8 +1,11 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
+import kotlinx.serialization.Polymorphic
+
 /**
  * Chat gif info
  */
+@Polymorphic
 interface ChatGifInfo {
     /**
      * Mp4src

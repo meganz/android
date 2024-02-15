@@ -1,10 +1,12 @@
 package mega.privacy.android.domain.entity.node
 
+import kotlinx.serialization.Polymorphic
 import mega.privacy.android.domain.entity.FileTypeInfo
 
 /**
  * File node
  */
+@Polymorphic
 interface FileNode : UnTypedNode {
     /**
      * Size

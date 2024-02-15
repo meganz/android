@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 
 /**
@@ -13,6 +14,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
  * @property width Width of the giphy.
  * @property height Height of the giphy.
  */
+@Serializable
 data class Giphy(
     override val mp4Src: String?,
     override val webpSrc: String?,

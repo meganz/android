@@ -6,6 +6,7 @@ plugins {
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
     id("com.google.devtools.ksp")
+    kotlin("plugin.serialization") version "1.9.21"
 }
 
 apply(plugin = "jacoco")
@@ -90,6 +91,7 @@ dependencies {
     implementation(project(":domain"))
 
     implementation(lib.coroutines.core)
+    implementation(lib.kotlin.serialisation)
     implementation(google.gson)
     implementation(google.zxing)
     implementation(androidx.java.core)
